@@ -9,15 +9,20 @@ import {
   Info,
   FileText,
   Building2,
-  Briefcase
+  Briefcase,
+  BarChart3,
+  FileDown
 } from "lucide-react";
-import { formatCurrency, type TaxResult, type TaxInputs } from "@/lib/taxCalculations";
+import { formatCurrency, calculateTax, type TaxResult, type TaxInputs } from "@/lib/taxCalculations";
+import { jsPDF } from "jspdf";
+import { useState } from "react";
 
 const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const result = location.state?.result as TaxResult | undefined;
   const inputs = location.state?.inputs as TaxInputs | undefined;
+  const [showComparison, setShowComparison] = useState(false);
 
   if (!result || !inputs) {
     return (
@@ -32,6 +37,12 @@ const Results = () => {
       </div>
     );
   }
+
+  // Calculate comparison data
+  const companyInputs: TaxInputs = { ...inputs, entityType: 'company' };
+  const businessInputs: TaxInputs = { ...inputs, entityType: 'business_name' };
+  const companyResult = calculateTax(companyInputs);
+  const businessResult = calculateTax(businessInputs);
 
   const exportToCSV = () => {
     const rows = [
@@ -62,6 +73,118 @@ const Results = () => {
     window.URL.revokeObjectURL(url);
   };
 
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let yPos = 20;
+
+    // Header
+    doc.setFontSize(20);
+    doc.setTextColor(26, 79, 62); // Primary green
+    doc.text('NaijaTaxPro', pageWidth / 2, yPos, { align: 'center' });
+    yPos += 8;
+    doc.setFontSize(14);
+    doc.setTextColor(100);
+    doc.text('Tax Calculation Report', pageWidth / 2, yPos, { align: 'center' });
+    yPos += 15;
+
+    // Entity & Rules
+    doc.setFontSize(11);
+    doc.setTextColor(60);
+    doc.text(`Entity Type: ${result.entityType}`, 20, yPos);
+    yPos += 6;
+    doc.text(`Tax Rules: ${inputs.use2026Rules ? '2026 (New Rules)' : 'Pre-2026 (Current)'}`, 20, yPos);
+    yPos += 6;
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-NG')}`, 20, yPos);
+    yPos += 15;
+
+    // Summary Box
+    doc.setFillColor(245, 245, 245);
+    doc.roundedRect(15, yPos, pageWidth - 30, 35, 3, 3, 'F');
+    yPos += 10;
+    doc.setFontSize(12);
+    doc.setTextColor(60);
+    doc.text('Total Tax Payable', pageWidth / 2, yPos, { align: 'center' });
+    yPos += 10;
+    doc.setFontSize(22);
+    doc.setTextColor(26, 79, 62);
+    doc.text(formatCurrency(result.totalTaxPayable), pageWidth / 2, yPos, { align: 'center' });
+    yPos += 8;
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Effective Rate: ${result.effectiveRate.toFixed(2)}%`, pageWidth / 2, yPos, { align: 'center' });
+    yPos += 20;
+
+    // Income Summary
+    doc.setFontSize(12);
+    doc.setTextColor(26, 79, 62);
+    doc.text('Income Summary', 20, yPos);
+    yPos += 8;
+    doc.setFontSize(10);
+    doc.setTextColor(60);
+    doc.text(`Gross Income: ${formatCurrency(result.grossIncome)}`, 25, yPos);
+    yPos += 6;
+    doc.text(`Taxable Income: ${formatCurrency(result.taxableIncome)}`, 25, yPos);
+    yPos += 12;
+
+    // Tax Breakdown
+    doc.setFontSize(12);
+    doc.setTextColor(26, 79, 62);
+    doc.text('Tax Breakdown', 20, yPos);
+    yPos += 8;
+    doc.setFontSize(10);
+    doc.setTextColor(60);
+
+    result.breakdown.forEach(item => {
+      if (yPos > 260) {
+        doc.addPage();
+        yPos = 20;
+      }
+      const amountText = item.amount < 0 ? `-${formatCurrency(Math.abs(item.amount))}` : formatCurrency(item.amount);
+      doc.text(item.label, 25, yPos);
+      doc.text(amountText, pageWidth - 25, yPos, { align: 'right' });
+      yPos += 6;
+      if (item.description) {
+        doc.setTextColor(130);
+        doc.setFontSize(8);
+        doc.text(item.description, 30, yPos);
+        doc.setTextColor(60);
+        doc.setFontSize(10);
+        yPos += 5;
+      }
+    });
+
+    yPos += 10;
+
+    // Alerts
+    if (result.alerts.length > 0) {
+      doc.setFontSize(12);
+      doc.setTextColor(26, 79, 62);
+      doc.text('Alerts & Recommendations', 20, yPos);
+      yPos += 8;
+      doc.setFontSize(9);
+      result.alerts.forEach(alert => {
+        if (yPos > 270) {
+          doc.addPage();
+          yPos = 20;
+        }
+        doc.setTextColor(alert.type === 'warning' ? 180 : alert.type === 'success' ? 46 : 100, 
+                         alert.type === 'success' ? 125 : alert.type === 'warning' ? 100 : 100, 
+                         alert.type === 'warning' ? 0 : alert.type === 'success' ? 50 : 140);
+        doc.text(`• ${alert.message}`, 25, yPos);
+        yPos += 6;
+      });
+    }
+
+    // Footer
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text('This is an estimate for educational purposes. Consult a certified tax professional.', pageWidth / 2, 285, { align: 'center' });
+    doc.text('References: Nigeria Tax Act 2025, CAMA 2020', pageWidth / 2, 290, { align: 'center' });
+
+    doc.save('naijataxpro-report.pdf');
+  };
+
   const alertIcons = {
     info: <Info className="h-4 w-4" />,
     warning: <AlertCircle className="h-4 w-4" />,
@@ -74,6 +197,9 @@ const Results = () => {
     success: 'bg-success/10 text-success border-success/20',
   };
 
+  const savings = businessResult.totalTaxPayable - companyResult.totalTaxPayable;
+  const betterOption = savings > 0 ? 'company' : 'business_name';
+
   return (
     <div className="min-h-screen bg-gradient-hero">
       <header className="container mx-auto px-4 py-6">
@@ -84,15 +210,21 @@ const Results = () => {
             </div>
             <span className="text-xl font-bold text-foreground">NaijaTaxPro</span>
           </Link>
-          <Button variant="outline" size="sm" onClick={exportToCSV}>
-            <Download className="h-4 w-4" />
-            Export CSV
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={exportToCSV}>
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">CSV</span>
+            </Button>
+            <Button variant="outline" size="sm" onClick={exportToPDF}>
+              <FileDown className="h-4 w-4" />
+              <span className="hidden sm:inline">PDF</span>
+            </Button>
+          </div>
         </nav>
       </header>
 
       <main className="container mx-auto px-4 py-8 pb-20">
-        <div className="mx-auto max-w-2xl">
+        <div className="mx-auto max-w-4xl">
           {/* Back Button */}
           <Button 
             variant="ghost" 
@@ -123,6 +255,161 @@ const Results = () => {
               <span>{inputs.use2026Rules ? '2026 Rules' : 'Pre-2026 Rules'}</span>
             </div>
           </div>
+
+          {/* Toggle Comparison */}
+          <div className="flex justify-center mb-6">
+            <Button
+              variant={showComparison ? "hero" : "outline"}
+              onClick={() => setShowComparison(!showComparison)}
+            >
+              <BarChart3 className="h-4 w-4" />
+              {showComparison ? 'Hide' : 'Show'} Comparison Dashboard
+            </Button>
+          </div>
+
+          {/* Comparison Dashboard */}
+          {showComparison && (
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">
+              <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                Entity Comparison Dashboard
+              </h3>
+              
+              {/* Recommendation Banner */}
+              <div className={`rounded-xl p-4 mb-6 ${
+                betterOption === inputs.entityType 
+                  ? 'bg-success/10 border border-success/20' 
+                  : 'bg-warning/10 border border-warning/20'
+              }`}>
+                <p className={`text-sm font-medium ${
+                  betterOption === inputs.entityType ? 'text-success' : 'text-warning'
+                }`}>
+                  {betterOption === inputs.entityType 
+                    ? '✓ You selected the optimal structure!' 
+                    : `💡 Switching to ${betterOption === 'company' ? 'Limited Company' : 'Business Name'} could save you ${formatCurrency(Math.abs(savings))}/year`
+                  }
+                </p>
+              </div>
+
+              {/* Side by Side Comparison */}
+              <div className="grid gap-4 md:grid-cols-2">
+                {/* Business Name Column */}
+                <div className={`rounded-xl p-5 ${
+                  inputs.entityType === 'business_name' 
+                    ? 'ring-2 ring-primary bg-primary/5' 
+                    : 'bg-secondary/50'
+                }`}>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Briefcase className="h-5 w-5 text-primary" />
+                    <h4 className="font-semibold text-foreground">Business Name</h4>
+                    {inputs.entityType === 'business_name' && (
+                      <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">Current</span>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Tax Payable</span>
+                      <span className="font-semibold text-foreground">{formatCurrency(businessResult.totalTaxPayable)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Effective Rate</span>
+                      <span className="font-medium text-foreground">{businessResult.effectiveRate.toFixed(2)}%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Income Tax</span>
+                      <span className="text-foreground">{formatCurrency(businessResult.incomeTax)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">VAT</span>
+                      <span className="text-foreground">{formatCurrency(businessResult.vatPayable)}</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <p className="text-xs text-muted-foreground">
+                      Personal Income Tax via State IRS. Simpler compliance, unlimited liability.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Company Column */}
+                <div className={`rounded-xl p-5 ${
+                  inputs.entityType === 'company' 
+                    ? 'ring-2 ring-primary bg-primary/5' 
+                    : 'bg-secondary/50'
+                }`}>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Building2 className="h-5 w-5 text-primary" />
+                    <h4 className="font-semibold text-foreground">Limited Company</h4>
+                    {inputs.entityType === 'company' && (
+                      <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">Current</span>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Tax Payable</span>
+                      <span className="font-semibold text-foreground">{formatCurrency(companyResult.totalTaxPayable)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Effective Rate</span>
+                      <span className="font-medium text-foreground">{companyResult.effectiveRate.toFixed(2)}%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">CIT</span>
+                      <span className="text-foreground">{formatCurrency(companyResult.incomeTax)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Dev Levy</span>
+                      <span className="text-foreground">{formatCurrency(companyResult.developmentLevy)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">VAT</span>
+                      <span className="text-foreground">{formatCurrency(companyResult.vatPayable)}</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <p className="text-xs text-muted-foreground">
+                      {companyResult.isSmallCompany 
+                        ? '0% CIT (Small Company). Limited liability protection.'
+                        : 'CIT via FIRS. Limited liability, better for scaling.'
+                      }
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Visual Bar Comparison */}
+              <div className="mt-6 space-y-3">
+                <div>
+                  <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                    <span>Business Name</span>
+                    <span>{formatCurrency(businessResult.totalTaxPayable)}</span>
+                  </div>
+                  <div className="h-3 bg-secondary rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-accent rounded-full transition-all"
+                      style={{ 
+                        width: `${Math.min(100, (businessResult.totalTaxPayable / Math.max(businessResult.totalTaxPayable, companyResult.totalTaxPayable)) * 100)}%` 
+                      }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                    <span>Limited Company</span>
+                    <span>{formatCurrency(companyResult.totalTaxPayable)}</span>
+                  </div>
+                  <div className="h-3 bg-secondary rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary rounded-full transition-all"
+                      style={{ 
+                        width: `${Math.min(100, (companyResult.totalTaxPayable / Math.max(businessResult.totalTaxPayable, companyResult.totalTaxPayable)) * 100)}%` 
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Alerts */}
           {result.alerts.length > 0 && (
@@ -230,10 +517,18 @@ const Results = () => {
               variant="hero" 
               size="lg" 
               className="flex-1"
+              onClick={exportToPDF}
+            >
+              <FileDown className="h-5 w-5" />
+              Download PDF Report
+            </Button>
+            <Button 
+              variant="outline" 
+              size="lg"
               onClick={exportToCSV}
             >
               <Download className="h-5 w-5" />
-              Download Report
+              Export CSV
             </Button>
             <Button 
               variant="outline" 
