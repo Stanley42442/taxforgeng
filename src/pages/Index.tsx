@@ -9,10 +9,14 @@ import {
   Users,
   ArrowRight,
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  Crown
 } from "lucide-react";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 const Index = () => {
+  const { tier } = useSubscription();
+
   return (
     <div className="min-h-screen bg-gradient-hero">
       {/* Header */}
@@ -31,12 +35,36 @@ const Index = () => {
             <Link to="/calculator" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Tax Calculator
             </Link>
+            <Link to="/pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Pricing
+            </Link>
+            {(tier === 'business' || tier === 'corporate') && (
+              <Link to="/tax-filing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Tax Filing
+              </Link>
+            )}
           </div>
-          <Link to="/advisory">
-            <Button variant="outline" size="sm">
-              Start Free
-            </Button>
-          </Link>
+          <div className="flex items-center gap-3">
+            {tier !== 'free' && (
+              <span className="hidden sm:inline text-xs bg-success/20 text-success px-2 py-1 rounded-full font-medium">
+                {tier.charAt(0).toUpperCase() + tier.slice(1)}
+              </span>
+            )}
+            {tier === 'free' ? (
+              <Link to="/pricing">
+                <Button variant="outline" size="sm">
+                  <Crown className="h-4 w-4" />
+                  Upgrade
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/advisory">
+                <Button variant="outline" size="sm">
+                  Start Free
+                </Button>
+              </Link>
+            )}
+          </div>
         </nav>
       </header>
 
@@ -130,13 +158,33 @@ const Index = () => {
               icon={<FileText className="h-6 w-6" />}
               title="Export Reports"
               description="Download your tax calculations as PDF or CSV for record keeping and filing."
+              badge="Basic+"
             />
             <FeatureCard 
               icon={<Users className="h-6 w-6" />}
-              title="Educational Tips"
-              description="Learn about Nigerian tax law with helpful tooltips referencing CAMA and Tax Act 2025."
+              title="Tax Filing Preparation"
+              description="Generate pre-filled FIRS forms ready for TaxProMax submission."
+              badge="Business+"
             />
           </div>
+        </div>
+      </section>
+
+      {/* Pricing Teaser */}
+      <section className="py-20">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold text-foreground mb-4">
+            Plans for Every Business
+          </h2>
+          <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+            Start free with unlimited calculations. Upgrade for exports, saved businesses, and filing tools.
+          </p>
+          <Link to="/pricing">
+            <Button variant="outline" size="lg">
+              View Pricing Plans
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
       </section>
 
@@ -169,8 +217,13 @@ const Index = () => {
               </div>
               <span className="font-bold text-foreground">NaijaTaxPro</span>
             </div>
+            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <Link to="/pricing" className="hover:text-foreground transition-colors">Pricing</Link>
+              <Link to="/advisory" className="hover:text-foreground transition-colors">Advisory</Link>
+              <Link to="/calculator" className="hover:text-foreground transition-colors">Calculator</Link>
+            </div>
             <p className="text-sm text-muted-foreground text-center">
-              © 2025 NaijaTaxPro. For educational purposes. Consult a tax professional for official advice.
+              © 2025 NaijaTaxPro. For educational purposes.
             </p>
           </div>
         </div>
@@ -182,13 +235,20 @@ const Index = () => {
 const FeatureCard = ({ 
   icon, 
   title, 
-  description 
+  description,
+  badge
 }: { 
   icon: React.ReactNode; 
   title: string; 
   description: string;
+  badge?: string;
 }) => (
-  <div className="group rounded-xl border border-border bg-card p-6 shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1">
+  <div className="group relative rounded-xl border border-border bg-card p-6 shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1">
+    {badge && (
+      <span className="absolute top-4 right-4 text-xs bg-accent/20 text-accent px-2 py-0.5 rounded-full font-medium">
+        {badge}
+      </span>
+    )}
     <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
       {icon}
     </div>
