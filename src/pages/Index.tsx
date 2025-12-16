@@ -10,9 +10,11 @@ import {
   ArrowRight,
   CheckCircle2,
   Sparkles,
-  Crown
+  Crown,
+  FolderOpen
 } from "lucide-react";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Index = () => {
   const { tier } = useSubscription();
@@ -38,6 +40,11 @@ const Index = () => {
             <Link to="/pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Pricing
             </Link>
+            {tier !== 'free' && (
+              <Link to="/businesses" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                My Businesses
+              </Link>
+            )}
             {(tier === 'business' || tier === 'corporate') && (
               <Link to="/tax-filing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 Tax Filing
@@ -50,6 +57,7 @@ const Index = () => {
                 {tier.charAt(0).toUpperCase() + tier.slice(1)}
               </span>
             )}
+            <ThemeToggle />
             {tier === 'free' ? (
               <Link to="/pricing">
                 <Button variant="outline" size="sm">
@@ -58,9 +66,10 @@ const Index = () => {
                 </Button>
               </Link>
             ) : (
-              <Link to="/advisory">
+              <Link to="/businesses">
                 <Button variant="outline" size="sm">
-                  Start Free
+                  <FolderOpen className="h-4 w-4" />
+                  Dashboard
                 </Button>
               </Link>
             )}
