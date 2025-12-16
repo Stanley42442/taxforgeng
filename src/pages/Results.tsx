@@ -11,11 +11,15 @@ import {
   Building2,
   Briefcase,
   BarChart3,
-  FileDown
+  FileDown,
+  Crown,
+  Lock
 } from "lucide-react";
 import { formatCurrency, calculateTax, type TaxResult, type TaxInputs } from "@/lib/taxCalculations";
-import { jsPDF } from "jspdf";
+import { downloadPDF } from "@/lib/pdfExport";
 import { useState } from "react";
+import { useSubscription } from "@/contexts/SubscriptionContext";
+import { toast } from "sonner";
 
 const Results = () => {
   const location = useLocation();
@@ -23,6 +27,7 @@ const Results = () => {
   const result = location.state?.result as TaxResult | undefined;
   const inputs = location.state?.inputs as TaxInputs | undefined;
   const [showComparison, setShowComparison] = useState(false);
+  const { canExport, showWatermark, tier } = useSubscription();
 
   if (!result || !inputs) {
     return (
@@ -45,6 +50,12 @@ const Results = () => {
   const businessResult = calculateTax(businessInputs);
 
   const exportToCSV = () => {
+    if (!canExport()) {
+      toast.error('Upgrade to Basic or higher to export CSV', {
+        action: { label: 'Upgrade', onClick: () => navigate('/pricing') }
+      });
+      return;
+    }
     const rows = [
       ['NaijaTaxPro Tax Calculation Report'],
       [''],
@@ -74,115 +85,13 @@ const Results = () => {
   };
 
   const exportToPDF = () => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    let yPos = 20;
-
-    // Header
-    doc.setFontSize(20);
-    doc.setTextColor(26, 79, 62); // Primary green
-    doc.text('NaijaTaxPro', pageWidth / 2, yPos, { align: 'center' });
-    yPos += 8;
-    doc.setFontSize(14);
-    doc.setTextColor(100);
-    doc.text('Tax Calculation Report', pageWidth / 2, yPos, { align: 'center' });
-    yPos += 15;
-
-    // Entity & Rules
-    doc.setFontSize(11);
-    doc.setTextColor(60);
-    doc.text(`Entity Type: ${result.entityType}`, 20, yPos);
-    yPos += 6;
-    doc.text(`Tax Rules: ${inputs.use2026Rules ? '2026 (New Rules)' : 'Pre-2026 (Current)'}`, 20, yPos);
-    yPos += 6;
-    doc.text(`Generated: ${new Date().toLocaleDateString('en-NG')}`, 20, yPos);
-    yPos += 15;
-
-    // Summary Box
-    doc.setFillColor(245, 245, 245);
-    doc.roundedRect(15, yPos, pageWidth - 30, 35, 3, 3, 'F');
-    yPos += 10;
-    doc.setFontSize(12);
-    doc.setTextColor(60);
-    doc.text('Total Tax Payable', pageWidth / 2, yPos, { align: 'center' });
-    yPos += 10;
-    doc.setFontSize(22);
-    doc.setTextColor(26, 79, 62);
-    doc.text(formatCurrency(result.totalTaxPayable), pageWidth / 2, yPos, { align: 'center' });
-    yPos += 8;
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`Effective Rate: ${result.effectiveRate.toFixed(2)}%`, pageWidth / 2, yPos, { align: 'center' });
-    yPos += 20;
-
-    // Income Summary
-    doc.setFontSize(12);
-    doc.setTextColor(26, 79, 62);
-    doc.text('Income Summary', 20, yPos);
-    yPos += 8;
-    doc.setFontSize(10);
-    doc.setTextColor(60);
-    doc.text(`Gross Income: ${formatCurrency(result.grossIncome)}`, 25, yPos);
-    yPos += 6;
-    doc.text(`Taxable Income: ${formatCurrency(result.taxableIncome)}`, 25, yPos);
-    yPos += 12;
-
-    // Tax Breakdown
-    doc.setFontSize(12);
-    doc.setTextColor(26, 79, 62);
-    doc.text('Tax Breakdown', 20, yPos);
-    yPos += 8;
-    doc.setFontSize(10);
-    doc.setTextColor(60);
-
-    result.breakdown.forEach(item => {
-      if (yPos > 260) {
-        doc.addPage();
-        yPos = 20;
-      }
-      const amountText = item.amount < 0 ? `-${formatCurrency(Math.abs(item.amount))}` : formatCurrency(item.amount);
-      doc.text(item.label, 25, yPos);
-      doc.text(amountText, pageWidth - 25, yPos, { align: 'right' });
-      yPos += 6;
-      if (item.description) {
-        doc.setTextColor(130);
-        doc.setFontSize(8);
-        doc.text(item.description, 30, yPos);
-        doc.setTextColor(60);
-        doc.setFontSize(10);
-        yPos += 5;
-      }
-    });
-
-    yPos += 10;
-
-    // Alerts
-    if (result.alerts.length > 0) {
-      doc.setFontSize(12);
-      doc.setTextColor(26, 79, 62);
-      doc.text('Alerts & Recommendations', 20, yPos);
-      yPos += 8;
-      doc.setFontSize(9);
-      result.alerts.forEach(alert => {
-        if (yPos > 270) {
-          doc.addPage();
-          yPos = 20;
-        }
-        doc.setTextColor(alert.type === 'warning' ? 180 : alert.type === 'success' ? 46 : 100, 
-                         alert.type === 'success' ? 125 : alert.type === 'warning' ? 100 : 100, 
-                         alert.type === 'warning' ? 0 : alert.type === 'success' ? 50 : 140);
-        doc.text(`• ${alert.message}`, 25, yPos);
-        yPos += 6;
+    if (!canExport()) {
+      toast.error('Upgrade to Basic or higher to export PDF', {
+        action: { label: 'Upgrade', onClick: () => navigate('/pricing') }
       });
+      return;
     }
-
-    // Footer
-    doc.setFontSize(8);
-    doc.setTextColor(150);
-    doc.text('This is an estimate for educational purposes. Consult a certified tax professional.', pageWidth / 2, 285, { align: 'center' });
-    doc.text('References: Nigeria Tax Act 2025, CAMA 2020', pageWidth / 2, 290, { align: 'center' });
-
-    doc.save('naijataxpro-report.pdf');
+    downloadPDF(result, inputs, showWatermark());
   };
 
   const alertIcons = {
