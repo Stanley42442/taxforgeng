@@ -1,10 +1,19 @@
 import { jsPDF } from "jspdf";
 import { formatCurrency, TaxResult, TaxInputs } from "./taxCalculations";
+import { CACVerificationDetails } from "@/contexts/SubscriptionContext";
+
+export interface BusinessPDFData {
+  name?: string;
+  rcBnNumber?: string;
+  verificationStatus?: 'verified' | 'not_verified' | 'pending' | 'manual';
+  cacDetails?: CACVerificationDetails;
+}
 
 export const generateProfessionalPDF = (
   result: TaxResult,
   inputs: TaxInputs,
-  showWatermark: boolean = false
+  showWatermark: boolean = false,
+  businessData?: BusinessPDFData
 ) => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -78,7 +87,45 @@ export const generateProfessionalPDF = (
   doc.text(`Entity: ${result.entityType}`, pageWidth / 2, y);
   doc.text(`Rules: ${inputs.use2026Rules ? '2026 (New)' : 'Pre-2026'}`, pageWidth - margin, y, { align: 'right' });
   
-  y += 15;
+  y += 8;
+
+  // Business name and CAC info if provided
+  if (businessData?.name) {
+    setColor(textColor);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Business: ${businessData.name}`, margin, y);
+    
+    if (businessData.rcBnNumber) {
+      doc.setFont('helvetica', 'normal');
+      const verificationBadge = businessData.verificationStatus === 'verified' ? ' ✓ CAC Verified' : '';
+      doc.text(`${businessData.rcBnNumber}${verificationBadge}`, pageWidth / 2, y);
+    }
+    y += 8;
+  }
+
+  // CAC Verification Details Box (if verified)
+  if (businessData?.verificationStatus === 'verified' && businessData.cacDetails) {
+    setFillColor([240, 253, 244]); // Light green
+    doc.roundedRect(margin, y, contentWidth, 25, 2, 2, 'F');
+    
+    setColor([34, 197, 94]); // Green
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text('✓ CAC VERIFIED BUSINESS', margin + 5, y + 8);
+    
+    setColor(textColor);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.text(`Registered Name: ${businessData.cacDetails.companyName}`, margin + 5, y + 14);
+    doc.text(`Status: ${businessData.cacDetails.status}`, margin + 100, y + 14);
+    doc.text(`Registration Date: ${businessData.cacDetails.registrationDate}`, margin + 5, y + 20);
+    doc.text(`Directors: ${businessData.cacDetails.directors.join(', ')}`, margin + 100, y + 20);
+    
+    y += 30;
+  }
+
+  y += 5;
 
   // === SUMMARY BOX ===
   setFillColor(primaryColor);
@@ -319,8 +366,9 @@ export const generateProfessionalPDF = (
 export const downloadPDF = (
   result: TaxResult,
   inputs: TaxInputs,
-  showWatermark: boolean = false
+  showWatermark: boolean = false,
+  businessData?: BusinessPDFData
 ) => {
-  const doc = generateProfessionalPDF(result, inputs, showWatermark);
+  const doc = generateProfessionalPDF(result, inputs, showWatermark, businessData);
   doc.save('naijataxpro-tax-report.pdf');
 };

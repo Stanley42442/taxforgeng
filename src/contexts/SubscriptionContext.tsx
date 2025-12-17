@@ -44,6 +44,8 @@ interface SubscriptionContextType extends SubscriptionState {
   upgradeTier: (newTier: SubscriptionTier) => void;
   setEmail: (email: string) => void;
   verifyRCBN: (rcBnNumber: string) => { isValid: boolean; details?: CACVerificationDetails };
+  bulkVerifyRCBN: (numbers: string[]) => Array<{ rcBnNumber: string; isValid: boolean; details?: CACVerificationDetails }>;
+  addSampleBusinesses: () => void;
 }
 
 const TIER_LIMITS: Record<SubscriptionTier, number | 'unlimited'> = {
@@ -52,6 +54,54 @@ const TIER_LIMITS: Record<SubscriptionTier, number | 'unlimited'> = {
   business: 10,
   corporate: 'unlimited',
 };
+
+// Sample test businesses
+const SAMPLE_BUSINESSES: Omit<SavedBusiness, 'id' | 'createdAt'>[] = [
+  {
+    name: 'Lagos Tech Hub Ltd',
+    entityType: 'company',
+    turnover: 35000000,
+    rcBnNumber: 'RC1234567',
+    verificationStatus: 'verified',
+    cacDetails: {
+      companyName: 'Lagos Tech Hub Limited',
+      status: 'Active',
+      registrationDate: '2023-06-15',
+      directors: ['Chinedu Okafor', 'Aisha Mohammed']
+    }
+  },
+  {
+    name: 'Adeyemi Consulting',
+    entityType: 'business_name',
+    turnover: 8500000,
+    rcBnNumber: 'BN111111',
+    verificationStatus: 'verified',
+    cacDetails: {
+      companyName: 'Adeyemi Consulting Services',
+      status: 'Active',
+      registrationDate: '2024-01-10',
+      directors: ['Folake Adeyemi']
+    }
+  },
+  {
+    name: 'Abuja Digital Services',
+    entityType: 'company',
+    turnover: 120000000,
+    rcBnNumber: 'RC555555',
+    verificationStatus: 'verified',
+    cacDetails: {
+      companyName: 'Abuja Digital Services Ltd',
+      status: 'Active',
+      registrationDate: '2022-11-30',
+      directors: ['Emeka Johnson', 'Amara Williams']
+    }
+  },
+  {
+    name: 'Kano Trading Enterprise',
+    entityType: 'business_name',
+    turnover: 15000000,
+  },
+];
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
@@ -214,6 +264,23 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     return { isValid: false };
   };
 
+  // Bulk CAC verification (Corporate tier)
+  const bulkVerifyRCBN = (numbers: string[]): Array<{ rcBnNumber: string; isValid: boolean; details?: CACVerificationDetails }> => {
+    return numbers.map(rcBnNumber => {
+      const result = verifyRCBN(rcBnNumber);
+      return { rcBnNumber: rcBnNumber.toUpperCase(), ...result };
+    });
+  };
+
+  // Add sample businesses for testing
+  const addSampleBusinesses = () => {
+    SAMPLE_BUSINESSES.forEach(business => {
+      if (canSaveBusiness()) {
+        addBusiness(business);
+      }
+    });
+  };
+
   return (
     <SubscriptionContext.Provider
       value={{
@@ -232,6 +299,8 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         upgradeTier,
         setEmail,
         verifyRCBN,
+        bulkVerifyRCBN,
+        addSampleBusinesses,
       }}
     >
       {children}

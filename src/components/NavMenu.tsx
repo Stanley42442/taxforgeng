@@ -1,0 +1,172 @@
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { useSubscription } from "@/contexts/SubscriptionContext";
+import { 
+  Calculator, 
+  Crown, 
+  FolderOpen, 
+  Menu, 
+  X,
+  FileText,
+  DollarSign,
+  Lightbulb
+} from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetClose,
+} from "@/components/ui/sheet";
+
+export const NavMenu = () => {
+  const { tier } = useSubscription();
+  const location = useLocation();
+  const [open, setOpen] = useState(false);
+
+  const navLinks = [
+    { to: "/advisory", label: "Get Advice", icon: Lightbulb },
+    { to: "/calculator", label: "Calculator", icon: Calculator },
+    { to: "/pricing", label: "Pricing", icon: DollarSign },
+    { to: "/businesses", label: "My Businesses", icon: FolderOpen },
+    ...(tier === 'business' || tier === 'corporate' 
+      ? [{ to: "/tax-filing", label: "Tax Filing", icon: FileText }] 
+      : []),
+  ];
+
+  const isActive = (path: string) => location.pathname === path;
+
+  return (
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto px-4">
+        <nav className="flex h-16 items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary">
+              <Calculator className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <span className="text-xl font-bold text-foreground">NaijaTaxPro</span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-6">
+            {navLinks.map((link) => (
+              <Link 
+                key={link.to}
+                to={link.to} 
+                className={`text-sm font-medium transition-colors ${
+                  isActive(link.to) 
+                    ? 'text-primary' 
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Desktop Actions */}
+          <div className="hidden md:flex items-center gap-3">
+            {tier !== 'free' && (
+              <span className="text-xs bg-success/20 text-success px-2 py-1 rounded-full font-medium">
+                {tier.charAt(0).toUpperCase() + tier.slice(1)}
+              </span>
+            )}
+            <ThemeToggle />
+            {tier === 'free' ? (
+              <Link to="/pricing">
+                <Button variant="outline" size="sm">
+                  <Crown className="h-4 w-4" />
+                  Upgrade
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/businesses">
+                <Button variant="outline" size="sm">
+                  <FolderOpen className="h-4 w-4" />
+                  Dashboard
+                </Button>
+              </Link>
+            )}
+          </div>
+
+          {/* Mobile Menu */}
+          <div className="flex md:hidden items-center gap-2">
+            <ThemeToggle />
+            <Sheet open={open} onOpenChange={setOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[280px] sm:w-[320px]">
+                <div className="flex flex-col h-full">
+                  <div className="flex items-center justify-between mb-6">
+                    <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary">
+                        <Calculator className="h-4 w-4 text-primary-foreground" />
+                      </div>
+                      <span className="font-bold text-foreground">NaijaTaxPro</span>
+                    </Link>
+                  </div>
+
+                  {/* Tier Badge */}
+                  {tier !== 'free' && (
+                    <div className="mb-4 p-3 rounded-lg bg-success/10 border border-success/20">
+                      <p className="text-sm font-medium text-success flex items-center gap-2">
+                        <Crown className="h-4 w-4" />
+                        {tier.charAt(0).toUpperCase() + tier.slice(1)} Plan
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Mobile Nav Links */}
+                  <nav className="flex flex-col gap-1">
+                    {navLinks.map((link) => (
+                      <SheetClose asChild key={link.to}>
+                        <Link
+                          to={link.to}
+                          className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+                            isActive(link.to)
+                              ? 'bg-primary/10 text-primary'
+                              : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+                          }`}
+                        >
+                          <link.icon className="h-5 w-5" />
+                          {link.label}
+                        </Link>
+                      </SheetClose>
+                    ))}
+                  </nav>
+
+                  {/* Mobile CTA */}
+                  <div className="mt-auto pt-6 border-t border-border">
+                    <SheetClose asChild>
+                      {tier === 'free' ? (
+                        <Link to="/pricing" className="block">
+                          <Button variant="hero" className="w-full">
+                            <Crown className="h-4 w-4" />
+                            Upgrade Now
+                          </Button>
+                        </Link>
+                      ) : (
+                        <Link to="/businesses" className="block">
+                          <Button variant="hero" className="w-full">
+                            <FolderOpen className="h-4 w-4" />
+                            My Dashboard
+                          </Button>
+                        </Link>
+                      )}
+                    </SheetClose>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </nav>
+      </div>
+    </header>
+  );
+};
