@@ -30,10 +30,12 @@ const features: TierFeature[] = [
   { name: 'Saved businesses', free: '0', basic: '2', business: '10', corporate: 'Unlimited' },
   { name: 'Data storage', free: false, basic: true, business: true, corporate: true },
   { name: 'PDF/CSV export', free: false, basic: true, business: true, corporate: true },
+  { name: 'CAC verification (auto)', free: false, basic: false, business: true, corporate: true },
   { name: 'No watermarks', free: false, basic: false, business: true, corporate: true },
   { name: 'Scenario modeling', free: false, basic: false, business: true, corporate: true },
   { name: 'Tax filing preparation', free: false, basic: false, business: true, corporate: true },
   { name: 'Email reminders', free: false, basic: true, business: true, corporate: true },
+  { name: 'Bulk CAC verification', free: false, basic: false, business: false, corporate: true },
   { name: 'Multi-user seats', free: false, basic: false, business: '2 seats', corporate: 'Unlimited' },
   { name: 'Priority support', free: false, basic: false, business: true, corporate: true },
   { name: 'Custom reports', free: false, basic: false, business: false, corporate: true },
@@ -136,10 +138,10 @@ const Pricing = () => {
             tier="business"
             name="Business"
             icon={<Building2 className="h-6 w-6" />}
-            monthlyPrice={7500}
-            annualPrice={75000}
+            monthlyPrice={9900}
+            annualPrice={99000}
             description="For growing businesses with multiple entities"
-            features={['Everything in Basic', 'Up to 10 businesses', 'Scenario modeling', 'Tax filing prep', 'No watermarks', '2 user seats', 'Priority support']}
+            features={['Everything in Basic', 'Up to 10 businesses', 'CAC verification', 'Scenario modeling', 'Tax filing prep', 'No watermarks', '2 user seats', 'Priority support']}
             isPopular
             currentTier={currentTier}
             onUpgrade={handleUpgrade}
