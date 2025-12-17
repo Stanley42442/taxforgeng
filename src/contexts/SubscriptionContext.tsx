@@ -2,12 +2,23 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 export type SubscriptionTier = 'free' | 'basic' | 'business' | 'corporate';
 
+export interface CACVerificationDetails {
+  companyName: string;
+  status: 'Active' | 'Inactive';
+  registrationDate: string;
+  directors: string[];
+}
+
 export interface SavedBusiness {
   id: string;
   name: string;
   entityType: 'company' | 'business_name';
   turnover: number;
   createdAt: Date;
+  // CAC Verification fields
+  rcBnNumber?: string;
+  verificationStatus?: 'verified' | 'not_verified' | 'pending' | 'manual';
+  cacDetails?: CACVerificationDetails;
 }
 
 export interface SubscriptionState {
@@ -22,14 +33,17 @@ interface SubscriptionContextType extends SubscriptionState {
   setTier: (tier: SubscriptionTier) => void;
   addBusiness: (business: Omit<SavedBusiness, 'id' | 'createdAt'>) => boolean;
   removeBusiness: (id: string) => void;
+  updateBusiness: (id: string, updates: Partial<SavedBusiness>) => void;
   canSaveBusiness: () => boolean;
   canExport: () => boolean;
   canAccessFiling: () => boolean;
   canAccessScenarioModeling: () => boolean;
+  canVerifyCAC: () => boolean;
   getBusinessLimit: () => number | 'unlimited';
   showWatermark: () => boolean;
   upgradeTier: (newTier: SubscriptionTier) => void;
   setEmail: (email: string) => void;
+  verifyRCBN: (rcBnNumber: string) => { isValid: boolean; details?: CACVerificationDetails };
 }
 
 const TIER_LIMITS: Record<SubscriptionTier, number | 'unlimited'> = {
@@ -112,9 +126,19 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     }));
   };
 
+  const updateBusiness = (id: string, updates: Partial<SavedBusiness>) => {
+    setState(prev => ({
+      ...prev,
+      savedBusinesses: prev.savedBusinesses.map(b => 
+        b.id === id ? { ...b, ...updates } : b
+      ),
+    }));
+  };
+
   const canExport = () => state.tier !== 'free';
   const canAccessFiling = () => state.tier === 'business' || state.tier === 'corporate';
   const canAccessScenarioModeling = () => state.tier === 'business' || state.tier === 'corporate';
+  const canVerifyCAC = () => state.tier === 'business' || state.tier === 'corporate';
   const showWatermark = () => state.tier === 'free';
 
   const upgradeTier = (newTier: SubscriptionTier) => {
@@ -131,6 +155,65 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     setState(prev => ({ ...prev, email }));
   };
 
+  // Mock CAC verification logic
+  const verifyRCBN = (rcBnNumber: string): { isValid: boolean; details?: CACVerificationDetails } => {
+    // Regex validation: RC + 6-8 digits or BN + digits
+    const rcPattern = /^RC\d{6,8}$/i;
+    const bnPattern = /^BN\d{5,8}$/i;
+    
+    const isValidFormat = rcPattern.test(rcBnNumber) || bnPattern.test(rcBnNumber);
+    
+    // Mock verified numbers for testing
+    const mockVerifiedNumbers: Record<string, CACVerificationDetails> = {
+      'RC1234567': { 
+        companyName: 'Example Ventures Ltd', 
+        status: 'Active', 
+        registrationDate: '2024-05-15',
+        directors: ['John Doe', 'Jane Smith']
+      },
+      'RC987654': { 
+        companyName: 'Tech Solutions Nigeria Ltd', 
+        status: 'Active', 
+        registrationDate: '2023-08-20',
+        directors: ['Chidi Okonkwo']
+      },
+      'BN111111': { 
+        companyName: 'Adeyemi Trading Enterprise', 
+        status: 'Active', 
+        registrationDate: '2024-01-10',
+        directors: ['Folake Adeyemi']
+      },
+      'RC555555': { 
+        companyName: 'Lagos Digital Services Ltd', 
+        status: 'Active', 
+        registrationDate: '2022-11-30',
+        directors: ['Emeka Johnson', 'Amara Williams']
+      },
+    };
+
+    const upperCaseNumber = rcBnNumber.toUpperCase();
+    
+    if (mockVerifiedNumbers[upperCaseNumber]) {
+      return { isValid: true, details: mockVerifiedNumbers[upperCaseNumber] };
+    }
+    
+    // For valid format but not in mock database, still mark as verified with generated data
+    if (isValidFormat) {
+      const isCompany = upperCaseNumber.startsWith('RC');
+      return { 
+        isValid: true, 
+        details: {
+          companyName: isCompany ? 'Verified Company Ltd' : 'Verified Business Enterprise',
+          status: 'Active',
+          registrationDate: '2024-03-01',
+          directors: ['Registered Owner']
+        }
+      };
+    }
+    
+    return { isValid: false };
+  };
+
   return (
     <SubscriptionContext.Provider
       value={{
@@ -138,14 +221,17 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         setTier,
         addBusiness,
         removeBusiness,
+        updateBusiness,
         canSaveBusiness,
         canExport,
         canAccessFiling,
         canAccessScenarioModeling,
+        canVerifyCAC,
         getBusinessLimit,
         showWatermark,
         upgradeTier,
         setEmail,
+        verifyRCBN,
       }}
     >
       {children}

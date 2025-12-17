@@ -40,11 +40,9 @@ const Index = () => {
             <Link to="/pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Pricing
             </Link>
-            {tier !== 'free' && (
-              <Link to="/businesses" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                My Businesses
-              </Link>
-            )}
+            <Link to="/businesses" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              My Businesses
+            </Link>
             {(tier === 'business' || tier === 'corporate') && (
               <Link to="/tax-filing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 Tax Filing
