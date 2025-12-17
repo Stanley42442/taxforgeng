@@ -9,71 +9,14 @@ import {
   Users,
   ArrowRight,
   CheckCircle2,
-  Sparkles,
-  Crown,
-  FolderOpen
+  Sparkles
 } from "lucide-react";
-import { useSubscription } from "@/contexts/SubscriptionContext";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { NavMenu } from "@/components/NavMenu";
 
 const Index = () => {
-  const { tier } = useSubscription();
-
   return (
     <div className="min-h-screen bg-gradient-hero">
-      {/* Header */}
-      <header className="container mx-auto px-4 py-6">
-        <nav className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary">
-              <Calculator className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">NaijaTaxPro</span>
-          </div>
-          <div className="hidden items-center gap-6 md:flex">
-            <Link to="/advisory" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Get Advice
-            </Link>
-            <Link to="/calculator" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Tax Calculator
-            </Link>
-            <Link to="/pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Pricing
-            </Link>
-            <Link to="/businesses" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              My Businesses
-            </Link>
-            {(tier === 'business' || tier === 'corporate') && (
-              <Link to="/tax-filing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                Tax Filing
-              </Link>
-            )}
-          </div>
-          <div className="flex items-center gap-3">
-            {tier !== 'free' && (
-              <span className="hidden sm:inline text-xs bg-success/20 text-success px-2 py-1 rounded-full font-medium">
-                {tier.charAt(0).toUpperCase() + tier.slice(1)}
-              </span>
-            )}
-            <ThemeToggle />
-            {tier === 'free' ? (
-              <Link to="/pricing">
-                <Button variant="outline" size="sm">
-                  <Crown className="h-4 w-4" />
-                  Upgrade
-                </Button>
-              </Link>
-            ) : (
-              <Link to="/businesses">
-                <Button variant="outline" size="sm">
-                  <FolderOpen className="h-4 w-4" />
-                  Dashboard
-                </Button>
-              </Link>
-            )}
-          </div>
-        </nav>
-      </header>
+      <NavMenu />
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 pb-20 pt-12 md:pt-20">
@@ -228,6 +171,7 @@ const Index = () => {
               <Link to="/pricing" className="hover:text-foreground transition-colors">Pricing</Link>
               <Link to="/advisory" className="hover:text-foreground transition-colors">Advisory</Link>
               <Link to="/calculator" className="hover:text-foreground transition-colors">Calculator</Link>
+              <Link to="/businesses" className="hover:text-foreground transition-colors">My Businesses</Link>
             </div>
             <p className="text-sm text-muted-foreground text-center">
               © 2025 NaijaTaxPro. For educational purposes.

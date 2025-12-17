@@ -1,5 +1,6 @@
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { 
   Calculator, 
   Download, 
@@ -13,13 +14,24 @@ import {
   BarChart3,
   FileDown,
   Crown,
-  Lock
+  Lock,
+  Save,
+  Plus
 } from "lucide-react";
 import { formatCurrency, calculateTax, type TaxResult, type TaxInputs } from "@/lib/taxCalculations";
 import { downloadPDF } from "@/lib/pdfExport";
 import { useState } from "react";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
+import { NavMenu } from "@/components/NavMenu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const Results = () => {
   const location = useLocation();
@@ -27,17 +39,22 @@ const Results = () => {
   const result = location.state?.result as TaxResult | undefined;
   const inputs = location.state?.inputs as TaxInputs | undefined;
   const [showComparison, setShowComparison] = useState(false);
-  const { canExport, showWatermark, tier } = useSubscription();
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [businessName, setBusinessName] = useState("");
+  const { canExport, showWatermark, tier, canSaveBusiness, addBusiness } = useSubscription();
 
   if (!result || !inputs) {
     return (
-      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">No Results</h1>
-          <p className="text-muted-foreground mb-6">Please use the calculator first</p>
-          <Link to="/calculator">
-            <Button variant="hero">Go to Calculator</Button>
-          </Link>
+      <div className="min-h-screen bg-gradient-hero">
+        <NavMenu />
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-foreground mb-4">No Results</h1>
+            <p className="text-muted-foreground mb-6">Please use the calculator first</p>
+            <Link to="/calculator">
+              <Button variant="hero">Go to Calculator</Button>
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -48,6 +65,43 @@ const Results = () => {
   const businessInputs: TaxInputs = { ...inputs, entityType: 'business_name' };
   const companyResult = calculateTax(companyInputs);
   const businessResult = calculateTax(businessInputs);
+
+  const handleSaveBusiness = () => {
+    if (!businessName.trim()) {
+      toast.error("Please enter a business name");
+      return;
+    }
+
+    if (tier === 'free') {
+      toast.error("Upgrade to Basic or higher to save businesses", {
+        action: { label: 'Upgrade', onClick: () => navigate('/pricing') }
+      });
+      return;
+    }
+
+    if (!canSaveBusiness()) {
+      toast.error("You've reached your business limit", {
+        action: { label: 'Upgrade', onClick: () => navigate('/pricing') }
+      });
+      return;
+    }
+
+    const success = addBusiness({
+      name: businessName.trim(),
+      entityType: inputs.entityType,
+      turnover: inputs.turnover,
+    });
+
+    if (success) {
+      toast.success(`"${businessName}" saved successfully!`, {
+        action: { label: 'View', onClick: () => navigate('/businesses') }
+      });
+      setShowSaveDialog(false);
+      setBusinessName("");
+    } else {
+      toast.error("Failed to save business");
+    }
+  };
 
   const exportToCSV = () => {
     if (!canExport()) {
@@ -111,26 +165,7 @@ const Results = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero">
-      <header className="container mx-auto px-4 py-6">
-        <nav className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary">
-              <Calculator className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">NaijaTaxPro</span>
-          </Link>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={exportToCSV}>
-              <Download className="h-4 w-4" />
-              <span className="hidden sm:inline">CSV</span>
-            </Button>
-            <Button variant="outline" size="sm" onClick={exportToPDF}>
-              <FileDown className="h-4 w-4" />
-              <span className="hidden sm:inline">PDF</span>
-            </Button>
-          </div>
-        </nav>
-      </header>
+      <NavMenu />
 
       <main className="container mx-auto px-4 py-8 pb-20">
         <div className="mx-auto max-w-4xl">
@@ -165,14 +200,31 @@ const Results = () => {
             </div>
           </div>
 
-          {/* Toggle Comparison */}
-          <div className="flex justify-center mb-6">
+          {/* Action Buttons Row */}
+          <div className="flex flex-wrap justify-center gap-3 mb-6">
             <Button
               variant={showComparison ? "hero" : "outline"}
               onClick={() => setShowComparison(!showComparison)}
             >
               <BarChart3 className="h-4 w-4" />
-              {showComparison ? 'Hide' : 'Show'} Comparison Dashboard
+              {showComparison ? 'Hide' : 'Show'} Comparison
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowSaveDialog(true)}
+              disabled={tier === 'free'}
+            >
+              <Save className="h-4 w-4" />
+              Save Business
+              {tier === 'free' && <Lock className="h-3 w-3 ml-1" />}
+            </Button>
+            <Button variant="outline" onClick={exportToPDF}>
+              <FileDown className="h-4 w-4" />
+              PDF
+            </Button>
+            <Button variant="outline" onClick={exportToCSV}>
+              <Download className="h-4 w-4" />
+              CSV
             </Button>
           </div>
 
@@ -420,34 +472,6 @@ const Results = () => {
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex flex-col gap-4 sm:flex-row animate-slide-up">
-            <Button 
-              variant="hero" 
-              size="lg" 
-              className="flex-1"
-              onClick={exportToPDF}
-            >
-              <FileDown className="h-5 w-5" />
-              Download PDF Report
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg"
-              onClick={exportToCSV}
-            >
-              <Download className="h-5 w-5" />
-              Export CSV
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg"
-              onClick={() => navigate('/calculator', { state: { entityType: inputs.entityType } })}
-            >
-              Recalculate
-            </Button>
-          </div>
-
           {/* Disclaimer */}
           <p className="text-center text-xs text-muted-foreground mt-8">
             This is an estimate for educational purposes. Consult a certified tax professional 
@@ -455,6 +479,55 @@ const Results = () => {
           </p>
         </div>
       </main>
+
+      {/* Save Business Dialog */}
+      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Save className="h-5 w-5 text-primary" />
+              Save Business Profile
+            </DialogTitle>
+            <DialogDescription>
+              Save this calculation to your dashboard for future reference and CAC verification.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <label className="text-sm font-medium text-foreground mb-2 block">
+              Business Name
+            </label>
+            <Input
+              placeholder="e.g., My Trading Company Ltd"
+              value={businessName}
+              onChange={(e) => setBusinessName(e.target.value)}
+            />
+            <div className="mt-4 p-3 rounded-lg bg-secondary/50">
+              <p className="text-xs text-muted-foreground mb-2">Will save:</p>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Entity:</span>{' '}
+                  <span className="font-medium text-foreground">
+                    {inputs.entityType === 'company' ? 'Limited Company' : 'Business Name'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Turnover:</span>{' '}
+                  <span className="font-medium text-foreground">{formatCurrency(inputs.turnover)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSaveDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveBusiness} disabled={!businessName.trim()}>
+              <Save className="h-4 w-4" />
+              Save Business
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
