@@ -81,16 +81,7 @@ const Advisory = () => {
   if (showResult && recommendation) {
     return (
       <div className="min-h-screen bg-gradient-hero">
-        <header className="container mx-auto px-4 py-6">
-          <nav className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary">
-                <Calculator className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="text-xl font-bold text-foreground">NaijaTaxPro</span>
-            </Link>
-          </nav>
-        </header>
+        <NavMenu />
 
         <main className="container mx-auto px-4 py-8">
           <div className="mx-auto max-w-2xl animate-slide-up">
@@ -205,23 +196,16 @@ const Advisory = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero">
-      <header className="container mx-auto px-4 py-6">
-        <nav className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary">
-              <Calculator className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">NaijaTaxPro</span>
-          </Link>
+      <NavMenu />
+
+      <main className="container mx-auto px-4 py-8">
+        <div className="mb-6 flex justify-end">
           <Link to="/calculator">
             <Button variant="ghost" size="sm">
               Skip to Calculator
             </Button>
           </Link>
-        </nav>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
+        </div>
         <div className="mx-auto max-w-xl">
           {/* Progress */}
           <div className="mb-8">

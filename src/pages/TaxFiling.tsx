@@ -1,9 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { 
-  Calculator, 
-  FileText, 
-  Upload, 
+import {
+  Calculator,
+  FileText,
+  Upload,
   Download,
   CheckCircle2,
   ArrowRight,
@@ -13,11 +13,13 @@ import {
   Briefcase,
   ExternalLink,
   Mail,
-  Info
+  Info,
 } from "lucide-react";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { NavMenu } from "@/components/NavMenu";
 import { toast } from "sonner";
 import { useState } from "react";
+import { jsPDF } from "jspdf";
 
 const TaxFiling = () => {
   const navigate = useNavigate();
@@ -27,17 +29,51 @@ const TaxFiling = () => {
 
   const handleGenerateForm = (formType: string) => {
     if (!selectedBusiness) {
-      toast.error('Please select a business first');
+      toast.error("Please select a business first");
       return;
     }
-    
-    toast.success(`Generating ${formType} form...`, {
-      description: 'Your pre-filled form will be ready shortly'
+
+    const business = savedBusinesses.find((b) => b.id === selectedBusiness);
+
+    // Prototype-friendly download (mock pre-filled form)
+    const doc = new jsPDF();
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text(`NaijaTaxPro — ${formType}`, 20, 22);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text(`Business: ${business?.name ?? ""}`, 20, 38);
+    doc.text(
+      `Entity: ${business?.entityType === "company" ? "Limited Company" : "Business Name"}`,
+      20,
+      48
+    );
+
+    if (business?.rcBnNumber) {
+      doc.text(`RC/BN: ${business.rcBnNumber}`, 20, 58);
+    }
+
+    if (business?.verificationStatus === "verified") {
+      doc.setTextColor(22, 163, 74);
+      doc.text("✓ Using verified CAC data for accuracy (prototype)", 20, 70);
+      doc.setTextColor(0, 0, 0);
+    }
+
+    doc.setFontSize(10);
+    doc.text(
+      "NOTE: This is a prototype mock form for testing. Live TaxProMax/FIRS submission is not enabled.",
+      20,
+      86,
+      { maxWidth: 170 }
+    );
+
+    const filename = `naijataxpro-${formType.replace(/\s+/g, "-").toLowerCase()}.pdf`;
+    doc.save(filename);
+
+    toast.success(`${formType} downloaded`, {
+      description: "Prototype mock file generated for testing",
     });
-    
-    setTimeout(() => {
-      toast.success(`${formType} form ready for download!`);
-    }, 1500);
   };
 
   const handleMockSubmit = () => {
@@ -51,16 +87,7 @@ const TaxFiling = () => {
   if (!canAccessFiling()) {
     return (
       <div className="min-h-screen bg-gradient-hero">
-        <header className="container mx-auto px-4 py-6">
-          <nav className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary">
-                <Calculator className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="text-xl font-bold text-foreground">NaijaTaxPro</span>
-            </Link>
-          </nav>
-        </header>
+        <NavMenu />
 
         <main className="container mx-auto px-4 py-20">
           <div className="max-w-2xl mx-auto text-center">
@@ -107,24 +134,7 @@ const TaxFiling = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero">
-      <header className="container mx-auto px-4 py-6">
-        <nav className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary">
-              <Calculator className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">NaijaTaxPro</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <span className="text-xs bg-success/20 text-success px-2 py-1 rounded-full font-medium">
-              {tier.charAt(0).toUpperCase() + tier.slice(1)} Plan
-            </span>
-            <Link to="/pricing">
-              <Button variant="ghost" size="sm">Upgrade</Button>
-            </Link>
-          </div>
-        </nav>
-      </header>
+      <NavMenu />
 
       <main className="container mx-auto px-4 py-8 pb-20">
         <div className="max-w-4xl mx-auto">
