@@ -324,7 +324,15 @@ const InputField = ({
 const TooltipHelper = ({ content }: { content: string }) => (
   <Tooltip>
     <TooltipTrigger asChild>
-      <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="h-6 w-6 text-muted-foreground hover:text-foreground"
+        aria-label="Help"
+      >
+        <HelpCircle className="h-4 w-4" />
+      </Button>
     </TooltipTrigger>
     <TooltipContent className="max-w-xs">
       <p className="text-sm">{content}</p>

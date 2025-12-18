@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { 
-  Calculator, 
-  Check, 
+import { NavMenu } from "@/components/NavMenu";
+import {
+  Calculator,
+  Check,
   X,
   Crown,
   Building2,
@@ -10,7 +11,7 @@ import {
   Star,
   ArrowRight,
   MessageCircle,
-  Mail
+  Mail,
 } from "lucide-react";
 import { useSubscription, SubscriptionTier } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
@@ -67,30 +68,7 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero">
-      {/* Header */}
-      <header className="container mx-auto px-4 py-6">
-        <nav className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary">
-              <Calculator className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">NaijaTaxPro</span>
-          </Link>
-          <div className="hidden items-center gap-6 md:flex">
-            <Link to="/advisory" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Get Advice
-            </Link>
-            <Link to="/calculator" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Calculator
-            </Link>
-          </div>
-          <Link to="/calculator">
-            <Button variant="outline" size="sm">
-              Try Free
-            </Button>
-          </Link>
-        </nav>
-      </header>
+      <NavMenu />
 
       <main className="container mx-auto px-4 py-12 pb-20">
         {/* Header */}
