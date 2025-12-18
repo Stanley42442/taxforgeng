@@ -12,6 +12,11 @@ import Results from "./pages/Results";
 import Pricing from "./pages/Pricing";
 import TaxFiling from "./pages/TaxFiling";
 import SavedBusinesses from "./pages/SavedBusinesses";
+import Reminders from "./pages/Reminders";
+import Insights from "./pages/Insights";
+import Team from "./pages/Team";
+import Transactions from "./pages/Transactions";
+import AuditLog from "./pages/AuditLog";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +37,11 @@ const App = () => (
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/tax-filing" element={<TaxFiling />} />
               <Route path="/businesses" element={<SavedBusinesses />} />
+              <Route path="/reminders" element={<Reminders />} />
+              <Route path="/insights" element={<Insights />} />
+              <Route path="/team" element={<Team />} />
+              <Route path="/transactions" element={<Transactions />} />
+              <Route path="/audit-log" element={<AuditLog />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

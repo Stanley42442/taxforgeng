@@ -1,0 +1,365 @@
+import { useState, useMemo } from "react";
+import { NavMenu } from "@/components/NavMenu";
+import { useSubscription } from "@/contexts/SubscriptionContext";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { BarChart3, TrendingUp, PieChart, Crown, Building2, Percent, Wallet, ArrowUpRight, ArrowDownRight, Info } from "lucide-react";
+import { Link } from "react-router-dom";
+import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
+
+// Mock calculation history data
+const MOCK_HISTORY = [
+  { month: 'Jul', cit: 2500000, vat: 450000, pit: 0, total: 2950000 },
+  { month: 'Aug', cit: 2800000, vat: 520000, pit: 0, total: 3320000 },
+  { month: 'Sep', cit: 2600000, vat: 480000, pit: 0, total: 3080000 },
+  { month: 'Oct', cit: 3100000, vat: 550000, pit: 0, total: 3650000 },
+  { month: 'Nov', cit: 2900000, vat: 510000, pit: 0, total: 3410000 },
+  { month: 'Dec', cit: 3200000, vat: 580000, pit: 0, total: 3780000 },
+];
+
+const MOCK_BENCHMARKS = {
+  company: {
+    avgEffectiveRate: 22.5,
+    avgVatPayable: 8.2,
+    topRelief: 'Rent Relief',
+  },
+  business_name: {
+    avgEffectiveRate: 18.3,
+    avgVatPayable: 6.5,
+    topRelief: 'Consolidated Relief',
+  }
+};
+
+const COLORS = ['hsl(153, 47%, 25%)', 'hsl(43, 96%, 56%)', 'hsl(199, 89%, 48%)', 'hsl(152, 69%, 31%)'];
+
+const Insights = () => {
+  const { tier, savedBusinesses } = useSubscription();
+  const [selectedBusinessId, setSelectedBusinessId] = useState<string>('all');
+
+  const canAccess = tier === 'business' || tier === 'corporate';
+
+  // Calculate aggregated insights
+  const insights = useMemo(() => {
+    if (savedBusinesses.length === 0) return null;
+
+    const totalTurnover = savedBusinesses.reduce((sum, b) => sum + b.turnover, 0);
+    const avgTurnover = totalTurnover / savedBusinesses.length;
+    const companyCount = savedBusinesses.filter(b => b.entityType === 'company').length;
+    const businessNameCount = savedBusinesses.filter(b => b.entityType === 'business_name').length;
+
+    // Mock tax calculations based on saved businesses
+    const estimatedTax = totalTurnover * 0.15; // Simplified estimation
+    const effectiveRate = 15.2;
+    const reliefSavings = totalTurnover * 0.03;
+
+    return {
+      totalTurnover,
+      avgTurnover,
+      companyCount,
+      businessNameCount,
+      estimatedTax,
+      effectiveRate,
+      reliefSavings,
+    };
+  }, [savedBusinesses]);
+
+  // Tax breakdown pie data
+  const pieData = useMemo(() => {
+    const latestMonth = MOCK_HISTORY[MOCK_HISTORY.length - 1];
+    return [
+      { name: 'CIT', value: latestMonth.cit },
+      { name: 'VAT', value: latestMonth.vat },
+      { name: 'Reliefs', value: 450000 },
+    ];
+  }, []);
+
+  // Free/Basic tier - show teaser
+  if (!canAccess) {
+    return (
+      <div className="min-h-screen bg-gradient-hero">
+        <NavMenu />
+        <div className="container mx-auto px-4 py-16">
+          <Card className="max-w-2xl mx-auto text-center">
+            <CardHeader>
+              <div className="mx-auto w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mb-4">
+                <BarChart3 className="w-8 h-8 text-accent" />
+              </div>
+              <CardTitle className="text-2xl">Tax Insights Dashboard</CardTitle>
+              <CardDescription>
+                Visualize your tax data with charts, trends, and benchmarks
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid gap-3 text-left">
+                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                  <PieChart className="w-5 h-5 text-primary" />
+                  <span>Tax breakdown visualizations</span>
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                  <span>Monthly trends & patterns</span>
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                  <Percent className="w-5 h-5 text-primary" />
+                  <span>Effective tax rate tracking</span>
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                  <Wallet className="w-5 h-5 text-primary" />
+                  <span>Relief savings analysis</span>
+                </div>
+              </div>
+              <div className="relative h-48 bg-muted rounded-lg overflow-hidden">
+                <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm bg-background/50">
+                  <Badge variant="secondary" className="text-sm">
+                    <Crown className="w-4 h-4 mr-1" />
+                    Business+ Feature
+                  </Badge>
+                </div>
+                <div className="opacity-30 p-4">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={MOCK_HISTORY.slice(0, 3)}>
+                      <Bar dataKey="total" fill="hsl(153, 47%, 25%)" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+              <Link to="/pricing">
+                <Button className="w-full bg-gradient-primary hover:opacity-90">
+                  <Crown className="w-4 h-4 mr-2" />
+                  Upgrade to Business for Insights
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-hero">
+      <NavMenu />
+      
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              <BarChart3 className="inline-block w-8 h-8 mr-2 text-primary" />
+              Tax Insights
+            </h1>
+            <p className="text-muted-foreground">
+              Analyze your tax data and discover savings opportunities
+            </p>
+          </div>
+          <Select value={selectedBusinessId} onValueChange={setSelectedBusinessId}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select business" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Businesses</SelectItem>
+              {savedBusinesses.map(b => (
+                <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {savedBusinesses.length === 0 ? (
+          <Card className="text-center py-12">
+            <CardContent>
+              <Building2 className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No Data Yet</h3>
+              <p className="text-muted-foreground mb-4">
+                Save businesses and run calculations to see insights
+              </p>
+              <Link to="/calculator">
+                <Button>Go to Calculator</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            {/* Summary Cards */}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Total Turnover</p>
+                      <p className="text-2xl font-bold">₦{insights?.totalTurnover.toLocaleString()}</p>
+                    </div>
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Wallet className="w-6 h-6 text-primary" />
+                    </div>
+                  </div>
+                  <div className="flex items-center mt-2 text-sm text-success">
+                    <ArrowUpRight className="w-4 h-4 mr-1" />
+                    <span>+12% from last period</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Effective Tax Rate</p>
+                      <p className="text-2xl font-bold">{insights?.effectiveRate}%</p>
+                    </div>
+                    <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
+                      <Percent className="w-6 h-6 text-accent" />
+                    </div>
+                  </div>
+                  <div className="flex items-center mt-2 text-sm text-destructive">
+                    <ArrowDownRight className="w-4 h-4 mr-1" />
+                    <span>-2.1% optimized</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Est. Annual Tax</p>
+                      <p className="text-2xl font-bold">₦{insights?.estimatedTax.toLocaleString()}</p>
+                    </div>
+                    <div className="w-12 h-12 rounded-full bg-info/10 flex items-center justify-center">
+                      <TrendingUp className="w-6 h-6 text-info" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Relief Savings</p>
+                      <p className="text-2xl font-bold text-success">₦{insights?.reliefSavings.toLocaleString()}</p>
+                    </div>
+                    <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center">
+                      <Wallet className="w-6 h-6 text-success" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Charts Row */}
+            <div className="grid gap-6 lg:grid-cols-2 mb-8">
+              {/* Tax Breakdown Pie */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <PieChart className="w-5 h-5" />
+                    Tax Breakdown
+                  </CardTitle>
+                  <CardDescription>Current period tax composition</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RechartsPie>
+                        <Pie
+                          data={pieData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          paddingAngle={5}
+                          dataKey="value"
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {pieData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value: number) => `₦${value.toLocaleString()}`} />
+                      </RechartsPie>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="flex justify-center gap-4 mt-4">
+                    {pieData.map((entry, index) => (
+                      <div key={entry.name} className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full" 
+                          style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                        />
+                        <span className="text-sm text-muted-foreground">{entry.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Monthly Trends */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5" />
+                    Monthly Trends
+                  </CardTitle>
+                  <CardDescription>Tax liability over time</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={MOCK_HISTORY}>
+                        <XAxis dataKey="month" />
+                        <YAxis tickFormatter={(value) => `₦${(value / 1000000).toFixed(1)}M`} />
+                        <Tooltip formatter={(value: number) => `₦${value.toLocaleString()}`} />
+                        <Legend />
+                        <Bar dataKey="cit" name="CIT" fill={COLORS[0]} />
+                        <Bar dataKey="vat" name="VAT" fill={COLORS[1]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Benchmarks */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Info className="w-5 h-5" />
+                  Industry Benchmarks
+                </CardTitle>
+                <CardDescription>Compare your tax profile with similar businesses</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-sm text-muted-foreground mb-1">Avg. Effective Rate</p>
+                    <p className="text-2xl font-bold">{MOCK_BENCHMARKS.company.avgEffectiveRate}%</p>
+                    <p className="text-xs text-muted-foreground mt-1">Similar companies</p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-sm text-muted-foreground mb-1">Avg. VAT %</p>
+                    <p className="text-2xl font-bold">{MOCK_BENCHMARKS.company.avgVatPayable}%</p>
+                    <p className="text-xs text-muted-foreground mt-1">Of turnover</p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-sm text-muted-foreground mb-1">Top Relief Used</p>
+                    <p className="text-2xl font-bold">{MOCK_BENCHMARKS.company.topRelief}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Most effective</p>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-4 flex items-center gap-1">
+                  <Info className="w-3 h-3" />
+                  Benchmarks are based on anonymized aggregate data from businesses with similar profiles
+                </p>
+              </CardContent>
+            </Card>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Insights;
