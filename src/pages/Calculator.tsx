@@ -1,24 +1,23 @@
-import { useState, useEffect } from "react";
-import { useLocation, Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { 
-  Calculator as CalcIcon, 
   Building2, 
   Briefcase,
   HelpCircle,
   ArrowRight,
   Info
 } from "lucide-react";
-import { calculateTax, formatCurrency, type TaxInputs } from "@/lib/taxCalculations";
+import { calculateTax, type TaxInputs } from "@/lib/taxCalculations";
 import { NavMenu } from "@/components/NavMenu";
 
 const CalculatorPage = () => {
@@ -322,8 +321,8 @@ const InputField = ({
 };
 
 const TooltipHelper = ({ content }: { content: string }) => (
-  <Tooltip>
-    <TooltipTrigger asChild>
+  <Popover>
+    <PopoverTrigger asChild>
       <Button
         type="button"
         variant="ghost"
@@ -333,11 +332,11 @@ const TooltipHelper = ({ content }: { content: string }) => (
       >
         <HelpCircle className="h-4 w-4" />
       </Button>
-    </TooltipTrigger>
-    <TooltipContent className="max-w-xs">
+    </PopoverTrigger>
+    <PopoverContent className="max-w-xs p-3" side="top">
       <p className="text-sm">{content}</p>
-    </TooltipContent>
-  </Tooltip>
+    </PopoverContent>
+  </Popover>
 );
 
 export default CalculatorPage;
