@@ -149,9 +149,9 @@ const Index = () => {
             Start with our free advisory tool.
           </p>
           <Link to="/advisory">
-            <Button variant="accent" size="xl">
-              Start Your Free Assessment
-              <ArrowRight className="h-5 w-5" />
+            <Button variant="accent" size="xl" className="w-full max-w-xs sm:w-auto">
+              <span className="truncate">Start Free Assessment</span>
+              <ArrowRight className="h-5 w-5 shrink-0" />
             </Button>
           </Link>
         </div>

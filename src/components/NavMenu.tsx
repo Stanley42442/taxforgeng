@@ -8,10 +8,14 @@ import {
   Crown, 
   FolderOpen, 
   Menu, 
-  X,
   FileText,
   DollarSign,
-  Lightbulb
+  Lightbulb,
+  Bell,
+  BarChart3,
+  Users,
+  Upload,
+  History
 } from "lucide-react";
 import {
   Sheet,
@@ -26,14 +30,25 @@ export const NavMenu = () => {
   const [open, setOpen] = useState(false);
 
   const navLinks = [
-    { to: "/advisory", label: "Get Advice", icon: Lightbulb },
-    { to: "/calculator", label: "Calculator", icon: Calculator },
-    { to: "/pricing", label: "Pricing", icon: DollarSign },
-    { to: "/businesses", label: "My Businesses", icon: FolderOpen },
-    ...(tier === 'business' || tier === 'corporate' 
-      ? [{ to: "/tax-filing", label: "Tax Filing", icon: FileText }] 
-      : []),
+    { to: "/advisory", label: "Get Advice", icon: Lightbulb, minTier: 'free' },
+    { to: "/calculator", label: "Calculator", icon: Calculator, minTier: 'free' },
+    { to: "/pricing", label: "Pricing", icon: DollarSign, minTier: 'free' },
+    { to: "/businesses", label: "My Businesses", icon: FolderOpen, minTier: 'free' },
+    { to: "/reminders", label: "Reminders", icon: Bell, minTier: 'basic' },
+    { to: "/insights", label: "Insights", icon: BarChart3, minTier: 'business' },
+    { to: "/transactions", label: "Transactions", icon: Upload, minTier: 'business' },
+    { to: "/tax-filing", label: "Tax Filing", icon: FileText, minTier: 'business' },
+    { to: "/team", label: "Team", icon: Users, minTier: 'business' },
+    { to: "/audit-log", label: "Audit Log", icon: History, minTier: 'corporate' },
   ];
+
+  const tierOrder = ['free', 'basic', 'business', 'corporate'];
+  const userTierIndex = tierOrder.indexOf(tier);
+  
+  const filteredLinks = navLinks.filter(link => {
+    const linkTierIndex = tierOrder.indexOf(link.minTier);
+    return linkTierIndex <= userTierIndex;
+  });
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -42,16 +57,16 @@ export const NavMenu = () => {
       <div className="container mx-auto px-4">
         <nav className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 shrink-0">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary">
               <Calculator className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold text-foreground">NaijaTaxPro</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
-            {navLinks.map((link) => (
+          {/* Desktop Navigation - now shows at lg breakpoint */}
+          <div className="hidden lg:flex items-center gap-6">
+            {filteredLinks.slice(0, 6).map((link) => (
               <Link 
                 key={link.to}
                 to={link.to} 
@@ -66,8 +81,8 @@ export const NavMenu = () => {
             ))}
           </div>
 
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Desktop Actions - now shows at lg breakpoint */}
+          <div className="hidden lg:flex items-center gap-3">
             {tier !== 'free' && (
               <span className="text-xs bg-success/20 text-success px-2 py-1 rounded-full font-medium">
                 {tier.charAt(0).toUpperCase() + tier.slice(1)}
@@ -91,8 +106,8 @@ export const NavMenu = () => {
             )}
           </div>
 
-          {/* Mobile Menu */}
-          <div className="flex md:hidden items-center gap-2">
+          {/* Mobile & Tablet Menu - now shows below lg breakpoint */}
+          <div className="flex lg:hidden items-center gap-2">
             <ThemeToggle />
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
@@ -123,8 +138,8 @@ export const NavMenu = () => {
                   )}
 
                   {/* Mobile Nav Links */}
-                  <nav className="flex flex-col gap-1">
-                    {navLinks.map((link) => (
+                  <nav className="flex flex-col gap-1 overflow-y-auto">
+                    {filteredLinks.map((link) => (
                       <SheetClose asChild key={link.to}>
                         <Link
                           to={link.to}
