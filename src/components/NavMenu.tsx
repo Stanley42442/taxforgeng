@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   Calculator, 
   Crown, 
@@ -21,7 +22,10 @@ import {
   GitBranch,
   Send,
   Code,
-  Trophy
+  Trophy,
+  LogIn,
+  LogOut,
+  User
 } from "lucide-react";
 import {
   Sheet,
@@ -29,11 +33,20 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
+import { toast } from "sonner";
 
 export const NavMenu = () => {
   const { tier } = useSubscription();
+  const { user, signOut, loading } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Signed out successfully");
+    navigate("/");
+  };
 
   const navLinks = [
     { to: "/advisory", label: "Get Advice", icon: Lightbulb, minTier: 'free' },
@@ -101,18 +114,21 @@ export const NavMenu = () => {
               </span>
             )}
             <ThemeToggle />
-            {tier === 'free' ? (
-              <Link to="/pricing">
-                <Button variant="outline" size="sm">
-                  <Crown className="h-4 w-4" />
-                  Upgrade
+            {user ? (
+              <>
+                <span className="text-xs text-muted-foreground truncate max-w-[120px]">
+                  {user.email}
+                </span>
+                <Button variant="outline" size="sm" onClick={handleSignOut}>
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
                 </Button>
-              </Link>
+              </>
             ) : (
-              <Link to="/businesses">
-                <Button variant="outline" size="sm">
-                  <FolderOpen className="h-4 w-4" />
-                  Dashboard
+              <Link to="/auth">
+                <Button variant="hero" size="sm">
+                  <LogIn className="h-4 w-4" />
+                  Sign In
                 </Button>
               </Link>
             )}
@@ -169,24 +185,32 @@ export const NavMenu = () => {
                   </nav>
 
                   {/* Mobile CTA */}
-                  <div className="mt-auto pt-6 border-t border-border">
-                    <SheetClose asChild>
-                      {tier === 'free' ? (
-                        <Link to="/pricing" className="block">
+                  <div className="mt-auto pt-6 border-t border-border space-y-3">
+                    {user ? (
+                      <>
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50">
+                          <User className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground truncate">
+                            {user.email}
+                          </span>
+                        </div>
+                        <SheetClose asChild>
+                          <Button variant="outline" className="w-full" onClick={handleSignOut}>
+                            <LogOut className="h-4 w-4" />
+                            Sign Out
+                          </Button>
+                        </SheetClose>
+                      </>
+                    ) : (
+                      <SheetClose asChild>
+                        <Link to="/auth" className="block">
                           <Button variant="hero" className="w-full">
-                            <Crown className="h-4 w-4" />
-                            Upgrade Now
+                            <LogIn className="h-4 w-4" />
+                            Sign In
                           </Button>
                         </Link>
-                      ) : (
-                        <Link to="/businesses" className="block">
-                          <Button variant="hero" className="w-full">
-                            <FolderOpen className="h-4 w-4" />
-                            My Dashboard
-                          </Button>
-                        </Link>
-                      )}
-                    </SheetClose>
+                      </SheetClose>
+                    )}
                   </div>
                 </div>
               </SheetContent>
