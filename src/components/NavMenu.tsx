@@ -25,7 +25,8 @@ import {
   Trophy,
   LogIn,
   LogOut,
-  User
+  User,
+  LayoutDashboard
 } from "lucide-react";
 import {
   Sheet,
@@ -49,6 +50,7 @@ export const NavMenu = () => {
   };
 
   const navLinks = [
+    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, minTier: 'free' },
     { to: "/advisory", label: "Get Advice", icon: Lightbulb, minTier: 'free' },
     { to: "/calculator", label: "Calculator", icon: Calculator, minTier: 'free' },
     { to: "/learn", label: "Learn", icon: GraduationCap, minTier: 'free' },

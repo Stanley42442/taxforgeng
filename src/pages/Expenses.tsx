@@ -67,11 +67,13 @@ const Expenses = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [filterBusinessId, setFilterBusinessId] = useState<string>('all');
   const [newExpense, setNewExpense] = useState({
     date: new Date().toISOString().split('T')[0],
     description: '',
     amount: '',
     category: 'other' as Expense['category'],
+    businessId: '' as string,
   });
 
   const isBasicPlus = tier !== 'free';
@@ -155,6 +157,7 @@ const Expenses = () => {
       .from('expenses')
       .insert({
         user_id: user.id,
+        business_id: newExpense.businessId || null,
         date: newExpense.date,
         description: newExpense.description.trim(),
         amount: Number(newExpense.amount),
@@ -179,6 +182,7 @@ const Expenses = () => {
       category: data.category as Expense['category'],
       type: data.type as 'income' | 'expense',
       isDeductible: data.is_deductible,
+      businessId: data.business_id || undefined,
     };
 
     setExpenses(prev => [expense, ...prev]);
@@ -188,6 +192,7 @@ const Expenses = () => {
       description: '',
       amount: '',
       category: 'other',
+      businessId: '',
     });
     toast.success("Entry added");
   };
@@ -247,11 +252,23 @@ const Expenses = () => {
     toast.success("Entry deleted");
   };
 
-  // Calculate summaries
-  const totalIncome = expenses.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
-  const totalExpenses = expenses.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
-  const deductibleExpenses = expenses.filter(e => e.isDeductible).reduce((sum, e) => sum + e.amount, 0);
+  // Filter expenses by business
+  const filteredExpenses = filterBusinessId === 'all' 
+    ? expenses 
+    : expenses.filter(e => e.businessId === filterBusinessId);
+
+  // Calculate summaries from filtered expenses
+  const totalIncome = filteredExpenses.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
+  const totalExpenses = filteredExpenses.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
+  const deductibleExpenses = filteredExpenses.filter(e => e.isDeductible).reduce((sum, e) => sum + e.amount, 0);
   const taxableIncome = Math.max(0, totalIncome - deductibleExpenses);
+
+  // Get business name helper
+  const getBusinessName = (businessId?: string) => {
+    if (!businessId) return null;
+    const business = savedBusinesses.find(b => b.id === businessId);
+    return business?.name || null;
+  };
   
   // Estimate tax (simplified PIT bands for demo)
   const estimateTax = (income: number): number => {
@@ -360,8 +377,8 @@ const Expenses = () => {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-3 mb-6 animate-slide-up">
+          {/* Action Buttons & Filter */}
+          <div className="flex flex-wrap items-center gap-3 mb-6 animate-slide-up">
             <Button variant="hero" onClick={() => setShowAddDialog(true)}>
               <Plus className="h-4 w-4" />
               Add Entry
@@ -385,6 +402,21 @@ const Expenses = () => {
               <Calculator className="h-4 w-4" />
               Use in Calculator
             </Button>
+            {savedBusinesses.length > 0 && (
+              <Select value={filterBusinessId} onValueChange={setFilterBusinessId}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by business" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Businesses</SelectItem>
+                  {savedBusinesses.map((business) => (
+                    <SelectItem key={business.id} value={business.id}>
+                      {business.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {/* Expense List */}
@@ -394,10 +426,12 @@ const Expenses = () => {
               Transactions ({expenses.length})
             </h2>
 
-            {expenses.length === 0 ? (
+            {filteredExpenses.length === 0 ? (
               <div className="text-center py-10">
                 <Receipt className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground mb-4">No entries yet</p>
+                <p className="text-muted-foreground mb-4">
+                  {filterBusinessId !== 'all' ? 'No entries for this business' : 'No entries yet'}
+                </p>
                 <div className="flex gap-3 justify-center">
                   <Button variant="outline" onClick={() => setShowAddDialog(true)}>
                     <Plus className="h-4 w-4" />
@@ -411,42 +445,48 @@ const Expenses = () => {
               </div>
             ) : (
               <div className="space-y-2">
-                {expenses.map((expense) => (
-                  <div 
-                    key={expense.id}
-                    className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-secondary/30 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">{getCategoryIcon(expense.category)}</span>
-                      <div>
-                        <p className="font-medium text-foreground text-sm">{expense.description}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(expense.date).toLocaleDateString('en-NG', { 
-                            day: 'numeric', 
-                            month: 'short', 
-                            year: 'numeric' 
-                          })}
-                          {expense.isDeductible && (
-                            <span className="ml-2 text-success">• Deductible</span>
-                          )}
-                        </p>
+                {filteredExpenses.map((expense) => {
+                  const businessName = getBusinessName(expense.businessId);
+                  return (
+                    <div 
+                      key={expense.id}
+                      className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-secondary/30 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl">{getCategoryIcon(expense.category)}</span>
+                        <div>
+                          <p className="font-medium text-foreground text-sm">{expense.description}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(expense.date).toLocaleDateString('en-NG', { 
+                              day: 'numeric', 
+                              month: 'short', 
+                              year: 'numeric' 
+                            })}
+                            {businessName && (
+                              <span className="ml-2 text-primary">• {businessName}</span>
+                            )}
+                            {expense.isDeductible && (
+                              <span className="ml-2 text-success">• Deductible</span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className={`font-semibold ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
+                          {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
+                        </span>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          onClick={() => handleDeleteExpense(expense.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className={`font-semibold ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
-                        {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
-                      </span>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                        onClick={() => handleDeleteExpense(expense.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -533,6 +573,27 @@ const Expenses = () => {
                 </Select>
               </div>
             </div>
+            {savedBusinesses.length > 0 && (
+              <div>
+                <Label htmlFor="business">Link to Business (Optional)</Label>
+                <Select
+                  value={newExpense.businessId}
+                  onValueChange={(value) => setNewExpense(prev => ({ ...prev, businessId: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select business" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">No business</SelectItem>
+                    {savedBusinesses.map((business) => (
+                      <SelectItem key={business.id} value={business.id}>
+                        {business.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div>
               <Label htmlFor="description">Description</Label>
               <Input
