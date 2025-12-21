@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 export type SubscriptionTier = 'free' | 'basic' | 'business' | 'corporate';
 
@@ -27,13 +29,14 @@ export interface SubscriptionState {
   savedBusinesses: SavedBusiness[];
   subscriptionEndDate: Date | null;
   email: string | null;
+  loading: boolean;
 }
 
 interface SubscriptionContextType extends SubscriptionState {
   setTier: (tier: SubscriptionTier) => void;
-  addBusiness: (business: Omit<SavedBusiness, 'id' | 'createdAt'>) => boolean;
-  removeBusiness: (id: string) => void;
-  updateBusiness: (id: string, updates: Partial<SavedBusiness>) => void;
+  addBusiness: (business: Omit<SavedBusiness, 'id' | 'createdAt'>) => Promise<boolean>;
+  removeBusiness: (id: string) => Promise<void>;
+  updateBusiness: (id: string, updates: Partial<SavedBusiness>) => Promise<void>;
   canSaveBusiness: () => boolean;
   canExport: () => boolean;
   canAccessFiling: () => boolean;
@@ -45,7 +48,8 @@ interface SubscriptionContextType extends SubscriptionState {
   setEmail: (email: string) => void;
   verifyRCBN: (rcBnNumber: string) => { isValid: boolean; details?: CACVerificationDetails };
   bulkVerifyRCBN: (numbers: string[]) => Array<{ rcBnNumber: string; isValid: boolean; details?: CACVerificationDetails }>;
-  addSampleBusinesses: () => void;
+  addSampleBusinesses: () => Promise<void>;
+  refreshBusinesses: () => Promise<void>;
 }
 
 const TIER_LIMITS: Record<SubscriptionTier, number | 'unlimited'> = {
@@ -106,40 +110,84 @@ const SAMPLE_BUSINESSES: Omit<SavedBusiness, 'id' | 'createdAt'>[] = [
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
 export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
-  const [state, setState] = useState<SubscriptionState>(() => {
-    // Try to load from localStorage for non-free tiers
-    const saved = localStorage.getItem('naijataxpro_subscription');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return {
-        ...parsed,
-        subscriptionEndDate: parsed.subscriptionEndDate ? new Date(parsed.subscriptionEndDate) : null,
-        savedBusinesses: parsed.savedBusinesses?.map((b: any) => ({
-          ...b,
-          createdAt: new Date(b.createdAt)
-        })) || []
-      };
-    }
-    return {
-      tier: 'free',
-      businessCount: 0,
-      savedBusinesses: [],
-      subscriptionEndDate: null,
-      email: null,
-    };
+  const { user } = useAuth();
+  const [state, setState] = useState<SubscriptionState>({
+    tier: 'free',
+    businessCount: 0,
+    savedBusinesses: [],
+    subscriptionEndDate: null,
+    email: null,
+    loading: true,
   });
 
-  // Persist to localStorage when state changes (except for free tier)
-  useEffect(() => {
-    if (state.tier !== 'free') {
-      localStorage.setItem('naijataxpro_subscription', JSON.stringify(state));
-    } else {
-      // Clear data on free tier (no persistence)
-      localStorage.removeItem('naijataxpro_subscription');
+  // Fetch user profile and businesses from database
+  const fetchUserData = useCallback(async () => {
+    if (!user) {
+      setState({
+        tier: 'free',
+        businessCount: 0,
+        savedBusinesses: [],
+        subscriptionEndDate: null,
+        email: null,
+        loading: false,
+      });
+      return;
     }
-  }, [state]);
 
-  const setTier = (tier: SubscriptionTier) => {
+    try {
+      // Fetch profile for subscription tier
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('subscription_tier, email')
+        .eq('id', user.id)
+        .single();
+
+      // Fetch businesses
+      const { data: businesses } = await supabase
+        .from('businesses')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      const mappedBusinesses: SavedBusiness[] = (businesses || []).map(b => ({
+        id: b.id,
+        name: b.name,
+        entityType: b.entity_type as 'company' | 'business_name',
+        turnover: Number(b.turnover),
+        createdAt: new Date(b.created_at),
+        verificationStatus: b.cac_verified ? 'verified' : 'not_verified',
+      }));
+
+      setState({
+        tier: (profile?.subscription_tier as SubscriptionTier) || 'free',
+        businessCount: mappedBusinesses.length,
+        savedBusinesses: mappedBusinesses,
+        subscriptionEndDate: null,
+        email: profile?.email || user.email || null,
+        loading: false,
+      });
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setState(prev => ({ ...prev, loading: false }));
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchUserData();
+  }, [fetchUserData]);
+
+  const refreshBusinesses = async () => {
+    await fetchUserData();
+  };
+
+  const setTier = async (tier: SubscriptionTier) => {
+    if (!user) return;
+    
+    await supabase
+      .from('profiles')
+      .update({ subscription_tier: tier })
+      .eq('id', user.id);
+    
     setState(prev => ({ ...prev, tier }));
   };
 
@@ -151,24 +199,53 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     return state.businessCount < limit;
   };
 
-  const addBusiness = (business: Omit<SavedBusiness, 'id' | 'createdAt'>): boolean => {
-    if (!canSaveBusiness()) return false;
+  const addBusiness = async (business: Omit<SavedBusiness, 'id' | 'createdAt'>): Promise<boolean> => {
+    if (!user || !canSaveBusiness()) return false;
     
+    const { data, error } = await supabase
+      .from('businesses')
+      .insert({
+        user_id: user.id,
+        name: business.name,
+        entity_type: business.entityType,
+        turnover: business.turnover,
+        cac_verified: business.verificationStatus === 'verified',
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error adding business:', error);
+      return false;
+    }
+
     const newBusiness: SavedBusiness = {
-      ...business,
-      id: crypto.randomUUID(),
-      createdAt: new Date(),
+      id: data.id,
+      name: data.name,
+      entityType: data.entity_type as 'company' | 'business_name',
+      turnover: Number(data.turnover),
+      createdAt: new Date(data.created_at),
+      verificationStatus: data.cac_verified ? 'verified' : 'not_verified',
     };
-    
+
     setState(prev => ({
       ...prev,
-      savedBusinesses: [...prev.savedBusinesses, newBusiness],
+      savedBusinesses: [newBusiness, ...prev.savedBusinesses],
       businessCount: prev.businessCount + 1,
     }));
+    
     return true;
   };
 
-  const removeBusiness = (id: string) => {
+  const removeBusiness = async (id: string) => {
+    if (!user) return;
+
+    await supabase
+      .from('businesses')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', user.id);
+
     setState(prev => ({
       ...prev,
       savedBusinesses: prev.savedBusinesses.filter(b => b.id !== id),
@@ -176,7 +253,21 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     }));
   };
 
-  const updateBusiness = (id: string, updates: Partial<SavedBusiness>) => {
+  const updateBusiness = async (id: string, updates: Partial<SavedBusiness>) => {
+    if (!user) return;
+
+    const dbUpdates: Record<string, unknown> = {};
+    if (updates.name) dbUpdates.name = updates.name;
+    if (updates.entityType) dbUpdates.entity_type = updates.entityType;
+    if (updates.turnover !== undefined) dbUpdates.turnover = updates.turnover;
+    if (updates.verificationStatus) dbUpdates.cac_verified = updates.verificationStatus === 'verified';
+
+    await supabase
+      .from('businesses')
+      .update(dbUpdates)
+      .eq('id', id)
+      .eq('user_id', user.id);
+
     setState(prev => ({
       ...prev,
       savedBusinesses: prev.savedBusinesses.map(b => 
@@ -191,9 +282,17 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const canVerifyCAC = () => state.tier === 'business' || state.tier === 'corporate';
   const showWatermark = () => state.tier === 'free';
 
-  const upgradeTier = (newTier: SubscriptionTier) => {
+  const upgradeTier = async (newTier: SubscriptionTier) => {
+    if (!user) return;
+    
     const endDate = new Date();
     endDate.setMonth(endDate.getMonth() + 1);
+    
+    await supabase
+      .from('profiles')
+      .update({ subscription_tier: newTier })
+      .eq('id', user.id);
+
     setState(prev => ({
       ...prev,
       tier: newTier,
@@ -207,13 +306,11 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
   // Mock CAC verification logic
   const verifyRCBN = (rcBnNumber: string): { isValid: boolean; details?: CACVerificationDetails } => {
-    // Regex validation: RC + 6-8 digits or BN + digits
     const rcPattern = /^RC\d{6,8}$/i;
     const bnPattern = /^BN\d{5,8}$/i;
     
     const isValidFormat = rcPattern.test(rcBnNumber) || bnPattern.test(rcBnNumber);
     
-    // Mock verified numbers for testing
     const mockVerifiedNumbers: Record<string, CACVerificationDetails> = {
       'RC1234567': { 
         companyName: 'Example Ventures Ltd', 
@@ -247,7 +344,6 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       return { isValid: true, details: mockVerifiedNumbers[upperCaseNumber] };
     }
     
-    // For valid format but not in mock database, still mark as verified with generated data
     if (isValidFormat) {
       const isCompany = upperCaseNumber.startsWith('RC');
       return { 
@@ -264,7 +360,6 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     return { isValid: false };
   };
 
-  // Bulk CAC verification (Corporate tier)
   const bulkVerifyRCBN = (numbers: string[]): Array<{ rcBnNumber: string; isValid: boolean; details?: CACVerificationDetails }> => {
     return numbers.map(rcBnNumber => {
       const result = verifyRCBN(rcBnNumber);
@@ -272,13 +367,12 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  // Add sample businesses for testing
-  const addSampleBusinesses = () => {
-    SAMPLE_BUSINESSES.forEach(business => {
+  const addSampleBusinesses = async () => {
+    for (const business of SAMPLE_BUSINESSES) {
       if (canSaveBusiness()) {
-        addBusiness(business);
+        await addBusiness(business);
       }
-    });
+    }
   };
 
   return (
@@ -301,6 +395,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         verifyRCBN,
         bulkVerifyRCBN,
         addSampleBusinesses,
+        refreshBusinesses,
       }}
     >
       {children}
