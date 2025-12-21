@@ -5,7 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
+import Auth from "./pages/Auth";
 import Advisory from "./pages/Advisory";
 import Calculator from "./pages/Calculator";
 import Results from "./pages/Results";
@@ -31,36 +33,39 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="light" storageKey="naijataxpro-theme">
-      <SubscriptionProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/advisory" element={<Advisory />} />
-              <Route path="/calculator" element={<Calculator />} />
-              <Route path="/results" element={<Results />} />
-              <Route path="/breakdown" element={<TaxBreakdown />} />
-              <Route path="/pricing" element={<Pricing />} />
-              <Route path="/tax-filing" element={<TaxFiling />} />
-              <Route path="/businesses" element={<SavedBusinesses />} />
-              <Route path="/reminders" element={<Reminders />} />
-              <Route path="/insights" element={<Insights />} />
-              <Route path="/team" element={<Team />} />
-              <Route path="/transactions" element={<Transactions />} />
-              <Route path="/audit-log" element={<AuditLog />} />
-              <Route path="/learn" element={<Learn />} />
-              <Route path="/expenses" element={<Expenses />} />
-              <Route path="/scenarios" element={<ScenarioModeling />} />
-              <Route path="/e-filing" element={<EFiling />} />
-              <Route path="/api" element={<ApiDocs />} />
-              <Route path="/achievements" element={<Achievements />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </SubscriptionProvider>
+      <AuthProvider>
+        <SubscriptionProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/advisory" element={<Advisory />} />
+                <Route path="/calculator" element={<Calculator />} />
+                <Route path="/results" element={<Results />} />
+                <Route path="/tax-breakdown" element={<TaxBreakdown />} />
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/tax-filing" element={<TaxFiling />} />
+                <Route path="/businesses" element={<SavedBusinesses />} />
+                <Route path="/reminders" element={<Reminders />} />
+                <Route path="/insights" element={<Insights />} />
+                <Route path="/team" element={<Team />} />
+                <Route path="/transactions" element={<Transactions />} />
+                <Route path="/audit-log" element={<AuditLog />} />
+                <Route path="/learn" element={<Learn />} />
+                <Route path="/expenses" element={<Expenses />} />
+                <Route path="/scenarios" element={<ScenarioModeling />} />
+                <Route path="/e-filing" element={<EFiling />} />
+                <Route path="/api-docs" element={<ApiDocs />} />
+                <Route path="/achievements" element={<Achievements />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </SubscriptionProvider>
+      </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );

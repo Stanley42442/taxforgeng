@@ -167,11 +167,13 @@ const Index = () => {
               </div>
               <span className="font-bold text-foreground">NaijaTaxPro</span>
             </div>
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
               <Link to="/pricing" className="hover:text-foreground transition-colors">Pricing</Link>
               <Link to="/advisory" className="hover:text-foreground transition-colors">Advisory</Link>
               <Link to="/calculator" className="hover:text-foreground transition-colors">Calculator</Link>
-              <Link to="/businesses" className="hover:text-foreground transition-colors">My Businesses</Link>
+              <Link to="/learn" className="hover:text-foreground transition-colors">Learn</Link>
+              <Link to="/api-docs" className="hover:text-foreground transition-colors">API</Link>
+              <Link to="/auth" className="hover:text-foreground transition-colors">Sign In</Link>
             </div>
             <p className="text-sm text-muted-foreground text-center">
               © 2025 NaijaTaxPro. For educational purposes.
