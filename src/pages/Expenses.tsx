@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavMenu } from "@/components/NavMenu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -22,9 +24,9 @@ import {
   TrendingDown,
   Calculator,
   Crown,
-  Lock,
   FileSpreadsheet,
-  PieChart
+  PieChart,
+  Loader2
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import {
@@ -44,6 +46,7 @@ interface Expense {
   category: 'income' | 'rent' | 'transport' | 'marketing' | 'salary' | 'utilities' | 'supplies' | 'other';
   type: 'income' | 'expense';
   isDeductible: boolean;
+  businessId?: string;
 }
 
 const EXPENSE_CATEGORIES = [
@@ -59,8 +62,10 @@ const EXPENSE_CATEGORIES = [
 
 const Expenses = () => {
   const { tier, savedBusinesses } = useSubscription();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newExpense, setNewExpense] = useState({
     date: new Date().toISOString().split('T')[0],
@@ -70,6 +75,43 @@ const Expenses = () => {
   });
 
   const isBasicPlus = tier !== 'free';
+
+  // Fetch expenses from database
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      if (!user) {
+        setExpenses([]);
+        setLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('expenses')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching expenses:', error);
+        toast.error('Failed to load expenses');
+      } else {
+        const mapped: Expense[] = (data || []).map(e => ({
+          id: e.id,
+          date: e.date,
+          description: e.description || '',
+          amount: Number(e.amount),
+          category: e.category as Expense['category'],
+          type: e.type as 'income' | 'expense',
+          isDeductible: e.is_deductible,
+          businessId: e.business_id || undefined,
+        }));
+        setExpenses(mapped);
+      }
+      setLoading(false);
+    };
+
+    fetchExpenses();
+  }, [user]);
 
   if (!isBasicPlus) {
     return (
@@ -94,21 +136,49 @@ const Expenses = () => {
     );
   }
 
-  const handleAddExpense = () => {
+  const handleAddExpense = async () => {
+    if (!user) {
+      toast.error("Please sign in to add expenses");
+      return;
+    }
+
     if (!newExpense.description.trim() || !newExpense.amount) {
       toast.error("Please fill all fields");
       return;
     }
 
     const categoryInfo = EXPENSE_CATEGORIES.find(c => c.value === newExpense.category);
+    const expenseType = categoryInfo?.type || 'expense';
+    const isDeductible = expenseType === 'expense' ? (categoryInfo?.deductible ?? false) : false;
+
+    const { data, error } = await supabase
+      .from('expenses')
+      .insert({
+        user_id: user.id,
+        date: newExpense.date,
+        description: newExpense.description.trim(),
+        amount: Number(newExpense.amount),
+        category: newExpense.category,
+        type: expenseType,
+        is_deductible: isDeductible,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error adding expense:', error);
+      toast.error('Failed to add expense');
+      return;
+    }
+
     const expense: Expense = {
-      id: crypto.randomUUID(),
-      date: newExpense.date,
-      description: newExpense.description.trim(),
-      amount: Number(newExpense.amount),
-      category: newExpense.category,
-      type: categoryInfo?.type || 'expense',
-      isDeductible: categoryInfo?.type === 'expense' ? (categoryInfo?.deductible ?? false) : false,
+      id: data.id,
+      date: data.date,
+      description: data.description || '',
+      amount: Number(data.amount),
+      category: data.category as Expense['category'],
+      type: data.type as 'income' | 'expense',
+      isDeductible: data.is_deductible,
     };
 
     setExpenses(prev => [expense, ...prev]);
@@ -122,21 +192,57 @@ const Expenses = () => {
     toast.success("Entry added");
   };
 
-  const handleCSVImport = () => {
-    // Mock CSV import
-    const mockData: Expense[] = [
-      { id: crypto.randomUUID(), date: '2025-12-01', description: 'Client Payment - Project A', amount: 500000, category: 'income', type: 'income', isDeductible: false },
-      { id: crypto.randomUUID(), date: '2025-12-05', description: 'Office Rent December', amount: 150000, category: 'rent', type: 'expense', isDeductible: true },
-      { id: crypto.randomUUID(), date: '2025-12-10', description: 'Google Ads Campaign', amount: 45000, category: 'marketing', type: 'expense', isDeductible: true },
-      { id: crypto.randomUUID(), date: '2025-12-12', description: 'Staff Salaries', amount: 350000, category: 'salary', type: 'expense', isDeductible: true },
-      { id: crypto.randomUUID(), date: '2025-12-15', description: 'Freelance Work', amount: 200000, category: 'income', type: 'income', isDeductible: false },
+  const handleCSVImport = async () => {
+    if (!user) {
+      toast.error("Please sign in to import expenses");
+      return;
+    }
+
+    const mockData = [
+      { date: '2025-12-01', description: 'Client Payment - Project A', amount: 500000, category: 'income', type: 'income', is_deductible: false },
+      { date: '2025-12-05', description: 'Office Rent December', amount: 150000, category: 'rent', type: 'expense', is_deductible: true },
+      { date: '2025-12-10', description: 'Google Ads Campaign', amount: 45000, category: 'marketing', type: 'expense', is_deductible: true },
+      { date: '2025-12-12', description: 'Staff Salaries', amount: 350000, category: 'salary', type: 'expense', is_deductible: true },
+      { date: '2025-12-15', description: 'Freelance Work', amount: 200000, category: 'income', type: 'income', is_deductible: false },
     ];
 
-    setExpenses(prev => [...mockData, ...prev]);
+    const { data, error } = await supabase
+      .from('expenses')
+      .insert(mockData.map(e => ({ ...e, user_id: user.id })))
+      .select();
+
+    if (error) {
+      console.error('Error importing expenses:', error);
+      toast.error('Failed to import expenses');
+      return;
+    }
+
+    const mapped: Expense[] = (data || []).map(e => ({
+      id: e.id,
+      date: e.date,
+      description: e.description || '',
+      amount: Number(e.amount),
+      category: e.category as Expense['category'],
+      type: e.type as 'income' | 'expense',
+      isDeductible: e.is_deductible,
+    }));
+
+    setExpenses(prev => [...mapped, ...prev]);
     toast.success("Imported 5 entries from CSV (mock data)");
   };
 
-  const handleDeleteExpense = (id: string) => {
+  const handleDeleteExpense = async (id: string) => {
+    const { error } = await supabase
+      .from('expenses')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting expense:', error);
+      toast.error('Failed to delete expense');
+      return;
+    }
+
     setExpenses(prev => prev.filter(e => e.id !== id));
     toast.success("Entry deleted");
   };
@@ -190,6 +296,18 @@ const Expenses = () => {
     };
     return icons[category];
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-hero">
+        <NavMenu />
+        <div className="container mx-auto px-4 py-20 text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground mt-4">Loading expenses...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-hero">
@@ -368,7 +486,7 @@ const Expenses = () => {
 
           {/* Disclaimer */}
           <p className="text-xs text-muted-foreground text-center mt-6">
-            Entries are stored locally. For accurate tax filing, consult a professional.
+            Expenses are saved to your account and persist across sessions.
           </p>
         </div>
       </main>
@@ -439,9 +557,7 @@ const Expenses = () => {
             <Button variant="outline" onClick={() => setShowAddDialog(false)}>
               Cancel
             </Button>
-            <Button variant="hero" onClick={handleAddExpense}>
-              Add Entry
-            </Button>
+            <Button onClick={handleAddExpense}>Add Entry</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { NavMenu } from "@/components/NavMenu";
 import { useSubscription, SavedBusiness } from "@/contexts/SubscriptionContext";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -8,14 +10,14 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Bell, Calendar, Mail, Plus, Settings, Clock, CheckCircle2, AlertTriangle, Building2, Crown } from "lucide-react";
+import { Bell, Calendar, Mail, Plus, Settings, Clock, CheckCircle2, AlertTriangle, Building2, Crown, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
 interface Reminder {
   id: string;
-  businessId: string;
-  type: 'vat_monthly' | 'cit_annual' | 'pit_monthly' | 'paye_monthly' | 'custom';
+  businessId: string | null;
+  type: string;
   name: string;
   dueDate: string;
   enabled: boolean;
@@ -23,56 +25,120 @@ interface Reminder {
 }
 
 const DEFAULT_REMINDERS = [
-  { type: 'vat_monthly' as const, name: 'Monthly VAT Filing', dueDate: '21st of each month' },
-  { type: 'cit_annual' as const, name: 'Annual CIT Return', dueDate: 'June 30th' },
-  { type: 'pit_monthly' as const, name: 'PIT Remittance', dueDate: '10th of each month' },
-  { type: 'paye_monthly' as const, name: 'PAYE Remittance', dueDate: '10th of each month' },
+  { type: 'vat_monthly', name: 'Monthly VAT Filing', dueDate: '21st of each month' },
+  { type: 'cit_annual', name: 'Annual CIT Return', dueDate: 'June 30th' },
+  { type: 'pit_monthly', name: 'PIT Remittance', dueDate: '10th of each month' },
+  { type: 'paye_monthly', name: 'PAYE Remittance', dueDate: '10th of each month' },
 ];
 
 const Reminders = () => {
-  const { tier, savedBusinesses, canExport } = useSubscription();
-  const [reminders, setReminders] = useState<Reminder[]>(() => {
-    const saved = localStorage.getItem('naijataxpro_reminders');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const { tier, savedBusinesses } = useSubscription();
+  const { user } = useAuth();
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedBusiness, setSelectedBusiness] = useState<SavedBusiness | null>(null);
   const [customReminderOpen, setCustomReminderOpen] = useState(false);
   const [customName, setCustomName] = useState('');
   const [customDate, setCustomDate] = useState('');
   const [customNote, setCustomNote] = useState('');
 
-  const saveReminders = (newReminders: Reminder[]) => {
-    setReminders(newReminders);
-    localStorage.setItem('naijataxpro_reminders', JSON.stringify(newReminders));
-  };
+  // Fetch reminders from database
+  const fetchReminders = useCallback(async () => {
+    if (!user) {
+      setReminders([]);
+      setLoading(false);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('reminders')
+      .select('*')
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('Error fetching reminders:', error);
+      toast.error('Failed to load reminders');
+    } else {
+      const mapped: Reminder[] = (data || []).map(r => ({
+        id: r.id,
+        businessId: r.business_id,
+        type: r.reminder_type,
+        name: r.title,
+        dueDate: r.due_date,
+        enabled: r.notify_email,
+        customNote: r.description || undefined,
+      }));
+      setReminders(mapped);
+    }
+    setLoading(false);
+  }, [user]);
+
+  useEffect(() => {
+    fetchReminders();
+  }, [fetchReminders]);
 
   const getBusinessReminders = (businessId: string) => {
     return reminders.filter(r => r.businessId === businessId);
   };
 
-  const toggleReminder = (businessId: string, type: string) => {
+  const toggleReminder = async (businessId: string, type: string) => {
+    if (!user) return;
+
     const existing = reminders.find(r => r.businessId === businessId && r.type === type);
     
     if (existing) {
-      const updated = reminders.map(r => 
+      // Toggle existing reminder
+      const { error } = await supabase
+        .from('reminders')
+        .update({ notify_email: !existing.enabled })
+        .eq('id', existing.id);
+
+      if (error) {
+        console.error('Error updating reminder:', error);
+        toast.error('Failed to update reminder');
+        return;
+      }
+
+      setReminders(prev => prev.map(r => 
         r.id === existing.id ? { ...r, enabled: !r.enabled } : r
-      );
-      saveReminders(updated);
+      ));
       toast.success(existing.enabled ? 'Reminder disabled' : 'Reminder enabled');
     } else {
+      // Create new reminder
       const template = DEFAULT_REMINDERS.find(d => d.type === type);
-      if (template) {
-        const newReminder: Reminder = {
-          id: crypto.randomUUID(),
-          businessId,
-          type: type as Reminder['type'],
-          name: template.name,
-          dueDate: template.dueDate,
-          enabled: true,
-        };
-        saveReminders([...reminders, newReminder]);
-        toast.success('Reminder enabled');
+      if (!template) return;
+
+      const { data, error } = await supabase
+        .from('reminders')
+        .insert({
+          user_id: user.id,
+          business_id: businessId,
+          reminder_type: type,
+          title: template.name,
+          due_date: new Date().toISOString(),
+          notify_email: true,
+          description: template.dueDate,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating reminder:', error);
+        toast.error('Failed to create reminder');
+        return;
       }
+
+      const newReminder: Reminder = {
+        id: data.id,
+        businessId: data.business_id,
+        type: data.reminder_type,
+        name: data.title,
+        dueDate: template.dueDate,
+        enabled: true,
+      };
+
+      setReminders(prev => [...prev, newReminder]);
+      toast.success('Reminder enabled');
     }
   };
 
@@ -80,19 +146,40 @@ const Reminders = () => {
     return reminders.some(r => r.businessId === businessId && r.type === type && r.enabled);
   };
 
-  const addCustomReminder = () => {
-    if (!selectedBusiness || !customName || !customDate) return;
+  const addCustomReminder = async () => {
+    if (!user || !selectedBusiness || !customName || !customDate) return;
     
+    const { data, error } = await supabase
+      .from('reminders')
+      .insert({
+        user_id: user.id,
+        business_id: selectedBusiness.id,
+        reminder_type: 'custom',
+        title: customName,
+        due_date: new Date().toISOString(),
+        notify_email: true,
+        description: customNote || customDate,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating custom reminder:', error);
+      toast.error('Failed to create reminder');
+      return;
+    }
+
     const newReminder: Reminder = {
-      id: crypto.randomUUID(),
-      businessId: selectedBusiness.id,
+      id: data.id,
+      businessId: data.business_id,
       type: 'custom',
       name: customName,
       dueDate: customDate,
       enabled: true,
       customNote,
     };
-    saveReminders([...reminders, newReminder]);
+
+    setReminders(prev => [...prev, newReminder]);
     setCustomReminderOpen(false);
     setCustomName('');
     setCustomDate('');
@@ -101,7 +188,6 @@ const Reminders = () => {
   };
 
   const sendTestEmail = (business: SavedBusiness, reminderType: string) => {
-    // Mock email send
     const template = DEFAULT_REMINDERS.find(d => d.type === reminderType);
     toast.success(
       `Test email sent! "Reminder: ${template?.name || reminderType} due in 7 days for ${business.name}"`,
@@ -109,8 +195,19 @@ const Reminders = () => {
     );
   };
 
-  const deleteReminder = (id: string) => {
-    saveReminders(reminders.filter(r => r.id !== id));
+  const deleteReminder = async (id: string) => {
+    const { error } = await supabase
+      .from('reminders')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting reminder:', error);
+      toast.error('Failed to delete reminder');
+      return;
+    }
+
+    setReminders(prev => prev.filter(r => r.id !== id));
     toast.success('Reminder deleted');
   };
 
@@ -157,6 +254,18 @@ const Reminders = () => {
               </Link>
             </CardContent>
           </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-hero">
+        <NavMenu />
+        <div className="container mx-auto px-4 py-20 text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground mt-4">Loading reminders...</p>
         </div>
       </div>
     );
@@ -359,11 +468,17 @@ const Reminders = () => {
                                   </Button>
                                   <Switch
                                     checked={reminder.enabled}
-                                    onCheckedChange={() => {
-                                      const updated = reminders.map(r => 
-                                        r.id === reminder.id ? { ...r, enabled: !r.enabled } : r
-                                      );
-                                      saveReminders(updated);
+                                    onCheckedChange={async () => {
+                                      const { error } = await supabase
+                                        .from('reminders')
+                                        .update({ notify_email: !reminder.enabled })
+                                        .eq('id', reminder.id);
+                                      
+                                      if (!error) {
+                                        setReminders(prev => prev.map(r => 
+                                          r.id === reminder.id ? { ...r, enabled: !r.enabled } : r
+                                        ));
+                                      }
                                     }}
                                   />
                                 </div>
