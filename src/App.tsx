@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
 import Advisory from "./pages/Advisory";
 import Calculator from "./pages/Calculator";
 import Results from "./pages/Results";
@@ -42,6 +43,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/advisory" element={<Advisory />} />
                 <Route path="/calculator" element={<Calculator />} />
                 <Route path="/results" element={<Results />} />
