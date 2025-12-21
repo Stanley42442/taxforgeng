@@ -15,7 +15,13 @@ import {
   BarChart3,
   Users,
   Upload,
-  History
+  History,
+  GraduationCap,
+  Receipt,
+  GitBranch,
+  Send,
+  Code,
+  Trophy
 } from "lucide-react";
 import {
   Sheet,
@@ -32,13 +38,19 @@ export const NavMenu = () => {
   const navLinks = [
     { to: "/advisory", label: "Get Advice", icon: Lightbulb, minTier: 'free' },
     { to: "/calculator", label: "Calculator", icon: Calculator, minTier: 'free' },
+    { to: "/learn", label: "Learn", icon: GraduationCap, minTier: 'free' },
     { to: "/pricing", label: "Pricing", icon: DollarSign, minTier: 'free' },
     { to: "/businesses", label: "My Businesses", icon: FolderOpen, minTier: 'free' },
+    { to: "/achievements", label: "Achievements", icon: Trophy, minTier: 'basic' },
     { to: "/reminders", label: "Reminders", icon: Bell, minTier: 'basic' },
+    { to: "/expenses", label: "Expenses", icon: Receipt, minTier: 'basic' },
+    { to: "/scenarios", label: "Scenarios", icon: GitBranch, minTier: 'business' },
     { to: "/insights", label: "Insights", icon: BarChart3, minTier: 'business' },
     { to: "/transactions", label: "Transactions", icon: Upload, minTier: 'business' },
+    { to: "/e-filing", label: "E-Filing", icon: Send, minTier: 'business' },
     { to: "/tax-filing", label: "Tax Filing", icon: FileText, minTier: 'business' },
     { to: "/team", label: "Team", icon: Users, minTier: 'business' },
+    { to: "/api-docs", label: "API Docs", icon: Code, minTier: 'corporate' },
     { to: "/audit-log", label: "Audit Log", icon: History, minTier: 'corporate' },
   ];
 

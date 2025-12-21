@@ -16,7 +16,8 @@ import {
   Crown,
   Lock,
   Save,
-  Plus
+  Plus,
+  ListOrdered
 } from "lucide-react";
 import { formatCurrency, calculateTax, type TaxResult, type TaxInputs } from "@/lib/taxCalculations";
 import { downloadPDF } from "@/lib/pdfExport";
@@ -202,6 +203,12 @@ const Results = () => {
 
           {/* Action Buttons Row */}
           <div className="flex flex-wrap justify-center gap-3 mb-6">
+            <Link to="/tax-breakdown" state={{ result, inputs }}>
+              <Button variant="hero">
+                <ListOrdered className="h-4 w-4" />
+                View Breakdown
+              </Button>
+            </Link>
             <Button
               variant={showComparison ? "hero" : "outline"}
               onClick={() => setShowComparison(!showComparison)}
