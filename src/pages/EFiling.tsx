@@ -53,7 +53,7 @@ const EFiling = () => {
             </div>
             <h1 className="text-2xl font-bold text-foreground mb-3">E-Filing & Payment</h1>
             <p className="text-muted-foreground mb-6">
-              File returns and pay taxes directly through NaijaTaxPro. Available on Business+ plans.
+              File returns and pay taxes directly through TaxForge NG. Available on Business+ plans.
             </p>
             <Button variant="hero" onClick={() => navigate('/pricing')}>
               <Crown className="h-4 w-4" />

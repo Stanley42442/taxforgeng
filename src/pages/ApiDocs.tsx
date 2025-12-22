@@ -75,7 +75,7 @@ const ApiDocs = () => {
   };
 
   const sampleCode = `// Node.js Example
-const response = await fetch('https://api.naijataxpro.com/v1/calculate', {
+const response = await fetch('https://api.taxforge.ng/v1/calculate', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer ${apiKey || 'YOUR_API_KEY'}',
@@ -93,7 +93,7 @@ const response = await fetch('https://api.naijataxpro.com/v1/calculate', {
 const data = await response.json();
 console.log(data.totalTaxPayable);`;
 
-  const curlExample = `curl -X POST https://api.naijataxpro.com/v1/calculate \\
+  const curlExample = `curl -X POST https://api.taxforge.ng/v1/calculate \\
   -H "Authorization: Bearer ${apiKey || 'YOUR_API_KEY'}" \\
   -H "Content-Type: application/json" \\
   -d '{

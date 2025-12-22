@@ -27,7 +27,7 @@ const MOCK_MEMBERS: TeamMember[] = [
 const Team = () => {
   const { tier, email } = useSubscription();
   const [members, setMembers] = useState<TeamMember[]>(() => {
-    const saved = localStorage.getItem('naijataxpro_team');
+    const saved = localStorage.getItem('taxforge_ng_team');
     return saved ? JSON.parse(saved) : MOCK_MEMBERS;
   });
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -36,7 +36,7 @@ const Team = () => {
 
   const saveMembers = (newMembers: TeamMember[]) => {
     setMembers(newMembers);
-    localStorage.setItem('naijataxpro_team', JSON.stringify(newMembers));
+    localStorage.setItem('taxforge_ng_team', JSON.stringify(newMembers));
   };
 
   const getMaxMembers = () => {

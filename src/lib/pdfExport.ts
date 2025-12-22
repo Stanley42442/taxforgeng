@@ -55,7 +55,7 @@ export const generateProfessionalPDF = (
   setColor(primaryColor);
   doc.setFontSize(20);
   doc.setFont('helvetica', 'bold');
-  doc.text('NaijaTaxPro', margin + 16, y + 8);
+  doc.text('TaxForge NG', margin + 16, y + 8);
 
   // Report badge
   setFillColor(lightBg);
@@ -331,7 +331,7 @@ export const generateProfessionalPDF = (
     pageWidth / 2, footerY + 7, { align: 'center' }
   );
   doc.text(
-    `© ${new Date().getFullYear()} NaijaTaxPro | www.naijataxpro.com`,
+    `© ${new Date().getFullYear()} TaxForge NG | www.taxforge.ng`,
     pageWidth / 2, footerY + 12, { align: 'center' }
   );
 
@@ -370,5 +370,5 @@ export const downloadPDF = (
   businessData?: BusinessPDFData
 ) => {
   const doc = generateProfessionalPDF(result, inputs, showWatermark, businessData);
-  doc.save('naijataxpro-tax-report.pdf');
+  doc.save('taxforge-ng-tax-report.pdf');
 };

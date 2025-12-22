@@ -91,7 +91,7 @@ export const NavMenu = () => {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary">
               <Calculator className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-foreground">NaijaTaxPro</span>
+            <span className="text-xl font-bold text-foreground">TaxForge NG</span>
           </Link>
 
           {/* Desktop Navigation - now shows at lg breakpoint */}
@@ -157,7 +157,7 @@ export const NavMenu = () => {
                       <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary">
                         <Calculator className="h-4 w-4 text-primary-foreground" />
                       </div>
-                      <span className="font-bold text-foreground">NaijaTaxPro</span>
+                      <span className="font-bold text-foreground">TaxForge NG</span>
                     </Link>
                   </div>
 
