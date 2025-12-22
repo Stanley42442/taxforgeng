@@ -27,6 +27,7 @@ import ScenarioModeling from "./pages/ScenarioModeling";
 import EFiling from "./pages/EFiling";
 import ApiDocs from "./pages/ApiDocs";
 import Achievements from "./pages/Achievements";
+import BusinessReport from "./pages/BusinessReport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -62,6 +63,7 @@ const App = () => (
                 <Route path="/e-filing" element={<EFiling />} />
                 <Route path="/api-docs" element={<ApiDocs />} />
                 <Route path="/achievements" element={<Achievements />} />
+                <Route path="/business-report" element={<BusinessReport />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

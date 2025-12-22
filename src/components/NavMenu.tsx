@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { TierSwitcher } from "@/components/TierSwitcher";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
 import { 
@@ -26,7 +27,8 @@ import {
   LogIn,
   LogOut,
   User,
-  LayoutDashboard
+  LayoutDashboard,
+  PieChart,
 } from "lucide-react";
 import {
   Sheet,
@@ -60,6 +62,7 @@ export const NavMenu = () => {
     { to: "/reminders", label: "Reminders", icon: Bell, minTier: 'basic' },
     { to: "/expenses", label: "Expenses", icon: Receipt, minTier: 'basic' },
     { to: "/scenarios", label: "Scenarios", icon: GitBranch, minTier: 'business' },
+    { to: "/business-report", label: "Reports", icon: PieChart, minTier: 'basic' },
     { to: "/insights", label: "Insights", icon: BarChart3, minTier: 'business' },
     { to: "/transactions", label: "Transactions", icon: Upload, minTier: 'business' },
     { to: "/e-filing", label: "E-Filing", icon: Send, minTier: 'business' },
@@ -110,6 +113,7 @@ export const NavMenu = () => {
 
           {/* Desktop Actions - now shows at lg breakpoint */}
           <div className="hidden lg:flex items-center gap-3">
+            <TierSwitcher />
             {tier !== 'free' && (
               <span className="text-xs bg-success/20 text-success px-2 py-1 rounded-full font-medium">
                 {tier.charAt(0).toUpperCase() + tier.slice(1)}
@@ -166,6 +170,11 @@ export const NavMenu = () => {
                       </p>
                     </div>
                   )}
+
+                  {/* Tier Switcher for testing */}
+                  <div className="mb-4">
+                    <TierSwitcher />
+                  </div>
 
                   {/* Mobile Nav Links */}
                   <nav className="flex flex-col gap-1 overflow-y-auto">

@@ -19,9 +19,22 @@ import {
   Loader2,
   Calendar,
   AlertTriangle,
+  FileText,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { format, isAfter, addDays } from "date-fns";
+import { ExpenseCharts } from "@/components/ExpenseCharts";
+
+interface Expense {
+  id: string;
+  date: string;
+  description: string;
+  amount: number;
+  category: string;
+  type: 'income' | 'expense';
+  isDeductible: boolean;
+  businessId?: string;
+}
 
 interface ExpenseSummary {
   totalIncome: number;
@@ -45,6 +58,7 @@ const Dashboard = () => {
     totalExpenses: 0,
     deductibleExpenses: 0,
   });
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [upcomingReminders, setUpcomingReminders] = useState<ReminderSummary[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -56,21 +70,34 @@ const Dashboard = () => {
       }
 
       // Fetch expense summary
-      const { data: expenses } = await supabase
+      const { data: expenseData } = await supabase
         .from('expenses')
-        .select('amount, type, is_deductible')
-        .eq('user_id', user.id);
+        .select('*')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false });
 
-      if (expenses) {
-        const income = expenses
+      if (expenseData) {
+        const mapped: Expense[] = expenseData.map(e => ({
+          id: e.id,
+          date: e.date,
+          description: e.description || '',
+          amount: Number(e.amount),
+          category: e.category,
+          type: e.type as 'income' | 'expense',
+          isDeductible: e.is_deductible,
+          businessId: e.business_id || undefined,
+        }));
+        setExpenses(mapped);
+
+        const income = mapped
           .filter(e => e.type === 'income')
-          .reduce((sum, e) => sum + Number(e.amount), 0);
-        const expense = expenses
+          .reduce((sum, e) => sum + e.amount, 0);
+        const expense = mapped
           .filter(e => e.type === 'expense')
-          .reduce((sum, e) => sum + Number(e.amount), 0);
-        const deductible = expenses
-          .filter(e => e.is_deductible)
-          .reduce((sum, e) => sum + Number(e.amount), 0);
+          .reduce((sum, e) => sum + e.amount, 0);
+        const deductible = mapped
+          .filter(e => e.isDeductible)
+          .reduce((sum, e) => sum + e.amount, 0);
 
         setExpenseSummary({
           totalIncome: income,
@@ -362,16 +389,24 @@ const Dashboard = () => {
                     <Receipt className="h-5 w-5 text-primary" />
                     Expense Summary
                   </CardTitle>
-                  <Link to="/expenses">
-                    <Button variant="ghost" size="sm">
-                      View Details
-                      <ArrowRight className="h-4 w-4 ml-1" />
-                    </Button>
-                  </Link>
+                  <div className="flex gap-2">
+                    <Link to="/business-report">
+                      <Button variant="ghost" size="sm">
+                        <FileText className="h-4 w-4 mr-1" />
+                        Reports
+                      </Button>
+                    </Link>
+                    <Link to="/expenses">
+                      <Button variant="ghost" size="sm">
+                        View Details
+                        <ArrowRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4 sm:grid-cols-3">
+                <div className="grid gap-4 sm:grid-cols-3 mb-6">
                   <div className="p-4 rounded-lg bg-success/10 border border-success/20">
                     <p className="text-sm text-muted-foreground mb-1">Total Income</p>
                     <p className="text-2xl font-bold text-success">{formatCurrency(expenseSummary.totalIncome)}</p>
@@ -385,12 +420,24 @@ const Dashboard = () => {
                     <p className="text-2xl font-bold text-primary">{formatCurrency(expenseSummary.deductibleExpenses)}</p>
                   </div>
                 </div>
+
+                {/* Expense Charts */}
+                {tier !== 'free' && expenses.length > 0 && (
+                  <ExpenseCharts expenses={expenses} />
+                )}
+
                 {tier !== 'free' && (
                   <div className="mt-4 flex gap-3">
                     <Link to="/expenses">
                       <Button variant="outline" size="sm">
                         <Plus className="h-4 w-4 mr-1" />
                         Add Expense
+                      </Button>
+                    </Link>
+                    <Link to="/business-report">
+                      <Button variant="outline" size="sm">
+                        <FileText className="h-4 w-4 mr-1" />
+                        Business Reports
                       </Button>
                     </Link>
                     <Button 
