@@ -39,7 +39,7 @@ const TaxFiling = () => {
     const doc = new jsPDF();
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
-    doc.text(`NaijaTaxPro — ${formType}`, 20, 22);
+    doc.text(`TaxForge NG — ${formType}`, 20, 22);
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(11);
@@ -68,7 +68,7 @@ const TaxFiling = () => {
       { maxWidth: 170 }
     );
 
-    const filename = `naijataxpro-${formType.replace(/\s+/g, "-").toLowerCase()}.pdf`;
+    const filename = `taxforge-ng-${formType.replace(/\s+/g, "-").toLowerCase()}.pdf`;
     doc.save(filename);
 
     toast.success(`${formType} downloaded`, {

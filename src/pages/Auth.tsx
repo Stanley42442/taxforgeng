@@ -114,7 +114,7 @@ const Auth = () => {
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary">
                 <Calculator className="h-6 w-6 text-primary-foreground" />
               </div>
-              <span className="text-2xl font-bold text-foreground">NaijaTaxPro</span>
+              <span className="text-2xl font-bold text-foreground">TaxForge NG</span>
             </Link>
             <h1 className="text-2xl font-bold text-foreground">
               {isLogin ? "Welcome Back" : "Create Account"}

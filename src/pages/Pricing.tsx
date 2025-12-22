@@ -193,7 +193,7 @@ const Pricing = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="outline" asChild>
-                <a href="mailto:support@naijataxpro.com">
+                <a href="mailto:support@taxforge.ng">
                   <Mail className="h-4 w-4" />
                   Contact Sales
                 </a>
@@ -213,7 +213,7 @@ const Pricing = () => {
       <footer className="bg-card py-8 border-t border-border">
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm text-muted-foreground">
-            © 2025 NaijaTaxPro. All prices include VAT. For educational purposes.
+            © 2025 TaxForge NG. All prices include VAT. For educational purposes.
           </p>
         </div>
       </footer>

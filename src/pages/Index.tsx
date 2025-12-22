@@ -165,7 +165,7 @@ const Index = () => {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary">
                 <Calculator className="h-4 w-4 text-primary-foreground" />
               </div>
-              <span className="font-bold text-foreground">NaijaTaxPro</span>
+              <span className="font-bold text-foreground">TaxForge NG</span>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
               <Link to="/pricing" className="hover:text-foreground transition-colors">Pricing</Link>
@@ -176,7 +176,7 @@ const Index = () => {
               <Link to="/auth" className="hover:text-foreground transition-colors">Sign In</Link>
             </div>
             <p className="text-sm text-muted-foreground text-center">
-              © 2025 NaijaTaxPro. For educational purposes.
+              © 2025 TaxForge NG. For educational purposes.
             </p>
           </div>
         </div>

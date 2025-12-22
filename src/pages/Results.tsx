@@ -112,7 +112,7 @@ const Results = () => {
       return;
     }
     const rows = [
-      ['NaijaTaxPro Tax Calculation Report'],
+      ['TaxForge NG Tax Calculation Report'],
       [''],
       ['Entity Type', result.entityType],
       ['Tax Rules', inputs.use2026Rules ? '2026 (New Rules)' : 'Pre-2026 (Current)'],
@@ -134,7 +134,7 @@ const Results = () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'naijataxpro-calculation.csv';
+    a.download = 'taxforge-ng-calculation.csv';
     a.click();
     window.URL.revokeObjectURL(url);
   };
