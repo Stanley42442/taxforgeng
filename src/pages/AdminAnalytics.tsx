@@ -92,7 +92,7 @@ const AdminAnalytics = () => {
         supabase.from('businesses').select('id', { count: 'exact' }),
         supabase.from('tax_calculations').select('id', { count: 'exact' }),
         supabase.from('expenses').select('id', { count: 'exact' }),
-        supabase.from('feedback').select('rating', { count: 'exact' }),
+        (supabase.from('feedback') as any).select('rating', { count: 'exact' }),
         supabase.from('reminders').select('id', { count: 'exact' })
       ]);
 
@@ -104,9 +104,9 @@ const AdminAnalytics = () => {
       }, {});
 
       // Calculate average rating
-      const feedbackData = feedbackResult.data || [];
+      const feedbackData = (feedbackResult.data as any[] | null) || [];
       const avgRating = feedbackData.length > 0
-        ? feedbackData.reduce((sum: number, f: { rating: number }) => sum + f.rating, 0) / feedbackData.length
+        ? feedbackData.reduce((sum: number, f: { rating: number }) => sum + (f.rating || 0), 0) / feedbackData.length
         : 0;
 
       setAnalytics({

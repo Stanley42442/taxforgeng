@@ -58,7 +58,7 @@ export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.from('feedback').insert({
+      const { error } = await (supabase.from('feedback') as any).insert({
         user_id: user.id,
         rating,
         category,

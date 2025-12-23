@@ -158,7 +158,7 @@ export type Database = {
           category: string
           created_at: string
           id: string
-          message: string
+          message: string | null
           rating: number
           user_id: string
         }
@@ -166,7 +166,7 @@ export type Database = {
           category: string
           created_at?: string
           id?: string
-          message: string
+          message?: string | null
           rating: number
           user_id: string
         }
@@ -174,7 +174,7 @@ export type Database = {
           category?: string
           created_at?: string
           id?: string
-          message?: string
+          message?: string | null
           rating?: number
           user_id?: string
         }
@@ -347,20 +347,26 @@ export type Database = {
         Row: {
           created_at: string
           email: string
+          feature_interest: string | null
           id: string
           name: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string
           email: string
+          feature_interest?: string | null
           id?: string
           name?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string
           email?: string
+          feature_interest?: string | null
           id?: string
           name?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
