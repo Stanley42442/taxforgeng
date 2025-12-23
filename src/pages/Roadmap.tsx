@@ -152,7 +152,7 @@ const Roadmap = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.from('waitlist').insert({
+      const { error } = await (supabase.from('waitlist') as any).insert({
         email: email.trim(),
         name: name.trim() || null,
         feature_interest: feature || null,
