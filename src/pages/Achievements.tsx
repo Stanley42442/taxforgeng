@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
 import { NavMenu } from "@/components/NavMenu";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { useAchievements } from "@/hooks/useAchievements";
 import { useNavigate } from "react-router-dom";
 import {
   Trophy,
@@ -17,14 +17,16 @@ import {
   Users,
   CheckCircle2,
   Lock,
-  Flame
+  Flame,
+  Receipt,
+  Loader2,
 } from "lucide-react";
 
 interface Achievement {
   id: string;
   title: string;
   description: string;
-  icon: any;
+  icon: React.ElementType;
   points: number;
   unlocked: boolean;
   progress?: number;
@@ -32,29 +34,11 @@ interface Achievement {
   category: 'starter' | 'calculation' | 'filing' | 'streak' | 'social';
 }
 
-interface UserStats {
-  totalPoints: number;
-  calculationsCount: number;
-  businessesSaved: number;
-  remindersSet: number;
-  streak: number;
-  level: number;
-}
-
 const Achievements = () => {
-  const { tier, savedBusinesses } = useSubscription();
+  const { tier } = useSubscription();
+  const { stats, earnedBadges, loading } = useAchievements();
   const navigate = useNavigate();
   const isBasicPlus = tier !== 'free';
-
-  // Mock user stats - in production these would come from backend
-  const [stats, setStats] = useState<UserStats>({
-    totalPoints: 250,
-    calculationsCount: 8,
-    businessesSaved: savedBusinesses.length,
-    remindersSet: 3,
-    streak: 5,
-    level: 2
-  });
 
   const getLevel = (points: number) => {
     if (points >= 1000) return { level: 5, title: 'Tax Master', nextLevel: null };
@@ -66,6 +50,8 @@ const Achievements = () => {
 
   const currentLevel = getLevel(stats.totalPoints);
 
+  const hasBadge = (badgeId: string) => earnedBadges.some(b => b.badgeId === badgeId);
+
   const achievements: Achievement[] = [
     {
       id: 'first_calc',
@@ -73,7 +59,7 @@ const Achievements = () => {
       description: 'Complete your first tax calculation',
       icon: Calculator,
       points: 10,
-      unlocked: stats.calculationsCount >= 1,
+      unlocked: stats.calculationsCount >= 1 || hasBadge('first_calc'),
       category: 'starter'
     },
     {
@@ -82,7 +68,16 @@ const Achievements = () => {
       description: 'Save your first business',
       icon: FileText,
       points: 50,
-      unlocked: stats.businessesSaved >= 1,
+      unlocked: stats.businessesSaved >= 1 || hasBadge('save_business'),
+      category: 'starter'
+    },
+    {
+      id: 'expense_tracker',
+      title: 'Expense Tracker',
+      description: 'Add your first expense entry',
+      icon: Receipt,
+      points: 15,
+      unlocked: stats.expensesCount >= 1 || hasBadge('expense_tracker'),
       category: 'starter'
     },
     {
@@ -91,7 +86,7 @@ const Achievements = () => {
       description: 'Complete 5 tax calculations',
       icon: Zap,
       points: 25,
-      unlocked: stats.calculationsCount >= 5,
+      unlocked: stats.calculationsCount >= 5 || hasBadge('five_calcs'),
       progress: Math.min(stats.calculationsCount, 5),
       maxProgress: 5,
       category: 'calculation'
@@ -102,7 +97,7 @@ const Achievements = () => {
       description: 'Complete 10 tax calculations',
       icon: Trophy,
       points: 50,
-      unlocked: stats.calculationsCount >= 10,
+      unlocked: stats.calculationsCount >= 10 || hasBadge('ten_calcs'),
       progress: Math.min(stats.calculationsCount, 10),
       maxProgress: 10,
       category: 'calculation'
@@ -113,7 +108,7 @@ const Achievements = () => {
       description: 'Set up a tax deadline reminder',
       icon: Bell,
       points: 20,
-      unlocked: stats.remindersSet >= 1,
+      unlocked: stats.remindersSet >= 1 || hasBadge('set_reminder'),
       category: 'starter'
     },
     {
@@ -122,9 +117,20 @@ const Achievements = () => {
       description: 'Save 3 businesses',
       icon: Target,
       points: 75,
-      unlocked: stats.businessesSaved >= 3,
+      unlocked: stats.businessesSaved >= 3 || hasBadge('three_businesses'),
       progress: Math.min(stats.businessesSaved, 3),
       maxProgress: 3,
+      category: 'filing'
+    },
+    {
+      id: 'ten_expenses',
+      title: 'Finance Tracker',
+      description: 'Track 10 income/expense entries',
+      icon: Receipt,
+      points: 30,
+      unlocked: stats.expensesCount >= 10 || hasBadge('ten_expenses'),
+      progress: Math.min(stats.expensesCount, 10),
+      maxProgress: 10,
       category: 'filing'
     },
     {
@@ -133,7 +139,7 @@ const Achievements = () => {
       description: 'Maintain a 7-day login streak',
       icon: Flame,
       points: 100,
-      unlocked: stats.streak >= 7,
+      unlocked: stats.streak >= 7 || hasBadge('week_streak'),
       progress: Math.min(stats.streak, 7),
       maxProgress: 7,
       category: 'streak'
@@ -144,7 +150,7 @@ const Achievements = () => {
       description: 'Complete a mock e-filing',
       icon: FileText,
       points: 100,
-      unlocked: false,
+      unlocked: hasBadge('mock_filing'),
       category: 'filing'
     },
     {
@@ -153,7 +159,7 @@ const Achievements = () => {
       description: 'Invite a team member',
       icon: Users,
       points: 50,
-      unlocked: false,
+      unlocked: hasBadge('invite_team'),
       category: 'social'
     },
     {
@@ -162,7 +168,7 @@ const Achievements = () => {
       description: 'File all returns on time for a year',
       icon: Award,
       points: 500,
-      unlocked: false,
+      unlocked: hasBadge('perfect_year'),
       category: 'filing'
     },
   ];
@@ -170,14 +176,6 @@ const Achievements = () => {
   const unlockedAchievements = achievements.filter(a => a.unlocked);
   const lockedAchievements = achievements.filter(a => !a.unlocked);
   const earnedPoints = unlockedAchievements.reduce((sum, a) => sum + a.points, 0);
-
-  const categoryLabels: Record<Achievement['category'], string> = {
-    starter: 'Getting Started',
-    calculation: 'Calculations',
-    filing: 'Filing & Compliance',
-    streak: 'Streaks',
-    social: 'Social'
-  };
 
   const getCategoryIcon = (category: Achievement['category']) => {
     switch (category) {
@@ -189,6 +187,12 @@ const Achievements = () => {
       default: return Star;
     }
   };
+
+  // Find next achievement to unlock
+  const nextUnlock = lockedAchievements.find(a => a.progress !== undefined && a.maxProgress !== undefined && a.progress > 0);
+  const nextUnlockMessage = nextUnlock 
+    ? `Complete ${nextUnlock.maxProgress! - nextUnlock.progress!} more to unlock "${nextUnlock.title}"!`
+    : 'Keep using TaxForge NG to unlock more achievements!';
 
   if (!isBasicPlus) {
     return (
@@ -208,6 +212,18 @@ const Achievements = () => {
               Upgrade to Basic
             </Button>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-hero">
+        <NavMenu />
+        <div className="container mx-auto px-4 py-20 text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground mt-4">Loading achievements...</p>
         </div>
       </div>
     );
@@ -241,7 +257,7 @@ const Achievements = () => {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-foreground">{currentLevel.title}</h2>
-                  <p className="text-sm text-muted-foreground">{stats.totalPoints} total points</p>
+                  <p className="text-sm text-muted-foreground">{stats.totalPoints || earnedPoints} total points</p>
                 </div>
               </div>
               <div className="text-right">
@@ -258,10 +274,10 @@ const Achievements = () => {
                 <div className="flex justify-between text-sm mb-2">
                   <span className="text-muted-foreground">Progress to Level {currentLevel.level + 1}</span>
                   <span className="text-foreground font-medium">
-                    {stats.totalPoints} / {currentLevel.nextLevel}
+                    {stats.totalPoints || earnedPoints} / {currentLevel.nextLevel}
                   </span>
                 </div>
-                <Progress value={(stats.totalPoints / currentLevel.nextLevel) * 100} className="h-3" />
+                <Progress value={((stats.totalPoints || earnedPoints) / currentLevel.nextLevel) * 100} className="h-3" />
               </div>
             )}
           </div>
@@ -296,27 +312,34 @@ const Achievements = () => {
               <CheckCircle2 className="h-5 w-5 text-success" />
               Unlocked ({unlockedAchievements.length})
             </h2>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {unlockedAchievements.map((achievement) => (
-                <div 
-                  key={achievement.id}
-                  className="flex items-center gap-3 p-4 rounded-xl bg-success/10 border border-success/20"
-                >
-                  <div className="h-12 w-12 rounded-full bg-success/20 flex items-center justify-center shrink-0">
-                    <achievement.icon className="h-6 w-6 text-success" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-foreground text-sm">{achievement.title}</h3>
-                      <span className="text-xs bg-success/20 text-success px-2 py-0.5 rounded-full">
-                        +{achievement.points}
-                      </span>
+            {unlockedAchievements.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Trophy className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <p>Start using TaxForge NG to unlock achievements!</p>
+              </div>
+            ) : (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {unlockedAchievements.map((achievement) => (
+                  <div 
+                    key={achievement.id}
+                    className="flex items-center gap-3 p-4 rounded-xl bg-success/10 border border-success/20"
+                  >
+                    <div className="h-12 w-12 rounded-full bg-success/20 flex items-center justify-center shrink-0">
+                      <achievement.icon className="h-6 w-6 text-success" />
                     </div>
-                    <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-medium text-foreground text-sm">{achievement.title}</h3>
+                        <span className="text-xs bg-success/20 text-success px-2 py-0.5 rounded-full">
+                          +{achievement.points}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Locked Achievements */}
@@ -362,7 +385,7 @@ const Achievements = () => {
           {/* Motivation */}
           <div className="mt-6 p-4 rounded-lg bg-primary/10 border border-primary/20 text-center">
             <p className="text-sm text-primary">
-              🎯 Complete 2 more calculations to unlock "Number Cruncher" badge!
+              🎯 {nextUnlockMessage}
             </p>
           </div>
         </div>

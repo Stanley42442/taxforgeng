@@ -153,33 +153,6 @@ export type Database = {
           },
         ]
       }
-      feedback: {
-        Row: {
-          category: string | null
-          created_at: string
-          id: string
-          message: string | null
-          rating: number
-          user_id: string
-        }
-        Insert: {
-          category?: string | null
-          created_at?: string
-          id?: string
-          message?: string | null
-          rating: number
-          user_id: string
-        }
-        Update: {
-          category?: string | null
-          created_at?: string
-          id?: string
-          message?: string | null
-          rating?: number
-          user_id?: string
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           created_at: string
@@ -340,33 +313,6 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
-        }
-        Relationships: []
-      }
-      waitlist: {
-        Row: {
-          created_at: string
-          email: string
-          feature_interest: string | null
-          id: string
-          name: string | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          feature_interest?: string | null
-          id?: string
-          name?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          feature_interest?: string | null
-          id?: string
-          name?: string | null
-          user_id?: string | null
         }
         Relationships: []
       }
