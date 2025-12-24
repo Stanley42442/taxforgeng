@@ -7,6 +7,7 @@ import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { TaxAssistant } from "@/components/TaxAssistant";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -74,6 +75,7 @@ const App = () => (
                 <Route path="/admin-analytics" element={<AdminAnalytics />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              <TaxAssistant />
             </BrowserRouter>
           </TooltipProvider>
         </SubscriptionProvider>
