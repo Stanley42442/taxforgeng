@@ -187,12 +187,39 @@ const Reminders = () => {
     toast.success('Custom reminder added');
   };
 
-  const sendTestEmail = (business: SavedBusiness, reminderType: string) => {
+  const [sendingEmail, setSendingEmail] = useState<string | null>(null);
+
+  const sendTestEmail = async (business: SavedBusiness, reminderType: string) => {
+    if (!user?.email) {
+      toast.error('No email address found for your account');
+      return;
+    }
+
     const template = DEFAULT_REMINDERS.find(d => d.type === reminderType);
-    toast.success(
-      `Test email sent! "Reminder: ${template?.name || reminderType} due in 7 days for ${business.name}"`,
-      { duration: 5000 }
-    );
+    const reminder = reminders.find(r => r.businessId === business.id && r.type === reminderType);
+    
+    setSendingEmail(`${business.id}-${reminderType}`);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('send-reminder-email', {
+        body: {
+          userEmail: user.email,
+          businessName: business.name,
+          reminderType: reminderType,
+          dueDate: reminder?.dueDate || template?.dueDate || 'Soon',
+          reminderTitle: template?.name || reminderType,
+        },
+      });
+
+      if (error) throw error;
+
+      toast.success(`Test email sent to ${user.email}!`, { duration: 5000 });
+    } catch (error) {
+      console.error('Error sending test email:', error);
+      toast.error('Failed to send test email. Please check your email configuration.');
+    } finally {
+      setSendingEmail(null);
+    }
   };
 
   const deleteReminder = async (id: string) => {
@@ -417,9 +444,14 @@ const Reminders = () => {
                                 size="sm"
                                 onClick={() => sendTestEmail(business, reminder.type)}
                                 className="text-xs"
+                                disabled={sendingEmail === `${business.id}-${reminder.type}`}
                               >
-                                <Mail className="w-3 h-3 mr-1" />
-                                Test
+                                {sendingEmail === `${business.id}-${reminder.type}` ? (
+                                  <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                ) : (
+                                  <Mail className="w-3 h-3 mr-1" />
+                                )}
+                                {sendingEmail === `${business.id}-${reminder.type}` ? 'Sending...' : 'Test'}
                               </Button>
                             )}
                             <Switch
