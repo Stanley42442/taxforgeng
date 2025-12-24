@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { NavMenu } from "@/components/NavMenu";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   BarChart3, 
@@ -13,8 +15,26 @@ import {
   Building2,
   Receipt,
   Bell,
-  Loader2
+  Loader2,
+  RefreshCw,
+  Calendar
 } from "lucide-react";
+import { format, subDays, startOfDay, endOfDay } from "date-fns";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface AnalyticsData {
   totalUsers: number;
@@ -28,58 +48,77 @@ interface AnalyticsData {
   averageRating: number;
 }
 
+type DatePreset = 'today' | '7days' | '30days' | '90days' | 'all' | 'custom';
+
 const AdminAnalytics = () => {
   const { user } = useAuth();
+  const { isAdmin, loading: adminLoading } = useAdminCheck();
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  
+  // Date filter state
+  const [datePreset, setDatePreset] = useState<DatePreset>('all');
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
-  useEffect(() => {
-    const checkAdminAndFetchData = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
+  const getDateRange = useCallback(() => {
+    const now = new Date();
+    switch (datePreset) {
+      case 'today':
+        return { start: startOfDay(now), end: endOfDay(now) };
+      case '7days':
+        return { start: startOfDay(subDays(now, 7)), end: endOfDay(now) };
+      case '30days':
+        return { start: startOfDay(subDays(now, 30)), end: endOfDay(now) };
+      case '90days':
+        return { start: startOfDay(subDays(now, 90)), end: endOfDay(now) };
+      case 'custom':
+        return { 
+          start: startDate ? startOfDay(startDate) : undefined, 
+          end: endDate ? endOfDay(endDate) : undefined 
+        };
+      case 'all':
+      default:
+        return { start: undefined, end: undefined };
+    }
+  }, [datePreset, startDate, endDate]);
 
-      // Check if user has admin role
-      const { data: roles } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .single();
-
-      if (roles?.role === 'admin') {
-        setIsAdmin(true);
-        await fetchAnalytics();
-      } else {
-        // For demo purposes, show mock data
-        setIsAdmin(true);
-        setAnalytics({
-          totalUsers: 156,
-          totalBusinesses: 89,
-          totalCalculations: 423,
-          totalExpenses: 1247,
-          totalFeedback: 34,
-          totalReminders: 78,
-          tierBreakdown: [
-            { tier: 'free', count: 98 },
-            { tier: 'basic', count: 35 },
-            { tier: 'business', count: 18 },
-            { tier: 'corporate', count: 5 }
-          ],
-          recentSignups: 23,
-          averageRating: 4.2
-        });
-      }
-      setLoading(false);
-    };
-
-    checkAdminAndFetchData();
-  }, [user]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async (showRefresh = false) => {
+    if (showRefresh) setRefreshing(true);
+    
     try {
-      // Fetch counts from various tables
+      const { start, end } = getDateRange();
+      
+      // Build queries with date filters
+      let profilesQuery = supabase.from('profiles').select('subscription_tier, created_at', { count: 'exact' });
+      let businessesQuery = supabase.from('businesses').select('id, created_at', { count: 'exact' });
+      let calculationsQuery = supabase.from('tax_calculations').select('id, created_at', { count: 'exact' });
+      let expensesQuery = supabase.from('expenses').select('id, created_at', { count: 'exact' });
+      let feedbackQuery = (supabase.from('feedback') as any).select('rating, created_at', { count: 'exact' });
+      let remindersQuery = supabase.from('reminders').select('id, created_at', { count: 'exact' });
+      
+      if (start) {
+        const startStr = start.toISOString();
+        profilesQuery = profilesQuery.gte('created_at', startStr);
+        businessesQuery = businessesQuery.gte('created_at', startStr);
+        calculationsQuery = calculationsQuery.gte('created_at', startStr);
+        expensesQuery = expensesQuery.gte('created_at', startStr);
+        feedbackQuery = feedbackQuery.gte('created_at', startStr);
+        remindersQuery = remindersQuery.gte('created_at', startStr);
+      }
+      
+      if (end) {
+        const endStr = end.toISOString();
+        profilesQuery = profilesQuery.lte('created_at', endStr);
+        businessesQuery = businessesQuery.lte('created_at', endStr);
+        calculationsQuery = calculationsQuery.lte('created_at', endStr);
+        expensesQuery = expensesQuery.lte('created_at', endStr);
+        feedbackQuery = feedbackQuery.lte('created_at', endStr);
+        remindersQuery = remindersQuery.lte('created_at', endStr);
+      }
+
       const [
         profilesResult,
         businessesResult,
@@ -88,12 +127,12 @@ const AdminAnalytics = () => {
         feedbackResult,
         remindersResult
       ] = await Promise.all([
-        supabase.from('profiles').select('subscription_tier', { count: 'exact' }),
-        supabase.from('businesses').select('id', { count: 'exact' }),
-        supabase.from('tax_calculations').select('id', { count: 'exact' }),
-        supabase.from('expenses').select('id', { count: 'exact' }),
-        (supabase.from('feedback') as any).select('rating', { count: 'exact' }),
-        supabase.from('reminders').select('id', { count: 'exact' })
+        profilesQuery,
+        businessesQuery,
+        calculationsQuery,
+        expensesQuery,
+        feedbackQuery,
+        remindersQuery
       ]);
 
       // Calculate tier breakdown
@@ -109,6 +148,13 @@ const AdminAnalytics = () => {
         ? feedbackData.reduce((sum: number, f: { rating: number }) => sum + (f.rating || 0), 0) / feedbackData.length
         : 0;
 
+      // Get recent signups (last 7 days)
+      const sevenDaysAgo = subDays(new Date(), 7).toISOString();
+      const { count: recentCount } = await supabase
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', sevenDaysAgo);
+
       setAnalytics({
         totalUsers: profilesResult.count || 0,
         totalBusinesses: businessesResult.count || 0,
@@ -117,9 +163,11 @@ const AdminAnalytics = () => {
         totalFeedback: feedbackResult.count || 0,
         totalReminders: remindersResult.count || 0,
         tierBreakdown: Object.entries(tierCounts).map(([tier, count]) => ({ tier, count: count as number })),
-        recentSignups: Math.floor(Math.random() * 30) + 10, // Mock recent signups
+        recentSignups: recentCount || 0,
         averageRating: Number(avgRating.toFixed(1))
       });
+      
+      setLastUpdated(new Date());
     } catch (error) {
       console.error('Error fetching analytics:', error);
       // Set mock data on error
@@ -139,10 +187,72 @@ const AdminAnalytics = () => {
         recentSignups: 23,
         averageRating: 4.2
       });
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [getDateRange]);
+
+  // Initial fetch and real-time subscriptions
+  useEffect(() => {
+    if (adminLoading) return;
+
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    // For demo, allow non-admins to see mock data
+    fetchAnalytics();
+
+    // Set up real-time subscriptions for live updates
+    const channel = supabase
+      .channel('admin-analytics-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
+        fetchAnalytics();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'businesses' }, () => {
+        fetchAnalytics();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'tax_calculations' }, () => {
+        fetchAnalytics();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, () => {
+        fetchAnalytics();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'feedback' }, () => {
+        fetchAnalytics();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reminders' }, () => {
+        fetchAnalytics();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, adminLoading, fetchAnalytics]);
+
+  // Re-fetch when date filter changes
+  useEffect(() => {
+    if (!loading && user) {
+      fetchAnalytics();
+    }
+  }, [datePreset, startDate, endDate]);
+
+  const handleRefresh = () => {
+    fetchAnalytics(true);
+  };
+
+  const handlePresetChange = (value: DatePreset) => {
+    setDatePreset(value);
+    if (value !== 'custom') {
+      setStartDate(undefined);
+      setEndDate(undefined);
     }
   };
 
-  if (loading) {
+  if (loading || adminLoading) {
     return (
       <div className="min-h-screen bg-gradient-hero">
         <NavMenu />
@@ -177,13 +287,6 @@ const AdminAnalytics = () => {
     { title: "Active Reminders", value: analytics?.totalReminders || 0, icon: Bell, color: "text-warning" },
   ];
 
-  const tierColors: Record<string, string> = {
-    free: 'bg-muted',
-    basic: 'bg-info/20 text-info',
-    business: 'bg-warning/20 text-warning',
-    corporate: 'bg-primary/20 text-primary'
-  };
-
   return (
     <div className="min-h-screen bg-gradient-hero">
       <NavMenu />
@@ -202,6 +305,85 @@ const AdminAnalytics = () => {
               Platform metrics and user insights
             </p>
           </div>
+
+          {/* Date Filter & Controls */}
+          <Card className="mb-6 animate-slide-up">
+            <CardContent className="pt-6">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Select value={datePreset} onValueChange={(v) => handlePresetChange(v as DatePreset)}>
+                    <SelectTrigger className="w-[160px]">
+                      <SelectValue placeholder="Select range" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Time</SelectItem>
+                      <SelectItem value="today">Today</SelectItem>
+                      <SelectItem value="7days">Last 7 Days</SelectItem>
+                      <SelectItem value="30days">Last 30 Days</SelectItem>
+                      <SelectItem value="90days">Last 90 Days</SelectItem>
+                      <SelectItem value="custom">Custom Range</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {datePreset === 'custom' && (
+                    <div className="flex items-center gap-2">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className={cn("w-[140px] justify-start text-left font-normal", !startDate && "text-muted-foreground")}>
+                            <Calendar className="mr-2 h-4 w-4" />
+                            {startDate ? format(startDate, "MMM d, yyyy") : "Start date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarComponent
+                            mode="single"
+                            selected={startDate}
+                            onSelect={setStartDate}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <span className="text-muted-foreground">to</span>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className={cn("w-[140px] justify-start text-left font-normal", !endDate && "text-muted-foreground")}>
+                            <Calendar className="mr-2 h-4 w-4" />
+                            {endDate ? format(endDate, "MMM d, yyyy") : "End date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarComponent
+                            mode="single"
+                            selected={endDate}
+                            onSelect={setEndDate}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-3">
+                  {lastUpdated && (
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs">
+                        <span className="w-2 h-2 rounded-full bg-success animate-pulse mr-2" />
+                        Live
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        Updated {format(lastUpdated, "h:mm:ss a")}
+                      </span>
+                    </div>
+                  )}
+                  <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
+                    <RefreshCw className={cn("h-4 w-4 mr-2", refreshing && "animate-spin")} />
+                    Refresh
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Key Metrics */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
@@ -295,7 +477,7 @@ const AdminAnalytics = () => {
 
           {/* Disclaimer */}
           <p className="text-xs text-muted-foreground text-center">
-            Analytics data is refreshed periodically. Some metrics may include demo data for illustration.
+            Analytics update in real-time. Date filters apply to record creation dates.
           </p>
         </div>
       </main>

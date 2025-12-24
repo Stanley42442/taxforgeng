@@ -6,6 +6,7 @@ import { TierSwitcher } from "@/components/TierSwitcher";
 import { FeedbackForm } from "@/components/FeedbackForm";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { 
   Calculator, 
   Crown, 
@@ -31,6 +32,7 @@ import {
   LayoutDashboard,
   PieChart,
   Map,
+  Shield,
 } from "lucide-react";
 import {
   Sheet,
@@ -43,6 +45,7 @@ import { toast } from "sonner";
 export const NavMenu = () => {
   const { tier } = useSubscription();
   const { user, signOut, loading } = useAuth();
+  const { isAdmin } = useAdminCheck();
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -54,25 +57,26 @@ export const NavMenu = () => {
   };
 
   const navLinks = [
-    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, minTier: 'free' },
-    { to: "/advisory", label: "Get Advice", icon: Lightbulb, minTier: 'free' },
-    { to: "/calculator", label: "Calculator", icon: Calculator, minTier: 'free' },
-    { to: "/learn", label: "Learn", icon: GraduationCap, minTier: 'free' },
-    { to: "/pricing", label: "Pricing", icon: DollarSign, minTier: 'free' },
-    { to: "/businesses", label: "My Businesses", icon: FolderOpen, minTier: 'free' },
-    { to: "/achievements", label: "Achievements", icon: Trophy, minTier: 'basic' },
-    { to: "/reminders", label: "Reminders", icon: Bell, minTier: 'basic' },
-    { to: "/expenses", label: "Expenses", icon: Receipt, minTier: 'basic' },
-    { to: "/scenarios", label: "Scenarios", icon: GitBranch, minTier: 'business' },
-    { to: "/business-report", label: "Reports", icon: PieChart, minTier: 'basic' },
-    { to: "/insights", label: "Insights", icon: BarChart3, minTier: 'business' },
-    { to: "/transactions", label: "Transactions", icon: Upload, minTier: 'business' },
-    { to: "/e-filing", label: "E-Filing", icon: Send, minTier: 'business' },
-    { to: "/tax-filing", label: "Tax Filing", icon: FileText, minTier: 'business' },
-    { to: "/team", label: "Team", icon: Users, minTier: 'business' },
-    { to: "/api-docs", label: "API Docs", icon: Code, minTier: 'corporate' },
-    { to: "/audit-log", label: "Audit Log", icon: History, minTier: 'corporate' },
-    { to: "/roadmap", label: "Roadmap", icon: Map, minTier: 'free' },
+    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, minTier: 'free', adminOnly: false },
+    { to: "/advisory", label: "Get Advice", icon: Lightbulb, minTier: 'free', adminOnly: false },
+    { to: "/calculator", label: "Calculator", icon: Calculator, minTier: 'free', adminOnly: false },
+    { to: "/learn", label: "Learn", icon: GraduationCap, minTier: 'free', adminOnly: false },
+    { to: "/pricing", label: "Pricing", icon: DollarSign, minTier: 'free', adminOnly: false },
+    { to: "/businesses", label: "My Businesses", icon: FolderOpen, minTier: 'free', adminOnly: false },
+    { to: "/achievements", label: "Achievements", icon: Trophy, minTier: 'basic', adminOnly: false },
+    { to: "/reminders", label: "Reminders", icon: Bell, minTier: 'basic', adminOnly: false },
+    { to: "/expenses", label: "Expenses", icon: Receipt, minTier: 'basic', adminOnly: false },
+    { to: "/scenarios", label: "Scenarios", icon: GitBranch, minTier: 'business', adminOnly: false },
+    { to: "/business-report", label: "Reports", icon: PieChart, minTier: 'basic', adminOnly: false },
+    { to: "/insights", label: "Insights", icon: BarChart3, minTier: 'business', adminOnly: false },
+    { to: "/transactions", label: "Transactions", icon: Upload, minTier: 'business', adminOnly: false },
+    { to: "/e-filing", label: "E-Filing", icon: Send, minTier: 'business', adminOnly: false },
+    { to: "/tax-filing", label: "Tax Filing", icon: FileText, minTier: 'business', adminOnly: false },
+    { to: "/team", label: "Team", icon: Users, minTier: 'business', adminOnly: false },
+    { to: "/api-docs", label: "API Docs", icon: Code, minTier: 'corporate', adminOnly: false },
+    { to: "/audit-log", label: "Audit Log", icon: History, minTier: 'corporate', adminOnly: false },
+    { to: "/roadmap", label: "Roadmap", icon: Map, minTier: 'free', adminOnly: false },
+    { to: "/admin-analytics", label: "Admin Analytics", icon: Shield, minTier: 'free', adminOnly: true },
   ];
 
   const tierOrder = ['free', 'basic', 'business', 'corporate'];
@@ -80,7 +84,9 @@ export const NavMenu = () => {
   
   const filteredLinks = navLinks.filter(link => {
     const linkTierIndex = tierOrder.indexOf(link.minTier);
-    return linkTierIndex <= userTierIndex;
+    const tierMatch = linkTierIndex <= userTierIndex;
+    const adminMatch = link.adminOnly ? isAdmin : true;
+    return tierMatch && adminMatch;
   });
 
   const isActive = (path: string) => location.pathname === path;
