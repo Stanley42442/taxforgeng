@@ -79,10 +79,10 @@ const CalculatorPage = () => {
   const canCalculate = Number(inputs.turnover) > 0;
 
   return (
-    <div className="min-h-screen bg-gradient-hero">
+    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
       <NavMenu />
 
-      <main className="container mx-auto px-4 py-8 pb-20">
+      <main className="container mx-auto px-4 py-6 pb-8 flex-1">
         <div className="mx-auto max-w-2xl">
           <div className="text-center mb-8 animate-slide-up">
             <h1 className="text-3xl font-bold text-foreground mb-2">

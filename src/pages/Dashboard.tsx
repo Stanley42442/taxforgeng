@@ -210,7 +210,7 @@ const Dashboard = () => {
   const totalTurnover = savedBusinesses.reduce((sum, b) => sum + b.turnover, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-hero">
+    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
       <NavMenu />
       
       {/* Disclaimer Modal - must accept before using */}
@@ -226,7 +226,7 @@ const Dashboard = () => {
       {/* Welcome Splash for new users */}
       {showWelcome && <WelcomeSplash onComplete={() => setShowWelcome(false)} />}
 
-      <main className="container mx-auto px-4 py-8 pb-20">
+      <main className="container mx-auto px-4 py-6 pb-8 flex-1">
         <div className="mx-auto max-w-6xl">
           {/* Header */}
           <div className="mb-8 animate-slide-up">

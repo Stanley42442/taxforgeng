@@ -81,10 +81,10 @@ const Advisory = () => {
 
   if (showResult && recommendation) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
+      <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
         <NavMenu />
 
-        <main className="container mx-auto px-4 py-8">
+        <main className="container mx-auto px-4 py-6 pb-8 flex-1">
           <div className="mx-auto max-w-2xl animate-slide-up">
             <div className="mb-8 text-center">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary">
@@ -196,10 +196,10 @@ const Advisory = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero">
+    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
       <NavMenu />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-6 pb-8 flex-1">
         <div className="mb-6 flex justify-end">
           <Link to="/calculator">
             <Button variant="ghost" size="sm">

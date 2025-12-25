@@ -67,10 +67,10 @@ const Pricing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero">
+    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
       <NavMenu />
 
-      <main className="container mx-auto px-4 py-12 pb-20">
+      <main className="container mx-auto px-4 py-8 pb-12 flex-1">
         {/* Header */}
         <div className="text-center mb-12 animate-slide-up">
           <h1 className="text-4xl font-extrabold text-foreground mb-4">
@@ -210,7 +210,7 @@ const Pricing = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-card py-8 border-t border-border">
+      <footer className="bg-card py-6 border-t border-border mt-auto">
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm text-muted-foreground">
             © 2025 TaxForge NG. All prices include VAT. For educational purposes.

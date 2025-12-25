@@ -214,10 +214,10 @@ const BusinessReport = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero">
+    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
       <NavMenu />
 
-      <main className="container mx-auto px-4 py-8 pb-20">
+      <main className="container mx-auto px-4 py-6 pb-8 flex-1">
         <div className="mx-auto max-w-5xl">
           {/* Header */}
           <div className="flex items-center justify-between mb-6 animate-slide-up">
