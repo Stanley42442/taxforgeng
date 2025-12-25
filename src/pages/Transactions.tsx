@@ -156,10 +156,10 @@ const Transactions = () => {
   const totals = getTotals();
 
   return (
-    <div className="min-h-screen bg-gradient-hero">
+    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
       <NavMenu />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 pb-8 flex-1">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
             <FileSpreadsheet className="inline-block w-8 h-8 mr-2 text-primary" />
