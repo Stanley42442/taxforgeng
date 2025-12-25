@@ -30,62 +30,59 @@ export const DisclaimerModal = ({ onAccept }: DisclaimerModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-lg" onPointerDownOutside={(e) => e.preventDefault()}>
-        <DialogHeader>
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-warning/20">
-            <AlertTriangle className="h-7 w-7 text-warning" />
+      <DialogContent className="w-[calc(100%-2rem)] max-w-lg max-h-[90vh] overflow-y-auto mx-auto" onPointerDownOutside={(e) => e.preventDefault()}>
+        <DialogHeader className="pb-2">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-warning/20">
+            <AlertTriangle className="h-6 w-6 text-warning" />
           </div>
-          <DialogTitle className="text-center text-xl">Important Disclaimer</DialogTitle>
-          <DialogDescription className="text-center">
+          <DialogTitle className="text-center text-lg sm:text-xl">Important Disclaimer</DialogTitle>
+          <DialogDescription className="text-center text-xs sm:text-sm">
             Please read and acknowledge before using TaxForge NG
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          <div className="space-y-3">
-            <div className="flex gap-3 p-3 rounded-lg bg-muted">
-              <Scale className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-              <div className="text-sm">
+        <div className="space-y-3 py-2">
+          <div className="space-y-2">
+            <div className="flex gap-2 p-2 sm:p-3 rounded-lg bg-muted">
+              <Scale className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0 mt-0.5" />
+              <div className="text-xs sm:text-sm">
                 <p className="font-medium text-foreground">Educational Purposes Only</p>
                 <p className="text-muted-foreground">
-                  This app provides tax estimates based on the Nigeria Tax Act 2025. 
-                  All calculations are for educational and planning purposes only.
+                  This app provides tax estimates based on the Nigeria Tax Act 2025 for educational and planning purposes.
                 </p>
               </div>
             </div>
 
-            <div className="flex gap-3 p-3 rounded-lg bg-muted">
-              <Shield className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-              <div className="text-sm">
+            <div className="flex gap-2 p-2 sm:p-3 rounded-lg bg-muted">
+              <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0 mt-0.5" />
+              <div className="text-xs sm:text-sm">
                 <p className="font-medium text-foreground">Not Official Tax Advice</p>
                 <p className="text-muted-foreground">
-                  Always consult FIRS, your state IRS, or certified tax professionals 
-                  for official guidance before filing or making financial decisions.
+                  Always consult FIRS, your state IRS, or certified tax professionals for official guidance.
                 </p>
               </div>
             </div>
 
-            <div className="flex gap-3 p-3 rounded-lg bg-destructive/10 border border-destructive/20">
-              <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
-              <div className="text-sm">
+            <div className="flex gap-2 p-2 sm:p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+              <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-destructive flex-shrink-0 mt-0.5" />
+              <div className="text-xs sm:text-sm">
                 <p className="font-medium text-foreground">No Liability</p>
                 <p className="text-muted-foreground">
-                  TaxForge NG and its operators are not liable for any errors, 
-                  omissions, penalties, or decisions made based on this platform.
+                  TaxForge NG is not liable for any errors, omissions, or decisions made based on this platform.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="flex items-start gap-3 pt-2">
+          <div className="flex items-start gap-2 pt-1">
             <Checkbox 
               id="accept" 
               checked={accepted} 
               onCheckedChange={(checked) => setAccepted(checked as boolean)}
+              className="mt-0.5"
             />
-            <Label htmlFor="accept" className="text-sm leading-relaxed cursor-pointer">
-              I understand and acknowledge that this is not official tax advice. 
-              I agree to the{" "}
+            <Label htmlFor="accept" className="text-xs sm:text-sm leading-relaxed cursor-pointer">
+              I understand this is not official tax advice. I agree to the{" "}
               <Link to="/terms" className="text-primary hover:underline" onClick={() => setOpen(false)}>
                 Terms of Service & Privacy Policy
               </Link>.
@@ -95,7 +92,7 @@ export const DisclaimerModal = ({ onAccept }: DisclaimerModalProps) => {
 
         <Button 
           variant="hero" 
-          className="w-full" 
+          className="w-full mt-2" 
           onClick={handleAccept}
           disabled={!accepted}
         >

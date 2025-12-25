@@ -244,62 +244,62 @@ const Dashboard = () => {
           </div>
 
           {/* Summary Cards Row */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8 animate-slide-up">
+          <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4 mb-6 sm:mb-8 animate-slide-up">
             <Card className="shadow-card">
-              <CardHeader className="pb-2">
-                <CardDescription className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4" />
+              <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-4">
+                <CardDescription className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                  <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
                   Businesses
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold text-foreground">{savedBusinesses.length}</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {formatCurrency(totalTurnover)} total turnover
+              <CardContent className="p-3 sm:p-4 pt-0">
+                <p className="text-xl sm:text-3xl font-bold text-foreground">{savedBusinesses.length}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1 truncate">
+                  {formatCurrency(totalTurnover)} turnover
                 </p>
               </CardContent>
             </Card>
 
             <Card className="shadow-card">
-              <CardHeader className="pb-2">
-                <CardDescription className="flex items-center gap-2 text-success">
-                  <TrendingUp className="h-4 w-4" />
-                  Total Income
+              <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-4">
+                <CardDescription className="flex items-center gap-1 sm:gap-2 text-success text-xs sm:text-sm">
+                  <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+                  Income
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold text-success">{formatCurrency(expenseSummary.totalIncome)}</p>
-                <p className="text-sm text-muted-foreground mt-1">From tracked entries</p>
+              <CardContent className="p-3 sm:p-4 pt-0">
+                <p className="text-xl sm:text-3xl font-bold text-success">{formatCurrency(expenseSummary.totalIncome)}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1 truncate">Tracked entries</p>
               </CardContent>
             </Card>
 
             <Card className="shadow-card">
-              <CardHeader className="pb-2">
-                <CardDescription className="flex items-center gap-2 text-destructive">
-                  <TrendingDown className="h-4 w-4" />
-                  Total Expenses
+              <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-4">
+                <CardDescription className="flex items-center gap-1 sm:gap-2 text-destructive text-xs sm:text-sm">
+                  <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4" />
+                  Expenses
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold text-destructive">{formatCurrency(expenseSummary.totalExpenses)}</p>
-                <p className="text-sm text-muted-foreground mt-1">
+              <CardContent className="p-3 sm:p-4 pt-0">
+                <p className="text-xl sm:text-3xl font-bold text-destructive">{formatCurrency(expenseSummary.totalExpenses)}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1 truncate">
                   {formatCurrency(expenseSummary.deductibleExpenses)} deductible
                 </p>
               </CardContent>
             </Card>
 
             <Card className="shadow-card">
-              <CardHeader className="pb-2">
-                <CardDescription className="flex items-center gap-2">
-                  <Calculator className="h-4 w-4" />
+              <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-4">
+                <CardDescription className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                  <Calculator className="h-3 w-3 sm:h-4 sm:w-4" />
                   Net Income
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <p className={`text-3xl font-bold ${netIncome >= 0 ? 'text-success' : 'text-destructive'}`}>
+              <CardContent className="p-3 sm:p-4 pt-0">
+                <p className={`text-xl sm:text-3xl font-bold ${netIncome >= 0 ? 'text-success' : 'text-destructive'}`}>
                   {formatCurrency(netIncome)}
                 </p>
-                <p className="text-sm text-muted-foreground mt-1">Income minus expenses</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1 truncate">Income - expenses</p>
               </CardContent>
             </Card>
           </div>
@@ -455,18 +455,18 @@ const Dashboard = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4 sm:grid-cols-3 mb-6">
-                  <div className="p-4 rounded-lg bg-success/10 border border-success/20">
-                    <p className="text-sm text-muted-foreground mb-1">Total Income</p>
-                    <p className="text-2xl font-bold text-success">{formatCurrency(expenseSummary.totalIncome)}</p>
+                <div className="grid gap-2 sm:gap-4 grid-cols-1 sm:grid-cols-3 mb-4 sm:mb-6">
+                  <div className="p-3 sm:p-4 rounded-lg bg-success/10 border border-success/20">
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-1">Total Income</p>
+                    <p className="text-lg sm:text-2xl font-bold text-success">{formatCurrency(expenseSummary.totalIncome)}</p>
                   </div>
-                  <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20">
-                    <p className="text-sm text-muted-foreground mb-1">Total Expenses</p>
-                    <p className="text-2xl font-bold text-destructive">{formatCurrency(expenseSummary.totalExpenses)}</p>
+                  <div className="p-3 sm:p-4 rounded-lg bg-destructive/10 border border-destructive/20">
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-1">Total Expenses</p>
+                    <p className="text-lg sm:text-2xl font-bold text-destructive">{formatCurrency(expenseSummary.totalExpenses)}</p>
                   </div>
-                  <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
-                    <p className="text-sm text-muted-foreground mb-1">Tax Deductible</p>
-                    <p className="text-2xl font-bold text-primary">{formatCurrency(expenseSummary.deductibleExpenses)}</p>
+                  <div className="p-3 sm:p-4 rounded-lg bg-primary/10 border border-primary/20">
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-1">Tax Deductible</p>
+                    <p className="text-lg sm:text-2xl font-bold text-primary">{formatCurrency(expenseSummary.deductibleExpenses)}</p>
                   </div>
                 </div>
 
@@ -476,22 +476,23 @@ const Dashboard = () => {
                 )}
 
                 {tier !== 'free' && (
-                  <div className="mt-4 flex gap-3">
+                  <div className="mt-4 flex flex-wrap gap-2 sm:gap-3">
                     <Link to="/expenses">
-                      <Button variant="outline" size="sm">
-                        <Plus className="h-4 w-4 mr-1" />
+                      <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                        <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                         Add Expense
                       </Button>
                     </Link>
                     <Link to="/business-report">
-                      <Button variant="outline" size="sm">
-                        <FileText className="h-4 w-4 mr-1" />
-                        Business Reports
+                      <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                        <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                        Reports
                       </Button>
                     </Link>
                     <Button 
                       variant="outline" 
                       size="sm"
+                      className="text-xs sm:text-sm"
                       onClick={() => navigate('/calculator', { 
                         state: { 
                           prefill: { 
@@ -502,7 +503,7 @@ const Dashboard = () => {
                       })}
                       disabled={expenseSummary.totalIncome === 0}
                     >
-                      <Calculator className="h-4 w-4 mr-1" />
+                      <Calculator className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                       Calculate Tax
                     </Button>
                   </div>
