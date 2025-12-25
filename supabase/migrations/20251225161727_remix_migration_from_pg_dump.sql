@@ -166,6 +166,21 @@ CREATE TABLE public.expenses (
 
 
 --
+-- Name: feedback; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.feedback (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    rating integer NOT NULL,
+    category text NOT NULL,
+    message text,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT feedback_rating_check CHECK (((rating >= 1) AND (rating <= 5)))
+);
+
+
+--
 -- Name: profiles; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -244,6 +259,20 @@ CREATE TABLE public.user_roles (
 
 
 --
+-- Name: waitlist; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.waitlist (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    email text NOT NULL,
+    name text,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    feature_interest text,
+    user_id uuid
+);
+
+
+--
 -- Name: achievements achievements_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -281,6 +310,14 @@ ALTER TABLE ONLY public.businesses
 
 ALTER TABLE ONLY public.expenses
     ADD CONSTRAINT expenses_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: feedback feedback_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.feedback
+    ADD CONSTRAINT feedback_pkey PRIMARY KEY (id);
 
 
 --
@@ -329,6 +366,22 @@ ALTER TABLE ONLY public.user_roles
 
 ALTER TABLE ONLY public.user_roles
     ADD CONSTRAINT user_roles_user_id_role_key UNIQUE (user_id, role);
+
+
+--
+-- Name: waitlist waitlist_email_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.waitlist
+    ADD CONSTRAINT waitlist_email_key UNIQUE (email);
+
+
+--
+-- Name: waitlist waitlist_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.waitlist
+    ADD CONSTRAINT waitlist_pkey PRIMARY KEY (id);
 
 
 --
@@ -458,6 +511,20 @@ ALTER TABLE ONLY public.user_roles
 
 
 --
+-- Name: waitlist Anyone can sign up for waitlist; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY "Anyone can sign up for waitlist" ON public.waitlist FOR INSERT WITH CHECK (true);
+
+
+--
+-- Name: waitlist Authenticated users can view waitlist; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY "Authenticated users can view waitlist" ON public.waitlist FOR SELECT USING ((auth.uid() IS NOT NULL));
+
+
+--
 -- Name: team_members Owners can create team invites; Type: POLICY; Schema: public; Owner: -
 --
 
@@ -556,6 +623,13 @@ CREATE POLICY "Users can delete their own reminders" ON public.reminders FOR DEL
 
 
 --
+-- Name: feedback Users can insert their own feedback; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY "Users can insert their own feedback" ON public.feedback FOR INSERT WITH CHECK ((auth.uid() = user_id));
+
+
+--
 -- Name: businesses Users can update their own businesses; Type: POLICY; Schema: public; Owner: -
 --
 
@@ -619,6 +693,13 @@ CREATE POLICY "Users can view their own expenses" ON public.expenses FOR SELECT 
 
 
 --
+-- Name: feedback Users can view their own feedback; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY "Users can view their own feedback" ON public.feedback FOR SELECT USING ((auth.uid() = user_id));
+
+
+--
 -- Name: profiles Users can view their own profile; Type: POLICY; Schema: public; Owner: -
 --
 
@@ -664,6 +745,12 @@ ALTER TABLE public.businesses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.expenses ENABLE ROW LEVEL SECURITY;
 
 --
+-- Name: feedback; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.feedback ENABLE ROW LEVEL SECURITY;
+
+--
 -- Name: profiles; Type: ROW SECURITY; Schema: public; Owner: -
 --
 
@@ -692,6 +779,12 @@ ALTER TABLE public.team_members ENABLE ROW LEVEL SECURITY;
 --
 
 ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: waitlist; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.waitlist ENABLE ROW LEVEL SECURITY;
 
 --
 -- PostgreSQL database dump complete
