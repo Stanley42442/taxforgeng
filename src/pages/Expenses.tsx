@@ -346,49 +346,52 @@ const Expenses = () => {
           </div>
 
           {/* Summary Cards */}
-          <div className="grid gap-4 sm:grid-cols-4 mb-6 animate-slide-up">
-            <div className="rounded-xl border border-border bg-card p-4 shadow-card">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="h-4 w-4 text-success" />
-                <span className="text-sm text-muted-foreground">Income</span>
+          <div className="grid gap-2 sm:gap-4 grid-cols-2 sm:grid-cols-4 mb-6 animate-slide-up">
+            <div className="rounded-xl border border-border bg-card p-2 sm:p-4 shadow-card overflow-hidden">
+              <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-success flex-shrink-0" />
+                <span className="text-[10px] sm:text-sm text-muted-foreground truncate">Income</span>
               </div>
-              <p className="text-xl font-bold text-success">{formatCurrency(totalIncome)}</p>
+              <p className="text-base sm:text-xl font-bold text-success truncate">{formatCurrency(totalIncome)}</p>
             </div>
-            <div className="rounded-xl border border-border bg-card p-4 shadow-card">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingDown className="h-4 w-4 text-destructive" />
-                <span className="text-sm text-muted-foreground">Expenses</span>
+            <div className="rounded-xl border border-border bg-card p-2 sm:p-4 shadow-card overflow-hidden">
+              <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4 text-destructive flex-shrink-0" />
+                <span className="text-[10px] sm:text-sm text-muted-foreground truncate">Expenses</span>
               </div>
-              <p className="text-xl font-bold text-destructive">{formatCurrency(totalExpenses)}</p>
+              <p className="text-base sm:text-xl font-bold text-destructive truncate">{formatCurrency(totalExpenses)}</p>
             </div>
-            <div className="rounded-xl border border-border bg-card p-4 shadow-card">
-              <div className="flex items-center gap-2 mb-2">
-                <Receipt className="h-4 w-4 text-primary" />
-                <span className="text-sm text-muted-foreground">Deductible</span>
+            <div className="rounded-xl border border-border bg-card p-2 sm:p-4 shadow-card overflow-hidden">
+              <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                <Receipt className="h-3 w-3 sm:h-4 sm:w-4 text-primary flex-shrink-0" />
+                <span className="text-[10px] sm:text-sm text-muted-foreground truncate">Deductible</span>
               </div>
-              <p className="text-xl font-bold text-foreground">{formatCurrency(deductibleExpenses)}</p>
+              <p className="text-base sm:text-xl font-bold text-foreground truncate">{formatCurrency(deductibleExpenses)}</p>
             </div>
-            <div className="rounded-xl border border-border bg-card p-4 shadow-card">
-              <div className="flex items-center gap-2 mb-2">
-                <Calculator className="h-4 w-4 text-warning" />
-                <span className="text-sm text-muted-foreground">Est. Tax</span>
+            <div className="rounded-xl border border-border bg-card p-2 sm:p-4 shadow-card overflow-hidden">
+              <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                <Calculator className="h-3 w-3 sm:h-4 sm:w-4 text-warning flex-shrink-0" />
+                <span className="text-[10px] sm:text-sm text-muted-foreground truncate">Est. Tax</span>
               </div>
-              <p className="text-xl font-bold text-warning">{formatCurrency(estimatedTax)}</p>
+              <p className="text-base sm:text-xl font-bold text-warning truncate">{formatCurrency(estimatedTax)}</p>
             </div>
           </div>
 
           {/* Action Buttons & Filter */}
-          <div className="flex flex-wrap items-center gap-3 mb-6 animate-slide-up">
-            <Button variant="hero" onClick={() => setShowAddDialog(true)}>
-              <Plus className="h-4 w-4" />
-              Add Entry
+          <div className="flex flex-wrap items-center gap-2 mb-6 animate-slide-up">
+            <Button variant="hero" size="sm" className="text-xs sm:text-sm" onClick={() => setShowAddDialog(true)}>
+              <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Add</span> Entry
             </Button>
-            <Button variant="outline" onClick={handleCSVImport}>
-              <Upload className="h-4 w-4" />
-              Import CSV (Mock)
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={handleCSVImport}>
+              <Upload className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Import CSV</span>
+              <span className="sm:hidden">Import</span>
             </Button>
             <Button 
               variant="outline"
+              size="sm"
+              className="text-xs sm:text-sm"
               onClick={() => navigate('/calculator', { 
                 state: { 
                   prefill: { 
@@ -399,13 +402,14 @@ const Expenses = () => {
               })}
               disabled={totalIncome === 0}
             >
-              <Calculator className="h-4 w-4" />
-              Use in Calculator
+              <Calculator className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Use in Calculator</span>
+              <span className="sm:hidden">Calculate</span>
             </Button>
             {savedBusinesses.length > 0 && (
               <Select value={filterBusinessId} onValueChange={setFilterBusinessId}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by business" />
+                <SelectTrigger className="w-[140px] sm:w-[180px] h-8 sm:h-10 text-xs sm:text-sm">
+                  <SelectValue placeholder="Filter" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Businesses</SelectItem>

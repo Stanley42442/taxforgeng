@@ -244,62 +244,62 @@ const Dashboard = () => {
           </div>
 
           {/* Summary Cards Row */}
-          <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4 mb-6 sm:mb-8 animate-slide-up">
-            <Card className="shadow-card">
-              <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-4">
-                <CardDescription className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                  <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                  Businesses
+          <div className="grid gap-2 sm:gap-4 grid-cols-2 lg:grid-cols-4 mb-6 animate-slide-up">
+            <Card className="shadow-card overflow-hidden">
+              <CardHeader className="pb-1 p-2 sm:p-4 sm:pb-2">
+                <CardDescription className="flex items-center gap-1 text-[10px] sm:text-sm">
+                  <Building2 className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                  <span className="truncate">Businesses</span>
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-3 sm:p-4 pt-0">
-                <p className="text-xl sm:text-3xl font-bold text-foreground">{savedBusinesses.length}</p>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1 truncate">
+              <CardContent className="p-2 sm:p-4 pt-0">
+                <p className="text-lg sm:text-3xl font-bold text-foreground">{savedBusinesses.length}</p>
+                <p className="text-[10px] sm:text-sm text-muted-foreground mt-0.5 truncate">
                   {formatCurrency(totalTurnover)} turnover
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="shadow-card">
-              <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-4">
-                <CardDescription className="flex items-center gap-1 sm:gap-2 text-success text-xs sm:text-sm">
-                  <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
-                  Income
+            <Card className="shadow-card overflow-hidden">
+              <CardHeader className="pb-1 p-2 sm:p-4 sm:pb-2">
+                <CardDescription className="flex items-center gap-1 text-success text-[10px] sm:text-sm">
+                  <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                  <span className="truncate">Income</span>
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-3 sm:p-4 pt-0">
-                <p className="text-xl sm:text-3xl font-bold text-success">{formatCurrency(expenseSummary.totalIncome)}</p>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1 truncate">Tracked entries</p>
+              <CardContent className="p-2 sm:p-4 pt-0">
+                <p className="text-lg sm:text-3xl font-bold text-success truncate">{formatCurrency(expenseSummary.totalIncome)}</p>
+                <p className="text-[10px] sm:text-sm text-muted-foreground mt-0.5 truncate">Tracked entries</p>
               </CardContent>
             </Card>
 
-            <Card className="shadow-card">
-              <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-4">
-                <CardDescription className="flex items-center gap-1 sm:gap-2 text-destructive text-xs sm:text-sm">
-                  <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4" />
-                  Expenses
+            <Card className="shadow-card overflow-hidden">
+              <CardHeader className="pb-1 p-2 sm:p-4 sm:pb-2">
+                <CardDescription className="flex items-center gap-1 text-destructive text-[10px] sm:text-sm">
+                  <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                  <span className="truncate">Expenses</span>
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-3 sm:p-4 pt-0">
-                <p className="text-xl sm:text-3xl font-bold text-destructive">{formatCurrency(expenseSummary.totalExpenses)}</p>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1 truncate">
+              <CardContent className="p-2 sm:p-4 pt-0">
+                <p className="text-lg sm:text-3xl font-bold text-destructive truncate">{formatCurrency(expenseSummary.totalExpenses)}</p>
+                <p className="text-[10px] sm:text-sm text-muted-foreground mt-0.5 truncate">
                   {formatCurrency(expenseSummary.deductibleExpenses)} deductible
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="shadow-card">
-              <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-4">
-                <CardDescription className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                  <Calculator className="h-3 w-3 sm:h-4 sm:w-4" />
-                  Net Income
+            <Card className="shadow-card overflow-hidden">
+              <CardHeader className="pb-1 p-2 sm:p-4 sm:pb-2">
+                <CardDescription className="flex items-center gap-1 text-[10px] sm:text-sm">
+                  <Calculator className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                  <span className="truncate">Net Income</span>
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-3 sm:p-4 pt-0">
-                <p className={`text-xl sm:text-3xl font-bold ${netIncome >= 0 ? 'text-success' : 'text-destructive'}`}>
+              <CardContent className="p-2 sm:p-4 pt-0">
+                <p className={`text-lg sm:text-3xl font-bold truncate ${netIncome >= 0 ? 'text-success' : 'text-destructive'}`}>
                   {formatCurrency(netIncome)}
                 </p>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1 truncate">Income - expenses</p>
+                <p className="text-[10px] sm:text-sm text-muted-foreground mt-0.5 truncate">Income - expenses</p>
               </CardContent>
             </Card>
           </div>
