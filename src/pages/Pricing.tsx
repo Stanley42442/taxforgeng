@@ -83,12 +83,12 @@ const Pricing = () => {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto mb-16">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto mb-12 sm:mb-16">
           {/* Free Tier */}
           <PricingCard
             tier="free"
             name="Free"
-            icon={<Briefcase className="h-6 w-6" />}
+            icon={<Briefcase className="h-5 w-5 sm:h-6 sm:w-6" />}
             monthlyPrice={0}
             description="Get started with basic tax calculations"
             features={['Unlimited calculations', 'Basic advisory', 'Pre-2026 & 2026 rules', 'Watermarked results']}
@@ -101,7 +101,7 @@ const Pricing = () => {
           <PricingCard
             tier="basic"
             name="Basic"
-            icon={<Star className="h-6 w-6" />}
+            icon={<Star className="h-5 w-5 sm:h-6 sm:w-6" />}
             monthlyPrice={2000}
             annualPrice={20000}
             description="Perfect for individual professionals"
@@ -115,7 +115,7 @@ const Pricing = () => {
           <PricingCard
             tier="business"
             name="Business"
-            icon={<Building2 className="h-6 w-6" />}
+            icon={<Building2 className="h-5 w-5 sm:h-6 sm:w-6" />}
             monthlyPrice={9900}
             annualPrice={99000}
             description="For growing businesses with multiple entities"
@@ -129,7 +129,7 @@ const Pricing = () => {
           <PricingCard
             tier="corporate"
             name="Corporate"
-            icon={<Crown className="h-6 w-6" />}
+            icon={<Crown className="h-5 w-5 sm:h-6 sm:w-6" />}
             monthlyPrice="Custom"
             description="Enterprise solution for large organizations"
             features={['Everything in Business', 'Unlimited businesses', 'Unlimited users', 'Custom reports', 'Dedicated support', 'API access (coming)', 'Direct filing (coming)']}
@@ -250,68 +250,68 @@ const PricingCard = ({
   const formatPrice = (price: number) => `₦${price.toLocaleString()}`;
 
   return (
-    <div className={`relative rounded-2xl border p-6 transition-all ${
+    <div className={`relative rounded-xl sm:rounded-2xl border p-4 sm:p-6 transition-all ${
       isPopular 
-        ? 'border-primary bg-card shadow-lg scale-105' 
+        ? 'border-primary bg-card shadow-lg sm:scale-105' 
         : 'border-border bg-card shadow-card hover:shadow-card-hover'
     }`}>
       {isPopular && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className="bg-gradient-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
+          <span className="bg-gradient-primary text-primary-foreground text-[10px] sm:text-xs font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
             Most Popular
           </span>
         </div>
       )}
       
       {isCurrentTier && (
-        <div className="absolute -top-3 right-4">
-          <span className="bg-success text-success-foreground text-xs font-semibold px-3 py-1 rounded-full">
+        <div className="absolute -top-3 right-2 sm:right-4">
+          <span className="bg-success text-success-foreground text-[10px] sm:text-xs font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
             Current Plan
           </span>
         </div>
       )}
 
-      <div className="flex items-center gap-3 mb-4">
-        <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
+      <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+        <div className={`h-8 w-8 sm:h-10 sm:w-10 rounded-lg flex items-center justify-center ${
           isPopular ? 'bg-gradient-primary text-primary-foreground' : 'bg-secondary text-primary'
         }`}>
           {icon}
         </div>
-        <h3 className="text-xl font-bold text-foreground">{name}</h3>
+        <h3 className="text-lg sm:text-xl font-bold text-foreground">{name}</h3>
       </div>
 
-      <div className="mb-4">
+      <div className="mb-3 sm:mb-4">
         {typeof monthlyPrice === 'number' ? (
           <>
             <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-extrabold text-foreground">{formatPrice(monthlyPrice)}</span>
-              <span className="text-muted-foreground">/mo</span>
+              <span className="text-2xl sm:text-3xl font-extrabold text-foreground">{formatPrice(monthlyPrice)}</span>
+              <span className="text-muted-foreground text-sm">/mo</span>
             </div>
             {annualPrice && (
-              <p className="text-sm text-success mt-1">
+              <p className="text-xs sm:text-sm text-success mt-1">
                 {formatPrice(annualPrice)}/year (save ~17%)
               </p>
             )}
           </>
         ) : (
           <div className="flex items-baseline gap-1">
-            <span className="text-3xl font-extrabold text-foreground">{monthlyPrice}</span>
+            <span className="text-2xl sm:text-3xl font-extrabold text-foreground">{monthlyPrice}</span>
           </div>
         )}
       </div>
 
-      <p className="text-sm text-muted-foreground mb-6">{description}</p>
+      <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6">{description}</p>
 
-      <ul className="space-y-3 mb-6">
+      <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
         {features.map((feature, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm">
-            <Check className="h-4 w-4 text-success mt-0.5 shrink-0" />
+          <li key={i} className="flex items-start gap-1.5 sm:gap-2 text-xs sm:text-sm">
+            <Check className="h-3 w-3 sm:h-4 sm:w-4 text-success mt-0.5 shrink-0" />
             <span className="text-foreground">{feature}</span>
           </li>
         ))}
         {limitations.map((limitation, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm">
-            <X className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+          <li key={i} className="flex items-start gap-1.5 sm:gap-2 text-xs sm:text-sm">
+            <X className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground mt-0.5 shrink-0" />
             <span className="text-muted-foreground">{limitation}</span>
           </li>
         ))}
@@ -319,7 +319,7 @@ const PricingCard = ({
 
       <Button
         variant={isPopular ? 'hero' : isCurrentTier ? 'secondary' : 'outline'}
-        className="w-full"
+        className="w-full text-xs sm:text-sm h-9 sm:h-10"
         disabled={isCurrentTier || (tier === 'free')}
         onClick={() => onUpgrade(tier)}
       >

@@ -272,49 +272,49 @@ const Roadmap = () => {
           </Card>
 
           {/* Roadmap Grid */}
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
             {ROADMAP_ITEMS.map((item, index) => {
               const Icon = item.icon;
               return (
                 <Card 
                   key={item.title} 
-                  className="shadow-card animate-fade-in"
+                  className="shadow-card animate-fade-in overflow-hidden"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <CardHeader className="pb-2">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                          <Icon className="h-5 w-5 text-primary" />
+                  <CardHeader className="pb-2 p-3 sm:p-6 sm:pb-2">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                      <div className="flex items-start gap-2 sm:gap-3 min-w-0 flex-1">
+                        <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
+                          <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                         </div>
-                        <div>
-                          <CardTitle className="text-base">{item.title}</CardTitle>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className={`text-xs px-2 py-0.5 rounded-full border ${getStatusColor(item.status)}`}>
+                        <div className="min-w-0 flex-1">
+                          <CardTitle className="text-sm sm:text-base truncate">{item.title}</CardTitle>
+                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1">
+                            <span className={`text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full border ${getStatusColor(item.status)}`}>
                               {getStatusLabel(item.status)}
                             </span>
-                            <span className="text-xs text-muted-foreground flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
+                            <span className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-0.5 sm:gap-1">
+                              <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                               {item.quarter}
                             </span>
                           </div>
                         </div>
                       </div>
-                      <span className="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded-full">
+                      <span className="text-[10px] sm:text-xs bg-secondary text-secondary-foreground px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full self-start whitespace-nowrap">
                         {item.tier}
                       </span>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-3">
+                  <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3 line-clamp-2">
                       {item.description}
                     </p>
                     <div className="space-y-1">
-                      <div className="flex justify-between text-xs">
+                      <div className="flex justify-between text-[10px] sm:text-xs">
                         <span className="text-muted-foreground">Progress</span>
                         <span className="font-medium">{item.progress}%</span>
                       </div>
-                      <Progress value={item.progress} className="h-2" />
+                      <Progress value={item.progress} className="h-1.5 sm:h-2" />
                     </div>
                   </CardContent>
                 </Card>

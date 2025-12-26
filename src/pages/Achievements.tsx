@@ -249,21 +249,21 @@ const Achievements = () => {
           </div>
 
           {/* Level Card */}
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-4">
-                <div className="h-16 w-16 rounded-full bg-gradient-primary flex items-center justify-center">
-                  <span className="text-2xl font-bold text-primary-foreground">{currentLevel.level}</span>
+          <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card mb-6 animate-slide-up overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-gradient-primary flex items-center justify-center flex-shrink-0">
+                  <span className="text-xl sm:text-2xl font-bold text-primary-foreground">{currentLevel.level}</span>
                 </div>
-                <div>
-                  <h2 className="text-xl font-bold text-foreground">{currentLevel.title}</h2>
-                  <p className="text-sm text-muted-foreground">{stats.totalPoints || earnedPoints} total points</p>
+                <div className="min-w-0">
+                  <h2 className="text-lg sm:text-xl font-bold text-foreground truncate">{currentLevel.title}</h2>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{stats.totalPoints || earnedPoints} total points</p>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="flex items-center gap-1 text-warning mb-1">
-                  <Flame className="h-5 w-5" />
-                  <span className="font-bold">{stats.streak} day streak</span>
+              <div className="flex items-center sm:flex-col sm:items-end gap-2 sm:gap-0">
+                <div className="flex items-center gap-1 text-warning">
+                  <Flame className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="font-bold text-sm sm:text-base">{stats.streak} day streak</span>
                 </div>
                 <p className="text-xs text-muted-foreground">Keep it going!</p>
               </div>
@@ -271,38 +271,38 @@ const Achievements = () => {
 
             {currentLevel.nextLevel && (
               <div>
-                <div className="flex justify-between text-sm mb-2">
+                <div className="flex justify-between text-xs sm:text-sm mb-2">
                   <span className="text-muted-foreground">Progress to Level {currentLevel.level + 1}</span>
                   <span className="text-foreground font-medium">
                     {stats.totalPoints || earnedPoints} / {currentLevel.nextLevel}
                   </span>
                 </div>
-                <Progress value={((stats.totalPoints || earnedPoints) / currentLevel.nextLevel) * 100} className="h-3" />
+                <Progress value={((stats.totalPoints || earnedPoints) / currentLevel.nextLevel) * 100} className="h-2 sm:h-3" />
               </div>
             )}
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6 animate-slide-up">
-            <div className="rounded-xl border border-border bg-card p-4 text-center shadow-card">
-              <Calculator className="h-6 w-6 text-primary mx-auto mb-2" />
-              <p className="text-2xl font-bold text-foreground">{stats.calculationsCount}</p>
-              <p className="text-xs text-muted-foreground">Calculations</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-6 animate-slide-up">
+            <div className="rounded-xl border border-border bg-card p-2 sm:p-4 text-center shadow-card overflow-hidden">
+              <Calculator className="h-5 w-5 sm:h-6 sm:w-6 text-primary mx-auto mb-1 sm:mb-2" />
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{stats.calculationsCount}</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Calculations</p>
             </div>
-            <div className="rounded-xl border border-border bg-card p-4 text-center shadow-card">
-              <FileText className="h-6 w-6 text-primary mx-auto mb-2" />
-              <p className="text-2xl font-bold text-foreground">{stats.businessesSaved}</p>
-              <p className="text-xs text-muted-foreground">Businesses</p>
+            <div className="rounded-xl border border-border bg-card p-2 sm:p-4 text-center shadow-card overflow-hidden">
+              <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-primary mx-auto mb-1 sm:mb-2" />
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{stats.businessesSaved}</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Businesses</p>
             </div>
-            <div className="rounded-xl border border-border bg-card p-4 text-center shadow-card">
-              <Trophy className="h-6 w-6 text-warning mx-auto mb-2" />
-              <p className="text-2xl font-bold text-foreground">{unlockedAchievements.length}</p>
-              <p className="text-xs text-muted-foreground">Badges</p>
+            <div className="rounded-xl border border-border bg-card p-2 sm:p-4 text-center shadow-card overflow-hidden">
+              <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-warning mx-auto mb-1 sm:mb-2" />
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{unlockedAchievements.length}</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Badges</p>
             </div>
-            <div className="rounded-xl border border-border bg-card p-4 text-center shadow-card">
-              <Star className="h-6 w-6 text-accent mx-auto mb-2" />
-              <p className="text-2xl font-bold text-foreground">{earnedPoints}</p>
-              <p className="text-xs text-muted-foreground">Points Earned</p>
+            <div className="rounded-xl border border-border bg-card p-2 sm:p-4 text-center shadow-card overflow-hidden">
+              <Star className="h-5 w-5 sm:h-6 sm:w-6 text-accent mx-auto mb-1 sm:mb-2" />
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{earnedPoints}</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Points Earned</p>
             </div>
           </div>
 
