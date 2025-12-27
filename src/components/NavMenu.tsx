@@ -93,23 +93,23 @@ export const NavMenu = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4">
-        <nav className="flex h-16 items-center justify-between">
+      <div className="container mx-auto px-2 sm:px-4">
+        <nav className="flex h-14 sm:h-16 items-center justify-between gap-2">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 shrink-0">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary">
-              <Calculator className="h-5 w-5 text-primary-foreground" />
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 shrink-0 min-w-0">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl bg-gradient-primary shrink-0">
+              <Calculator className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-foreground">TaxForge NG</span>
+            <span className="text-base sm:text-xl font-bold text-foreground truncate">TaxForge NG</span>
           </Link>
 
           {/* Desktop Quick Links - shows on xl screens only */}
-          <div className="hidden xl:flex items-center gap-6">
+          <div className="hidden xl:flex items-center gap-4 2xl:gap-6">
             {filteredLinks.slice(0, 5).map((link) => (
               <Link 
                 key={link.to}
                 to={link.to} 
-                className={`text-sm font-medium transition-colors ${
+                className={`text-sm font-medium transition-colors whitespace-nowrap ${
                   isActive(link.to) 
                     ? 'text-primary' 
                     : 'text-muted-foreground hover:text-foreground'
@@ -121,15 +121,15 @@ export const NavMenu = () => {
           </div>
 
           {/* Actions - always visible */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1 sm:gap-2">
             <div className="hidden sm:block">
               <FeedbackForm />
             </div>
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <TierSwitcher />
             </div>
             {tier !== 'free' && (
-              <span className="hidden sm:inline-flex text-xs bg-success/20 text-success px-2 py-1 rounded-full font-medium">
+              <span className="hidden md:inline-flex text-[10px] sm:text-xs bg-success/20 text-success px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-medium whitespace-nowrap">
                 {tier.charAt(0).toUpperCase() + tier.slice(1)}
               </span>
             )}
@@ -138,8 +138,8 @@ export const NavMenu = () => {
             {/* Hamburger Menu - always visible */}
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10 shrink-0">
+                  <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>

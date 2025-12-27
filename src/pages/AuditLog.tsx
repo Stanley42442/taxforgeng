@@ -240,42 +240,42 @@ const AuditLog = () => {
 
         {/* Audit Log Table */}
         <Card>
-          <CardHeader>
-            <CardTitle>Activity History</CardTitle>
-            <CardDescription>All recorded changes and actions</CardDescription>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Activity History</CardTitle>
+            <CardDescription className="text-sm">All recorded changes and actions</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             {filteredLogs.length === 0 ? (
-              <div className="text-center py-12">
-                <History className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No Activity Found</h3>
-                <p className="text-muted-foreground">
+              <div className="text-center py-8">
+                <History className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
+                <h3 className="text-base font-semibold mb-1">No Activity Found</h3>
+                <p className="text-sm text-muted-foreground">
                   {filterBusiness !== 'all' || filterAction !== 'all' 
                     ? 'Try adjusting your filters'
                     : 'Activity will appear here as you use the app'}
                 </p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-12">Type</TableHead>
-                      <TableHead>Action</TableHead>
-                      <TableHead>User</TableHead>
-                      <TableHead>Changes</TableHead>
-                      <TableHead className="text-right">Timestamp</TableHead>
+                      <TableHead className="w-10 px-2 sm:px-4">Type</TableHead>
+                      <TableHead className="px-2 sm:px-4">Action</TableHead>
+                      <TableHead className="hidden sm:table-cell px-2 sm:px-4">User</TableHead>
+                      <TableHead className="hidden md:table-cell px-2 sm:px-4">Changes</TableHead>
+                      <TableHead className="text-right px-2 sm:px-4 whitespace-nowrap">Time</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredLogs.map(entry => (
                       <TableRow key={entry.id}>
-                        <TableCell>{getActionIcon(entry.action)}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
+                        <TableCell className="px-2 sm:px-4 py-2">{getActionIcon(entry.action)}</TableCell>
+                        <TableCell className="px-2 sm:px-4 py-2">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                             <Badge 
                               variant="outline" 
-                              className={`capitalize ${
+                              className={`capitalize text-xs w-fit ${
                                 entry.action === 'create' ? 'bg-success/10 text-success border-success/30' :
                                 entry.action === 'update' ? 'bg-warning/10 text-warning border-warning/30' :
                                 entry.action === 'delete' ? 'bg-destructive/10 text-destructive border-destructive/30' :
@@ -284,15 +284,15 @@ const AuditLog = () => {
                             >
                               {entry.action}
                             </Badge>
-                            <span className="font-medium">{entry.businessName}</span>
+                            <span className="font-medium text-sm truncate max-w-[120px] sm:max-w-none">{entry.businessName}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-muted-foreground">
+                        <TableCell className="hidden sm:table-cell text-muted-foreground text-sm px-2 sm:px-4 py-2 truncate max-w-[150px]">
                           {entry.user}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="hidden md:table-cell px-2 sm:px-4 py-2">
                           {entry.oldValue && entry.newValue ? (
-                            <div className="text-sm">
+                            <div className="text-xs">
                               <span className="text-muted-foreground">{entry.field}: </span>
                               <span className="line-through text-destructive/70">{entry.oldValue}</span>
                               <span className="mx-1">→</span>
@@ -302,8 +302,8 @@ const AuditLog = () => {
                             <span className="text-muted-foreground">—</span>
                           )}
                         </TableCell>
-                        <TableCell className="text-right whitespace-nowrap">
-                          {new Date(entry.timestamp).toLocaleString()}
+                        <TableCell className="text-right text-xs text-muted-foreground px-2 sm:px-4 py-2 whitespace-nowrap">
+                          {new Date(entry.timestamp).toLocaleDateString()}
                         </TableCell>
                       </TableRow>
                     ))}
