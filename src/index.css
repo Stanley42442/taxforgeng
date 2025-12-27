@@ -230,6 +230,67 @@ body {
   word-break: break-word !important;
 }
 
+/* CARD CONTENT - Ensure all children stay within card boundaries */
+[class*="card"] > *,
+[class*="Card"] > *,
+[data-slot="card"] > *,
+.rounded-lg > *,
+.rounded-xl > * {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+/* Nested content within cards */
+[class*="card"] *,
+[class*="Card"] *,
+[data-slot="card"] * {
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* Card internal spacing */
+[class*="card"],
+[class*="Card"],
+[data-slot="card"] {
+  padding: clamp(0.75rem, 3vw, 1.5rem) !important;
+}
+
+/* Card content flex/grid children spacing */
+[class*="card"] .flex,
+[class*="Card"] .flex,
+[data-slot="card"] .flex {
+  gap: clamp(0.5rem, 2vw, 1rem);
+  flex-wrap: wrap !important;
+}
+
+[class*="card"] .grid,
+[class*="Card"] .grid,
+[data-slot="card"] .grid {
+  gap: clamp(0.5rem, 2vw, 1rem);
+}
+
+/* Ensure buttons/inputs inside cards don't overflow */
+[class*="card"] button,
+[class*="card"] input,
+[class*="card"] select,
+[class*="card"] textarea,
+[class*="Card"] button,
+[class*="Card"] input,
+[class*="Card"] select,
+[class*="Card"] textarea {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Images inside cards */
+[class*="card"] img,
+[class*="Card"] img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
 /* Ensure grid containers never overflow */
 .grid {
   max-width: 100% !important;
