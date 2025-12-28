@@ -275,10 +275,12 @@ const AuditLog = () => {
                           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                             <Badge 
                               variant="outline" 
-                              className={`capitalize text-xs w-fit ${
+                              className={`capitalize text-[10px] sm:text-xs px-1.5 py-0.5 h-5 w-fit ${
                                 entry.action === 'create' ? 'bg-success/10 text-success border-success/30' :
                                 entry.action === 'update' ? 'bg-warning/10 text-warning border-warning/30' :
                                 entry.action === 'delete' ? 'bg-destructive/10 text-destructive border-destructive/30' :
+                                entry.action === 'view' ? 'bg-info/10 text-info border-info/30' :
+                                entry.action === 'export' ? 'bg-primary/10 text-primary border-primary/30' :
                                 'bg-muted'
                               }`}
                             >
