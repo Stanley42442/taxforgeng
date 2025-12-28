@@ -19,7 +19,7 @@ import {
   Building2,
   Bot,
   FileText,
-  CreditCard,
+  Landmark,
   Users,
   Shield,
   CheckCircle2,
@@ -45,7 +45,7 @@ const ROADMAP_ITEMS = [
   {
     title: "Bank Feed Integration",
     description: "Connect your Nigerian bank accounts for automatic transaction import and categorization.",
-    icon: CreditCard,
+    icon: Landmark,
     progress: 20,
     status: "in-progress",
     quarter: "Q2 2026",
