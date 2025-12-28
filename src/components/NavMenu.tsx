@@ -143,74 +143,74 @@ export const NavMenu = () => {
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[280px] sm:w-[320px]">
-                <div className="flex flex-col h-full">
-                  <div className="flex items-center justify-between mb-6">
+              <SheetContent side="right" className="w-[280px] sm:w-[320px] h-full flex flex-col">
+                <div className="flex flex-col h-full min-h-0">
+                  <div className="flex items-center justify-between mb-4 shrink-0">
                     <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary shrink-0">
                         <Calculator className="h-4 w-4 text-primary-foreground" />
                       </div>
-                      <span className="font-bold text-foreground">TaxForge NG</span>
+                      <span className="font-bold text-foreground truncate">TaxForge NG</span>
                     </Link>
                   </div>
 
                   {/* Tier Badge */}
                   {tier !== 'free' && (
-                    <div className="mb-4 p-3 rounded-lg bg-success/10 border border-success/20">
+                    <div className="mb-3 p-2.5 rounded-lg bg-success/10 border border-success/20 shrink-0">
                       <p className="text-sm font-medium text-success flex items-center gap-2">
-                        <Crown className="h-4 w-4" />
-                        {tier.charAt(0).toUpperCase() + tier.slice(1)} Plan
+                        <Crown className="h-4 w-4 shrink-0" />
+                        <span className="truncate">{tier.charAt(0).toUpperCase() + tier.slice(1)} Plan</span>
                       </p>
                     </div>
                   )}
 
                   {/* Tier Switcher for testing */}
-                  <div className="mb-4">
+                  <div className="mb-3 shrink-0">
                     <TierSwitcher />
                   </div>
 
-                  {/* Nav Links */}
-                  <nav className="flex flex-col gap-1 overflow-y-auto flex-1">
+                  {/* Nav Links - Vertical scrollable list */}
+                  <nav className="flex flex-col gap-1 overflow-y-auto flex-1 min-h-0 pr-1">
                     {filteredLinks.map((link) => (
                       <SheetClose asChild key={link.to}>
                         <Link
                           to={link.to}
-                          className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors shrink-0 ${
                             isActive(link.to)
                               ? 'bg-primary/10 text-primary'
                               : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                           }`}
                         >
-                          <link.icon className="h-5 w-5" />
-                          {link.label}
+                          <link.icon className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{link.label}</span>
                         </Link>
                       </SheetClose>
                     ))}
                   </nav>
 
                   {/* Mobile CTA */}
-                  <div className="mt-auto pt-6 border-t border-border space-y-3">
+                  <div className="mt-auto pt-4 border-t border-border space-y-2 shrink-0">
                     {user ? (
                       <>
                         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50">
-                          <User className="h-4 w-4 text-muted-foreground" />
+                          <User className="h-4 w-4 text-muted-foreground shrink-0" />
                           <span className="text-sm text-muted-foreground truncate">
                             {user.email}
                           </span>
                         </div>
                         <SheetClose asChild>
-                          <Button variant="outline" className="w-full" onClick={handleSignOut}>
-                            <LogOut className="h-4 w-4" />
-                            Sign Out
+                          <Button variant="outline" className="w-full h-9 text-sm" onClick={handleSignOut}>
+                            <LogOut className="h-4 w-4 shrink-0" />
+                            <span className="truncate">Sign Out</span>
                           </Button>
                         </SheetClose>
                       </>
                     ) : (
                       <SheetClose asChild>
                         <Link to="/auth" className="block">
-                          <Button variant="hero" className="w-full">
-                            <LogIn className="h-4 w-4" />
-                            Sign In
+                          <Button variant="hero" className="w-full h-9 text-sm">
+                            <LogIn className="h-4 w-4 shrink-0" />
+                            <span className="truncate">Sign In</span>
                           </Button>
                         </Link>
                       </SheetClose>
