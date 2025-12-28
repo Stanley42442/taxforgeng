@@ -378,15 +378,15 @@ const BusinessReport = () => {
               </CardHeader>
               <CardContent>
                 {pieData.length > 0 ? (
-                  <div className="h-48 sm:h-56">
+                  <div className="h-40 sm:h-44">
                     <ResponsiveContainer width="100%" height="100%">
                       <RechartsPie>
                         <Pie
                           data={pieData}
                           cx="50%"
-                          cy="50%"
-                          innerRadius={35}
-                          outerRadius={60}
+                          cy="45%"
+                          innerRadius={25}
+                          outerRadius={45}
                           paddingAngle={2}
                           dataKey="value"
                         >
@@ -400,12 +400,12 @@ const BusinessReport = () => {
                             backgroundColor: 'hsl(var(--card))', 
                             border: '1px solid hsl(var(--border))',
                             borderRadius: '8px',
-                            fontSize: '12px'
+                            fontSize: '10px'
                           }}
                         />
                         <Legend 
-                          wrapperStyle={{ fontSize: '11px' }}
-                          iconSize={8}
+                          wrapperStyle={{ fontSize: '9px', paddingTop: '4px' }}
+                          iconSize={6}
                         />
                       </RechartsPie>
                     </ResponsiveContainer>
