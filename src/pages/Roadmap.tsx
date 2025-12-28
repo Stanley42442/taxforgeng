@@ -290,7 +290,7 @@ const Roadmap = () => {
                         <div className="min-w-0 flex-1">
                           <CardTitle className="text-sm sm:text-base truncate">{item.title}</CardTitle>
                           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1">
-                            <span className={`text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full border ${getStatusColor(item.status)}`}>
+                            <span className={`text-[10px] sm:text-xs px-1.5 py-0.5 rounded-full border ${getStatusColor(item.status)}`}>
                               {getStatusLabel(item.status)}
                             </span>
                             <span className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-0.5 sm:gap-1">
