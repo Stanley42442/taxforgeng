@@ -20,6 +20,11 @@ const buttonVariants = cva(
         accent: "bg-accent text-accent-foreground shadow-md hover:shadow-lg hover:brightness-110",
         "outline-light": "border-2 border-primary-foreground/30 text-primary-foreground bg-transparent hover:bg-primary-foreground/10",
         success: "bg-success text-success-foreground hover:bg-success/90 shadow-md",
+        // New futuristic variants
+        glow: "bg-primary text-primary-foreground shadow-lg hover:glow-primary hover:scale-[1.02] active:scale-[0.98]",
+        glowAccent: "bg-accent text-accent-foreground shadow-lg hover:glow-accent hover:scale-[1.02] active:scale-[0.98]",
+        glass: "glass text-foreground hover:bg-card/80 border-border/50",
+        neon: "neon-border text-primary hover:text-primary-foreground hover:bg-primary/10",
       },
       size: {
         default: "h-10 px-4 py-2",
