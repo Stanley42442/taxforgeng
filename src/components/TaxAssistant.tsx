@@ -370,8 +370,10 @@ export function TaxAssistant() {
                   <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <Bot className="h-3 w-3 text-primary" />
                   </div>
-                  <div className="bg-muted rounded-lg px-2.5 py-1.5">
-                    <Loader2 className="h-3 w-3 animate-spin" />
+                  <div className="bg-muted rounded-lg px-3 py-2.5 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
               )}
