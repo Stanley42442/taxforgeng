@@ -29,6 +29,8 @@ import { WelcomeSplash } from "@/components/WelcomeSplash";
 import { DisclaimerModal } from "@/components/DisclaimerModal";
 import { FeedbackForm } from "@/components/FeedbackForm";
 import { seedSampleData } from "@/lib/sampleData";
+import { useUpcomingReminders } from "@/hooks/useUpcomingReminders";
+import { Badge } from "@/components/ui/badge";
 
 interface Expense {
   id: string;
@@ -57,6 +59,7 @@ interface ReminderSummary {
 const Dashboard = () => {
   const { tier, savedBusinesses, loading: businessLoading, refreshBusinesses } = useSubscription();
   const { user } = useAuth();
+  const { urgentCount } = useUpcomingReminders();
   const navigate = useNavigate();
   const [expenseSummary, setExpenseSummary] = useState<ExpenseSummary>({
     totalIncome: 0,
@@ -334,10 +337,23 @@ const Dashboard = () => {
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
-                    <div className="h-8 w-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                    <div className="h-8 w-8 rounded-lg bg-accent/10 flex items-center justify-center relative">
                       <Bell className="h-4 w-4 text-accent" />
+                      {urgentCount > 0 && (
+                        <Badge 
+                          variant="destructive" 
+                          className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center animate-pulse"
+                        >
+                          {urgentCount > 9 ? '9+' : urgentCount}
+                        </Badge>
+                      )}
                     </div>
                     Upcoming Reminders
+                    {urgentCount > 0 && (
+                      <Badge variant="destructive" className="ml-2 text-xs">
+                        {urgentCount} urgent
+                      </Badge>
+                    )}
                   </CardTitle>
                   <Link to="/reminders">
                     <Button variant="ghost" size="sm" className="group">

@@ -7,6 +7,8 @@ import { FeedbackForm } from "@/components/FeedbackForm";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
+import { useUpcomingReminders } from "@/hooks/useUpcomingReminders";
+import { Badge } from "@/components/ui/badge";
 import { 
   Calculator, 
   Crown, 
@@ -46,6 +48,7 @@ export const NavMenu = () => {
   const { tier } = useSubscription();
   const { user, signOut, loading } = useAuth();
   const { isAdmin } = useAdminCheck();
+  const { urgentCount } = useUpcomingReminders();
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -181,8 +184,23 @@ export const NavMenu = () => {
                               : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                           }`}
                         >
-                          <link.icon className="h-4 w-4 shrink-0" />
+                          <div className="relative">
+                            <link.icon className="h-4 w-4 shrink-0" />
+                            {link.to === '/reminders' && urgentCount > 0 && (
+                              <Badge 
+                                variant="destructive" 
+                                className="absolute -top-2 -right-2 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center"
+                              >
+                                {urgentCount > 9 ? '9+' : urgentCount}
+                              </Badge>
+                            )}
+                          </div>
                           <span className="truncate">{link.label}</span>
+                          {link.to === '/reminders' && urgentCount > 0 && (
+                            <Badge variant="destructive" className="ml-auto text-[10px] px-1.5">
+                              {urgentCount}
+                            </Badge>
+                          )}
                         </Link>
                       </SheetClose>
                     ))}
