@@ -434,31 +434,24 @@ const Reminders = () => {
                               />
                             </div>
                             <div className="space-y-2">
-                              <Label>Due Date</Label>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    className={cn(
-                                      "w-full justify-start text-left font-normal",
-                                      !customDate && "text-muted-foreground"
-                                    )}
-                                  >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {customDate ? format(customDate, "PPP") : <span>Pick a date</span>}
-                                  </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                  <Calendar
-                                    mode="single"
-                                    selected={customDate}
-                                    onSelect={setCustomDate}
-                                    disabled={(date) => date < new Date()}
-                                    initialFocus
-                                    className="pointer-events-auto"
-                                  />
-                                </PopoverContent>
-                              </Popover>
+                              <Label htmlFor="dueDate">Due Date</Label>
+                              <div className="relative">
+                                <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                                <Input
+                                  id="dueDate"
+                                  type="date"
+                                  className="pl-10"
+                                  value={customDate ? format(customDate, "yyyy-MM-dd") : ""}
+                                  min={format(new Date(), "yyyy-MM-dd")}
+                                  onChange={(e) => {
+                                    if (e.target.value) {
+                                      setCustomDate(new Date(e.target.value));
+                                    } else {
+                                      setCustomDate(undefined);
+                                    }
+                                  }}
+                                />
+                              </div>
                             </div>
                             <div className="space-y-2">
                               <Label htmlFor="note">Note (Optional)</Label>
