@@ -482,11 +482,11 @@ const Reminders = () => {
                                 ? 'bg-success/20' 
                                 : 'bg-muted'
                             }`}>
-                              <Calendar className={`w-5 h-5 ${
-                                isReminderEnabled(business.id, reminder.type) 
-                                  ? 'text-success' 
-                                  : 'text-muted-foreground'
-                              }`} />
+                            <CalendarIcon className={`w-5 h-5 ${
+                              isReminderEnabled(business.id, reminder.type) 
+                                ? 'text-success' 
+                                : 'text-muted-foreground'
+                            }`} />
                             </div>
                             <div>
                               <p className="font-medium text-sm">{reminder.name}</p>
