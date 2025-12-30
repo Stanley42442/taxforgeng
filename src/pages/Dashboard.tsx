@@ -446,19 +446,30 @@ const Dashboard = () => {
 
           {/* Quick Actions */}
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 animate-slide-up-delay-2">
-            {[
-              { to: "/calculator", icon: Calculator, label: "New Calculation", color: "primary" },
-              { to: "/expenses", icon: Receipt, label: "Track Expense", color: "success" },
-              { to: "/reminders", icon: Bell, label: "Set Reminder", color: "accent" },
-              { to: "/learn", icon: Sparkles, label: "Tax Tips", color: "warning" },
-            ].map((action) => (
-              <Link key={action.to} to={action.to}>
-                <Button variant="outline" className="w-full h-14 glass-subtle neon-border hover-lift group">
-                  <action.icon className={`h-5 w-5 mr-2 text-${action.color}`} />
-                  <span>{action.label}</span>
-                </Button>
-              </Link>
-            ))}
+            <Link to="/calculator">
+              <Button variant="outline" className="w-full h-14 glass-subtle neon-border hover-lift group">
+                <Calculator className="h-5 w-5 mr-2 text-primary" />
+                <span className="text-foreground">New Calculation</span>
+              </Button>
+            </Link>
+            <Link to="/expenses">
+              <Button variant="outline" className="w-full h-14 glass-subtle neon-border hover-lift group">
+                <Receipt className="h-5 w-5 mr-2 text-success" />
+                <span className="text-foreground">Track Expense</span>
+              </Button>
+            </Link>
+            <Link to="/reminders">
+              <Button variant="outline" className="w-full h-14 glass-subtle neon-border hover-lift group">
+                <Bell className="h-5 w-5 mr-2 text-accent" />
+                <span className="text-foreground">Set Reminder</span>
+              </Button>
+            </Link>
+            <Link to="/learn">
+              <Button variant="outline" className="w-full h-14 glass-subtle neon-border hover-lift group">
+                <Sparkles className="h-5 w-5 mr-2 text-warning" />
+                <span className="text-foreground">Tax Tips</span>
+              </Button>
+            </Link>
           </div>
 
           <FeedbackForm />

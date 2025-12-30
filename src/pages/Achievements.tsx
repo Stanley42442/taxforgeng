@@ -294,10 +294,10 @@ const Achievements = () => {
                   </span>
                 </div>
                 <div className="relative">
-                  <Progress value={((stats.totalPoints || earnedPoints) / currentLevel.nextLevel) * 100} className="h-4" />
+                  <Progress value={Math.min(((stats.totalPoints || earnedPoints) / currentLevel.nextLevel) * 100, 100)} className="h-4" />
                   <div 
                     className="absolute top-0 left-0 h-4 rounded-full bg-gradient-primary animate-glow-pulse"
-                    style={{ width: `${((stats.totalPoints || earnedPoints) / currentLevel.nextLevel) * 100}%` }}
+                    style={{ width: `${Math.min(((stats.totalPoints || earnedPoints) / currentLevel.nextLevel) * 100, 100)}%` }}
                   />
                 </div>
               </div>
