@@ -551,28 +551,29 @@ const Reminders = () => {
                             .map(reminder => (
                               <div 
                                 key={reminder.id}
-                                className="flex items-center justify-between p-3 border rounded-lg bg-accent/5"
+                                className="flex items-center justify-between p-3 border rounded-lg bg-accent/5 min-w-0 overflow-hidden"
                               >
-                                <div className="flex items-center gap-3">
-                                  <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+                                <div className="flex items-center gap-3 min-w-0 flex-1">
+                                  <div className="w-10 h-10 flex-shrink-0 rounded-full bg-accent/20 flex items-center justify-center">
                                     <Settings className="w-5 h-5 text-accent" />
                                   </div>
-                                  <div>
-                                    <p className="font-medium text-sm">{reminder.name}</p>
-                                    <p className="text-xs text-muted-foreground">{reminder.dueDate}</p>
+                                  <div className="min-w-0">
+                                    <p className="font-medium text-sm truncate">{reminder.name}</p>
+                                    <p className="text-xs text-muted-foreground truncate">{reminder.dueDate}</p>
                                     {reminder.customNote && (
-                                      <p className="text-xs text-muted-foreground italic">{reminder.customNote}</p>
+                                      <p className="text-xs text-muted-foreground italic truncate">{reminder.customNote}</p>
                                     )}
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 flex-shrink-0">
                                   <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => deleteReminder(reminder.id)}
-                                    className="text-destructive"
+                                    className="text-destructive px-2"
                                   >
-                                    Delete
+                                    <span className="hidden sm:inline">Delete</span>
+                                    <span className="sm:hidden">×</span>
                                   </Button>
                                   <Switch
                                     checked={reminder.enabled}
