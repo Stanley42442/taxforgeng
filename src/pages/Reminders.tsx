@@ -474,40 +474,42 @@ const Reminders = () => {
                       {DEFAULT_REMINDERS.map(reminder => (
                         <div 
                           key={reminder.type}
-                          className="flex items-center justify-between p-3 border rounded-lg"
+                          className="flex items-center justify-between p-3 border rounded-lg min-w-0 overflow-hidden"
                         >
-                          <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                          <div className="flex items-center gap-3 min-w-0 flex-1">
+                            <div className={`w-10 h-10 flex-shrink-0 rounded-full flex items-center justify-center ${
                               isReminderEnabled(business.id, reminder.type) 
                                 ? 'bg-success/20' 
                                 : 'bg-muted'
                             }`}>
-                            <CalendarIcon className={`w-5 h-5 ${
-                              isReminderEnabled(business.id, reminder.type) 
-                                ? 'text-success' 
-                                : 'text-muted-foreground'
-                            }`} />
+                              <CalendarIcon className={`w-5 h-5 ${
+                                isReminderEnabled(business.id, reminder.type) 
+                                  ? 'text-success' 
+                                  : 'text-muted-foreground'
+                              }`} />
                             </div>
-                            <div>
-                              <p className="font-medium text-sm">{reminder.name}</p>
-                              <p className="text-xs text-muted-foreground">{reminder.dueDate}</p>
+                            <div className="min-w-0">
+                              <p className="font-medium text-sm truncate">{reminder.name}</p>
+                              <p className="text-xs text-muted-foreground truncate">{reminder.dueDate}</p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-shrink-0">
                             {isReminderEnabled(business.id, reminder.type) && (
                               <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => sendTestEmail(business, reminder.type)}
-                                className="text-xs"
+                                className="text-xs px-2"
                                 disabled={sendingEmail === `${business.id}-${reminder.type}`}
                               >
                                 {sendingEmail === `${business.id}-${reminder.type}` ? (
-                                  <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                  <Loader2 className="w-3 h-3 animate-spin" />
                                 ) : (
-                                  <Mail className="w-3 h-3 mr-1" />
+                                  <Mail className="w-3 h-3" />
                                 )}
-                                {sendingEmail === `${business.id}-${reminder.type}` ? 'Sending...' : 'Test'}
+                                <span className="hidden sm:inline ml-1">
+                                  {sendingEmail === `${business.id}-${reminder.type}` ? 'Sending...' : 'Test'}
+                                </span>
                               </Button>
                             )}
                             <Switch
