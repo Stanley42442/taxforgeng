@@ -1,15 +1,16 @@
 import { supabase } from "@/integrations/supabase/client";
 
 const SAMPLE_EXPENSES = [
-  // Income entries
+  // Income entries - spread across 3 months
   { description: 'Client Payment - ABC Corp', amount: 2500000, category: 'income', type: 'income', isDeductible: false, daysAgo: 2 },
   { description: 'Consulting Fee - TechStart Ltd', amount: 1200000, category: 'income', type: 'income', isDeductible: false, daysAgo: 8 },
   { description: 'Product Sales - Q4 Revenue', amount: 3800000, category: 'income', type: 'income', isDeductible: false, daysAgo: 15 },
-  { description: 'Service Contract Payment', amount: 950000, category: 'income', type: 'income', isDeductible: false, daysAgo: 22 },
-  { description: 'Retainer Fee - Monthly', amount: 450000, category: 'income', type: 'income', isDeductible: false, daysAgo: 30 },
-  { description: 'Commission Income', amount: 680000, category: 'income', type: 'income', isDeductible: false, daysAgo: 45 },
+  { description: 'Service Contract Payment', amount: 950000, category: 'income', type: 'income', isDeductible: false, daysAgo: 35 },
+  { description: 'Retainer Fee - Monthly', amount: 450000, category: 'income', type: 'income', isDeductible: false, daysAgo: 45 },
+  { description: 'Commission Income', amount: 680000, category: 'income', type: 'income', isDeductible: false, daysAgo: 65 },
+  { description: 'Freelance Project Payment', amount: 520000, category: 'income', type: 'income', isDeductible: false, daysAgo: 75 },
   
-  // Expense entries
+  // Expense entries - spread across 3 months
   { description: 'Office Rent - December', amount: 350000, category: 'rent', type: 'expense', isDeductible: true, daysAgo: 1 },
   { description: 'Staff Salaries', amount: 1200000, category: 'salary', type: 'expense', isDeductible: true, daysAgo: 3 },
   { description: 'Internet & Phone Bills', amount: 45000, category: 'utilities', type: 'expense', isDeductible: true, daysAgo: 5 },
@@ -21,7 +22,10 @@ const SAMPLE_EXPENSES = [
   { description: 'Staff Salaries - November', amount: 1200000, category: 'salary', type: 'expense', isDeductible: true, daysAgo: 35 },
   { description: 'Google Ads Spend', amount: 120000, category: 'marketing', type: 'expense', isDeductible: true, daysAgo: 40 },
   { description: 'Fuel & Generator', amount: 55000, category: 'transport', type: 'expense', isDeductible: true, daysAgo: 48 },
-  { description: 'Software Subscriptions', amount: 85000, category: 'other', type: 'expense', isDeductible: true, daysAgo: 52 },
+  { description: 'Office Rent - October', amount: 350000, category: 'rent', type: 'expense', isDeductible: true, daysAgo: 62 },
+  { description: 'Staff Salaries - October', amount: 1100000, category: 'salary', type: 'expense', isDeductible: true, daysAgo: 65 },
+  { description: 'Software Subscriptions', amount: 85000, category: 'other', type: 'expense', isDeductible: true, daysAgo: 70 },
+  { description: 'Marketing Materials', amount: 95000, category: 'marketing', type: 'expense', isDeductible: true, daysAgo: 78 },
 ];
 
 const SAMPLE_BUSINESS = {

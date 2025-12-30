@@ -172,14 +172,7 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
                     );
                   })}
                 </Pie>
-                <Tooltip 
-                  formatter={(value: number) => formatCurrency(value)}
-                  contentStyle={{ 
-                    backgroundColor: 'hsl(var(--card))', 
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px'
-                  }}
-                />
+                {/* Tooltip disabled to prevent persistent hover card */}
               </PieChart>
             </ResponsiveContainer>
             {activeIndex !== null && categoryData[activeIndex] && (
