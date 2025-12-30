@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +16,9 @@ interface Position {
   y: number;
 }
 
+const STORAGE_KEY = "taxbot-position";
+const DEFAULT_POSITION: Position = { x: 24, y: 24 };
+
 const SUGGESTED_QUESTIONS = [
   "What's the VAT rate in Nigeria?",
   "When is CIT due for companies?",
@@ -23,14 +26,34 @@ const SUGGESTED_QUESTIONS = [
   "What items are VAT exempt?",
 ];
 
+const getStoredPosition = (): Position => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (typeof parsed.x === "number" && typeof parsed.y === "number") {
+        return parsed;
+      }
+    }
+  } catch {}
+  return DEFAULT_POSITION;
+};
+
+const savePosition = (pos: Position) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(pos));
+  } catch {}
+};
+
 export function TaxAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [position, setPosition] = useState<Position>({ x: 24, y: 24 });
+  const [position, setPosition] = useState<Position>(getStoredPosition);
   const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState<Position>({ x: 0, y: 0 });
+  const [hasMoved, setHasMoved] = useState(false);
+  const dragStartPos = useRef<{ x: number; y: number } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -40,65 +63,77 @@ export function TaxAssistant() {
     }
   }, [messages]);
 
-  // Handle drag start for both mouse and touch
-  const handleDragStart = (clientX: number, clientY: number) => {
-    if (!buttonRef.current) return;
-    const rect = buttonRef.current.getBoundingClientRect();
-    setDragOffset({
-      x: clientX - (window.innerWidth - rect.right),
-      y: clientY - (window.innerHeight - rect.bottom),
-    });
+  const handleDragStart = useCallback((clientX: number, clientY: number) => {
+    dragStartPos.current = { x: clientX, y: clientY };
     setIsDragging(true);
-  };
+    setHasMoved(false);
+  }, []);
 
-  // Handle drag move
-  const handleDragMove = (clientX: number, clientY: number) => {
-    if (!isDragging) return;
-    const newX = Math.max(8, Math.min(window.innerWidth - 64, window.innerWidth - clientX + dragOffset.x - 56));
-    const newY = Math.max(8, Math.min(window.innerHeight - 64, window.innerHeight - clientY + dragOffset.y - 56));
+  const handleDragMove = useCallback((clientX: number, clientY: number) => {
+    if (!isDragging || !dragStartPos.current) return;
+    
+    const deltaX = Math.abs(clientX - dragStartPos.current.x);
+    const deltaY = Math.abs(clientY - dragStartPos.current.y);
+    
+    // Only consider it a drag if moved more than 5px
+    if (deltaX > 5 || deltaY > 5) {
+      setHasMoved(true);
+    }
+    
+    const newX = Math.max(8, Math.min(window.innerWidth - 64, window.innerWidth - clientX - 28));
+    const newY = Math.max(8, Math.min(window.innerHeight - 64, window.innerHeight - clientY - 28));
     setPosition({ x: newX, y: newY });
-  };
+  }, [isDragging]);
 
-  // Handle drag end
-  const handleDragEnd = () => {
+  const handleDragEnd = useCallback(() => {
+    if (hasMoved) {
+      savePosition(position);
+    }
     setIsDragging(false);
-  };
+    dragStartPos.current = null;
+  }, [hasMoved, position]);
+
+  const handleClick = useCallback(() => {
+    if (!hasMoved) {
+      setIsOpen(true);
+    }
+  }, [hasMoved]);
 
   // Mouse events
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     handleDragStart(e.clientX, e.clientY);
-  };
+  }, [handleDragStart]);
 
   useEffect(() => {
+    if (!isDragging) return;
+    
     const handleMouseMove = (e: MouseEvent) => handleDragMove(e.clientX, e.clientY);
     const handleMouseUp = () => handleDragEnd();
 
-    if (isDragging) {
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mouseup", handleMouseUp);
-    }
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, dragOffset]);
+  }, [isDragging, handleDragMove, handleDragEnd]);
 
   // Touch events
-  const handleTouchStart = (e: React.TouchEvent) => {
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
     handleDragStart(touch.clientX, touch.clientY);
-  };
+  }, [handleDragStart]);
 
-  const handleTouchMove = (e: React.TouchEvent) => {
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
     handleDragMove(touch.clientX, touch.clientY);
-  };
+  }, [handleDragMove]);
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = useCallback(() => {
     handleDragEnd();
-  };
+  }, [handleDragEnd]);
 
   const streamChat = async (userMessages: Message[]) => {
     const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tax-assistant`;
@@ -196,19 +231,20 @@ export function TaxAssistant() {
     return (
       <Button
         ref={buttonRef}
-        onClick={() => !isDragging && setIsOpen(true)}
+        onClick={handleClick}
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        className="fixed h-14 w-14 rounded-full shadow-lg bg-gradient-primary hover:opacity-90 z-50 cursor-grab active:cursor-grabbing touch-none"
+        className="fixed h-14 w-14 rounded-full shadow-lg bg-gradient-primary hover:opacity-90 z-50 touch-none select-none"
         style={{
           right: `${position.x}px`,
           bottom: `${position.y}px`,
+          cursor: isDragging ? "grabbing" : "grab",
         }}
         size="icon"
       >
-        <MessageCircle className="h-6 w-6" />
+        <MessageCircle className="h-6 w-6 pointer-events-none" />
       </Button>
     );
   }
