@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import { formatCurrency } from "@/lib/taxCalculations";
 
@@ -40,6 +40,19 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [animationComplete, setAnimationComplete] = useState(false);
+
+  useEffect(() => {
+    // Trigger entrance animation after mount
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    const animTimer = setTimeout(() => setAnimationComplete(true), 1200);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(animTimer);
+    };
+  }, []);
+
   // Category breakdown for pie chart (expenses only)
   const categoryData = useMemo(() => {
     const expenseItems = expenses.filter(e => e.type === 'expense');
@@ -95,9 +108,13 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
       {/* Expense Category Pie Chart */}
-      <div className="rounded-xl border border-border bg-card p-4 sm:p-6 shadow-card">
+      <div 
+        className={`rounded-xl border border-border bg-card p-4 sm:p-6 shadow-card transition-all duration-700 ease-out ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}
+      >
         <h3 className="font-semibold text-foreground mb-4">Expense Breakdown</h3>
         {categoryData.length > 0 ? (
           <div className="h-72 sm:h-80 md:h-96">
@@ -113,6 +130,9 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
                   dataKey="value"
                   label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   labelLine={false}
+                  animationBegin={200}
+                  animationDuration={1000}
+                  animationEasing="ease-out"
                 >
                   {categoryData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -134,14 +154,20 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
             No expense data yet
           </div>
         )}
-        <div className="mt-4 text-center">
+        <div className={`mt-4 text-center transition-all duration-500 delay-500 ${
+          isVisible ? 'opacity-100' : 'opacity-0'
+        }`}>
           <p className="text-sm text-muted-foreground">Total Expenses</p>
           <p className="text-xl font-bold text-destructive">{formatCurrency(totalExpenses)}</p>
         </div>
       </div>
 
       {/* Monthly Income vs Expenses Bar Chart */}
-      <div className="rounded-xl border border-border bg-card p-4 sm:p-6 shadow-card">
+      <div 
+        className={`rounded-xl border border-border bg-card p-4 sm:p-6 shadow-card transition-all duration-700 ease-out delay-150 ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}
+      >
         <h3 className="font-semibold text-foreground mb-4">Monthly Overview</h3>
         {monthlyData.length > 0 ? (
           <div className="h-72 sm:h-80 md:h-96">
@@ -168,8 +194,24 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
                   }}
                 />
                 <Legend />
-                <Bar dataKey="income" name="Income" fill="#22c55e" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="expenses" name="Expenses" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                <Bar 
+                  dataKey="income" 
+                  name="Income" 
+                  fill="#22c55e" 
+                  radius={[4, 4, 0, 0]}
+                  animationBegin={300}
+                  animationDuration={1000}
+                  animationEasing="ease-out"
+                />
+                <Bar 
+                  dataKey="expenses" 
+                  name="Expenses" 
+                  fill="#ef4444" 
+                  radius={[4, 4, 0, 0]}
+                  animationBegin={400}
+                  animationDuration={1000}
+                  animationEasing="ease-out"
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
