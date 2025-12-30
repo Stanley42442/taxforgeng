@@ -51,11 +51,10 @@ export function TaxAssistant() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [position, setPosition] = useState<Position>(getStoredPosition);
-  const [isDragging, setIsDragging] = useState(false);
-  const [hasMoved, setHasMoved] = useState(false);
-  const dragStartPos = useRef<{ x: number; y: number } | null>(null);
+  const isDraggingRef = useRef(false);
+  const hasMovedRef = useRef(false);
+  const dragStartPos = useRef<{ x: number; y: number; posX: number; posY: number } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -63,53 +62,58 @@ export function TaxAssistant() {
     }
   }, [messages]);
 
-  const handleDragStart = useCallback((clientX: number, clientY: number) => {
-    dragStartPos.current = { x: clientX, y: clientY };
-    setIsDragging(true);
-    setHasMoved(false);
+  // Unified drag handlers
+  const handlePointerDown = useCallback((clientX: number, clientY: number) => {
+    isDraggingRef.current = true;
+    hasMovedRef.current = false;
+    dragStartPos.current = { 
+      x: clientX, 
+      y: clientY, 
+      posX: position.x, 
+      posY: position.y 
+    };
+  }, [position]);
+
+  const handlePointerMove = useCallback((clientX: number, clientY: number) => {
+    if (!isDraggingRef.current || !dragStartPos.current) return;
+    
+    const deltaX = clientX - dragStartPos.current.x;
+    const deltaY = clientY - dragStartPos.current.y;
+    
+    // Only consider it moved if dragged more than 8px
+    if (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8) {
+      hasMovedRef.current = true;
+    }
+    
+    const newX = Math.max(8, Math.min(window.innerWidth - 64, dragStartPos.current.posX - deltaX));
+    const newY = Math.max(8, Math.min(window.innerHeight - 64, dragStartPos.current.posY - deltaY));
+    setPosition({ x: newX, y: newY });
   }, []);
 
-  const handleDragMove = useCallback((clientX: number, clientY: number) => {
-    if (!isDragging || !dragStartPos.current) return;
-    
-    const deltaX = Math.abs(clientX - dragStartPos.current.x);
-    const deltaY = Math.abs(clientY - dragStartPos.current.y);
-    
-    // Only consider it a drag if moved more than 5px
-    if (deltaX > 5 || deltaY > 5) {
-      setHasMoved(true);
-    }
-    
-    const newX = Math.max(8, Math.min(window.innerWidth - 64, window.innerWidth - clientX - 28));
-    const newY = Math.max(8, Math.min(window.innerHeight - 64, window.innerHeight - clientY - 28));
-    setPosition({ x: newX, y: newY });
-  }, [isDragging]);
-
-  const handleDragEnd = useCallback(() => {
-    if (hasMoved) {
+  const handlePointerUp = useCallback(() => {
+    if (hasMovedRef.current) {
       savePosition(position);
     }
-    setIsDragging(false);
+    isDraggingRef.current = false;
     dragStartPos.current = null;
-  }, [hasMoved, position]);
+  }, [position]);
 
   const handleClick = useCallback(() => {
-    if (!hasMoved) {
+    // Only open if we didn't drag
+    if (!hasMovedRef.current) {
       setIsOpen(true);
     }
-  }, [hasMoved]);
+    hasMovedRef.current = false;
+  }, []);
 
   // Mouse events
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    handleDragStart(e.clientX, e.clientY);
-  }, [handleDragStart]);
-
   useEffect(() => {
-    if (!isDragging) return;
-    
-    const handleMouseMove = (e: MouseEvent) => handleDragMove(e.clientX, e.clientY);
-    const handleMouseUp = () => handleDragEnd();
+    const handleMouseMove = (e: MouseEvent) => {
+      handlePointerMove(e.clientX, e.clientY);
+    };
+    const handleMouseUp = () => {
+      handlePointerUp();
+    };
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
@@ -118,22 +122,28 @@ export function TaxAssistant() {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, handleDragMove, handleDragEnd]);
+  }, [handlePointerMove, handlePointerUp]);
 
   // Touch events
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    handleDragStart(touch.clientX, touch.clientY);
-  }, [handleDragStart]);
+  useEffect(() => {
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDraggingRef.current && e.touches[0]) {
+        e.preventDefault(); // Prevent scrolling while dragging
+        handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
+    const handleTouchEnd = () => {
+      handlePointerUp();
+    };
 
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    handleDragMove(touch.clientX, touch.clientY);
-  }, [handleDragMove]);
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    window.addEventListener("touchend", handleTouchEnd);
 
-  const handleTouchEnd = useCallback(() => {
-    handleDragEnd();
-  }, [handleDragEnd]);
+    return () => {
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [handlePointerMove, handlePointerUp]);
 
   const streamChat = async (userMessages: Message[]) => {
     const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tax-assistant`;
@@ -229,50 +239,60 @@ export function TaxAssistant() {
 
   if (!isOpen) {
     return (
-      <Button
-        ref={buttonRef}
+      <button
         onClick={handleClick}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        className="fixed h-14 w-14 rounded-full shadow-lg bg-gradient-primary hover:opacity-90 z-50 touch-none select-none"
+        onMouseDown={(e) => {
+          e.preventDefault();
+          handlePointerDown(e.clientX, e.clientY);
+        }}
+        onTouchStart={(e) => {
+          const touch = e.touches[0];
+          if (touch) {
+            handlePointerDown(touch.clientX, touch.clientY);
+          }
+        }}
+        className="fixed h-14 w-14 rounded-full shadow-lg bg-gradient-primary hover:opacity-90 z-50 select-none flex items-center justify-center text-white"
         style={{
           right: `${position.x}px`,
           bottom: `${position.y}px`,
-          cursor: isDragging ? "grabbing" : "grab",
+          cursor: "grab",
+          WebkitTapHighlightColor: "transparent",
         }}
-        size="icon"
       >
         <MessageCircle className="h-6 w-6 pointer-events-none" />
-      </Button>
+      </button>
     );
   }
 
   return (
     <Card 
-      className="fixed w-[calc(100vw-1rem)] max-w-[380px] h-[min(70vh,420px)] sm:h-[500px] flex flex-col shadow-2xl z-50 border-primary/20"
+      className="fixed flex flex-col shadow-2xl z-50 border-primary/20"
       style={{
-        right: `max(0.5rem, ${Math.min(position.x, window.innerWidth - 396)}px)`,
-        bottom: `max(0.5rem, ${position.y}px)`,
+        right: "0.5rem",
+        bottom: "0.5rem",
+        left: "0.5rem",
+        width: "auto",
+        maxWidth: "380px",
+        height: "min(60vh, 360px)",
+        marginLeft: "auto",
       }}
     >
-      <CardHeader className="bg-gradient-primary text-white rounded-t-lg py-2.5 sm:py-3 px-3 sm:px-4 flex-shrink-0">
+      <CardHeader className="bg-gradient-primary text-white rounded-t-lg py-2 px-3 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/20 flex items-center justify-center">
-              <Bot className="h-4 w-4 sm:h-5 sm:w-5" />
+            <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
+              <Bot className="h-4 w-4" />
             </div>
             <div>
-              <CardTitle className="text-sm sm:text-base font-semibold">TaxBot</CardTitle>
-              <p className="text-[10px] sm:text-xs text-white/80">Nigerian Tax Assistant</p>
+              <CardTitle className="text-sm font-semibold">TaxBot</CardTitle>
+              <p className="text-[10px] text-white/80">Nigerian Tax Assistant</p>
             </div>
           </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setIsOpen(false)}
-            className="text-white hover:bg-white/20 h-7 w-7 sm:h-8 sm:w-8"
+            className="text-white hover:bg-white/20 h-7 w-7"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -280,23 +300,23 @@ export function TaxAssistant() {
       </CardHeader>
 
       <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
-        <ScrollArea className="flex-1 p-3 sm:p-4" ref={scrollRef}>
+        <ScrollArea className="flex-1 p-3" ref={scrollRef}>
           {messages.length === 0 ? (
-            <div className="space-y-3 sm:space-y-4">
-              <div className="text-center py-3 sm:py-4">
-                <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 mx-auto text-primary mb-2" />
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  Hi! I'm TaxBot, your Nigerian tax assistant. Ask me anything about taxes!
+            <div className="space-y-3">
+              <div className="text-center py-2">
+                <Sparkles className="h-6 w-6 mx-auto text-primary mb-1" />
+                <p className="text-xs text-muted-foreground">
+                  Hi! I'm TaxBot. Ask me anything about Nigerian taxes!
                 </p>
               </div>
-              <div className="space-y-1.5 sm:space-y-2">
-                <p className="text-[10px] sm:text-xs text-muted-foreground font-medium">Try asking:</p>
+              <div className="space-y-1.5">
+                <p className="text-[10px] text-muted-foreground font-medium">Try asking:</p>
                 {SUGGESTED_QUESTIONS.map((q, i) => (
                   <Button
                     key={i}
                     variant="outline"
                     size="sm"
-                    className="w-full justify-start text-left h-auto py-1.5 sm:py-2 text-[11px] sm:text-xs"
+                    className="w-full justify-start text-left h-auto py-1.5 text-[11px]"
                     onClick={() => sendMessage(q)}
                     disabled={isLoading}
                   >
@@ -306,19 +326,19 @@ export function TaxAssistant() {
               </div>
             </div>
           ) : (
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-3">
               {messages.map((msg, i) => (
                 <div
                   key={i}
-                  className={`flex gap-1.5 sm:gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                  className={`flex gap-1.5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   {msg.role === "assistant" && (
-                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
+                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Bot className="h-3 w-3 text-primary" />
                     </div>
                   )}
                   <div
-                    className={`max-w-[85%] rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm ${
+                    className={`max-w-[85%] rounded-lg px-2.5 py-1.5 text-xs ${
                       msg.role === "user"
                         ? "bg-primary text-primary-foreground"
                         : "bg-muted"
@@ -327,19 +347,19 @@ export function TaxAssistant() {
                     <p className="whitespace-pre-wrap">{msg.content}</p>
                   </div>
                   {msg.role === "user" && (
-                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                      <User className="h-3 w-3 sm:h-4 sm:w-4 text-primary-foreground" />
+                    <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                      <User className="h-3 w-3 text-primary-foreground" />
                     </div>
                   )}
                 </div>
               ))}
               {isLoading && messages[messages.length - 1]?.role === "user" && (
-                <div className="flex gap-1.5 sm:gap-2">
-                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
+                <div className="flex gap-1.5">
+                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Bot className="h-3 w-3 text-primary" />
                   </div>
-                  <div className="bg-muted rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2">
-                    <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                  <div className="bg-muted rounded-lg px-2.5 py-1.5">
+                    <Loader2 className="h-3 w-3 animate-spin" />
                   </div>
                 </div>
               )}
@@ -347,7 +367,7 @@ export function TaxAssistant() {
           )}
         </ScrollArea>
 
-        <div className="p-2.5 sm:p-3 border-t bg-background">
+        <div className="p-2 border-t bg-background">
           <div className="flex gap-2">
             <Input
               value={input}
@@ -355,18 +375,18 @@ export function TaxAssistant() {
               onKeyDown={handleKeyDown}
               placeholder="Ask about Nigerian taxes..."
               disabled={isLoading}
-              className="text-xs sm:text-sm h-9 sm:h-10"
+              className="text-xs h-9"
             />
             <Button
               onClick={() => sendMessage()}
               disabled={!input.trim() || isLoading}
               size="icon"
-              className="bg-primary hover:bg-primary/90 h-9 w-9 sm:h-10 sm:w-10"
+              className="bg-primary hover:bg-primary/90 h-9 w-9 flex-shrink-0"
             >
               {isLoading ? (
-                <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : (
-                <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <Send className="h-3.5 w-3.5" />
               )}
             </Button>
           </div>
