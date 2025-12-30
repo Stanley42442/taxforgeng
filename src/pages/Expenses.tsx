@@ -484,11 +484,11 @@ const Expenses = () => {
                   return (
                     <div 
                       key={expense.id}
-                      className="glass flex items-center justify-between p-4 rounded-xl hover-lift group"
+                      className="glass flex items-center justify-between gap-4 p-4 rounded-xl hover-lift group"
                     >
-                      <div className="flex items-center gap-4">
-                        <span className="text-2xl">{getCategoryIcon(expense.category)}</span>
-                        <div>
+                      <div className="flex items-center gap-4 min-w-0 flex-1">
+                        <span className="text-2xl flex-shrink-0">{getCategoryIcon(expense.category)}</span>
+                        <div className="min-w-0 mr-3">
                           <p className="font-medium text-foreground">{expense.description}</p>
                           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                             <span>{new Date(expense.date).toLocaleDateString()}</span>
@@ -506,7 +506,7 @@ const Expenses = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-4 flex-shrink-0 ml-2">
                         <span className={`font-bold ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
                           {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
                         </span>

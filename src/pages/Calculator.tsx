@@ -104,16 +104,16 @@ const CalculatorPage = () => {
 
           {/* Tax Rule Toggle - Neumorphic */}
           <div className="mb-6 glass-frosted rounded-2xl p-5 shadow-futuristic animate-slide-up">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className={`rounded-xl p-3 transition-all duration-300 ${
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-4 min-w-0 flex-1">
+                <div className={`rounded-xl p-3 flex-shrink-0 transition-all duration-300 ${
                   use2026Rules 
                     ? 'bg-success/20 text-success glow-success' 
                     : 'bg-secondary text-secondary-foreground neumorphic-sm'
                 }`}>
                   <Info className="h-6 w-6" />
                 </div>
-                <div>
+                <div className="min-w-0 mr-3">
                   <p className="font-semibold text-foreground">
                     {use2026Rules ? 'Nigeria Tax Act 2025 Rules' : 'Current (Pre-2026) Rules'}
                   </p>
@@ -124,11 +124,13 @@ const CalculatorPage = () => {
                   </p>
                 </div>
               </div>
-              <Switch 
-                checked={use2026Rules} 
-                onCheckedChange={setUse2026Rules}
-                className="data-[state=checked]:bg-success"
-              />
+              <div className="flex-shrink-0 ml-2">
+                <Switch 
+                  checked={use2026Rules} 
+                  onCheckedChange={setUse2026Rules}
+                  className="data-[state=checked]:bg-success"
+                />
+              </div>
             </div>
           </div>
 

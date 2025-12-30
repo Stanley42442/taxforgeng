@@ -598,16 +598,18 @@ const Reminders = () => {
 
         {!canCustomize && (
           <Card className="mt-6 border-accent/50 bg-accent/5">
-            <CardContent className="flex items-center justify-between p-4">
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="w-5 h-5 text-accent" />
+            <CardContent className="flex items-center justify-between gap-4 p-4">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <AlertTriangle className="w-5 h-5 text-accent flex-shrink-0" />
                 <span className="text-sm">
                   Upgrade to Business to add custom reminder dates and notes
                 </span>
               </div>
-              <Link to="/pricing">
-                <Button variant="outline" size="sm">Upgrade</Button>
-              </Link>
+              <div className="flex-shrink-0 ml-2">
+                <Link to="/pricing">
+                  <Button variant="outline" size="sm">Upgrade</Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
         )}
