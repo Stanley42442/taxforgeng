@@ -20,6 +20,7 @@ import {
   Calendar,
   AlertTriangle,
   FileText,
+  Sparkles,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { format, isAfter, addDays } from "date-fns";
@@ -69,7 +70,6 @@ const Dashboard = () => {
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [dataSeeded, setDataSeeded] = useState(false);
 
-  // Check for welcome splash and disclaimer
   useEffect(() => {
     if (user) {
       if (!localStorage.getItem('taxforge_disclaimer_accepted')) {
@@ -80,19 +80,15 @@ const Dashboard = () => {
     }
   }, [user]);
 
-  // Seed sample data for new users
   useEffect(() => {
     const seedData = async () => {
       if (!user || dataSeeded) return;
-      
       const result = await seedSampleData(user.id);
       if (result.success && result.businessId) {
-        // Data was seeded, refresh the businesses
         refreshBusinesses();
         setDataSeeded(true);
       }
     };
-
     if (user && !businessLoading) {
       seedData();
     }
@@ -105,7 +101,6 @@ const Dashboard = () => {
         return;
       }
 
-      // Fetch expense summary
       const { data: expenseData } = await supabase
         .from('expenses')
         .select('*')
@@ -125,24 +120,13 @@ const Dashboard = () => {
         }));
         setExpenses(mapped);
 
-        const income = mapped
-          .filter(e => e.type === 'income')
-          .reduce((sum, e) => sum + e.amount, 0);
-        const expense = mapped
-          .filter(e => e.type === 'expense')
-          .reduce((sum, e) => sum + e.amount, 0);
-        const deductible = mapped
-          .filter(e => e.isDeductible)
-          .reduce((sum, e) => sum + e.amount, 0);
+        const income = mapped.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
+        const expense = mapped.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
+        const deductible = mapped.filter(e => e.isDeductible).reduce((sum, e) => sum + e.amount, 0);
 
-        setExpenseSummary({
-          totalIncome: income,
-          totalExpenses: expense,
-          deductibleExpenses: deductible,
-        });
+        setExpenseSummary({ totalIncome: income, totalExpenses: expense, deductibleExpenses: deductible });
       }
 
-      // Fetch upcoming reminders with business names
       const { data: reminders } = await supabase
         .from('reminders')
         .select('id, title, due_date, business_id')
@@ -174,20 +158,17 @@ const Dashboard = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
+      <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
+        <div className="absolute inset-0 bg-mesh pointer-events-none" />
         <NavMenu />
-        <div className="container mx-auto px-4 py-20 text-center">
-          <div className="mx-auto max-w-md">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary/10">
-              <LayoutDashboard className="h-10 w-10 text-primary" />
+        <div className="container mx-auto px-4 py-20 text-center relative z-10">
+          <div className="mx-auto max-w-md glass-frosted rounded-3xl p-10">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-primary glow-primary">
+              <LayoutDashboard className="h-10 w-10 text-primary-foreground" />
             </div>
             <h1 className="text-2xl font-bold text-foreground mb-3">Dashboard</h1>
-            <p className="text-muted-foreground mb-6">
-              Sign in to view your dashboard overview.
-            </p>
-            <Button variant="hero" onClick={() => navigate('/auth')}>
-              Sign In
-            </Button>
+            <p className="text-muted-foreground mb-6">Sign in to view your dashboard overview.</p>
+            <Button variant="glow" size="lg" onClick={() => navigate('/auth')}>Sign In</Button>
           </div>
         </div>
       </div>
@@ -196,11 +177,14 @@ const Dashboard = () => {
 
   if (loading || businessLoading) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
+      <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
+        <div className="absolute inset-0 bg-mesh pointer-events-none" />
         <NavMenu />
-        <div className="container mx-auto px-4 py-20 text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground mt-4">Loading dashboard...</p>
+        <div className="container mx-auto px-4 py-20 text-center relative z-10">
+          <div className="glass-frosted rounded-2xl p-12 max-w-sm mx-auto">
+            <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary glow-primary" />
+            <p className="text-muted-foreground mt-4">Loading dashboard...</p>
+          </div>
         </div>
       </div>
     );
@@ -210,10 +194,14 @@ const Dashboard = () => {
   const totalTurnover = savedBusinesses.reduce((sum, b) => sum + b.turnover, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
+    <div className="min-h-screen flex flex-col overflow-x-hidden relative">
+      {/* Background */}
+      <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
+      <div className="fixed inset-0 bg-mesh pointer-events-none" />
+      <div className="fixed inset-0 bg-dots opacity-15 pointer-events-none" />
+      
       <NavMenu />
       
-      {/* Disclaimer Modal - must accept before using */}
       {showDisclaimer && (
         <DisclaimerModal onAccept={() => {
           setShowDisclaimer(false);
@@ -223,112 +211,89 @@ const Dashboard = () => {
         }} />
       )}
       
-      {/* Welcome Splash for new users */}
       {showWelcome && <WelcomeSplash onComplete={() => setShowWelcome(false)} />}
 
-      <main className="container mx-auto px-4 py-6 pb-8 flex-1">
+      <main className="container mx-auto px-4 py-6 pb-8 flex-1 relative z-10">
         <div className="mx-auto max-w-6xl">
           {/* Header */}
           <div className="mb-8 animate-slide-up">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary">
-                <LayoutDashboard className="h-6 w-6 text-primary-foreground" />
+            <div className="flex items-center gap-4 mb-2">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-primary shadow-lg glow-primary">
+                <LayoutDashboard className="h-7 w-7 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-                <p className="text-muted-foreground text-sm">
-                  Overview of your businesses, expenses, and reminders
-                </p>
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground">Dashboard</h1>
+                <p className="text-muted-foreground text-sm">Overview of your businesses, expenses, and reminders</p>
               </div>
             </div>
           </div>
 
-          {/* Summary Cards Row */}
-          <div className="grid gap-2 sm:gap-4 grid-cols-2 lg:grid-cols-4 mb-6 animate-slide-up">
-            <Card className="shadow-card overflow-hidden">
-              <CardHeader className="pb-1 p-2 sm:p-4 sm:pb-2">
-                <CardDescription className="flex items-center gap-1 text-[10px] sm:text-sm">
-                  <Building2 className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                  <span className="truncate">Businesses</span>
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-2 sm:p-4 pt-0">
-                <p className="text-lg sm:text-3xl font-bold text-foreground">{savedBusinesses.length}</p>
-                <p className="text-[10px] sm:text-sm text-muted-foreground mt-0.5 truncate">
-                  {formatCurrency(totalTurnover)} turnover
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-card overflow-hidden">
-              <CardHeader className="pb-1 p-2 sm:p-4 sm:pb-2">
-                <CardDescription className="flex items-center gap-1 text-success text-[10px] sm:text-sm">
-                  <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                  <span className="truncate">Income</span>
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-2 sm:p-4 pt-0">
-                <p className="text-lg sm:text-3xl font-bold text-success truncate">{formatCurrency(expenseSummary.totalIncome)}</p>
-                <p className="text-[10px] sm:text-sm text-muted-foreground mt-0.5 truncate">Tracked entries</p>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-card overflow-hidden">
-              <CardHeader className="pb-1 p-2 sm:p-4 sm:pb-2">
-                <CardDescription className="flex items-center gap-1 text-destructive text-[10px] sm:text-sm">
-                  <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                  <span className="truncate">Expenses</span>
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-2 sm:p-4 pt-0">
-                <p className="text-lg sm:text-3xl font-bold text-destructive truncate">{formatCurrency(expenseSummary.totalExpenses)}</p>
-                <p className="text-[10px] sm:text-sm text-muted-foreground mt-0.5 truncate">
-                  {formatCurrency(expenseSummary.deductibleExpenses)} deductible
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-card overflow-hidden">
-              <CardHeader className="pb-1 p-2 sm:p-4 sm:pb-2">
-                <CardDescription className="flex items-center gap-1 text-[10px] sm:text-sm">
-                  <Calculator className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                  <span className="truncate">Net Income</span>
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-2 sm:p-4 pt-0">
-                <p className={`text-lg sm:text-3xl font-bold truncate ${netIncome >= 0 ? 'text-success' : 'text-destructive'}`}>
-                  {formatCurrency(netIncome)}
-                </p>
-                <p className="text-[10px] sm:text-sm text-muted-foreground mt-0.5 truncate">Income - expenses</p>
-              </CardContent>
-            </Card>
+          {/* Bento Grid Summary Cards */}
+          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-8 animate-slide-up">
+            <StatCard
+              icon={Building2}
+              label="Businesses"
+              value={savedBusinesses.length.toString()}
+              subtext={`${formatCurrency(totalTurnover)} turnover`}
+              gradient="from-primary/20 to-primary/5"
+              iconColor="text-primary"
+            />
+            <StatCard
+              icon={TrendingUp}
+              label="Income"
+              value={formatCurrency(expenseSummary.totalIncome)}
+              subtext="Tracked entries"
+              gradient="from-success/20 to-success/5"
+              iconColor="text-success"
+              valueColor="text-success"
+            />
+            <StatCard
+              icon={TrendingDown}
+              label="Expenses"
+              value={formatCurrency(expenseSummary.totalExpenses)}
+              subtext={`${formatCurrency(expenseSummary.deductibleExpenses)} deductible`}
+              gradient="from-destructive/20 to-destructive/5"
+              iconColor="text-destructive"
+              valueColor="text-destructive"
+            />
+            <StatCard
+              icon={Calculator}
+              label="Net Income"
+              value={formatCurrency(netIncome)}
+              subtext="Income - expenses"
+              gradient={netIncome >= 0 ? "from-success/20 to-success/5" : "from-destructive/20 to-destructive/5"}
+              iconColor={netIncome >= 0 ? "text-success" : "text-destructive"}
+              valueColor={netIncome >= 0 ? "text-success" : "text-destructive"}
+            />
           </div>
 
           {/* Main Content Grid */}
-          <div className="grid gap-6 lg:grid-cols-2 animate-slide-up">
+          <div className="grid gap-6 lg:grid-cols-2 animate-slide-up-delay-1">
             {/* Saved Businesses */}
-            <Card className="shadow-card">
-              <CardHeader>
+            <Card className="glass-frosted shadow-futuristic border-border/40 hover-glow-primary transition-all duration-300">
+              <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5 text-primary" />
+                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Building2 className="h-4 w-4 text-primary" />
+                    </div>
                     Saved Businesses
                   </CardTitle>
                   <Link to="/businesses">
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" className="group">
                       View All
-                      <ArrowRight className="h-4 w-4 ml-1" />
+                      <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
                 </div>
               </CardHeader>
               <CardContent>
                 {savedBusinesses.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                  <div className="text-center py-10 glass-subtle rounded-xl">
+                    <Building2 className="h-14 w-14 text-muted-foreground mx-auto mb-4 opacity-50" />
                     <p className="text-muted-foreground mb-4">No businesses saved yet</p>
                     <Link to="/calculator">
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="neon-border">
                         <Plus className="h-4 w-4 mr-1" />
                         Add Business
                       </Button>
@@ -339,7 +304,7 @@ const Dashboard = () => {
                     {savedBusinesses.slice(0, 4).map((business) => (
                       <div
                         key={business.id}
-                        className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-secondary/30 transition-colors"
+                        className="flex items-center justify-between p-4 rounded-xl glass-subtle hover:bg-secondary/50 transition-all duration-300 group hover-lift"
                       >
                         <div>
                           <p className="font-medium text-foreground">{business.name}</p>
@@ -348,14 +313,14 @@ const Dashboard = () => {
                           </p>
                         </div>
                         {business.verificationStatus === 'verified' && (
-                          <span className="text-xs bg-success/20 text-success px-2 py-1 rounded-full">
+                          <span className="text-xs bg-success/20 text-success px-3 py-1 rounded-full border border-success/30">
                             Verified
                           </span>
                         )}
                       </div>
                     ))}
                     {savedBusinesses.length > 4 && (
-                      <p className="text-sm text-muted-foreground text-center">
+                      <p className="text-sm text-muted-foreground text-center pt-2">
                         +{savedBusinesses.length - 4} more businesses
                       </p>
                     )}
@@ -365,28 +330,30 @@ const Dashboard = () => {
             </Card>
 
             {/* Upcoming Reminders */}
-            <Card className="shadow-card">
-              <CardHeader>
+            <Card className="glass-frosted shadow-futuristic border-border/40 hover-glow-accent transition-all duration-300">
+              <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
-                    <Bell className="h-5 w-5 text-primary" />
+                    <div className="h-8 w-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                      <Bell className="h-4 w-4 text-accent" />
+                    </div>
                     Upcoming Reminders
                   </CardTitle>
                   <Link to="/reminders">
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" className="group">
                       Manage
-                      <ArrowRight className="h-4 w-4 ml-1" />
+                      <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
                 </div>
               </CardHeader>
               <CardContent>
                 {upcomingReminders.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                  <div className="text-center py-10 glass-subtle rounded-xl">
+                    <Bell className="h-14 w-14 text-muted-foreground mx-auto mb-4 opacity-50" />
                     <p className="text-muted-foreground mb-4">No active reminders</p>
                     <Link to="/reminders">
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="neon-border-accent">
                         <Plus className="h-4 w-4 mr-1" />
                         Set Reminders
                       </Button>
@@ -402,11 +369,11 @@ const Dashboard = () => {
                       return (
                         <div
                           key={reminder.id}
-                          className="flex items-center justify-between p-3 rounded-lg border border-border"
+                          className="flex items-center justify-between p-4 rounded-xl glass-subtle hover-lift transition-all duration-300"
                         >
                           <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                              isOverdue ? 'bg-destructive/20' : isDueSoon ? 'bg-warning/20' : 'bg-success/20'
+                            <div className={`w-11 h-11 rounded-full flex items-center justify-center ${
+                              isOverdue ? 'bg-destructive/20 glow-primary' : isDueSoon ? 'bg-warning/20' : 'bg-success/20'
                             }`}>
                               {isOverdue ? (
                                 <AlertTriangle className="h-5 w-5 text-destructive" />
@@ -419,7 +386,7 @@ const Dashboard = () => {
                               <p className="text-xs text-muted-foreground">{reminder.businessName}</p>
                             </div>
                           </div>
-                          <span className={`text-xs ${isOverdue ? 'text-destructive' : 'text-muted-foreground'}`}>
+                          <span className={`text-xs font-medium ${isOverdue ? 'text-destructive' : 'text-muted-foreground'}`}>
                             {format(dueDate, 'MMM d')}
                           </span>
                         </div>
@@ -430,91 +397,107 @@ const Dashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Recent Expenses */}
-            <Card className="shadow-card lg:col-span-2">
+            {/* Expense Summary - Full Width */}
+            <Card className="glass-frosted shadow-futuristic border-border/40 lg:col-span-2">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
-                    <Receipt className="h-5 w-5 text-primary" />
+                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Receipt className="h-4 w-4 text-primary" />
+                    </div>
                     Expense Summary
                   </CardTitle>
                   <div className="flex gap-2">
                     <Link to="/business-report">
-                      <Button variant="ghost" size="sm">
+                      <Button variant="outline" size="sm" className="hidden sm:flex">
                         <FileText className="h-4 w-4 mr-1" />
-                        Reports
+                        Report
                       </Button>
                     </Link>
                     <Link to="/expenses">
-                      <Button variant="ghost" size="sm">
-                        View Details
-                        <ArrowRight className="h-4 w-4 ml-1" />
+                      <Button variant="ghost" size="sm" className="group">
+                        Manage
+                        <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
                       </Button>
                     </Link>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-2 sm:gap-4 grid-cols-1 sm:grid-cols-3 mb-4 sm:mb-6">
-                  <div className="p-3 sm:p-4 rounded-lg bg-success/10 border border-success/20">
-                    <p className="text-xs sm:text-sm text-muted-foreground mb-1">Total Income</p>
-                    <p className="text-lg sm:text-2xl font-bold text-success">{formatCurrency(expenseSummary.totalIncome)}</p>
-                  </div>
-                  <div className="p-3 sm:p-4 rounded-lg bg-destructive/10 border border-destructive/20">
-                    <p className="text-xs sm:text-sm text-muted-foreground mb-1">Total Expenses</p>
-                    <p className="text-lg sm:text-2xl font-bold text-destructive">{formatCurrency(expenseSummary.totalExpenses)}</p>
-                  </div>
-                  <div className="p-3 sm:p-4 rounded-lg bg-primary/10 border border-primary/20">
-                    <p className="text-xs sm:text-sm text-muted-foreground mb-1">Tax Deductible</p>
-                    <p className="text-lg sm:text-2xl font-bold text-primary">{formatCurrency(expenseSummary.deductibleExpenses)}</p>
-                  </div>
-                </div>
-
-                {/* Expense Charts */}
-                {tier !== 'free' && expenses.length > 0 && (
-                  <ExpenseCharts expenses={expenses} />
-                )}
-
-                {tier !== 'free' && (
-                  <div className="mt-4 flex flex-wrap gap-2 sm:gap-3">
+                {expenses.length === 0 ? (
+                  <div className="text-center py-12 glass-subtle rounded-xl">
+                    <Receipt className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+                    <p className="text-muted-foreground mb-4">No expenses tracked yet</p>
                     <Link to="/expenses">
-                      <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-                        <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                      <Button variant="glow" size="sm">
+                        <Plus className="h-4 w-4 mr-1" />
                         Add Expense
                       </Button>
                     </Link>
-                    <Link to="/business-report">
-                      <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-                        <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                        Reports
-                      </Button>
-                    </Link>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="text-xs sm:text-sm"
-                      onClick={() => navigate('/calculator', { 
-                        state: { 
-                          prefill: { 
-                            turnover: expenseSummary.totalIncome, 
-                            expenses: expenseSummary.deductibleExpenses 
-                          } 
-                        } 
-                      })}
-                      disabled={expenseSummary.totalIncome === 0}
-                    >
-                      <Calculator className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                      Calculate Tax
-                    </Button>
+                  </div>
+                ) : (
+                  <div className="chart-glass-container">
+                    <ExpenseCharts expenses={expenses} />
                   </div>
                 )}
               </CardContent>
             </Card>
           </div>
+
+          {/* Quick Actions */}
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 animate-slide-up-delay-2">
+            {[
+              { to: "/calculator", icon: Calculator, label: "New Calculation", color: "primary" },
+              { to: "/expenses", icon: Receipt, label: "Track Expense", color: "success" },
+              { to: "/reminders", icon: Bell, label: "Set Reminder", color: "accent" },
+              { to: "/learn", icon: Sparkles, label: "Tax Tips", color: "warning" },
+            ].map((action) => (
+              <Link key={action.to} to={action.to}>
+                <Button variant="outline" className="w-full h-14 glass-subtle neon-border hover-lift group">
+                  <action.icon className={`h-5 w-5 mr-2 text-${action.color}`} />
+                  <span>{action.label}</span>
+                </Button>
+              </Link>
+            ))}
+          </div>
+
+          <FeedbackForm />
         </div>
       </main>
     </div>
   );
 };
+
+const StatCard = ({
+  icon: Icon,
+  label,
+  value,
+  subtext,
+  gradient,
+  iconColor,
+  valueColor,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+  subtext: string;
+  gradient: string;
+  iconColor: string;
+  valueColor?: string;
+}) => (
+  <div className={`glass-frosted rounded-2xl p-4 sm:p-5 shadow-futuristic overflow-hidden hover-lift transition-all duration-300 relative group`}>
+    <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-50 group-hover:opacity-70 transition-opacity`} />
+    <div className="relative z-10">
+      <div className="flex items-center gap-2 mb-3">
+        <div className={`h-9 w-9 rounded-xl bg-background/50 flex items-center justify-center`}>
+          <Icon className={`h-5 w-5 ${iconColor}`} />
+        </div>
+        <span className="text-xs sm:text-sm text-muted-foreground font-medium">{label}</span>
+      </div>
+      <p className={`text-xl sm:text-2xl font-bold truncate ${valueColor || 'text-foreground'}`}>{value}</p>
+      <p className="text-xs text-muted-foreground mt-1 truncate">{subtext}</p>
+    </div>
+  </div>
+);
 
 export default Dashboard;
