@@ -10,9 +10,13 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Bell, Calendar, Mail, Plus, Settings, Clock, CheckCircle2, AlertTriangle, Building2, Crown, Loader2 } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Bell, Calendar as CalendarIcon, Mail, Plus, Settings, Clock, CheckCircle2, AlertTriangle, Building2, Crown, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface Reminder {
   id: string;
@@ -67,7 +71,7 @@ const Reminders = () => {
   const [selectedBusiness, setSelectedBusiness] = useState<SavedBusiness | null>(null);
   const [customReminderOpen, setCustomReminderOpen] = useState(false);
   const [customName, setCustomName] = useState('');
-  const [customDate, setCustomDate] = useState('');
+  const [customDate, setCustomDate] = useState<Date | undefined>(undefined);
   const [customNote, setCustomNote] = useState('');
 
   // Fetch reminders from database
@@ -179,13 +183,8 @@ const Reminders = () => {
   const addCustomReminder = async () => {
     if (!user || !selectedBusiness || !customName || !customDate) return;
     
-    // Parse the custom date - try to create a proper date
-    let parsedDate = new Date(customDate);
-    if (isNaN(parsedDate.getTime())) {
-      // If parsing fails, use current date + 7 days as fallback
-      parsedDate = new Date();
-      parsedDate.setDate(parsedDate.getDate() + 7);
-    }
+    // Use the selected date directly
+    const parsedDate = new Date(customDate);
     parsedDate.setHours(9, 0, 0, 0);
     
     const { data, error } = await supabase
@@ -197,7 +196,7 @@ const Reminders = () => {
         title: customName,
         due_date: parsedDate.toISOString(),
         notify_email: true,
-        description: customNote || customDate,
+        description: customNote || format(customDate, 'PPP'),
       })
       .select()
       .single();
@@ -213,7 +212,7 @@ const Reminders = () => {
       businessId: data.business_id,
       type: 'custom',
       name: customName,
-      dueDate: customDate,
+      dueDate: parsedDate.toISOString(),
       enabled: true,
       customNote,
     };
@@ -221,7 +220,7 @@ const Reminders = () => {
     setReminders(prev => [...prev, newReminder]);
     setCustomReminderOpen(false);
     setCustomName('');
-    setCustomDate('');
+    setCustomDate(undefined);
     setCustomNote('');
     toast.success('Custom reminder added');
   };
@@ -417,13 +416,31 @@ const Reminders = () => {
                               />
                             </div>
                             <div className="space-y-2">
-                              <Label htmlFor="date">Due Date</Label>
-                              <Input
-                                id="date"
-                                placeholder="e.g., March 31st"
-                                value={customDate}
-                                onChange={(e) => setCustomDate(e.target.value)}
-                              />
+                              <Label>Due Date</Label>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    className={cn(
+                                      "w-full justify-start text-left font-normal",
+                                      !customDate && "text-muted-foreground"
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {customDate ? format(customDate, "PPP") : <span>Pick a date</span>}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                  <Calendar
+                                    mode="single"
+                                    selected={customDate}
+                                    onSelect={setCustomDate}
+                                    disabled={(date) => date < new Date()}
+                                    initialFocus
+                                    className={cn("p-3 pointer-events-auto")}
+                                  />
+                                </PopoverContent>
+                              </Popover>
                             </div>
                             <div className="space-y-2">
                               <Label htmlFor="note">Note (Optional)</Label>
