@@ -436,7 +436,7 @@ const Reminders = () => {
                                 onChange={(e) => setCustomName(e.target.value)}
                               />
                             </div>
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               <div className="space-y-2">
                                 <Label htmlFor="dueDate">Due Date</Label>
                                 <div className="relative">
@@ -459,12 +459,12 @@ const Reminders = () => {
                               </div>
                               <div className="space-y-2">
                                 <Label htmlFor="dueTime">Time</Label>
-                                <div className="relative">
-                                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                                <div className="relative overflow-hidden">
+                                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
                                   <Input
                                     id="dueTime"
                                     type="time"
-                                    className="pl-10"
+                                    className="pl-10 w-full [&::-webkit-calendar-picker-indicator]:opacity-100"
                                     value={customTime}
                                     onChange={(e) => setCustomTime(e.target.value)}
                                   />
