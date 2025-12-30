@@ -56,6 +56,18 @@ export function TaxAssistant() {
   const dragStartPos = useRef<{ x: number; y: number; posX: number; posY: number } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Lock body scroll when chat is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -367,7 +379,7 @@ export function TaxAssistant() {
           )}
         </ScrollArea>
 
-        <div className="p-2 border-t bg-background">
+        <div className="p-2 border-t bg-background rounded-b-lg">
           <div className="flex gap-2">
             <Input
               value={input}
