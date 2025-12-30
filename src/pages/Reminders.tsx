@@ -72,6 +72,7 @@ const Reminders = () => {
   const [customReminderOpen, setCustomReminderOpen] = useState(false);
   const [customName, setCustomName] = useState('');
   const [customDate, setCustomDate] = useState<Date | undefined>(undefined);
+  const [customTime, setCustomTime] = useState('09:00');
   const [customNote, setCustomNote] = useState('');
 
   // Fetch reminders from database
@@ -201,9 +202,10 @@ const Reminders = () => {
   const addCustomReminder = async () => {
     if (!user || !selectedBusiness || !customName || !customDate) return;
     
-    // Use the selected date directly
+    // Parse time and combine with date
+    const [hours, minutes] = customTime.split(':').map(Number);
     const parsedDate = new Date(customDate);
-    parsedDate.setHours(9, 0, 0, 0);
+    parsedDate.setHours(hours, minutes, 0, 0);
     
     const { data, error } = await supabase
       .from('reminders')
@@ -239,6 +241,7 @@ const Reminders = () => {
     setCustomReminderOpen(false);
     setCustomName('');
     setCustomDate(undefined);
+    setCustomTime('09:00');
     setCustomNote('');
     toast.success('Custom reminder added');
   };
@@ -433,24 +436,39 @@ const Reminders = () => {
                                 onChange={(e) => setCustomName(e.target.value)}
                               />
                             </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="dueDate">Due Date</Label>
-                              <div className="relative">
-                                <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                                <Input
-                                  id="dueDate"
-                                  type="date"
-                                  className="pl-10"
-                                  value={customDate ? format(customDate, "yyyy-MM-dd") : ""}
-                                  min={format(new Date(), "yyyy-MM-dd")}
-                                  onChange={(e) => {
-                                    if (e.target.value) {
-                                      setCustomDate(new Date(e.target.value));
-                                    } else {
-                                      setCustomDate(undefined);
-                                    }
-                                  }}
-                                />
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="space-y-2">
+                                <Label htmlFor="dueDate">Due Date</Label>
+                                <div className="relative">
+                                  <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                                  <Input
+                                    id="dueDate"
+                                    type="date"
+                                    className="pl-10"
+                                    value={customDate ? format(customDate, "yyyy-MM-dd") : ""}
+                                    min={format(new Date(), "yyyy-MM-dd")}
+                                    onChange={(e) => {
+                                      if (e.target.value) {
+                                        setCustomDate(new Date(e.target.value));
+                                      } else {
+                                        setCustomDate(undefined);
+                                      }
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="dueTime">Time</Label>
+                                <div className="relative">
+                                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                                  <Input
+                                    id="dueTime"
+                                    type="time"
+                                    className="pl-10"
+                                    value={customTime}
+                                    onChange={(e) => setCustomTime(e.target.value)}
+                                  />
+                                </div>
                               </div>
                             </div>
                             <div className="space-y-2">
