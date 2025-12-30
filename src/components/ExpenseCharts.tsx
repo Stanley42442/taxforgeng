@@ -97,18 +97,18 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       {/* Expense Category Pie Chart */}
-      <div className="rounded-xl border border-border bg-card p-4 shadow-card">
+      <div className="rounded-xl border border-border bg-card p-4 sm:p-6 shadow-card">
         <h3 className="font-semibold text-foreground mb-4">Expense Breakdown</h3>
         {categoryData.length > 0 ? (
-          <div className="h-64">
+          <div className="h-72 sm:h-80 md:h-96">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={categoryData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={50}
-                  outerRadius={80}
+                  innerRadius={60}
+                  outerRadius={100}
                   paddingAngle={2}
                   dataKey="value"
                   label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
@@ -130,7 +130,7 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="h-64 flex items-center justify-center text-muted-foreground">
+          <div className="h-72 sm:h-80 md:h-96 flex items-center justify-center text-muted-foreground">
             No expense data yet
           </div>
         )}
@@ -141,10 +141,10 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
       </div>
 
       {/* Monthly Income vs Expenses Bar Chart */}
-      <div className="rounded-xl border border-border bg-card p-4 shadow-card">
+      <div className="rounded-xl border border-border bg-card p-4 sm:p-6 shadow-card">
         <h3 className="font-semibold text-foreground mb-4">Monthly Overview</h3>
         {monthlyData.length > 0 ? (
-          <div className="h-64">
+          <div className="h-72 sm:h-80 md:h-96">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlyData}>
                 <XAxis 
@@ -174,7 +174,7 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="h-64 flex items-center justify-center text-muted-foreground">
+          <div className="h-72 sm:h-80 md:h-96 flex items-center justify-center text-muted-foreground">
             Add entries to see monthly trends
           </div>
         )}
