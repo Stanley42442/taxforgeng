@@ -455,19 +455,22 @@ const Reminders = () => {
                                     onSelect={setCustomDate}
                                     disabled={(date) => date < new Date()}
                                     initialFocus
-                                    className={cn("p-2 pointer-events-auto")}
+                                    className={cn("p-2 pointer-events-auto w-[240px]")}
                                     classNames={{
-                                      months: "flex flex-col sm:flex-row space-y-2 sm:space-x-2 sm:space-y-0",
+                                      months: "flex flex-col space-y-2",
                                       month: "space-y-2",
-                                      caption: "flex justify-center pt-1 relative items-center",
+                                      caption: "flex justify-center pt-1 relative items-center h-7",
                                       caption_label: "text-xs font-medium",
-                                      nav_button: "h-6 w-6 bg-transparent p-0 opacity-50 hover:opacity-100",
+                                      nav: "space-x-1 flex items-center",
+                                      nav_button: "h-6 w-6 bg-transparent p-0 opacity-50 hover:opacity-100 inline-flex items-center justify-center",
+                                      nav_button_previous: "absolute left-1",
+                                      nav_button_next: "absolute right-1",
                                       table: "w-full border-collapse",
-                                      head_row: "flex",
-                                      head_cell: "text-muted-foreground rounded-md w-7 font-normal text-[0.7rem]",
-                                      row: "flex w-full mt-1",
+                                      head_row: "flex justify-between",
+                                      head_cell: "text-muted-foreground rounded-md w-7 font-normal text-[0.7rem] text-center",
+                                      row: "flex w-full justify-between mt-1",
                                       cell: "h-7 w-7 text-center text-xs p-0 relative",
-                                      day: "h-7 w-7 p-0 font-normal text-xs aria-selected:opacity-100",
+                                      day: "h-7 w-7 p-0 font-normal text-xs aria-selected:opacity-100 rounded-md hover:bg-accent",
                                       day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
                                       day_today: "bg-accent text-accent-foreground",
                                     }}
