@@ -1,6 +1,8 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import { formatCurrency } from "@/lib/taxCalculations";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Receipt, BarChart3 } from "lucide-react";
 
 interface Expense {
   id: string;
@@ -129,164 +131,185 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
 
   return (
     <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
-      {/* Expense Category Pie Chart */}
-      <div 
-        className={`transition-all duration-700 ease-out ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-        }`}
-      >
-        <h3 className="font-semibold text-foreground mb-4">Expense Breakdown</h3>
-        {categoryData.length > 0 ? (
-          <div className="h-[20rem] relative" ref={pieContainerRef}>
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={categoryData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={85}
-                  paddingAngle={2}
-                  dataKey="value"
-                  animationBegin={200}
-                  animationDuration={1000}
-                  animationEasing="ease-out"
-                  onClick={handlePieClick}
-                  style={{ cursor: 'pointer' }}
-                >
-                  {categoryData.map((entry, index) => {
-                    const isActive = activeIndex === index;
-                    return (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill={entry.color}
-                        stroke={isActive ? 'hsl(var(--foreground))' : 'transparent'}
-                        strokeWidth={isActive ? 3 : 0}
-                        style={{
-                          filter: activeIndex !== null && !isActive ? 'opacity(0.4)' : 'none',
-                          transform: isActive ? 'scale(1.05)' : 'scale(1)',
-                          transformOrigin: 'center',
-                          transition: 'all 0.2s ease-out'
-                        }}
+      {/* Expense Category Pie Chart Card */}
+      <Card className="glass-frosted shadow-futuristic border-border/40">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Receipt className="h-4 w-4 text-primary" />
+            </div>
+            Expense Breakdown
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div 
+            className={`transition-all duration-700 ease-out ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+          >
+            {categoryData.length > 0 ? (
+              <div className="h-[20rem] relative" ref={pieContainerRef}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={categoryData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={85}
+                      paddingAngle={2}
+                      dataKey="value"
+                      animationBegin={200}
+                      animationDuration={1000}
+                      animationEasing="ease-out"
+                      onClick={handlePieClick}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {categoryData.map((entry, index) => {
+                        const isActive = activeIndex === index;
+                        return (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={entry.color}
+                            stroke={isActive ? 'hsl(var(--foreground))' : 'transparent'}
+                            strokeWidth={isActive ? 3 : 0}
+                            style={{
+                              filter: activeIndex !== null && !isActive ? 'opacity(0.4)' : 'none',
+                              transform: isActive ? 'scale(1.05)' : 'scale(1)',
+                              transformOrigin: 'center',
+                              transition: 'all 0.2s ease-out'
+                            }}
+                          />
+                        );
+                      })}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                {activeIndex !== null && categoryData[activeIndex] && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-foreground">{categoryData[activeIndex].name}</p>
+                      <p className="text-sm text-muted-foreground">{formatCurrency(categoryData[activeIndex].value)}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {((categoryData[activeIndex].value / categoryData.reduce((sum, e) => sum + e.value, 0)) * 100).toFixed(1)}%
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="h-[20rem] flex items-center justify-center text-muted-foreground">
+                No expense data yet
+              </div>
+            )}
+            {/* Color Key Legend */}
+            {categoryData.length > 0 && (
+              <div className={`mt-4 grid grid-cols-2 gap-2 transition-all duration-500 delay-300 ${
+                isVisible ? 'opacity-100' : 'opacity-0'
+              }`}>
+                {categoryData.map((entry, index) => {
+                  const total = categoryData.reduce((sum, e) => sum + e.value, 0);
+                  const percent = ((entry.value / total) * 100).toFixed(0);
+                  const isActive = activeIndex === index;
+                  return (
+                    <div 
+                      key={`legend-${index}`} 
+                      className={`flex items-center gap-2 text-sm cursor-pointer rounded-md p-1 transition-all ${
+                        isActive ? 'bg-muted ring-2 ring-primary' : 'hover:bg-muted/50'
+                      } ${activeIndex !== null && !isActive ? 'opacity-40' : ''}`}
+                      onClick={() => setActiveIndex(isActive ? null : index)}
+                    >
+                      <div 
+                        className="w-3 h-3 rounded-full flex-shrink-0" 
+                        style={{ backgroundColor: entry.color }}
                       />
-                    );
-                  })}
-                </Pie>
-                {/* Tooltip disabled to prevent persistent hover card */}
-              </PieChart>
-            </ResponsiveContainer>
-            {activeIndex !== null && categoryData[activeIndex] && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="text-center">
-                  <p className="text-lg font-bold text-foreground">{categoryData[activeIndex].name}</p>
-                  <p className="text-sm text-muted-foreground">{formatCurrency(categoryData[activeIndex].value)}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {((categoryData[activeIndex].value / categoryData.reduce((sum, e) => sum + e.value, 0)) * 100).toFixed(1)}%
-                  </p>
-                </div>
+                      <span className="text-muted-foreground truncate">{entry.name}</span>
+                      <span className="font-medium text-foreground ml-auto">{percent}%</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            <div className={`mt-4 text-center transition-all duration-500 delay-500 ${
+              isVisible ? 'opacity-100' : 'opacity-0'
+            }`}>
+              <p className="text-sm text-muted-foreground">Total Expenses</p>
+              <p className="text-xl font-bold text-destructive">{formatCurrency(totalExpenses)}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Monthly Income vs Expenses Bar Chart Card */}
+      <Card className="glass-frosted shadow-futuristic border-border/40">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <div className="h-8 w-8 rounded-lg bg-accent/10 flex items-center justify-center">
+              <BarChart3 className="h-4 w-4 text-accent" />
+            </div>
+            Monthly Overview
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div 
+            className={`transition-all duration-700 ease-out delay-150 ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+          >
+            {monthlyData.length > 0 ? (
+              <div className="h-[28rem]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={monthlyData}>
+                    <XAxis 
+                      dataKey="month" 
+                      tick={{ fontSize: 12 }}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis 
+                      tick={{ fontSize: 12 }}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) => `₦${(value / 1000000).toFixed(1)}M`}
+                    />
+                    <Tooltip 
+                      formatter={(value: number) => formatCurrency(value)}
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--card))', 
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Legend />
+                    <Bar 
+                      dataKey="income" 
+                      name="Income" 
+                      fill="#22c55e" 
+                      radius={[4, 4, 0, 0]}
+                      animationBegin={300}
+                      animationDuration={1000}
+                      animationEasing="ease-out"
+                    />
+                    <Bar 
+                      dataKey="expenses" 
+                      name="Expenses" 
+                      fill="#ef4444" 
+                      radius={[4, 4, 0, 0]}
+                      animationBegin={400}
+                      animationDuration={1000}
+                      animationEasing="ease-out"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-[28rem] flex items-center justify-center text-muted-foreground">
+                Add entries to see monthly trends
               </div>
             )}
           </div>
-        ) : (
-          <div className="h-[20rem] flex items-center justify-center text-muted-foreground">
-            No expense data yet
-          </div>
-        )}
-        {/* Color Key Legend */}
-        {categoryData.length > 0 && (
-          <div className={`mt-4 grid grid-cols-2 gap-2 transition-all duration-500 delay-300 ${
-            isVisible ? 'opacity-100' : 'opacity-0'
-          }`}>
-            {categoryData.map((entry, index) => {
-              const total = categoryData.reduce((sum, e) => sum + e.value, 0);
-              const percent = ((entry.value / total) * 100).toFixed(0);
-              const isActive = activeIndex === index;
-              return (
-                <div 
-                  key={`legend-${index}`} 
-                  className={`flex items-center gap-2 text-sm cursor-pointer rounded-md p-1 transition-all ${
-                    isActive ? 'bg-muted ring-2 ring-primary' : 'hover:bg-muted/50'
-                  } ${activeIndex !== null && !isActive ? 'opacity-40' : ''}`}
-                  onClick={() => setActiveIndex(isActive ? null : index)}
-                >
-                  <div 
-                    className="w-3 h-3 rounded-full flex-shrink-0" 
-                    style={{ backgroundColor: entry.color }}
-                  />
-                  <span className="text-muted-foreground truncate">{entry.name}</span>
-                  <span className="font-medium text-foreground ml-auto">{percent}%</span>
-                </div>
-              );
-            })}
-          </div>
-        )}
-        <div className={`mt-4 text-center transition-all duration-500 delay-500 ${
-          isVisible ? 'opacity-100' : 'opacity-0'
-        }`}>
-          <p className="text-sm text-muted-foreground">Total Expenses</p>
-          <p className="text-xl font-bold text-destructive">{formatCurrency(totalExpenses)}</p>
-        </div>
-      </div>
-
-      {/* Monthly Income vs Expenses Bar Chart */}
-      <div 
-        className={`transition-all duration-700 ease-out delay-150 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-        }`}
-      >
-        <h3 className="font-semibold text-foreground mb-4">Monthly Overview</h3>
-        {monthlyData.length > 0 ? (
-          <div className="h-[28rem]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthlyData}>
-                <XAxis 
-                  dataKey="month" 
-                  tick={{ fontSize: 12 }}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis 
-                  tick={{ fontSize: 12 }}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => `₦${(value / 1000000).toFixed(1)}M`}
-                />
-                <Tooltip 
-                  formatter={(value: number) => formatCurrency(value)}
-                  contentStyle={{ 
-                    backgroundColor: 'hsl(var(--card))', 
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px'
-                  }}
-                />
-                <Legend />
-                <Bar 
-                  dataKey="income" 
-                  name="Income" 
-                  fill="#22c55e" 
-                  radius={[4, 4, 0, 0]}
-                  animationBegin={300}
-                  animationDuration={1000}
-                  animationEasing="ease-out"
-                />
-                <Bar 
-                  dataKey="expenses" 
-                  name="Expenses" 
-                  fill="#ef4444" 
-                  radius={[4, 4, 0, 0]}
-                  animationBegin={400}
-                  animationDuration={1000}
-                  animationEasing="ease-out"
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        ) : (
-          <div className="h-[28rem] flex items-center justify-center text-muted-foreground">
-            Add entries to see monthly trends
-          </div>
-        )}
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

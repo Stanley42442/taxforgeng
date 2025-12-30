@@ -397,51 +397,27 @@ const Dashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Expense Summary - Full Width */}
-            <Card className="glass-frosted shadow-futuristic border-border/40 lg:col-span-2">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Receipt className="h-4 w-4 text-primary" />
+            {/* Expense Charts - Two Separate Cards */}
+            <div className="lg:col-span-2">
+              {expenses.length === 0 ? (
+                <Card className="glass-frosted shadow-futuristic border-border/40">
+                  <CardContent className="py-12">
+                    <div className="text-center glass-subtle rounded-xl py-12">
+                      <Receipt className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+                      <p className="text-muted-foreground mb-4">No expenses tracked yet</p>
+                      <Link to="/expenses">
+                        <Button variant="glow" size="sm">
+                          <Plus className="h-4 w-4 mr-1" />
+                          Add Expense
+                        </Button>
+                      </Link>
                     </div>
-                    Expense Summary
-                  </CardTitle>
-                  <div className="flex gap-2">
-                    <Link to="/business-report">
-                      <Button variant="outline" size="sm" className="hidden sm:flex">
-                        <FileText className="h-4 w-4 mr-1" />
-                        Report
-                      </Button>
-                    </Link>
-                    <Link to="/expenses">
-                      <Button variant="ghost" size="sm" className="group">
-                        Manage
-                        <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {expenses.length === 0 ? (
-                  <div className="text-center py-12 glass-subtle rounded-xl">
-                    <Receipt className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-                    <p className="text-muted-foreground mb-4">No expenses tracked yet</p>
-                    <Link to="/expenses">
-                      <Button variant="glow" size="sm">
-                        <Plus className="h-4 w-4 mr-1" />
-                        Add Expense
-                      </Button>
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="chart-glass-container">
-                    <ExpenseCharts expenses={expenses} />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              ) : (
+                <ExpenseCharts expenses={expenses} />
+              )}
+            </div>
           </div>
 
           {/* Quick Actions */}
