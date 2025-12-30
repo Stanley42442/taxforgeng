@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import { formatCurrency } from "@/lib/taxCalculations";
 
@@ -43,6 +43,7 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const pieContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Trigger entrance animation after mount
@@ -51,6 +52,20 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
     return () => {
       clearTimeout(timer);
       clearTimeout(animTimer);
+    };
+  }, []);
+
+  // Handle click outside pie chart to deselect
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (pieContainerRef.current && !pieContainerRef.current.contains(event.target as Node)) {
+        setActiveIndex(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -99,7 +114,7 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
     return Object.entries(monthTotals)
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([, data]) => data)
-      .slice(-6); // Last 6 months
+      .slice(-3); // Last 3 months
   }, [expenses]);
 
   const totalExpenses = expenses.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
@@ -122,7 +137,7 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
       >
         <h3 className="font-semibold text-foreground mb-4">Expense Breakdown</h3>
         {categoryData.length > 0 ? (
-          <div className="h-[20rem] relative">
+          <div className="h-[20rem] relative" ref={pieContainerRef}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
