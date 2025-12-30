@@ -448,7 +448,9 @@ const Dashboard = () => {
             </Link>
           </div>
 
-          <FeedbackForm />
+          <div className="mt-8">
+            <FeedbackForm />
+          </div>
         </div>
       </main>
     </div>
