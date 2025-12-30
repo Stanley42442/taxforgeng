@@ -459,16 +459,13 @@ const Reminders = () => {
                               </div>
                               <div className="space-y-2">
                                 <Label htmlFor="dueTime">Time</Label>
-                                <div className="relative overflow-hidden">
-                                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-                                  <Input
-                                    id="dueTime"
-                                    type="time"
-                                    className="pl-10 w-full [&::-webkit-calendar-picker-indicator]:opacity-100"
-                                    value={customTime}
-                                    onChange={(e) => setCustomTime(e.target.value)}
-                                  />
-                                </div>
+                                <Input
+                                  id="dueTime"
+                                  type="time"
+                                  className="w-full"
+                                  value={customTime}
+                                  onChange={(e) => setCustomTime(e.target.value)}
+                                />
                               </div>
                             </div>
                             <div className="space-y-2">
