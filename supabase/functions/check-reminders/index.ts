@@ -36,7 +36,6 @@ function getNextDueDate(reminderType: string, currentDueDate: Date): Date {
 
   switch (reminderType) {
     case 'vat_monthly':
-      // 21st of each month
       nextDate.setDate(21);
       if (nextDate <= now) {
         nextDate.setMonth(nextDate.getMonth() + 1);
@@ -44,39 +43,215 @@ function getNextDueDate(reminderType: string, currentDueDate: Date): Date {
       break;
     case 'pit_monthly':
     case 'paye_monthly':
-      // 10th of each month
       nextDate.setDate(10);
       if (nextDate <= now) {
         nextDate.setMonth(nextDate.getMonth() + 1);
       }
       break;
     case 'cit_annual':
-      // June 30th annually
-      nextDate.setMonth(5); // June
+      nextDate.setMonth(5);
       nextDate.setDate(30);
       if (nextDate <= now) {
         nextDate.setFullYear(nextDate.getFullYear() + 1);
       }
       break;
     default:
-      // Custom reminder - don't auto-advance
       break;
   }
 
   return nextDate;
 }
 
-// Check if a reminder is due within the next N days
 function isDueSoon(dueDate: Date, daysAhead: number = 3): boolean {
   const now = new Date();
   const futureDate = new Date(now);
   futureDate.setDate(futureDate.getDate() + daysAhead);
-  
   return dueDate >= now && dueDate <= futureDate;
 }
 
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-NG', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+}
+
+// Professional HTML email template
+function generateEmailHtml(params: {
+  businessName: string;
+  reminderTitle: string;
+  dueDate: string;
+  daysUntilDue: number;
+  description?: string;
+  appUrl: string;
+}): string {
+  const { businessName, reminderTitle, dueDate, daysUntilDue, description, appUrl } = params;
+  const urgencyText = daysUntilDue <= 0 ? "TODAY" : daysUntilDue === 1 ? "TOMORROW" : `in ${daysUntilDue} days`;
+  const isUrgent = daysUntilDue <= 1;
+  const bannerColor = isUrgent ? '#ef4444' : '#f59e0b';
+  const bannerGradient = isUrgent 
+    ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' 
+    : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Tax Deadline Reminder</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif;">
+  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f5;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
+          
+          <!-- Header -->
+          <tr>
+            <td style="background-color: #18181b; padding: 24px; text-align: center;">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <span style="color: #10b981; font-size: 28px; margin-right: 8px;">⚡</span>
+                    <span style="color: #ffffff; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">TaxForge NG</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Alert Banner -->
+          <tr>
+            <td style="background: ${bannerGradient}; padding: 40px 24px; text-align: center;">
+              <div style="font-size: 56px; line-height: 1; margin-bottom: 12px;">⏰</div>
+              <h1 style="color: #ffffff; font-size: 28px; font-weight: 700; margin: 0 0 8px 0; line-height: 1.2;">Tax Deadline Approaching!</h1>
+              <p style="color: rgba(255, 255, 255, 0.9); font-size: 20px; font-weight: 500; margin: 0;">Your deadline is <strong>${urgencyText}</strong></p>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 32px 24px;">
+              
+              <!-- Deadline Card -->
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fafafa; border-radius: 12px; border: 1px solid #e4e4e7; margin-bottom: 24px;">
+                <tr>
+                  <td style="padding: 20px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7;">
+                          <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                              <td style="color: #71717a; font-size: 14px;">Business</td>
+                              <td style="color: #18181b; font-size: 14px; font-weight: 600; text-align: right;">${businessName}</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7;">
+                          <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                              <td style="color: #71717a; font-size: 14px;">Reminder</td>
+                              <td style="color: #18181b; font-size: 14px; font-weight: 600; text-align: right;">${reminderTitle}</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 12px 0;">
+                          <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                              <td style="color: #71717a; font-size: 14px;">Due Date</td>
+                              <td style="color: ${bannerColor}; font-size: 14px; font-weight: 700; text-align: right;">${dueDate}</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              ${description ? `
+              <!-- Note Section -->
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b; margin-bottom: 24px;">
+                <tr>
+                  <td style="padding: 16px;">
+                    <p style="color: #92400e; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0;">📝 Note</p>
+                    <p style="color: #78350f; font-size: 14px; margin: 0; line-height: 1.5;">${description}</p>
+                  </td>
+                </tr>
+              </table>
+              ` : ''}
+
+              <p style="color: #52525b; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0;">
+                Don't forget to file on time to avoid penalties and interest charges from the Federal Inland Revenue Service (FIRS).
+              </p>
+
+              <!-- CTA Button -->
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 32px;">
+                <tr>
+                  <td align="center">
+                    <a href="${appUrl}/reminders" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; font-size: 16px; font-weight: 600; padding: 14px 32px; border-radius: 8px; text-decoration: none;">
+                      View All Reminders →
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Tips Section -->
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0;">
+                <tr>
+                  <td style="padding: 20px;">
+                    <p style="color: #166534; font-size: 14px; font-weight: 600; margin: 0 0 12px 0;">💡 Quick Tips</p>
+                    <p style="color: #15803d; font-size: 13px; margin: 0 0 6px 0; line-height: 1.4;">• Prepare all required documents in advance</p>
+                    <p style="color: #15803d; font-size: 13px; margin: 0 0 6px 0; line-height: 1.4;">• Double-check calculations before submission</p>
+                    <p style="color: #15803d; font-size: 13px; margin: 0; line-height: 1.4;">• Keep copies of all filed returns</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #fafafa; padding: 24px; text-align: center; border-top: 1px solid #e4e4e7;">
+              <p style="color: #a1a1aa; font-size: 12px; margin: 0 0 8px 0;">
+                You received this email because you enabled tax reminders on TaxForge NG.
+              </p>
+              <p style="color: #71717a; font-size: 12px; margin: 0 0 16px 0;">
+                <a href="${appUrl}/reminders" style="color: #71717a; text-decoration: underline;">Manage notification preferences</a>
+              </p>
+              <hr style="border: none; border-top: 1px solid #e4e4e7; margin: 16px 0;">
+              <p style="color: #a1a1aa; font-size: 11px; margin: 0;">
+                © 2025 TaxForge NG. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+}
+
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -86,10 +261,10 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const appUrl = "https://taxforge.lovable.app";
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Fetch all active reminders with email notifications enabled
     const { data: reminders, error: remindersError } = await supabase
       .from('reminders')
       .select('*')
@@ -109,14 +284,12 @@ const handler = async (req: Request): Promise<Response> => {
     for (const reminder of (reminders as ReminderRow[] || [])) {
       const dueDate = new Date(reminder.due_date);
       
-      // Check if reminder is due within 3 days
       if (!isDueSoon(dueDate, 3)) {
         continue;
       }
 
       console.log(`Processing reminder: ${reminder.title} (due: ${dueDate.toISOString()})`);
 
-      // Get user email
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('email')
@@ -128,7 +301,6 @@ const handler = async (req: Request): Promise<Response> => {
         continue;
       }
 
-      // Get business name if applicable
       let businessName = "Your Business";
       if (reminder.business_id) {
         const { data: business } = await supabase
@@ -142,78 +314,30 @@ const handler = async (req: Request): Promise<Response> => {
         }
       }
 
-      // Calculate days until due
       const now = new Date();
       const daysUntilDue = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      const urgencyText = daysUntilDue <= 1 ? "TOMORROW" : `in ${daysUntilDue} days`;
+      const urgencyText = daysUntilDue <= 0 ? "TODAY" : daysUntilDue === 1 ? "TOMORROW" : `in ${daysUntilDue} days`;
 
-      // Send the reminder email
       try {
+        const html = generateEmailHtml({
+          businessName,
+          reminderTitle: reminder.title,
+          dueDate: formatDate(dueDate),
+          daysUntilDue,
+          description: reminder.description || undefined,
+          appUrl,
+        });
+
         const emailResponse = await resend.emails.send({
           from: "TaxForge NG <onboarding@resend.dev>",
           to: [(profile as ProfileRow).email!],
           subject: `⚠️ Tax Deadline ${urgencyText}: ${reminder.title}`,
-          html: `
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <meta charset="utf-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            </head>
-            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px;">
-              <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 30px; text-align: center;">
-                  <h1 style="color: white; margin: 0; font-size: 24px;">⏰ Tax Deadline Approaching!</h1>
-                </div>
-                <div style="padding: 30px;">
-                  <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
-                    <p style="color: #92400e; font-weight: 600; margin: 0;">
-                      Your deadline is ${urgencyText}!
-                    </p>
-                  </div>
-                  
-                  <div style="background: #f9fafb; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                      <tr>
-                        <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Business:</td>
-                        <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${businessName}</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Reminder:</td>
-                        <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${reminder.title}</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Due Date:</td>
-                        <td style="padding: 8px 0; color: #f59e0b; font-size: 14px; font-weight: 600; text-align: right;">${dueDate.toLocaleDateString('en-NG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</td>
-                      </tr>
-                    </table>
-                  </div>
-                  
-                  ${reminder.description ? `<p style="color: #6b7280; font-size: 14px; margin-bottom: 20px;"><strong>Note:</strong> ${reminder.description}</p>` : ''}
-                  
-                  <p style="color: #374151; font-size: 14px; margin-bottom: 20px;">
-                    Don't forget to file on time to avoid penalties and interest charges.
-                  </p>
-                  
-                  <a href="https://taxforge.lovable.app/reminders" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
-                    View Reminders
-                  </a>
-                </div>
-                <div style="background: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
-                  <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-                    You received this email because you enabled tax reminders on TaxForge NG.
-                  </p>
-                </div>
-              </div>
-            </body>
-            </html>
-          `,
+          html,
         });
 
         console.log(`Email sent to ${(profile as ProfileRow).email}:`, emailResponse);
         emailsSent.push((profile as ProfileRow).email!);
 
-        // For recurring reminders, update to next due date after the current one passes
         if (reminder.reminder_type !== 'custom' && daysUntilDue <= 0) {
           const nextDueDate = getNextDueDate(reminder.reminder_type, dueDate);
           
