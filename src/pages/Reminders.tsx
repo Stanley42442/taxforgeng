@@ -499,12 +499,12 @@ const Reminders = () => {
                                   : 'text-muted-foreground'
                               }`} />
                             </div>
-                            <div className="min-w-0">
+                            <div className="min-w-0 mr-3">
                               <p className="font-medium text-sm truncate">{reminder.name}</p>
                               <p className="text-xs text-muted-foreground truncate">{reminder.dueDate}</p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
+                          <div className="flex items-center gap-3 flex-shrink-0 ml-2">
                             {isReminderEnabled(business.id, reminder.type) && (
                               <Button
                                 variant="ghost"
@@ -550,7 +550,7 @@ const Reminders = () => {
                                   <div className="w-10 h-10 flex-shrink-0 rounded-full bg-accent/20 flex items-center justify-center">
                                     <Settings className="w-5 h-5 text-accent" />
                                   </div>
-                                  <div className="min-w-0">
+                                  <div className="min-w-0 mr-3">
                                     <p className="font-medium text-sm truncate">{reminder.name}</p>
                                     <p className="text-xs text-muted-foreground truncate">{reminder.dueDate}</p>
                                     {reminder.customNote && (
@@ -558,7 +558,7 @@ const Reminders = () => {
                                     )}
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-2 flex-shrink-0">
+                                <div className="flex items-center gap-3 flex-shrink-0 ml-2">
                                   <Button
                                     variant="ghost"
                                     size="sm"
