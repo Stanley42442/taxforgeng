@@ -15,7 +15,8 @@ import {
   Briefcase,
   HelpCircle,
   ArrowRight,
-  Info
+  Info,
+  Sparkles
 } from "lucide-react";
 import { calculateTax, type TaxInputs } from "@/lib/taxCalculations";
 import { NavMenu } from "@/components/NavMenu";
@@ -45,14 +46,8 @@ const CalculatorPage = () => {
   });
 
   const updateInput = (field: string, value: string) => {
-    // Allow only numbers and format
     const numValue = value.replace(/[^0-9]/g, '');
     setInputs(prev => ({ ...prev, [field]: numValue }));
-  };
-
-  const formatInputDisplay = (value: string) => {
-    if (!value) return '';
-    return Number(value).toLocaleString('en-NG');
   };
 
   const handleCalculate = () => {
@@ -79,13 +74,27 @@ const CalculatorPage = () => {
   const canCalculate = Number(inputs.turnover) > 0;
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
+    <div className="min-h-screen flex flex-col overflow-x-hidden relative">
+      {/* Background */}
+      <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
+      <div className="fixed inset-0 bg-mesh pointer-events-none" />
+      <div className="fixed inset-0 bg-dots opacity-15 pointer-events-none" />
+      
+      {/* Floating Orbs */}
+      <div className="fixed top-32 right-20 w-64 h-64 rounded-full bg-primary/8 blur-3xl animate-float-slow pointer-events-none" />
+      <div className="fixed bottom-20 left-10 w-48 h-48 rounded-full bg-accent/10 blur-3xl animate-float pointer-events-none" />
+
       <NavMenu />
 
-      <main className="container mx-auto px-4 py-6 pb-8 flex-1">
+      <main className="container mx-auto px-4 py-6 pb-8 flex-1 relative z-10">
         <div className="mx-auto max-w-2xl">
+          {/* Header */}
           <div className="text-center mb-8 animate-slide-up">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+            <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-2 text-sm font-medium mb-4">
+              <Sparkles className="h-4 w-4 text-accent animate-pulse-soft" />
+              FIRS Compliant Calculator
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
               Tax Calculator
             </h1>
             <p className="text-muted-foreground">
@@ -93,15 +102,19 @@ const CalculatorPage = () => {
             </p>
           </div>
 
-          {/* Tax Rule Toggle */}
-          <div className="mb-6 rounded-xl border border-border bg-card p-4 shadow-card animate-slide-up">
+          {/* Tax Rule Toggle - Neumorphic */}
+          <div className="mb-6 glass-frosted rounded-2xl p-5 shadow-futuristic animate-slide-up">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className={`rounded-lg p-2 ${use2026Rules ? 'bg-success/10 text-success' : 'bg-secondary text-secondary-foreground'}`}>
-                  <Info className="h-5 w-5" />
+              <div className="flex items-center gap-4">
+                <div className={`rounded-xl p-3 transition-all duration-300 ${
+                  use2026Rules 
+                    ? 'bg-success/20 text-success glow-success' 
+                    : 'bg-secondary text-secondary-foreground neumorphic-sm'
+                }`}>
+                  <Info className="h-6 w-6" />
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">
+                  <p className="font-semibold text-foreground">
                     {use2026Rules ? 'Nigeria Tax Act 2025 Rules' : 'Current (Pre-2026) Rules'}
                   </p>
                   <p className="text-sm text-muted-foreground">
@@ -114,162 +127,144 @@ const CalculatorPage = () => {
               <Switch 
                 checked={use2026Rules} 
                 onCheckedChange={setUse2026Rules}
+                className="data-[state=checked]:bg-success"
               />
             </div>
           </div>
 
-          {/* Entity Type Selection */}
+          {/* Entity Type Selection - Glass Tabs */}
           <Tabs 
             value={entityType} 
             onValueChange={(v) => setEntityType(v as 'business_name' | 'company')}
-            className="mb-6 animate-slide-up"
+            className="mb-6 animate-slide-up-delay-1"
           >
-            <TabsList className="grid w-full grid-cols-2 h-auto p-1">
+            <TabsList className="grid w-full grid-cols-2 h-auto p-1.5 glass-frosted rounded-2xl">
               <TabsTrigger 
                 value="business_name"
-                className="flex items-center gap-2 py-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="flex items-center gap-2 py-4 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-300"
               >
-                <Briefcase className="h-4 w-4" />
-                Business Name
+                <Briefcase className="h-5 w-5" />
+                <span className="font-semibold">Business Name</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="company"
-                className="flex items-center gap-2 py-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="flex items-center gap-2 py-4 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-300"
               >
-                <Building2 className="h-4 w-4" />
-                Company (LTD)
+                <Building2 className="h-5 w-5" />
+                <span className="font-semibold">Company (LTD)</span>
               </TabsTrigger>
             </TabsList>
           </Tabs>
 
-          {/* Input Form */}
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card animate-slide-up">
-            <div className="space-y-6">
+          {/* Input Form - Glassmorphic Card */}
+          <div className="glass-frosted rounded-3xl p-6 md:p-8 shadow-futuristic animate-slide-up-delay-2">
+            <div className="space-y-8">
               {/* Primary Income */}
-              <div>
-                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  Primary Income
-                  <TooltipHelper content="Your main business revenue and expenses" />
-                </h3>
+              <InputSection title="Primary Income" tooltip="Your main business revenue and expenses">
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <InputField
+                  <NeumorphicInput
                     label="Annual Turnover"
                     value={inputs.turnover}
                     onChange={(v) => updateInput('turnover', v)}
                     tooltip="Total revenue/sales for the year"
                     required
                   />
-                  <InputField
+                  <NeumorphicInput
                     label="Business Expenses"
                     value={inputs.expenses}
                     onChange={(v) => updateInput('expenses', v)}
                     tooltip="Deductible business costs"
                   />
                 </div>
-              </div>
+              </InputSection>
 
               {/* Company-specific fields */}
               {entityType === 'company' && (
-                <div>
-                  <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                    Company Assets
-                    <TooltipHelper content="Required to determine small company status" />
-                  </h3>
-                  <InputField
+                <InputSection title="Company Assets" tooltip="Required to determine small company status">
+                  <NeumorphicInput
                     label="Fixed Assets Value"
                     value={inputs.fixedAssets}
                     onChange={(v) => updateInput('fixedAssets', v)}
                     tooltip="Total value of property, equipment, vehicles etc."
                   />
-                </div>
+                </InputSection>
               )}
 
               {/* Rent (for Business Name PIT relief) */}
               {entityType === 'business_name' && use2026Rules && (
-                <div>
-                  <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                    Rent Relief
-                    <TooltipHelper content="2026 rules allow relief for rent paid" />
-                  </h3>
-                  <InputField
+                <InputSection title="Rent Relief" tooltip="2026 rules allow relief for rent paid">
+                  <NeumorphicInput
                     label="Annual Rent Paid"
                     value={inputs.rentPaid}
                     onChange={(v) => updateInput('rentPaid', v)}
                     tooltip="Relief: min(20% of rent, ₦500k)"
                   />
-                </div>
+                </InputSection>
               )}
 
               {/* VAT */}
-              <div>
-                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  VAT (7.5%)
-                  <TooltipHelper content="Mandatory if turnover > ₦25m" />
-                </h3>
+              <InputSection title="VAT (7.5%)" tooltip="Mandatory if turnover > ₦25m">
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <InputField
+                  <NeumorphicInput
                     label="Vatable Sales"
                     value={inputs.vatableSales}
                     onChange={(v) => updateInput('vatableSales', v)}
                     tooltip="Sales subject to VAT"
                   />
-                  <InputField
+                  <NeumorphicInput
                     label="Vatable Purchases"
                     value={inputs.vatablePurchases}
                     onChange={(v) => updateInput('vatablePurchases', v)}
                     tooltip="Purchases with recoverable VAT"
                   />
                 </div>
-              </div>
+              </InputSection>
 
               {/* Other Income */}
-              <div>
-                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  Other Income (Optional)
-                  <TooltipHelper content="Additional income sources" />
-                </h3>
+              <InputSection title="Other Income (Optional)" tooltip="Additional income sources">
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <InputField
+                  <NeumorphicInput
                     label="Rental Income"
                     value={inputs.rentalIncome}
                     onChange={(v) => updateInput('rentalIncome', v)}
                     tooltip="10% WHT usually deducted at source"
                   />
-                  <InputField
+                  <NeumorphicInput
                     label="Consultancy Income"
                     value={inputs.consultancyIncome}
                     onChange={(v) => updateInput('consultancyIncome', v)}
                     tooltip="10% WHT for companies, 5% for individuals"
                   />
-                  <InputField
+                  <NeumorphicInput
                     label="Dividend Income"
                     value={inputs.dividendIncome}
                     onChange={(v) => updateInput('dividendIncome', v)}
                     tooltip="Franked dividends from Nigerian companies are tax-exempt"
                   />
-                  <InputField
+                  <NeumorphicInput
                     label="Capital Gains"
                     value={inputs.capitalGains}
                     onChange={(v) => updateInput('capitalGains', v)}
                     tooltip="10% Capital Gains Tax applies"
                   />
                 </div>
-              </div>
+              </InputSection>
             </div>
 
-            <div className="mt-8">
+            {/* Calculate Button */}
+            <div className="mt-10">
               <Button 
-                variant="hero" 
+                variant="glow" 
                 size="xl" 
-                className="w-full"
+                className="w-full text-lg shadow-2xl"
                 onClick={handleCalculate}
                 disabled={!canCalculate}
               >
-                Calculate Tax
+                <span>Calculate Tax</span>
                 <ArrowRight className="h-5 w-5" />
               </Button>
               {!canCalculate && (
-                <p className="text-center text-sm text-muted-foreground mt-2">
+                <p className="text-center text-sm text-muted-foreground mt-3">
                   Enter your annual turnover to calculate
                 </p>
               )}
@@ -281,7 +276,25 @@ const CalculatorPage = () => {
   );
 };
 
-const InputField = ({
+const InputSection = ({
+  title,
+  tooltip,
+  children,
+}: {
+  title: string;
+  tooltip: string;
+  children: React.ReactNode;
+}) => (
+  <div>
+    <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+      {title}
+      <TooltipHelper content={tooltip} />
+    </h3>
+    {children}
+  </div>
+);
+
+const NeumorphicInput = ({
   label,
   value,
   onChange,
@@ -298,13 +311,13 @@ const InputField = ({
 
   return (
     <div>
-      <Label className="flex items-center gap-1 mb-2 text-sm">
+      <Label className="flex items-center gap-1.5 mb-2.5 text-sm font-medium">
         {label}
         {required && <span className="text-destructive">*</span>}
         <TooltipHelper content={tooltip} />
       </Label>
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
           ₦
         </span>
         <Input
@@ -312,7 +325,7 @@ const InputField = ({
           inputMode="numeric"
           value={displayValue}
           onChange={(e) => onChange(e.target.value)}
-          className="pl-7"
+          className="pl-9 h-12 rounded-xl neumorphic-inset border-0 bg-muted/30 focus:ring-2 focus:ring-primary/30 transition-all"
           placeholder="0"
         />
       </div>
@@ -327,13 +340,13 @@ const TooltipHelper = ({ content }: { content: string }) => (
         type="button"
         variant="ghost"
         size="icon"
-        className="h-6 w-6 text-muted-foreground hover:text-foreground"
+        className="h-5 w-5 text-muted-foreground hover:text-foreground rounded-full"
         aria-label="Help"
       >
         <HelpCircle className="h-4 w-4" />
       </Button>
     </PopoverTrigger>
-    <PopoverContent className="max-w-xs p-3" side="top">
+    <PopoverContent className="max-w-xs p-3 glass-frosted" side="top">
       <p className="text-sm">{content}</p>
     </PopoverContent>
   </Popover>
