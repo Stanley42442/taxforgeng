@@ -7,33 +7,47 @@ import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { TaxAssistant } from "@/components/TaxAssistant";
+import { lazy, Suspense } from "react";
+
+// Eagerly load Index for fast initial render
 import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
-import Advisory from "./pages/Advisory";
-import Calculator from "./pages/Calculator";
-import Results from "./pages/Results";
-import TaxBreakdown from "./pages/TaxBreakdown";
-import Pricing from "./pages/Pricing";
-import TaxFiling from "./pages/TaxFiling";
-import SavedBusinesses from "./pages/SavedBusinesses";
-import Reminders from "./pages/Reminders";
-import Insights from "./pages/Insights";
-import Team from "./pages/Team";
-import Transactions from "./pages/Transactions";
-import AuditLog from "./pages/AuditLog";
-import Learn from "./pages/Learn";
-import Expenses from "./pages/Expenses";
-import ScenarioModeling from "./pages/ScenarioModeling";
-import EFiling from "./pages/EFiling";
-import ApiDocs from "./pages/ApiDocs";
-import Achievements from "./pages/Achievements";
-import BusinessReport from "./pages/BusinessReport";
-import Roadmap from "./pages/Roadmap";
-import Terms from "./pages/Terms";
-import AdminAnalytics from "./pages/AdminAnalytics";
-import NotFound from "./pages/NotFound";
+
+// Lazy load all other pages
+const Auth = lazy(() => import("./pages/Auth"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Advisory = lazy(() => import("./pages/Advisory"));
+const Calculator = lazy(() => import("./pages/Calculator"));
+const Results = lazy(() => import("./pages/Results"));
+const TaxBreakdown = lazy(() => import("./pages/TaxBreakdown"));
+const Pricing = lazy(() => import("./pages/Pricing"));
+const TaxFiling = lazy(() => import("./pages/TaxFiling"));
+const SavedBusinesses = lazy(() => import("./pages/SavedBusinesses"));
+const Reminders = lazy(() => import("./pages/Reminders"));
+const Insights = lazy(() => import("./pages/Insights"));
+const Team = lazy(() => import("./pages/Team"));
+const Transactions = lazy(() => import("./pages/Transactions"));
+const AuditLog = lazy(() => import("./pages/AuditLog"));
+const Learn = lazy(() => import("./pages/Learn"));
+const Expenses = lazy(() => import("./pages/Expenses"));
+const ScenarioModeling = lazy(() => import("./pages/ScenarioModeling"));
+const EFiling = lazy(() => import("./pages/EFiling"));
+const ApiDocs = lazy(() => import("./pages/ApiDocs"));
+const Achievements = lazy(() => import("./pages/Achievements"));
+const BusinessReport = lazy(() => import("./pages/BusinessReport"));
+const Roadmap = lazy(() => import("./pages/Roadmap"));
+const Terms = lazy(() => import("./pages/Terms"));
+const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+// Lazy load TaxAssistant (heavy component with AI chat)
+const TaxAssistant = lazy(() => import("./components/TaxAssistant").then(m => ({ default: m.TaxAssistant })));
+
+// Minimal loading fallback
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+  </div>
+);
 
 const queryClient = new QueryClient();
 
@@ -47,35 +61,37 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <ScrollToTop />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/advisory" element={<Advisory />} />
-                <Route path="/calculator" element={<Calculator />} />
-                <Route path="/results" element={<Results />} />
-                <Route path="/tax-breakdown" element={<TaxBreakdown />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/tax-filing" element={<TaxFiling />} />
-                <Route path="/businesses" element={<SavedBusinesses />} />
-                <Route path="/reminders" element={<Reminders />} />
-                <Route path="/insights" element={<Insights />} />
-                <Route path="/team" element={<Team />} />
-                <Route path="/transactions" element={<Transactions />} />
-                <Route path="/audit-log" element={<AuditLog />} />
-                <Route path="/learn" element={<Learn />} />
-                <Route path="/expenses" element={<Expenses />} />
-                <Route path="/scenarios" element={<ScenarioModeling />} />
-                <Route path="/e-filing" element={<EFiling />} />
-                <Route path="/api-docs" element={<ApiDocs />} />
-                <Route path="/achievements" element={<Achievements />} />
-                <Route path="/business-report" element={<BusinessReport />} />
-                <Route path="/roadmap" element={<Roadmap />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/admin-analytics" element={<AdminAnalytics />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <TaxAssistant />
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/advisory" element={<Advisory />} />
+                  <Route path="/calculator" element={<Calculator />} />
+                  <Route path="/results" element={<Results />} />
+                  <Route path="/tax-breakdown" element={<TaxBreakdown />} />
+                  <Route path="/pricing" element={<Pricing />} />
+                  <Route path="/tax-filing" element={<TaxFiling />} />
+                  <Route path="/businesses" element={<SavedBusinesses />} />
+                  <Route path="/reminders" element={<Reminders />} />
+                  <Route path="/insights" element={<Insights />} />
+                  <Route path="/team" element={<Team />} />
+                  <Route path="/transactions" element={<Transactions />} />
+                  <Route path="/audit-log" element={<AuditLog />} />
+                  <Route path="/learn" element={<Learn />} />
+                  <Route path="/expenses" element={<Expenses />} />
+                  <Route path="/scenarios" element={<ScenarioModeling />} />
+                  <Route path="/e-filing" element={<EFiling />} />
+                  <Route path="/api-docs" element={<ApiDocs />} />
+                  <Route path="/achievements" element={<Achievements />} />
+                  <Route path="/business-report" element={<BusinessReport />} />
+                  <Route path="/roadmap" element={<Roadmap />} />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/admin-analytics" element={<AdminAnalytics />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                <TaxAssistant />
+              </Suspense>
             </BrowserRouter>
           </TooltipProvider>
         </SubscriptionProvider>
