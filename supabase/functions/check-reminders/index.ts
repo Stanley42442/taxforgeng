@@ -35,20 +35,20 @@ function getNextDueDate(reminderType: string, currentDueDate: Date): Date {
   let nextDate = new Date(currentDueDate);
 
   switch (reminderType) {
-    case 'vat_monthly':
+    case 'vat':
       nextDate.setDate(21);
       if (nextDate <= now) {
         nextDate.setMonth(nextDate.getMonth() + 1);
       }
       break;
-    case 'pit_monthly':
-    case 'paye_monthly':
+    case 'pit':
+    case 'paye':
       nextDate.setDate(10);
       if (nextDate <= now) {
         nextDate.setMonth(nextDate.getMonth() + 1);
       }
       break;
-    case 'cit_annual':
+    case 'cit':
       nextDate.setMonth(5);
       nextDate.setDate(30);
       if (nextDate <= now) {

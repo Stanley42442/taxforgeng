@@ -29,10 +29,10 @@ interface Reminder {
 }
 
 const DEFAULT_REMINDERS = [
-  { type: 'vat_monthly', name: 'Monthly VAT Filing', dueDate: '21st of each month', dayOfMonth: 21 },
-  { type: 'cit_annual', name: 'Annual CIT Return', dueDate: 'June 30th', month: 5, dayOfMonth: 30 },
-  { type: 'pit_monthly', name: 'PIT Remittance', dueDate: '10th of each month', dayOfMonth: 10 },
-  { type: 'paye_monthly', name: 'PAYE Remittance', dueDate: '10th of each month', dayOfMonth: 10 },
+  { type: 'vat', name: 'Monthly VAT Filing', dueDate: '21st of each month', dayOfMonth: 21 },
+  { type: 'cit', name: 'Annual CIT Return', dueDate: 'June 30th', month: 5, dayOfMonth: 30 },
+  { type: 'pit', name: 'PIT Remittance', dueDate: '10th of each month', dayOfMonth: 10 },
+  { type: 'paye', name: 'PAYE Remittance', dueDate: '10th of each month', dayOfMonth: 10 },
 ];
 
 // Calculate the next due date based on reminder type
@@ -44,7 +44,7 @@ const calculateNextDueDate = (type: string): Date => {
   
   let nextDate = new Date();
   
-  if (type === 'cit_annual') {
+  if (type === 'cit') {
     // June 30th annually
     nextDate.setMonth(5, 30);
     nextDate.setHours(9, 0, 0, 0);
@@ -295,7 +295,7 @@ const Reminders = () => {
             <CardContent className="space-y-6">
               <div className="grid gap-3 text-left">
                 <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                  <Calendar className="w-5 h-5 text-primary" />
+                  <CalendarIcon className="w-5 h-5 text-primary" />
                   <span>Monthly VAT filing reminders</span>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
