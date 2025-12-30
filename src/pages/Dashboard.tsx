@@ -213,8 +213,8 @@ const Dashboard = () => {
       
       {showWelcome && <WelcomeSplash onComplete={() => setShowWelcome(false)} />}
 
-      <main className="container mx-auto px-4 py-6 pb-8 flex-1 relative z-10">
-        <div className="mx-auto max-w-6xl">
+      <main className="w-full max-w-7xl mx-auto px-4 py-6 pb-8 flex-1 relative z-10">
+        <div className="w-full max-w-6xl mx-auto">
           {/* Header */}
           <div className="mb-8 animate-slide-up">
             <div className="flex items-center gap-4 mb-2">
