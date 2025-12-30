@@ -448,14 +448,14 @@ const Reminders = () => {
                                     {customDate ? format(customDate, "PPP") : <span>Pick a date</span>}
                                   </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0 z-[9999]" align="start" sideOffset={4}>
+                                <PopoverContent className="w-auto p-0 z-[9999]" align="start" side="bottom" sideOffset={8}>
                                   <Calendar
                                     mode="single"
                                     selected={customDate}
                                     onSelect={setCustomDate}
                                     disabled={(date) => date < new Date()}
                                     initialFocus
-                                    className={cn("p-3 pointer-events-auto")}
+                                    className={cn("p-2 pointer-events-auto text-sm scale-90 origin-top-left")}
                                   />
                                 </PopoverContent>
                               </Popover>
