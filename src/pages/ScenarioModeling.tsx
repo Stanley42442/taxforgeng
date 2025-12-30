@@ -273,17 +273,17 @@ const ScenarioModeling = () => {
             {/* Comparison Panel */}
             <div className="space-y-6 animate-slide-up">
               {/* Side by Side */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                <div className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-card overflow-hidden">
                   <p className="text-sm text-muted-foreground mb-2">Current Tax</p>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-lg sm:text-2xl font-bold text-foreground truncate">
                     {formatCurrency(baseTax.totalTaxPayable)}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
                     Rate: {baseTax.effectiveRate.toFixed(2)}%
                   </p>
                 </div>
-                <div className={`rounded-2xl border p-5 shadow-card ${
+                <div className={`rounded-2xl border p-4 sm:p-5 shadow-card overflow-hidden ${
                   taxDifference > 0 
                     ? 'border-destructive/20 bg-destructive/5' 
                     : taxDifference < 0 
@@ -291,7 +291,7 @@ const ScenarioModeling = () => {
                     : 'border-border bg-card'
                 }`}>
                   <p className="text-sm text-muted-foreground mb-2">Scenario Tax</p>
-                  <p className={`text-2xl font-bold ${
+                  <p className={`text-lg sm:text-2xl font-bold truncate ${
                     taxDifference > 0 ? 'text-destructive' : taxDifference < 0 ? 'text-success' : 'text-foreground'
                   }`}>
                     {formatCurrency(scenarioTax.totalTaxPayable)}
