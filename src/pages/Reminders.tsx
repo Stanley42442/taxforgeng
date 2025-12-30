@@ -25,11 +25,39 @@ interface Reminder {
 }
 
 const DEFAULT_REMINDERS = [
-  { type: 'vat_monthly', name: 'Monthly VAT Filing', dueDate: '21st of each month' },
-  { type: 'cit_annual', name: 'Annual CIT Return', dueDate: 'June 30th' },
-  { type: 'pit_monthly', name: 'PIT Remittance', dueDate: '10th of each month' },
-  { type: 'paye_monthly', name: 'PAYE Remittance', dueDate: '10th of each month' },
+  { type: 'vat_monthly', name: 'Monthly VAT Filing', dueDate: '21st of each month', dayOfMonth: 21 },
+  { type: 'cit_annual', name: 'Annual CIT Return', dueDate: 'June 30th', month: 5, dayOfMonth: 30 },
+  { type: 'pit_monthly', name: 'PIT Remittance', dueDate: '10th of each month', dayOfMonth: 10 },
+  { type: 'paye_monthly', name: 'PAYE Remittance', dueDate: '10th of each month', dayOfMonth: 10 },
 ];
+
+// Calculate the next due date based on reminder type
+const calculateNextDueDate = (type: string): Date => {
+  const now = new Date();
+  const template = DEFAULT_REMINDERS.find(r => r.type === type);
+  
+  if (!template) return now;
+  
+  let nextDate = new Date();
+  
+  if (type === 'cit_annual') {
+    // June 30th annually
+    nextDate.setMonth(5, 30);
+    nextDate.setHours(9, 0, 0, 0);
+    if (nextDate <= now) {
+      nextDate.setFullYear(nextDate.getFullYear() + 1);
+    }
+  } else if (template.dayOfMonth) {
+    // Monthly reminders
+    nextDate.setDate(template.dayOfMonth);
+    nextDate.setHours(9, 0, 0, 0);
+    if (nextDate <= now) {
+      nextDate.setMonth(nextDate.getMonth() + 1);
+    }
+  }
+  
+  return nextDate;
+};
 
 const Reminders = () => {
   const { tier, savedBusinesses } = useSubscription();
@@ -108,6 +136,8 @@ const Reminders = () => {
       const template = DEFAULT_REMINDERS.find(d => d.type === type);
       if (!template) return;
 
+      const nextDueDate = calculateNextDueDate(type);
+      
       const { data, error } = await supabase
         .from('reminders')
         .insert({
@@ -115,7 +145,7 @@ const Reminders = () => {
           business_id: businessId,
           reminder_type: type,
           title: template.name,
-          due_date: new Date().toISOString(),
+          due_date: nextDueDate.toISOString(),
           notify_email: true,
           description: template.dueDate,
         })
@@ -149,6 +179,15 @@ const Reminders = () => {
   const addCustomReminder = async () => {
     if (!user || !selectedBusiness || !customName || !customDate) return;
     
+    // Parse the custom date - try to create a proper date
+    let parsedDate = new Date(customDate);
+    if (isNaN(parsedDate.getTime())) {
+      // If parsing fails, use current date + 7 days as fallback
+      parsedDate = new Date();
+      parsedDate.setDate(parsedDate.getDate() + 7);
+    }
+    parsedDate.setHours(9, 0, 0, 0);
+    
     const { data, error } = await supabase
       .from('reminders')
       .insert({
@@ -156,7 +195,7 @@ const Reminders = () => {
         business_id: selectedBusiness.id,
         reminder_type: 'custom',
         title: customName,
-        due_date: new Date().toISOString(),
+        due_date: parsedDate.toISOString(),
         notify_email: true,
         description: customNote || customDate,
       })
