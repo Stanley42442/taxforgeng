@@ -116,42 +116,54 @@ const Reminders = () => {
   const toggleReminder = async (businessId: string, type: string) => {
     if (!user) return;
 
-    console.log('Toggle reminder - businessId:', businessId, 'type:', type);
-    console.log('Current reminders:', reminders);
-    
-    const existing = reminders.find(r => r.businessId === businessId && r.type === type);
-    console.log('Found existing reminder:', existing);
+    // Find all matching reminders (there might be duplicates)
+    const existingReminders = reminders.filter(r => r.businessId === businessId && r.type === type);
+    const existing = existingReminders[0];
     
     if (existing) {
-      // Toggle existing reminder
-      console.log('Updating existing reminder, current enabled:', existing.enabled, 'new enabled:', !existing.enabled);
+      const newEnabledState = !existing.enabled;
       
+      // Optimistic update - update UI immediately
+      setReminders(prev => prev.map(r => 
+        r.businessId === businessId && r.type === type ? { ...r, enabled: newEnabledState } : r
+      ));
+      toast.success(newEnabledState ? 'Reminder enabled' : 'Reminder disabled');
+      
+      // Then sync with database for all matching reminders
       const { error } = await supabase
         .from('reminders')
-        .update({ notify_email: !existing.enabled })
-        .eq('id', existing.id);
+        .update({ notify_email: newEnabledState })
+        .eq('business_id', businessId)
+        .eq('reminder_type', type)
+        .eq('user_id', user.id);
 
       if (error) {
         console.error('Error updating reminder:', error);
+        // Revert on error
+        setReminders(prev => prev.map(r => 
+          r.businessId === businessId && r.type === type ? { ...r, enabled: existing.enabled } : r
+        ));
         toast.error('Failed to update reminder');
-        return;
       }
-
-      console.log('Database update successful, updating local state');
-      setReminders(prev => {
-        const updated = prev.map(r => 
-          r.id === existing.id ? { ...r, enabled: !r.enabled } : r
-        );
-        console.log('Updated reminders state:', updated);
-        return updated;
-      });
-      toast.success(existing.enabled ? 'Reminder disabled' : 'Reminder enabled');
     } else {
       // Create new reminder
       const template = DEFAULT_REMINDERS.find(d => d.type === type);
       if (!template) return;
 
       const nextDueDate = calculateNextDueDate(type);
+      const tempId = `temp-${Date.now()}`;
+      
+      // Optimistic update - add to UI immediately with temp id
+      const optimisticReminder: Reminder = {
+        id: tempId,
+        businessId: businessId,
+        type: type,
+        name: template.name,
+        dueDate: template.dueDate,
+        enabled: true,
+      };
+      setReminders(prev => [...prev, optimisticReminder]);
+      toast.success('Reminder enabled');
       
       const { data, error } = await supabase
         .from('reminders')
@@ -169,21 +181,16 @@ const Reminders = () => {
 
       if (error) {
         console.error('Error creating reminder:', error);
+        // Revert on error
+        setReminders(prev => prev.filter(r => r.id !== tempId));
         toast.error('Failed to create reminder');
         return;
       }
 
-      const newReminder: Reminder = {
-        id: data.id,
-        businessId: data.business_id,
-        type: data.reminder_type,
-        name: data.title,
-        dueDate: template.dueDate,
-        enabled: true,
-      };
-
-      setReminders(prev => [...prev, newReminder]);
-      toast.success('Reminder enabled');
+      // Replace temp reminder with real one
+      setReminders(prev => prev.map(r => 
+        r.id === tempId ? { ...r, id: data.id } : r
+      ));
     }
   };
 
