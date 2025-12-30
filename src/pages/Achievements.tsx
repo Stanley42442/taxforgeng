@@ -20,6 +20,7 @@ import {
   Flame,
   Receipt,
   Loader2,
+  Sparkles,
 } from "lucide-react";
 
 interface Achievement {
@@ -177,17 +178,6 @@ const Achievements = () => {
   const lockedAchievements = achievements.filter(a => !a.unlocked);
   const earnedPoints = unlockedAchievements.reduce((sum, a) => sum + a.points, 0);
 
-  const getCategoryIcon = (category: Achievement['category']) => {
-    switch (category) {
-      case 'starter': return Star;
-      case 'calculation': return Calculator;
-      case 'filing': return FileText;
-      case 'streak': return Flame;
-      case 'social': return Users;
-      default: return Star;
-    }
-  };
-
   // Find next achievement to unlock
   const nextUnlock = lockedAchievements.find(a => a.progress !== undefined && a.maxProgress !== undefined && a.progress > 0);
   const nextUnlockMessage = nextUnlock 
@@ -196,19 +186,25 @@ const Achievements = () => {
 
   if (!isBasicPlus) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
+      <div className="min-h-screen bg-gradient-hero overflow-hidden">
+        {/* Background Effects */}
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-warning/10 blur-3xl animate-float-slow" />
+          <div className="bg-mesh absolute inset-0" />
+        </div>
+
         <NavMenu />
-        <div className="container mx-auto px-4 py-20 text-center">
+        <div className="container mx-auto px-4 py-20 text-center relative z-10">
           <div className="mx-auto max-w-md">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-warning/10">
-              <Crown className="h-10 w-10 text-warning" />
+            <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-accent glow-accent">
+              <Crown className="h-12 w-12 text-accent-foreground" />
             </div>
-            <h1 className="text-2xl font-bold text-foreground mb-3">Achievements & Progress</h1>
-            <p className="text-muted-foreground mb-6">
+            <h1 className="text-3xl font-bold text-foreground mb-3">Achievements & Progress</h1>
+            <p className="text-lg text-muted-foreground mb-8">
               Track your tax compliance journey with points, badges, and achievements. Available on Basic+ plans.
             </p>
-            <Button variant="hero" onClick={() => navigate('/pricing')}>
-              <Crown className="h-4 w-4" />
+            <Button variant="glow" size="lg" onClick={() => navigate('/pricing')}>
+              <Crown className="h-5 w-5" />
               Upgrade to Basic
             </Button>
           </div>
@@ -222,8 +218,10 @@ const Achievements = () => {
       <div className="min-h-screen bg-gradient-hero">
         <NavMenu />
         <div className="container mx-auto px-4 py-20 text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground mt-4">Loading achievements...</p>
+          <div className="glass-frosted p-8 rounded-3xl inline-block">
+            <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" />
+            <p className="text-muted-foreground mt-4">Loading achievements...</p>
+          </div>
         </div>
       </div>
     );
@@ -231,110 +229,134 @@ const Achievements = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
+      {/* Premium Background Effects */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 right-1/4 w-[600px] h-[600px] rounded-full bg-primary/5 blur-3xl animate-float-slow" />
+        <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] rounded-full bg-accent/5 blur-3xl animate-float" />
+        <div className="bg-mesh absolute inset-0" />
+        <div className="bg-dots absolute inset-0 opacity-30" />
+      </div>
+
       <NavMenu />
 
-      <main className="container mx-auto px-4 py-6 pb-8 flex-1">
-        <div className="mx-auto max-w-4xl">
+      <main className="container mx-auto px-4 py-6 pb-8 flex-1 relative z-10">
+        <div className="mx-auto max-w-5xl">
           {/* Header */}
-          <div className="text-center mb-8 animate-slide-up">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary">
-              <Trophy className="h-8 w-8 text-primary-foreground" />
+          <div className="text-center mb-10 animate-slide-up">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-primary glow-primary">
+              <Trophy className="h-10 w-10 text-primary-foreground" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+            <h1 className="text-4xl font-bold text-foreground mb-3">
               Achievements
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-lg text-muted-foreground">
               Track your tax compliance journey
             </p>
           </div>
 
-          {/* Level Card */}
-          <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card mb-6 animate-slide-up overflow-hidden">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-              <div className="flex items-center gap-3 sm:gap-4">
-                <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-gradient-primary flex items-center justify-center flex-shrink-0">
-                  <span className="text-xl sm:text-2xl font-bold text-primary-foreground">{currentLevel.level}</span>
+          {/* Level Card - Premium Neumorphic */}
+          <div className="neumorphic p-6 sm:p-8 mb-8 animate-slide-up-delay-1">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+              {/* Level Info */}
+              <div className="flex items-center gap-5">
+                <div className="relative">
+                  <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full bg-gradient-primary glow-primary flex items-center justify-center">
+                    <span className="text-3xl sm:text-4xl font-bold text-primary-foreground">{currentLevel.level}</span>
+                  </div>
+                  {/* Animated ring */}
+                  <div className="absolute inset-0 rounded-full border-4 border-primary/30 animate-pulse-soft" />
                 </div>
-                <div className="min-w-0">
-                  <h2 className="text-lg sm:text-xl font-bold text-foreground truncate">{currentLevel.title}</h2>
-                  <p className="text-xs sm:text-sm text-muted-foreground">{stats.totalPoints || earnedPoints} total points</p>
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-foreground">{currentLevel.title}</h2>
+                  <p className="text-muted-foreground">{stats.totalPoints || earnedPoints} total points</p>
                 </div>
               </div>
-              <div className="flex items-center sm:flex-col sm:items-end gap-2 sm:gap-0">
-                <div className="flex items-center gap-1 text-warning">
-                  <Flame className="h-4 w-4 sm:h-5 sm:w-5" />
-                  <span className="font-bold text-sm sm:text-base">{stats.streak} day streak</span>
+              
+              {/* Streak Badge */}
+              <div className="glass p-4 rounded-2xl flex items-center gap-3">
+                <div className="p-3 rounded-xl bg-gradient-accent glow-accent">
+                  <Flame className="h-6 w-6 text-accent-foreground" />
                 </div>
-                <p className="text-xs text-muted-foreground">Keep it going!</p>
+                <div>
+                  <p className="text-2xl font-bold text-warning">{stats.streak} day streak</p>
+                  <p className="text-sm text-muted-foreground">Keep it going!</p>
+                </div>
               </div>
             </div>
 
+            {/* Progress to Next Level */}
             {currentLevel.nextLevel && (
-              <div>
-                <div className="flex justify-between text-xs sm:text-sm mb-2">
+              <div className="mt-6 pt-6 border-t border-border/50">
+                <div className="flex justify-between text-sm mb-3">
                   <span className="text-muted-foreground">Progress to Level {currentLevel.level + 1}</span>
-                  <span className="text-foreground font-medium">
+                  <span className="text-foreground font-semibold">
                     {stats.totalPoints || earnedPoints} / {currentLevel.nextLevel}
                   </span>
                 </div>
-                <Progress value={((stats.totalPoints || earnedPoints) / currentLevel.nextLevel) * 100} className="h-2 sm:h-3" />
+                <div className="relative">
+                  <Progress value={((stats.totalPoints || earnedPoints) / currentLevel.nextLevel) * 100} className="h-4" />
+                  <div 
+                    className="absolute top-0 left-0 h-4 rounded-full bg-gradient-primary animate-glow-pulse"
+                    style={{ width: `${((stats.totalPoints || earnedPoints) / currentLevel.nextLevel) * 100}%` }}
+                  />
+                </div>
               </div>
             )}
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-6 animate-slide-up">
-            <div className="rounded-xl border border-border bg-card p-2 sm:p-4 text-center shadow-card overflow-hidden">
-              <Calculator className="h-5 w-5 sm:h-6 sm:w-6 text-primary mx-auto mb-1 sm:mb-2" />
-              <p className="text-xl sm:text-2xl font-bold text-foreground">{stats.calculationsCount}</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">Calculations</p>
-            </div>
-            <div className="rounded-xl border border-border bg-card p-2 sm:p-4 text-center shadow-card overflow-hidden">
-              <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-primary mx-auto mb-1 sm:mb-2" />
-              <p className="text-xl sm:text-2xl font-bold text-foreground">{stats.businessesSaved}</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">Businesses</p>
-            </div>
-            <div className="rounded-xl border border-border bg-card p-2 sm:p-4 text-center shadow-card overflow-hidden">
-              <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-warning mx-auto mb-1 sm:mb-2" />
-              <p className="text-xl sm:text-2xl font-bold text-foreground">{unlockedAchievements.length}</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">Badges</p>
-            </div>
-            <div className="rounded-xl border border-border bg-card p-2 sm:p-4 text-center shadow-card overflow-hidden">
-              <Star className="h-5 w-5 sm:h-6 sm:w-6 text-accent mx-auto mb-1 sm:mb-2" />
-              <p className="text-xl sm:text-2xl font-bold text-foreground">{earnedPoints}</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">Points Earned</p>
-            </div>
+          {/* Stats Grid - Glass Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 animate-slide-up-delay-2">
+            {[
+              { icon: Calculator, value: stats.calculationsCount, label: 'Calculations', color: 'primary' },
+              { icon: FileText, value: stats.businessesSaved, label: 'Businesses', color: 'primary' },
+              { icon: Trophy, value: unlockedAchievements.length, label: 'Badges', color: 'warning' },
+              { icon: Star, value: earnedPoints, label: 'Points Earned', color: 'accent' }
+            ].map((stat, idx) => (
+              <div key={idx} className="glass hover-lift p-4 sm:p-5 rounded-2xl text-center">
+                <div className={`p-3 rounded-xl bg-${stat.color}/10 w-fit mx-auto mb-3`}>
+                  <stat.icon className={`h-6 w-6 text-${stat.color}`} />
+                </div>
+                <p className="text-2xl sm:text-3xl font-bold text-foreground">{stat.value}</p>
+                <p className="text-sm text-muted-foreground">{stat.label}</p>
+              </div>
+            ))}
           </div>
 
           {/* Unlocked Achievements */}
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">
-            <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-success" />
+          <div className="glass-frosted rounded-3xl p-6 mb-8 animate-fade-in">
+            <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-success/10">
+                <CheckCircle2 className="h-5 w-5 text-success" />
+              </div>
               Unlocked ({unlockedAchievements.length})
             </h2>
             {unlockedAchievements.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Trophy className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p>Start using TaxForge NG to unlock achievements!</p>
+              <div className="text-center py-12">
+                <div className="w-20 h-20 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                  <Trophy className="h-10 w-10 text-muted-foreground" />
+                </div>
+                <p className="text-muted-foreground">Start using TaxForge NG to unlock achievements!</p>
               </div>
             ) : (
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2">
                 {unlockedAchievements.map((achievement) => (
                   <div 
                     key={achievement.id}
-                    className="flex items-center gap-3 p-4 rounded-xl bg-success/10 border border-success/20"
+                    className="neon-border p-5 hover-lift"
                   >
-                    <div className="h-12 w-12 rounded-full bg-success/20 flex items-center justify-center shrink-0">
-                      <achievement.icon className="h-6 w-6 text-success" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-medium text-foreground text-sm">{achievement.title}</h3>
-                        <span className="text-xs bg-success/20 text-success px-2 py-0.5 rounded-full">
-                          +{achievement.points}
-                        </span>
+                    <div className="flex items-center gap-4">
+                      <div className="h-14 w-14 rounded-2xl bg-gradient-primary glow-primary flex items-center justify-center shrink-0">
+                        <achievement.icon className="h-7 w-7 text-primary-foreground" />
                       </div>
-                      <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold text-foreground">{achievement.title}</h3>
+                          <span className="text-xs bg-success/20 text-success px-2 py-0.5 rounded-full font-medium">
+                            +{achievement.points}
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{achievement.description}</p>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -343,50 +365,57 @@ const Achievements = () => {
           </div>
 
           {/* Locked Achievements */}
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card animate-slide-up">
-            <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Lock className="h-5 w-5 text-muted-foreground" />
+          <div className="glass-frosted rounded-3xl p-6 animate-fade-in">
+            <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-muted">
+                <Lock className="h-5 w-5 text-muted-foreground" />
+              </div>
               Locked ({lockedAchievements.length})
             </h2>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2">
               {lockedAchievements.map((achievement) => (
                 <div 
                   key={achievement.id}
-                  className="flex items-center gap-3 p-4 rounded-xl bg-secondary/50 border border-border opacity-75"
+                  className="glass p-5 rounded-2xl opacity-60 hover:opacity-80 transition-opacity"
                 >
-                  <div className="h-12 w-12 rounded-full bg-secondary flex items-center justify-center shrink-0">
-                    <achievement.icon className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-foreground text-sm">{achievement.title}</h3>
-                      <span className="text-xs bg-secondary text-muted-foreground px-2 py-0.5 rounded-full">
-                        {achievement.points} pts
-                      </span>
+                  <div className="flex items-center gap-4">
+                    <div className="h-14 w-14 rounded-2xl bg-muted flex items-center justify-center shrink-0">
+                      <achievement.icon className="h-7 w-7 text-muted-foreground" />
                     </div>
-                    <p className="text-xs text-muted-foreground">{achievement.description}</p>
-                    {achievement.progress !== undefined && achievement.maxProgress && (
-                      <div className="mt-2">
-                        <Progress 
-                          value={(achievement.progress / achievement.maxProgress) * 100} 
-                          className="h-1.5" 
-                        />
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {achievement.progress}/{achievement.maxProgress}
-                        </p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-medium text-foreground">{achievement.title}</h3>
+                        <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
+                          {achievement.points} pts
+                        </span>
                       </div>
-                    )}
+                      <p className="text-sm text-muted-foreground">{achievement.description}</p>
+                      {achievement.progress !== undefined && achievement.maxProgress && (
+                        <div className="mt-3">
+                          <Progress 
+                            value={(achievement.progress / achievement.maxProgress) * 100} 
+                            className="h-2" 
+                          />
+                          <p className="text-xs text-muted-foreground mt-1.5">
+                            {achievement.progress}/{achievement.maxProgress}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Motivation */}
-          <div className="mt-6 p-4 rounded-lg bg-primary/10 border border-primary/20 text-center">
-            <p className="text-sm text-primary">
-              🎯 {nextUnlockMessage}
-            </p>
+          {/* Motivation Banner */}
+          <div className="mt-8 glass p-5 rounded-2xl text-center animate-fade-in">
+            <div className="flex items-center justify-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              <p className="text-primary font-medium">
+                {nextUnlockMessage}
+              </p>
+            </div>
           </div>
         </div>
       </main>

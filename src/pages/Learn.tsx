@@ -23,7 +23,9 @@ import {
   Building2,
   Briefcase,
   Calculator,
-  DollarSign
+  DollarSign,
+  Sparkles,
+  GraduationCap
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 
@@ -274,8 +276,8 @@ As an employer, you must:
   );
 
   const getTierBadge = (articleTier: string) => {
-    if (articleTier === 'business') return { label: 'Business+', color: 'bg-accent text-accent-foreground' };
-    if (articleTier === 'corporate') return { label: 'Corporate', color: 'bg-warning/20 text-warning' };
+    if (articleTier === 'business') return { label: 'Business+', color: 'bg-accent/20 text-accent border border-accent/30' };
+    if (articleTier === 'corporate') return { label: 'Corporate', color: 'bg-warning/20 text-warning border border-warning/30' };
     return null;
   };
 
@@ -286,43 +288,53 @@ As an employer, you must:
 
   return (
     <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
+      {/* Premium Background Effects */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full bg-primary/5 blur-3xl animate-float-slow" />
+        <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] rounded-full bg-accent/5 blur-3xl animate-float" />
+        <div className="bg-mesh absolute inset-0" />
+        <div className="bg-dots absolute inset-0 opacity-30" />
+      </div>
+
       <NavMenu />
 
-      <main className="container mx-auto px-4 py-6 pb-8 flex-1">
-        <div className="mx-auto max-w-4xl">
+      <main className="container mx-auto px-4 py-6 pb-8 flex-1 relative z-10">
+        <div className="mx-auto max-w-5xl">
           {/* Header */}
-          <div className="text-center mb-8 animate-slide-up">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary">
-              <BookOpen className="h-8 w-8 text-primary-foreground" />
+          <div className="text-center mb-10 animate-slide-up">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-primary glow-primary">
+              <GraduationCap className="h-10 w-10 text-primary-foreground" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+            <h1 className="text-4xl font-bold text-foreground mb-3">
               Tax Academy
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
               Learn Nigerian tax rules in simple English
             </p>
           </div>
 
-          {/* Personalized Tips */}
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">
-            <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Lightbulb className="h-5 w-5 text-warning" />
+          {/* Personalized Tips - Glass Cards */}
+          <div className="glass-frosted rounded-3xl p-6 mb-8 animate-slide-up-delay-1">
+            <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-warning/10">
+                <Sparkles className="h-5 w-5 text-warning" />
+              </div>
               Your Tax Tips
             </h2>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2">
               {personalizedTips.map((tip, index) => (
                 <div 
                   key={index}
-                  className="p-4 rounded-xl border border-border bg-secondary/30 hover:bg-secondary/50 transition-colors"
+                  className="glass p-5 rounded-2xl hover-lift cursor-pointer group"
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-lg bg-primary/10">
-                      <tip.icon className="h-5 w-5 text-primary" />
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 rounded-xl bg-gradient-primary glow-primary group-hover:scale-110 transition-transform">
+                      <tip.icon className="h-5 w-5 text-primary-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-foreground text-sm mb-1">{tip.title}</h3>
-                      <p className="text-xs text-muted-foreground mb-2">{tip.description}</p>
-                      <Button variant="link" size="sm" className="h-auto p-0 text-xs text-primary">
+                      <h3 className="font-semibold text-foreground mb-1">{tip.title}</h3>
+                      <p className="text-sm text-muted-foreground mb-3 leading-relaxed">{tip.description}</p>
+                      <Button variant="link" size="sm" className="h-auto p-0 text-primary font-medium">
                         {tip.action} →
                       </Button>
                     </div>
@@ -332,94 +344,108 @@ As an employer, you must:
             </div>
           </div>
 
-          {/* Search */}
-          <div className="relative mb-6 animate-slide-up">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input
-              placeholder="Search articles..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-
-          {/* Video Section Placeholder */}
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">
-            <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Play className="h-5 w-5 text-primary" />
-              Quick Videos
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="aspect-video rounded-xl bg-secondary/50 flex items-center justify-center border border-border">
-                <div className="text-center">
-                  <Play className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">2026 Tax Reforms Explained</p>
-                  <p className="text-xs text-muted-foreground">2 min</p>
-                </div>
-              </div>
-              <div className="aspect-video rounded-xl bg-secondary/50 flex items-center justify-center border border-border">
-                <div className="text-center">
-                  <Play className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">How to Calculate PIT</p>
-                  <p className="text-xs text-muted-foreground">3 min</p>
-                </div>
+          {/* Search - Neumorphic */}
+          <div className="relative mb-8 animate-slide-up-delay-2">
+            <div className="neumorphic p-2">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                  placeholder="Search articles, topics, or categories..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-12 h-14 text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                />
               </div>
             </div>
           </div>
 
-          {/* Articles */}
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">
-            <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-              <FileText className="h-5 w-5 text-primary" />
+          {/* Video Section - Glass Cards */}
+          <div className="glass-frosted rounded-3xl p-6 mb-8 animate-slide-up-delay-3">
+            <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-primary/10">
+                <Play className="h-5 w-5 text-primary" />
+              </div>
+              Quick Videos
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {[
+                { title: '2026 Tax Reforms Explained', duration: '2 min' },
+                { title: 'How to Calculate PIT', duration: '3 min' }
+              ].map((video, idx) => (
+                <div 
+                  key={idx}
+                  className="glass aspect-video rounded-2xl flex items-center justify-center cursor-pointer group hover-lift relative overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="text-center relative z-10">
+                    <div className="w-16 h-16 rounded-full bg-gradient-primary glow-primary flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                      <Play className="h-7 w-7 text-primary-foreground fill-primary-foreground ml-1" />
+                    </div>
+                    <p className="font-medium text-foreground">{video.title}</p>
+                    <p className="text-sm text-muted-foreground">{video.duration}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Articles - Premium Glass Cards */}
+          <div className="glass-frosted rounded-3xl p-6 mb-8 animate-fade-in">
+            <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-primary/10">
+                <FileText className="h-5 w-5 text-primary" />
+              </div>
               Knowledge Base
             </h2>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {filteredArticles.map((article) => {
                 const badge = getTierBadge(article.tier);
                 const hasAccess = canAccess(article.tier);
                 
                 return (
                   <Accordion type="single" collapsible key={article.id}>
-                    <AccordionItem value={article.id} className="border border-border rounded-xl px-4">
-                      <AccordionTrigger className="py-4 hover:no-underline" disabled={!hasAccess}>
-                        <div className="flex items-start gap-3 text-left w-full pr-4">
+                    <AccordionItem value={article.id} className="glass rounded-2xl px-5 border-0">
+                      <AccordionTrigger className="py-5 hover:no-underline" disabled={!hasAccess}>
+                        <div className="flex items-start gap-4 text-left w-full pr-4">
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <span className="text-xs bg-secondary px-2 py-0.5 rounded-full text-muted-foreground">
+                            <div className="flex items-center gap-2 mb-2 flex-wrap">
+                              <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
                                 {article.category}
                               </span>
                               {badge && (
-                                <span className={`text-xs px-2 py-0.5 rounded-full ${badge.color}`}>
+                                <span className={`text-xs px-3 py-1 rounded-full font-medium ${badge.color}`}>
                                   {badge.label}
                                 </span>
                               )}
                               <span className="text-xs text-muted-foreground">{article.readTime}</span>
                             </div>
-                            <h3 className="font-medium text-foreground flex items-center gap-2">
+                            <h3 className="font-semibold text-foreground flex items-center gap-2">
                               {article.title}
                               {!hasAccess && <Lock className="h-4 w-4 text-muted-foreground" />}
                             </h3>
-                            <p className="text-sm text-muted-foreground">{article.description}</p>
+                            <p className="text-sm text-muted-foreground mt-1">{article.description}</p>
                           </div>
                         </div>
                       </AccordionTrigger>
                       {hasAccess ? (
-                        <AccordionContent className="pb-4">
-                          <div className="pt-2 border-t border-border">
+                        <AccordionContent className="pb-5">
+                          <div className="pt-4 border-t border-border/50">
                             <pre className="whitespace-pre-wrap text-sm text-foreground font-sans leading-relaxed">
                               {article.content}
                             </pre>
                           </div>
                         </AccordionContent>
                       ) : (
-                        <AccordionContent className="pb-4">
-                          <div className="pt-2 border-t border-border">
-                            <div className="p-4 rounded-lg bg-secondary/50 text-center">
-                              <Crown className="h-8 w-8 text-warning mx-auto mb-2" />
-                              <p className="text-sm text-muted-foreground mb-3">
+                        <AccordionContent className="pb-5">
+                          <div className="pt-4 border-t border-border/50">
+                            <div className="p-6 rounded-2xl bg-gradient-to-br from-warning/10 to-accent/5 text-center">
+                              <div className="w-14 h-14 rounded-full bg-warning/20 flex items-center justify-center mx-auto mb-3">
+                                <Crown className="h-7 w-7 text-warning" />
+                              </div>
+                              <p className="text-muted-foreground mb-4">
                                 Upgrade to {badge?.label} to access this content
                               </p>
-                              <Button variant="hero" size="sm" onClick={() => navigate('/pricing')}>
+                              <Button variant="glow" size="sm" onClick={() => navigate('/pricing')}>
                                 Upgrade Now
                               </Button>
                             </div>
@@ -433,34 +459,49 @@ As an employer, you must:
             </div>
           </div>
 
-          {/* FAQs */}
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card animate-slide-up">
-            <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Calculator className="h-5 w-5 text-primary" />
+          {/* FAQs - Neumorphic Accordion */}
+          <div className="neumorphic p-6 mb-8 animate-fade-in">
+            <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-primary/10">
+                <Calculator className="h-5 w-5 text-primary" />
+              </div>
               Frequently Asked Questions
             </h2>
-            <Accordion type="single" collapsible className="space-y-2">
+            <Accordion type="single" collapsible className="space-y-3">
               {faqs.map((faq, index) => (
                 <AccordionItem 
                   key={index} 
                   value={`faq-${index}`}
-                  className="border border-border rounded-lg px-4"
+                  className="glass rounded-xl px-5 border-0"
                 >
-                  <AccordionTrigger className="py-3 text-sm hover:no-underline text-left">
-                    {faq.question}
+                  <AccordionTrigger className="py-4 hover:no-underline text-left">
+                    <span className="font-medium text-foreground">{faq.question}</span>
                   </AccordionTrigger>
-                  <AccordionContent className="pb-3 text-sm text-muted-foreground">
-                    {faq.answer}
+                  <AccordionContent className="pb-4">
+                    <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
                   </AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>
           </div>
 
-          {/* Disclaimer */}
-          <p className="text-xs text-muted-foreground text-center mt-6">
-            Content is for educational purposes only. Always consult a certified tax professional for advice.
-          </p>
+          {/* Upgrade CTA */}
+          {!isBusinessPlus && (
+            <div className="neon-border p-8 text-center animate-fade-in">
+              <div className="w-16 h-16 rounded-full bg-gradient-accent glow-accent flex items-center justify-center mx-auto mb-4">
+                <Crown className="h-8 w-8 text-accent-foreground" />
+              </div>
+              <h3 className="text-xl font-bold text-foreground mb-2">
+                Unlock Premium Content
+              </h3>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                Get access to advanced tax guides, freelancer tips, and audit preparation guides.
+              </p>
+              <Button variant="glow" size="lg" onClick={() => navigate('/pricing')}>
+                View Plans
+              </Button>
+            </div>
+          )}
         </div>
       </main>
     </div>

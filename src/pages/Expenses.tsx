@@ -26,7 +26,8 @@ import {
   Crown,
   FileSpreadsheet,
   PieChart,
-  Loader2
+  Loader2,
+  Sparkles
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import {
@@ -37,6 +38,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { ExpenseCharts } from "@/components/ExpenseCharts";
 
 interface Expense {
   id: string;
@@ -68,6 +70,7 @@ const Expenses = () => {
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [filterBusinessId, setFilterBusinessId] = useState<string>('all');
+  const [showCharts, setShowCharts] = useState(false);
   const [newExpense, setNewExpense] = useState({
     date: new Date().toISOString().split('T')[0],
     description: '',
@@ -117,19 +120,25 @@ const Expenses = () => {
 
   if (!isBasicPlus) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
+      <div className="min-h-screen bg-gradient-hero overflow-hidden">
+        {/* Background Effects */}
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-warning/10 blur-3xl animate-float-slow" />
+          <div className="bg-mesh absolute inset-0" />
+        </div>
+
         <NavMenu />
-        <div className="container mx-auto px-4 py-20 text-center">
+        <div className="container mx-auto px-4 py-20 text-center relative z-10">
           <div className="mx-auto max-w-md">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-warning/10">
-              <Crown className="h-10 w-10 text-warning" />
+            <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-accent glow-accent">
+              <Crown className="h-12 w-12 text-accent-foreground" />
             </div>
-            <h1 className="text-2xl font-bold text-foreground mb-3">Expense Tracking</h1>
-            <p className="text-muted-foreground mb-6">
+            <h1 className="text-3xl font-bold text-foreground mb-3">Expense Tracking</h1>
+            <p className="text-lg text-muted-foreground mb-8">
               Track income and expenses to get real-time tax estimates. Available on Basic+ plans.
             </p>
-            <Button variant="hero" onClick={() => navigate('/pricing')}>
-              <Crown className="h-4 w-4" />
+            <Button variant="glow" size="lg" onClick={() => navigate('/pricing')}>
+              <Crown className="h-5 w-5" />
               Upgrade to Basic
             </Button>
           </div>
@@ -319,8 +328,10 @@ const Expenses = () => {
       <div className="min-h-screen bg-gradient-hero">
         <NavMenu />
         <div className="container mx-auto px-4 py-20 text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground mt-4">Loading expenses...</p>
+          <div className="glass-frosted p-8 rounded-3xl inline-block">
+            <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" />
+            <p className="text-muted-foreground mt-4">Loading expenses...</p>
+          </div>
         </div>
       </div>
     );
@@ -328,70 +339,66 @@ const Expenses = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
+      {/* Premium Background Effects */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-1/3 w-[600px] h-[600px] rounded-full bg-primary/5 blur-3xl animate-float-slow" />
+        <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] rounded-full bg-accent/5 blur-3xl animate-float" />
+        <div className="bg-mesh absolute inset-0" />
+        <div className="bg-dots absolute inset-0 opacity-30" />
+      </div>
+
       <NavMenu />
 
-      <main className="container mx-auto px-4 py-6 pb-8 flex-1">
-        <div className="mx-auto max-w-4xl">
+      <main className="container mx-auto px-4 py-6 pb-8 flex-1 relative z-10">
+        <div className="mx-auto max-w-5xl">
           {/* Header */}
-          <div className="text-center mb-8 animate-slide-up">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary">
-              <Receipt className="h-8 w-8 text-primary-foreground" />
+          <div className="text-center mb-10 animate-slide-up">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-primary glow-primary">
+              <Receipt className="h-10 w-10 text-primary-foreground" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+            <h1 className="text-4xl font-bold text-foreground mb-3">
               Expense Tracking
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-lg text-muted-foreground">
               Track income and expenses for real-time tax estimates
             </p>
           </div>
 
-          {/* Summary Cards */}
-          <div className="grid gap-2 sm:gap-4 grid-cols-2 sm:grid-cols-4 mb-6 animate-slide-up">
-            <div className="rounded-xl border border-border bg-card p-2 sm:p-4 shadow-card overflow-hidden">
-              <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
-                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-success flex-shrink-0" />
-                <span className="text-[10px] sm:text-sm text-muted-foreground truncate">Income</span>
+          {/* Summary Cards - Glass Design */}
+          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-8 animate-slide-up-delay-1">
+            {[
+              { icon: TrendingUp, value: totalIncome, label: 'Income', color: 'success', glowClass: 'glow-success' },
+              { icon: TrendingDown, value: totalExpenses, label: 'Expenses', color: 'destructive', glowClass: '' },
+              { icon: Receipt, value: deductibleExpenses, label: 'Deductible', color: 'primary', glowClass: '' },
+              { icon: Calculator, value: estimatedTax, label: 'Est. Tax', color: 'warning', glowClass: 'glow-accent' }
+            ].map((stat, idx) => (
+              <div key={idx} className="glass hover-lift p-4 sm:p-5 rounded-2xl">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className={`p-2 rounded-lg bg-${stat.color}/10 ${stat.glowClass}`}>
+                    <stat.icon className={`h-4 w-4 text-${stat.color}`} />
+                  </div>
+                  <span className="text-sm text-muted-foreground">{stat.label}</span>
+                </div>
+                <p className={`text-xl sm:text-2xl font-bold text-${stat.color} truncate`}>
+                  {formatCurrency(stat.value)}
+                </p>
               </div>
-              <p className="text-base sm:text-xl font-bold text-success truncate">{formatCurrency(totalIncome)}</p>
-            </div>
-            <div className="rounded-xl border border-border bg-card p-2 sm:p-4 shadow-card overflow-hidden">
-              <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
-                <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4 text-destructive flex-shrink-0" />
-                <span className="text-[10px] sm:text-sm text-muted-foreground truncate">Expenses</span>
-              </div>
-              <p className="text-base sm:text-xl font-bold text-destructive truncate">{formatCurrency(totalExpenses)}</p>
-            </div>
-            <div className="rounded-xl border border-border bg-card p-2 sm:p-4 shadow-card overflow-hidden">
-              <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
-                <Receipt className="h-3 w-3 sm:h-4 sm:w-4 text-primary flex-shrink-0" />
-                <span className="text-[10px] sm:text-sm text-muted-foreground truncate">Deductible</span>
-              </div>
-              <p className="text-base sm:text-xl font-bold text-foreground truncate">{formatCurrency(deductibleExpenses)}</p>
-            </div>
-            <div className="rounded-xl border border-border bg-card p-2 sm:p-4 shadow-card overflow-hidden">
-              <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
-                <Calculator className="h-3 w-3 sm:h-4 sm:w-4 text-warning flex-shrink-0" />
-                <span className="text-[10px] sm:text-sm text-muted-foreground truncate">Est. Tax</span>
-              </div>
-              <p className="text-base sm:text-xl font-bold text-warning truncate">{formatCurrency(estimatedTax)}</p>
-            </div>
+            ))}
           </div>
 
-          {/* Action Buttons & Filter */}
-          <div className="flex flex-wrap items-center gap-2 mb-6 animate-slide-up">
-            <Button variant="hero" size="sm" className="text-xs sm:text-sm" onClick={() => setShowAddDialog(true)}>
-              <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="hidden xs:inline">Add</span> Entry
+          {/* Action Buttons - Premium Style */}
+          <div className="flex flex-wrap items-center gap-3 mb-8 animate-slide-up-delay-2">
+            <Button variant="glow" onClick={() => setShowAddDialog(true)}>
+              <Plus className="h-4 w-4" />
+              Add Entry
             </Button>
-            <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={handleCSVImport}>
-              <Upload className="h-3 w-3 sm:h-4 sm:w-4" />
+            <Button variant="glass" onClick={handleCSVImport}>
+              <Upload className="h-4 w-4" />
               <span className="hidden sm:inline">Import CSV</span>
               <span className="sm:hidden">Import</span>
             </Button>
             <Button 
-              variant="outline"
-              size="sm"
-              className="text-xs sm:text-sm"
+              variant="glass"
               onClick={() => navigate('/calculator', { 
                 state: { 
                   prefill: { 
@@ -402,13 +409,21 @@ const Expenses = () => {
               })}
               disabled={totalIncome === 0}
             >
-              <Calculator className="h-3 w-3 sm:h-4 sm:w-4" />
+              <Calculator className="h-4 w-4" />
               <span className="hidden sm:inline">Use in Calculator</span>
               <span className="sm:hidden">Calculate</span>
             </Button>
+            <Button 
+              variant="glass"
+              onClick={() => setShowCharts(!showCharts)}
+            >
+              <PieChart className="h-4 w-4" />
+              <span className="hidden sm:inline">{showCharts ? 'Hide' : 'Show'} Charts</span>
+              <span className="sm:hidden">Charts</span>
+            </Button>
             {savedBusinesses.length > 0 && (
               <Select value={filterBusinessId} onValueChange={setFilterBusinessId}>
-                <SelectTrigger className="w-[140px] sm:w-[180px] h-8 sm:h-10 text-xs sm:text-sm">
+                <SelectTrigger className="w-[180px] glass border-0">
                   <SelectValue placeholder="Filter" />
                 </SelectTrigger>
                 <SelectContent>
@@ -423,66 +438,82 @@ const Expenses = () => {
             )}
           </div>
 
-          {/* Expense List */}
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card animate-slide-up">
-            <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-              <FileSpreadsheet className="h-5 w-5 text-primary" />
-              Transactions ({expenses.length})
+          {/* Charts Section */}
+          {showCharts && filteredExpenses.length > 0 && (
+            <div className="glass-frosted rounded-3xl p-6 mb-8 animate-fade-in">
+              <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                <PieChart className="h-5 w-5 text-primary" />
+                Expense Analytics
+              </h2>
+              <ExpenseCharts expenses={filteredExpenses} />
+            </div>
+          )}
+
+          {/* Expense List - Glass Card */}
+          <div className="glass-frosted rounded-3xl p-6 animate-fade-in">
+            <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-primary/10">
+                <FileSpreadsheet className="h-5 w-5 text-primary" />
+              </div>
+              Transactions ({filteredExpenses.length})
             </h2>
 
             {filteredExpenses.length === 0 ? (
-              <div className="text-center py-10">
-                <Receipt className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground mb-4">
+              <div className="text-center py-16">
+                <div className="w-20 h-20 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                  <Receipt className="h-10 w-10 text-muted-foreground" />
+                </div>
+                <p className="text-muted-foreground mb-6">
                   {filterBusinessId !== 'all' ? 'No entries for this business' : 'No entries yet'}
                 </p>
                 <div className="flex gap-3 justify-center">
-                  <Button variant="outline" onClick={() => setShowAddDialog(true)}>
+                  <Button variant="glow" onClick={() => setShowAddDialog(true)}>
                     <Plus className="h-4 w-4" />
                     Add Entry
                   </Button>
-                  <Button variant="outline" onClick={handleCSVImport}>
+                  <Button variant="glass" onClick={handleCSVImport}>
                     <Upload className="h-4 w-4" />
                     Import Mock CSV
                   </Button>
                 </div>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {filteredExpenses.map((expense) => {
                   const businessName = getBusinessName(expense.businessId);
                   return (
                     <div 
                       key={expense.id}
-                      className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-secondary/30 transition-colors"
+                      className="glass flex items-center justify-between p-4 rounded-xl hover-lift group"
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="text-xl">{getCategoryIcon(expense.category)}</span>
+                      <div className="flex items-center gap-4">
+                        <span className="text-2xl">{getCategoryIcon(expense.category)}</span>
                         <div>
-                          <p className="font-medium text-foreground text-sm">{expense.description}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(expense.date).toLocaleDateString('en-NG', { 
-                              day: 'numeric', 
-                              month: 'short', 
-                              year: 'numeric' 
-                            })}
+                          <p className="font-medium text-foreground">{expense.description}</p>
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                            <span>{new Date(expense.date).toLocaleDateString()}</span>
                             {businessName && (
-                              <span className="ml-2 text-primary">• {businessName}</span>
+                              <>
+                                <span>•</span>
+                                <span>{businessName}</span>
+                              </>
                             )}
                             {expense.isDeductible && (
-                              <span className="ml-2 text-success">• Deductible</span>
+                              <span className="px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20">
+                                Deductible
+                              </span>
                             )}
-                          </p>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className={`font-semibold ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
+                      <div className="flex items-center gap-4">
+                        <span className={`font-bold ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
                           {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
                         </span>
                         <Button 
                           variant="ghost" 
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          size="icon" 
+                          className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
                           onClick={() => handleDeleteExpense(expense.id)}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -494,135 +525,101 @@ const Expenses = () => {
               </div>
             )}
           </div>
-
-          {/* Tax Estimate Card */}
-          {expenses.length > 0 && (
-            <div className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-card animate-slide-up">
-              <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                <PieChart className="h-5 w-5 text-primary" />
-                Real-Time Tax Estimate
-              </h2>
-              <div className="grid gap-4 sm:grid-cols-3">
-                <div className="p-4 rounded-lg bg-secondary/50">
-                  <p className="text-sm text-muted-foreground mb-1">Net Income</p>
-                  <p className="text-xl font-bold text-foreground">
-                    {formatCurrency(totalIncome - totalExpenses)}
-                  </p>
-                </div>
-                <div className="p-4 rounded-lg bg-secondary/50">
-                  <p className="text-sm text-muted-foreground mb-1">Taxable Income</p>
-                  <p className="text-xl font-bold text-foreground">
-                    {formatCurrency(taxableIncome)}
-                  </p>
-                </div>
-                <div className="p-4 rounded-lg bg-primary/10">
-                  <p className="text-sm text-muted-foreground mb-1">Estimated Tax (PIT)</p>
-                  <p className="text-xl font-bold text-primary">
-                    {formatCurrency(estimatedTax)}
-                  </p>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-4">
-                Estimate based on 2026 PIT rules. Actual tax may vary. Use the full calculator for accurate results.
-              </p>
-            </div>
-          )}
-
-          {/* Disclaimer */}
-          <p className="text-xs text-muted-foreground text-center mt-6">
-            Expenses are saved to your account and persist across sessions.
-          </p>
         </div>
       </main>
 
-      {/* Add Entry Dialog */}
+      {/* Add Expense Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent>
+        <DialogContent className="glass-frosted border-0 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Add Entry</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              Add Entry
+            </DialogTitle>
             <DialogDescription>
-              Add an income or expense entry to track
+              Add a new income or expense entry
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="date">Date</Label>
+            <div className="space-y-2">
+              <Label>Date</Label>
+              <div className="neumorphic-sm p-1">
                 <Input
-                  id="date"
                   type="date"
                   value={newExpense.date}
-                  onChange={(e) => setNewExpense(prev => ({ ...prev, date: e.target.value }))}
+                  onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
+                  className="border-0 bg-transparent"
                 />
               </div>
-              <div>
-                <Label htmlFor="category">Category</Label>
-                <Select
-                  value={newExpense.category}
-                  onValueChange={(value) => setNewExpense(prev => ({ 
-                    ...prev, 
-                    category: value as Expense['category'] 
-                  }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {EXPENSE_CATEGORIES.map((cat) => (
-                      <SelectItem key={cat.value} value={cat.value}>
-                        {cat.label} {cat.type === 'income' ? '(Income)' : ''}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Category</Label>
+              <Select 
+                value={newExpense.category} 
+                onValueChange={(v) => setNewExpense({ ...newExpense, category: v as Expense['category'] })}
+              >
+                <SelectTrigger className="neumorphic-sm border-0">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {EXPENSE_CATEGORIES.map(cat => (
+                    <SelectItem key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <div className="neumorphic-sm p-1">
+                <Input
+                  placeholder="e.g., Client payment, Office rent"
+                  value={newExpense.description}
+                  onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
+                  className="border-0 bg-transparent"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Amount (₦)</Label>
+              <div className="neumorphic-sm p-1">
+                <Input
+                  type="number"
+                  placeholder="0"
+                  value={newExpense.amount}
+                  onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
+                  className="border-0 bg-transparent"
+                />
               </div>
             </div>
             {savedBusinesses.length > 0 && (
-              <div>
-                <Label htmlFor="business">Link to Business (Optional)</Label>
-                <Select
-                  value={newExpense.businessId}
-                  onValueChange={(value) => setNewExpense(prev => ({ ...prev, businessId: value }))}
+              <div className="space-y-2">
+                <Label>Business (optional)</Label>
+                <Select 
+                  value={newExpense.businessId} 
+                  onValueChange={(v) => setNewExpense({ ...newExpense, businessId: v })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="neumorphic-sm border-0">
                     <SelectValue placeholder="Select business" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">No business</SelectItem>
-                    {savedBusinesses.map((business) => (
-                      <SelectItem key={business.id} value={business.id}>
-                        {business.name}
-                      </SelectItem>
+                    {savedBusinesses.map(b => (
+                      <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
             )}
-            <div>
-              <Label htmlFor="description">Description</Label>
-              <Input
-                id="description"
-                value={newExpense.description}
-                onChange={(e) => setNewExpense(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="e.g., Client Payment, Office Rent"
-              />
-            </div>
-            <div>
-              <Label htmlFor="amount">Amount (₦)</Label>
-              <Input
-                id="amount"
-                type="number"
-                value={newExpense.amount}
-                onChange={(e) => setNewExpense(prev => ({ ...prev, amount: e.target.value }))}
-                placeholder="0"
-              />
-            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+            <Button variant="ghost" onClick={() => setShowAddDialog(false)}>
               Cancel
             </Button>
-            <Button onClick={handleAddExpense}>Add Entry</Button>
+            <Button variant="glow" onClick={handleAddExpense}>
+              Add Entry
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
