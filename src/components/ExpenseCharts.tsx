@@ -42,6 +42,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   useEffect(() => {
     // Trigger entrance animation after mount
@@ -52,6 +53,10 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
       clearTimeout(animTimer);
     };
   }, []);
+
+  const handlePieClick = (data: any, index: number) => {
+    setActiveIndex(activeIndex === index ? null : index);
+  };
 
   // Category breakdown for pie chart (expenses only)
   const categoryData = useMemo(() => {
@@ -117,7 +122,7 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
       >
         <h3 className="font-semibold text-foreground mb-4">Expense Breakdown</h3>
         {categoryData.length > 0 ? (
-          <div className="h-[20rem]">
+          <div className="h-[20rem] relative">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -131,10 +136,26 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
                   animationBegin={200}
                   animationDuration={1000}
                   animationEasing="ease-out"
+                  onClick={handlePieClick}
+                  style={{ cursor: 'pointer' }}
                 >
-                  {categoryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
+                  {categoryData.map((entry, index) => {
+                    const isActive = activeIndex === index;
+                    return (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={entry.color}
+                        stroke={isActive ? 'hsl(var(--foreground))' : 'transparent'}
+                        strokeWidth={isActive ? 3 : 0}
+                        style={{
+                          filter: activeIndex !== null && !isActive ? 'opacity(0.4)' : 'none',
+                          transform: isActive ? 'scale(1.05)' : 'scale(1)',
+                          transformOrigin: 'center',
+                          transition: 'all 0.2s ease-out'
+                        }}
+                      />
+                    );
+                  })}
                 </Pie>
                 <Tooltip 
                   formatter={(value: number) => formatCurrency(value)}
@@ -146,6 +167,17 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
                 />
               </PieChart>
             </ResponsiveContainer>
+            {activeIndex !== null && categoryData[activeIndex] && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="text-center">
+                  <p className="text-lg font-bold text-foreground">{categoryData[activeIndex].name}</p>
+                  <p className="text-sm text-muted-foreground">{formatCurrency(categoryData[activeIndex].value)}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {((categoryData[activeIndex].value / categoryData.reduce((sum, e) => sum + e.value, 0)) * 100).toFixed(1)}%
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="h-[20rem] flex items-center justify-center text-muted-foreground">
@@ -160,8 +192,15 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
             {categoryData.map((entry, index) => {
               const total = categoryData.reduce((sum, e) => sum + e.value, 0);
               const percent = ((entry.value / total) * 100).toFixed(0);
+              const isActive = activeIndex === index;
               return (
-                <div key={`legend-${index}`} className="flex items-center gap-2 text-sm">
+                <div 
+                  key={`legend-${index}`} 
+                  className={`flex items-center gap-2 text-sm cursor-pointer rounded-md p-1 transition-all ${
+                    isActive ? 'bg-muted ring-2 ring-primary' : 'hover:bg-muted/50'
+                  } ${activeIndex !== null && !isActive ? 'opacity-40' : ''}`}
+                  onClick={() => setActiveIndex(isActive ? null : index)}
+                >
                   <div 
                     className="w-3 h-3 rounded-full flex-shrink-0" 
                     style={{ backgroundColor: entry.color }}
