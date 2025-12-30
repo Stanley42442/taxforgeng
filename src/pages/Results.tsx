@@ -21,9 +21,11 @@ import {
 } from "lucide-react";
 import { formatCurrency, calculateTax, type TaxResult, type TaxInputs } from "@/lib/taxCalculations";
 import { downloadPDF } from "@/lib/pdfExport";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { NavMenu } from "@/components/NavMenu";
 import {
   Dialog,
@@ -37,12 +39,41 @@ import {
 const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const result = location.state?.result as TaxResult | undefined;
   const inputs = location.state?.inputs as TaxInputs | undefined;
   const [showComparison, setShowComparison] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [businessName, setBusinessName] = useState("");
   const { canExport, showWatermark, tier, canSaveBusiness, addBusiness } = useSubscription();
+  const savedRef = useRef(false);
+
+  // Save calculation to database when results are displayed
+  useEffect(() => {
+    const saveCalculation = async () => {
+      if (!user || !result || !inputs || savedRef.current) return;
+      
+      savedRef.current = true;
+      
+      try {
+        const { error } = await supabase.from('tax_calculations').insert([{
+          user_id: user.id,
+          inputs: JSON.parse(JSON.stringify(inputs)),
+          result: JSON.parse(JSON.stringify(result)),
+        }]);
+        
+        if (error) {
+          console.error('Error saving calculation:', error);
+        } else {
+          console.log('Calculation saved successfully');
+        }
+      } catch (error) {
+        console.error('Error saving calculation:', error);
+      }
+    };
+
+    saveCalculation();
+  }, [user, result, inputs]);
 
   if (!result || !inputs) {
     return (
