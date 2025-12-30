@@ -116,10 +116,16 @@ const Reminders = () => {
   const toggleReminder = async (businessId: string, type: string) => {
     if (!user) return;
 
+    console.log('Toggle reminder - businessId:', businessId, 'type:', type);
+    console.log('Current reminders:', reminders);
+    
     const existing = reminders.find(r => r.businessId === businessId && r.type === type);
+    console.log('Found existing reminder:', existing);
     
     if (existing) {
       // Toggle existing reminder
+      console.log('Updating existing reminder, current enabled:', existing.enabled, 'new enabled:', !existing.enabled);
+      
       const { error } = await supabase
         .from('reminders')
         .update({ notify_email: !existing.enabled })
@@ -131,9 +137,14 @@ const Reminders = () => {
         return;
       }
 
-      setReminders(prev => prev.map(r => 
-        r.id === existing.id ? { ...r, enabled: !r.enabled } : r
-      ));
+      console.log('Database update successful, updating local state');
+      setReminders(prev => {
+        const updated = prev.map(r => 
+          r.id === existing.id ? { ...r, enabled: !r.enabled } : r
+        );
+        console.log('Updated reminders state:', updated);
+        return updated;
+      });
       toast.success(existing.enabled ? 'Reminder disabled' : 'Reminder enabled');
     } else {
       // Create new reminder
