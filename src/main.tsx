@@ -2,8 +2,9 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
-// Dynamic device-specific CSS will be loaded by useDeviceCSS hook
-// Import base device styles for initial render
+// Import all device-specific styles - CSS media queries handle when they apply
+import "./styles/mobile.css";
+import "./styles/tablet.css";
 import "./styles/desktop.css";
 
 createRoot(document.getElementById("root")!).render(<App />);
