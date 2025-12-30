@@ -117,19 +117,17 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
       >
         <h3 className="font-semibold text-foreground mb-4">Expense Breakdown</h3>
         {categoryData.length > 0 ? (
-          <div className="h-[28rem]">
+          <div className="h-[20rem]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={categoryData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={45}
-                  outerRadius={75}
+                  innerRadius={50}
+                  outerRadius={85}
                   paddingAngle={2}
                   dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  labelLine={false}
                   animationBegin={200}
                   animationDuration={1000}
                   animationEasing="ease-out"
@@ -150,8 +148,29 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="h-[28rem] flex items-center justify-center text-muted-foreground">
+          <div className="h-[20rem] flex items-center justify-center text-muted-foreground">
             No expense data yet
+          </div>
+        )}
+        {/* Color Key Legend */}
+        {categoryData.length > 0 && (
+          <div className={`mt-4 grid grid-cols-2 gap-2 transition-all duration-500 delay-300 ${
+            isVisible ? 'opacity-100' : 'opacity-0'
+          }`}>
+            {categoryData.map((entry, index) => {
+              const total = categoryData.reduce((sum, e) => sum + e.value, 0);
+              const percent = ((entry.value / total) * 100).toFixed(0);
+              return (
+                <div key={`legend-${index}`} className="flex items-center gap-2 text-sm">
+                  <div 
+                    className="w-3 h-3 rounded-full flex-shrink-0" 
+                    style={{ backgroundColor: entry.color }}
+                  />
+                  <span className="text-muted-foreground truncate">{entry.name}</span>
+                  <span className="font-medium text-foreground ml-auto">{percent}%</span>
+                </div>
+              );
+            })}
           </div>
         )}
         <div className={`mt-4 text-center transition-all duration-500 delay-500 ${
