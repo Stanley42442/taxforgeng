@@ -194,7 +194,7 @@ const Dashboard = () => {
   const totalTurnover = savedBusinesses.reduce((sum, b) => sum + b.turnover, 0);
 
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden relative">
+    <div className="min-h-screen flex flex-col relative" style={{ maxWidth: '100vw', overflowX: 'hidden' }}>
       {/* Background */}
       <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
       <div className="fixed inset-0 bg-mesh pointer-events-none" />
@@ -213,8 +213,8 @@ const Dashboard = () => {
       
       {showWelcome && <WelcomeSplash onComplete={() => setShowWelcome(false)} />}
 
-      <main className="flex-1 relative z-10 py-6 pb-8 px-4 w-full max-w-full box-border overflow-visible">
-        <div className="w-full lg:max-w-6xl lg:mx-auto">
+      <main className="flex-1 relative z-10 py-6 pb-8" style={{ paddingLeft: '16px', paddingRight: '16px', width: '100%', boxSizing: 'border-box' }}>
+        <div style={{ width: '100%', maxWidth: '100%' }}>
           {/* Header */}
           <div className="mb-8 animate-slide-up">
             <div className="flex items-center gap-4 mb-2">
