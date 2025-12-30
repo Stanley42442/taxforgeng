@@ -311,13 +311,13 @@ const NeumorphicInput = ({
 
   return (
     <div>
-      <Label className="flex items-center gap-1.5 mb-2.5 text-sm font-medium">
+      <Label className="flex items-center gap-1.5 mb-2.5 text-sm font-medium text-foreground">
         {label}
         {required && <span className="text-destructive">*</span>}
         <TooltipHelper content={tooltip} />
       </Label>
-      <div className="relative">
-        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
+      <div className="relative group">
+        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary font-semibold text-lg z-10">
           ₦
         </span>
         <Input
@@ -325,9 +325,10 @@ const NeumorphicInput = ({
           inputMode="numeric"
           value={displayValue}
           onChange={(e) => onChange(e.target.value)}
-          className="pl-9 h-12 rounded-xl neumorphic-inset border-0 bg-muted/30 focus:ring-2 focus:ring-primary/30 transition-all"
+          className="pl-10 h-14 rounded-xl border-2 border-border/60 bg-background/80 backdrop-blur-sm shadow-md text-lg font-medium text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-4 focus:ring-primary/20 focus:shadow-lg focus:shadow-primary/10 hover:border-primary/50 hover:shadow-md transition-all duration-300"
           placeholder="0"
         />
+        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
       </div>
     </div>
   );
