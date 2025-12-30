@@ -14,31 +14,40 @@
 
 /* Fix container centering */
 @media (max-width: 767px) {
-  /* Main content area padding */
+  /* Reset all max-width constraints on mobile */
+  .max-w-6xl,
+  .max-w-7xl,
+  .max-w-5xl,
+  .max-w-4xl,
+  .max-w-3xl,
+  .max-w-2xl,
+  .max-w-xl,
+  .max-w-lg,
+  .max-w-md {
+    max-width: 100% !important;
+  }
+  
+  /* Main content area - consistent padding */
   main {
     padding-left: 1rem !important;
     padding-right: 1rem !important;
     box-sizing: border-box !important;
   }
   
-  /* Inner wrappers should have no extra padding */
-  main > div,
-  main > .mx-auto,
-  main > div > .mx-auto {
+  /* Inner wrappers should have no extra padding/margins */
+  main > div {
     padding-left: 0 !important;
     padding-right: 0 !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
-    max-width: 100% !important;
-    width: 100% !important;
   }
   
   /* Container class fallback */
   .container {
     padding-left: 1rem !important;
     padding-right: 1rem !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
@@ -47,9 +56,11 @@
   /* Fix card grid centering */
   .grid {
     width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
   }
   
-  /* Ensure Card components have equal margins */
+  /* Ensure Card components fill width with no side margins */
   [class*="Card"],
   .glass-frosted {
     margin-left: 0 !important;
