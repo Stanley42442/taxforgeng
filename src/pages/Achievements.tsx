@@ -49,9 +49,29 @@ const Achievements = () => {
     return { level: 1, title: 'Beginner', nextLevel: 50 };
   };
 
-  const currentLevel = getLevel(stats.totalPoints);
-
+  // Calculate earned points from unlocked achievements based on actual activity
   const hasBadge = (badgeId: string) => earnedBadges.some(b => b.badgeId === badgeId);
+  
+  // Calculate points from achievements that should be unlocked based on stats
+  const calculateEarnedPoints = () => {
+    let points = 0;
+    if (stats.calculationsCount >= 1) points += 10; // first_calc
+    if (stats.businessesSaved >= 1) points += 50; // save_business
+    if (stats.expensesCount >= 1) points += 15; // expense_tracker
+    if (stats.calculationsCount >= 5) points += 25; // five_calcs
+    if (stats.calculationsCount >= 10) points += 50; // ten_calcs
+    if (stats.remindersSet >= 1) points += 20; // set_reminder
+    if (stats.businessesSaved >= 3) points += 75; // three_businesses
+    if (stats.expensesCount >= 10) points += 30; // ten_expenses
+    if (stats.streak >= 7) points += 100; // week_streak
+    if (hasBadge('mock_filing')) points += 100;
+    if (hasBadge('invite_team')) points += 50;
+    if (hasBadge('perfect_year')) points += 500;
+    return points;
+  };
+  
+  const actualPoints = Math.max(stats.totalPoints, calculateEarnedPoints());
+  const currentLevel = getLevel(actualPoints);
 
   const achievements: Achievement[] = [
     {
@@ -268,7 +288,7 @@ const Achievements = () => {
                 </div>
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-bold text-foreground">{currentLevel.title}</h2>
-                  <p className="text-muted-foreground">{stats.totalPoints || earnedPoints} total points</p>
+                  <p className="text-muted-foreground">{actualPoints} total points</p>
                 </div>
               </div>
               
@@ -290,14 +310,14 @@ const Achievements = () => {
                 <div className="flex justify-between text-sm mb-3">
                   <span className="text-muted-foreground">Progress to Level {currentLevel.level + 1}</span>
                   <span className="text-foreground font-semibold">
-                    {stats.totalPoints || earnedPoints} / {currentLevel.nextLevel}
+                    {actualPoints} / {currentLevel.nextLevel}
                   </span>
                 </div>
                 <div className="relative">
-                  <Progress value={Math.min(((stats.totalPoints || earnedPoints) / currentLevel.nextLevel) * 100, 100)} className="h-4" />
+                  <Progress value={Math.min((actualPoints / currentLevel.nextLevel) * 100, 100)} className="h-4" />
                   <div 
                     className="absolute top-0 left-0 h-4 rounded-full bg-gradient-primary animate-glow-pulse"
-                    style={{ width: `${Math.min(((stats.totalPoints || earnedPoints) / currentLevel.nextLevel) * 100, 100)}%` }}
+                    style={{ width: `${Math.min((actualPoints / currentLevel.nextLevel) * 100, 100)}%` }}
                   />
                 </div>
               </div>
