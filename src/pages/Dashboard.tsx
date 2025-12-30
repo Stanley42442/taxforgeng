@@ -194,7 +194,7 @@ const Dashboard = () => {
   const totalTurnover = savedBusinesses.reduce((sum, b) => sum + b.turnover, 0);
 
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden relative">
+    <div className="min-h-screen flex flex-col relative w-full max-w-full overflow-x-hidden">
       {/* Background */}
       <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
       <div className="fixed inset-0 bg-mesh pointer-events-none" />
@@ -213,23 +213,23 @@ const Dashboard = () => {
       
       {showWelcome && <WelcomeSplash onComplete={() => setShowWelcome(false)} />}
 
-      <main className="container mx-auto px-4 flex-1 relative z-10 py-6 pb-8">
-        <div className="mx-auto max-w-6xl">
+      <main className="flex-1 relative z-10 py-6 pb-8 px-4 w-full overflow-x-hidden">
+        <div className="w-full max-w-6xl mx-auto overflow-hidden">
           {/* Header */}
           <div className="mb-8 animate-slide-up">
             <div className="flex items-center gap-4 mb-2">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-primary shadow-lg glow-primary">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-primary shadow-lg glow-primary shrink-0">
                 <LayoutDashboard className="h-7 w-7 text-primary-foreground" />
               </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-foreground">Dashboard</h1>
-                <p className="text-muted-foreground text-sm">Overview of your businesses, expenses, and reminders</p>
+              <div className="min-w-0">
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground truncate">Dashboard</h1>
+                <p className="text-muted-foreground text-sm truncate">Overview of your businesses, expenses, and reminders</p>
               </div>
             </div>
           </div>
 
           {/* Bento Grid Summary Cards */}
-          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-8 animate-slide-up">
+          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-8 animate-slide-up [&>*]:min-w-0 [&>*]:overflow-hidden">
             <StatCard
               icon={Building2}
               label="Businesses"
@@ -268,7 +268,7 @@ const Dashboard = () => {
           </div>
 
           {/* Main Content Grid */}
-          <div className="grid gap-6 lg:grid-cols-2 animate-slide-up-delay-1">
+          <div className="grid gap-6 lg:grid-cols-2 animate-slide-up-delay-1 [&>*]:min-w-0 [&>*]:overflow-hidden">
             {/* Saved Businesses */}
             <Card className="glass-frosted shadow-futuristic border-border/40 hover-glow-primary transition-all duration-300">
               <CardHeader className="pb-4">
