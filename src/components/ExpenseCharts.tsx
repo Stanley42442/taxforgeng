@@ -117,15 +117,15 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
       >
         <h3 className="font-semibold text-foreground mb-4">Expense Breakdown</h3>
         {categoryData.length > 0 ? (
-          <div className="h-72 sm:h-80 md:h-96">
+          <div className="h-80 sm:h-96 md:h-[28rem]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={categoryData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
+                  innerRadius={45}
+                  outerRadius={75}
                   paddingAngle={2}
                   dataKey="value"
                   label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
@@ -150,7 +150,7 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="h-72 sm:h-80 md:h-96 flex items-center justify-center text-muted-foreground">
+          <div className="h-80 sm:h-96 md:h-[28rem] flex items-center justify-center text-muted-foreground">
             No expense data yet
           </div>
         )}
@@ -170,7 +170,7 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
       >
         <h3 className="font-semibold text-foreground mb-4">Monthly Overview</h3>
         {monthlyData.length > 0 ? (
-          <div className="h-72 sm:h-80 md:h-96">
+          <div className="h-80 sm:h-96 md:h-[28rem]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlyData}>
                 <XAxis 
@@ -216,7 +216,7 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="h-72 sm:h-80 md:h-96 flex items-center justify-center text-muted-foreground">
+          <div className="h-80 sm:h-96 md:h-[28rem] flex items-center justify-center text-muted-foreground">
             Add entries to see monthly trends
           </div>
         )}
