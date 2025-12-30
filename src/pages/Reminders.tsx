@@ -389,8 +389,8 @@ const Reminders = () => {
             {savedBusinesses.map(business => (
               <Card key={business.id} className="overflow-hidden">
                 <CardHeader className="bg-muted/50">
-                  <div className="flex items-center justify-between">
-                    <div>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="min-w-0 flex-1">
                       <CardTitle className="flex items-center gap-2">
                         {business.name}
                         {business.verificationStatus === 'verified' && (
