@@ -500,10 +500,10 @@ const BusinessReport = () => {
                   {businessExpenses.slice(0, 20).map((expense) => (
                     <div
                       key={expense.id}
-                      className="flex items-center justify-between p-3 rounded-lg border border-border"
+                      className="flex items-center justify-between gap-4 p-3 rounded-lg border border-border"
                     >
-                      <div>
-                        <p className="font-medium text-foreground text-sm">{expense.description}</p>
+                      <div className="min-w-0 flex-1 mr-3">
+                        <p className="font-medium text-foreground text-sm truncate">{expense.description}</p>
                         <p className="text-xs text-muted-foreground">
                           {new Date(expense.date).toLocaleDateString('en-NG', {
                             day: 'numeric',
@@ -515,7 +515,7 @@ const BusinessReport = () => {
                           )}
                         </p>
                       </div>
-                      <span className={`font-semibold ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
+                      <span className={`font-semibold flex-shrink-0 ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
                         {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
                       </span>
                     </div>

@@ -248,15 +248,15 @@ const Team = () => {
               {members.map((member, index) => (
                 <div 
                   key={member.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
+                  className="flex items-center justify-between gap-4 p-4 border rounded-lg"
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 min-w-0 flex-1">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                       <span className="text-lg font-medium text-primary">
                         {member.email.charAt(0).toUpperCase()}
                       </span>
                     </div>
-                    <div>
+                    <div className="min-w-0 mr-3">
                       <div className="flex items-center gap-2">
                         <p className="font-medium">{member.email}</p>
                         {index === 0 && (
@@ -281,7 +281,7 @@ const Team = () => {
                     </div>
                   </div>
                   {index !== 0 && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3 flex-shrink-0 ml-2">
                       {isCorporate && (
                         <Select 
                           value={member.role} 
@@ -315,16 +315,18 @@ const Team = () => {
 
         {!isCorporate && (
           <Card className="mt-6 border-accent/50 bg-accent/5">
-            <CardContent className="flex items-center justify-between p-4">
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="w-5 h-5 text-accent" />
+            <CardContent className="flex items-center justify-between gap-4 p-4">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <AlertTriangle className="w-5 h-5 text-accent flex-shrink-0" />
                 <span className="text-sm">
                   Upgrade to Corporate for unlimited team members and advanced role management
                 </span>
               </div>
-              <Link to="/pricing">
-                <Button variant="outline" size="sm">Upgrade</Button>
-              </Link>
+              <div className="flex-shrink-0 ml-2">
+                <Link to="/pricing">
+                  <Button variant="outline" size="sm">Upgrade</Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
         )}
