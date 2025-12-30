@@ -111,13 +111,13 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
     <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
       {/* Expense Category Pie Chart */}
       <div 
-        className={`rounded-xl border border-border bg-card p-4 sm:p-6 shadow-card transition-all duration-700 ease-out ${
+        className={`transition-all duration-700 ease-out ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}
       >
         <h3 className="font-semibold text-foreground mb-4">Expense Breakdown</h3>
         {categoryData.length > 0 ? (
-          <div className="h-80 sm:h-96 md:h-[28rem]">
+          <div className="h-[28rem]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -150,7 +150,7 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="h-80 sm:h-96 md:h-[28rem] flex items-center justify-center text-muted-foreground">
+          <div className="h-[28rem] flex items-center justify-center text-muted-foreground">
             No expense data yet
           </div>
         )}
@@ -164,13 +164,13 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
 
       {/* Monthly Income vs Expenses Bar Chart */}
       <div 
-        className={`rounded-xl border border-border bg-card p-4 sm:p-6 shadow-card transition-all duration-700 ease-out delay-150 ${
+        className={`transition-all duration-700 ease-out delay-150 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}
       >
         <h3 className="font-semibold text-foreground mb-4">Monthly Overview</h3>
         {monthlyData.length > 0 ? (
-          <div className="h-80 sm:h-96 md:h-[28rem]">
+          <div className="h-[28rem]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlyData}>
                 <XAxis 
@@ -216,7 +216,7 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="h-80 sm:h-96 md:h-[28rem] flex items-center justify-center text-muted-foreground">
+          <div className="h-[28rem] flex items-center justify-center text-muted-foreground">
             Add entries to see monthly trends
           </div>
         )}
