@@ -66,7 +66,12 @@ function isDueSoon(dueDate: Date, daysAhead: number = 3): boolean {
   const now = new Date();
   const futureDate = new Date(now);
   futureDate.setDate(futureDate.getDate() + daysAhead);
-  return dueDate >= now && dueDate <= futureDate;
+  
+  // Include reminders that are due within the next X days OR just became due (within past 5 minutes)
+  const pastBuffer = new Date(now);
+  pastBuffer.setMinutes(pastBuffer.getMinutes() - 5);
+  
+  return dueDate >= pastBuffer && dueDate <= futureDate;
 }
 
 function formatDate(date: Date): string {
