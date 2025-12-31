@@ -58,7 +58,9 @@ export const requestNotificationPermission = async (): Promise<boolean> => {
 
 // Show browser notification
 const showBrowserNotification = (title: string, body: string) => {
-  if (Notification.permission === "granted") {
+  const browserEnabled = localStorage.getItem('notification-browser-enabled') !== 'false';
+  
+  if (Notification.permission === "granted" && browserEnabled) {
     const notification = new Notification(title, {
       body,
       icon: "/favicon.ico",
@@ -73,6 +75,34 @@ const showBrowserNotification = (title: string, body: string) => {
       window.location.href = "/reminders";
     };
   }
+};
+
+// Save notification to localStorage for the notifications page
+const saveNotificationToStorage = (title: string, message: string, type: 'reminder' | 'warning' | 'info' | 'success') => {
+  try {
+    const existing = localStorage.getItem('app-notifications');
+    const notifications = existing ? JSON.parse(existing) : [];
+    
+    const newNotification = {
+      id: Date.now().toString(),
+      title,
+      message,
+      type,
+      timestamp: new Date().toISOString(),
+      read: false
+    };
+    
+    // Keep only last 50 notifications
+    const updated = [newNotification, ...notifications].slice(0, 50);
+    localStorage.setItem('app-notifications', JSON.stringify(updated));
+  } catch (error) {
+    console.error('Error saving notification:', error);
+  }
+};
+
+// Check if sound is enabled
+const isSoundEnabled = () => {
+  return localStorage.getItem('notification-sound-enabled') !== 'false';
 };
 
 interface DueReminder {
@@ -110,8 +140,10 @@ export const useReminderNotifications = () => {
       if (!notifiedReminders.current.has(reminder.id)) {
         notifiedReminders.current.add(reminder.id);
         
-        // Play sound
-        playNotificationSound();
+        // Play sound if enabled
+        if (isSoundEnabled()) {
+          playNotificationSound();
+        }
         
         // Show toast
         toast.warning(`Reminder: ${reminder.title}`, {
@@ -127,6 +159,13 @@ export const useReminderNotifications = () => {
         showBrowserNotification(
           "TaxForge NG Reminder",
           `${reminder.title} is due now!`
+        );
+        
+        // Save to notification list
+        saveNotificationToStorage(
+          `Reminder: ${reminder.title}`,
+          "This reminder is due now!",
+          'reminder'
         );
       }
     }
@@ -151,7 +190,10 @@ export const useReminderNotifications = () => {
       if (!notifiedReminders.current.has(overdueKey)) {
         notifiedReminders.current.add(overdueKey);
         
-        playNotificationSound();
+        // Play sound if enabled
+        if (isSoundEnabled()) {
+          playNotificationSound();
+        }
         
         toast.error(`Overdue: ${reminder.title}`, {
           description: "This reminder is now overdue!",
@@ -165,6 +207,13 @@ export const useReminderNotifications = () => {
         showBrowserNotification(
           "TaxForge NG - Overdue Reminder",
           `${reminder.title} is now overdue!`
+        );
+        
+        // Save to notification list
+        saveNotificationToStorage(
+          `Overdue: ${reminder.title}`,
+          "This reminder is now overdue!",
+          'warning'
         );
       }
     }
