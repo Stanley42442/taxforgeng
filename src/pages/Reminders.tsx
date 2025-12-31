@@ -12,11 +12,12 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Bell, Calendar as CalendarIcon, Mail, Plus, Settings, Clock, CheckCircle2, AlertTriangle, Building2, Crown, Loader2 } from "lucide-react";
+import { Bell, Calendar as CalendarIcon, Mail, Plus, Settings, Clock, CheckCircle2, AlertTriangle, Building2, Crown, Loader2, BellRing, Volume2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { requestNotificationPermission } from "@/hooks/useReminderNotifications";
 
 interface Reminder {
   id: string;
@@ -88,6 +89,27 @@ const Reminders = () => {
   const [customDate, setCustomDate] = useState<Date | undefined>(undefined);
   const [customTime, setCustomTime] = useState('09:00');
   const [customNote, setCustomNote] = useState('');
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | 'unsupported'>('default');
+
+  // Check notification permission on mount
+  useEffect(() => {
+    if ('Notification' in window) {
+      setNotificationPermission(Notification.permission);
+    } else {
+      setNotificationPermission('unsupported');
+    }
+  }, []);
+
+  const handleEnableNotifications = async () => {
+    const granted = await requestNotificationPermission();
+    if (granted) {
+      setNotificationPermission('granted');
+      toast.success('Push notifications enabled!');
+    } else {
+      setNotificationPermission(Notification.permission);
+      toast.error('Notification permission denied');
+    }
+  };
 
   // Fetch reminders from database
   const fetchReminders = useCallback(async () => {
@@ -389,6 +411,49 @@ const Reminders = () => {
             Set up automated reminders for your tax filing deadlines
           </p>
         </div>
+
+        {/* Notification Permission Card */}
+        {notificationPermission !== 'granted' && notificationPermission !== 'unsupported' && (
+          <Card className="mb-6 border-primary/20 bg-primary/5">
+            <CardContent className="py-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-primary/10">
+                    <BellRing className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Enable Push Notifications</p>
+                    <p className="text-sm text-muted-foreground">
+                      Get notified when reminders are due, even when the app is in the background
+                    </p>
+                  </div>
+                </div>
+                <Button onClick={handleEnableNotifications} size="sm" className="shrink-0">
+                  <Volume2 className="w-4 h-4 mr-2" />
+                  Enable Notifications
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {notificationPermission === 'granted' && (
+          <Card className="mb-6 border-success/20 bg-success/5">
+            <CardContent className="py-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-full bg-success/10">
+                  <CheckCircle2 className="w-5 h-5 text-success" />
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Notifications Enabled</p>
+                  <p className="text-sm text-muted-foreground">
+                    You'll receive sound and push notifications when reminders are due
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {savedBusinesses.length === 0 ? (
           <Card className="text-center py-12">

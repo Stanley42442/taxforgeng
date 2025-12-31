@@ -7,6 +7,7 @@ import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { ReminderNotificationProvider } from "@/components/ReminderNotificationProvider";
 import { lazy, Suspense } from "react";
 
 // Eagerly load Index for fast initial render
@@ -61,6 +62,7 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <ScrollToTop />
+              <ReminderNotificationProvider />
               <Suspense fallback={<PageLoader />}>
                 <Routes>
                   <Route path="/" element={<Index />} />
