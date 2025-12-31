@@ -35,6 +35,20 @@ const DEFAULT_REMINDERS = [
   { type: 'paye', name: 'PAYE Remittance', dueDate: '10th of each month', dayOfMonth: 10 },
 ];
 
+// Format due date for display - handles both ISO strings and readable text
+const formatDueDate = (dueDate: string): string => {
+  // Check if it's an ISO date string
+  if (dueDate.includes('T') || dueDate.match(/^\d{4}-\d{2}-\d{2}/)) {
+    try {
+      const date = new Date(dueDate);
+      return format(date, "PPP 'at' h:mm a");
+    } catch {
+      return dueDate;
+    }
+  }
+  return dueDate;
+};
+
 // Calculate the next due date based on reminder type
 const calculateNextDueDate = (type: string): Date => {
   const now = new Date();
@@ -518,7 +532,7 @@ const Reminders = () => {
                             </div>
                             <div className="min-w-0 mr-3">
                               <p className="font-medium text-sm truncate">{reminder.name}</p>
-                              <p className="text-xs text-muted-foreground truncate">{reminder.dueDate}</p>
+                              <p className="text-xs text-muted-foreground truncate">{formatDueDate(reminder.dueDate)}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3 flex-shrink-0 ml-2">
@@ -569,7 +583,7 @@ const Reminders = () => {
                                   </div>
                                   <div className="min-w-0 mr-3">
                                     <p className="font-medium text-sm truncate">{reminder.name}</p>
-                                    <p className="text-xs text-muted-foreground truncate">{reminder.dueDate}</p>
+                                    <p className="text-xs text-muted-foreground truncate">{formatDueDate(reminder.dueDate)}</p>
                                     {reminder.customNote && (
                                       <p className="text-xs text-muted-foreground italic truncate">{reminder.customNote}</p>
                                     )}
