@@ -43,6 +43,22 @@ const Notifications = () => {
   const [browserNotificationsEnabled, setBrowserNotificationsEnabled] = useState(true);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 
+  // Load notifications from localStorage
+  const loadNotifications = () => {
+    const savedNotifications = localStorage.getItem('app-notifications');
+    if (savedNotifications) {
+      try {
+        const parsed = JSON.parse(savedNotifications);
+        setNotifications(parsed.map((n: any) => ({
+          ...n,
+          timestamp: new Date(n.timestamp)
+        })));
+      } catch (e) {
+        console.error('Error parsing notifications:', e);
+      }
+    }
+  };
+
   useEffect(() => {
     if ('Notification' in window) {
       setNotificationPermission(Notification.permission);
@@ -56,19 +72,28 @@ const Notifications = () => {
     if (savedSound !== null) setSoundEnabled(savedSound === 'true');
     if (savedBrowser !== null) setBrowserNotificationsEnabled(savedBrowser === 'true');
 
-    // Load notifications from localStorage
-    const savedNotifications = localStorage.getItem('app-notifications');
-    if (savedNotifications) {
-      try {
-        const parsed = JSON.parse(savedNotifications);
-        setNotifications(parsed.map((n: any) => ({
-          ...n,
-          timestamp: new Date(n.timestamp)
-        })));
-      } catch (e) {
-        console.error('Error parsing notifications:', e);
+    // Load notifications initially
+    loadNotifications();
+
+    // Listen for storage changes to update notifications in real-time (cross-tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'app-notifications') {
+        loadNotifications();
       }
-    }
+    };
+
+    // Listen for custom event for same-tab updates
+    const handleNotificationAdded = () => {
+      loadNotifications();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('notification-added', handleNotificationAdded);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('notification-added', handleNotificationAdded);
+    };
   }, []);
 
   const handleEnableNotifications = async () => {

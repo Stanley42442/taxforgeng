@@ -286,16 +286,22 @@ const Reminders = () => {
 
   const [sendingEmail, setSendingEmail] = useState<string | null>(null);
 
-  const sendTestEmail = async (business: SavedBusiness, reminderType: string) => {
+  const sendTestEmail = async (business: SavedBusiness, reminderType: string, reminderId?: string) => {
     if (!user?.email) {
       toast.error('No email address found for your account');
       return;
     }
 
     const template = DEFAULT_REMINDERS.find(d => d.type === reminderType);
-    const reminder = reminders.find(r => r.businessId === business.id && r.type === reminderType);
+    // Find the specific reminder - use reminderId for custom reminders
+    const reminder = reminderId 
+      ? reminders.find(r => r.id === reminderId)
+      : reminders.find(r => r.businessId === business.id && r.type === reminderType);
     
-    setSendingEmail(`${business.id}-${reminderType}`);
+    // Use the actual reminder name, not the template name
+    const reminderTitle = reminder?.name || template?.name || reminderType;
+    
+    setSendingEmail(`${business.id}-${reminderType}-${reminderId || ''}`);
     
     try {
       const { data, error } = await supabase.functions.invoke('send-reminder-email', {
@@ -304,7 +310,7 @@ const Reminders = () => {
           businessName: business.name,
           reminderType: reminderType,
           dueDate: reminder?.dueDate || template?.dueDate || 'Soon',
-          reminderTitle: template?.name || reminderType,
+          reminderTitle: reminderTitle,
         },
       });
 
@@ -655,6 +661,22 @@ const Reminders = () => {
                                   </div>
                                 </div>
                                 <div className="flex items-center gap-3 flex-shrink-0 ml-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => sendTestEmail(business, reminder.type, reminder.id)}
+                                    className="text-xs px-2"
+                                    disabled={sendingEmail === `${business.id}-${reminder.type}-${reminder.id}`}
+                                  >
+                                    {sendingEmail === `${business.id}-${reminder.type}-${reminder.id}` ? (
+                                      <Loader2 className="w-3 h-3 animate-spin" />
+                                    ) : (
+                                      <Mail className="w-3 h-3" />
+                                    )}
+                                    <span className="hidden sm:inline ml-1">
+                                      {sendingEmail === `${business.id}-${reminder.type}-${reminder.id}` ? 'Sending...' : 'Test'}
+                                    </span>
+                                  </Button>
                                   <Button
                                     variant="ghost"
                                     size="sm"

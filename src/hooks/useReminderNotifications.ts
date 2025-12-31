@@ -95,6 +95,9 @@ const saveNotificationToStorage = (title: string, message: string, type: 'remind
     // Keep only last 50 notifications
     const updated = [newNotification, ...notifications].slice(0, 50);
     localStorage.setItem('app-notifications', JSON.stringify(updated));
+    
+    // Dispatch custom event for real-time updates within the same tab
+    window.dispatchEvent(new CustomEvent('notification-added', { detail: newNotification }));
   } catch (error) {
     console.error('Error saving notification:', error);
   }
