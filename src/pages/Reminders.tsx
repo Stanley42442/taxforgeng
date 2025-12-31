@@ -232,7 +232,7 @@ const Reminders = () => {
         title: customName,
         due_date: dueDate.toISOString(),
         notify_email: true,
-        description: customNote || format(customDate, 'PPP'),
+        description: customNote || null,
       })
       .select()
       .single();
