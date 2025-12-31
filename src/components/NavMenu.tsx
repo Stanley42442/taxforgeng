@@ -139,20 +139,27 @@ export const NavMenu = () => {
               </span>
             )}
             <ThemeToggle />
+
+            {/* Notification Badge - next to hamburger */}
+            {urgentCount > 0 && (
+              <Link to="/reminders" className="relative">
+                <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10 shrink-0 relative">
+                  <BellRing className="h-4 w-4 sm:h-5 sm:w-5 text-destructive" />
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center animate-pulse"
+                  >
+                    {urgentCount > 9 ? '9+' : urgentCount}
+                  </Badge>
+                </Button>
+              </Link>
+            )}
             
             {/* Hamburger Menu - always visible */}
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10 shrink-0 relative">
+                <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10 shrink-0">
                   <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
-                  {urgentCount > 0 && (
-                    <Badge 
-                      variant="destructive" 
-                      className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center"
-                    >
-                      {urgentCount > 9 ? '9+' : urgentCount}
-                    </Badge>
-                  )}
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
