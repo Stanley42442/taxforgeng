@@ -32,7 +32,6 @@ export const useUpcomingReminders = () => {
         .select("id, title, due_date, business_id")
         .eq("user_id", user.id)
         .eq("is_completed", false)
-        .eq("notify_email", true)
         .order("due_date", { ascending: true });
 
       if (error) {
