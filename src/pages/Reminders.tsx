@@ -202,10 +202,12 @@ const Reminders = () => {
   const addCustomReminder = async () => {
     if (!user || !selectedBusiness || !customName || !customDate) return;
     
-    // Parse time and combine with date
+    // Parse time and combine with date using local timezone
     const [hours, minutes] = customTime.split(':').map(Number);
-    const parsedDate = new Date(customDate);
-    parsedDate.setHours(hours, minutes, 0, 0);
+    const year = customDate.getFullYear();
+    const month = customDate.getMonth();
+    const day = customDate.getDate();
+    const dueDate = new Date(year, month, day, hours, minutes, 0, 0);
     
     const { data, error } = await supabase
       .from('reminders')
@@ -214,7 +216,7 @@ const Reminders = () => {
         business_id: selectedBusiness.id,
         reminder_type: 'custom',
         title: customName,
-        due_date: parsedDate.toISOString(),
+        due_date: dueDate.toISOString(),
         notify_email: true,
         description: customNote || format(customDate, 'PPP'),
       })
@@ -232,7 +234,7 @@ const Reminders = () => {
       businessId: data.business_id,
       type: 'custom',
       name: customName,
-      dueDate: parsedDate.toISOString(),
+      dueDate: dueDate.toISOString(),
       enabled: true,
       customNote,
     };
