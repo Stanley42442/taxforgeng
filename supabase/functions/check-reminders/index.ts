@@ -288,9 +288,33 @@ const handler = async (req: Request): Promise<Response> => {
 
     for (const reminder of (reminders as ReminderRow[] || [])) {
       const dueDate = new Date(reminder.due_date);
+      const now = new Date();
       
-      if (!isDueSoon(dueDate, 3)) {
-        continue;
+      // For custom reminders, only send email when the exact time is reached (within 5 min window)
+      // For standard reminders, send 3 days ahead as before
+      if (reminder.reminder_type === 'custom') {
+        // Check if the reminder time has arrived (within 5 minutes of due time)
+        const timeDiff = now.getTime() - dueDate.getTime();
+        const isTimeToSend = timeDiff >= 0 && timeDiff <= 5 * 60 * 1000; // 0 to 5 minutes after due time
+        
+        if (!isTimeToSend) {
+          continue;
+        }
+      } else {
+        // Standard reminders: send if due within 3 days
+        if (!isDueSoon(dueDate, 3)) {
+          continue;
+        }
+      }
+
+      // Check if we already sent a notification recently (within last hour) to prevent duplicates
+      const lastNotified = (reminder as any).last_notified_at ? new Date((reminder as any).last_notified_at) : null;
+      if (lastNotified) {
+        const hourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+        if (lastNotified > hourAgo) {
+          console.log(`Skipping reminder ${reminder.id} - already notified at ${lastNotified.toISOString()}`);
+          continue;
+        }
       }
 
       console.log(`Processing reminder: ${reminder.title} (due: ${dueDate.toISOString()})`);
@@ -319,9 +343,8 @@ const handler = async (req: Request): Promise<Response> => {
         }
       }
 
-      const now = new Date();
       const daysUntilDue = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      const urgencyText = daysUntilDue <= 0 ? "TODAY" : daysUntilDue === 1 ? "TOMORROW" : `in ${daysUntilDue} days`;
+      const urgencyText = daysUntilDue <= 0 ? "NOW" : daysUntilDue === 1 ? "TOMORROW" : `in ${daysUntilDue} days`;
 
       try {
         const html = generateEmailHtml({
@@ -336,13 +359,20 @@ const handler = async (req: Request): Promise<Response> => {
         const emailResponse = await resend.emails.send({
           from: "TaxForge NG <onboarding@resend.dev>",
           to: [(profile as ProfileRow).email!],
-          subject: `⚠️ Tax Deadline ${urgencyText}: ${reminder.title}`,
+          subject: `⚠️ Tax Reminder ${urgencyText}: ${reminder.title}`,
           html,
         });
 
         console.log(`Email sent to ${(profile as ProfileRow).email}:`, emailResponse);
         emailsSent.push((profile as ProfileRow).email!);
 
+        // Update last_notified_at to prevent duplicate emails
+        await supabase
+          .from('reminders')
+          .update({ last_notified_at: now.toISOString() })
+          .eq('id', reminder.id);
+
+        // For standard reminders that are past due, update to next occurrence
         if (reminder.reminder_type !== 'custom' && daysUntilDue <= 0) {
           const nextDueDate = getNextDueDate(reminder.reminder_type, dueDate);
           

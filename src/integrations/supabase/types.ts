@@ -218,6 +218,7 @@ export type Database = {
           due_date: string
           id: string
           is_completed: boolean
+          last_notified_at: string | null
           notify_email: boolean
           reminder_type: string
           title: string
@@ -230,6 +231,7 @@ export type Database = {
           due_date: string
           id?: string
           is_completed?: boolean
+          last_notified_at?: string | null
           notify_email?: boolean
           reminder_type: string
           title: string
@@ -242,6 +244,7 @@ export type Database = {
           due_date?: string
           id?: string
           is_completed?: boolean
+          last_notified_at?: string | null
           notify_email?: boolean
           reminder_type?: string
           title?: string
