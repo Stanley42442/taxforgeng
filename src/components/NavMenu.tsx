@@ -141,22 +141,23 @@ export const NavMenu = () => {
             <ThemeToggle />
 
             {/* Notification Badge - next to hamburger */}
-            <Link to="/reminders" className="relative">
-              <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10 shrink-0 relative">
-                {urgentCount > 0 ? (
-                  <BellRing className="h-4 w-4 sm:h-5 sm:w-5 text-destructive" />
-                ) : (
-                  <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-                )}
-                {urgentCount > 0 && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center animate-pulse"
-                  >
-                    {urgentCount > 9 ? '9+' : urgentCount}
-                  </Badge>
-                )}
-              </Button>
+            <Link 
+              to="/reminders" 
+              className="relative flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              {urgentCount > 0 ? (
+                <BellRing className="h-4 w-4 sm:h-5 sm:w-5 text-destructive" />
+              ) : (
+                <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+              )}
+              {urgentCount > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center animate-pulse pointer-events-none"
+                >
+                  {urgentCount > 9 ? '9+' : urgentCount}
+                </Badge>
+              )}
             </Link>
             
             {/* Hamburger Menu - always visible */}
