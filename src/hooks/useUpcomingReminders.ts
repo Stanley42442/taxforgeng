@@ -58,11 +58,9 @@ export const useUpcomingReminders = () => {
         };
       });
 
-      // Count urgent (overdue or due within 7 days)
-      const urgent = mapped.filter((r) => r.isOverdue || r.isDueSoon).length;
-
+      // Count all incomplete reminders
       setReminders(mapped);
-      setUrgentCount(urgent);
+      setUrgentCount(mapped.length);
       setLoading(false);
     };
 
