@@ -336,15 +336,11 @@ const Expenses = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative w-full max-w-full overflow-x-hidden">
-      {/* Background */}
-      <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
-      <div className="fixed inset-0 bg-mesh pointer-events-none" />
-      
+    <div className="min-h-screen bg-background">
       <NavMenu />
 
-      <main className="flex-1 relative z-10 py-6 pb-8 px-4 w-full overflow-x-hidden">
-        <div className="w-full max-w-5xl mx-auto overflow-hidden">
+      <main className="container mx-auto px-4 py-6 pb-8">
+        <div className="max-w-5xl mx-auto">
           {/* Header */}
           <div className="text-center mb-10 animate-slide-up">
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-primary glow-primary">
