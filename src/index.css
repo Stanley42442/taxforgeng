@@ -385,30 +385,43 @@
   }
 
   /* ================================================
-     HOVER & TRANSFORM EFFECTS
+   HOVER & TRANSFORM EFFECTS
      ================================================ */
   .hover-lift {
     @apply transition-all duration-300;
   }
-  .hover-lift:hover {
-    transform: translateY(-6px) scale(1.01);
-    box-shadow: var(--shadow-xl);
+  
+  /* Only apply hover transforms on devices that support hover (non-touch) */
+  @media (hover: hover) and (pointer: fine) {
+    .hover-lift:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: var(--shadow-xl);
+    }
   }
 
   .hover-scale {
     @apply transition-transform duration-300;
   }
-  .hover-scale:hover {
-    transform: scale(1.05);
+  
+  @media (hover: hover) and (pointer: fine) {
+    .hover-scale:hover {
+      transform: scale(1.05);
+    }
   }
 
   .floating-card {
     @apply transition-all duration-400;
-    transform-style: preserve-3d;
   }
-  .floating-card:hover {
-    transform: translateY(-8px) rotateX(2deg);
-    box-shadow: var(--shadow-2xl);
+  
+  /* Only apply 3D transforms on non-touch devices */
+  @media (hover: hover) and (pointer: fine) {
+    .floating-card {
+      transform-style: preserve-3d;
+    }
+    .floating-card:hover {
+      transform: translateY(-8px) rotateX(2deg);
+      box-shadow: var(--shadow-2xl);
+    }
   }
 
   /* ================================================

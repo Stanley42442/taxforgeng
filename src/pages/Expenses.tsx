@@ -339,7 +339,7 @@ const Expenses = () => {
     <div className="min-h-screen bg-gradient-hero">
       <NavMenu />
 
-      <main className="container mx-auto px-4 py-6 pb-8 relative z-10">
+      <main className="container mx-auto px-4 py-6 pb-8">
         <div className="mx-auto max-w-5xl">
           {/* Header */}
           <div className="text-center mb-10 animate-slide-up">
