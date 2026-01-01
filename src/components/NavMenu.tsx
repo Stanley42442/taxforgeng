@@ -142,7 +142,7 @@ export const NavMenu = () => {
 
             {/* Notification Badge - next to hamburger */}
             <Link 
-              to="/reminders" 
+              to="/notifications" 
               className="relative flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
             >
               {urgentCount > 0 ? (
