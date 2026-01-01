@@ -8,6 +8,7 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { useUpcomingReminders } from "@/hooks/useUpcomingReminders";
+import { useNotificationCount } from "@/hooks/useNotificationCount";
 import { Badge } from "@/components/ui/badge";
 import { 
   Calculator, 
@@ -50,6 +51,7 @@ export const NavMenu = () => {
   const { user, signOut, loading } = useAuth();
   const { isAdmin } = useAdminCheck();
   const { urgentCount } = useUpcomingReminders();
+  const { unreadCount: notificationCount } = useNotificationCount();
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -140,25 +142,22 @@ export const NavMenu = () => {
             )}
             <ThemeToggle />
 
-            {/* Notification Badge - next to hamburger */}
-            <Link 
-              to="/notifications" 
-              className="relative flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
-            >
-              {urgentCount > 0 ? (
+            {/* Notification Badge - not a link, just a visual indicator */}
+            <div className="relative flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10">
+              {notificationCount > 0 ? (
                 <BellRing className="h-4 w-4 sm:h-5 sm:w-5 text-destructive" />
               ) : (
                 <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
               )}
-              {urgentCount > 0 && (
+              {notificationCount > 0 && (
                 <Badge 
                   variant="destructive" 
                   className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center animate-pulse pointer-events-none"
                 >
-                  {urgentCount > 9 ? '9+' : urgentCount}
+                  {notificationCount > 9 ? '9+' : notificationCount}
                 </Badge>
               )}
-            </Link>
+            </div>
             
             {/* Hamburger Menu - always visible */}
             <Sheet open={open} onOpenChange={setOpen}>
