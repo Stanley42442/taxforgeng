@@ -12,27 +12,18 @@
   overflow-x: hidden;
 }
 
-/* Fix container centering and scrolling */
+/* Fix container centering */
 @media (max-width: 767px) {
-  /* Allow normal page scrolling, only prevent horizontal overflow */
   html {
     overflow-x: hidden;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
   }
   
   body {
     overflow-x: hidden;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
-    position: relative;
-    min-height: 100vh;
   }
   
   #root {
     overflow-x: hidden;
-    overflow-y: visible;
-    min-height: 100vh;
   }
   
   /* Container resets */
