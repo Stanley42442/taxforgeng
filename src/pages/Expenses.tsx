@@ -491,8 +491,8 @@ const Expenses = () => {
                       className="glass p-4 rounded-xl hover-lift group"
                     >
                       <div className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-2">
-                        {/* Top row: icon + description + delete button */}
-                        <div className="flex items-start gap-3 min-w-0">
+                        {/* Top row: icon + description */}
+                        <div className="col-span-2 flex items-start gap-3 min-w-0">
                           <span className="text-2xl flex-shrink-0">{getCategoryIcon(expense.category)}</span>
                           <div className="min-w-0 flex-1">
                             <p className="font-medium text-foreground">{expense.description}</p>
@@ -512,6 +512,8 @@ const Expenses = () => {
                             </div>
                           </div>
                         </div>
+                        
+                        {/* Bottom row: delete button left, amount right */}
                         <Button 
                           variant="ghost" 
                           size="icon" 
@@ -520,9 +522,7 @@ const Expenses = () => {
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
-                        
-                        {/* Bottom row: amount aligned to right, spanning second column */}
-                        <div className="col-start-2 text-right">
+                        <div className="text-right">
                           <span className={`font-bold text-lg ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
                             {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
                           </span>
