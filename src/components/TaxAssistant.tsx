@@ -50,132 +50,14 @@ export function TaxAssistant() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [position, setPosition] = useState<Position>(getStoredPosition);
-  const [isDragging, setIsDragging] = useState(false);
-  const hasMovedRef = useRef(false);
-  const dragStartPos = useRef<{ x: number; y: number; posX: number; posY: number } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // Lock body scroll when chat is open (only on mobile to prevent background scroll)
-  useEffect(() => {
-    if (isOpen) {
-      // Save current scroll position and lock
-      const scrollY = window.scrollY;
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
-    } else {
-      // Restore scroll position
-      const scrollY = document.body.style.top;
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0') * -1);
-      }
-    }
-    return () => {
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-    };
-  }, [isOpen]);
-
+  // Scroll to bottom of chat when new messages arrive
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
-
-  // Unified drag handlers
-  const handlePointerDown = useCallback((clientX: number, clientY: number) => {
-    setIsDragging(true);
-    hasMovedRef.current = false;
-    dragStartPos.current = { 
-      x: clientX, 
-      y: clientY, 
-      posX: position.x, 
-      posY: position.y 
-    };
-  }, [position]);
-
-  const handlePointerMove = useCallback((clientX: number, clientY: number) => {
-    if (!dragStartPos.current) return;
-    
-    const deltaX = clientX - dragStartPos.current.x;
-    const deltaY = clientY - dragStartPos.current.y;
-    
-    // Only consider it moved if dragged more than 8px
-    if (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8) {
-      hasMovedRef.current = true;
-    }
-    
-    const newX = Math.max(8, Math.min(window.innerWidth - 64, dragStartPos.current.posX - deltaX));
-    const newY = Math.max(8, Math.min(window.innerHeight - 64, dragStartPos.current.posY - deltaY));
-    setPosition({ x: newX, y: newY });
-  }, []);
-
-  const handlePointerUp = useCallback(() => {
-    if (hasMovedRef.current) {
-      savePosition(position);
-    }
-    setIsDragging(false);
-    dragStartPos.current = null;
-  }, [position]);
-
-  const handleClick = useCallback(() => {
-    // Only open if we didn't drag
-    if (!hasMovedRef.current) {
-      setIsOpen(true);
-    }
-    hasMovedRef.current = false;
-  }, []);
-
-  // Mouse events
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging) {
-        handlePointerMove(e.clientX, e.clientY);
-      }
-    };
-    const handleMouseUp = () => {
-      if (isDragging) {
-        handlePointerUp();
-      }
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDragging, handlePointerMove, handlePointerUp]);
-
-  // Touch events - only attach when dragging to avoid blocking page scroll
-  useEffect(() => {
-    if (!isDragging) return;
-    
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches[0]) {
-        e.preventDefault();
-        handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
-      }
-    };
-    const handleTouchEnd = () => {
-      handlePointerUp();
-    };
-
-    window.addEventListener("touchmove", handleTouchMove, { passive: false });
-    window.addEventListener("touchend", handleTouchEnd);
-
-    return () => {
-      window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, [isDragging, handlePointerMove, handlePointerUp]);
 
   const streamChat = async (userMessages: Message[]) => {
     const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tax-assistant`;
@@ -272,22 +154,11 @@ export function TaxAssistant() {
   if (!isOpen) {
     return (
       <button
-        onClick={handleClick}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          handlePointerDown(e.clientX, e.clientY);
-        }}
-        onTouchStart={(e) => {
-          const touch = e.touches[0];
-          if (touch) {
-            handlePointerDown(touch.clientX, touch.clientY);
-          }
-        }}
+        onClick={() => setIsOpen(true)}
         className="fixed h-14 w-14 rounded-full shadow-lg bg-gradient-primary hover:opacity-90 z-50 select-none flex items-center justify-center text-white"
         style={{
-          right: `${position.x}px`,
-          bottom: `${position.y}px`,
-          cursor: "grab",
+          right: "24px",
+          bottom: "24px",
           WebkitTapHighlightColor: "transparent",
         }}
       >
