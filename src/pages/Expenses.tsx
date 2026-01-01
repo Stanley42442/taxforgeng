@@ -28,7 +28,10 @@ import {
   FileSpreadsheet,
   PieChart,
   Loader2,
-  Sparkles
+  Sparkles,
+  CalendarIcon,
+  Filter,
+  X
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import {
@@ -40,6 +43,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { ExpenseCharts } from "@/components/ExpenseCharts";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface Expense {
   id: string;
@@ -72,6 +79,14 @@ const Expenses = () => {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [filterBusinessId, setFilterBusinessId] = useState<string>('all');
   const [showCharts, setShowCharts] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  
+  // Filter states
+  const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
+  const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+  
   const [newExpense, setNewExpense] = useState({
     date: new Date().toISOString().split('T')[0],
     description: '',
@@ -265,10 +280,43 @@ const Expenses = () => {
     toast.success("Entry deleted");
   };
 
-  // Filter expenses by business
-  const filteredExpenses = filterBusinessId === 'all' 
-    ? expenses 
-    : expenses.filter(e => e.businessId === filterBusinessId);
+  // Filter expenses by business, type, category, and date range
+  const filteredExpenses = expenses.filter(e => {
+    // Business filter
+    if (filterBusinessId !== 'all' && e.businessId !== filterBusinessId) return false;
+    
+    // Type filter (income/expense)
+    if (filterType !== 'all' && e.type !== filterType) return false;
+    
+    // Category filter
+    if (filterCategory !== 'all' && e.category !== filterCategory) return false;
+    
+    // Date range filter
+    if (dateFrom) {
+      const expenseDate = new Date(e.date);
+      if (expenseDate < dateFrom) return false;
+    }
+    if (dateTo) {
+      const expenseDate = new Date(e.date);
+      const endOfDay = new Date(dateTo);
+      endOfDay.setHours(23, 59, 59, 999);
+      if (expenseDate > endOfDay) return false;
+    }
+    
+    return true;
+  });
+
+  // Check if any filters are active
+  const hasActiveFilters = filterType !== 'all' || filterCategory !== 'all' || dateFrom !== undefined || dateTo !== undefined || filterBusinessId !== 'all';
+
+  // Clear all filters
+  const clearFilters = () => {
+    setFilterType('all');
+    setFilterCategory('all');
+    setDateFrom(undefined);
+    setDateTo(undefined);
+    setFilterBusinessId('all');
+  };
 
   // Calculate summaries from filtered expenses
   const totalIncome = filteredExpenses.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
@@ -391,7 +439,7 @@ const Expenses = () => {
           </div>
 
           {/* Action Buttons - Premium Style */}
-          <div className="flex flex-wrap items-center gap-3 mb-8 animate-slide-up-delay-2">
+          <div className="flex flex-wrap items-center gap-3 mb-4 animate-slide-up-delay-2">
             <Button variant="glow" onClick={() => setShowAddDialog(true)}>
               <Plus className="h-4 w-4" />
               Add Entry
@@ -425,22 +473,152 @@ const Expenses = () => {
               <span className="hidden sm:inline">{showCharts ? 'Hide' : 'Show'} Charts</span>
               <span className="sm:hidden">Charts</span>
             </Button>
-            {savedBusinesses.length > 0 && (
-              <Select value={filterBusinessId} onValueChange={setFilterBusinessId}>
-                <SelectTrigger className="w-[180px] glass border-0">
-                  <SelectValue placeholder="Filter" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Businesses</SelectItem>
-                  {savedBusinesses.map((business) => (
-                    <SelectItem key={business.id} value={business.id}>
-                      {business.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <Button 
+              variant={showFilters ? "default" : "glass"}
+              onClick={() => setShowFilters(!showFilters)}
+              className={hasActiveFilters ? "ring-2 ring-primary" : ""}
+            >
+              <Filter className="h-4 w-4" />
+              <span className="hidden sm:inline">Filters</span>
+              {hasActiveFilters && (
+                <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-primary text-primary-foreground">
+                  !
+                </span>
+              )}
+            </Button>
+            {hasActiveFilters && (
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground">
+                <X className="h-4 w-4" />
+                Clear
+              </Button>
             )}
           </div>
+
+          {/* Filter Panel */}
+          {showFilters && (
+            <div className="glass-frosted rounded-2xl p-4 mb-6 animate-fade-in">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Date Range - From */}
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">From Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal glass border-0",
+                          !dateFrom && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {dateFrom ? format(dateFrom, "PPP") : "Start date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={dateFrom}
+                        onSelect={setDateFrom}
+                        initialFocus
+                        className="pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                {/* Date Range - To */}
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">To Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal glass border-0",
+                          !dateTo && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {dateTo ? format(dateTo, "PPP") : "End date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={dateTo}
+                        onSelect={setDateTo}
+                        initialFocus
+                        className="pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                {/* Type Filter */}
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">Type</Label>
+                  <Select value={filterType} onValueChange={(v) => setFilterType(v as 'all' | 'income' | 'expense')}>
+                    <SelectTrigger className="glass border-0">
+                      <SelectValue placeholder="All types" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Types</SelectItem>
+                      <SelectItem value="income">
+                        <span className="flex items-center gap-2">
+                          <TrendingUp className="h-4 w-4 text-success" />
+                          Income Only
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="expense">
+                        <span className="flex items-center gap-2">
+                          <TrendingDown className="h-4 w-4 text-destructive" />
+                          Expenses Only
+                        </span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Category Filter */}
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">Category</Label>
+                  <Select value={filterCategory} onValueChange={setFilterCategory}>
+                    <SelectTrigger className="glass border-0">
+                      <SelectValue placeholder="All categories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {EXPENSE_CATEGORIES.map(cat => (
+                        <SelectItem key={cat.value} value={cat.value}>
+                          {cat.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Business Filter (if applicable) */}
+                {savedBusinesses.length > 0 && (
+                  <div className="space-y-2 sm:col-span-2 lg:col-span-4">
+                    <Label className="text-sm text-muted-foreground">Business</Label>
+                    <Select value={filterBusinessId} onValueChange={setFilterBusinessId}>
+                      <SelectTrigger className="glass border-0 w-full sm:w-[280px]">
+                        <SelectValue placeholder="All businesses" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Businesses</SelectItem>
+                        {savedBusinesses.map((business) => (
+                          <SelectItem key={business.id} value={business.id}>
+                            {business.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Charts Section */}
           {showCharts && filteredExpenses.length > 0 && (
