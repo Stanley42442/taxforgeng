@@ -342,7 +342,7 @@ const Expenses = () => {
       <main className="container mx-auto px-4 py-6 pb-8">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-10 animate-slide-up">
+          <div className="text-center mb-10">
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-primary glow-primary">
               <Receipt className="h-10 w-10 text-primary-foreground" />
             </div>
@@ -355,14 +355,14 @@ const Expenses = () => {
           </div>
 
           {/* Summary Cards - Glass Design */}
-          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-8 animate-slide-up-delay-1">
+          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-8">
             {[
               { icon: TrendingUp, value: totalIncome, label: 'Income', color: 'success', glowClass: 'glow-success' },
               { icon: TrendingDown, value: totalExpenses, label: 'Expenses', color: 'destructive', glowClass: '' },
               { icon: Receipt, value: deductibleExpenses, label: 'Deductible', color: 'primary', glowClass: '' },
               { icon: Calculator, value: estimatedTax, label: 'Est. Tax', color: 'warning', glowClass: 'glow-accent' }
             ].map((stat, idx) => (
-              <div key={idx} className="glass hover-lift p-4 sm:p-5 rounded-2xl">
+              <div key={idx} className="glass p-4 sm:p-5 rounded-2xl">
                 <div className="flex items-center gap-2 mb-2">
                   <div className={`p-2 rounded-lg bg-${stat.color}/10 ${stat.glowClass}`}>
                     <stat.icon className={`h-4 w-4 text-${stat.color}`} />
@@ -377,7 +377,7 @@ const Expenses = () => {
           </div>
 
           {/* Action Buttons - Premium Style */}
-          <div className="flex flex-wrap items-center gap-2 mb-8 animate-slide-up-delay-2 overflow-hidden">
+          <div className="flex flex-wrap items-center gap-2 mb-8 overflow-hidden">
             <Button variant="glow" size="sm" onClick={() => setShowAddDialog(true)}>
               <Plus className="h-4 w-4" />
               <span className="hidden xs:inline">Add Entry</span>
@@ -430,7 +430,7 @@ const Expenses = () => {
 
           {/* Charts Section */}
           {showCharts && filteredExpenses.length > 0 && (
-            <div className="glass-frosted rounded-3xl p-6 mb-8 animate-fade-in">
+            <div className="glass-frosted rounded-3xl p-6 mb-8">
               <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                 <PieChart className="h-5 w-5 text-primary" />
                 Expense Analytics
@@ -440,7 +440,7 @@ const Expenses = () => {
           )}
 
           {/* Expense List - Glass Card */}
-          <div className="glass-frosted rounded-3xl p-6 animate-fade-in">
+          <div className="glass-frosted rounded-3xl p-6">
             <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
               <div className="p-2 rounded-xl bg-primary/10">
                 <FileSpreadsheet className="h-5 w-5 text-primary" />
