@@ -208,23 +208,8 @@ export const NavMenu = () => {
                               : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                           }`}
                         >
-                          <div className="relative">
-                            <link.icon className="h-4 w-4 shrink-0" />
-                            {link.to === '/reminders' && urgentCount > 0 && (
-                              <Badge 
-                                variant="destructive" 
-                                className="absolute -top-2 -right-2 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center"
-                              >
-                                {urgentCount > 9 ? '9+' : urgentCount}
-                              </Badge>
-                            )}
-                          </div>
+                          <link.icon className="h-4 w-4 shrink-0" />
                           <span className="truncate">{link.label}</span>
-                          {link.to === '/reminders' && urgentCount > 0 && (
-                            <Badge variant="destructive" className="ml-auto text-[10px] px-1.5">
-                              {urgentCount}
-                            </Badge>
-                          )}
                         </Link>
                       </SheetClose>
                     ))}
