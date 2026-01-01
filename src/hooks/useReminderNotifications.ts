@@ -2,40 +2,11 @@ import { useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-
-// Notification sound using Web Audio API
-const playNotificationSound = () => {
-  try {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    
-    // Create a pleasant notification sound (two-tone chime)
-    const playTone = (frequency: number, startTime: number, duration: number) => {
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = frequency;
-      oscillator.type = "sine";
-      
-      gainNode.gain.setValueAtTime(0, startTime);
-      gainNode.gain.linearRampToValueAtTime(0.3, startTime + 0.05);
-      gainNode.gain.linearRampToValueAtTime(0, startTime + duration);
-      
-      oscillator.start(startTime);
-      oscillator.stop(startTime + duration);
-    };
-    
-    const now = audioContext.currentTime;
-    playTone(880, now, 0.15); // A5
-    playTone(1108.73, now + 0.15, 0.2); // C#6
-    playTone(1318.51, now + 0.3, 0.25); // E6
-    
-  } catch (error) {
-    console.error("Error playing notification sound:", error);
-  }
-};
+import { 
+  playNotificationSound, 
+  showBrowserNotification, 
+  addNotification 
+} from "@/lib/notifications";
 
 // Request notification permission
 export const requestNotificationPermission = async (): Promise<boolean> => {
@@ -54,53 +25,6 @@ export const requestNotificationPermission = async (): Promise<boolean> => {
   }
   
   return false;
-};
-
-// Show browser notification
-const showBrowserNotification = (title: string, body: string) => {
-  const browserEnabled = localStorage.getItem('notification-browser-enabled') !== 'false';
-  
-  if (Notification.permission === "granted" && browserEnabled) {
-    const notification = new Notification(title, {
-      body,
-      icon: "/favicon.ico",
-      badge: "/favicon.ico",
-      tag: "reminder-notification",
-      requireInteraction: true,
-    });
-    
-    notification.onclick = () => {
-      window.focus();
-      notification.close();
-      window.location.href = "/reminders";
-    };
-  }
-};
-
-// Save notification to localStorage for the notifications page
-const saveNotificationToStorage = (title: string, message: string, type: 'reminder' | 'warning' | 'info' | 'success') => {
-  try {
-    const existing = localStorage.getItem('app-notifications');
-    const notifications = existing ? JSON.parse(existing) : [];
-    
-    const newNotification = {
-      id: Date.now().toString(),
-      title,
-      message,
-      type,
-      timestamp: new Date().toISOString(),
-      read: false
-    };
-    
-    // Keep only last 50 notifications
-    const updated = [newNotification, ...notifications].slice(0, 50);
-    localStorage.setItem('app-notifications', JSON.stringify(updated));
-    
-    // Dispatch custom event for real-time updates within the same tab
-    window.dispatchEvent(new CustomEvent('notification-added', { detail: newNotification }));
-  } catch (error) {
-    console.error('Error saving notification:', error);
-  }
 };
 
 // Check if sound is enabled
@@ -165,7 +89,7 @@ export const useReminderNotifications = () => {
         );
         
         // Save to notification list
-        saveNotificationToStorage(
+        addNotification(
           `Reminder: ${reminder.title}`,
           "This reminder is due now!",
           'reminder'
@@ -213,7 +137,7 @@ export const useReminderNotifications = () => {
         );
         
         // Save to notification list
-        saveNotificationToStorage(
+        addNotification(
           `Overdue: ${reminder.title}`,
           "This reminder is now overdue!",
           'warning'

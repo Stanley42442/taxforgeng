@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { notifyAchievement } from '@/lib/notifications';
 
 export interface UserStats {
   totalPoints: number;
@@ -143,6 +144,9 @@ export const useAchievements = () => {
         badgeName: data.badge_name,
         earnedAt: new Date(data.earned_at),
       }]);
+
+      // Send notification for the achievement
+      notifyAchievement(badgeName, points);
 
       return true;
     } catch (error) {
