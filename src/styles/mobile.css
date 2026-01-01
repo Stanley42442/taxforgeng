@@ -14,20 +14,20 @@
 
 /* Fix container centering */
 @media (max-width: 767px) {
-  /* Prevent any horizontal overflow at root level */
+  /* Prevent any horizontal overflow at root level - use clip to avoid Chrome Android scroll issues */
   html {
-    overflow-x: hidden;
+    overflow-x: clip;
     max-width: 100vw;
   }
   
   body {
-    overflow-x: hidden;
+    overflow-x: clip;
     max-width: 100vw;
     width: 100%;
   }
   
   #root {
-    overflow-x: hidden;
+    overflow-x: clip;
     max-width: 100vw;
     width: 100%;
   }
@@ -265,9 +265,9 @@
   padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
 }
 
-/* Prevent ALL Horizontal Overflow */
+/* Prevent ALL Horizontal Overflow - use clip to avoid Chrome Android scroll issues */
 html, body, #root {
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100vw;
   width: 100%;
 }
@@ -275,7 +275,7 @@ html, body, #root {
 .mobile-overflow-fix {
   max-width: 100vw;
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .mobile-overflow-fix *,
