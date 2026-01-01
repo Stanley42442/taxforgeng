@@ -342,7 +342,7 @@ const Expenses = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-hero flex flex-col">
       {/* Premium Background Effects */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-0 left-1/3 w-[600px] h-[600px] rounded-full bg-primary/5 blur-3xl animate-float-slow" />
