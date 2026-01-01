@@ -1,22 +1,13 @@
 import { useState, useEffect } from "react";
+import { getNotifications } from "@/lib/notifications";
 
 export const useNotificationCount = () => {
   const [unreadCount, setUnreadCount] = useState(0);
 
   const loadCount = () => {
-    const savedNotifications = localStorage.getItem('app-notifications');
-    if (savedNotifications) {
-      try {
-        const parsed = JSON.parse(savedNotifications);
-        const unread = parsed.filter((n: any) => !n.read).length;
-        setUnreadCount(unread);
-      } catch (e) {
-        console.error('Error parsing notifications:', e);
-        setUnreadCount(0);
-      }
-    } else {
-      setUnreadCount(0);
-    }
+    const notifications = getNotifications();
+    const unread = notifications.filter(n => !n.read).length;
+    setUnreadCount(unread);
   };
 
   useEffect(() => {
@@ -43,5 +34,5 @@ export const useNotificationCount = () => {
     };
   }, []);
 
-  return { unreadCount };
+  return { unreadCount, refresh: loadCount };
 };

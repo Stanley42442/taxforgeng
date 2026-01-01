@@ -27,14 +27,16 @@ import { toast } from "sonner";
 import { requestNotificationPermission } from "@/hooks/useReminderNotifications";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { format } from "date-fns";
+import { 
+  getNotifications, 
+  addNotification, 
+  playNotificationSound,
+  showBrowserNotification,
+  type AppNotification 
+} from "@/lib/notifications";
 
-interface NotificationItem {
-  id: string;
-  title: string;
-  message: string;
-  type: 'reminder' | 'warning' | 'info' | 'success';
+interface NotificationItem extends Omit<AppNotification, 'timestamp'> {
   timestamp: Date;
-  read: boolean;
 }
 
 const Notifications = () => {
@@ -45,18 +47,11 @@ const Notifications = () => {
 
   // Load notifications from localStorage
   const loadNotifications = () => {
-    const savedNotifications = localStorage.getItem('app-notifications');
-    if (savedNotifications) {
-      try {
-        const parsed = JSON.parse(savedNotifications);
-        setNotifications(parsed.map((n: any) => ({
-          ...n,
-          timestamp: new Date(n.timestamp)
-        })));
-      } catch (e) {
-        console.error('Error parsing notifications:', e);
-      }
-    }
+    const stored = getNotifications();
+    setNotifications(stored.map(n => ({
+      ...n,
+      timestamp: new Date(n.timestamp)
+    })));
   };
 
   useEffect(() => {
@@ -123,49 +118,25 @@ const Notifications = () => {
 
   const testNotification = () => {
     // Play test sound
-    try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const playTone = (frequency: number, startTime: number, duration: number) => {
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        oscillator.frequency.value = frequency;
-        oscillator.type = "sine";
-        gainNode.gain.setValueAtTime(0, startTime);
-        gainNode.gain.linearRampToValueAtTime(0.3, startTime + 0.05);
-        gainNode.gain.linearRampToValueAtTime(0, startTime + duration);
-        oscillator.start(startTime);
-        oscillator.stop(startTime + duration);
-      };
-      const now = audioContext.currentTime;
-      playTone(880, now, 0.15);
-      playTone(1108.73, now + 0.15, 0.2);
-      playTone(1318.51, now + 0.3, 0.25);
-    } catch (error) {
-      console.error("Error playing test sound:", error);
-    }
+    playNotificationSound();
 
     // Show test browser notification
     if (notificationPermission === 'granted') {
-      new Notification("TaxForge NG - Test", {
-        body: "This is a test notification. Your notifications are working!",
-        icon: "/favicon.ico",
-      });
+      showBrowserNotification(
+        "TaxForge NG - Test",
+        "This is a test notification. Your notifications are working!"
+      );
     }
 
-    // Add to notification list
-    const newNotification: NotificationItem = {
-      id: Date.now().toString(),
-      title: "Test Notification",
-      message: "This is a test notification to verify your settings are working.",
-      type: 'info',
-      timestamp: new Date(),
-      read: false
-    };
-    const updatedNotifications = [newNotification, ...notifications];
-    setNotifications(updatedNotifications);
-    localStorage.setItem('app-notifications', JSON.stringify(updatedNotifications));
+    // Add to notification list using centralized utility
+    addNotification(
+      "Test Notification",
+      "This is a test notification to verify your settings are working.",
+      'info'
+    );
+    
+    // Reload to show the new notification
+    loadNotifications();
 
     toast.success("Test notification sent!");
   };
@@ -176,12 +147,14 @@ const Notifications = () => {
     );
     setNotifications(updated);
     localStorage.setItem('app-notifications', JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent('notification-added'));
   };
 
   const markAllAsRead = () => {
     const updated = notifications.map(n => ({ ...n, read: true }));
     setNotifications(updated);
     localStorage.setItem('app-notifications', JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent('notification-added'));
     toast.success('All notifications marked as read');
   };
 
@@ -189,12 +162,14 @@ const Notifications = () => {
     const updated = notifications.filter(n => n.id !== id);
     setNotifications(updated);
     localStorage.setItem('app-notifications', JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent('notification-added'));
     toast.success('Notification deleted');
   };
 
   const clearAllNotifications = () => {
     setNotifications([]);
     localStorage.removeItem('app-notifications');
+    window.dispatchEvent(new CustomEvent('notification-added'));
     toast.success('All notifications cleared');
   };
 

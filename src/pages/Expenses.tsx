@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { notifyExpenseAdded } from "@/lib/notifications";
 import {
   Receipt,
   Plus,
@@ -204,6 +205,9 @@ const Expenses = () => {
       businessId: '',
     });
     toast.success("Entry added");
+    
+    // Send notification for added expense/income
+    notifyExpenseAdded(expense.description, expense.amount, expense.type === 'income');
   };
 
   const handleCSVImport = async () => {

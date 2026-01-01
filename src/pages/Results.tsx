@@ -26,6 +26,7 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { notifyTaxCalculation } from "@/lib/notifications";
 import { NavMenu } from "@/components/NavMenu";
 import {
   Dialog,
@@ -66,6 +67,8 @@ const Results = () => {
           console.error('Error saving calculation:', error);
         } else {
           console.log('Calculation saved successfully');
+          // Send notification for completed tax calculation
+          notifyTaxCalculation(result.entityType, result.totalTaxPayable);
         }
       } catch (error) {
         console.error('Error saving calculation:', error);
