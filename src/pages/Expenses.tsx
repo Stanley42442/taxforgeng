@@ -478,7 +478,7 @@ const Expenses = () => {
                   return (
                     <div 
                       key={expense.id}
-                      className="glass p-4 rounded-xl hover-lift group"
+                      className="glass p-4 rounded-xl group"
                     >
                       <div className="flex items-start gap-3 mb-3">
                         <span className="text-2xl flex-shrink-0">{getCategoryIcon(expense.category)}</span>
