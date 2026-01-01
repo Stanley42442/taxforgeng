@@ -488,38 +488,42 @@ const Expenses = () => {
                   return (
                     <div 
                       key={expense.id}
-                      className="glass flex items-center gap-3 p-4 rounded-xl hover-lift group"
+                      className="glass p-4 rounded-xl hover-lift group"
                     >
-                      <span className="text-2xl flex-shrink-0">{getCategoryIcon(expense.category)}</span>
-                      <div className="min-w-0 flex-1 overflow-hidden">
-                        <p className="font-medium text-foreground truncate">{expense.description}</p>
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                          <span>{new Date(expense.date).toLocaleDateString()}</span>
-                          {businessName && (
-                            <>
-                              <span>•</span>
-                              <span className="truncate max-w-[100px]">{businessName}</span>
-                            </>
-                          )}
-                          {expense.isDeductible && (
-                            <span className="px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20 whitespace-nowrap">
-                              Deductible
-                            </span>
-                          )}
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3 min-w-0 flex-1">
+                          <span className="text-2xl flex-shrink-0">{getCategoryIcon(expense.category)}</span>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-foreground break-words">{expense.description}</p>
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground mt-1">
+                              <span>{new Date(expense.date).toLocaleDateString()}</span>
+                              {businessName && (
+                                <>
+                                  <span>•</span>
+                                  <span>{businessName}</span>
+                                </>
+                              )}
+                              {expense.isDeductible && (
+                                <span className="px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20">
+                                  Deductible
+                                </span>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className={`font-bold text-sm sm:text-base whitespace-nowrap ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
-                          {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
-                        </span>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
-                          onClick={() => handleDeleteExpense(expense.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span className={`font-bold whitespace-nowrap ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
+                            {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
+                          </span>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0 h-8 w-8"
+                            onClick={() => handleDeleteExpense(expense.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   );
