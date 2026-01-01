@@ -50,14 +50,112 @@ export function TaxAssistant() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [position, setPosition] = useState<Position>(getStoredPosition);
+  const isDraggingRef = useRef(false);
+  const hasMovedRef = useRef(false);
+  const dragStartPos = useRef<{ x: number; y: number; posX: number; posY: number } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to bottom of chat when new messages arrive
+  // Lock body scroll when chat is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Unified drag handlers
+  const handlePointerDown = useCallback((clientX: number, clientY: number) => {
+    isDraggingRef.current = true;
+    hasMovedRef.current = false;
+    dragStartPos.current = { 
+      x: clientX, 
+      y: clientY, 
+      posX: position.x, 
+      posY: position.y 
+    };
+  }, [position]);
+
+  const handlePointerMove = useCallback((clientX: number, clientY: number) => {
+    if (!isDraggingRef.current || !dragStartPos.current) return;
+    
+    const deltaX = clientX - dragStartPos.current.x;
+    const deltaY = clientY - dragStartPos.current.y;
+    
+    // Only consider it moved if dragged more than 8px
+    if (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8) {
+      hasMovedRef.current = true;
+    }
+    
+    const newX = Math.max(8, Math.min(window.innerWidth - 64, dragStartPos.current.posX - deltaX));
+    const newY = Math.max(8, Math.min(window.innerHeight - 64, dragStartPos.current.posY - deltaY));
+    setPosition({ x: newX, y: newY });
+  }, []);
+
+  const handlePointerUp = useCallback(() => {
+    if (hasMovedRef.current) {
+      savePosition(position);
+    }
+    isDraggingRef.current = false;
+    dragStartPos.current = null;
+  }, [position]);
+
+  const handleClick = useCallback(() => {
+    // Only open if we didn't drag
+    if (!hasMovedRef.current) {
+      setIsOpen(true);
+    }
+    hasMovedRef.current = false;
+  }, []);
+
+  // Mouse events
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      handlePointerMove(e.clientX, e.clientY);
+    };
+    const handleMouseUp = () => {
+      handlePointerUp();
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [handlePointerMove, handlePointerUp]);
+
+  // Touch events
+  useEffect(() => {
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDraggingRef.current && e.touches[0]) {
+        e.preventDefault(); // Prevent scrolling while dragging
+        handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
+    const handleTouchEnd = () => {
+      handlePointerUp();
+    };
+
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    window.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [handlePointerMove, handlePointerUp]);
 
   const streamChat = async (userMessages: Message[]) => {
     const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tax-assistant`;
@@ -154,11 +252,22 @@ export function TaxAssistant() {
   if (!isOpen) {
     return (
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={handleClick}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          handlePointerDown(e.clientX, e.clientY);
+        }}
+        onTouchStart={(e) => {
+          const touch = e.touches[0];
+          if (touch) {
+            handlePointerDown(touch.clientX, touch.clientY);
+          }
+        }}
         className="fixed h-14 w-14 rounded-full shadow-lg bg-gradient-primary hover:opacity-90 z-50 select-none flex items-center justify-center text-white"
         style={{
-          right: "24px",
-          bottom: "24px",
+          right: `${position.x}px`,
+          bottom: `${position.y}px`,
+          cursor: "grab",
           WebkitTapHighlightColor: "transparent",
         }}
       >

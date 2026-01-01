@@ -121,7 +121,13 @@ const Expenses = () => {
 
   if (!isBasicPlus) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
+      <div className="min-h-screen bg-gradient-hero overflow-hidden">
+        {/* Background Effects */}
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-warning/10 blur-3xl animate-float-slow" />
+          <div className="bg-mesh absolute inset-0" />
+        </div>
+
         <NavMenu />
         <div className="container mx-auto px-4 py-20 text-center relative z-10">
           <div className="mx-auto max-w-md">
@@ -336,13 +342,21 @@ const Expenses = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
+      {/* Premium Background Effects */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-1/3 w-[600px] h-[600px] rounded-full bg-primary/5 blur-3xl animate-float-slow" />
+        <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] rounded-full bg-accent/5 blur-3xl animate-float" />
+        <div className="bg-mesh absolute inset-0" />
+        <div className="bg-dots absolute inset-0 opacity-30" />
+      </div>
+
       <NavMenu />
 
-      <main className="container mx-auto px-4 py-6 pb-8">
-        <div className="max-w-5xl mx-auto">
+      <main className="container mx-auto px-4 py-6 pb-8 flex-1 relative z-10">
+        <div className="mx-auto max-w-5xl">
           {/* Header */}
-          <div className="text-center mb-10">
+          <div className="text-center mb-10 animate-slide-up">
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-primary glow-primary">
               <Receipt className="h-10 w-10 text-primary-foreground" />
             </div>
@@ -355,14 +369,14 @@ const Expenses = () => {
           </div>
 
           {/* Summary Cards - Glass Design */}
-          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-8">
+          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-8 animate-slide-up-delay-1">
             {[
               { icon: TrendingUp, value: totalIncome, label: 'Income', color: 'success', glowClass: 'glow-success' },
               { icon: TrendingDown, value: totalExpenses, label: 'Expenses', color: 'destructive', glowClass: '' },
               { icon: Receipt, value: deductibleExpenses, label: 'Deductible', color: 'primary', glowClass: '' },
               { icon: Calculator, value: estimatedTax, label: 'Est. Tax', color: 'warning', glowClass: 'glow-accent' }
             ].map((stat, idx) => (
-              <div key={idx} className="glass p-4 sm:p-5 rounded-2xl">
+              <div key={idx} className="glass hover-lift p-4 sm:p-5 rounded-2xl">
                 <div className="flex items-center gap-2 mb-2">
                   <div className={`p-2 rounded-lg bg-${stat.color}/10 ${stat.glowClass}`}>
                     <stat.icon className={`h-4 w-4 text-${stat.color}`} />
@@ -377,19 +391,18 @@ const Expenses = () => {
           </div>
 
           {/* Action Buttons - Premium Style */}
-          <div className="flex flex-wrap items-center gap-2 mb-8 overflow-hidden">
-            <Button variant="glow" size="sm" onClick={() => setShowAddDialog(true)}>
+          <div className="flex flex-wrap items-center gap-3 mb-8 animate-slide-up-delay-2">
+            <Button variant="glow" onClick={() => setShowAddDialog(true)}>
               <Plus className="h-4 w-4" />
-              <span className="hidden xs:inline">Add Entry</span>
-              <span className="xs:hidden">Add</span>
+              Add Entry
             </Button>
-            <Button variant="glass" size="sm" onClick={handleCSVImport}>
+            <Button variant="glass" onClick={handleCSVImport}>
               <Upload className="h-4 w-4" />
-              <span className="hidden sm:inline">Import</span>
+              <span className="hidden sm:inline">Import CSV</span>
+              <span className="sm:hidden">Import</span>
             </Button>
             <Button 
               variant="glass"
-              size="sm"
               onClick={() => navigate('/calculator', { 
                 state: { 
                   prefill: { 
@@ -401,19 +414,20 @@ const Expenses = () => {
               disabled={totalIncome === 0}
             >
               <Calculator className="h-4 w-4" />
-              <span className="hidden sm:inline">Calculate</span>
+              <span className="hidden sm:inline">Use in Calculator</span>
+              <span className="sm:hidden">Calculate</span>
             </Button>
             <Button 
               variant="glass"
-              size="sm"
               onClick={() => setShowCharts(!showCharts)}
             >
               <PieChart className="h-4 w-4" />
-              <span className="hidden sm:inline">Charts</span>
+              <span className="hidden sm:inline">{showCharts ? 'Hide' : 'Show'} Charts</span>
+              <span className="sm:hidden">Charts</span>
             </Button>
             {savedBusinesses.length > 0 && (
               <Select value={filterBusinessId} onValueChange={setFilterBusinessId}>
-                <SelectTrigger className="w-auto min-w-[100px] max-w-[150px] glass border-0 h-9 text-sm">
+                <SelectTrigger className="w-[180px] glass border-0">
                   <SelectValue placeholder="Filter" />
                 </SelectTrigger>
                 <SelectContent>
@@ -430,7 +444,7 @@ const Expenses = () => {
 
           {/* Charts Section */}
           {showCharts && filteredExpenses.length > 0 && (
-            <div className="glass-frosted rounded-3xl p-6 mb-8">
+            <div className="glass-frosted rounded-3xl p-6 mb-8 animate-fade-in">
               <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                 <PieChart className="h-5 w-5 text-primary" />
                 Expense Analytics
@@ -440,7 +454,7 @@ const Expenses = () => {
           )}
 
           {/* Expense List - Glass Card */}
-          <div className="glass-frosted rounded-3xl p-6">
+          <div className="glass-frosted rounded-3xl p-6 animate-fade-in">
             <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
               <div className="p-2 rounded-xl bg-primary/10">
                 <FileSpreadsheet className="h-5 w-5 text-primary" />
@@ -474,40 +488,42 @@ const Expenses = () => {
                   return (
                     <div 
                       key={expense.id}
-                      className="glass p-4 rounded-xl group"
+                      className="glass p-4 rounded-xl hover-lift group"
                     >
-                      <div className="flex items-start gap-3 mb-3">
-                        <span className="text-2xl flex-shrink-0">{getCategoryIcon(expense.category)}</span>
-                        <div className="flex-1">
-                          <p className="font-medium text-foreground">{expense.description}</p>
-                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground mt-1">
-                            <span>{new Date(expense.date).toLocaleDateString()}</span>
-                            {businessName && (
-                              <>
-                                <span>•</span>
-                                <span>{businessName}</span>
-                              </>
-                            )}
-                            {expense.isDeductible && (
-                              <span className="px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20">
-                                Deductible
-                              </span>
-                            )}
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3 min-w-0 flex-1">
+                          <span className="text-2xl flex-shrink-0">{getCategoryIcon(expense.category)}</span>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-foreground break-words">{expense.description}</p>
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground mt-1">
+                              <span>{new Date(expense.date).toLocaleDateString()}</span>
+                              {businessName && (
+                                <>
+                                  <span>•</span>
+                                  <span>{businessName}</span>
+                                </>
+                              )}
+                              {expense.isDeductible && (
+                                <span className="px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20">
+                                  Deductible
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="flex items-center justify-between pt-3 border-t border-border/50">
-                        <span className={`font-bold text-lg ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
-                          {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
-                        </span>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
-                          onClick={() => handleDeleteExpense(expense.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span className={`font-bold whitespace-nowrap ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
+                            {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
+                          </span>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0 h-8 w-8"
+                            onClick={() => handleDeleteExpense(expense.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   );
