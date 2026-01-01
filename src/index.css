@@ -594,6 +594,19 @@ html, body, #root {
   .glass, .glass-frosted, .neumorphic {
     border-radius: 1rem;
   }
+
+  /* Disable float animations on mobile to prevent scroll jank */
+  .animate-float,
+  .animate-float-slow,
+  .animate-float-fast {
+    animation: none !important;
+  }
+
+  /* Ensure proper scrolling */
+  html, body {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* Small Mobile (≤359px) */
