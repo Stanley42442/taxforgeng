@@ -71,7 +71,7 @@ export const NavMenu = () => {
     { to: "/businesses", label: "My Businesses", icon: FolderOpen, minTier: 'free', adminOnly: false },
     { to: "/achievements", label: "Achievements", icon: Trophy, minTier: 'basic', adminOnly: false },
     { to: "/reminders", label: "Reminders", icon: Bell, minTier: 'basic', adminOnly: false },
-    { to: "/notifications", label: "Notifications", icon: BellRing, minTier: 'free', adminOnly: false },
+    
     { to: "/expenses", label: "Expenses", icon: Receipt, minTier: 'basic', adminOnly: false },
     { to: "/scenarios", label: "Scenarios", icon: GitBranch, minTier: 'business', adminOnly: false },
     { to: "/business-report", label: "Reports", icon: PieChart, minTier: 'basic', adminOnly: false },
@@ -142,8 +142,11 @@ export const NavMenu = () => {
             )}
             <ThemeToggle />
 
-            {/* Notification Badge - not a link, just a visual indicator */}
-            <div className="relative flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10">
+            {/* Notification Badge - links to notifications page */}
+            <Link 
+              to="/notifications" 
+              className="relative flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
               {notificationCount > 0 ? (
                 <BellRing className="h-4 w-4 sm:h-5 sm:w-5 text-destructive" />
               ) : (
@@ -157,7 +160,7 @@ export const NavMenu = () => {
                   {notificationCount > 9 ? '9+' : notificationCount}
                 </Badge>
               )}
-            </div>
+            </Link>
             
             {/* Hamburger Menu - always visible */}
             <Sheet open={open} onOpenChange={setOpen}>
