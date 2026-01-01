@@ -377,18 +377,19 @@ const Expenses = () => {
           </div>
 
           {/* Action Buttons - Premium Style */}
-          <div className="flex flex-wrap items-center gap-3 mb-8 animate-slide-up-delay-2">
-            <Button variant="glow" onClick={() => setShowAddDialog(true)}>
+          <div className="flex flex-wrap items-center gap-2 mb-8 animate-slide-up-delay-2 overflow-hidden">
+            <Button variant="glow" size="sm" onClick={() => setShowAddDialog(true)}>
               <Plus className="h-4 w-4" />
-              Add Entry
+              <span className="hidden xs:inline">Add Entry</span>
+              <span className="xs:hidden">Add</span>
             </Button>
-            <Button variant="glass" onClick={handleCSVImport}>
+            <Button variant="glass" size="sm" onClick={handleCSVImport}>
               <Upload className="h-4 w-4" />
-              <span className="hidden sm:inline">Import CSV</span>
-              <span className="sm:hidden">Import</span>
+              <span className="hidden sm:inline">Import</span>
             </Button>
             <Button 
               variant="glass"
+              size="sm"
               onClick={() => navigate('/calculator', { 
                 state: { 
                   prefill: { 
@@ -400,20 +401,19 @@ const Expenses = () => {
               disabled={totalIncome === 0}
             >
               <Calculator className="h-4 w-4" />
-              <span className="hidden sm:inline">Use in Calculator</span>
-              <span className="sm:hidden">Calculate</span>
+              <span className="hidden sm:inline">Calculate</span>
             </Button>
             <Button 
               variant="glass"
+              size="sm"
               onClick={() => setShowCharts(!showCharts)}
             >
               <PieChart className="h-4 w-4" />
-              <span className="hidden sm:inline">{showCharts ? 'Hide' : 'Show'} Charts</span>
-              <span className="sm:hidden">Charts</span>
+              <span className="hidden sm:inline">Charts</span>
             </Button>
             {savedBusinesses.length > 0 && (
               <Select value={filterBusinessId} onValueChange={setFilterBusinessId}>
-                <SelectTrigger className="w-[180px] glass border-0">
+                <SelectTrigger className="w-auto min-w-[100px] max-w-[150px] glass border-0 h-9 text-sm">
                   <SelectValue placeholder="Filter" />
                 </SelectTrigger>
                 <SelectContent>
