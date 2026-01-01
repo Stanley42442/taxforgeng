@@ -51,10 +51,11 @@ export function TaxAssistant() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [position, setPosition] = useState<Position>(getStoredPosition);
-  const isDraggingRef = useRef(false);
+  const [isDragging, setIsDragging] = useState(false);
   const hasMovedRef = useRef(false);
   const dragStartPos = useRef<{ x: number; y: number; posX: number; posY: number } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Lock body scroll when chat is open
   useEffect(() => {
@@ -76,7 +77,7 @@ export function TaxAssistant() {
 
   // Unified drag handlers
   const handlePointerDown = useCallback((clientX: number, clientY: number) => {
-    isDraggingRef.current = true;
+    setIsDragging(true);
     hasMovedRef.current = false;
     dragStartPos.current = { 
       x: clientX, 
@@ -87,7 +88,7 @@ export function TaxAssistant() {
   }, [position]);
 
   const handlePointerMove = useCallback((clientX: number, clientY: number) => {
-    if (!isDraggingRef.current || !dragStartPos.current) return;
+    if (!dragStartPos.current) return;
     
     const deltaX = clientX - dragStartPos.current.x;
     const deltaY = clientY - dragStartPos.current.y;
@@ -106,7 +107,7 @@ export function TaxAssistant() {
     if (hasMovedRef.current) {
       savePosition(position);
     }
-    isDraggingRef.current = false;
+    setIsDragging(false);
     dragStartPos.current = null;
   }, [position]);
 
@@ -121,10 +122,14 @@ export function TaxAssistant() {
   // Mouse events
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      handlePointerMove(e.clientX, e.clientY);
+      if (isDragging) {
+        handlePointerMove(e.clientX, e.clientY);
+      }
     };
     const handleMouseUp = () => {
-      handlePointerUp();
+      if (isDragging) {
+        handlePointerUp();
+      }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -134,13 +139,15 @@ export function TaxAssistant() {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [handlePointerMove, handlePointerUp]);
+  }, [isDragging, handlePointerMove, handlePointerUp]);
 
-  // Touch events
+  // Touch events - only attach when dragging to avoid blocking page scroll
   useEffect(() => {
+    if (!isDragging) return;
+    
     const handleTouchMove = (e: TouchEvent) => {
-      if (isDraggingRef.current && e.touches[0]) {
-        e.preventDefault(); // Prevent scrolling while dragging
+      if (e.touches[0]) {
+        e.preventDefault();
         handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
       }
     };
@@ -155,7 +162,7 @@ export function TaxAssistant() {
       window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [handlePointerMove, handlePointerUp]);
+  }, [isDragging, handlePointerMove, handlePointerUp]);
 
   const streamChat = async (userMessages: Message[]) => {
     const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tax-assistant`;
