@@ -601,14 +601,14 @@ const Expenses = () => {
               <div className="space-y-2">
                 <Label>Business (optional)</Label>
                 <Select 
-                  value={newExpense.businessId} 
-                  onValueChange={(v) => setNewExpense({ ...newExpense, businessId: v })}
+                  value={newExpense.businessId || "none"} 
+                  onValueChange={(v) => setNewExpense({ ...newExpense, businessId: v === "none" ? "" : v })}
                 >
                   <SelectTrigger className="neumorphic-sm border-0">
                     <SelectValue placeholder="Select business" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No business</SelectItem>
+                    <SelectItem value="none">No business</SelectItem>
                     {savedBusinesses.map(b => (
                       <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
                     ))}
