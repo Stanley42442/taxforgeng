@@ -121,7 +121,7 @@ const Expenses = () => {
 
   if (!isBasicPlus) {
     return (
-      <div className="min-h-screen bg-gradient-hero overflow-hidden">
+      <div className="min-h-screen bg-gradient-hero">
         {/* Background Effects */}
         <div className="fixed inset-0 pointer-events-none">
           <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-warning/10 blur-3xl animate-float-slow" />

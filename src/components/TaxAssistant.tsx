@@ -57,15 +57,28 @@ export function TaxAssistant() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // Lock body scroll when chat is open
+  // Lock body scroll when chat is open (only on mobile to prevent background scroll)
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden";
+      // Save current scroll position and lock
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
     } else {
-      document.body.style.overflow = "";
+      // Restore scroll position
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
     }
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
     };
   }, [isOpen]);
 
