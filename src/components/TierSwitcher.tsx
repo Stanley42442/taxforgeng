@@ -13,6 +13,7 @@ import { FlaskConical } from "lucide-react";
 const TIER_INFO: Record<SubscriptionTier, { label: string; color: string }> = {
   free: { label: 'Free', color: 'bg-muted text-muted-foreground' },
   basic: { label: 'Basic', color: 'bg-primary/20 text-primary' },
+  freelancer: { label: 'Freelancer', color: 'bg-accent/20 text-accent-foreground' },
   business: { label: 'Business', color: 'bg-success/20 text-success' },
   corporate: { label: 'Corporate', color: 'bg-warning/20 text-warning' },
 };
