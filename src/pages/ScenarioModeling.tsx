@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useNavigate } from "react-router-dom";
 import { calculateTax, formatCurrency, type TaxInputs } from "@/lib/taxCalculations";
@@ -16,14 +17,17 @@ import {
   Calculator,
   Crown,
   Lightbulb,
-  Minus
+  Minus,
+  Calendar
 } from "lucide-react";
+import { MultiYearProjection } from "@/components/MultiYearProjection";
 
 const ScenarioModeling = () => {
-  const { tier } = useSubscription();
+  const { tier, canAccessScenarioModeling } = useSubscription();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'whatif' | 'multiyear'>('whatif');
 
-  const isBusinessPlus = tier === 'business' || tier === 'corporate';
+  const isBusinessPlus = canAccessScenarioModeling();
 
   // Base scenario values
   const [baseValues, setBaseValues] = useState({
@@ -118,9 +122,27 @@ const ScenarioModeling = () => {
               Scenario Modeling
             </h1>
             <p className="text-muted-foreground">
-              Adjust variables to see how changes affect your tax
+              Model "what-if" scenarios and multi-year projections
             </p>
           </div>
+
+          {/* Tabs for What-If vs Multi-Year */}
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'whatif' | 'multiyear')} className="mb-6">
+            <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
+              <TabsTrigger value="whatif" className="flex items-center gap-2">
+                <Calculator className="h-4 w-4" />
+                What-If Analysis
+              </TabsTrigger>
+              <TabsTrigger value="multiyear" className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                Multi-Year Projection
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          {activeTab === 'multiyear' ? (
+            <MultiYearProjection />
+          ) : (
 
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Adjustments Panel */}
@@ -401,12 +423,20 @@ const ScenarioModeling = () => {
             </div>
           </div>
 
+            </div>
+          )}
+
           {/* Disclaimer */}
           <p className="text-xs text-muted-foreground text-center mt-8">
             Scenarios are estimates only. Actual tax may vary based on full circumstances.
           </p>
         </div>
       </main>
+    </div>
+  );
+};
+
+export default ScenarioModeling;
     </div>
   );
 };
