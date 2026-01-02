@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { NavMenu } from "@/components/NavMenu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useNavigate } from "react-router-dom";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Accordion,
   AccordionContent,
@@ -25,16 +26,65 @@ import {
   Calculator,
   DollarSign,
   Sparkles,
-  GraduationCap
+  GraduationCap,
+  AlertTriangle,
+  ShieldAlert,
+  HelpCircle,
+  Factory,
+  Wheat,
+  ShoppingCart,
+  Globe,
+  Package,
+  Cpu,
+  XCircle,
+  CheckCircle,
+  ChevronRight,
+  ExternalLink
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
+import { 
+  taxMyths, 
+  sectorGuides, 
+  searchMythsAndGuides,
+  getMythsByTier,
+  getSectorGuidesByTier,
+  type TaxMyth,
+  type SectorGuide 
+} from "@/lib/taxMyths";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 
 const Learn = () => {
   const { tier, savedBusinesses } = useSubscription();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("myths");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, number | null>>({});
+  const [showQuizResults, setShowQuizResults] = useState<Record<string, boolean>>({});
 
   const isBusinessPlus = tier === 'business' || tier === 'corporate';
+  const isBasicPlus = tier !== 'free';
+
+  // Map tier to expected format
+  const tierForMyths = tier === 'corporate' ? 'business' : (tier === 'basic' ? 'basic' : 'free');
+
+  // Filter myths and guides based on search and tier
+  const { filteredMyths, filteredGuides } = useMemo(() => {
+    if (searchQuery.trim()) {
+      const results = searchMythsAndGuides(searchQuery);
+      return {
+        filteredMyths: results.myths,
+        filteredGuides: results.guides
+      };
+    }
+    return {
+      filteredMyths: selectedCategory === 'all' 
+        ? taxMyths 
+        : taxMyths.filter(m => m.category === selectedCategory),
+      filteredGuides: sectorGuides
+    };
+  }, [searchQuery, selectedCategory]);
 
   // Generate personalized tips based on user's saved businesses
   const generatePersonalizedTips = () => {
@@ -93,6 +143,68 @@ const Learn = () => {
 
   const personalizedTips = generatePersonalizedTips();
 
+  const mythCategories = [
+    { value: 'all', label: 'All Myths', icon: ShieldAlert },
+    { value: 'gifts', label: 'Gifts & Income', icon: DollarSign },
+    { value: 'audits', label: 'Audits', icon: Search },
+    { value: 'penalties', label: 'Penalties', icon: AlertTriangle },
+    { value: 'foreign', label: 'Foreign Income', icon: Globe },
+    { value: 'vat', label: 'VAT', icon: Calculator },
+    { value: 'exemptions', label: 'Exemptions', icon: CheckCircle2 },
+    { value: 'reforms', label: '2026 Reforms', icon: Sparkles },
+    { value: 'general', label: 'General', icon: HelpCircle },
+  ];
+
+  const sectorIcons: Record<string, typeof Cpu> = {
+    tech: Cpu,
+    agriculture: Wheat,
+    manufacturing: Factory,
+    retail: ShoppingCart,
+    freezone: Globe,
+    export: Package,
+  };
+
+  const canAccessMyth = (myth: TaxMyth) => {
+    const tierOrder = { free: 0, basic: 1, business: 2 };
+    const userTierValue = tierOrder[tierForMyths as keyof typeof tierOrder] || 0;
+    return userTierValue >= tierOrder[myth.tier];
+  };
+
+  const canAccessGuide = (guide: SectorGuide) => {
+    const tierOrder = { free: 0, basic: 1, business: 2 };
+    const userTierValue = tierOrder[tierForMyths as keyof typeof tierOrder] || 0;
+    return userTierValue >= tierOrder[guide.tier];
+  };
+
+  const handleQuizAnswer = (mythId: string, answerIndex: number) => {
+    setQuizAnswers(prev => ({ ...prev, [mythId]: answerIndex }));
+  };
+
+  const checkQuizAnswer = (mythId: string) => {
+    setShowQuizResults(prev => ({ ...prev, [mythId]: true }));
+  };
+
+  const getSeverityColor = (severity: TaxMyth['severity']) => {
+    switch (severity) {
+      case 'high': return 'bg-destructive/10 text-destructive border-destructive/30';
+      case 'medium': return 'bg-warning/10 text-warning border-warning/30';
+      case 'low': return 'bg-info/10 text-info border-info/30';
+    }
+  };
+
+  const getTierBadge = (articleTier: string) => {
+    if (articleTier === 'basic') return { label: 'Basic+', color: 'bg-accent/20 text-accent border border-accent/30' };
+    if (articleTier === 'business') return { label: 'Business+', color: 'bg-warning/20 text-warning border border-warning/30' };
+    return null;
+  };
+
+  // Calculate quiz progress
+  const answeredQuizzes = Object.keys(showQuizResults).filter(id => showQuizResults[id]).length;
+  const correctQuizzes = Object.keys(showQuizResults).filter(id => {
+    const myth = taxMyths.find(m => m.id === id);
+    return myth?.quiz && quizAnswers[id] === myth.quiz.correctIndex;
+  }).length;
+
   const articles = [
     {
       id: "2026-reforms",
@@ -136,111 +248,8 @@ const Learn = () => {
 • 25% flat rate (or 0% for small companies)
 • Limited liability protection
 • More complex compliance
-• Best for: Scaling businesses, contractors, professionals
-
-**When to Switch:**
-Consider incorporating when:
-• Annual profit exceeds ₦3-5 million
-• You need liability protection
-• You want to attract investors`
+• Best for: Scaling businesses, contractors, professionals`
     },
-    {
-      id: "vat-guide",
-      title: "VAT Registration & Compliance Guide",
-      description: "When to register, how to file, and common mistakes to avoid",
-      category: "VAT",
-      readTime: "5 min",
-      tier: 'free',
-      content: `**Registration Threshold:**
-VAT registration is mandatory if your annual turnover exceeds ₦25 million.
-
-**How VAT Works:**
-• Charge 7.5% on vatable sales (Output VAT)
-• Claim back 7.5% on vatable purchases (Input VAT)
-• Remit the difference to FIRS
-
-**Filing Deadlines:**
-• VAT returns due by 21st of following month
-• Late filing: 5% penalty + ₦5,000 per month
-
-**Exempt Items:**
-• Basic food items
-• Medical supplies
-• Educational materials
-• Agricultural equipment`
-    },
-    {
-      id: "freelancer-taxes",
-      title: "Tax Guide for Freelancers & Remote Workers",
-      description: "Special considerations for those earning in foreign currency",
-      category: "Freelancers",
-      readTime: "7 min",
-      tier: 'business',
-      content: `**Declaring Foreign Income:**
-• Convert at CBN rate on payment date
-• All worldwide income is taxable in Nigeria
-
-**Withholding Tax on Consultancy:**
-• 10% WHT on payments to companies
-• 5% WHT on payments to individuals
-
-**Common Deductions:**
-• Home office expenses (proportional)
-• Internet and phone costs
-• Equipment depreciation
-• Software subscriptions
-
-**Crypto Gains (Coming Soon):**
-• Expected 10% CGT on crypto disposals
-• Keep records of all transactions`
-    },
-    {
-      id: "sme-payroll",
-      title: "PAYE & Payroll for SMEs",
-      description: "Managing employee taxes and pension contributions",
-      category: "Payroll",
-      readTime: "6 min",
-      tier: 'business',
-      content: `**PAYE Obligations:**
-As an employer, you must:
-• Deduct PIT from employee salaries
-• Remit to State IRS by 10th of following month
-• File annual returns by January 31st
-
-**Pension Contributions:**
-• Employer: 10% of basic salary
-• Employee: 8% of basic salary
-• Total: 18% to PFA
-
-**Contractor vs Employee:**
-• Contractors: Deduct 5-10% WHT
-• Employees: Deduct PAYE + Pension
-• Misclassification attracts penalties`
-    },
-    {
-      id: "audit-preparation",
-      title: "How to Prepare for a Tax Audit",
-      description: "Best practices for maintaining records and handling FIRS inquiries",
-      category: "Compliance",
-      readTime: "8 min",
-      tier: 'corporate',
-      content: `**Record Keeping Requirements:**
-• Maintain records for 6 years minimum
-• Store invoices, receipts, bank statements
-• Keep digital backups
-
-**Common Audit Triggers:**
-• Large refund claims
-• Inconsistent filing patterns
-• Industry-specific reviews
-• Random selection
-
-**During an Audit:**
-• Respond within stipulated timelines
-• Provide only what's requested
-• Document all communications
-• Consider professional representation`
-    }
   ];
 
   const faqs = [
@@ -270,22 +279,6 @@ As an employer, you must:
     }
   ];
 
-  const filteredArticles = articles.filter(article => 
-    article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    article.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const getTierBadge = (articleTier: string) => {
-    if (articleTier === 'business') return { label: 'Business+', color: 'bg-accent/20 text-accent border border-accent/30' };
-    if (articleTier === 'corporate') return { label: 'Corporate', color: 'bg-warning/20 text-warning border border-warning/30' };
-    return null;
-  };
-
-  const canAccess = (articleTier: string) => {
-    const tierOrder = ['free', 'basic', 'business', 'corporate'];
-    return tierOrder.indexOf(tier) >= tierOrder.indexOf(articleTier);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
       {/* Premium Background Effects */}
@@ -309,9 +302,22 @@ As an employer, you must:
               Tax Academy
             </h1>
             <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-              Learn Nigerian tax rules in simple English
+              Master Nigerian tax rules • Bust common myths • Learn sector incentives
             </p>
           </div>
+
+          {/* Quiz Progress (if started) */}
+          {answeredQuizzes > 0 && (
+            <div className="glass-frosted rounded-2xl p-4 mb-6 animate-slide-up">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-foreground">Quiz Progress</span>
+                <span className="text-sm text-muted-foreground">
+                  {correctQuizzes}/{answeredQuizzes} correct
+                </span>
+              </div>
+              <Progress value={(correctQuizzes / Math.max(answeredQuizzes, 1)) * 100} className="h-2" />
+            </div>
+          )}
 
           {/* Personalized Tips - Glass Cards */}
           <div className="glass-frosted rounded-3xl p-6 mb-8 animate-slide-up-delay-1">
@@ -350,7 +356,7 @@ As an employer, you must:
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
-                  placeholder="Search articles, topics, or categories..."
+                  placeholder="Search myths, guides, articles..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-12 h-14 text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
@@ -359,75 +365,315 @@ As an employer, you must:
             </div>
           </div>
 
-          {/* Video Section - Glass Cards */}
-          <div className="glass-frosted rounded-3xl p-6 mb-8 animate-slide-up-delay-3">
-            <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
-              <div className="p-2 rounded-xl bg-primary/10">
-                <Play className="h-5 w-5 text-primary" />
-              </div>
-              Quick Videos
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {[
-                { title: '2026 Tax Reforms Explained', duration: '2 min' },
-                { title: 'How to Calculate PIT', duration: '3 min' }
-              ].map((video, idx) => (
-                <div 
-                  key={idx}
-                  className="glass aspect-video rounded-2xl flex items-center justify-center cursor-pointer group hover-lift relative overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="text-center relative z-10">
-                    <div className="w-16 h-16 rounded-full bg-gradient-primary glow-primary flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                      <Play className="h-7 w-7 text-primary-foreground fill-primary-foreground ml-1" />
-                    </div>
-                    <p className="font-medium text-foreground">{video.title}</p>
-                    <p className="text-sm text-muted-foreground">{video.duration}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Main Content Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="animate-slide-up-delay-3">
+            <TabsList className="grid w-full grid-cols-4 h-auto p-1.5 glass-frosted rounded-2xl mb-6">
+              <TabsTrigger value="myths" className="py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
+                <ShieldAlert className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Myth Busters</span>
+                <span className="sm:hidden">Myths</span>
+              </TabsTrigger>
+              <TabsTrigger value="sectors" className="py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
+                <Factory className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Sector Guides</span>
+                <span className="sm:hidden">Sectors</span>
+              </TabsTrigger>
+              <TabsTrigger value="articles" className="py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
+                <FileText className="h-4 w-4 mr-2" />
+                Articles
+              </TabsTrigger>
+              <TabsTrigger value="faqs" className="py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
+                <HelpCircle className="h-4 w-4 mr-2" />
+                FAQs
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Articles - Premium Glass Cards */}
-          <div className="glass-frosted rounded-3xl p-6 mb-8 animate-fade-in">
-            <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
-              <div className="p-2 rounded-xl bg-primary/10">
-                <FileText className="h-5 w-5 text-primary" />
+            {/* Myths Tab */}
+            <TabsContent value="myths" className="space-y-6">
+              {/* Category Filter */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {mythCategories.map(cat => (
+                  <Button
+                    key={cat.value}
+                    variant={selectedCategory === cat.value ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedCategory(cat.value)}
+                    className="rounded-full"
+                  >
+                    <cat.icon className="h-3 w-3 mr-1" />
+                    {cat.label}
+                  </Button>
+                ))}
               </div>
-              Knowledge Base
-            </h2>
-            <div className="space-y-4">
-              {filteredArticles.map((article) => {
-                const badge = getTierBadge(article.tier);
-                const hasAccess = canAccess(article.tier);
-                
-                return (
-                  <Accordion type="single" collapsible key={article.id}>
-                    <AccordionItem value={article.id} className="glass rounded-2xl px-5 border-0">
-                      <AccordionTrigger className="py-5 hover:no-underline" disabled={!hasAccess}>
-                        <div className="flex items-start gap-4 text-left w-full pr-4">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-2 flex-wrap">
-                              <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
-                                {article.category}
-                              </span>
-                              {badge && (
-                                <span className={`text-xs px-3 py-1 rounded-full font-medium ${badge.color}`}>
-                                  {badge.label}
-                                </span>
-                              )}
-                              <span className="text-xs text-muted-foreground">{article.readTime}</span>
+
+              {/* Myths Count */}
+              <p className="text-sm text-muted-foreground">
+                Showing {filteredMyths.length} myths {selectedCategory !== 'all' && `in "${mythCategories.find(c => c.value === selectedCategory)?.label}"`}
+              </p>
+
+              {/* Myths List */}
+              <div className="space-y-4">
+                {filteredMyths.map((myth) => {
+                  const hasAccess = canAccessMyth(myth);
+                  const badge = getTierBadge(myth.tier);
+                  const quizAnswer = quizAnswers[myth.id];
+                  const showResult = showQuizResults[myth.id];
+                  const isCorrect = myth.quiz && quizAnswer === myth.quiz.correctIndex;
+
+                  return (
+                    <Accordion type="single" collapsible key={myth.id}>
+                      <AccordionItem value={myth.id} className="glass rounded-2xl px-5 border-0 overflow-hidden">
+                        <AccordionTrigger className="py-5 hover:no-underline" disabled={!hasAccess}>
+                          <div className="flex items-start gap-4 text-left w-full pr-4">
+                            <div className={`p-3 rounded-xl ${getSeverityColor(myth.severity)} flex-shrink-0`}>
+                              <XCircle className="h-5 w-5" />
                             </div>
-                            <h3 className="font-semibold text-foreground flex items-center gap-2">
-                              {article.title}
-                              {!hasAccess && <Lock className="h-4 w-4 text-muted-foreground" />}
-                            </h3>
-                            <p className="text-sm text-muted-foreground mt-1">{article.description}</p>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                <Badge variant="outline" className={getSeverityColor(myth.severity)}>
+                                  {myth.severity === 'high' ? '⚠️ Dangerous' : myth.severity === 'medium' ? '⚡ Moderate' : 'ℹ️ Minor'}
+                                </Badge>
+                                {badge && (
+                                  <span className={`text-xs px-3 py-1 rounded-full font-medium ${badge.color}`}>
+                                    {badge.label}
+                                  </span>
+                                )}
+                              </div>
+                              <h3 className="font-semibold text-foreground flex items-center gap-2">
+                                <span className="text-destructive">MYTH:</span> {myth.myth}
+                                {!hasAccess && <Lock className="h-4 w-4 text-muted-foreground" />}
+                              </h3>
+                            </div>
+                          </div>
+                        </AccordionTrigger>
+                        {hasAccess && (
+                          <AccordionContent className="pb-5">
+                            <div className="space-y-4 pt-4 border-t border-border/50">
+                              {/* Truth */}
+                              <div className="flex items-start gap-3 p-4 rounded-xl bg-success/10 border border-success/20">
+                                <CheckCircle className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
+                                <div>
+                                  <p className="font-semibold text-success mb-1">TRUTH:</p>
+                                  <p className="text-foreground">{myth.truth}</p>
+                                </div>
+                              </div>
+
+                              {/* Explanation */}
+                              <div className="p-4 rounded-xl bg-secondary/50">
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                  {myth.explanation}
+                                </p>
+                              </div>
+
+                              {/* Related Topics */}
+                              <div className="flex flex-wrap gap-2">
+                                {myth.relatedTopics.map((topic, i) => (
+                                  <Badge key={i} variant="secondary" className="text-xs">
+                                    {topic}
+                                  </Badge>
+                                ))}
+                              </div>
+
+                              {/* Quiz */}
+                              {myth.quiz && (
+                                <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 space-y-3">
+                                  <p className="font-semibold text-foreground flex items-center gap-2">
+                                    <HelpCircle className="h-4 w-4 text-primary" />
+                                    Quick Quiz
+                                  </p>
+                                  <p className="text-sm text-foreground">{myth.quiz.question}</p>
+                                  <div className="space-y-2">
+                                    {myth.quiz.options.map((option, i) => (
+                                      <button
+                                        key={i}
+                                        onClick={() => handleQuizAnswer(myth.id, i)}
+                                        disabled={showResult}
+                                        className={`w-full text-left p-3 rounded-lg text-sm transition-all ${
+                                          showResult
+                                            ? i === myth.quiz!.correctIndex
+                                              ? 'bg-success/20 border-success text-success'
+                                              : quizAnswer === i
+                                              ? 'bg-destructive/20 border-destructive text-destructive'
+                                              : 'bg-secondary/50 text-muted-foreground'
+                                            : quizAnswer === i
+                                            ? 'bg-primary/20 border-primary'
+                                            : 'bg-secondary/50 hover:bg-secondary'
+                                        } border`}
+                                      >
+                                        {String.fromCharCode(65 + i)}. {option}
+                                      </button>
+                                    ))}
+                                  </div>
+                                  {quizAnswer !== null && quizAnswer !== undefined && !showResult && (
+                                    <Button size="sm" onClick={() => checkQuizAnswer(myth.id)}>
+                                      Check Answer
+                                    </Button>
+                                  )}
+                                  {showResult && (
+                                    <div className={`p-3 rounded-lg text-sm ${isCorrect ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`}>
+                                      {isCorrect ? '✓ Correct! ' : '✗ Incorrect. '}
+                                      {myth.quiz.explanation}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </AccordionContent>
+                        )}
+                      </AccordionItem>
+                    </Accordion>
+                  );
+                })}
+              </div>
+            </TabsContent>
+
+            {/* Sectors Tab */}
+            <TabsContent value="sectors" className="space-y-6">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredGuides.map((guide) => {
+                  const hasAccess = canAccessGuide(guide);
+                  const badge = getTierBadge(guide.tier);
+                  const SectorIcon = sectorIcons[guide.sector] || Package;
+
+                  return (
+                    <div
+                      key={guide.id}
+                      className={`glass rounded-2xl p-5 hover-lift cursor-pointer group ${!hasAccess ? 'opacity-70' : ''}`}
+                      onClick={() => hasAccess && navigate(`/learn/sector/${guide.id}`)}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="p-3 rounded-xl bg-gradient-primary text-primary-foreground flex-shrink-0">
+                          <SectorIcon className="h-6 w-6" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-2">
+                            {badge && (
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${badge.color}`}>
+                                {badge.label}
+                              </span>
+                            )}
+                            {!hasAccess && <Lock className="h-3 w-3 text-muted-foreground" />}
+                          </div>
+                          <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
+                            {guide.title}
+                          </h3>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {guide.description}
+                          </p>
+                          <div className="mt-3 flex flex-wrap gap-1">
+                            {guide.taxIncentives.slice(0, 2).map((incentive, i) => (
+                              <Badge key={i} variant="secondary" className="text-xs">
+                                {incentive.name}
+                              </Badge>
+                            ))}
+                            {guide.taxIncentives.length > 2 && (
+                              <Badge variant="secondary" className="text-xs">
+                                +{guide.taxIncentives.length - 2} more
+                              </Badge>
+                            )}
                           </div>
                         </div>
-                      </AccordionTrigger>
-                      {hasAccess ? (
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Sector Detail Modal / Expanded View */}
+              <div className="glass-frosted rounded-3xl p-6">
+                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Lightbulb className="h-5 w-5 text-warning" />
+                  Quick Reference
+                </h3>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <a href="https://nitda.gov.ng" target="_blank" rel="noopener noreferrer" 
+                     className="flex items-center gap-3 p-3 glass rounded-xl hover:bg-primary/5 transition-colors">
+                    <Cpu className="h-5 w-5 text-primary" />
+                    <span className="text-sm font-medium">NITDA Portal</span>
+                    <ExternalLink className="h-3 w-3 ml-auto text-muted-foreground" />
+                  </a>
+                  <a href="https://nepza.gov.ng" target="_blank" rel="noopener noreferrer"
+                     className="flex items-center gap-3 p-3 glass rounded-xl hover:bg-primary/5 transition-colors">
+                    <Globe className="h-5 w-5 text-primary" />
+                    <span className="text-sm font-medium">NEPZA Portal</span>
+                    <ExternalLink className="h-3 w-3 ml-auto text-muted-foreground" />
+                  </a>
+                  <a href="https://firs.gov.ng" target="_blank" rel="noopener noreferrer"
+                     className="flex items-center gap-3 p-3 glass rounded-xl hover:bg-primary/5 transition-colors">
+                    <Building2 className="h-5 w-5 text-primary" />
+                    <span className="text-sm font-medium">FIRS Portal</span>
+                    <ExternalLink className="h-3 w-3 ml-auto text-muted-foreground" />
+                  </a>
+                  <a href="https://nepc.gov.ng" target="_blank" rel="noopener noreferrer"
+                     className="flex items-center gap-3 p-3 glass rounded-xl hover:bg-primary/5 transition-colors">
+                    <Package className="h-5 w-5 text-primary" />
+                    <span className="text-sm font-medium">NEPC Portal</span>
+                    <ExternalLink className="h-3 w-3 ml-auto text-muted-foreground" />
+                  </a>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Articles Tab */}
+            <TabsContent value="articles" className="space-y-6">
+              {/* Video Section - Glass Cards */}
+              <div className="glass-frosted rounded-3xl p-6">
+                <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-primary/10">
+                    <Play className="h-5 w-5 text-primary" />
+                  </div>
+                  Quick Videos
+                </h2>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {[
+                    { title: '2026 Tax Reforms Explained', duration: '2 min' },
+                    { title: 'How to Calculate PIT', duration: '3 min' },
+                    { title: 'VAT Registration Guide', duration: '4 min' },
+                    { title: 'Small Company Benefits', duration: '2 min' }
+                  ].map((video, idx) => (
+                    <div 
+                      key={idx}
+                      className="glass aspect-video rounded-2xl flex items-center justify-center cursor-pointer group hover-lift relative overflow-hidden"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="text-center relative z-10">
+                        <div className="w-16 h-16 rounded-full bg-gradient-primary glow-primary flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                          <Play className="h-7 w-7 text-primary-foreground fill-primary-foreground ml-1" />
+                        </div>
+                        <p className="font-medium text-foreground">{video.title}</p>
+                        <p className="text-sm text-muted-foreground">{video.duration}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Articles List */}
+              <div className="glass-frosted rounded-3xl p-6">
+                <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-primary/10">
+                    <FileText className="h-5 w-5 text-primary" />
+                  </div>
+                  Knowledge Base
+                </h2>
+                <div className="space-y-4">
+                  {articles.map((article) => (
+                    <Accordion type="single" collapsible key={article.id}>
+                      <AccordionItem value={article.id} className="glass rounded-2xl px-5 border-0">
+                        <AccordionTrigger className="py-5 hover:no-underline">
+                          <div className="flex items-start gap-4 text-left w-full pr-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
+                                  {article.category}
+                                </span>
+                                <span className="text-xs text-muted-foreground">{article.readTime}</span>
+                              </div>
+                              <h3 className="font-semibold text-foreground">{article.title}</h3>
+                              <p className="text-sm text-muted-foreground mt-1">{article.description}</p>
+                            </div>
+                          </div>
+                        </AccordionTrigger>
                         <AccordionContent className="pb-5">
                           <div className="pt-4 border-t border-border/50">
                             <pre className="whitespace-pre-wrap text-sm text-foreground font-sans leading-relaxed">
@@ -435,70 +681,51 @@ As an employer, you must:
                             </pre>
                           </div>
                         </AccordionContent>
-                      ) : (
-                        <AccordionContent className="pb-5">
-                          <div className="pt-4 border-t border-border/50">
-                            <div className="p-6 rounded-2xl bg-gradient-to-br from-warning/10 to-accent/5 text-center">
-                              <div className="w-14 h-14 rounded-full bg-warning/20 flex items-center justify-center mx-auto mb-3">
-                                <Crown className="h-7 w-7 text-warning" />
-                              </div>
-                              <p className="text-muted-foreground mb-4">
-                                Upgrade to {badge?.label} to access this content
-                              </p>
-                              <Button variant="glow" size="sm" onClick={() => navigate('/pricing')}>
-                                Upgrade Now
-                              </Button>
-                            </div>
-                          </div>
-                        </AccordionContent>
-                      )}
-                    </AccordionItem>
-                  </Accordion>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* FAQs - Neumorphic Accordion */}
-          <div className="neumorphic p-6 mb-8 animate-fade-in">
-            <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
-              <div className="p-2 rounded-xl bg-primary/10">
-                <Calculator className="h-5 w-5 text-primary" />
+                      </AccordionItem>
+                    </Accordion>
+                  ))}
+                </div>
               </div>
-              Frequently Asked Questions
-            </h2>
-            <Accordion type="single" collapsible className="space-y-3">
-              {faqs.map((faq, index) => (
-                <AccordionItem 
-                  key={index} 
-                  value={`faq-${index}`}
-                  className="glass rounded-xl px-5 border-0"
-                >
-                  <AccordionTrigger className="py-4 hover:no-underline text-left">
-                    <span className="font-medium text-foreground">{faq.question}</span>
-                  </AccordionTrigger>
-                  <AccordionContent className="pb-4">
-                    <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
+            </TabsContent>
+
+            {/* FAQs Tab */}
+            <TabsContent value="faqs" className="space-y-6">
+              <div className="glass-frosted rounded-3xl p-6">
+                <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-accent/10">
+                    <HelpCircle className="h-5 w-5 text-accent" />
+                  </div>
+                  Frequently Asked Questions
+                </h2>
+                <Accordion type="single" collapsible className="space-y-3">
+                  {faqs.map((faq, i) => (
+                    <AccordionItem key={i} value={`faq-${i}`} className="glass rounded-2xl px-5 border-0">
+                      <AccordionTrigger className="py-4 hover:no-underline text-left">
+                        <span className="font-medium text-foreground">{faq.question}</span>
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-4 text-muted-foreground">
+                        {faq.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </div>
+            </TabsContent>
+          </Tabs>
 
           {/* Upgrade CTA */}
           {!isBusinessPlus && (
-            <div className="neon-border p-8 text-center animate-fade-in">
-              <div className="w-16 h-16 rounded-full bg-gradient-accent glow-accent flex items-center justify-center mx-auto mb-4">
-                <Crown className="h-8 w-8 text-accent-foreground" />
-              </div>
+            <div className="glass-frosted rounded-3xl p-8 text-center mt-8 animate-fade-in">
+              <Crown className="h-12 w-12 text-warning mx-auto mb-4" />
               <h3 className="text-xl font-bold text-foreground mb-2">
-                Unlock Premium Content
+                Unlock All Content
               </h3>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                Get access to advanced tax guides, freelancer tips, and audit preparation guides.
+                Get access to advanced sector guides, all tax myths, and exclusive content with a Business plan.
               </p>
               <Button variant="glow" size="lg" onClick={() => navigate('/pricing')}>
-                View Plans
+                <Crown className="h-5 w-5" />
+                Upgrade Now
               </Button>
             </div>
           )}
