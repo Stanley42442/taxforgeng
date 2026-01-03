@@ -1,11 +1,33 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.89.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const SYSTEM_PROMPT = `You are TaxBot, an expert AI assistant specializing in Nigerian taxation. You help Nigerian businesses and individuals understand their tax obligations.
+const buildSystemPrompt = (userContext?: { 
+  businessName?: string; 
+  entityType?: string; 
+  sector?: string; 
+  turnover?: number;
+}) => {
+  let contextInfo = '';
+  
+  if (userContext?.businessName) {
+    contextInfo = `\n\nUSER CONTEXT (use this to personalize responses):
+- Business: ${userContext.businessName}
+- Entity Type: ${userContext.entityType === 'company' ? 'Limited Liability Company (LTD)' : 'Business Name/Sole Proprietor'}
+${userContext.sector ? `- Sector: ${userContext.sector}` : ''}
+${userContext.turnover ? `- Turnover: ₦${userContext.turnover.toLocaleString()}` : ''}
+
+When answering, reference this user's specific situation. For example:
+- If they're a small company (<₦50m turnover), mention 0% CIT eligibility
+- If they're in tech/agriculture/manufacturing, highlight sector-specific incentives
+- Personalize examples using their business name`;
+  }
+
+  return `You are TaxBot, an expert AI assistant specializing in Nigerian taxation. You help Nigerian businesses and individuals understand their tax obligations.
 
 Your expertise includes:
 - Company Income Tax (CIT) - rates, exemptions, and filing requirements
@@ -81,6 +103,7 @@ EXPORTS:
 - Export Expansion Grant (EEG) up to 30% of export value
 - Duty drawback on imported inputs used for exports
 - Reduced tax rate on export profits
+${contextInfo}
 
 Guidelines:
 1. Always provide accurate information based on current Nigerian tax laws
@@ -94,8 +117,10 @@ Guidelines:
 9. PROACTIVELY debunk myths when relevant to the user's question
 10. Reference specific 2026 rule changes when applicable
 11. Mention relevant sector incentives when the user's business type is clear
+12. If user context is provided, personalize your responses to their specific business situation
 
 Remember: You're here to educate and guide, not to provide official tax advice that would replace a licensed tax consultant.`;
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -103,12 +128,15 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, userContext } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
+
+    // Build context-aware system prompt
+    const systemPrompt = buildSystemPrompt(userContext);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -119,7 +147,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: systemPrompt },
           ...messages,
         ],
         stream: true,
