@@ -12,7 +12,11 @@ import {
   ShoppingCart, 
   Globe, 
   Package,
-  Sparkles
+  Sparkles,
+  CreditCard,
+  Stethoscope,
+  Building,
+  Truck
 } from "lucide-react";
 
 interface SectorPreset {
@@ -28,6 +32,11 @@ interface SectorPreset {
     vatablePurchases?: number;
   };
   benefits: string[];
+  taxRules: {
+    citRate?: string;
+    vatStatus?: string;
+    specialIncentives?: string[];
+  };
 }
 
 const SECTOR_PRESETS: SectorPreset[] = [
@@ -43,7 +52,12 @@ const SECTOR_PRESETS: SectorPreset[] = [
       vatableSales: 50000000,
       vatablePurchases: 5000000,
     },
-    benefits: ['5% EDTI tax credit', 'R&D deductions', 'IP income benefits']
+    benefits: ['5% EDTI tax credit', 'R&D deductions', 'IP income benefits'],
+    taxRules: {
+      citRate: '0% with Pioneer Status',
+      vatStatus: 'Standard 7.5%',
+      specialIncentives: ['NSA labeling (<₦1.5B)', 'EDTI 5% credit', 'R&D 120% deduction']
+    }
   },
   {
     id: 'agriculture',
@@ -54,10 +68,15 @@ const SECTOR_PRESETS: SectorPreset[] = [
       turnover: 30000000,
       expenses: 18000000,
       fixedAssets: 25000000,
-      vatableSales: 0, // Zero-rated
+      vatableSales: 0,
       vatablePurchases: 8000000,
     },
-    benefits: ['CIT holiday (5 years)', 'VAT zero-rating', 'Input VAT credits']
+    benefits: ['CIT holiday (5 years)', 'VAT zero-rating', 'Input VAT credits'],
+    taxRules: {
+      citRate: '0% for 5 years',
+      vatStatus: 'Zero-rated inputs, exempt output',
+      specialIncentives: ['Duty-free equipment', 'Accelerated depreciation', 'Export incentives']
+    }
   },
   {
     id: 'manufacturing',
@@ -71,7 +90,12 @@ const SECTOR_PRESETS: SectorPreset[] = [
       vatableSales: 120000000,
       vatablePurchases: 60000000,
     },
-    benefits: ['10% fixed asset credit', 'Wage deductions', 'Accelerated depreciation']
+    benefits: ['10% fixed asset credit', 'Wage deductions', 'Accelerated depreciation'],
+    taxRules: {
+      citRate: '25% (standard)',
+      vatStatus: 'Standard 7.5%',
+      specialIncentives: ['Investment Tax Credit 10%', 'Local raw material bonus 10%', 'Job creation 10% deduction']
+    }
   },
   {
     id: 'retail',
@@ -85,7 +109,12 @@ const SECTOR_PRESETS: SectorPreset[] = [
       vatableSales: 15000000,
       vatablePurchases: 10000000,
     },
-    benefits: ['Presumptive tax option', 'Simplified filing', 'Small company relief']
+    benefits: ['Presumptive tax option', 'Simplified filing', 'Small company relief'],
+    taxRules: {
+      citRate: '0% (small company) or 1% presumptive',
+      vatStatus: 'Optional registration <₦25m',
+      specialIncentives: ['Simplified record-keeping', 'Reduced audit risk']
+    }
   },
   {
     id: 'freezone',
@@ -96,10 +125,15 @@ const SECTOR_PRESETS: SectorPreset[] = [
       turnover: 200000000,
       expenses: 100000000,
       fixedAssets: 80000000,
-      vatableSales: 0, // Exports zero-rated
+      vatableSales: 0,
       vatablePurchases: 40000000,
     },
-    benefits: ['CIT exemption', 'Duty-free imports', 'No WHT on dividends']
+    benefits: ['CIT exemption', 'Duty-free imports', 'No WHT on dividends'],
+    taxRules: {
+      citRate: '0% on exports',
+      vatStatus: 'Zero-rated exports',
+      specialIncentives: ['NEPZA/OGFZA registration', 'Repatriation guaranteed', 'One-stop approval']
+    }
   },
   {
     id: 'export',
@@ -110,10 +144,91 @@ const SECTOR_PRESETS: SectorPreset[] = [
       turnover: 80000000,
       expenses: 50000000,
       fixedAssets: 30000000,
-      vatableSales: 0, // Exports zero-rated
+      vatableSales: 0,
       vatablePurchases: 25000000,
     },
-    benefits: ['VAT zero-rating', 'EEG eligibility', 'Forex retention']
+    benefits: ['VAT zero-rating', 'EEG eligibility', 'Forex retention'],
+    taxRules: {
+      citRate: 'Reduced on export profits',
+      vatStatus: 'Zero-rated',
+      specialIncentives: ['EEG up to 30%', 'Duty drawback', 'Export Development Fund']
+    }
+  },
+  {
+    id: 'fintech',
+    name: 'Fintech',
+    icon: CreditCard,
+    description: 'Digital financial services taxation',
+    presets: {
+      turnover: 100000000,
+      expenses: 60000000,
+      fixedAssets: 20000000,
+      vatableSales: 100000000,
+      vatablePurchases: 30000000,
+    },
+    benefits: ['NSA labeling eligible', 'R&D deductions', 'EDTI credits'],
+    taxRules: {
+      citRate: '25% or Pioneer Status',
+      vatStatus: 'Standard 7.5% on fees',
+      specialIncentives: ['CBN sandbox benefits', 'Platform development deductions']
+    }
+  },
+  {
+    id: 'healthcare',
+    name: 'Healthcare',
+    icon: Stethoscope,
+    description: 'Medical services exemptions',
+    presets: {
+      turnover: 50000000,
+      expenses: 35000000,
+      fixedAssets: 40000000,
+      vatableSales: 0,
+      vatablePurchases: 15000000,
+    },
+    benefits: ['VAT-exempt services', 'Equipment duty waiver', 'Pioneer Status'],
+    taxRules: {
+      citRate: '25% or Pioneer Status',
+      vatStatus: 'Exempt (medical services)',
+      specialIncentives: ['Duty-free medical equipment', 'NAFDAC fast-track']
+    }
+  },
+  {
+    id: 'realestate',
+    name: 'Real Estate',
+    icon: Building,
+    description: 'Property development & rental income',
+    presets: {
+      turnover: 150000000,
+      expenses: 100000000,
+      fixedAssets: 500000000,
+      vatableSales: 150000000,
+      vatablePurchases: 80000000,
+    },
+    benefits: ['Capital allowances', 'Interest deductions', 'CGT deferral'],
+    taxRules: {
+      citRate: '25% on rental income',
+      vatStatus: 'Exempt (residential), Standard (commercial)',
+      specialIncentives: ['10% CGT on disposal', 'Rollover relief available']
+    }
+  },
+  {
+    id: 'logistics',
+    name: 'Logistics',
+    icon: Truck,
+    description: 'Transportation and warehousing',
+    presets: {
+      turnover: 80000000,
+      expenses: 55000000,
+      fixedAssets: 60000000,
+      vatableSales: 80000000,
+      vatablePurchases: 40000000,
+    },
+    benefits: ['Vehicle depreciation', 'Fuel deductions', 'Export logistics incentives'],
+    taxRules: {
+      citRate: '25% standard',
+      vatStatus: 'Standard 7.5%',
+      specialIncentives: ['Accelerated vehicle depreciation', 'Export logistics zero-rated']
+    }
   },
 ];
 
@@ -130,14 +245,14 @@ export const SectorPresets = ({ onApplyPreset }: SectorPresetsProps) => {
           Sector Presets
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0 glass-frosted" align="start">
+      <PopoverContent className="w-96 p-0 glass-frosted" align="start">
         <div className="p-3 border-b border-border">
           <h4 className="font-semibold text-sm">Choose Your Sector</h4>
           <p className="text-xs text-muted-foreground mt-1">
-            Apply sector-specific tax presets
+            Apply sector-specific tax presets and incentives
           </p>
         </div>
-        <div className="max-h-80 overflow-y-auto">
+        <div className="max-h-96 overflow-y-auto">
           {SECTOR_PRESETS.map((sector) => (
             <button
               key={sector.id}
@@ -151,6 +266,11 @@ export const SectorPresets = ({ onApplyPreset }: SectorPresetsProps) => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium text-sm">{sector.name}</span>
+                    {sector.taxRules.citRate && (
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                        {sector.taxRules.citRate}
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-xs text-muted-foreground mb-2">
                     {sector.description}

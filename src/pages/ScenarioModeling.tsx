@@ -9,6 +9,8 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useNavigate } from "react-router-dom";
 import { calculateTax, formatCurrency, type TaxInputs } from "@/lib/taxCalculations";
 import { MultiYearProjection } from "@/components/MultiYearProjection";
+import { PenaltyEstimator } from "@/components/PenaltyEstimator";
+import { ForeignIncomeCalculator } from "@/components/ForeignIncomeCalculator";
 import {
   ArrowRight,
   ArrowDown,
@@ -19,7 +21,9 @@ import {
   Crown,
   Lightbulb,
   Minus,
-  Calendar
+  Calendar,
+  AlertTriangle,
+  Globe
 } from "lucide-react";
 
 const ScenarioModeling = () => {
@@ -127,14 +131,22 @@ const ScenarioModeling = () => {
 
           {/* Tabs for What-If vs Multi-Year */}
           <Tabs defaultValue="what-if" className="animate-slide-up-delay-1">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsList className="grid w-full grid-cols-4 mb-6">
               <TabsTrigger value="what-if" className="gap-2">
                 <Calculator className="h-4 w-4" />
-                What-If Analysis
+                <span className="hidden sm:inline">What-If</span>
               </TabsTrigger>
               <TabsTrigger value="multi-year" className="gap-2">
                 <Calendar className="h-4 w-4" />
-                Multi-Year Projections
+                <span className="hidden sm:inline">Multi-Year</span>
+              </TabsTrigger>
+              <TabsTrigger value="penalties" className="gap-2">
+                <AlertTriangle className="h-4 w-4" />
+                <span className="hidden sm:inline">Penalties</span>
+              </TabsTrigger>
+              <TabsTrigger value="foreign" className="gap-2">
+                <Globe className="h-4 w-4" />
+                <span className="hidden sm:inline">Foreign</span>
               </TabsTrigger>
             </TabsList>
 
@@ -421,6 +433,18 @@ const ScenarioModeling = () => {
 
             <TabsContent value="multi-year">
               <MultiYearProjection />
+            </TabsContent>
+
+            <TabsContent value="penalties">
+              <div className="max-w-xl mx-auto">
+                <PenaltyEstimator />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="foreign">
+              <div className="max-w-xl mx-auto">
+                <ForeignIncomeCalculator />
+              </div>
             </TabsContent>
           </Tabs>
 

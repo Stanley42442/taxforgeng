@@ -5,7 +5,7 @@ export interface TaxMyth {
   myth: string;
   truth: string;
   explanation: string;
-  category: 'gifts' | 'audits' | 'penalties' | 'foreign' | 'vat' | 'exemptions' | 'reforms' | 'general';
+  category: 'gifts' | 'audits' | 'penalties' | 'foreign' | 'vat' | 'exemptions' | 'reforms' | 'general' | 'digital' | 'compliance';
   severity: 'high' | 'medium' | 'low'; // How dangerous the myth is
   tier: 'free' | 'basic' | 'business';
   relatedTopics: string[];
@@ -19,7 +19,7 @@ export interface TaxMyth {
 
 export interface SectorGuide {
   id: string;
-  sector: 'tech' | 'agriculture' | 'manufacturing' | 'retail' | 'freezone' | 'export';
+  sector: 'tech' | 'agriculture' | 'manufacturing' | 'retail' | 'freezone' | 'export' | 'fintech' | 'healthcare';
   title: string;
   description: string;
   benefits: string[];
@@ -32,6 +32,17 @@ export interface SectorGuide {
   content: string;
   tier: 'free' | 'basic' | 'business';
   icon: string;
+}
+
+export interface VideoGuide {
+  id: string;
+  title: string;
+  description: string;
+  duration: string;
+  youtubeId?: string;
+  thumbnail?: string;
+  category: 'basics' | 'reforms' | 'sectors' | 'tips';
+  tier: 'free' | 'basic' | 'business';
 }
 
 export const taxMyths: TaxMyth[] = [
@@ -209,7 +220,7 @@ export const taxMyths: TaxMyth[] = [
     myth: 'Cryptocurrency gains don\'t need to be reported since crypto isn\'t recognized',
     truth: 'Crypto gains are TAXABLE as capital gains (10% CGT) regardless of regulatory status.',
     explanation: 'While CBN restricts banking services for crypto, FIRS treats crypto as property. Gains from crypto disposals attract 10% Capital Gains Tax. Losses can offset gains. Proper record-keeping of acquisition costs is essential.',
-    category: 'general',
+    category: 'digital',
     severity: 'high',
     tier: 'basic',
     relatedTopics: ['cryptocurrency', 'capital gains', 'digital assets'],
@@ -293,7 +304,7 @@ export const taxMyths: TaxMyth[] = [
     myth: 'You only need a TIN when you\'re ready to pay taxes',
     truth: 'TIN registration is MANDATORY for many activities: bank accounts, contracts, land purchases.',
     explanation: 'Tax Identification Number (TIN) is required for: opening bank accounts, government contracts, land registry transactions, vehicle registration, and business registrations. Failure to obtain TIN can block legitimate business activities even before tax liability arises.',
-    category: 'general',
+    category: 'compliance',
     severity: 'medium',
     tier: 'free',
     relatedTopics: ['TIN registration', 'tax compliance', 'business setup'],
@@ -439,7 +450,7 @@ export const taxMyths: TaxMyth[] = [
     id: 'staff-loans-free',
     myth: 'Staff loans are tax-free benefits for employees',
     truth: 'Below-market loans create TAXABLE benefit equal to the interest foregone.',
-    explanation: 'If an employer provides a loan at below-market interest rates, the difference between market rate and actual rate charged is a taxable benefit. The employee must pay tax on this \"benefit in kind.\" This applies to housing loans, car loans, and other employer-provided financing.',
+    explanation: 'If an employer provides a loan at below-market interest rates, the difference between market rate and actual rate charged is a taxable benefit. The employee must pay tax on this "benefit in kind." This applies to housing loans, car loans, and other employer-provided financing.',
     category: 'general',
     severity: 'low',
     tier: 'business',
@@ -454,6 +465,217 @@ export const taxMyths: TaxMyth[] = [
       ],
       correctIndex: 1,
       explanation: 'Below-market interest loans create taxable benefits. The interest rate difference is treated as employee income.'
+    }
+  },
+  // NEW MYTHS ADDED
+  {
+    id: 'reforms-retroactive',
+    myth: 'The 2026 tax reforms will apply retroactively to previous years',
+    truth: 'Tax reforms are PROSPECTIVE. They only apply from the effective date forward.',
+    explanation: 'The Nigeria Tax Act 2025 comes into effect from January 1, 2026. It doesn\'t apply to tax years before that date. Your 2024 and 2025 returns still follow the old rules. Only income earned from 2026 onwards follows the new rules.',
+    category: 'reforms',
+    severity: 'high',
+    tier: 'free',
+    relatedTopics: ['tax reforms', 'effective dates', 'transitional provisions'],
+    quiz: {
+      question: 'When do the 2026 tax reforms apply?',
+      options: [
+        'From January 1, 2024 retroactively',
+        'From January 1, 2026 onwards only',
+        'Immediately upon signing',
+        'When FIRS issues guidelines'
+      ],
+      correctIndex: 1,
+      explanation: 'Tax reforms are prospective and apply from January 1, 2026. Previous years follow old rules.'
+    }
+  },
+  {
+    id: 'reforms-increase-taxes',
+    myth: 'The 2026 reforms will increase taxes for everyone',
+    truth: 'The reforms REDUCE taxes for 98% of workers by raising the exempt threshold to ₦800,000.',
+    explanation: 'Under the new rules, the first ₦800,000 of annual income is tax-free (up from ₦300,000). This means most Nigerian workers will pay LESS tax. Only very high earners may see marginal increases, and even then, the effective rates are often lower.',
+    category: 'reforms',
+    severity: 'high',
+    tier: 'free',
+    relatedTopics: ['personal income tax', 'tax relief', '2026 reforms'],
+    quiz: {
+      question: 'How do 2026 reforms affect most Nigerian workers?',
+      options: [
+        'Taxes increase by 50%',
+        'Taxes decrease for 98% of workers',
+        'No change for anyone',
+        'Only affects high earners'
+      ],
+      correctIndex: 1,
+      explanation: 'The raised exempt threshold (₦800,000) means most workers pay less tax under the new rules.'
+    }
+  },
+  {
+    id: 'digital-vat-kills-startups',
+    myth: 'VAT on digital services will kill Nigerian tech startups',
+    truth: 'The VAT primarily targets FOREIGN providers. Nigerian startups below ₦25m are exempt from registration.',
+    explanation: 'The digital services VAT targets foreign companies like Netflix, Spotify selling to Nigerian consumers. Small Nigerian tech startups (turnover <₦25m) aren\'t required to register for VAT. B2B services can often recover input VAT. The impact on local startups is minimal.',
+    category: 'digital',
+    severity: 'medium',
+    tier: 'basic',
+    relatedTopics: ['digital economy', 'tech startups', 'VAT registration'],
+    quiz: {
+      question: 'Who is primarily targeted by Nigeria\'s digital services VAT?',
+      options: [
+        'All Nigerian tech companies',
+        'Foreign digital service providers',
+        'Only streaming services',
+        'E-commerce platforms only'
+      ],
+      correctIndex: 1,
+      explanation: 'The digital VAT primarily targets foreign providers. Small Nigerian startups are often exempt.'
+    }
+  },
+  {
+    id: 'audit-means-jail',
+    myth: 'Being selected for a tax audit means you\'re going to jail',
+    truth: 'Most audits are ROUTINE compliance checks. Only fraud leads to criminal prosecution.',
+    explanation: 'Tax audits are normal business procedures. FIRS conducts thousands annually, most resulting in no penalties or minor adjustments. Even when issues are found, the first response is usually additional assessment and penalties, not prosecution. Criminal charges require proof of intentional fraud.',
+    category: 'audits',
+    severity: 'high',
+    tier: 'free',
+    relatedTopics: ['tax audits', 'compliance', 'FIRS procedures'],
+    quiz: {
+      question: 'What happens in most tax audits?',
+      options: [
+        'Immediate arrest',
+        'Routine check with minor or no adjustments',
+        'Business shutdown',
+        'Automatic penalties'
+      ],
+      correctIndex: 1,
+      explanation: 'Most audits are routine compliance checks. Only intentional fraud leads to criminal prosecution.'
+    }
+  },
+  {
+    id: 'freelancer-no-tax',
+    myth: 'Freelancers and gig workers don\'t need to pay taxes',
+    truth: 'Freelance income is TAXABLE. You must file annual PIT returns and pay quarterly estimates.',
+    explanation: 'Freelancers are self-employed and must register for tax, file annual Personal Income Tax returns with their state IRS, and pay estimated taxes quarterly. Common deductible expenses include equipment, internet, co-working space, and professional development.',
+    category: 'compliance',
+    severity: 'high',
+    tier: 'free',
+    relatedTopics: ['freelancing', 'self-employment', 'PIT', 'estimated taxes'],
+    quiz: {
+      question: 'What are a freelancer\'s tax obligations?',
+      options: [
+        'No tax if income is irregular',
+        'Register, file annual returns, pay estimated taxes',
+        'Only if earning above ₦10m',
+        'Employer handles everything'
+      ],
+      correctIndex: 1,
+      explanation: 'Freelancers must register for tax, file annual returns, and pay estimated taxes quarterly.'
+    }
+  },
+  {
+    id: 'deductions-fake-receipts',
+    myth: 'You can claim deductions with any receipt, even fabricated ones',
+    truth: 'FIRS verifies receipts. Fabricated documents are FRAUD with criminal penalties.',
+    explanation: 'FIRS cross-references receipts with supplier records and conducts random verification. Submitting fabricated receipts constitutes tax fraud with penalties including fines, back taxes with interest, and potential criminal prosecution. Always keep genuine documentation.',
+    category: 'penalties',
+    severity: 'high',
+    tier: 'basic',
+    relatedTopics: ['tax fraud', 'documentation', 'deductions'],
+    quiz: {
+      question: 'What happens if you submit fake receipts for deductions?',
+      options: [
+        'Nothing if not audited',
+        'Criminal fraud charges and penalties',
+        'Just lose the deduction',
+        'Warning letter only'
+      ],
+      correctIndex: 1,
+      explanation: 'Submitting fabricated receipts is tax fraud with criminal penalties, fines, and back taxes.'
+    }
+  },
+  {
+    id: 'late-penalty-fixed',
+    myth: 'Late filing penalties are a fixed amount anyone can afford to pay',
+    truth: 'Penalties are PERCENTAGE-BASED and compound with interest. Large liabilities mean large penalties.',
+    explanation: 'Late CIT filing is 10% of tax due + interest at CBN rate. Late VAT is 5% + ₦5,000/month. For a ₦10m tax liability, that\'s ₦1m+ in penalties. Interest compounds monthly. What seems affordable for small amounts becomes devastating for larger liabilities.',
+    category: 'penalties',
+    severity: 'high',
+    tier: 'free',
+    relatedTopics: ['late filing', 'penalties', 'interest charges'],
+    quiz: {
+      question: 'What is the penalty for filing CIT 1 year late on ₦10m tax due?',
+      options: [
+        '₦10,000 fixed penalty',
+        '₦1m + interest (potentially ₦2m+ total)',
+        '5% = ₦500,000',
+        'No penalty for first offense'
+      ],
+      correctIndex: 1,
+      explanation: 'Late penalties are 10% of tax due plus compound interest. For ₦10m, that\'s ₦1m+ in penalties.'
+    }
+  },
+  {
+    id: 'voluntary-disclosure-trap',
+    myth: 'Coming forward voluntarily about past errors will make things worse',
+    truth: 'Voluntary disclosure programs offer REDUCED penalties and protection from prosecution.',
+    explanation: 'FIRS and state tax authorities offer voluntary disclosure programs. Coming forward before an audit typically results in: waived or reduced penalties, no criminal prosecution, payment plans for back taxes, and a clean slate going forward. Waiting for an audit is much worse.',
+    category: 'penalties',
+    severity: 'medium',
+    tier: 'basic',
+    relatedTopics: ['voluntary disclosure', 'tax amnesty', 'penalty waivers'],
+    quiz: {
+      question: 'What happens if you voluntarily disclose past tax errors?',
+      options: [
+        'Automatic prosecution',
+        'Reduced penalties and protection from prosecution',
+        'Double penalties for admitting guilt',
+        'No benefit vs being caught'
+      ],
+      correctIndex: 1,
+      explanation: 'Voluntary disclosure programs offer reduced penalties and protection from criminal prosecution.'
+    }
+  },
+  {
+    id: 'entertainment-full-deduction',
+    myth: 'All entertainment and client meals are fully deductible',
+    truth: 'Entertainment deductions are LIMITED and require proper documentation of business purpose.',
+    explanation: 'Entertainment expenses have caps and strict documentation requirements: who attended, business discussed, relationship to business. Lavish entertainment may be disallowed entirely. Keep detailed records including receipts, attendee lists, and meeting notes.',
+    category: 'general',
+    severity: 'low',
+    tier: 'basic',
+    relatedTopics: ['entertainment expenses', 'deductions', 'documentation'],
+    quiz: {
+      question: 'Can you fully deduct a ₦500,000 client dinner?',
+      options: [
+        'Yes, if you have the receipt',
+        'Limited deduction with strict documentation requirements',
+        'Only if the client signed',
+        'Never deductible'
+      ],
+      correctIndex: 1,
+      explanation: 'Entertainment deductions are limited and require detailed documentation of business purpose.'
+    }
+  },
+  {
+    id: 'loss-carried-forever',
+    myth: 'Business losses can be carried forward indefinitely',
+    truth: 'Loss carry-forward has TIME LIMITS and restrictions under the new rules.',
+    explanation: 'Under the 2026 rules, losses can be carried forward for 4 years (reduced from unlimited). Additionally, losses can only offset up to 50% of future profits in any given year. This means planning for loss recovery is now more critical.',
+    category: 'reforms',
+    severity: 'medium',
+    tier: 'business',
+    relatedTopics: ['loss carry-forward', 'tax planning', '2026 rules'],
+    quiz: {
+      question: 'How long can business losses be carried forward under 2026 rules?',
+      options: [
+        'Indefinitely',
+        '4 years maximum',
+        '2 years only',
+        '10 years'
+      ],
+      correctIndex: 1,
+      explanation: 'Under 2026 rules, losses can be carried forward for 4 years and offset up to 50% of future profits.'
     }
   }
 ];
@@ -704,7 +926,7 @@ Choose consistent method:
       { name: 'Import Duties', value: 'Exempt on raw materials', duration: 'For zone operations' },
       { name: 'Dividend WHT', value: '0% to non-residents', duration: 'Ongoing' }
     ],
-    content: `Nigeria\'s free zones offer significant tax advantages:
+    content: `Nigeria's free zones offer significant tax advantages:
 
 **Types of Free Zones:**
 - NEPZA zones (general export processing)
@@ -802,41 +1024,302 @@ Access to financing for:
 - Maximize EEG through eligible activities`,
     tier: 'basic',
     icon: '📦'
+  },
+  {
+    id: 'fintech',
+    sector: 'fintech',
+    title: 'Fintech & Digital Finance',
+    description: 'Tax considerations for fintech companies, payment processors, and digital lenders',
+    benefits: [
+      'NSA labeling benefits for qualifying fintechs',
+      'CBN sandbox participation',
+      'R&D deductions on platform development',
+      'EDTI credits for technology investment',
+      'Potential Pioneer Status for innovative services'
+    ],
+    requirements: [
+      'CBN licensing or registration',
+      'Compliance with financial regulations',
+      'Data protection compliance (NDPA)',
+      'Anti-money laundering procedures',
+      'Capital adequacy requirements'
+    ],
+    taxIncentives: [
+      { name: 'NSA Benefits', value: 'Various tax credits', duration: 'For qualifying startups' },
+      { name: 'R&D Deduction', value: '120% of platform development costs', duration: 'Ongoing' },
+      { name: 'EDTI Credit', value: '5% on domestic tech spend', duration: 'Annual' }
+    ],
+    content: `Fintech companies have unique tax considerations:
+
+**Regulatory Landscape:**
+- CBN licensing for payment services
+- SEC registration for investment platforms
+- NAICOM for insurtechs
+- Multiple compliance requirements affect costs
+
+**Tax Treatment of Revenue:**
+- Transaction fees: Standard income
+- Interest income: Withholding may apply
+- FX gains: Taxable as income
+- Subscription fees: Standard VAT rules
+
+**Deductible Expenses:**
+- Platform development and maintenance
+- Server and infrastructure costs
+- Compliance and licensing fees
+- Customer acquisition costs
+- Fraud prevention systems
+
+**NSA Labeling:**
+Qualifying fintechs can benefit from:
+- Tax holidays via Pioneer Status
+- R&D super deductions
+- EDTI credits
+- Simplified forex access
+
+**VAT on Digital Services:**
+- B2C services: Charge 7.5% VAT
+- B2B services: May be zero-rated
+- Cross-border payments: Complex rules apply`,
+    tier: 'business',
+    icon: '💳'
+  },
+  {
+    id: 'healthcare',
+    sector: 'healthcare',
+    title: 'Healthcare & Pharmaceutical',
+    description: 'Tax incentives for healthcare providers, hospitals, and pharmaceutical companies',
+    benefits: [
+      'VAT exemption on medical services',
+      'Import duty waivers on medical equipment',
+      'Pioneer Status for local drug manufacturing',
+      'Accelerated depreciation on medical equipment',
+      'Reduced WHT on pharmaceutical exports'
+    ],
+    requirements: [
+      'Registration with health authorities',
+      'NAFDAC approval for pharmaceuticals',
+      'Professional licensing requirements',
+      'Quality certifications',
+      'Compliance with healthcare standards'
+    ],
+    taxIncentives: [
+      { name: 'Medical Services', value: 'VAT-exempt', duration: 'Ongoing' },
+      { name: 'Equipment Import', value: 'Reduced/waived duties', duration: 'For medical equipment' },
+      { name: 'Drug Manufacturing', value: 'Pioneer Status available', duration: 'Up to 5 years' }
+    ],
+    content: `Healthcare sector enjoys various tax benefits:
+
+**VAT Exemptions:**
+The following are VAT-exempt:
+- Medical and veterinary services
+- Pharmaceutical products
+- Basic medical supplies
+- Hospital services
+
+**Equipment Import:**
+Medical equipment qualifies for:
+- Reduced or zero import duties
+- VAT exemption on qualifying items
+- Faster customs clearance via NAFDAC
+
+**Local Manufacturing:**
+Pharmaceutical companies manufacturing locally can apply for:
+- Pioneer Status (0% CIT for 3-5 years)
+- Additional capital allowances
+- Local content bonuses
+
+**Healthcare Professional Income:**
+Doctors, nurses, and other professionals:
+- PIT applies to employment income
+- Private practice income separately taxed
+- Allowable deductions for professional costs
+
+**Hospital Operations:**
+- Separate treatment for profit vs non-profit
+- Non-profit hospitals may have additional exemptions
+- For-profit hospitals use standard CIT rules`,
+    tier: 'basic',
+    icon: '🏥'
+  }
+];
+
+export const videoGuides: VideoGuide[] = [
+  {
+    id: 'reforms-2026-overview',
+    title: '2026 Tax Reforms Explained',
+    description: 'Complete overview of the Nigeria Tax Act 2025 and what changes for you',
+    duration: '5 min',
+    category: 'reforms',
+    tier: 'free'
+  },
+  {
+    id: 'pit-calculation',
+    title: 'How to Calculate PIT (2026 Rules)',
+    description: 'Step-by-step guide to calculating Personal Income Tax under new rules',
+    duration: '4 min',
+    category: 'basics',
+    tier: 'free'
+  },
+  {
+    id: 'vat-registration',
+    title: 'VAT Registration Guide',
+    description: 'When and how to register for VAT, and what to do after',
+    duration: '6 min',
+    category: 'basics',
+    tier: 'free'
+  },
+  {
+    id: 'small-company-benefits',
+    title: 'Small Company 0% CIT',
+    description: 'Understanding the new small company exemption and how to qualify',
+    duration: '3 min',
+    category: 'reforms',
+    tier: 'free'
+  },
+  {
+    id: 'myth-busting-gifts',
+    title: 'Myth: Labeling as Gifts',
+    description: 'Why calling income "gifts" doesn\'t make it tax-free',
+    duration: '2 min',
+    category: 'tips',
+    tier: 'free'
+  },
+  {
+    id: 'tech-nsa-incentives',
+    title: 'Tech Startup Tax Benefits',
+    description: 'NSA labeling, EDTI credits, and R&D deductions for tech companies',
+    duration: '7 min',
+    category: 'sectors',
+    tier: 'basic'
+  },
+  {
+    id: 'agriculture-exemptions',
+    title: 'Agriculture Tax Exemptions',
+    description: '5-year CIT holiday and zero-rated inputs for farmers',
+    duration: '5 min',
+    category: 'sectors',
+    tier: 'free'
+  },
+  {
+    id: 'avoiding-audits',
+    title: 'Avoiding Tax Audits',
+    description: 'Common audit triggers and how to stay compliant',
+    duration: '6 min',
+    category: 'tips',
+    tier: 'basic'
+  },
+  {
+    id: 'freelancer-taxes',
+    title: 'Freelancer Tax Guide',
+    description: 'Complete tax guide for gig workers and freelancers',
+    duration: '8 min',
+    category: 'basics',
+    tier: 'free'
+  },
+  {
+    id: 'penalty-prevention',
+    title: 'Penalty Prevention Tips',
+    description: 'Understand penalties and how to avoid them',
+    duration: '4 min',
+    category: 'tips',
+    tier: 'free'
   }
 ];
 
 // Helper functions
 export const getMythsByCategory = (category: TaxMyth['category']): TaxMyth[] => {
-  return taxMyths.filter(m => m.category === category);
+  return taxMyths.filter(myth => myth.category === category);
 };
 
 export const getMythsByTier = (tier: 'free' | 'basic' | 'business'): TaxMyth[] => {
   const tierOrder = { free: 0, basic: 1, business: 2 };
-  return taxMyths.filter(m => tierOrder[m.tier] <= tierOrder[tier]);
+  return taxMyths.filter(myth => tierOrder[myth.tier] <= tierOrder[tier]);
 };
 
 export const getHighSeverityMyths = (): TaxMyth[] => {
-  return taxMyths.filter(m => m.severity === 'high');
+  return taxMyths.filter(myth => myth.severity === 'high');
 };
 
 export const getSectorGuidesByTier = (tier: 'free' | 'basic' | 'business'): SectorGuide[] => {
   const tierOrder = { free: 0, basic: 1, business: 2 };
-  return sectorGuides.filter(g => tierOrder[g.tier] <= tierOrder[tier]);
+  return sectorGuides.filter(guide => tierOrder[guide.tier] <= tierOrder[tier]);
 };
 
-export const searchMythsAndGuides = (query: string): { myths: TaxMyth[]; guides: SectorGuide[] } => {
+export const getVideoGuidesByTier = (tier: 'free' | 'basic' | 'business'): VideoGuide[] => {
+  const tierOrder = { free: 0, basic: 1, business: 2 };
+  return videoGuides.filter(video => tierOrder[video.tier] <= tierOrder[tier]);
+};
+
+export const searchMythsAndGuides = (query: string): { myths: TaxMyth[]; guides: SectorGuide[]; videos: VideoGuide[] } => {
   const lowerQuery = query.toLowerCase();
+  
+  const myths = taxMyths.filter(myth => 
+    myth.myth.toLowerCase().includes(lowerQuery) ||
+    myth.truth.toLowerCase().includes(lowerQuery) ||
+    myth.explanation.toLowerCase().includes(lowerQuery) ||
+    myth.relatedTopics.some(topic => topic.toLowerCase().includes(lowerQuery))
+  );
+  
+  const guides = sectorGuides.filter(guide =>
+    guide.title.toLowerCase().includes(lowerQuery) ||
+    guide.description.toLowerCase().includes(lowerQuery) ||
+    guide.content.toLowerCase().includes(lowerQuery) ||
+    guide.benefits.some(b => b.toLowerCase().includes(lowerQuery))
+  );
+
+  const videos = videoGuides.filter(video =>
+    video.title.toLowerCase().includes(lowerQuery) ||
+    video.description.toLowerCase().includes(lowerQuery)
+  );
+  
+  return { myths, guides, videos };
+};
+
+// Penalty calculator helper
+export interface PenaltyEstimate {
+  lateFiling: number;
+  interest: number;
+  totalPenalty: number;
+  description: string;
+}
+
+export const calculatePenalty = (
+  taxType: 'cit' | 'vat' | 'pit' | 'paye',
+  taxDue: number,
+  monthsLate: number,
+  cbnRate: number = 24
+): PenaltyEstimate => {
+  let lateFiling = 0;
+  let monthlyPenalty = 0;
+  let description = '';
+
+  switch (taxType) {
+    case 'cit':
+      lateFiling = taxDue * 0.1; // 10% of tax due
+      description = '10% penalty on tax due + interest at CBN rate';
+      break;
+    case 'vat':
+      lateFiling = taxDue * 0.05; // 5% of tax due
+      monthlyPenalty = 5000 * monthsLate; // ₦5,000 per month
+      lateFiling += monthlyPenalty;
+      description = '5% penalty + ₦5,000 per month + interest';
+      break;
+    case 'pit':
+    case 'paye':
+      lateFiling = taxDue * 0.1; // 10% of tax due
+      description = '10% penalty on tax due + interest at CBN rate';
+      break;
+  }
+
+  // Interest calculation (compound monthly)
+  const monthlyRate = cbnRate / 100 / 12;
+  const interest = taxDue * (Math.pow(1 + monthlyRate, monthsLate) - 1);
+
   return {
-    myths: taxMyths.filter(m => 
-      m.myth.toLowerCase().includes(lowerQuery) ||
-      m.truth.toLowerCase().includes(lowerQuery) ||
-      m.explanation.toLowerCase().includes(lowerQuery) ||
-      m.relatedTopics.some(t => t.toLowerCase().includes(lowerQuery))
-    ),
-    guides: sectorGuides.filter(g =>
-      g.title.toLowerCase().includes(lowerQuery) ||
-      g.description.toLowerCase().includes(lowerQuery) ||
-      g.content.toLowerCase().includes(lowerQuery)
-    )
+    lateFiling,
+    interest,
+    totalPenalty: lateFiling + interest,
+    description
   };
 };
