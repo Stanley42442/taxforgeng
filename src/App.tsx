@@ -39,6 +39,7 @@ const Roadmap = lazy(() => import("./pages/Roadmap"));
 const Terms = lazy(() => import("./pages/Terms"));
 const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
 const Notifications = lazy(() => import("./pages/Notifications"));
+const SectorGuide = lazy(() => import("./pages/SectorGuide"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Lazy load TaxAssistant (heavy component with AI chat)
@@ -92,6 +93,7 @@ const App = () => (
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/admin-analytics" element={<AdminAnalytics />} />
                   <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/sector/:id" element={<SectorGuide />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <TaxAssistant />

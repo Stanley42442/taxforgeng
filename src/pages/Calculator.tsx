@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { calculateTax, type TaxInputs } from "@/lib/taxCalculations";
 import { NavMenu } from "@/components/NavMenu";
+import { SectorPresets } from "@/components/SectorPresets";
+import { toast } from "sonner";
 
 const CalculatorPage = () => {
   const location = useLocation();
@@ -97,9 +99,20 @@ const CalculatorPage = () => {
             <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
               Tax Calculator
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mb-4">
               Calculate your Nigerian taxes accurately
             </p>
+            <SectorPresets onApplyPreset={(presets) => {
+              setInputs(prev => ({
+                ...prev,
+                turnover: presets.turnover?.toString() || prev.turnover,
+                expenses: presets.expenses?.toString() || prev.expenses,
+                fixedAssets: presets.fixedAssets?.toString() || prev.fixedAssets,
+                vatableSales: presets.vatableSales?.toString() || prev.vatableSales,
+                vatablePurchases: presets.vatablePurchases?.toString() || prev.vatablePurchases,
+              }));
+              toast.success('Sector preset applied');
+            }} />
           </div>
 
           {/* Tax Rule Toggle - Neumorphic */}

@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useNavigate } from "react-router-dom";
 import { calculateTax, formatCurrency, type TaxInputs } from "@/lib/taxCalculations";
+import { MultiYearProjection } from "@/components/MultiYearProjection";
 import {
   ArrowRight,
   ArrowDown,
@@ -16,14 +18,15 @@ import {
   Calculator,
   Crown,
   Lightbulb,
-  Minus
+  Minus,
+  Calendar
 } from "lucide-react";
 
 const ScenarioModeling = () => {
-  const { tier } = useSubscription();
+  const { tier, canAccessScenarioModeling } = useSubscription();
   const navigate = useNavigate();
 
-  const isBusinessPlus = tier === 'business' || tier === 'corporate';
+  const hasAccess = canAccessScenarioModeling();
 
   // Base scenario values
   const [baseValues, setBaseValues] = useState({
@@ -44,7 +47,7 @@ const ScenarioModeling = () => {
     cryptoGains: 0, // absolute
   });
 
-  if (!isBusinessPlus) {
+  if (!hasAccess) {
     return (
       <div className="min-h-screen bg-gradient-hero">
         <NavMenu />
@@ -55,11 +58,11 @@ const ScenarioModeling = () => {
             </div>
             <h1 className="text-2xl font-bold text-foreground mb-3">Scenario Modeling</h1>
             <p className="text-muted-foreground mb-6">
-              Model "what-if" scenarios to optimize your tax position. Available on Business+ plans.
+              Model "what-if" scenarios and multi-year projections. Available on Freelancer+ plans.
             </p>
             <Button variant="hero" onClick={() => navigate('/pricing')}>
               <Crown className="h-4 w-4" />
-              Upgrade to Business
+              Upgrade to Freelancer
             </Button>
           </div>
         </div>
@@ -118,11 +121,25 @@ const ScenarioModeling = () => {
               Scenario Modeling
             </h1>
             <p className="text-muted-foreground">
-              Adjust variables to see how changes affect your tax
+              Model scenarios and project your tax over time
             </p>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          {/* Tabs for What-If vs Multi-Year */}
+          <Tabs defaultValue="what-if" className="animate-slide-up-delay-1">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="what-if" className="gap-2">
+                <Calculator className="h-4 w-4" />
+                What-If Analysis
+              </TabsTrigger>
+              <TabsTrigger value="multi-year" className="gap-2">
+                <Calendar className="h-4 w-4" />
+                Multi-Year Projections
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="what-if">
+              <div className="grid gap-6 lg:grid-cols-2">
             {/* Adjustments Panel */}
             <div className="rounded-2xl border border-border bg-card p-6 shadow-card animate-slide-up">
               <h2 className="font-semibold text-foreground mb-6 flex items-center gap-2">
@@ -400,6 +417,12 @@ const ScenarioModeling = () => {
               </Button>
             </div>
           </div>
+            </TabsContent>
+
+            <TabsContent value="multi-year">
+              <MultiYearProjection />
+            </TabsContent>
+          </Tabs>
 
           {/* Disclaimer */}
           <p className="text-xs text-muted-foreground text-center mt-8">
