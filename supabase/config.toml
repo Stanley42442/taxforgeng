@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.send-reminder-email]
 verify_jwt = false
+
+[functions.tax-assistant]
+verify_jwt = false
+
+[functions.categorize-expense]
+verify_jwt = false

@@ -189,6 +189,7 @@ export type Database = {
           subscription_tier: string
           total_points: number
           updated_at: string
+          whatsapp_number: string | null
         }
         Insert: {
           created_at?: string
@@ -198,6 +199,7 @@ export type Database = {
           subscription_tier?: string
           total_points?: number
           updated_at?: string
+          whatsapp_number?: string | null
         }
         Update: {
           created_at?: string
@@ -207,6 +209,7 @@ export type Database = {
           subscription_tier?: string
           total_points?: number
           updated_at?: string
+          whatsapp_number?: string | null
         }
         Relationships: []
       }
@@ -220,6 +223,7 @@ export type Database = {
           is_completed: boolean
           last_notified_at: string | null
           notify_email: boolean
+          notify_whatsapp: boolean
           reminder_type: string
           title: string
           user_id: string
@@ -233,6 +237,7 @@ export type Database = {
           is_completed?: boolean
           last_notified_at?: string | null
           notify_email?: boolean
+          notify_whatsapp?: boolean
           reminder_type: string
           title: string
           user_id: string
@@ -246,6 +251,7 @@ export type Database = {
           is_completed?: boolean
           last_notified_at?: string | null
           notify_email?: boolean
+          notify_whatsapp?: boolean
           reminder_type?: string
           title?: string
           user_id?: string
