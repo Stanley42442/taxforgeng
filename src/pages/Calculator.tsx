@@ -10,39 +10,26 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { 
   Building2, 
   Briefcase,
   HelpCircle,
   ArrowRight,
   Info,
-  Sparkles,
-  Layers
+  Sparkles
 } from "lucide-react";
 import { calculateTax, type TaxInputs } from "@/lib/taxCalculations";
 import { NavMenu } from "@/components/NavMenu";
-import { SECTOR_PRESETS, getSectorBenefitsSummary } from "@/lib/sectorPresets";
-import { useSubscription } from "@/contexts/SubscriptionContext";
 
 const CalculatorPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const preselectedEntity = location.state?.entityType;
-  const { tier } = useSubscription();
-  const canUseSectorPresets = tier === 'freelancer' || tier === 'business' || tier === 'corporate';
 
   const [entityType, setEntityType] = useState<'business_name' | 'company'>(
     preselectedEntity || 'business_name'
   );
   const [use2026Rules, setUse2026Rules] = useState(false);
-  const [selectedSector, setSelectedSector] = useState<string>('');
   
   const [inputs, setInputs] = useState({
     turnover: '',
@@ -61,29 +48,6 @@ const CalculatorPage = () => {
   const updateInput = (field: string, value: string) => {
     const numValue = value.replace(/[^0-9]/g, '');
     setInputs(prev => ({ ...prev, [field]: numValue }));
-  };
-
-  const applySectorPreset = (sectorId: string) => {
-    const preset = SECTOR_PRESETS.find(p => p.id === sectorId);
-    if (!preset) return;
-    
-    setSelectedSector(sectorId);
-    setEntityType(preset.defaults.entityType);
-    setUse2026Rules(preset.defaults.use2026Rules);
-    setInputs({
-      turnover: preset.defaults.turnover.toString(),
-      expenses: preset.defaults.expenses.toString(),
-      fixedAssets: preset.defaults.fixedAssets.toString(),
-      rentPaid: '',
-      vatableSales: '',
-      vatablePurchases: '',
-      rentalIncome: '',
-      consultancyIncome: '',
-      dividendIncome: '',
-      capitalGains: '',
-      foreignIncome: '',
-    });
-  };
   };
 
   const handleCalculate = () => {
@@ -137,39 +101,6 @@ const CalculatorPage = () => {
               Calculate your Nigerian taxes accurately
             </p>
           </div>
-
-          {/* Sector Presets */}
-          {canUseSectorPresets && (
-            <div className="mb-6 glass-frosted rounded-2xl p-5 shadow-futuristic animate-slide-up">
-              <div className="flex items-center gap-2 mb-3">
-                <Layers className="h-5 w-5 text-accent" />
-                <span className="font-semibold text-foreground">Sector Preset</span>
-              </div>
-              <Select value={selectedSector} onValueChange={applySectorPreset}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Choose a sector for optimized settings..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {SECTOR_PRESETS.map((preset) => (
-                    <SelectItem key={preset.id} value={preset.id}>
-                      <span className="flex items-center gap-2">
-                        <span>{preset.icon}</span>
-                        <span>{preset.name}</span>
-                        <span className="text-xs text-muted-foreground ml-2">
-                          {getSectorBenefitsSummary(preset)}
-                        </span>
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {selectedSector && (
-                <p className="text-xs text-muted-foreground mt-2">
-                  {SECTOR_PRESETS.find(p => p.id === selectedSector)?.description}
-                </p>
-              )}
-            </div>
-          )}
 
           {/* Tax Rule Toggle - Neumorphic */}
           <div className="mb-6 glass-frosted rounded-2xl p-5 shadow-futuristic animate-slide-up">

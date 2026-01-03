@@ -20,32 +20,28 @@ interface TierFeature {
   name: string;
   free: boolean | string;
   basic: boolean | string;
-  freelancer: boolean | string;
   business: boolean | string;
   corporate: boolean | string;
 }
 
 const features: TierFeature[] = [
-  { name: 'Unlimited tax calculations', free: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Basic advisory', free: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Pre-2026 & 2026 rules', free: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Saved businesses', free: '0', basic: '2', freelancer: '5', business: '10', corporate: 'Unlimited' },
-  { name: 'Data storage', free: false, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'PDF/CSV export', free: false, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Sector presets', free: false, basic: false, freelancer: true, business: true, corporate: true },
-  { name: 'OCR receipt scanning', free: false, basic: false, freelancer: true, business: true, corporate: true },
-  { name: 'Scenario modeling', free: false, basic: false, freelancer: 'Basic', business: 'Advanced', corporate: 'Advanced' },
-  { name: 'Multi-year projections', free: false, basic: false, freelancer: true, business: true, corporate: true },
-  { name: 'CAC verification (auto)', free: false, basic: false, freelancer: false, business: true, corporate: true },
-  { name: 'No watermarks', free: false, basic: false, freelancer: true, business: true, corporate: true },
-  { name: 'Tax filing preparation', free: false, basic: false, freelancer: false, business: true, corporate: true },
-  { name: 'Email reminders', free: false, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Bulk CAC verification', free: false, basic: false, freelancer: false, business: false, corporate: true },
-  { name: 'Multi-user seats', free: false, basic: false, freelancer: false, business: '2 seats', corporate: 'Unlimited' },
-  { name: 'Priority support', free: false, basic: false, freelancer: true, business: true, corporate: true },
-  { name: 'Custom reports', free: false, basic: false, freelancer: false, business: false, corporate: true },
-  { name: 'Dedicated support', free: false, basic: false, freelancer: false, business: false, corporate: true },
-  { name: 'API access (coming)', free: false, basic: false, freelancer: false, business: false, corporate: true },
+  { name: 'Unlimited tax calculations', free: true, basic: true, business: true, corporate: true },
+  { name: 'Basic advisory', free: true, basic: true, business: true, corporate: true },
+  { name: 'Pre-2026 & 2026 rules', free: true, basic: true, business: true, corporate: true },
+  { name: 'Saved businesses', free: '0', basic: '2', business: '10', corporate: 'Unlimited' },
+  { name: 'Data storage', free: false, basic: true, business: true, corporate: true },
+  { name: 'PDF/CSV export', free: false, basic: true, business: true, corporate: true },
+  { name: 'CAC verification (auto)', free: false, basic: false, business: true, corporate: true },
+  { name: 'No watermarks', free: false, basic: false, business: true, corporate: true },
+  { name: 'Scenario modeling', free: false, basic: false, business: true, corporate: true },
+  { name: 'Tax filing preparation', free: false, basic: false, business: true, corporate: true },
+  { name: 'Email reminders', free: false, basic: true, business: true, corporate: true },
+  { name: 'Bulk CAC verification', free: false, basic: false, business: false, corporate: true },
+  { name: 'Multi-user seats', free: false, basic: false, business: '2 seats', corporate: 'Unlimited' },
+  { name: 'Priority support', free: false, basic: false, business: true, corporate: true },
+  { name: 'Custom reports', free: false, basic: false, business: false, corporate: true },
+  { name: 'Dedicated support', free: false, basic: false, business: false, corporate: true },
+  { name: 'API access (coming)', free: false, basic: false, business: false, corporate: true },
 ];
 
 const Pricing = () => {
@@ -87,7 +83,7 @@ const Pricing = () => {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 max-w-7xl mx-auto mb-12 sm:mb-16">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto mb-12 sm:mb-16">
           {/* Free Tier */}
           <PricingCard
             tier="free"
@@ -115,28 +111,15 @@ const Pricing = () => {
             onUpgrade={handleUpgrade}
           />
 
-          {/* Freelancer Tier - NEW */}
-          <PricingCard
-            tier="freelancer"
-            name="Freelancer"
-            icon={<Calculator className="h-5 w-5 sm:h-6 sm:w-6" />}
-            monthlyPrice={4999}
-            annualPrice={49990}
-            description="For freelancers & consultants"
-            features={['Everything in Basic', 'Up to 5 businesses', 'OCR receipt scanning', 'Sector presets', 'Basic scenarios', 'Multi-year projections', 'No watermarks', 'Priority support']}
-            currentTier={currentTier}
-            onUpgrade={handleUpgrade}
-          />
-
           {/* Business Tier */}
           <PricingCard
             tier="business"
             name="Business"
             icon={<Building2 className="h-5 w-5 sm:h-6 sm:w-6" />}
-            monthlyPrice={8999}
-            annualPrice={89990}
-            description="For growing businesses"
-            features={['Everything in Freelancer', 'Up to 10 businesses', 'CAC verification', 'Advanced scenarios', 'Tax filing prep', '2 user seats']}
+            monthlyPrice={9900}
+            annualPrice={99000}
+            description="For growing businesses with multiple entities"
+            features={['Everything in Basic', 'Up to 10 businesses', 'CAC verification', 'Scenario modeling', 'Tax filing prep', 'No watermarks', '2 user seats', 'Priority support']}
             isPopular
             currentTier={currentTier}
             onUpgrade={handleUpgrade}
@@ -148,8 +131,8 @@ const Pricing = () => {
             name="Corporate"
             icon={<Crown className="h-5 w-5 sm:h-6 sm:w-6" />}
             monthlyPrice="Custom"
-            description="Enterprise solution"
-            features={['Everything in Business', 'Unlimited businesses', 'Unlimited users', 'Custom reports', 'Dedicated support', 'API access (coming)']}
+            description="Enterprise solution for large organizations"
+            features={['Everything in Business', 'Unlimited businesses', 'Unlimited users', 'Custom reports', 'Dedicated support', 'API access (coming)', 'Direct filing (coming)']}
             currentTier={currentTier}
             onUpgrade={handleUpgrade}
           />
@@ -168,7 +151,6 @@ const Pricing = () => {
                     <th className="text-left p-4 font-semibold text-foreground">Feature</th>
                     <th className="text-center p-4 font-semibold text-foreground">Free</th>
                     <th className="text-center p-4 font-semibold text-foreground">Basic</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Freelancer</th>
                     <th className="text-center p-4 font-semibold text-foreground bg-primary/5">Business</th>
                     <th className="text-center p-4 font-semibold text-foreground">Corporate</th>
                   </tr>
@@ -179,7 +161,6 @@ const Pricing = () => {
                       <td className="p-4 text-sm text-foreground">{feature.name}</td>
                       <td className="p-4 text-center"><FeatureValue value={feature.free} /></td>
                       <td className="p-4 text-center"><FeatureValue value={feature.basic} /></td>
-                      <td className="p-4 text-center"><FeatureValue value={feature.freelancer} /></td>
                       <td className="p-4 text-center bg-primary/5"><FeatureValue value={feature.business} /></td>
                       <td className="p-4 text-center"><FeatureValue value={feature.corporate} /></td>
                     </tr>

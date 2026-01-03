@@ -29,7 +29,6 @@ const Team = lazy(() => import("./pages/Team"));
 const Transactions = lazy(() => import("./pages/Transactions"));
 const AuditLog = lazy(() => import("./pages/AuditLog"));
 const Learn = lazy(() => import("./pages/Learn"));
-const SectorGuide = lazy(() => import("./pages/SectorGuide"));
 const Expenses = lazy(() => import("./pages/Expenses"));
 const ScenarioModeling = lazy(() => import("./pages/ScenarioModeling"));
 const EFiling = lazy(() => import("./pages/EFiling"));
@@ -83,7 +82,6 @@ const App = () => (
                   <Route path="/transactions" element={<Transactions />} />
                   <Route path="/audit-log" element={<AuditLog />} />
                   <Route path="/learn" element={<Learn />} />
-                  <Route path="/sector/:sectorId" element={<SectorGuide />} />
                   <Route path="/expenses" element={<Expenses />} />
                   <Route path="/scenarios" element={<ScenarioModeling />} />
                   <Route path="/e-filing" element={<EFiling />} />
