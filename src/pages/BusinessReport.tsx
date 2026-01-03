@@ -26,7 +26,7 @@ import {
   Download,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
-import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { downloadBusinessReportPDF } from "@/lib/businessReportPdf";
 import { toast } from "sonner";
 
@@ -369,29 +369,38 @@ const BusinessReport = () => {
           {/* Charts and Details */}
           <div className="grid gap-6 lg:grid-cols-2 animate-slide-up">
             {/* Expense Breakdown Chart */}
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <PieChart className="h-5 w-5 text-primary" />
+            <Card className="glass-frosted shadow-futuristic border-border/40">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <PieChart className="h-4 w-4 text-primary" />
+                  </div>
                   Expense Breakdown
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {pieData.length > 0 ? (
-                  <div className="h-32 sm:h-40">
+                  <div className="h-[16rem] relative">
                     <ResponsiveContainer width="100%" height="100%">
                       <RechartsPie>
                         <Pie
                           data={pieData}
                           cx="50%"
-                          cy="40%"
-                          innerRadius={18}
-                          outerRadius={35}
+                          cy="50%"
+                          innerRadius={50}
+                          outerRadius={75}
                           paddingAngle={2}
                           dataKey="value"
+                          animationBegin={200}
+                          animationDuration={1000}
+                          animationEasing="ease-out"
                         >
                           {pieData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
+                            <Cell 
+                              key={`cell-${index}`} 
+                              fill={entry.color}
+                              style={{ cursor: 'pointer' }}
+                            />
                           ))}
                         </Pie>
                         <Tooltip 
@@ -399,30 +408,49 @@ const BusinessReport = () => {
                           contentStyle={{ 
                             backgroundColor: 'hsl(var(--card))', 
                             border: '1px solid hsl(var(--border))',
-                            borderRadius: '8px',
-                            fontSize: '9px'
+                            borderRadius: '8px'
                           }}
-                        />
-                        <Legend 
-                          wrapperStyle={{ fontSize: '8px', paddingTop: '2px' }}
-                          iconSize={5}
                         />
                       </RechartsPie>
                     </ResponsiveContainer>
                   </div>
                 ) : (
-                  <div className="h-64 flex items-center justify-center text-muted-foreground">
+                  <div className="h-[16rem] flex items-center justify-center text-muted-foreground">
                     No expenses recorded for this business
+                  </div>
+                )}
+                {/* Legend */}
+                {pieData.length > 0 && (
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    {pieData.map((entry, index) => {
+                      const total = pieData.reduce((sum, e) => sum + e.value, 0);
+                      const percent = ((entry.value / total) * 100).toFixed(0);
+                      return (
+                        <div 
+                          key={`legend-${index}`} 
+                          className="flex items-center gap-2 text-sm rounded-md p-1 hover:bg-muted/50 transition-all"
+                        >
+                          <div 
+                            className="w-3 h-3 rounded-full flex-shrink-0" 
+                            style={{ backgroundColor: entry.color }}
+                          />
+                          <span className="text-muted-foreground truncate">{entry.name}</span>
+                          <span className="font-medium text-foreground ml-auto">{percent}%</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
             </Card>
 
             {/* Tax Summary */}
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Calculator className="h-5 w-5 text-primary" />
+            <Card className="glass-frosted shadow-futuristic border-border/40">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <div className="h-8 w-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                    <Calculator className="h-4 w-4 text-accent" />
+                  </div>
                   Tax Summary
                 </CardTitle>
               </CardHeader>

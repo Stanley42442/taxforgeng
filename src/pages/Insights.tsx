@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart3, TrendingUp, PieChart, Crown, Building2, Percent, Wallet, ArrowUpRight, ArrowDownRight, Info } from "lucide-react";
 import { Link } from "react-router-dom";
-import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
+import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
 
 // Mock calculation history data
 const MOCK_HISTORY = [
@@ -183,14 +183,14 @@ const Insights = () => {
           <>
             {/* Summary Cards */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-              <Card>
+              <Card className="glass-frosted shadow-futuristic border-border/40 hover-lift transition-all duration-300">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Total Turnover</p>
                       <p className="text-2xl font-bold">₦{insights?.totalTurnover.toLocaleString()}</p>
                     </div>
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                       <Wallet className="w-6 h-6 text-primary" />
                     </div>
                   </div>
@@ -201,14 +201,14 @@ const Insights = () => {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="glass-frosted shadow-futuristic border-border/40 hover-lift transition-all duration-300">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Effective Tax Rate</p>
                       <p className="text-2xl font-bold">{insights?.effectiveRate}%</p>
                     </div>
-                    <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
                       <Percent className="w-6 h-6 text-accent" />
                     </div>
                   </div>
@@ -219,28 +219,28 @@ const Insights = () => {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="glass-frosted shadow-futuristic border-border/40 hover-lift transition-all duration-300">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Est. Annual Tax</p>
                       <p className="text-2xl font-bold">₦{insights?.estimatedTax.toLocaleString()}</p>
                     </div>
-                    <div className="w-12 h-12 rounded-full bg-info/10 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-xl bg-info/10 flex items-center justify-center">
                       <TrendingUp className="w-6 h-6 text-info" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="glass-frosted shadow-futuristic border-border/40 hover-lift transition-all duration-300">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Relief Savings</p>
                       <p className="text-2xl font-bold text-success">₦{insights?.reliefSavings.toLocaleString()}</p>
                     </div>
-                    <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center">
                       <Wallet className="w-6 h-6 text-success" />
                     </div>
                   </div>
@@ -251,82 +251,152 @@ const Insights = () => {
             {/* Charts Row */}
             <div className="grid gap-6 lg:grid-cols-2 mb-8">
               {/* Tax Breakdown Pie */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <PieChart className="w-5 h-5" />
+              <Card className="glass-frosted shadow-futuristic border-border/40">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <PieChart className="w-4 h-4 text-primary" />
+                    </div>
                     Tax Breakdown
                   </CardTitle>
                   <CardDescription>Current period tax composition</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-64">
+                  <div className="h-[16rem] relative">
                     <ResponsiveContainer width="100%" height="100%">
                       <RechartsPie>
                         <Pie
                           data={pieData}
                           cx="50%"
                           cy="50%"
-                          innerRadius={60}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          paddingAngle={5}
+                          innerRadius={50}
+                          outerRadius={75}
+                          paddingAngle={2}
                           dataKey="value"
-                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          animationBegin={200}
+                          animationDuration={1000}
+                          animationEasing="ease-out"
                         >
                           {pieData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            <Cell 
+                              key={`cell-${index}`} 
+                              fill={COLORS[index % COLORS.length]}
+                              style={{ cursor: 'pointer' }}
+                            />
                           ))}
                         </Pie>
-                        <Tooltip formatter={(value: number) => `₦${value.toLocaleString()}`} />
+                        <Tooltip 
+                          formatter={(value: number) => `₦${value.toLocaleString()}`}
+                          contentStyle={{ 
+                            backgroundColor: 'hsl(var(--card))', 
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px'
+                          }}
+                        />
                       </RechartsPie>
                     </ResponsiveContainer>
                   </div>
-                  <div className="flex justify-center gap-4 mt-4">
-                    {pieData.map((entry, index) => (
-                      <div key={entry.name} className="flex items-center gap-2">
+                  {/* Legend */}
+                  <div className="mt-4 grid grid-cols-3 gap-2">
+                    {pieData.map((entry, index) => {
+                      const total = pieData.reduce((sum, e) => sum + e.value, 0);
+                      const percent = ((entry.value / total) * 100).toFixed(0);
+                      return (
                         <div 
-                          className="w-3 h-3 rounded-full" 
-                          style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                        />
-                        <span className="text-sm text-muted-foreground">{entry.name}</span>
-                      </div>
-                    ))}
+                          key={entry.name} 
+                          className="flex items-center gap-2 text-sm rounded-md p-1 hover:bg-muted/50 transition-all"
+                        >
+                          <div 
+                            className="w-3 h-3 rounded-full flex-shrink-0" 
+                            style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                          />
+                          <span className="text-muted-foreground truncate">{entry.name}</span>
+                          <span className="font-medium text-foreground ml-auto">{percent}%</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>
 
               {/* Monthly Trends */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5" />
+              <Card className="glass-frosted shadow-futuristic border-border/40">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <div className="h-8 w-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                      <TrendingUp className="w-4 h-4 text-accent" />
+                    </div>
                     Monthly Trends
                   </CardTitle>
                   <CardDescription>Tax liability over time</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-64">
+                  <div className="h-[20rem]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={MOCK_HISTORY}>
-                        <XAxis dataKey="month" />
-                        <YAxis tickFormatter={(value) => `₦${(value / 1000000).toFixed(1)}M`} />
-                        <Tooltip formatter={(value: number) => `₦${value.toLocaleString()}`} />
-                        <Legend />
-                        <Bar dataKey="cit" name="CIT" fill={COLORS[0]} />
-                        <Bar dataKey="vat" name="VAT" fill={COLORS[1]} />
+                        <XAxis 
+                          dataKey="month" 
+                          tick={{ fontSize: 12 }}
+                          tickLine={false}
+                          axisLine={false}
+                        />
+                        <YAxis 
+                          tick={{ fontSize: 12 }}
+                          tickLine={false}
+                          axisLine={false}
+                          tickFormatter={(value) => `₦${(value / 1000000).toFixed(1)}M`}
+                        />
+                        <Tooltip 
+                          formatter={(value: number) => `₦${value.toLocaleString()}`}
+                          contentStyle={{ 
+                            backgroundColor: 'hsl(var(--card))', 
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px'
+                          }}
+                        />
+                        <Bar 
+                          dataKey="cit" 
+                          name="CIT" 
+                          fill={COLORS[0]} 
+                          radius={[4, 4, 0, 0]}
+                          animationBegin={300}
+                          animationDuration={1000}
+                          animationEasing="ease-out"
+                        />
+                        <Bar 
+                          dataKey="vat" 
+                          name="VAT" 
+                          fill={COLORS[1]} 
+                          radius={[4, 4, 0, 0]}
+                          animationBegin={400}
+                          animationDuration={1000}
+                          animationEasing="ease-out"
+                        />
                       </BarChart>
                     </ResponsiveContainer>
+                  </div>
+                  {/* Legend */}
+                  <div className="mt-4 flex justify-center gap-6">
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[0] }} />
+                      <span className="text-muted-foreground">CIT</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[1] }} />
+                      <span className="text-muted-foreground">VAT</span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
             {/* Benchmarks */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Info className="w-5 h-5" />
+            <Card className="glass-frosted shadow-futuristic border-border/40">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <div className="h-8 w-8 rounded-lg bg-info/10 flex items-center justify-center">
+                    <Info className="w-4 h-4 text-info" />
+                  </div>
                   Industry Benchmarks
                 </CardTitle>
                 <CardDescription>Compare your tax profile with similar businesses</CardDescription>
