@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
-export type SubscriptionTier = 'free' | 'basic' | 'business' | 'corporate';
+export type SubscriptionTier = 'free' | 'basic' | 'freelancer' | 'business' | 'corporate';
 
 export interface CACVerificationDetails {
   companyName: string;
@@ -55,6 +55,7 @@ interface SubscriptionContextType extends SubscriptionState {
 const TIER_LIMITS: Record<SubscriptionTier, number | 'unlimited'> = {
   free: 0,
   basic: 2,
+  freelancer: 5,
   business: 10,
   corporate: 'unlimited',
 };
@@ -278,9 +279,9 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
   const canExport = () => state.tier !== 'free';
   const canAccessFiling = () => state.tier === 'business' || state.tier === 'corporate';
-  const canAccessScenarioModeling = () => state.tier === 'business' || state.tier === 'corporate';
+  const canAccessScenarioModeling = () => state.tier === 'freelancer' || state.tier === 'business' || state.tier === 'corporate';
   const canVerifyCAC = () => state.tier === 'business' || state.tier === 'corporate';
-  const showWatermark = () => state.tier === 'free';
+  const showWatermark = () => state.tier === 'free' || state.tier === 'basic';
 
   const upgradeTier = async (newTier: SubscriptionTier) => {
     if (!user) return;

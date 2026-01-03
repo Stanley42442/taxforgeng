@@ -31,7 +31,8 @@ import {
   Sparkles,
   CalendarIcon,
   Filter,
-  X
+  X,
+  Camera
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import {
@@ -43,6 +44,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { ExpenseCharts } from "@/components/ExpenseCharts";
+import { OCRReceiptScanner } from "@/components/OCRReceiptScanner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
@@ -77,6 +79,7 @@ const Expenses = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showOCRScanner, setShowOCRScanner] = useState(false);
   const [filterBusinessId, setFilterBusinessId] = useState<string>('all');
   const [showCharts, setShowCharts] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -444,6 +447,11 @@ const Expenses = () => {
               <Plus className="h-4 w-4" />
               Add Entry
             </Button>
+            <Button variant="glass" onClick={() => setShowOCRScanner(true)}>
+              <Camera className="h-4 w-4" />
+              <span className="hidden sm:inline">Scan Receipt</span>
+              <span className="sm:hidden">Scan</span>
+            </Button>
             <Button variant="glass" onClick={handleCSVImport}>
               <Upload className="h-4 w-4" />
               <span className="hidden sm:inline">Import CSV</span>
@@ -810,6 +818,55 @@ const Expenses = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* OCR Receipt Scanner */}
+      <OCRReceiptScanner
+        open={showOCRScanner}
+        onOpenChange={setShowOCRScanner}
+        onReceiptParsed={async (data) => {
+          if (!user) {
+            toast.error("Please sign in to add expenses");
+            return;
+          }
+
+          const categoryInfo = EXPENSE_CATEGORIES.find(c => c.value === data.category);
+          const expenseType = categoryInfo?.type || 'expense';
+          const isDeductible = expenseType === 'expense' ? (categoryInfo?.deductible ?? false) : false;
+
+          const { data: dbData, error } = await supabase
+            .from('expenses')
+            .insert({
+              user_id: user.id,
+              date: data.date,
+              description: data.description,
+              amount: data.amount,
+              category: data.category,
+              type: expenseType,
+              is_deductible: isDeductible,
+            })
+            .select()
+            .single();
+
+          if (error) {
+            console.error('Error adding expense:', error);
+            toast.error('Failed to add expense from receipt');
+            return;
+          }
+
+          const expense: Expense = {
+            id: dbData.id,
+            date: dbData.date,
+            description: dbData.description || '',
+            amount: Number(dbData.amount),
+            category: dbData.category as Expense['category'],
+            type: dbData.type as 'income' | 'expense',
+            isDeductible: dbData.is_deductible,
+          };
+
+          setExpenses(prev => [expense, ...prev]);
+          notifyExpenseAdded(expense.description, expense.amount, expense.type === 'income');
+        }}
+      />
     </div>
   );
 };
