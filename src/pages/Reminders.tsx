@@ -12,12 +12,13 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Bell, Calendar as CalendarIcon, Mail, Plus, Settings, Clock, CheckCircle2, AlertTriangle, Building2, Crown, Loader2, BellRing, Volume2 } from "lucide-react";
+import { Bell, Calendar as CalendarIcon, Mail, Plus, Settings, Clock, CheckCircle2, AlertTriangle, Building2, Crown, Loader2, BellRing, Volume2, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { requestNotificationPermission } from "@/hooks/useReminderNotifications";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Reminder {
   id: string;
@@ -26,6 +27,7 @@ interface Reminder {
   name: string;
   dueDate: string;
   enabled: boolean;
+  notifyWhatsapp?: boolean;
   customNote?: string;
 }
 
@@ -135,6 +137,7 @@ const Reminders = () => {
         name: r.title,
         dueDate: r.due_date,
         enabled: r.notify_email,
+        notifyWhatsapp: (r as any).notify_whatsapp ?? false,
         customNote: r.description || undefined,
       }));
       setReminders(mapped);
@@ -233,6 +236,37 @@ const Reminders = () => {
 
   const isReminderEnabled = (businessId: string, type: string) => {
     return reminders.some(r => r.businessId === businessId && r.type === type && r.enabled);
+  };
+
+  const toggleWhatsApp = async (reminderId: string) => {
+    if (!user) return;
+    
+    const reminder = reminders.find(r => r.id === reminderId);
+    if (!reminder) return;
+    
+    const newWhatsappState = !reminder.notifyWhatsapp;
+    
+    // Optimistic update
+    setReminders(prev => prev.map(r => 
+      r.id === reminderId ? { ...r, notifyWhatsapp: newWhatsappState } : r
+    ));
+    
+    const { error } = await supabase
+      .from('reminders')
+      .update({ notify_whatsapp: newWhatsappState } as any)
+      .eq('id', reminderId)
+      .eq('user_id', user.id);
+    
+    if (error) {
+      console.error('Error updating WhatsApp setting:', error);
+      // Revert on error
+      setReminders(prev => prev.map(r => 
+        r.id === reminderId ? { ...r, notifyWhatsapp: reminder.notifyWhatsapp } : r
+      ));
+      toast.error('Failed to update WhatsApp notification');
+    } else {
+      toast.success(newWhatsappState ? 'WhatsApp notifications enabled' : 'WhatsApp notifications disabled');
+    }
   };
 
   const addCustomReminder = async () => {
@@ -461,6 +495,26 @@ const Reminders = () => {
           </Card>
         )}
 
+        {/* WhatsApp Info Card */}
+        <Card className="mb-6 border-accent/20 bg-accent/5">
+          <CardContent className="py-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-full bg-accent/10">
+                  <MessageCircle className="w-5 h-5 text-accent" />
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">WhatsApp Reminders</p>
+                  <p className="text-sm text-muted-foreground">
+                    Enable WhatsApp notifications for individual reminders below
+                  </p>
+                </div>
+              </div>
+              <Badge variant="outline" className="text-xs">Coming Soon</Badge>
+            </div>
+          </CardContent>
+        </Card>
+
         {savedBusinesses.length === 0 ? (
           <Card className="text-center py-12">
             <CardContent>
@@ -660,7 +714,17 @@ const Reminders = () => {
                                     )}
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-3 flex-shrink-0 ml-2">
+                                <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                                  {/* WhatsApp toggle */}
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => toggleWhatsApp(reminder.id)}
+                                    className={`text-xs px-2 ${reminder.notifyWhatsapp ? 'text-accent' : 'text-muted-foreground'}`}
+                                    title="WhatsApp notifications (coming soon)"
+                                  >
+                                    <MessageCircle className="w-3 h-3" />
+                                  </Button>
                                   <Button
                                     variant="ghost"
                                     size="sm"
@@ -673,9 +737,6 @@ const Reminders = () => {
                                     ) : (
                                       <Mail className="w-3 h-3" />
                                     )}
-                                    <span className="hidden sm:inline ml-1">
-                                      {sendingEmail === `${business.id}-${reminder.type}-${reminder.id}` ? 'Sending...' : 'Test'}
-                                    </span>
                                   </Button>
                                   <Button
                                     variant="ghost"
