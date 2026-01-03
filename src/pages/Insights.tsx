@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { NavMenu } from "@/components/NavMenu";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { Button } from "@/components/ui/button";
@@ -37,8 +37,32 @@ const COLORS = ['hsl(153, 47%, 25%)', 'hsl(43, 96%, 56%)', 'hsl(199, 89%, 48%)',
 const Insights = () => {
   const { tier, savedBusinesses } = useSubscription();
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>('all');
+  const [isVisible, setIsVisible] = useState(false);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const pieContainerRef = useRef<HTMLDivElement>(null);
 
   const canAccess = tier === 'business' || tier === 'corporate';
+
+  // Entrance animation
+  useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Handle click outside pie chart to deselect
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (pieContainerRef.current && !pieContainerRef.current.contains(event.target as Node)) {
+        setActiveIndex(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handlePieClick = (data: any, index: number) => {
+    setActiveIndex(activeIndex === index ? null : index);
+  };
 
   // Calculate aggregated insights
   const insights = useMemo(() => {
@@ -262,59 +286,95 @@ const Insights = () => {
                   <CardDescription>Current period tax composition</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-[16rem] relative">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RechartsPie>
-                        <Pie
-                          data={pieData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={50}
-                          outerRadius={75}
-                          paddingAngle={2}
-                          dataKey="value"
-                          animationBegin={200}
-                          animationDuration={1000}
-                          animationEasing="ease-out"
-                        >
-                          {pieData.map((entry, index) => (
-                            <Cell 
-                              key={`cell-${index}`} 
-                              fill={COLORS[index % COLORS.length]}
-                              style={{ cursor: 'pointer' }}
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip 
-                          formatter={(value: number) => `₦${value.toLocaleString()}`}
-                          contentStyle={{ 
-                            backgroundColor: 'hsl(var(--card))', 
-                            border: '1px solid hsl(var(--border))',
-                            borderRadius: '8px'
-                          }}
-                        />
-                      </RechartsPie>
-                    </ResponsiveContainer>
-                  </div>
-                  {/* Legend */}
-                  <div className="mt-4 grid grid-cols-3 gap-2">
-                    {pieData.map((entry, index) => {
-                      const total = pieData.reduce((sum, e) => sum + e.value, 0);
-                      const percent = ((entry.value / total) * 100).toFixed(0);
-                      return (
-                        <div 
-                          key={entry.name} 
-                          className="flex items-center gap-2 text-sm rounded-md p-1 hover:bg-muted/50 transition-all"
-                        >
-                          <div 
-                            className="w-3 h-3 rounded-full flex-shrink-0" 
-                            style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                  <div 
+                    className={`transition-all duration-700 ease-out ${
+                      isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                    }`}
+                  >
+                    <div className="h-[16rem] relative" ref={pieContainerRef}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RechartsPie>
+                          <Pie
+                            data={pieData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={50}
+                            outerRadius={75}
+                            paddingAngle={2}
+                            dataKey="value"
+                            animationBegin={200}
+                            animationDuration={1000}
+                            animationEasing="ease-out"
+                            onClick={handlePieClick}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            {pieData.map((entry, index) => {
+                              const isActive = activeIndex === index;
+                              return (
+                                <Cell 
+                                  key={`cell-${index}`} 
+                                  fill={COLORS[index % COLORS.length]}
+                                  stroke={isActive ? 'hsl(var(--foreground))' : 'transparent'}
+                                  strokeWidth={isActive ? 3 : 0}
+                                  style={{
+                                    filter: activeIndex !== null && !isActive ? 'opacity(0.4)' : 'none',
+                                    transform: isActive ? 'scale(1.05)' : 'scale(1)',
+                                    transformOrigin: 'center',
+                                    transition: 'all 0.2s ease-out',
+                                    cursor: 'pointer'
+                                  }}
+                                />
+                              );
+                            })}
+                          </Pie>
+                          <Tooltip 
+                            formatter={(value: number) => `₦${value.toLocaleString()}`}
+                            contentStyle={{ 
+                              backgroundColor: 'hsl(var(--card))', 
+                              border: '1px solid hsl(var(--border))',
+                              borderRadius: '8px'
+                            }}
                           />
-                          <span className="text-muted-foreground truncate">{entry.name}</span>
-                          <span className="font-medium text-foreground ml-auto">{percent}%</span>
+                        </RechartsPie>
+                      </ResponsiveContainer>
+                      {activeIndex !== null && pieData[activeIndex] && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <div className="text-center">
+                            <p className="text-lg font-bold text-foreground">{pieData[activeIndex].name}</p>
+                            <p className="text-sm text-muted-foreground">₦{pieData[activeIndex].value.toLocaleString()}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {((pieData[activeIndex].value / pieData.reduce((sum, e) => sum + e.value, 0)) * 100).toFixed(1)}%
+                            </p>
+                          </div>
                         </div>
-                      );
-                    })}
+                      )}
+                    </div>
+                    {/* Legend */}
+                    <div className={`mt-4 grid grid-cols-3 gap-2 transition-all duration-500 delay-300 ${
+                      isVisible ? 'opacity-100' : 'opacity-0'
+                    }`}>
+                      {pieData.map((entry, index) => {
+                        const total = pieData.reduce((sum, e) => sum + e.value, 0);
+                        const percent = ((entry.value / total) * 100).toFixed(0);
+                        const isActive = activeIndex === index;
+                        return (
+                          <div 
+                            key={entry.name} 
+                            className={`flex items-center gap-2 text-sm cursor-pointer rounded-md p-1 transition-all ${
+                              isActive ? 'bg-muted ring-2 ring-primary' : 'hover:bg-muted/50'
+                            } ${activeIndex !== null && !isActive ? 'opacity-40' : ''}`}
+                            onClick={() => setActiveIndex(isActive ? null : index)}
+                          >
+                            <div 
+                              className="w-3 h-3 rounded-full flex-shrink-0" 
+                              style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                            />
+                            <span className="text-muted-foreground truncate">{entry.name}</span>
+                            <span className="font-medium text-foreground ml-auto">{percent}%</span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
