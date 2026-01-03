@@ -327,14 +327,6 @@ const Insights = () => {
                               );
                             })}
                           </Pie>
-                          <Tooltip 
-                            formatter={(value: number) => `₦${value.toLocaleString()}`}
-                            contentStyle={{ 
-                              backgroundColor: 'hsl(var(--card))', 
-                              border: '1px solid hsl(var(--border))',
-                              borderRadius: '8px'
-                            }}
-                          />
                         </RechartsPie>
                       </ResponsiveContainer>
                       {activeIndex !== null && pieData[activeIndex] && (
