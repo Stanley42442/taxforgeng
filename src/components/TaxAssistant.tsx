@@ -3,8 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bot, Send, User, Loader2, X, MessageCircle, Sparkles } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Bot, Send, User, Loader2, X, MessageCircle, Sparkles, Building2 } from "lucide-react";
 import { toast } from "sonner";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 interface Message {
   role: "user" | "assistant";
@@ -14,6 +17,13 @@ interface Message {
 interface Position {
   x: number;
   y: number;
+}
+
+interface UserContext {
+  businessName?: string;
+  entityType?: string;
+  sector?: string;
+  turnover?: number;
 }
 
 const STORAGE_KEY = "taxbot-position";
@@ -51,10 +61,14 @@ export function TaxAssistant() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [position, setPosition] = useState<Position>(getStoredPosition);
+  const [useContext, setUseContext] = useState(false);
   const isDraggingRef = useRef(false);
   const hasMovedRef = useRef(false);
   const dragStartPos = useRef<{ x: number; y: number; posX: number; posY: number } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  
+  const { savedBusinesses } = useSubscription();
+  const primaryBusiness = savedBusinesses[0];
 
   // Lock body scroll when chat is open
   useEffect(() => {
@@ -160,13 +174,23 @@ export function TaxAssistant() {
   const streamChat = async (userMessages: Message[]) => {
     const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tax-assistant`;
 
+    // Build user context if enabled
+    let userContext: UserContext | undefined;
+    if (useContext && primaryBusiness) {
+      userContext = {
+        businessName: primaryBusiness.name,
+        entityType: primaryBusiness.entityType,
+        turnover: primaryBusiness.turnover,
+      };
+    }
+
     const resp = await fetch(CHAT_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages: userMessages }),
+      body: JSON.stringify({ messages: userMessages, userContext }),
     });
 
     if (resp.status === 429) {
@@ -312,6 +336,31 @@ export function TaxAssistant() {
       </CardHeader>
 
       <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
+        {/* Context Toggle */}
+        {primaryBusiness && (
+          <div className="px-3 py-2 border-b bg-muted/30">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 min-w-0">
+                <Building2 className="h-3 w-3 text-primary flex-shrink-0" />
+                <span className="text-[10px] text-muted-foreground truncate">
+                  {useContext ? `Using: ${primaryBusiness.name}` : 'Personalize'}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Label htmlFor="use-context" className="text-[10px] text-muted-foreground">
+                  Context
+                </Label>
+                <Switch
+                  id="use-context"
+                  checked={useContext}
+                  onCheckedChange={setUseContext}
+                  className="scale-75"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+        
         <ScrollArea className="flex-1 p-3" ref={scrollRef}>
           {messages.length === 0 ? (
             <div className="space-y-3">
@@ -320,6 +369,11 @@ export function TaxAssistant() {
                 <p className="text-xs text-muted-foreground">
                   Hi! I'm TaxBot. Ask me anything about Nigerian taxes!
                 </p>
+                {useContext && primaryBusiness && (
+                  <p className="text-[10px] text-primary mt-1">
+                    Personalized for {primaryBusiness.name}
+                  </p>
+                )}
               </div>
               <div className="space-y-1.5">
                 <p className="text-[10px] text-muted-foreground font-medium">Try asking:</p>

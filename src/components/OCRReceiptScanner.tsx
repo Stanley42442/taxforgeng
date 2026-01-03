@@ -5,9 +5,11 @@ import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Camera, Upload, Loader2, Sparkles, CheckCircle2, AlertCircle } from "lucide-react";
+import { Camera, Upload, Loader2, Sparkles, CheckCircle2, AlertCircle, Brain, FileText } from "lucide-react";
 import { createWorker, type Worker } from "tesseract.js";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ParsedReceipt {
   amount: number | null;
@@ -15,12 +17,14 @@ interface ParsedReceipt {
   date: string;
   category: string;
   confidence: number;
+  isDeductible?: boolean;
+  taxNote?: string;
 }
 
 interface OCRReceiptScannerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onReceiptParsed: (data: { amount: number; description: string; date: string; category: string }) => void;
+  onReceiptParsed: (data: { amount: number; description: string; date: string; category: string; isDeductible?: boolean }) => void;
 }
 
 const EXPENSE_CATEGORIES = [
@@ -34,7 +38,7 @@ const EXPENSE_CATEGORIES = [
   { value: 'other', label: 'Other Expenses' },
 ];
 
-// Keywords for category detection
+// Keywords for category detection (fallback)
 const CATEGORY_KEYWORDS: Record<string, string[]> = {
   transport: ['uber', 'bolt', 'fuel', 'petrol', 'diesel', 'taxi', 'bus', 'flight', 'airline', 'car', 'transport'],
   rent: ['rent', 'lease', 'office', 'workspace', 'coworking', 'electricity', 'nepa', 'phcn'],
@@ -55,12 +59,14 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
     description: '',
     date: new Date().toISOString().split('T')[0],
     category: 'other',
+    isDeductible: true,
   });
   const [rawText, setRawText] = useState('');
+  const [useAI, setUseAI] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const workerRef = useRef<Worker | null>(null);
 
-  const parseReceiptText = (text: string): ParsedReceipt => {
+  const parseReceiptTextLocal = (text: string): ParsedReceipt => {
     // Extract amount (look for ₦, NGN, or numbers after "total", "amount")
     const amountPatterns = [
       /(?:₦|NGN|N)\s*([0-9,]+(?:\.[0-9]{2})?)/gi,
@@ -72,7 +78,6 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
     for (const pattern of amountPatterns) {
       const matches = [...text.matchAll(pattern)];
       if (matches.length > 0) {
-        // Get the largest amount (usually the total)
         const amounts = matches.map(m => parseFloat(m[1].replace(/,/g, '')));
         amount = Math.max(...amounts);
         break;
@@ -128,6 +133,32 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
     return { amount, description, date, category, confidence };
   };
 
+  const categorizeWithAI = async (text: string): Promise<ParsedReceipt | null> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('categorize-expense', {
+        body: { receiptText: text },
+      });
+
+      if (error) throw error;
+
+      // Merge AI results with local parsing for date (AI doesn't always get dates right)
+      const localParsed = parseReceiptTextLocal(text);
+      
+      return {
+        amount: data.amount ?? localParsed.amount,
+        description: data.description || localParsed.description,
+        date: localParsed.date, // Keep local date parsing
+        category: data.category || localParsed.category,
+        confidence: data.confidence || 80,
+        isDeductible: data.isDeductible ?? true,
+        taxNote: data.taxNote,
+      };
+    } catch (error) {
+      console.error('AI categorization failed:', error);
+      return null;
+    }
+  };
+
   const processImage = async (imageData: string) => {
     setProcessing(true);
     setProgress(0);
@@ -138,7 +169,7 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
       const worker = await createWorker('eng', 1, {
         logger: (m) => {
           if (m.status === 'recognizing text') {
-            setProgress(Math.round(m.progress * 100));
+            setProgress(Math.round(m.progress * 70)); // OCR is 70% of progress
             setProgressText('Reading receipt...');
           }
         },
@@ -150,8 +181,19 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
       const { data: { text } } = await worker.recognize(imageData);
       setRawText(text);
 
+      setProgress(75);
       setProgressText('Analyzing receipt...');
-      const parsed = parseReceiptText(text);
+
+      let parsed: ParsedReceipt;
+      
+      if (useAI) {
+        setProgressText('AI categorizing...');
+        const aiResult = await categorizeWithAI(text);
+        parsed = aiResult || parseReceiptTextLocal(text);
+      } else {
+        parsed = parseReceiptTextLocal(text);
+      }
+      
       setParsedData(parsed);
 
       setEditableData({
@@ -159,13 +201,16 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
         description: parsed.description,
         date: parsed.date,
         category: parsed.category,
+        isDeductible: parsed.isDeductible ?? true,
       });
 
       await worker.terminate();
       workerRef.current = null;
 
-      if (parsed.confidence > 30) {
-        toast.success('Receipt scanned successfully!');
+      setProgress(100);
+
+      if (parsed.confidence > 50) {
+        toast.success(useAI ? 'Receipt analyzed with AI!' : 'Receipt scanned successfully!');
       } else {
         toast.info('Receipt scanned - please verify the details');
       }
@@ -174,7 +219,6 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
       toast.error('Failed to process receipt');
     } finally {
       setProcessing(false);
-      setProgress(100);
     }
   };
 
@@ -207,6 +251,7 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
       description: editableData.description || 'Receipt scan',
       date: editableData.date,
       category: editableData.category,
+      isDeductible: editableData.isDeductible,
     });
 
     // Reset state
@@ -216,6 +261,7 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
       description: '',
       date: new Date().toISOString().split('T')[0],
       category: 'other',
+      isDeductible: true,
     });
     setRawText('');
     onOpenChange(false);
@@ -248,6 +294,22 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* AI Toggle */}
+          {!parsedData && !processing && (
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+              <div className="flex items-center gap-2">
+                <Brain className="h-4 w-4 text-primary" />
+                <div>
+                  <p className="text-sm font-medium">AI Categorization</p>
+                  <p className="text-xs text-muted-foreground">
+                    Use AI to categorize & check deductibility
+                  </p>
+                </div>
+              </div>
+              <Switch checked={useAI} onCheckedChange={setUseAI} />
+            </div>
+          )}
+
           {!parsedData && !processing && (
             <div 
               className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
@@ -348,6 +410,25 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Tax Deductibility */}
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-primary" />
+                    <span className="text-sm">Tax Deductible</span>
+                  </div>
+                  <Switch
+                    checked={editableData.isDeductible}
+                    onCheckedChange={(checked) => setEditableData(prev => ({ ...prev, isDeductible: checked }))}
+                  />
+                </div>
+
+                {/* AI Tax Note */}
+                {parsedData.taxNote && (
+                  <div className="p-2 rounded-lg bg-info/10 text-info text-xs">
+                    <span className="font-medium">Tax tip:</span> {parsedData.taxNote}
+                  </div>
+                )}
               </div>
 
               {/* Raw text preview */}
