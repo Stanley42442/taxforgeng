@@ -180,6 +180,101 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_api_logs: {
+        Row: {
+          created_at: string
+          endpoint: string
+          id: string
+          method: string
+          partner_id: string
+          request_body: Json | null
+          response_time_ms: number | null
+          status_code: number
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          id?: string
+          method: string
+          partner_id: string
+          request_body?: Json | null
+          response_time_ms?: number | null
+          status_code: number
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          id?: string
+          method?: string
+          partner_id?: string
+          request_body?: Json | null
+          response_time_ms?: number | null
+          status_code?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_api_logs_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partners: {
+        Row: {
+          allowed_origins: string[] | null
+          api_key: string
+          api_secret_hash: string
+          created_at: string
+          id: string
+          is_active: boolean
+          last_request_at: string | null
+          name: string
+          rate_limit_daily: number
+          requests_today: number
+          requests_total: number
+          tier: string
+          updated_at: string
+          user_id: string
+          webhook_url: string | null
+        }
+        Insert: {
+          allowed_origins?: string[] | null
+          api_key: string
+          api_secret_hash: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_request_at?: string | null
+          name: string
+          rate_limit_daily?: number
+          requests_today?: number
+          requests_total?: number
+          tier?: string
+          updated_at?: string
+          user_id: string
+          webhook_url?: string | null
+        }
+        Update: {
+          allowed_origins?: string[] | null
+          api_key?: string
+          api_secret_hash?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_request_at?: string | null
+          name?: string
+          rate_limit_daily?: number
+          requests_today?: number
+          requests_total?: number
+          tier?: string
+          updated_at?: string
+          user_id?: string
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
