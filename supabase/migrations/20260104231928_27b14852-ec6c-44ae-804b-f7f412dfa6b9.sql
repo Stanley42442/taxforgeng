@@ -1,0 +1,14 @@
+-- Add theme/branding columns to partners table
+ALTER TABLE public.partners 
+ADD COLUMN IF NOT EXISTS brand_name TEXT,
+ADD COLUMN IF NOT EXISTS logo_url TEXT,
+ADD COLUMN IF NOT EXISTS primary_color TEXT DEFAULT '#10b981',
+ADD COLUMN IF NOT EXISTS secondary_color TEXT DEFAULT '#3b82f6',
+ADD COLUMN IF NOT EXISTS accent_color TEXT DEFAULT '#f59e0b',
+ADD COLUMN IF NOT EXISTS background_color TEXT DEFAULT '#ffffff',
+ADD COLUMN IF NOT EXISTS text_color TEXT DEFAULT '#1f2937',
+ADD COLUMN IF NOT EXISTS border_radius TEXT DEFAULT '12',
+ADD COLUMN IF NOT EXISTS font_family TEXT DEFAULT 'Inter',
+ADD COLUMN IF NOT EXISTS custom_css TEXT,
+ADD COLUMN IF NOT EXISTS embed_allowed_domains TEXT[],
+ADD COLUMN IF NOT EXISTS show_powered_by BOOLEAN DEFAULT true;
