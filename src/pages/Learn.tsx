@@ -45,11 +45,14 @@ import { formatCurrency } from "@/lib/taxCalculations";
 import { 
   taxMyths, 
   sectorGuides, 
+  videoGuides,
   searchMythsAndGuides,
   getMythsByTier,
   getSectorGuidesByTier,
+  getVideoGuidesByTier,
   type TaxMyth,
-  type SectorGuide 
+  type SectorGuide,
+  type VideoGuide
 } from "@/lib/taxMyths";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -367,24 +370,31 @@ const Learn = () => {
 
           {/* Main Content Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="animate-slide-up-delay-3">
-            <TabsList className="grid w-full grid-cols-4 h-auto p-1.5 glass-frosted rounded-2xl mb-6">
+            <TabsList className="grid w-full grid-cols-5 h-auto p-1.5 glass-frosted rounded-2xl mb-6">
               <TabsTrigger value="myths" className="py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
                 <ShieldAlert className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Myth Busters</span>
+                <span className="hidden sm:inline">Myths</span>
                 <span className="sm:hidden">Myths</span>
+              </TabsTrigger>
+              <TabsTrigger value="videos" className="py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
+                <Play className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Videos</span>
+                <span className="sm:hidden">Videos</span>
               </TabsTrigger>
               <TabsTrigger value="sectors" className="py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
                 <Factory className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Sector Guides</span>
+                <span className="hidden sm:inline">Sectors</span>
                 <span className="sm:hidden">Sectors</span>
               </TabsTrigger>
               <TabsTrigger value="articles" className="py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
                 <FileText className="h-4 w-4 mr-2" />
-                Articles
+                <span className="hidden sm:inline">Articles</span>
+                <span className="sm:hidden">Articles</span>
               </TabsTrigger>
               <TabsTrigger value="faqs" className="py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
                 <HelpCircle className="h-4 w-4 mr-2" />
-                FAQs
+                <span className="hidden sm:inline">FAQs</span>
+                <span className="sm:hidden">FAQs</span>
               </TabsTrigger>
             </TabsList>
 
@@ -524,6 +534,78 @@ const Learn = () => {
                     </Accordion>
                   );
                 })}
+              </div>
+            </TabsContent>
+
+            {/* Videos Tab */}
+            <TabsContent value="videos" className="space-y-6">
+              {/* Video Categories */}
+              {['basics', 'reforms', 'sectors', 'tips'].map((category) => {
+                const categoryVideos = videoGuides.filter(v => v.category === category);
+                if (categoryVideos.length === 0) return null;
+                
+                const categoryTitles: Record<string, string> = {
+                  basics: 'Tax Fundamentals',
+                  reforms: '2026 Tax Reforms',
+                  sectors: 'Sector-Specific',
+                  tips: 'Tips & Best Practices'
+                };
+                
+                return (
+                  <div key={category} className="glass-frosted rounded-3xl p-6">
+                    <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
+                      <div className="p-2 rounded-xl bg-primary/10">
+                        <Play className="h-5 w-5 text-primary" />
+                      </div>
+                      {categoryTitles[category]}
+                    </h2>
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {categoryVideos.map((video) => {
+                        const tierOrder = { free: 0, basic: 1, business: 2 };
+                        const userTierValue = tierOrder[tierForMyths as keyof typeof tierOrder] || 0;
+                        const hasAccess = userTierValue >= tierOrder[video.tier];
+                        const badge = getTierBadge(video.tier);
+                        
+                        return (
+                          <div 
+                            key={video.id}
+                            className={`glass aspect-video rounded-2xl flex items-center justify-center cursor-pointer group hover-lift relative overflow-hidden ${!hasAccess ? 'opacity-70' : ''}`}
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 via-transparent to-transparent" />
+                            <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+                              {badge && (
+                                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${badge.color}`}>
+                                  {badge.label}
+                                </span>
+                              )}
+                              {!hasAccess && <Lock className="h-4 w-4 text-muted-foreground" />}
+                            </div>
+                            <div className="text-center relative z-10 px-4">
+                              <div className={`w-14 h-14 rounded-full ${hasAccess ? 'bg-gradient-primary glow-primary' : 'bg-muted'} flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
+                                {hasAccess ? (
+                                  <Play className="h-6 w-6 text-primary-foreground fill-primary-foreground ml-1" />
+                                ) : (
+                                  <Lock className="h-5 w-5 text-muted-foreground" />
+                                )}
+                              </div>
+                              <p className="font-medium text-foreground text-sm">{video.title}</p>
+                              <p className="text-xs text-muted-foreground mt-1">{video.duration} • {video.description.slice(0, 40)}...</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+              
+              {/* Coming Soon Notice */}
+              <div className="glass rounded-2xl p-6 text-center">
+                <Play className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+                <p className="text-foreground font-medium mb-1">More Videos Coming Soon</p>
+                <p className="text-sm text-muted-foreground">
+                  We're creating more educational content. Check back regularly!
+                </p>
               </div>
             </TabsContent>
 
