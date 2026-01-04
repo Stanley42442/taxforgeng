@@ -38,6 +38,45 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_queries: {
+        Row: {
+          categories: string[] | null
+          created_at: string | null
+          feedback: number | null
+          id: string
+          question: string
+          response: string
+          response_time_ms: number | null
+          sector: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          categories?: string[] | null
+          created_at?: string | null
+          feedback?: number | null
+          id?: string
+          question: string
+          response: string
+          response_time_ms?: number | null
+          sector?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          categories?: string[] | null
+          created_at?: string | null
+          feedback?: number | null
+          id?: string
+          question?: string
+          response?: string
+          response_time_ms?: number | null
+          sector?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -80,6 +119,8 @@ export type Database = {
           entity_type: string
           id: string
           name: string
+          sector: string | null
+          sub_sector: string | null
           turnover: number
           updated_at: string
           user_id: string
@@ -90,6 +131,8 @@ export type Database = {
           entity_type: string
           id?: string
           name: string
+          sector?: string | null
+          sub_sector?: string | null
           turnover?: number
           updated_at?: string
           user_id: string
@@ -100,9 +143,47 @@ export type Database = {
           entity_type?: string
           id?: string
           name?: string
+          sector?: string | null
+          sub_sector?: string | null
           turnover?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      digital_vat_registrations: {
+        Row: {
+          annual_digital_revenue: number
+          business_name: string
+          country_of_origin: string
+          created_at: string | null
+          id: string
+          registration_status: string | null
+          sep_threshold_met: boolean | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          annual_digital_revenue?: number
+          business_name: string
+          country_of_origin: string
+          created_at?: string | null
+          id?: string
+          registration_status?: string | null
+          sep_threshold_met?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          annual_digital_revenue?: number
+          business_name?: string
+          country_of_origin?: string
+          created_at?: string | null
+          id?: string
+          registration_status?: string | null
+          sep_threshold_met?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -177,6 +258,33 @@ export type Database = {
           message?: string | null
           rating?: number
           user_id?: string
+        }
+        Relationships: []
+      }
+      individual_calculations: {
+        Row: {
+          calculation_type: string
+          created_at: string | null
+          id: string
+          inputs: Json
+          result: Json
+          user_id: string | null
+        }
+        Insert: {
+          calculation_type: string
+          created_at?: string | null
+          id?: string
+          inputs: Json
+          result: Json
+          user_id?: string | null
+        }
+        Update: {
+          calculation_type?: string
+          created_at?: string | null
+          id?: string
+          inputs?: Json
+          result?: Json
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -396,6 +504,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sector_presets: {
+        Row: {
+          benefits: string[] | null
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          myths: Json | null
+          name: string
+          sector_id: string
+          tax_rules: Json
+          updated_at: string | null
+        }
+        Insert: {
+          benefits?: string[] | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          myths?: Json | null
+          name: string
+          sector_id: string
+          tax_rules?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          benefits?: string[] | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          myths?: Json | null
+          name?: string
+          sector_id?: string
+          tax_rules?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      subscription_addons: {
+        Row: {
+          addon_type: string
+          expires_at: string | null
+          id: string
+          purchased_at: string | null
+          quantity: number | null
+          remaining: number | null
+          user_id: string
+        }
+        Insert: {
+          addon_type: string
+          expires_at?: string | null
+          id?: string
+          purchased_at?: string | null
+          quantity?: number | null
+          remaining?: number | null
+          user_id: string
+        }
+        Update: {
+          addon_type?: string
+          expires_at?: string | null
+          id?: string
+          purchased_at?: string | null
+          quantity?: number | null
+          remaining?: number | null
+          user_id?: string
+        }
+        Relationships: []
       }
       tax_calculations: {
         Row: {
