@@ -223,51 +223,87 @@ export type Database = {
       }
       partners: {
         Row: {
+          accent_color: string | null
           allowed_origins: string[] | null
           api_key: string
           api_secret_hash: string
+          background_color: string | null
+          border_radius: string | null
+          brand_name: string | null
           created_at: string
+          custom_css: string | null
+          embed_allowed_domains: string[] | null
+          font_family: string | null
           id: string
           is_active: boolean
           last_request_at: string | null
+          logo_url: string | null
           name: string
+          primary_color: string | null
           rate_limit_daily: number
           requests_today: number
           requests_total: number
+          secondary_color: string | null
+          show_powered_by: boolean | null
+          text_color: string | null
           tier: string
           updated_at: string
           user_id: string
           webhook_url: string | null
         }
         Insert: {
+          accent_color?: string | null
           allowed_origins?: string[] | null
           api_key: string
           api_secret_hash: string
+          background_color?: string | null
+          border_radius?: string | null
+          brand_name?: string | null
           created_at?: string
+          custom_css?: string | null
+          embed_allowed_domains?: string[] | null
+          font_family?: string | null
           id?: string
           is_active?: boolean
           last_request_at?: string | null
+          logo_url?: string | null
           name: string
+          primary_color?: string | null
           rate_limit_daily?: number
           requests_today?: number
           requests_total?: number
+          secondary_color?: string | null
+          show_powered_by?: boolean | null
+          text_color?: string | null
           tier?: string
           updated_at?: string
           user_id: string
           webhook_url?: string | null
         }
         Update: {
+          accent_color?: string | null
           allowed_origins?: string[] | null
           api_key?: string
           api_secret_hash?: string
+          background_color?: string | null
+          border_radius?: string | null
+          brand_name?: string | null
           created_at?: string
+          custom_css?: string | null
+          embed_allowed_domains?: string[] | null
+          font_family?: string | null
           id?: string
           is_active?: boolean
           last_request_at?: string | null
+          logo_url?: string | null
           name?: string
+          primary_color?: string | null
           rate_limit_daily?: number
           requests_today?: number
           requests_total?: number
+          secondary_color?: string | null
+          show_powered_by?: boolean | null
+          text_color?: string | null
           tier?: string
           updated_at?: string
           user_id?: string

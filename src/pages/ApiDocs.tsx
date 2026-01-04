@@ -20,8 +20,10 @@ import {
   Trash2,
   RefreshCw,
   BarChart3,
-  Shield
+  Shield,
+  Palette
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface PartnerKey {
   id: string;
@@ -38,6 +40,7 @@ interface PartnerKey {
 const ApiDocs = () => {
   const { tier } = useSubscription();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [partnerKeys, setPartnerKeys] = useState<PartnerKey[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
@@ -356,10 +359,18 @@ console.log(data.data.totalTaxPayable);`;
                     </p>
                   </div>
                 ) : (
-                  <Button variant="hero" onClick={() => setShowNewKeyForm(true)}>
-                    <Key className="h-4 w-4" />
-                    Create New API Key
-                  </Button>
+                  <div className="flex gap-3">
+                    <Button variant="hero" onClick={() => setShowNewKeyForm(true)}>
+                      <Key className="h-4 w-4" />
+                      Create New API Key
+                    </Button>
+                    {partnerKeys.length > 0 && (
+                      <Button variant="outline" onClick={() => navigate('/partner-branding')}>
+                        <Palette className="h-4 w-4" />
+                        Customize Branding
+                      </Button>
+                    )}
+                  </div>
                 )}
 
                 <p className="text-xs text-muted-foreground">
