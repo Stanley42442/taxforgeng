@@ -128,17 +128,18 @@ const CalculatorPage = () => {
             <p className="text-muted-foreground mb-4">
               Calculate your Nigerian taxes accurately
             </p>
-            <SectorPresets onApplyPreset={(presets) => {
-              setInputs(prev => ({
-                ...prev,
-                turnover: presets.turnover?.toString() || prev.turnover,
-                expenses: presets.expenses?.toString() || prev.expenses,
-                fixedAssets: presets.fixedAssets?.toString() || prev.fixedAssets,
-                vatableSales: presets.vatableSales?.toString() || prev.vatableSales,
-                vatablePurchases: presets.vatablePurchases?.toString() || prev.vatablePurchases,
-              }));
-              toast.success('Sector preset applied');
-            }} />
+            <SectorPresets 
+              onApplyPreset={(taxRules, sectorId) => {
+                // Apply tax rules to calculation context (not pre-filling data)
+                toast.success(`${sectorId.replace('_', ' ')} sector rules applied`, {
+                  description: taxRules.vatStatus === 'zero' 
+                    ? 'Zero-rated VAT enabled' 
+                    : taxRules.vatStatus === 'exempt'
+                    ? 'VAT exempt status applied'
+                    : 'Standard tax rules applied'
+                });
+              }} 
+            />
           </div>
 
           {/* Tax Rule Toggle - Neumorphic */}
