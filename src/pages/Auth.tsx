@@ -285,10 +285,21 @@ const Auth = () => {
         .single();
 
       if (existingDevice) {
-        // Update last seen timestamp
+        // Update last seen timestamp and device info
         await supabase
           .from('known_devices')
-          .update({ last_seen_at: new Date().toISOString() })
+          .update({ 
+            last_seen_at: new Date().toISOString(),
+            browser: deviceInfo.browser,
+            browser_version: deviceInfo.browserVersion,
+            os: deviceInfo.os,
+            os_version: deviceInfo.osVersion,
+            device_type: deviceInfo.deviceType,
+            device_model: deviceInfo.deviceModel,
+            screen_resolution: deviceInfo.screenResolution,
+            timezone: deviceInfo.timezone,
+            language: deviceInfo.language
+          })
           .eq('id', existingDevice.id);
       } else {
         // New device detected - register it and send alert
@@ -297,7 +308,14 @@ const Auth = () => {
           device_fingerprint: deviceInfo.fingerprint,
           device_name: deviceInfo.deviceName,
           browser: deviceInfo.browser,
-          os: deviceInfo.os
+          browser_version: deviceInfo.browserVersion,
+          os: deviceInfo.os,
+          os_version: deviceInfo.osVersion,
+          device_type: deviceInfo.deviceType,
+          device_model: deviceInfo.deviceModel,
+          screen_resolution: deviceInfo.screenResolution,
+          timezone: deviceInfo.timezone,
+          language: deviceInfo.language
         } as any);
 
         // Send new device alert email
@@ -307,9 +325,11 @@ const Auth = () => {
             alertType: 'new_device',
             timestamp: new Date().toLocaleString(),
             deviceInfo: {
-              browser: deviceInfo.browser,
-              os: deviceInfo.os,
-              deviceName: deviceInfo.deviceName
+              browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`,
+              os: `${deviceInfo.os} ${deviceInfo.osVersion}`,
+              deviceName: deviceInfo.deviceName,
+              deviceType: deviceInfo.deviceType,
+              deviceModel: deviceInfo.deviceModel
             }
           }
         });
