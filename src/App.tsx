@@ -10,6 +10,7 @@ import { AuthLoadingScreen } from "@/components/AuthLoadingScreen";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ReminderNotificationProvider } from "@/components/ReminderNotificationProvider";
 import { TrialBanner } from "@/components/TrialBanner";
+import { TierSelectionWrapper } from "@/components/TierSelectionWrapper";
 import { lazy, Suspense } from "react";
 
 // Eagerly load Index for fast initial render
@@ -75,6 +76,7 @@ const App = () => (
                 <ScrollToTop />
                 <ReminderNotificationProvider />
                 <TrialBanner />
+                <TierSelectionWrapper />
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
                     <Route path="/" element={<Index />} />

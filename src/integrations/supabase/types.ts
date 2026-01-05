@@ -535,9 +535,12 @@ export type Database = {
           created_at: string
           email: string | null
           full_name: string | null
+          has_selected_initial_tier: boolean
           id: string
           subscription_tier: string
           total_points: number
+          trial_expires_at: string | null
+          trial_started_at: string | null
           updated_at: string
           whatsapp_number: string | null
         }
@@ -545,9 +548,12 @@ export type Database = {
           created_at?: string
           email?: string | null
           full_name?: string | null
+          has_selected_initial_tier?: boolean
           id: string
           subscription_tier?: string
           total_points?: number
+          trial_expires_at?: string | null
+          trial_started_at?: string | null
           updated_at?: string
           whatsapp_number?: string | null
         }
@@ -555,9 +561,12 @@ export type Database = {
           created_at?: string
           email?: string | null
           full_name?: string | null
+          has_selected_initial_tier?: boolean
           id?: string
           subscription_tier?: string
           total_points?: number
+          trial_expires_at?: string | null
+          trial_started_at?: string | null
           updated_at?: string
           whatsapp_number?: string | null
         }
@@ -806,6 +815,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_expired_trials: { Args: never; Returns: undefined }
       cleanup_old_backup_attempts: { Args: never; Returns: undefined }
       has_role: {
         Args: {
