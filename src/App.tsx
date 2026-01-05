@@ -38,6 +38,7 @@ const BusinessReport = lazy(() => import("./pages/BusinessReport"));
 const Roadmap = lazy(() => import("./pages/Roadmap"));
 const Terms = lazy(() => import("./pages/Terms"));
 const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
+const AIQueryAnalytics = lazy(() => import("./pages/AIQueryAnalytics"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 const SectorGuide = lazy(() => import("./pages/SectorGuide"));
 const PartnerBranding = lazy(() => import("./pages/PartnerBranding"));
@@ -95,6 +96,7 @@ const App = () => (
                   <Route path="/roadmap" element={<Roadmap />} />
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/admin-analytics" element={<AdminAnalytics />} />
+                  <Route path="/ai-analytics" element={<AIQueryAnalytics />} />
                   <Route path="/notifications" element={<Notifications />} />
                   <Route path="/sector/:id" element={<SectorGuide />} />
                   <Route path="/partner-branding" element={<PartnerBranding />} />
