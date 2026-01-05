@@ -113,8 +113,14 @@ const Auth = () => {
           } else {
             sessionStorage.removeItem('taxforge-session-only');
           }
-          toast.success("Account created successfully! You are now logged in.");
-          navigate("/");
+          // Show verification message instead of immediate redirect
+          toast.success("Account created! Please check your email to verify your account.", {
+            duration: 6000
+          });
+          setView('login');
+          setEmail("");
+          setPassword("");
+          setFullName("");
         }
       }
     } finally {

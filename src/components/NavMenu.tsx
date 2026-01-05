@@ -242,6 +242,14 @@ export const NavMenu = () => {
                           </span>
                         </div>
                         <SheetClose asChild>
+                          <Link to="/settings" className="block">
+                            <Button variant="ghost" className="w-full h-9 text-sm justify-start">
+                              <User className="h-4 w-4 shrink-0" />
+                              <span className="truncate">Account Settings</span>
+                            </Button>
+                          </Link>
+                        </SheetClose>
+                        <SheetClose asChild>
                           <Button variant="outline" className="w-full h-9 text-sm" onClick={handleSignOut}>
                             <LogOut className="h-4 w-4 shrink-0" />
                             <span className="truncate">Sign Out</span>
