@@ -28,9 +28,11 @@ import {
   LogIn,
   Key,
   Globe,
-  Monitor,
   XCircle,
-  Loader2
+  Loader2,
+  Copy,
+  Download,
+  RefreshCw
 } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { useAuth } from "@/hooks/useAuth";
@@ -125,6 +127,13 @@ const Settings = () => {
   const [mfaEnrolling, setMfaEnrolling] = useState(false);
   const [mfaVerifying, setMfaVerifying] = useState(false);
 
+  // Backup codes state
+  const [backupCodes, setBackupCodes] = useState<string[]>([]);
+  const [showBackupCodes, setShowBackupCodes] = useState(false);
+  const [hasBackupCodes, setHasBackupCodes] = useState(false);
+  const [backupCodesLoading, setBackupCodesLoading] = useState(true);
+  const [generatingBackupCodes, setGeneratingBackupCodes] = useState(false);
+
   // Activity log state
   const [authEvents, setAuthEvents] = useState<AuthEvent[]>([]);
   const [eventsLoading, setEventsLoading] = useState(true);
@@ -180,6 +189,30 @@ const Settings = () => {
     };
 
     loadMfaFactors();
+  }, [user]);
+
+  // Load backup codes status
+  useEffect(() => {
+    const loadBackupCodesStatus = async () => {
+      if (!user) return;
+
+      try {
+        const { count, error } = await supabase
+          .from('backup_codes')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .is('used_at', null);
+
+        if (error) throw error;
+        setHasBackupCodes((count || 0) > 0);
+      } catch (error) {
+        console.error("Error loading backup codes status:", error);
+      } finally {
+        setBackupCodesLoading(false);
+      }
+    };
+
+    loadBackupCodesStatus();
   }, [user]);
 
   // Load auth events
@@ -397,10 +430,92 @@ const Settings = () => {
       const { data: factors } = await supabase.auth.mfa.listFactors();
       setMfaFactors((factors?.totp || []) as MFAFactor[]);
 
+      // Delete backup codes when 2FA is disabled
+      await supabase.from('backup_codes').delete().eq('user_id', user?.id);
+      setHasBackupCodes(false);
+
       toast.success("Two-factor authentication disabled");
     } catch (error: any) {
       toast.error(error.message || "Failed to disable 2FA");
     }
+  };
+
+  // Generate backup codes
+  const generateBackupCodes = (): string[] => {
+    const codes: string[] = [];
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No I, O, 0, 1 to avoid confusion
+    for (let i = 0; i < 10; i++) {
+      let code = '';
+      for (let j = 0; j < 8; j++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      codes.push(code.slice(0, 4) + '-' + code.slice(4));
+    }
+    return codes;
+  };
+
+  // Simple hash function for backup codes (in production, use bcrypt on server)
+  const hashCode = async (code: string): Promise<string> => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(code.replace('-', '').toUpperCase());
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  };
+
+  const handleGenerateBackupCodes = async () => {
+    if (!user) return;
+
+    setGeneratingBackupCodes(true);
+    try {
+      // Delete existing backup codes
+      await supabase.from('backup_codes').delete().eq('user_id', user.id);
+
+      // Generate new codes
+      const codes = generateBackupCodes();
+      setBackupCodes(codes);
+
+      // Store hashed codes in database
+      const hashedCodes = await Promise.all(
+        codes.map(async (code) => ({
+          user_id: user.id,
+          code_hash: await hashCode(code),
+        }))
+      );
+
+      const { error } = await supabase.from('backup_codes').insert(hashedCodes as any);
+      if (error) throw error;
+
+      setHasBackupCodes(true);
+      setShowBackupCodes(true);
+      await logAuthEvent('backup_codes_generated');
+      
+      toast.success("Backup codes generated successfully!");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to generate backup codes");
+    } finally {
+      setGeneratingBackupCodes(false);
+    }
+  };
+
+  const handleCopyBackupCodes = () => {
+    const codesText = backupCodes.join('\n');
+    navigator.clipboard.writeText(codesText);
+    toast.success("Backup codes copied to clipboard!");
+  };
+
+  const handleDownloadBackupCodes = () => {
+    const codesText = `TaxForge NG - 2FA Backup Codes\n${'='.repeat(35)}\n\nThese codes can be used to sign in if you lose access to your authenticator app.\nEach code can only be used once.\n\n${backupCodes.map((code, i) => `${i + 1}. ${code}`).join('\n')}\n\nGenerated: ${new Date().toLocaleString()}\n\nKeep these codes in a safe place!`;
+    const blob = new Blob([codesText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'taxforge-backup-codes.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("Backup codes downloaded!");
   };
 
   if (loading || profileLoading) {
@@ -588,6 +703,87 @@ const Settings = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Backup Codes */}
+          {hasMfaEnabled && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Key className="h-5 w-5 text-primary" />
+                  Backup Codes
+                </CardTitle>
+                <CardDescription>
+                  Recovery codes to use if you lose access to your authenticator app
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {backupCodesLoading ? (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading...
+                  </div>
+                ) : hasBackupCodes ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                      <CheckCircle2 className="h-5 w-5 text-green-600" />
+                      <div>
+                        <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                          Backup codes available
+                        </p>
+                        <p className="text-xs text-green-600 dark:text-green-400">
+                          You have recovery codes saved for account access
+                        </p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      onClick={handleGenerateBackupCodes}
+                      disabled={generatingBackupCodes}
+                    >
+                      {generatingBackupCodes ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          Regenerating...
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="h-4 w-4 mr-2" />
+                          Regenerate Codes
+                        </>
+                      )}
+                    </Button>
+                    <p className="text-xs text-muted-foreground">
+                      Warning: Regenerating codes will invalidate all existing backup codes.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                      <AlertCircle className="h-5 w-5 text-amber-600" />
+                      <div>
+                        <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                          No backup codes
+                        </p>
+                        <p className="text-xs text-amber-600 dark:text-amber-400">
+                          Generate backup codes for account recovery
+                        </p>
+                      </div>
+                    </div>
+                    <Button onClick={handleGenerateBackupCodes} disabled={generatingBackupCodes}>
+                      {generatingBackupCodes ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          Generating...
+                        </>
+                      ) : (
+                        "Generate Backup Codes"
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Email Settings */}
           <Card>
@@ -805,6 +1001,56 @@ const Settings = () => {
               ) : (
                 "Verify and Enable"
               )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Backup Codes Dialog */}
+      <Dialog open={showBackupCodes} onOpenChange={setShowBackupCodes}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Your Backup Codes</DialogTitle>
+            <DialogDescription>
+              Save these codes in a secure place. Each code can only be used once to sign in if you lose access to your authenticator app.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-2 p-4 bg-muted rounded-lg font-mono text-sm">
+              {backupCodes.map((code, index) => (
+                <div key={index} className="p-2 bg-background rounded border text-center">
+                  {code}
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={handleCopyBackupCodes}
+              >
+                <Copy className="h-4 w-4 mr-2" />
+                Copy
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={handleDownloadBackupCodes}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download
+              </Button>
+            </div>
+            <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+              <p className="text-xs text-amber-800 dark:text-amber-200">
+                <strong>Important:</strong> Store these codes securely. They won't be shown again after you close this dialog.
+              </p>
+            </div>
+            <Button 
+              className="w-full" 
+              onClick={() => setShowBackupCodes(false)}
+            >
+              I've saved my codes
             </Button>
           </div>
         </DialogContent>
