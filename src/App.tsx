@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/hooks/useAuth";
+import { AuthLoadingScreen } from "@/components/AuthLoadingScreen";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ReminderNotificationProvider } from "@/components/ReminderNotificationProvider";
 import { lazy, Suspense } from "react";
@@ -62,53 +63,55 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="light" storageKey="taxforge-ng-theme">
       <AuthProvider>
-        <SubscriptionProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <ScrollToTop />
-              <ReminderNotificationProvider />
-              <Suspense fallback={<PageLoader />}>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/advisory" element={<Advisory />} />
-                  <Route path="/calculator" element={<Calculator />} />
-                  <Route path="/results" element={<Results />} />
-                  <Route path="/tax-breakdown" element={<TaxBreakdown />} />
-                  <Route path="/pricing" element={<Pricing />} />
-                  <Route path="/tax-filing" element={<TaxFiling />} />
-                  <Route path="/businesses" element={<SavedBusinesses />} />
-                  <Route path="/reminders" element={<Reminders />} />
-                  <Route path="/insights" element={<Insights />} />
-                  <Route path="/team" element={<Team />} />
-                  <Route path="/transactions" element={<Transactions />} />
-                  <Route path="/audit-log" element={<AuditLog />} />
-                  <Route path="/learn" element={<Learn />} />
-                  <Route path="/expenses" element={<Expenses />} />
-                  <Route path="/scenarios" element={<ScenarioModeling />} />
-                  <Route path="/e-filing" element={<EFiling />} />
-                  <Route path="/api-docs" element={<ApiDocs />} />
-                  <Route path="/achievements" element={<Achievements />} />
-                  <Route path="/business-report" element={<BusinessReport />} />
-                  <Route path="/roadmap" element={<Roadmap />} />
-                  <Route path="/terms" element={<Terms />} />
-                  <Route path="/admin-analytics" element={<AdminAnalytics />} />
-                  <Route path="/ai-analytics" element={<AIQueryAnalytics />} />
-                  <Route path="/notifications" element={<Notifications />} />
-                  <Route path="/sector/:id" element={<SectorGuide />} />
-                  <Route path="/partner-branding" element={<PartnerBranding />} />
-                  <Route path="/embed/calculator" element={<EmbedCalculator />} />
-                  <Route path="/individual-calculator" element={<IndividualCalculator />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-                <TaxAssistant />
-              </Suspense>
-            </BrowserRouter>
-          </TooltipProvider>
-        </SubscriptionProvider>
+        <AuthLoadingScreen>
+          <SubscriptionProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <ScrollToTop />
+                <ReminderNotificationProvider />
+                <Suspense fallback={<PageLoader />}>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/advisory" element={<Advisory />} />
+                    <Route path="/calculator" element={<Calculator />} />
+                    <Route path="/results" element={<Results />} />
+                    <Route path="/tax-breakdown" element={<TaxBreakdown />} />
+                    <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/tax-filing" element={<TaxFiling />} />
+                    <Route path="/businesses" element={<SavedBusinesses />} />
+                    <Route path="/reminders" element={<Reminders />} />
+                    <Route path="/insights" element={<Insights />} />
+                    <Route path="/team" element={<Team />} />
+                    <Route path="/transactions" element={<Transactions />} />
+                    <Route path="/audit-log" element={<AuditLog />} />
+                    <Route path="/learn" element={<Learn />} />
+                    <Route path="/expenses" element={<Expenses />} />
+                    <Route path="/scenarios" element={<ScenarioModeling />} />
+                    <Route path="/e-filing" element={<EFiling />} />
+                    <Route path="/api-docs" element={<ApiDocs />} />
+                    <Route path="/achievements" element={<Achievements />} />
+                    <Route path="/business-report" element={<BusinessReport />} />
+                    <Route path="/roadmap" element={<Roadmap />} />
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/admin-analytics" element={<AdminAnalytics />} />
+                    <Route path="/ai-analytics" element={<AIQueryAnalytics />} />
+                    <Route path="/notifications" element={<Notifications />} />
+                    <Route path="/sector/:id" element={<SectorGuide />} />
+                    <Route path="/partner-branding" element={<PartnerBranding />} />
+                    <Route path="/embed/calculator" element={<EmbedCalculator />} />
+                    <Route path="/individual-calculator" element={<IndividualCalculator />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                  <TaxAssistant />
+                </Suspense>
+              </BrowserRouter>
+            </TooltipProvider>
+          </SubscriptionProvider>
+        </AuthLoadingScreen>
       </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
