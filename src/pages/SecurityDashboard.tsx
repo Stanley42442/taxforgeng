@@ -23,7 +23,9 @@ import {
   Activity,
   AlertCircle,
   Monitor,
-  Trash2
+  Trash2,
+  Star,
+  StarOff
 } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { useAuth } from "@/hooks/useAuth";
@@ -71,9 +73,12 @@ const getEventIcon = (eventType: string) => {
     case 'login':
     case 'login_success':
       return <LogIn className="h-4 w-4 text-green-500" />;
+    case 'logout':
+      return <LogIn className="h-4 w-4 text-blue-500 rotate-180" />;
     case 'login_failed':
       return <XCircle className="h-4 w-4 text-destructive" />;
     case 'password_change':
+    case 'password_recovery_initiated':
       return <Key className="h-4 w-4 text-amber-500" />;
     case 'email_change':
       return <Mail className="h-4 w-4 text-blue-500" />;
@@ -83,6 +88,10 @@ const getEventIcon = (eventType: string) => {
       return <Unlock className="h-4 w-4 text-amber-500" />;
     case 'backup_codes_generated':
       return <Key className="h-4 w-4 text-purple-500" />;
+    case 'signup':
+      return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+    case 'profile_updated':
+      return <Shield className="h-4 w-4 text-blue-500" />;
     default:
       return <Shield className="h-4 w-4 text-muted-foreground" />;
   }
@@ -93,12 +102,15 @@ const getEventLabel = (eventType: string) => {
     'login': 'Signed in',
     'login_success': 'Signed in successfully',
     'login_failed': 'Failed login attempt',
+    'logout': 'Signed out',
     'password_change': 'Password changed',
+    'password_recovery_initiated': 'Password recovery started',
     'email_change': 'Email changed',
     '2fa_enabled': '2FA enabled',
     '2fa_disabled': '2FA disabled',
     'signup': 'Account created',
     'backup_codes_generated': 'Backup codes generated',
+    'profile_updated': 'Profile updated',
   };
   return labels[eventType] || eventType;
 };
@@ -109,12 +121,16 @@ const getEventSeverity = (eventType: string): 'success' | 'warning' | 'error' | 
     case 'login_success':
     case '2fa_enabled':
     case 'backup_codes_generated':
+    case 'signup':
       return 'success';
     case 'login_failed':
       return 'error';
     case '2fa_disabled':
     case 'password_change':
+    case 'password_recovery_initiated':
       return 'warning';
+    case 'logout':
+    case 'profile_updated':
     default:
       return 'info';
   }
@@ -137,6 +153,7 @@ const SecurityDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [removingDeviceId, setRemovingDeviceId] = useState<string | null>(null);
+  const [togglingTrustId, setTogglingTrustId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -229,6 +246,8 @@ const SecurityDashboard = () => {
   const handleRemoveDevice = async (deviceId: string) => {
     if (!user) return;
     
+    const device = knownDevices.find(d => d.id === deviceId);
+    
     setRemovingDeviceId(deviceId);
     try {
       const { error } = await supabase
@@ -241,11 +260,52 @@ const SecurityDashboard = () => {
 
       setKnownDevices(prev => prev.filter(d => d.id !== deviceId));
       toast.success("Device removed successfully");
+
+      // Send email notification about device removal
+      if (user.email && device) {
+        supabase.functions.invoke('send-security-alert', {
+          body: {
+            userEmail: user.email,
+            alertType: 'device_removed',
+            timestamp: new Date().toLocaleString(),
+            deviceInfo: {
+              browser: device.browser || 'Unknown',
+              os: device.os || 'Unknown',
+              deviceName: device.device_name || 'Unknown Device'
+            }
+          }
+        }).catch(err => console.error('Failed to send device removal alert:', err));
+      }
     } catch (error) {
       console.error("Error removing device:", error);
       toast.error("Failed to remove device");
     } finally {
       setRemovingDeviceId(null);
+    }
+  };
+
+  const handleToggleTrust = async (deviceId: string, currentTrusted: boolean) => {
+    if (!user) return;
+    
+    setTogglingTrustId(deviceId);
+    try {
+      const { error } = await supabase
+        .from('known_devices')
+        .update({ is_trusted: !currentTrusted })
+        .eq('id', deviceId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setKnownDevices(prev => prev.map(d => 
+        d.id === deviceId ? { ...d, is_trusted: !currentTrusted } : d
+      ));
+      toast.success(currentTrusted ? "Device removed from trusted list" : "Device marked as trusted");
+    } catch (error) {
+      console.error("Error updating device trust status:", error);
+      toast.error("Failed to update device");
+    } finally {
+      setTogglingTrustId(null);
     }
   };
 
@@ -444,34 +504,59 @@ const SecurityDashboard = () => {
                       {knownDevices.map((device) => (
                         <div 
                           key={device.id}
-                          className="flex items-start gap-3 p-4 rounded-lg border bg-card"
+                          className={`flex items-start gap-3 p-4 rounded-lg border bg-card ${device.is_trusted ? 'border-green-200 dark:border-green-800' : ''}`}
                         >
-                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <Monitor className="h-5 w-5 text-primary" />
+                          <div className={`h-10 w-10 rounded-full flex items-center justify-center ${device.is_trusted ? 'bg-green-100 dark:bg-green-900/30' : 'bg-primary/10'}`}>
+                            <Monitor className={`h-5 w-5 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
                               <div>
-                                <p className="font-medium text-sm">
-                                  {device.device_name || 'Unknown Device'}
-                                </p>
+                                <div className="flex items-center gap-2">
+                                  <p className="font-medium text-sm">
+                                    {device.device_name || 'Unknown Device'}
+                                  </p>
+                                  {device.is_trusted && (
+                                    <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50 dark:bg-green-900/20 text-xs">
+                                      Trusted
+                                    </Badge>
+                                  )}
+                                </div>
                                 <p className="text-xs text-muted-foreground mt-0.5">
                                   {device.browser} on {device.os}
                                 </p>
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                onClick={() => handleRemoveDevice(device.id)}
-                                disabled={removingDeviceId === device.id}
-                              >
-                                {removingDeviceId === device.id ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  <Trash2 className="h-4 w-4" />
-                                )}
-                              </Button>
+                              <div className="flex items-center gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className={device.is_trusted ? "text-amber-500 hover:text-amber-600 hover:bg-amber-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}
+                                  onClick={() => handleToggleTrust(device.id, device.is_trusted)}
+                                  disabled={togglingTrustId === device.id}
+                                  title={device.is_trusted ? "Remove from trusted devices" : "Mark as trusted device"}
+                                >
+                                  {togglingTrustId === device.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : device.is_trusted ? (
+                                    <StarOff className="h-4 w-4" />
+                                  ) : (
+                                    <Star className="h-4 w-4" />
+                                  )}
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                  onClick={() => handleRemoveDevice(device.id)}
+                                  disabled={removingDeviceId === device.id}
+                                >
+                                  {removingDeviceId === device.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Trash2 className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </div>
                             </div>
                             <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                               <div className="flex items-center gap-1">

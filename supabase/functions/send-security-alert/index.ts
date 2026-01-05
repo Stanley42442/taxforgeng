@@ -11,7 +11,7 @@ const corsHeaders = {
 
 interface SecurityAlertRequest {
   userEmail: string;
-  alertType: 'failed_backup_codes' | 'suspicious_login' | 'account_locked' | 'new_device';
+  alertType: 'failed_backup_codes' | 'suspicious_login' | 'account_locked' | 'new_device' | 'device_removed';
   attemptCount?: number;
   timestamp: string;
   deviceInfo?: {
@@ -72,6 +72,28 @@ const handler = async (req: Request): Promise<Response> => {
           `;
         }
         break;
+      case 'device_removed':
+        subject = "🔒 Security Alert: Device Removed from Your Account";
+        alertTitle = "Device Removed";
+        alertMessage = "A device was removed from your trusted devices list.";
+        actionMessage = "If this was you, no action is needed. If you didn't remove this device, please review your account security immediately.";
+        if (deviceInfo) {
+          extraInfo = `
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Device:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${deviceInfo.deviceName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Browser:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${deviceInfo.browser}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Operating System:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${deviceInfo.os}</td>
+            </tr>
+          `;
+        }
+        break;
       default:
         alertMessage = "Unusual activity was detected on your account.";
         actionMessage = "Please review your recent account activity.";
@@ -110,7 +132,7 @@ const handler = async (req: Request): Promise<Response> => {
                     <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Time:</td>
                     <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${timestamp}</td>
                   </tr>
-                  ${alertType === 'new_device' ? extraInfo : `
+                  ${(alertType === 'new_device' || alertType === 'device_removed') ? extraInfo : `
                   <tr>
                     <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Failed Attempts:</td>
                     <td style="padding: 8px 0; color: #dc2626; font-size: 14px; font-weight: 600; text-align: right;">${attemptCount || 0}</td>
