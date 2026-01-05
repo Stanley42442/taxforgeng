@@ -72,6 +72,47 @@ const EXPENSE_CATEGORIES = [
   { value: 'other', label: 'Other Expenses', type: 'expense' as const, deductible: false },
 ];
 
+const getCategoryIcon = (category: Expense['category']) => {
+  const icons: Record<Expense['category'], string> = {
+    income: '💰',
+    rent: '🏢',
+    transport: '🚗',
+    marketing: '📢',
+    salary: '👥',
+    utilities: '💡',
+    supplies: '📦',
+    other: '📋',
+  };
+  return icons[category];
+};
+
+const estimateTax = (income: number): number => {
+  if (income <= 800000) return 0;
+  let tax = 0;
+  let remaining = income;
+  
+  if (remaining > 800000) {
+    const band = Math.min(remaining - 800000, 2200000);
+    tax += band * 0.15;
+    remaining -= 800000 + band;
+  }
+  if (remaining > 0) {
+    const band = Math.min(remaining, 7000000);
+    tax += band * 0.19;
+    remaining -= band;
+  }
+  if (remaining > 0) {
+    const band = Math.min(remaining, 40000000);
+    tax += band * 0.21;
+    remaining -= band;
+  }
+  if (remaining > 0) {
+    tax += remaining * 0.25;
+  }
+  
+  return tax;
+};
+
 const Expenses = () => {
   const { tier, savedBusinesses } = useSubscription();
   const { user } = useAuth();
@@ -84,7 +125,6 @@ const Expenses = () => {
   const [showCharts, setShowCharts] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   
-  // Filter states
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
@@ -95,10 +135,9 @@ const Expenses = () => {
     description: '',
     amount: '',
     category: 'other' as Expense['category'],
-    businessId: filterBusinessId !== 'all' ? filterBusinessId : '',
+    businessId: '',
   });
 
-  // Update new expense businessId when filter changes
   useEffect(() => {
     setNewExpense(prev => ({
       ...prev,
@@ -108,7 +147,6 @@ const Expenses = () => {
 
   const isBasicPlus = tier !== 'free';
 
-  // Fetch expenses from database
   useEffect(() => {
     const fetchExpenses = async () => {
       if (!user) {
@@ -145,19 +183,14 @@ const Expenses = () => {
     fetchExpenses();
   }, [user]);
 
+  // Upgrade prompt for free tier
   if (!isBasicPlus) {
     return (
-      <div className="min-h-screen bg-gradient-hero overflow-hidden">
-        {/* Background Effects */}
-        <div className="fixed inset-0 pointer-events-none">
-          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-warning/10 blur-3xl animate-float-slow" />
-          <div className="bg-mesh absolute inset-0" />
-        </div>
-
+      <div className="min-h-screen bg-background">
         <NavMenu />
-        <div className="container mx-auto px-4 py-20 text-center relative z-10">
+        <div className="container mx-auto px-4 py-20 text-center">
           <div className="mx-auto max-w-md">
-            <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-accent glow-accent">
+            <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-accent">
               <Crown className="h-12 w-12 text-accent-foreground" />
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-3">Expense Tracking</h1>
@@ -231,8 +264,6 @@ const Expenses = () => {
       businessId: '',
     });
     toast.success("Entry added");
-    
-    // Send notification for added expense/income
     notifyExpenseAdded(expense.description, expense.amount, expense.type === 'income');
   };
 
@@ -291,18 +322,10 @@ const Expenses = () => {
     toast.success("Entry deleted");
   };
 
-  // Filter expenses by business, type, category, and date range
   const filteredExpenses = expenses.filter(e => {
-    // Business filter
     if (filterBusinessId !== 'all' && e.businessId !== filterBusinessId) return false;
-    
-    // Type filter (income/expense)
     if (filterType !== 'all' && e.type !== filterType) return false;
-    
-    // Category filter
     if (filterCategory !== 'all' && e.category !== filterCategory) return false;
-    
-    // Date range filter
     if (dateFrom) {
       const expenseDate = new Date(e.date);
       if (expenseDate < dateFrom) return false;
@@ -313,14 +336,11 @@ const Expenses = () => {
       endOfDay.setHours(23, 59, 59, 999);
       if (expenseDate > endOfDay) return false;
     }
-    
     return true;
   });
 
-  // Check if any filters are active
   const hasActiveFilters = filterType !== 'all' || filterCategory !== 'all' || dateFrom !== undefined || dateTo !== undefined || filterBusinessId !== 'all';
 
-  // Clear all filters
   const clearFilters = () => {
     setFilterType('all');
     setFilterCategory('all');
@@ -329,179 +349,115 @@ const Expenses = () => {
     setFilterBusinessId('all');
   };
 
-  // Calculate summaries from filtered expenses
   const totalIncome = filteredExpenses.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
   const totalExpenses = filteredExpenses.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
   const deductibleExpenses = filteredExpenses.filter(e => e.isDeductible).reduce((sum, e) => sum + e.amount, 0);
   const taxableIncome = Math.max(0, totalIncome - deductibleExpenses);
+  const estimatedTax = estimateTax(taxableIncome);
 
-  // Get business name helper
   const getBusinessName = (businessId?: string) => {
     if (!businessId) return null;
     const business = savedBusinesses.find(b => b.id === businessId);
     return business?.name || null;
   };
-  
-  // Estimate tax (simplified PIT bands for demo)
-  const estimateTax = (income: number): number => {
-    if (income <= 800000) return 0;
-    let tax = 0;
-    let remaining = income;
-    
-    if (remaining > 800000) {
-      const band = Math.min(remaining - 800000, 2200000);
-      tax += band * 0.15;
-      remaining -= 800000 + band;
-    }
-    if (remaining > 0) {
-      const band = Math.min(remaining, 7000000);
-      tax += band * 0.19;
-      remaining -= band;
-    }
-    if (remaining > 0) {
-      const band = Math.min(remaining, 40000000);
-      tax += band * 0.21;
-      remaining -= band;
-    }
-    if (remaining > 0) {
-      tax += remaining * 0.25;
-    }
-    
-    return tax;
-  };
-
-  const estimatedTax = estimateTax(taxableIncome);
-
-  const getCategoryIcon = (category: Expense['category']) => {
-    const icons: Record<Expense['category'], string> = {
-      income: '💰',
-      rent: '🏢',
-      transport: '🚗',
-      marketing: '📢',
-      salary: '👥',
-      utilities: '💡',
-      supplies: '📦',
-      other: '📋',
-    };
-    return icons[category];
-  };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
+      <div className="min-h-screen bg-background">
         <NavMenu />
         <div className="container mx-auto px-4 py-20 text-center">
-          <div className="glass-frosted p-8 rounded-3xl inline-block">
-            <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" />
-            <p className="text-muted-foreground mt-4">Loading expenses...</p>
-          </div>
+          <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground mt-4">Loading expenses...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero">
-      {/* Background - static only, no animations for mobile stability */}
-      <div className="fixed inset-0 pointer-events-none" aria-hidden="true">
-        <div className="bg-mesh absolute inset-0" />
-        <div className="bg-dots absolute inset-0 opacity-20" />
-      </div>
-
+    <div className="min-h-screen bg-background">
       <NavMenu />
 
-      <main className="container mx-auto px-4 py-6 pb-8 relative z-10">
+      <main className="container mx-auto px-4 py-6 pb-8">
         <div className="mx-auto max-w-5xl">
           {/* Header */}
-          <div className="text-center mb-10 animate-slide-up">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-primary glow-primary">
-              <Receipt className="h-10 w-10 text-primary-foreground" />
+          <div className="text-center mb-8">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+              <Receipt className="h-8 w-8" />
             </div>
-            <h1 className="text-4xl font-bold text-foreground mb-3">
-              Expense Tracking
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Track income and expenses for real-time tax estimates
-            </p>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Expense Tracking</h1>
+            <p className="text-muted-foreground">Track income and expenses for real-time tax estimates</p>
           </div>
 
-          {/* Summary Cards - Glass Design */}
-          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-8 animate-slide-up-delay-1">
-            {[
-              { icon: TrendingUp, value: totalIncome, label: 'Income', color: 'success', glowClass: 'glow-success' },
-              { icon: TrendingDown, value: totalExpenses, label: 'Expenses', color: 'destructive', glowClass: '' },
-              { icon: Receipt, value: deductibleExpenses, label: 'Deductible', color: 'primary', glowClass: '' },
-              { icon: Calculator, value: estimatedTax, label: 'Est. Tax', color: 'warning', glowClass: 'glow-accent' }
-            ].map((stat, idx) => (
-              <div key={idx} className="glass hover-lift p-4 sm:p-5 rounded-2xl">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className={`p-2 rounded-lg bg-${stat.color}/10 ${stat.glowClass}`}>
-                    <stat.icon className={`h-4 w-4 text-${stat.color}`} />
-                  </div>
-                  <span className="text-sm text-muted-foreground">{stat.label}</span>
-                </div>
-                <p className={`text-xl sm:text-2xl font-bold text-${stat.color} truncate`}>
-                  {formatCurrency(stat.value)}
-                </p>
+          {/* Summary Cards */}
+          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-6">
+            <div className="bg-card border border-border rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <TrendingUp className="h-4 w-4 text-success" />
+                <span className="text-sm text-muted-foreground">Income</span>
               </div>
-            ))}
+              <p className="text-xl font-bold text-success">{formatCurrency(totalIncome)}</p>
+            </div>
+            <div className="bg-card border border-border rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <TrendingDown className="h-4 w-4 text-destructive" />
+                <span className="text-sm text-muted-foreground">Expenses</span>
+              </div>
+              <p className="text-xl font-bold text-destructive">{formatCurrency(totalExpenses)}</p>
+            </div>
+            <div className="bg-card border border-border rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Receipt className="h-4 w-4 text-primary" />
+                <span className="text-sm text-muted-foreground">Deductible</span>
+              </div>
+              <p className="text-xl font-bold text-primary">{formatCurrency(deductibleExpenses)}</p>
+            </div>
+            <div className="bg-card border border-border rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Calculator className="h-4 w-4 text-warning" />
+                <span className="text-sm text-muted-foreground">Est. Tax</span>
+              </div>
+              <p className="text-xl font-bold text-warning">{formatCurrency(estimatedTax)}</p>
+            </div>
           </div>
 
-          {/* Action Buttons - Premium Style */}
-          <div className="flex flex-wrap items-center gap-3 mb-4 animate-slide-up-delay-2">
-            <Button variant="glow" onClick={() => setShowAddDialog(true)}>
+          {/* Action Buttons */}
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <Button onClick={() => setShowAddDialog(true)}>
               <Plus className="h-4 w-4" />
               Add Entry
             </Button>
-            <Button variant="glass" onClick={() => setShowOCRScanner(true)}>
+            <Button variant="outline" onClick={() => setShowOCRScanner(true)}>
               <Camera className="h-4 w-4" />
               <span className="hidden sm:inline">Scan Receipt</span>
-              <span className="sm:hidden">Scan</span>
             </Button>
-            <Button variant="glass" onClick={handleCSVImport}>
+            <Button variant="outline" onClick={handleCSVImport}>
               <Upload className="h-4 w-4" />
               <span className="hidden sm:inline">Import CSV</span>
-              <span className="sm:hidden">Import</span>
             </Button>
             <Button 
-              variant="glass"
+              variant="outline"
               onClick={() => navigate('/calculator', { 
-                state: { 
-                  prefill: { 
-                    turnover: totalIncome, 
-                    expenses: deductibleExpenses 
-                  } 
-                } 
+                state: { prefill: { turnover: totalIncome, expenses: deductibleExpenses } } 
               })}
               disabled={totalIncome === 0}
             >
               <Calculator className="h-4 w-4" />
               <span className="hidden sm:inline">Use in Calculator</span>
-              <span className="sm:hidden">Calculate</span>
             </Button>
-            <Button 
-              variant="glass"
-              onClick={() => setShowCharts(!showCharts)}
-            >
+            <Button variant="outline" onClick={() => setShowCharts(!showCharts)}>
               <PieChart className="h-4 w-4" />
               <span className="hidden sm:inline">{showCharts ? 'Hide' : 'Show'} Charts</span>
-              <span className="sm:hidden">Charts</span>
             </Button>
             <Button 
-              variant={showFilters ? "default" : "glass"}
+              variant={showFilters ? "secondary" : "outline"}
               onClick={() => setShowFilters(!showFilters)}
-              className={hasActiveFilters ? "ring-2 ring-primary" : ""}
             >
               <Filter className="h-4 w-4" />
               <span className="hidden sm:inline">Filters</span>
-              {hasActiveFilters && (
-                <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-primary text-primary-foreground">
-                  !
-                </span>
-              )}
+              {hasActiveFilters && <span className="ml-1 text-xs">!</span>}
             </Button>
             {hasActiveFilters && (
-              <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground">
+              <Button variant="ghost" size="sm" onClick={clearFilters}>
                 <X className="h-4 w-4" />
                 Clear
               </Button>
@@ -510,121 +466,78 @@ const Expenses = () => {
 
           {/* Filter Panel */}
           {showFilters && (
-            <div className="glass-frosted rounded-2xl p-4 mb-6 animate-fade-in">
+            <div className="bg-card border border-border rounded-xl p-4 mb-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Date Range - From */}
                 <div className="space-y-2">
-                  <Label className="text-sm text-muted-foreground">From Date</Label>
+                  <Label className="text-sm">From Date</Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal glass border-0",
-                          !dateFrom && "text-muted-foreground"
-                        )}
-                      >
+                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !dateFrom && "text-muted-foreground")}>
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {dateFrom ? format(dateFrom, "PPP") : "Start date"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={dateFrom}
-                        onSelect={setDateFrom}
-                        initialFocus
-                        className="pointer-events-auto"
-                      />
+                      <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} initialFocus />
                     </PopoverContent>
                   </Popover>
                 </div>
 
-                {/* Date Range - To */}
                 <div className="space-y-2">
-                  <Label className="text-sm text-muted-foreground">To Date</Label>
+                  <Label className="text-sm">To Date</Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal glass border-0",
-                          !dateTo && "text-muted-foreground"
-                        )}
-                      >
+                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !dateTo && "text-muted-foreground")}>
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {dateTo ? format(dateTo, "PPP") : "End date"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={dateTo}
-                        onSelect={setDateTo}
-                        initialFocus
-                        className="pointer-events-auto"
-                      />
+                      <Calendar mode="single" selected={dateTo} onSelect={setDateTo} initialFocus />
                     </PopoverContent>
                   </Popover>
                 </div>
 
-                {/* Type Filter */}
                 <div className="space-y-2">
-                  <Label className="text-sm text-muted-foreground">Type</Label>
+                  <Label className="text-sm">Type</Label>
                   <Select value={filterType} onValueChange={(v) => setFilterType(v as 'all' | 'income' | 'expense')}>
-                    <SelectTrigger className="glass border-0">
+                    <SelectTrigger>
                       <SelectValue placeholder="All types" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Types</SelectItem>
-                      <SelectItem value="income">
-                        <span className="flex items-center gap-2">
-                          <TrendingUp className="h-4 w-4 text-success" />
-                          Income Only
-                        </span>
-                      </SelectItem>
-                      <SelectItem value="expense">
-                        <span className="flex items-center gap-2">
-                          <TrendingDown className="h-4 w-4 text-destructive" />
-                          Expenses Only
-                        </span>
-                      </SelectItem>
+                      <SelectItem value="income">Income Only</SelectItem>
+                      <SelectItem value="expense">Expenses Only</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
-                {/* Category Filter */}
                 <div className="space-y-2">
-                  <Label className="text-sm text-muted-foreground">Category</Label>
+                  <Label className="text-sm">Category</Label>
                   <Select value={filterCategory} onValueChange={setFilterCategory}>
-                    <SelectTrigger className="glass border-0">
+                    <SelectTrigger>
                       <SelectValue placeholder="All categories" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Categories</SelectItem>
                       {EXPENSE_CATEGORIES.map(cat => (
-                        <SelectItem key={cat.value} value={cat.value}>
-                          {cat.label}
-                        </SelectItem>
+                        <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
 
-                {/* Business Filter (if applicable) */}
                 {savedBusinesses.length > 0 && (
                   <div className="space-y-2 sm:col-span-2 lg:col-span-4">
-                    <Label className="text-sm text-muted-foreground">Business</Label>
+                    <Label className="text-sm">Business</Label>
                     <Select value={filterBusinessId} onValueChange={setFilterBusinessId}>
-                      <SelectTrigger className="glass border-0 w-full sm:w-[280px]">
+                      <SelectTrigger className="w-full sm:w-[280px]">
                         <SelectValue placeholder="All businesses" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Businesses</SelectItem>
                         {savedBusinesses.map((business) => (
-                          <SelectItem key={business.id} value={business.id}>
-                            {business.name}
-                          </SelectItem>
+                          <SelectItem key={business.id} value={business.id}>{business.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -636,7 +549,7 @@ const Expenses = () => {
 
           {/* Charts Section */}
           {showCharts && filteredExpenses.length > 0 && (
-            <div className="glass-frosted rounded-3xl p-6 mb-8 animate-fade-in">
+            <div className="bg-card border border-border rounded-xl p-6 mb-6">
               <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                 <PieChart className="h-5 w-5 text-primary" />
                 Expense Analytics
@@ -645,81 +558,55 @@ const Expenses = () => {
             </div>
           )}
 
-          {/* Expense List - Glass Card */}
-          <div className="glass-frosted rounded-3xl p-6 animate-fade-in">
-            <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
-              <div className="p-2 rounded-xl bg-primary/10">
-                <FileSpreadsheet className="h-5 w-5 text-primary" />
-              </div>
+          {/* Expense List */}
+          <div className="bg-card border border-border rounded-xl p-6">
+            <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+              <FileSpreadsheet className="h-5 w-5 text-primary" />
               Transactions ({filteredExpenses.length})
             </h2>
 
             {filteredExpenses.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="w-20 h-20 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
-                  <Receipt className="h-10 w-10 text-muted-foreground" />
-                </div>
-                <p className="text-muted-foreground mb-6">
+              <div className="text-center py-12">
+                <Receipt className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground mb-4">
                   {filterBusinessId !== 'all' ? 'No entries for this business' : 'No entries yet'}
                 </p>
-                <div className="flex gap-3 justify-center">
-                  <Button variant="glow" onClick={() => setShowAddDialog(true)}>
+                <div className="flex gap-2 justify-center">
+                  <Button onClick={() => setShowAddDialog(true)}>
                     <Plus className="h-4 w-4" />
                     Add Entry
                   </Button>
-                  <Button variant="glass" onClick={handleCSVImport}>
+                  <Button variant="outline" onClick={handleCSVImport}>
                     <Upload className="h-4 w-4" />
                     Import Mock CSV
                   </Button>
                 </div>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {filteredExpenses.map((expense) => {
                   const businessName = getBusinessName(expense.businessId);
                   return (
-                    <div 
-                      key={expense.id}
-                      className="glass p-4 rounded-xl hover-lift group"
-                    >
-                      <div className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-2">
-                        {/* Top row: icon + description */}
-                        <div className="col-span-2 flex items-start gap-3 min-w-0">
-                          <span className="text-2xl flex-shrink-0">{getCategoryIcon(expense.category)}</span>
-                          <div className="min-w-0 flex-1">
-                            <p className="font-medium text-foreground">{expense.description}</p>
-                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground mt-1">
-                              <span>{new Date(expense.date).toLocaleDateString()}</span>
-                              {businessName && (
-                                <>
-                                  <span>•</span>
-                                  <span>{businessName}</span>
-                                </>
-                              )}
-                              {expense.isDeductible && (
-                                <span className="px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20">
-                                  Deductible
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {/* Bottom row: delete button left, amount right */}
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
-                          onClick={() => handleDeleteExpense(expense.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                        <div className="text-right">
-                          <span className={`font-bold text-lg ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
-                            {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
-                          </span>
+                    <div key={expense.id} className="bg-muted/50 border border-border rounded-lg p-4 flex items-center gap-4">
+                      <span className="text-2xl">{getCategoryIcon(expense.category)}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-foreground truncate">{expense.description}</p>
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                          <span>{new Date(expense.date).toLocaleDateString()}</span>
+                          {businessName && <span>• {businessName}</span>}
+                          {expense.isDeductible && (
+                            <span className="px-2 py-0.5 rounded bg-success/10 text-success">Deductible</span>
+                          )}
                         </div>
                       </div>
+                      <div className="text-right">
+                        <span className={`font-bold ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
+                          {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
+                        </span>
+                      </div>
+                      <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDeleteExpense(expense.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   );
                 })}
@@ -731,77 +618,58 @@ const Expenses = () => {
 
       {/* Add Expense Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="glass-frosted border-0 sm:max-w-md">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
               Add Entry
             </DialogTitle>
-            <DialogDescription>
-              Add a new income or expense entry
-            </DialogDescription>
+            <DialogDescription>Add a new income or expense entry</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label>Date</Label>
-              <div className="neumorphic-sm p-1">
-                <Input
-                  type="date"
-                  value={newExpense.date}
-                  onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
-                  className="border-0 bg-transparent"
-                />
-              </div>
+              <Input
+                type="date"
+                value={newExpense.date}
+                onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
+              />
             </div>
             <div className="space-y-2">
               <Label>Category</Label>
-              <Select 
-                value={newExpense.category} 
-                onValueChange={(v) => setNewExpense({ ...newExpense, category: v as Expense['category'] })}
-              >
-                <SelectTrigger className="neumorphic-sm border-0">
+              <Select value={newExpense.category} onValueChange={(v) => setNewExpense({ ...newExpense, category: v as Expense['category'] })}>
+                <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {EXPENSE_CATEGORIES.map(cat => (
-                    <SelectItem key={cat.value} value={cat.value}>
-                      {cat.label}
-                    </SelectItem>
+                    <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
               <Label>Description</Label>
-              <div className="neumorphic-sm p-1">
-                <Input
-                  placeholder="e.g., Client payment, Office rent"
-                  value={newExpense.description}
-                  onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
-                  className="border-0 bg-transparent"
-                />
-              </div>
+              <Input
+                placeholder="e.g., Client payment, Office rent"
+                value={newExpense.description}
+                onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
+              />
             </div>
             <div className="space-y-2">
               <Label>Amount (₦)</Label>
-              <div className="neumorphic-sm p-1">
-                <Input
-                  type="number"
-                  placeholder="0"
-                  value={newExpense.amount}
-                  onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
-                  className="border-0 bg-transparent"
-                />
-              </div>
+              <Input
+                type="number"
+                placeholder="0"
+                value={newExpense.amount}
+                onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
+              />
             </div>
             {savedBusinesses.length > 0 && (
               <div className="space-y-2">
                 <Label>Business (optional)</Label>
-                <Select 
-                  value={newExpense.businessId || "none"} 
-                  onValueChange={(v) => setNewExpense({ ...newExpense, businessId: v === "none" ? "" : v })}
-                >
-                  <SelectTrigger className="neumorphic-sm border-0">
+                <Select value={newExpense.businessId || "none"} onValueChange={(v) => setNewExpense({ ...newExpense, businessId: v === "none" ? "" : v })}>
+                  <SelectTrigger>
                     <SelectValue placeholder="Select business" />
                   </SelectTrigger>
                   <SelectContent>
@@ -815,12 +683,8 @@ const Expenses = () => {
             )}
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setShowAddDialog(false)}>
-              Cancel
-            </Button>
-            <Button variant="glow" onClick={handleAddExpense}>
-              Add Entry
-            </Button>
+            <Button variant="outline" onClick={() => setShowAddDialog(false)}>Cancel</Button>
+            <Button onClick={handleAddExpense}>Add Entry</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
