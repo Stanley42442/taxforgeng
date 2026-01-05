@@ -55,37 +55,7 @@ const CalculatorPage = () => {
   const { tier, savedBusinesses, loading: subscriptionLoading } = useSubscription();
   const { user, loading: authLoading } = useAuth();
 
-  // Wait for auth and subscription data to load before checking access
-  const isLoading = authLoading || subscriptionLoading;
-  const isFreeTierOrGuest = !user || tier === 'free';
-
-  useEffect(() => {
-    // Only redirect after loading is complete
-    if (!isLoading && isFreeTierOrGuest) {
-      toast.info("Business Tax requires a paid plan. Redirecting to Personal Tax Calculator.", {
-        duration: 4000
-      });
-      navigate('/individual-calculator', { 
-        state: { showUpgradePrompt: true },
-        replace: true 
-      });
-    }
-  }, [isLoading, isFreeTierOrGuest, navigate]);
-
-  // Show loading state while checking access
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  // Don't render if redirecting
-  if (isFreeTierOrGuest) {
-    return null;
-  }
-  
+  // ALL HOOKS MUST BE DECLARED BEFORE ANY CONDITIONAL RETURNS
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>('');
   const [entityType, setEntityType] = useState<'business_name' | 'company'>(
     preselectedEntity || 'business_name'
@@ -116,6 +86,37 @@ const CalculatorPage = () => {
     amount: '',
     category: 'other' as string,
   });
+
+  // Wait for auth and subscription data to load before checking access
+  const isLoading = authLoading || subscriptionLoading;
+  const isFreeTierOrGuest = !user || tier === 'free';
+
+  useEffect(() => {
+    // Only redirect after loading is complete
+    if (!isLoading && isFreeTierOrGuest) {
+      toast.info("Business Tax requires a paid plan. Redirecting to Personal Tax Calculator.", {
+        duration: 4000
+      });
+      navigate('/individual-calculator', { 
+        state: { showUpgradePrompt: true },
+        replace: true 
+      });
+    }
+  }, [isLoading, isFreeTierOrGuest, navigate]);
+
+  // Show loading state while checking access
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Don't render if redirecting
+  if (isFreeTierOrGuest) {
+    return null;
+  }
 
   type ExpenseCategory = 'office_supplies' | 'travel' | 'utilities' | 'meals' | 'rent' | 'equipment' | 'other';
 
