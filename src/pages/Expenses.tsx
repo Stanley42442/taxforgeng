@@ -402,13 +402,16 @@ const Expenses = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col relative"
-      style={{ overscrollBehavior: 'contain' }}
+      className="min-h-screen flex flex-col relative bg-gradient-hero"
+      style={{ 
+        overscrollBehavior: 'none',
+        WebkitOverflowScrolling: 'touch',
+        touchAction: 'pan-y'
+      }}
     >
-      {/* Background */}
-      <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
-      <div className="fixed inset-0 bg-mesh pointer-events-none" />
-      <div className="fixed inset-0 bg-dots opacity-20 pointer-events-none" />
+      {/* Background - use absolute instead of fixed to prevent Chrome Android bounce */}
+      <div className="absolute inset-0 bg-mesh pointer-events-none" />
+      <div className="absolute inset-0 bg-dots opacity-20 pointer-events-none" />
 
       <NavMenu />
 
