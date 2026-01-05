@@ -401,9 +401,9 @@ const Expenses = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero overflow-x-clip">
-      {/* Premium Background Effects */}
-      <div className="fixed inset-0 pointer-events-none overflow-clip">
+    <div className="min-h-screen bg-gradient-hero" style={{ overflowX: 'clip', touchAction: 'pan-y pinch-zoom' }}>
+      {/* Premium Background Effects - simplified for mobile performance */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
         <div className="absolute top-0 left-1/3 w-[600px] h-[600px] rounded-full bg-primary/5 blur-3xl animate-float-slow" />
         <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] rounded-full bg-accent/5 blur-3xl animate-float" />
         <div className="bg-mesh absolute inset-0" />
@@ -412,7 +412,7 @@ const Expenses = () => {
 
       <NavMenu />
 
-      <main className="container mx-auto px-4 py-6 pb-8 relative z-10">
+      <main className="container mx-auto px-4 py-6 pb-8 relative" style={{ zIndex: 1, touchAction: 'pan-y pinch-zoom' }}>
         <div className="mx-auto max-w-5xl">
           {/* Header */}
           <div className="text-center mb-10 animate-slide-up">
