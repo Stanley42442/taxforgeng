@@ -401,7 +401,10 @@ const Expenses = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden relative">
+    <div 
+      className="min-h-screen flex flex-col relative"
+      style={{ overscrollBehavior: 'contain' }}
+    >
       {/* Background */}
       <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
       <div className="fixed inset-0 bg-mesh pointer-events-none" />
