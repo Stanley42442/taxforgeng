@@ -30,13 +30,22 @@ import {
   Laptop,
   Globe,
   Languages,
-  Info
+  Info,
+  MapPin,
+  History
 } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow, format } from "date-fns";
 import { toast } from "sonner";
+
+interface LocationData {
+  city?: string;
+  region?: string;
+  country?: string;
+  country_code?: string;
+}
 
 interface AuthEvent {
   id: string;
@@ -45,6 +54,7 @@ interface AuthEvent {
   user_agent: string | null;
   metadata: unknown;
   created_at: string;
+  location?: LocationData | null;
 }
 
 interface BackupCodeAttempt {
@@ -104,6 +114,8 @@ const getEventIcon = (eventType: string) => {
       return <CheckCircle2 className="h-4 w-4 text-green-500" />;
     case 'profile_updated':
       return <Shield className="h-4 w-4 text-blue-500" />;
+    case 'sessions_revoked':
+      return <Lock className="h-4 w-4 text-amber-500" />;
     default:
       return <Shield className="h-4 w-4 text-muted-foreground" />;
   }
@@ -123,6 +135,7 @@ const getEventLabel = (eventType: string) => {
     'signup': 'Account created',
     'backup_codes_generated': 'Backup codes generated',
     'profile_updated': 'Profile updated',
+    'sessions_revoked': 'Signed out all other devices',
   };
   return labels[eventType] || eventType;
 };
@@ -140,6 +153,7 @@ const getEventSeverity = (eventType: string): 'success' | 'warning' | 'error' | 
     case '2fa_disabled':
     case 'password_change':
     case 'password_recovery_initiated':
+    case 'sessions_revoked':
       return 'warning';
     case 'logout':
     case 'profile_updated':
@@ -166,6 +180,8 @@ const SecurityDashboard = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [removingDeviceId, setRemovingDeviceId] = useState<string | null>(null);
   const [togglingTrustId, setTogglingTrustId] = useState<string | null>(null);
+  const [isSigningOutOthers, setIsSigningOutOthers] = useState(false);
+  const [loginHistory, setLoginHistory] = useState<AuthEvent[]>([]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -185,7 +201,50 @@ const SecurityDashboard = () => {
         .order('created_at', { ascending: false })
         .limit(50);
 
-      setAuthEvents((events || []) as AuthEvent[]);
+      // Cast and set auth events with location data
+      const typedEvents = (events || []) as AuthEvent[];
+      setAuthEvents(typedEvents);
+
+      // Filter login events for login history and fetch locations
+      const loginEvents = typedEvents.filter(e => 
+        e.event_type === 'login' || e.event_type === 'login_success'
+      );
+      
+      // Fetch locations for login events that don't have them
+      const eventsWithLocations = await Promise.all(
+        loginEvents.map(async (event) => {
+          // Check if location is already in metadata
+          const metadata = event.metadata as { location?: LocationData } | null;
+          if (metadata?.location) {
+            return { ...event, location: metadata.location };
+          }
+          
+          // Fetch location if IP exists and no cached location
+          if (event.ip_address && event.ip_address !== '127.0.0.1') {
+            try {
+              const { data: locationData } = await supabase.functions.invoke('get-ip-location', {
+                body: { ip: event.ip_address }
+              });
+              if (locationData && !locationData.error) {
+                return { 
+                  ...event, 
+                  location: {
+                    city: locationData.city,
+                    region: locationData.region,
+                    country: locationData.country,
+                    country_code: locationData.country_code
+                  }
+                };
+              }
+            } catch (err) {
+              console.error('Failed to get location for IP:', event.ip_address, err);
+            }
+          }
+          return event;
+        })
+      );
+      
+      setLoginHistory(eventsWithLocations);
 
       // Load backup code attempts
       const { data: attempts } = await supabase
@@ -217,11 +276,9 @@ const SecurityDashboard = () => {
         .is('used_at', null);
 
       // Calculate stats
-      const logins = (events || []).filter(e => 
-        e.event_type === 'login' || e.event_type === 'login_success'
-      ).length;
+      const logins = loginEvents.length;
       
-      const failed = (events || []).filter(e => 
+      const failed = typedEvents.filter(e => 
         e.event_type === 'login_failed'
       ).length;
 
@@ -485,6 +542,15 @@ const SecurityDashboard = () => {
               <Activity className="h-4 w-4" />
               Sessions
             </TabsTrigger>
+            <TabsTrigger value="history" className="gap-2">
+              <History className="h-4 w-4" />
+              Login History
+              {loginHistory.length > 0 && (
+                <Badge variant="secondary" className="ml-1 h-5 px-1.5">
+                  {loginHistory.length}
+                </Badge>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="events" className="gap-2">
               <Shield className="h-4 w-4" />
               Security Events
@@ -690,18 +756,47 @@ const SecurityDashboard = () => {
                   <Button 
                     variant="destructive" 
                     className="w-full"
+                    disabled={isSigningOutOthers}
                     onClick={async () => {
+                      if (!user) return;
+                      setIsSigningOutOthers(true);
                       try {
                         // Sign out from all sessions except current
                         const { error } = await supabase.auth.signOut({ scope: 'others' });
                         if (error) throw error;
+                        
+                        // Send email notification
+                        if (user.email) {
+                          supabase.functions.invoke('send-security-alert', {
+                            body: {
+                              userEmail: user.email,
+                              alertType: 'sessions_revoked',
+                              timestamp: new Date().toLocaleString(),
+                            }
+                          }).catch(err => console.error('Failed to send session revocation alert:', err));
+                        }
+                        
+                        // Log the event
+                        await supabase.from('auth_events').insert({
+                          user_id: user.id,
+                          event_type: 'sessions_revoked',
+                          ip_address: null,
+                          user_agent: navigator.userAgent,
+                        });
+                        
                         toast.success("Signed out of all other devices successfully");
                       } catch (error: any) {
                         toast.error(error.message || "Failed to sign out of other devices");
+                      } finally {
+                        setIsSigningOutOthers(false);
                       }
                     }}
                   >
-                    <Lock className="h-4 w-4 mr-2" />
+                    {isSigningOutOthers ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Lock className="h-4 w-4 mr-2" />
+                    )}
                     Sign Out All Other Devices
                   </Button>
 
@@ -709,6 +804,80 @@ const SecurityDashboard = () => {
                     Last login: {user?.last_sign_in_at ? format(new Date(user.last_sign_in_at), 'PPpp') : 'Unknown'}
                   </p>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="history">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <History className="h-5 w-5" />
+                  Login History
+                </CardTitle>
+                <CardDescription>
+                  Recent login activity with approximate locations
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {loginHistory.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>No login history recorded yet</p>
+                  </div>
+                ) : (
+                  <ScrollArea className="h-[400px] pr-4">
+                    <div className="space-y-3">
+                      {loginHistory.map((event) => (
+                        <div 
+                          key={event.id}
+                          className="flex items-start gap-3 p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                            <LogIn className="h-5 w-5 text-green-600" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="font-medium text-sm">
+                                Signed in successfully
+                              </p>
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <Clock className="h-3 w-3" />
+                                {formatDistanceToNow(new Date(event.created_at), { addSuffix: true })}
+                              </div>
+                            </div>
+                            
+                            {/* Location Info */}
+                            {event.location && (event.location.city || event.location.country) && (
+                              <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
+                                <MapPin className="h-3.5 w-3.5 text-primary" />
+                                <span>
+                                  {[event.location.city, event.location.region, event.location.country]
+                                    .filter(Boolean)
+                                    .join(', ')}
+                                </span>
+                              </div>
+                            )}
+                            
+                            {/* IP and Time */}
+                            <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                              {event.ip_address && (
+                                <div className="flex items-center gap-1">
+                                  <Globe className="h-3 w-3" />
+                                  <span className="font-mono">{event.ip_address}</span>
+                                </div>
+                              )}
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                <span>{format(new Date(event.created_at), 'PPpp')}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
