@@ -375,16 +375,23 @@ const Expenses = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero relative">
+    <div 
+      className="min-h-screen bg-gradient-hero"
+      style={{ 
+        WebkitOverflowScrolling: 'touch',
+        overscrollBehavior: 'none'
+      }}
+    >
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-mesh pointer-events-none" />
-      <div className="hidden lg:block absolute top-20 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="hidden lg:block absolute bottom-40 right-10 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="fixed inset-0 bg-mesh pointer-events-none" style={{ zIndex: 0 }} />
+      <div className="hidden lg:block fixed top-20 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" style={{ zIndex: 0 }} />
+      <div className="hidden lg:block fixed bottom-40 right-10 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none" style={{ zIndex: 0 }} />
       
-      <NavMenu />
+      <div className="relative" style={{ zIndex: 1 }}>
+        <NavMenu />
 
-      <main className="container mx-auto px-4 py-6 pb-8 relative z-10">
-        <div className="mx-auto max-w-5xl">
+        <main className="container mx-auto px-4 py-6 pb-8">
+          <div className="mx-auto max-w-5xl">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow-primary">
@@ -607,28 +614,26 @@ const Expenses = () => {
                 {filteredExpenses.map((expense) => {
                   const businessName = getBusinessName(expense.businessId);
                   return (
-                    <div key={expense.id} className="bg-card border border-border rounded-xl p-4 flex items-start gap-4">
+                    <div key={expense.id} className="bg-card border border-border rounded-xl p-4 flex items-center gap-4">
                       <div className="text-2xl p-2 rounded-xl bg-muted/30 shrink-0">{getCategoryIcon(expense.category)}</div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <p className="font-medium text-foreground truncate">{expense.description}</p>
-                          <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 shrink-0 -mt-1 -mr-2" onClick={() => handleDeleteExpense(expense.id)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mt-1">
+                        <p className="font-medium text-foreground truncate">{expense.description}</p>
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                           <span>{new Date(expense.date).toLocaleDateString()}</span>
                           {businessName && <span>• {businessName}</span>}
                           {expense.isDeductible && (
                             <span className="px-2 py-0.5 rounded-full bg-success/10 text-success font-medium">Deductible</span>
                           )}
                         </div>
-                        <div className="mt-2 text-right">
-                          <span className={`font-bold text-lg ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
-                            {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
-                          </span>
-                        </div>
                       </div>
+                      <div className="text-right shrink-0">
+                        <span className={`font-bold ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
+                          {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
+                        </span>
+                      </div>
+                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 shrink-0" onClick={() => handleDeleteExpense(expense.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   );
                 })}
@@ -637,6 +642,7 @@ const Expenses = () => {
           </div>
         </div>
       </main>
+      </div>
 
       {/* Add Expense Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
