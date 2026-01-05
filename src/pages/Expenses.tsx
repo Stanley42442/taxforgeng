@@ -826,6 +826,27 @@ const Expenses = () => {
             </div>
           )}
 
+          {/* Category Legend */}
+          <div className="glass-frosted rounded-xl p-4 mb-4 shadow-futuristic">
+            <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
+              <div className="p-1 rounded-lg bg-primary/10">
+                <PieChart className="h-4 w-4 text-primary" />
+              </div>
+              Category Legend
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {EXPENSE_CATEGORIES.map((cat) => (
+                <div 
+                  key={cat.value}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${getCategoryColor(cat.value as Expense['category'])}`}
+                >
+                  <span>{getCategoryIcon(cat.value as Expense['category'])}</span>
+                  <span>{cat.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Expense List */}
           <div className="glass-frosted rounded-xl p-6 shadow-futuristic">
             <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
