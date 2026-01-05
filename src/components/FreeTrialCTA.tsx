@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
-import { Sparkles, Zap, Crown, ArrowRight, CheckCircle2, Clock } from 'lucide-react';
+import { Sparkles, Zap, ArrowRight, Clock } from 'lucide-react';
 
 export const FreeTrialCTA = () => {
   const { user } = useAuth();
@@ -12,88 +12,89 @@ export const FreeTrialCTA = () => {
   }
 
   return (
-    <section className="relative z-10 py-16 md:py-20 overflow-hidden">
+    <section className="relative z-10 py-10 md:py-14 overflow-hidden">
       {/* Futuristic Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-secondary/30 to-background" />
       <div className="absolute inset-0 bg-grid opacity-5" />
       
       {/* Animated Glow Orbs */}
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-primary/20 blur-[100px] animate-pulse-soft" />
-      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[250px] h-[250px] rounded-full bg-accent/20 blur-[80px] animate-float" />
+      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[200px] h-[200px] rounded-full bg-primary/20 blur-[80px] animate-pulse-soft" />
+      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[150px] h-[150px] rounded-full bg-accent/20 blur-[60px] animate-float" />
       
       <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-2xl mx-auto">
           {/* Main CTA Card */}
           <div className="relative group">
             {/* Outer Glow Border */}
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary via-accent to-primary rounded-3xl blur-sm opacity-50 group-hover:opacity-75 transition-opacity duration-500 animate-pulse-soft" />
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary via-accent to-primary rounded-2xl blur-sm opacity-50 group-hover:opacity-75 transition-opacity duration-500 animate-pulse-soft" />
             
             {/* Card Content */}
-            <div className="relative glass-frosted rounded-3xl p-8 md:p-12 border border-border/50 overflow-hidden">
+            <div className="relative glass-frosted rounded-2xl p-6 md:p-8 border border-border/50 overflow-hidden">
               {/* Inner Decorative Elements */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-2xl" />
-              <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-accent/10 to-transparent rounded-full blur-2xl" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-xl" />
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-accent/10 to-transparent rounded-full blur-xl" />
               
               {/* Floating Badge */}
-              <div className="flex justify-center mb-8">
+              <div className="flex justify-center mb-4">
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-full blur-md opacity-50 animate-pulse-soft" />
-                  <div className="relative inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm shadow-lg">
-                    <Zap className="h-4 w-4" />
+                  <div className="relative inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-xs shadow-lg">
+                    <Zap className="h-3 w-3" />
                     <span>Limited Time Offer</span>
-                    <Sparkles className="h-4 w-4" />
+                    <Sparkles className="h-3 w-3" />
                   </div>
                 </div>
               </div>
               
               {/* Headline */}
-              <div className="text-center mb-8 relative z-10">
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-foreground mb-4">
+              <div className="text-center mb-4 relative z-10">
+                <h2 className="text-2xl md:text-3xl font-extrabold text-foreground mb-2">
                   Get{' '}
-                  <span className="relative">
-                    <span className="text-gradient bg-gradient-to-r from-primary via-success to-accent bg-clip-text">
-                      Full Business Access
-                    </span>
-                    <Crown className="absolute -top-6 -right-8 h-8 w-8 text-accent animate-float" />
+                  <span className="text-gradient bg-gradient-to-r from-primary via-success to-accent bg-clip-text">
+                    Full Business Access
                   </span>
                 </h2>
-                <p className="text-xl md:text-2xl text-muted-foreground font-medium">
+                <p className="text-base md:text-lg text-muted-foreground font-medium">
                   Free for <span className="text-primary font-bold">7 Days</span> — No Credit Card Required
                 </p>
               </div>
               
+              {/* Tagline Benefits */}
+              <p className="text-center text-sm text-muted-foreground mb-5 relative z-10">
+                Calculate taxes accurately • Track expenses • Get AI-powered insights
+              </p>
               
               {/* CTA Button */}
-              <div className="flex flex-col items-center gap-4 relative z-10">
+              <div className="flex flex-col items-center gap-3 relative z-10">
                 <Link to="/auth">
                   <Button 
                     variant="glow" 
-                    size="xl" 
-                    className="group shadow-2xl px-10 py-6 text-lg font-bold hover:scale-105 transition-transform duration-300"
+                    size="default" 
+                    className="group shadow-lg px-6 py-2 text-sm font-semibold hover:scale-105 transition-transform duration-300"
                   >
-                    <Sparkles className="h-5 w-5 mr-2" />
+                    <Sparkles className="h-4 w-4 mr-1.5" />
                     <span>Start Your Free Trial</span>
-                    <ArrowRight className="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="h-4 w-4 ml-1.5 transition-transform group-hover:translate-x-1" />
                   </Button>
                 </Link>
                 
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4" />
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Clock className="h-3 w-3" />
                   <span>Instant access • No payment details needed</span>
                 </div>
               </div>
               
               {/* Bottom Stats */}
-              <div className="mt-10 pt-8 border-t border-border/30 relative z-10">
-                <div className="flex flex-wrap justify-center gap-8 md:gap-12">
+              <div className="mt-6 pt-5 border-t border-border/30 relative z-10">
+                <div className="flex flex-wrap justify-center gap-6 md:gap-8">
                   {[
                     { value: '10,000+', label: 'Businesses trust us' },
                     { value: '₦2.5B+', label: 'Tax calculated' },
                     { value: '4.9/5', label: 'User rating' },
                   ].map((stat, index) => (
                     <div key={index} className="text-center">
-                      <div className="text-2xl md:text-3xl font-bold text-foreground">{stat.value}</div>
-                      <div className="text-sm text-muted-foreground">{stat.label}</div>
+                      <div className="text-lg md:text-xl font-bold text-foreground">{stat.value}</div>
+                      <div className="text-xs text-muted-foreground">{stat.label}</div>
                     </div>
                   ))}
                 </div>
