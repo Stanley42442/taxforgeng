@@ -375,35 +375,28 @@ const Expenses = () => {
   }
 
   return (
-    <div 
-      className="min-h-screen bg-gradient-hero"
-      style={{ 
-        WebkitOverflowScrolling: 'touch',
-        overscrollBehavior: 'none'
-      }}
-    >
-      {/* Background Elements */}
-      <div className="fixed inset-0 bg-mesh pointer-events-none" style={{ zIndex: 0 }} />
-      <div className="hidden lg:block fixed top-20 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" style={{ zIndex: 0 }} />
-      <div className="hidden lg:block fixed bottom-40 right-10 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none" style={{ zIndex: 0 }} />
+    <div className="min-h-screen bg-gradient-hero relative overflow-x-hidden">
+      {/* Background Elements - Hidden on mobile to prevent scroll issues */}
+      <div className="hidden lg:block absolute inset-0 bg-mesh pointer-events-none" />
+      <div className="hidden lg:block absolute top-20 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none animate-float" />
+      <div className="hidden lg:block absolute bottom-40 right-10 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
       
-      <div className="relative" style={{ zIndex: 1 }}>
-        <NavMenu />
+      <NavMenu />
 
-        <main className="container mx-auto px-4 py-6 pb-8">
-          <div className="mx-auto max-w-5xl">
+      <main className="container mx-auto px-4 py-6 pb-8 relative z-10">
+        <div className="mx-auto max-w-5xl">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow-primary">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow-primary animate-glow">
               <Receipt className="h-8 w-8" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Expense Tracking</h1>
+            <h1 className="text-3xl font-bold bg-gradient-text bg-clip-text text-transparent mb-2">Expense Tracking</h1>
             <p className="text-muted-foreground">Track income and expenses for real-time tax estimates</p>
           </div>
 
           {/* Summary Cards */}
           <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-6">
-            <Card variant="elevated" glow="success" className="p-4">
+            <div className="neumorphic-sm p-4 rounded-xl">
               <div className="flex items-center gap-2 mb-2">
                 <div className="p-1.5 rounded-lg bg-success/10">
                   <TrendingUp className="h-4 w-4 text-success" />
@@ -411,8 +404,8 @@ const Expenses = () => {
                 <span className="text-sm text-muted-foreground">Income</span>
               </div>
               <p className="text-xl font-bold text-success">{formatCurrency(totalIncome)}</p>
-            </Card>
-            <Card variant="elevated" className="p-4">
+            </div>
+            <div className="neumorphic-sm p-4 rounded-xl">
               <div className="flex items-center gap-2 mb-2">
                 <div className="p-1.5 rounded-lg bg-destructive/10">
                   <TrendingDown className="h-4 w-4 text-destructive" />
@@ -420,8 +413,8 @@ const Expenses = () => {
                 <span className="text-sm text-muted-foreground">Expenses</span>
               </div>
               <p className="text-xl font-bold text-destructive">{formatCurrency(totalExpenses)}</p>
-            </Card>
-            <Card variant="elevated" glow="primary" className="p-4">
+            </div>
+            <div className="neumorphic-sm p-4 rounded-xl">
               <div className="flex items-center gap-2 mb-2">
                 <div className="p-1.5 rounded-lg bg-primary/10">
                   <Receipt className="h-4 w-4 text-primary" />
@@ -429,8 +422,8 @@ const Expenses = () => {
                 <span className="text-sm text-muted-foreground">Deductible</span>
               </div>
               <p className="text-xl font-bold text-primary">{formatCurrency(deductibleExpenses)}</p>
-            </Card>
-            <Card variant="elevated" glow="accent" className="p-4">
+            </div>
+            <div className="neumorphic-sm p-4 rounded-xl">
               <div className="flex items-center gap-2 mb-2">
                 <div className="p-1.5 rounded-lg bg-warning/10">
                   <Calculator className="h-4 w-4 text-warning" />
@@ -438,51 +431,55 @@ const Expenses = () => {
                 <span className="text-sm text-muted-foreground">Est. Tax</span>
               </div>
               <p className="text-xl font-bold text-warning">{formatCurrency(estimatedTax)}</p>
-            </Card>
+            </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap items-center gap-2 mb-4">
-            <Button onClick={() => setShowAddDialog(true)}>
-              <Plus className="h-4 w-4" />
-              Add Entry
-            </Button>
-            <Button variant="outline" onClick={() => setShowOCRScanner(true)}>
-              <Camera className="h-4 w-4" />
-              <span className="hidden sm:inline">Scan Receipt</span>
-            </Button>
-            <Button variant="outline" onClick={handleCSVImport}>
-              <Upload className="h-4 w-4" />
-              <span className="hidden sm:inline">Import CSV</span>
-            </Button>
-            <Button 
-              variant="outline"
-              onClick={() => navigate('/calculator', { 
-                state: { prefill: { turnover: totalIncome, expenses: deductibleExpenses } } 
-              })}
-              disabled={totalIncome === 0}
-            >
-              <Calculator className="h-4 w-4" />
-              <span className="hidden sm:inline">Use in Calculator</span>
-            </Button>
-            <Button variant="outline" onClick={() => setShowCharts(!showCharts)}>
-              <PieChart className="h-4 w-4" />
-              <span className="hidden sm:inline">{showCharts ? 'Hide' : 'Show'} Charts</span>
-            </Button>
-            <Button 
-              variant={showFilters ? "secondary" : "outline"}
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <Filter className="h-4 w-4" />
-              <span className="hidden sm:inline">Filters</span>
-              {hasActiveFilters && <span className="ml-1 text-xs">!</span>}
-            </Button>
-            {hasActiveFilters && (
-              <Button variant="ghost" size="sm" onClick={clearFilters}>
-                <X className="h-4 w-4" />
-                Clear
+          <div className="glass rounded-xl p-4 mb-6 shadow-card">
+            <div className="flex flex-wrap items-center gap-2">
+              <Button variant="glow" onClick={() => setShowAddDialog(true)}>
+                <Plus className="h-4 w-4" />
+                Add Entry
               </Button>
-            )}
+              <Button variant="outline" className="glass" onClick={() => setShowOCRScanner(true)}>
+                <Camera className="h-4 w-4" />
+                <span className="hidden sm:inline">Scan Receipt</span>
+              </Button>
+              <Button variant="outline" className="glass" onClick={handleCSVImport}>
+                <Upload className="h-4 w-4" />
+                <span className="hidden sm:inline">Import CSV</span>
+              </Button>
+              <Button 
+                variant="outline"
+                className="glass"
+                onClick={() => navigate('/calculator', { 
+                  state: { prefill: { turnover: totalIncome, expenses: deductibleExpenses } } 
+                })}
+                disabled={totalIncome === 0}
+              >
+                <Calculator className="h-4 w-4" />
+                <span className="hidden sm:inline">Use in Calculator</span>
+              </Button>
+              <Button variant="outline" className="glass" onClick={() => setShowCharts(!showCharts)}>
+                <PieChart className="h-4 w-4" />
+                <span className="hidden sm:inline">{showCharts ? 'Hide' : 'Show'} Charts</span>
+              </Button>
+              <Button 
+                variant={showFilters ? "secondary" : "outline"}
+                className={showFilters ? "" : "glass"}
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                <Filter className="h-4 w-4" />
+                <span className="hidden sm:inline">Filters</span>
+                {hasActiveFilters && <span className="ml-1 text-xs bg-primary text-primary-foreground rounded-full px-1.5">!</span>}
+              </Button>
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" onClick={clearFilters}>
+                  <X className="h-4 w-4" />
+                  Clear
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Filter Panel */}
@@ -642,7 +639,6 @@ const Expenses = () => {
           </div>
         </div>
       </main>
-      </div>
 
       {/* Add Expense Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
