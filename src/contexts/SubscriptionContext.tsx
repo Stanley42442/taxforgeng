@@ -27,11 +27,14 @@ export interface SavedBusiness {
 
 export interface SubscriptionState {
   tier: SubscriptionTier;
+  effectiveTier: SubscriptionTier; // The tier after considering trial
   businessCount: number;
   savedBusinesses: SavedBusiness[];
   subscriptionEndDate: Date | null;
   email: string | null;
   loading: boolean;
+  isOnTrial: boolean;
+  trialEndsAt: Date | null;
 }
 
 interface SubscriptionContextType extends SubscriptionState {
@@ -116,11 +119,14 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
   const [state, setState] = useState<SubscriptionState>({
     tier: 'free',
+    effectiveTier: 'free',
     businessCount: 0,
     savedBusinesses: [],
     subscriptionEndDate: null,
     email: null,
     loading: true,
+    isOnTrial: false,
+    trialEndsAt: null,
   });
 
   // Fetch user profile and businesses from database
@@ -128,20 +134,23 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     if (!user) {
       setState({
         tier: 'free',
+        effectiveTier: 'free',
         businessCount: 0,
         savedBusinesses: [],
         subscriptionEndDate: null,
         email: null,
         loading: false,
+        isOnTrial: false,
+        trialEndsAt: null,
       });
       return;
     }
 
     try {
-      // Fetch profile for subscription tier
+      // Fetch profile for subscription tier and created_at for trial calculation
       const { data: profile } = await supabase
         .from('profiles')
-        .select('subscription_tier, email')
+        .select('subscription_tier, email, created_at')
         .eq('id', user.id)
         .single();
 
@@ -163,13 +172,31 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         verificationStatus: b.cac_verified ? 'verified' : 'not_verified',
       }));
 
+      // Calculate trial status
+      const baseTier = (profile?.subscription_tier as SubscriptionTier) || 'free';
+      let isOnTrial = false;
+      let trialEndsAt: Date | null = null;
+      let effectiveTier = baseTier;
+
+      if (profile?.created_at && baseTier === 'free') {
+        const createdAt = new Date(profile.created_at);
+        trialEndsAt = new Date(createdAt.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days
+        isOnTrial = new Date() < trialEndsAt;
+        if (isOnTrial) {
+          effectiveTier = 'business';
+        }
+      }
+
       setState({
-        tier: (profile?.subscription_tier as SubscriptionTier) || 'free',
+        tier: baseTier,
+        effectiveTier,
         businessCount: mappedBusinesses.length,
         savedBusinesses: mappedBusinesses,
         subscriptionEndDate: null,
         email: profile?.email || user.email || null,
         loading: false,
+        isOnTrial,
+        trialEndsAt,
       });
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -193,10 +220,10 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       .update({ subscription_tier: tier })
       .eq('id', user.id);
     
-    setState(prev => ({ ...prev, tier }));
+    setState(prev => ({ ...prev, tier, effectiveTier: tier }));
   };
 
-  const getBusinessLimit = () => TIER_LIMITS[state.tier];
+  const getBusinessLimit = () => TIER_LIMITS[state.effectiveTier];
 
   const canSaveBusiness = () => {
     const limit = getBusinessLimit();
@@ -283,11 +310,11 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     }));
   };
 
-  const canExport = () => state.tier !== 'free';
-  const canAccessFiling = () => state.tier === 'business' || state.tier === 'corporate';
-  const canAccessScenarioModeling = () => state.tier === 'freelancer' || state.tier === 'business' || state.tier === 'corporate';
-  const canVerifyCAC = () => state.tier === 'business' || state.tier === 'corporate';
-  const showWatermark = () => state.tier === 'free' || state.tier === 'basic';
+  const canExport = () => state.effectiveTier !== 'free';
+  const canAccessFiling = () => state.effectiveTier === 'business' || state.effectiveTier === 'corporate';
+  const canAccessScenarioModeling = () => state.effectiveTier === 'freelancer' || state.effectiveTier === 'business' || state.effectiveTier === 'corporate';
+  const canVerifyCAC = () => state.effectiveTier === 'business' || state.effectiveTier === 'corporate';
+  const showWatermark = () => state.effectiveTier === 'free' || state.effectiveTier === 'basic';
 
   const upgradeTier = async (newTier: SubscriptionTier) => {
     if (!user) return;
@@ -303,7 +330,9 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     setState(prev => ({
       ...prev,
       tier: newTier,
+      effectiveTier: newTier,
       subscriptionEndDate: endDate,
+      isOnTrial: false, // Upgrading ends trial
     }));
   };
 
