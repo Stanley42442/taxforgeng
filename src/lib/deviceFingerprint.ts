@@ -1,42 +1,174 @@
-// Device fingerprinting utility
+// Device fingerprinting utility with enhanced device detection
 
-interface DeviceInfo {
+export interface DeviceInfo {
   fingerprint: string;
   browser: string;
+  browserVersion: string;
   os: string;
+  osVersion: string;
   deviceName: string;
+  deviceType: 'mobile' | 'tablet' | 'desktop' | 'unknown';
+  deviceModel: string;
+  screenResolution: string;
+  timezone: string;
+  language: string;
 }
 
-const getBrowserInfo = (): string => {
+const getBrowserInfo = (): { name: string; version: string } => {
   const ua = navigator.userAgent;
+  let name = 'Unknown Browser';
+  let version = '';
   
-  if (ua.includes('Firefox')) return 'Firefox';
-  if (ua.includes('Edg')) return 'Edge';
-  if (ua.includes('Chrome')) return 'Chrome';
-  if (ua.includes('Safari')) return 'Safari';
-  if (ua.includes('Opera') || ua.includes('OPR')) return 'Opera';
+  // Extract browser and version
+  const browserPatterns = [
+    { pattern: /Firefox\/(\d+(?:\.\d+)?)/, name: 'Firefox' },
+    { pattern: /Edg\/(\d+(?:\.\d+)?)/, name: 'Edge' },
+    { pattern: /OPR\/(\d+(?:\.\d+)?)/, name: 'Opera' },
+    { pattern: /Chrome\/(\d+(?:\.\d+)?)/, name: 'Chrome' },
+    { pattern: /Safari\/(\d+(?:\.\d+)?)/, name: 'Safari' },
+    { pattern: /Version\/(\d+(?:\.\d+)?).*Safari/, name: 'Safari' },
+  ];
   
-  return 'Unknown Browser';
+  for (const { pattern, name: browserName } of browserPatterns) {
+    const match = ua.match(pattern);
+    if (match) {
+      name = browserName;
+      version = match[1] || '';
+      // Special case for Safari - get version from Version/
+      if (browserName === 'Safari' && ua.includes('Version/')) {
+        const versionMatch = ua.match(/Version\/(\d+(?:\.\d+)?)/);
+        if (versionMatch) version = versionMatch[1];
+      }
+      break;
+    }
+  }
+  
+  return { name, version };
 };
 
-const getOSInfo = (): string => {
+const getOSInfo = (): { name: string; version: string } => {
   const ua = navigator.userAgent;
+  let name = 'Unknown OS';
+  let version = '';
   
-  if (ua.includes('Windows NT 10.0')) return 'Windows 10/11';
-  if (ua.includes('Windows')) return 'Windows';
-  if (ua.includes('Mac OS X')) return 'macOS';
-  if (ua.includes('Linux')) return 'Linux';
-  if (ua.includes('Android')) return 'Android';
-  if (ua.includes('iPhone') || ua.includes('iPad')) return 'iOS';
+  const osPatterns = [
+    { pattern: /Windows NT 10\.0/, name: 'Windows', version: '10/11' },
+    { pattern: /Windows NT 6\.3/, name: 'Windows', version: '8.1' },
+    { pattern: /Windows NT 6\.2/, name: 'Windows', version: '8' },
+    { pattern: /Windows NT 6\.1/, name: 'Windows', version: '7' },
+    { pattern: /Mac OS X (\d+[._]\d+(?:[._]\d+)?)/, name: 'macOS' },
+    { pattern: /Android (\d+(?:\.\d+)?)/, name: 'Android' },
+    { pattern: /iPhone OS (\d+[_]\d+)/, name: 'iOS' },
+    { pattern: /iPad.*OS (\d+[_]\d+)/, name: 'iPadOS' },
+    { pattern: /Linux/, name: 'Linux', version: '' },
+    { pattern: /CrOS/, name: 'Chrome OS', version: '' },
+  ];
   
-  return 'Unknown OS';
+  for (const { pattern, name: osName, version: defaultVersion } of osPatterns) {
+    const match = ua.match(pattern);
+    if (match) {
+      name = osName;
+      if (match[1]) {
+        version = match[1].replace(/_/g, '.');
+      } else if (defaultVersion) {
+        version = defaultVersion;
+      }
+      break;
+    }
+  }
+  
+  return { name, version };
 };
 
-const getDeviceName = (browser: string, os: string): string => {
-  const isMobile = /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent);
-  const deviceType = isMobile ? 'Mobile' : 'Desktop';
+const getDeviceType = (): 'mobile' | 'tablet' | 'desktop' | 'unknown' => {
+  const ua = navigator.userAgent.toLowerCase();
   
-  return `${browser} on ${os} (${deviceType})`;
+  // Check for tablets first (before mobile check)
+  const isTablet = 
+    /ipad/.test(ua) ||
+    (/android/.test(ua) && !/mobile/.test(ua)) ||
+    /tablet/.test(ua);
+  
+  if (isTablet) return 'tablet';
+  
+  // Check for mobile
+  const isMobile = 
+    /iphone|ipod|android.*mobile|windows phone|blackberry|opera mini|opera mobi/i.test(ua);
+  
+  if (isMobile) return 'mobile';
+  
+  // Check for desktop indicators
+  const isDesktop = 
+    /windows nt|macintosh|linux x86|linux i686|linux amd64/i.test(ua);
+  
+  if (isDesktop) return 'desktop';
+  
+  return 'unknown';
+};
+
+const getDeviceModel = (): string => {
+  const ua = navigator.userAgent;
+  
+  // iPhone models
+  if (ua.includes('iPhone')) {
+    const match = ua.match(/iPhone\s*(\d+)?/);
+    return match ? `iPhone ${match[1] || ''}`.trim() : 'iPhone';
+  }
+  
+  // iPad models
+  if (ua.includes('iPad')) {
+    return 'iPad';
+  }
+  
+  // Android device models
+  const androidMatch = ua.match(/;\s*([^;)]+)\s+Build\//);
+  if (androidMatch) {
+    return androidMatch[1].trim();
+  }
+  
+  // Fallback for Android
+  if (ua.includes('Android')) {
+    const mobileMatch = ua.match(/Android[^;]*;\s*([^;)]+)/);
+    if (mobileMatch) {
+      return mobileMatch[1].replace(/Build.*/, '').trim();
+    }
+    return 'Android Device';
+  }
+  
+  // Mac
+  if (ua.includes('Macintosh')) {
+    if (ua.includes('MacBook')) return 'MacBook';
+    if (ua.includes('iMac')) return 'iMac';
+    return 'Mac';
+  }
+  
+  // Windows
+  if (ua.includes('Windows')) {
+    return 'Windows PC';
+  }
+  
+  // Linux
+  if (ua.includes('Linux')) {
+    return 'Linux PC';
+  }
+  
+  // Chrome OS
+  if (ua.includes('CrOS')) {
+    return 'Chromebook';
+  }
+  
+  return 'Unknown Device';
+};
+
+const getDeviceName = (browser: string, os: string, deviceType: string, model: string): string => {
+  const typeLabel = {
+    'mobile': '📱 Phone',
+    'tablet': '📱 Tablet',
+    'desktop': '💻 Desktop',
+    'unknown': '🖥️ Device'
+  }[deviceType] || 'Device';
+  
+  return `${model} - ${browser} on ${os}`;
 };
 
 const generateFingerprint = async (): Promise<string> => {
@@ -102,15 +234,27 @@ const generateFingerprint = async (): Promise<string> => {
 };
 
 export const getDeviceInfo = async (): Promise<DeviceInfo> => {
-  const browser = getBrowserInfo();
-  const os = getOSInfo();
-  const deviceName = getDeviceName(browser, os);
+  const { name: browser, version: browserVersion } = getBrowserInfo();
+  const { name: os, version: osVersion } = getOSInfo();
+  const deviceType = getDeviceType();
+  const deviceModel = getDeviceModel();
+  const deviceName = getDeviceName(browser, os, deviceType, deviceModel);
   const fingerprint = await generateFingerprint();
+  const screenResolution = `${screen.width}x${screen.height}`;
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const language = navigator.language;
   
   return {
     fingerprint,
     browser,
+    browserVersion,
     os,
-    deviceName
+    osVersion,
+    deviceName,
+    deviceType,
+    deviceModel,
+    screenResolution,
+    timezone,
+    language
   };
 };

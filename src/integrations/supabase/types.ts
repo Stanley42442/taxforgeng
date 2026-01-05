@@ -366,35 +366,56 @@ export type Database = {
       known_devices: {
         Row: {
           browser: string | null
+          browser_version: string | null
           device_fingerprint: string
+          device_model: string | null
           device_name: string | null
+          device_type: string | null
           first_seen_at: string
           id: string
           is_trusted: boolean
+          language: string | null
           last_seen_at: string
           os: string | null
+          os_version: string | null
+          screen_resolution: string | null
+          timezone: string | null
           user_id: string
         }
         Insert: {
           browser?: string | null
+          browser_version?: string | null
           device_fingerprint: string
+          device_model?: string | null
           device_name?: string | null
+          device_type?: string | null
           first_seen_at?: string
           id?: string
           is_trusted?: boolean
+          language?: string | null
           last_seen_at?: string
           os?: string | null
+          os_version?: string | null
+          screen_resolution?: string | null
+          timezone?: string | null
           user_id: string
         }
         Update: {
           browser?: string | null
+          browser_version?: string | null
           device_fingerprint?: string
+          device_model?: string | null
           device_name?: string | null
+          device_type?: string | null
           first_seen_at?: string
           id?: string
           is_trusted?: boolean
+          language?: string | null
           last_seen_at?: string
           os?: string | null
+          os_version?: string | null
+          screen_resolution?: string | null
+          timezone?: string | null
           user_id?: string
         }
         Relationships: []

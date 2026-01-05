@@ -2,6 +2,7 @@ import { useState, useEffect, createContext, useContext, ReactNode } from 'react
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
+import { getDeviceInfo } from '@/lib/deviceFingerprint';
 
 interface AuthContextType {
   user: User | null;
@@ -28,52 +29,35 @@ const logAuthEvent = async (userId: string, eventType: string, metadata?: Json) 
   }
 };
 
-// Helper to get or create device info
-const getDeviceInfo = () => {
-  const ua = navigator.userAgent;
-  let browser = 'Unknown';
-  let os = 'Unknown';
-  
-  // Detect browser
-  if (ua.includes('Firefox')) browser = 'Firefox';
-  else if (ua.includes('Edge')) browser = 'Edge';
-  else if (ua.includes('Chrome')) browser = 'Chrome';
-  else if (ua.includes('Safari')) browser = 'Safari';
-  else if (ua.includes('Opera')) browser = 'Opera';
-  
-  // Detect OS
-  if (ua.includes('Windows')) os = 'Windows';
-  else if (ua.includes('Mac')) os = 'macOS';
-  else if (ua.includes('Linux')) os = 'Linux';
-  else if (ua.includes('Android')) os = 'Android';
-  else if (ua.includes('iOS') || ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
-  
-  const deviceName = `${browser} on ${os}`;
-  
-  // Simple fingerprint based on user agent and screen
-  const fingerprint = btoa(`${ua}-${screen.width}x${screen.height}-${new Date().getTimezoneOffset()}`).slice(0, 32);
-  
-  return { browser, os, deviceName, fingerprint };
-};
-
 // Track device on login
 const trackDevice = async (userId: string, userEmail: string) => {
   try {
-    const { browser, os, deviceName, fingerprint } = getDeviceInfo();
+    const deviceInfo = await getDeviceInfo();
     
     // Check if device exists
     const { data: existingDevice } = await supabase
       .from('known_devices')
       .select('id, is_trusted')
       .eq('user_id', userId)
-      .eq('device_fingerprint', fingerprint)
+      .eq('device_fingerprint', deviceInfo.fingerprint)
       .single();
     
     if (existingDevice) {
-      // Update last seen
+      // Update last seen and device info
       await supabase
         .from('known_devices')
-        .update({ last_seen_at: new Date().toISOString() })
+        .update({ 
+          last_seen_at: new Date().toISOString(),
+          browser: deviceInfo.browser,
+          browser_version: deviceInfo.browserVersion,
+          os: deviceInfo.os,
+          os_version: deviceInfo.osVersion,
+          device_type: deviceInfo.deviceType,
+          device_model: deviceInfo.deviceModel,
+          screen_resolution: deviceInfo.screenResolution,
+          timezone: deviceInfo.timezone,
+          language: deviceInfo.language
+        })
         .eq('id', existingDevice.id);
     } else {
       // Insert new device
@@ -81,10 +65,17 @@ const trackDevice = async (userId: string, userEmail: string) => {
         .from('known_devices')
         .insert({
           user_id: userId,
-          device_fingerprint: fingerprint,
-          device_name: deviceName,
-          browser,
-          os,
+          device_fingerprint: deviceInfo.fingerprint,
+          device_name: deviceInfo.deviceName,
+          browser: deviceInfo.browser,
+          browser_version: deviceInfo.browserVersion,
+          os: deviceInfo.os,
+          os_version: deviceInfo.osVersion,
+          device_type: deviceInfo.deviceType,
+          device_model: deviceInfo.deviceModel,
+          screen_resolution: deviceInfo.screenResolution,
+          timezone: deviceInfo.timezone,
+          language: deviceInfo.language,
           is_trusted: false
         });
       
@@ -94,7 +85,11 @@ const trackDevice = async (userId: string, userEmail: string) => {
           userEmail,
           alertType: 'new_device',
           timestamp: new Date().toLocaleString(),
-          deviceInfo: { browser, os, deviceName }
+          deviceInfo: { 
+            browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, 
+            os: `${deviceInfo.os} ${deviceInfo.osVersion}`, 
+            deviceName: deviceInfo.deviceName 
+          }
         }
       }).catch(err => console.error('Failed to send new device alert:', err));
     }

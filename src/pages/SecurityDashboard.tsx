@@ -25,7 +25,12 @@ import {
   Monitor,
   Trash2,
   Star,
-  StarOff
+  StarOff,
+  Tablet,
+  Laptop,
+  Globe,
+  Languages,
+  Info
 } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { useAuth } from "@/hooks/useAuth";
@@ -54,7 +59,14 @@ interface KnownDevice {
   device_fingerprint: string;
   device_name: string | null;
   browser: string | null;
+  browser_version: string | null;
   os: string | null;
+  os_version: string | null;
+  device_type: string | null;
+  device_model: string | null;
+  screen_resolution: string | null;
+  timezone: string | null;
+  language: string | null;
   is_trusted: boolean;
   first_seen_at: string;
   last_seen_at: string;
@@ -459,7 +471,7 @@ const SecurityDashboard = () => {
 
         {/* Activity Tabs */}
         <Tabs defaultValue="events" className="space-y-4">
-          <TabsList>
+          <TabsList className="flex-wrap">
             <TabsTrigger value="devices" className="gap-2">
               <Monitor className="h-4 w-4" />
               Devices
@@ -469,8 +481,12 @@ const SecurityDashboard = () => {
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="events" className="gap-2">
+            <TabsTrigger value="sessions" className="gap-2">
               <Activity className="h-4 w-4" />
+              Sessions
+            </TabsTrigger>
+            <TabsTrigger value="events" className="gap-2">
+              <Shield className="h-4 w-4" />
               Security Events
             </TabsTrigger>
             <TabsTrigger value="attempts" className="gap-2">
@@ -504,68 +520,105 @@ const SecurityDashboard = () => {
                       {knownDevices.map((device) => (
                         <div 
                           key={device.id}
-                          className={`flex items-start gap-3 p-4 rounded-lg border bg-card ${device.is_trusted ? 'border-green-200 dark:border-green-800' : ''}`}
+                          className={`p-4 rounded-lg border bg-card ${device.is_trusted ? 'border-green-200 dark:border-green-800' : ''}`}
                         >
-                          <div className={`h-10 w-10 rounded-full flex items-center justify-center ${device.is_trusted ? 'bg-green-100 dark:bg-green-900/30' : 'bg-primary/10'}`}>
-                            <Monitor className={`h-5 w-5 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-2">
-                              <div>
-                                <div className="flex items-center gap-2">
-                                  <p className="font-medium text-sm">
-                                    {device.device_name || 'Unknown Device'}
-                                  </p>
-                                  {device.is_trusted && (
-                                    <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50 dark:bg-green-900/20 text-xs">
-                                      Trusted
-                                    </Badge>
-                                  )}
-                                </div>
-                                <p className="text-xs text-muted-foreground mt-0.5">
-                                  {device.browser} on {device.os}
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className={device.is_trusted ? "text-amber-500 hover:text-amber-600 hover:bg-amber-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}
-                                  onClick={() => handleToggleTrust(device.id, device.is_trusted)}
-                                  disabled={togglingTrustId === device.id}
-                                  title={device.is_trusted ? "Remove from trusted devices" : "Mark as trusted device"}
-                                >
-                                  {togglingTrustId === device.id ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                  ) : device.is_trusted ? (
-                                    <StarOff className="h-4 w-4" />
-                                  ) : (
-                                    <Star className="h-4 w-4" />
-                                  )}
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                  onClick={() => handleRemoveDevice(device.id)}
-                                  disabled={removingDeviceId === device.id}
-                                >
-                                  {removingDeviceId === device.id ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                  ) : (
-                                    <Trash2 className="h-4 w-4" />
-                                  )}
-                                </Button>
-                              </div>
+                          <div className="flex items-start gap-3">
+                            <div className={`h-12 w-12 rounded-full flex items-center justify-center ${device.is_trusted ? 'bg-green-100 dark:bg-green-900/30' : 'bg-primary/10'}`}>
+                              {device.device_type === 'mobile' ? (
+                                <Smartphone className={`h-6 w-6 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
+                              ) : device.device_type === 'tablet' ? (
+                                <Tablet className={`h-6 w-6 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
+                              ) : (
+                                <Laptop className={`h-6 w-6 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
+                              )}
                             </div>
-                            <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                First seen: {format(new Date(device.first_seen_at), 'PP')}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-2">
+                                <div>
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <p className="font-medium text-sm">
+                                      {device.device_model || device.device_name || 'Unknown Device'}
+                                    </p>
+                                    <Badge variant="outline" className="text-xs capitalize">
+                                      {device.device_type || 'desktop'}
+                                    </Badge>
+                                    {device.is_trusted && (
+                                      <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50 dark:bg-green-900/20 text-xs">
+                                        Trusted
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    {device.browser}{device.browser_version ? ` v${device.browser_version}` : ''} on {device.os}{device.os_version ? ` ${device.os_version}` : ''}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className={device.is_trusted ? "text-amber-500 hover:text-amber-600 hover:bg-amber-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}
+                                    onClick={() => handleToggleTrust(device.id, device.is_trusted)}
+                                    disabled={togglingTrustId === device.id}
+                                    title={device.is_trusted ? "Remove from trusted devices" : "Mark as trusted device"}
+                                  >
+                                    {togglingTrustId === device.id ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : device.is_trusted ? (
+                                      <StarOff className="h-4 w-4" />
+                                    ) : (
+                                      <Star className="h-4 w-4" />
+                                    )}
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                    onClick={() => handleRemoveDevice(device.id)}
+                                    disabled={removingDeviceId === device.id}
+                                  >
+                                    {removingDeviceId === device.id ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      <Trash2 className="h-4 w-4" />
+                                    )}
+                                  </Button>
+                                </div>
                               </div>
-                              <div className="flex items-center gap-1">
-                                <RefreshCw className="h-3 w-3" />
-                                Last active: {formatDistanceToNow(new Date(device.last_seen_at), { addSuffix: true })}
+                              
+                              {/* Device Details Grid */}
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 text-xs">
+                                {device.screen_resolution && (
+                                  <div className="flex items-center gap-1 text-muted-foreground">
+                                    <Monitor className="h-3 w-3" />
+                                    <span>{device.screen_resolution}</span>
+                                  </div>
+                                )}
+                                {device.timezone && (
+                                  <div className="flex items-center gap-1 text-muted-foreground">
+                                    <Globe className="h-3 w-3" />
+                                    <span className="truncate" title={device.timezone}>
+                                      {device.timezone.split('/').pop()?.replace(/_/g, ' ')}
+                                    </span>
+                                  </div>
+                                )}
+                                {device.language && (
+                                  <div className="flex items-center gap-1 text-muted-foreground">
+                                    <Languages className="h-3 w-3" />
+                                    <span>{device.language}</span>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {/* Timestamps */}
+                              <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                                <div className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  First seen: {format(new Date(device.first_seen_at), 'PP')}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <RefreshCw className="h-3 w-3" />
+                                  Last active: {formatDistanceToNow(new Date(device.last_seen_at), { addSuffix: true })}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -574,6 +627,88 @@ const SecurityDashboard = () => {
                     </div>
                   </ScrollArea>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="sessions">
+            <Card>
+              <CardHeader>
+                <CardTitle>Active Sessions</CardTitle>
+                <CardDescription>
+                  Manage your active login sessions across devices
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Current Session */}
+                  <div className="p-4 rounded-lg border-2 border-primary bg-primary/5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <CheckCircle2 className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm flex items-center gap-2">
+                            Current Session
+                            <Badge variant="default" className="text-xs">Active</Badge>
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {navigator.userAgent.includes('Chrome') ? 'Chrome' : 
+                             navigator.userAgent.includes('Firefox') ? 'Firefox' :
+                             navigator.userAgent.includes('Safari') ? 'Safari' : 'Browser'} on {
+                             navigator.userAgent.includes('Windows') ? 'Windows' :
+                             navigator.userAgent.includes('Mac') ? 'macOS' :
+                             navigator.userAgent.includes('Linux') ? 'Linux' :
+                             navigator.userAgent.includes('Android') ? 'Android' :
+                             navigator.userAgent.includes('iPhone') ? 'iOS' : 'Unknown OS'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="text-green-600 border-green-300">
+                        This device
+                      </Badge>
+                    </div>
+                  </div>
+
+                  {/* Other sessions info */}
+                  <div className="p-4 rounded-lg bg-muted/50 border">
+                    <div className="flex items-start gap-3">
+                      <Info className="h-5 w-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium">Session Management</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          For security, you can sign out of all other devices by clicking the button below. 
+                          This will invalidate all sessions except your current one.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sign out all button */}
+                  <Button 
+                    variant="destructive" 
+                    className="w-full"
+                    onClick={async () => {
+                      try {
+                        // Sign out from all sessions except current
+                        const { error } = await supabase.auth.signOut({ scope: 'others' });
+                        if (error) throw error;
+                        toast.success("Signed out of all other devices successfully");
+                      } catch (error: any) {
+                        toast.error(error.message || "Failed to sign out of other devices");
+                      }
+                    }}
+                  >
+                    <Lock className="h-4 w-4 mr-2" />
+                    Sign Out All Other Devices
+                  </Button>
+
+                  <p className="text-xs text-muted-foreground text-center">
+                    Last login: {user?.last_sign_in_at ? format(new Date(user.last_sign_in_at), 'PPpp') : 'Unknown'}
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
