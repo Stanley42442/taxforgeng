@@ -131,6 +131,7 @@ const Settings = () => {
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const [showBackupCodes, setShowBackupCodes] = useState(false);
   const [hasBackupCodes, setHasBackupCodes] = useState(false);
+  const [remainingBackupCodes, setRemainingBackupCodes] = useState(0);
   const [backupCodesLoading, setBackupCodesLoading] = useState(true);
   const [generatingBackupCodes, setGeneratingBackupCodes] = useState(false);
 
@@ -204,7 +205,9 @@ const Settings = () => {
           .is('used_at', null);
 
         if (error) throw error;
-        setHasBackupCodes((count || 0) > 0);
+        const remaining = count || 0;
+        setRemainingBackupCodes(remaining);
+        setHasBackupCodes(remaining > 0);
       } catch (error) {
         console.error("Error loading backup codes status:", error);
       } finally {
@@ -433,6 +436,7 @@ const Settings = () => {
       // Delete backup codes when 2FA is disabled
       await supabase.from('backup_codes').delete().eq('user_id', user?.id);
       setHasBackupCodes(false);
+      setRemainingBackupCodes(0);
 
       toast.success("Two-factor authentication disabled");
     } catch (error: any) {
@@ -487,6 +491,7 @@ const Settings = () => {
       if (error) throw error;
 
       setHasBackupCodes(true);
+      setRemainingBackupCodes(10); // 10 new codes generated
       setShowBackupCodes(true);
       await logAuthEvent('backup_codes_generated');
       
@@ -724,17 +729,31 @@ const Settings = () => {
                   </div>
                 ) : hasBackupCodes ? (
                   <div className="space-y-4">
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                      <CheckCircle2 className="h-5 w-5 text-green-600" />
-                      <div>
-                        <p className="text-sm font-medium text-green-800 dark:text-green-200">
-                          Backup codes available
-                        </p>
-                        <p className="text-xs text-green-600 dark:text-green-400">
-                          You have recovery codes saved for account access
-                        </p>
+                    {remainingBackupCodes <= 3 ? (
+                      <div className="flex items-center gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                        <AlertCircle className="h-5 w-5 text-amber-600" />
+                        <div>
+                          <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                            {remainingBackupCodes} backup code{remainingBackupCodes !== 1 ? 's' : ''} remaining
+                          </p>
+                          <p className="text-xs text-amber-600 dark:text-amber-400">
+                            You're running low! Consider generating new codes soon.
+                          </p>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                        <div>
+                          <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                            {remainingBackupCodes} backup codes available
+                          </p>
+                          <p className="text-xs text-green-600 dark:text-green-400">
+                            You have recovery codes saved for account access
+                          </p>
+                        </div>
+                      </div>
+                    )}
                     <Button 
                       variant="outline" 
                       onClick={handleGenerateBackupCodes}
