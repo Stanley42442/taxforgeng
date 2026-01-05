@@ -377,8 +377,6 @@ const Expenses = () => {
     <div className="min-h-screen bg-gradient-hero relative">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-mesh pointer-events-none" />
-      <div className="absolute top-20 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-40 right-10 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
       
       <NavMenu />
 
