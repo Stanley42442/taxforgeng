@@ -37,14 +37,16 @@ const CalculatorPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const preselectedEntity = location.state?.entityType;
-  const { tier, savedBusinesses } = useSubscription();
-  const { user } = useAuth();
+  const { tier, savedBusinesses, loading: subscriptionLoading } = useSubscription();
+  const { user, loading: authLoading } = useAuth();
 
-  // Redirect free-tier/guest users to Individual Calculator
+  // Wait for auth and subscription data to load before checking access
+  const isLoading = authLoading || subscriptionLoading;
   const isFreeTierOrGuest = !user || tier === 'free';
 
   useEffect(() => {
-    if (isFreeTierOrGuest) {
+    // Only redirect after loading is complete
+    if (!isLoading && isFreeTierOrGuest) {
       toast.info("Business Tax requires a paid plan. Redirecting to Personal Tax Calculator.", {
         duration: 4000
       });
@@ -53,7 +55,16 @@ const CalculatorPage = () => {
         replace: true 
       });
     }
-  }, [isFreeTierOrGuest, navigate]);
+  }, [isLoading, isFreeTierOrGuest, navigate]);
+
+  // Show loading state while checking access
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   // Don't render if redirecting
   if (isFreeTierOrGuest) {
