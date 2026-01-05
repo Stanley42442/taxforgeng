@@ -37,9 +37,13 @@ import {
   Search,
   ChevronDown,
   ChevronUp,
-  BarChart3
+  BarChart3,
+  Download,
+  AlertTriangle,
+  Target
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
+import { jsPDF } from "jspdf";
 import {
   Dialog,
   DialogContent,
@@ -132,6 +136,12 @@ const Expenses = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
   const [showMonthlySummary, setShowMonthlySummary] = useState(false);
+  const [monthlyBudget, setMonthlyBudget] = useState<number>(() => {
+    const saved = localStorage.getItem('expenseBudget');
+    return saved ? Number(saved) : 0;
+  });
+  const [showBudgetDialog, setShowBudgetDialog] = useState(false);
+  const [budgetInput, setBudgetInput] = useState('');
   
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -373,6 +383,12 @@ const Expenses = () => {
 
   const sortedMonths = Object.entries(monthlySummary).sort((a, b) => b[0].localeCompare(a[0]));
 
+  // Current month expense check for budget
+  const currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+  const currentMonthExpenses = monthlySummary[currentMonthKey]?.expenses || 0;
+  const isBudgetExceeded = monthlyBudget > 0 && currentMonthExpenses > monthlyBudget;
+  const budgetPercentage = monthlyBudget > 0 ? Math.min((currentMonthExpenses / monthlyBudget) * 100, 100) : 0;
+
   const hasActiveFilters = filterType !== 'all' || filterCategory !== 'all' || dateFrom !== undefined || dateTo !== undefined || filterBusinessId !== 'all' || searchQuery.trim() !== '';
 
   const clearFilters = () => {
@@ -384,8 +400,93 @@ const Expenses = () => {
     setSearchQuery('');
   };
 
+  const handleSetBudget = () => {
+    const budget = Number(budgetInput) || 0;
+    setMonthlyBudget(budget);
+    localStorage.setItem('expenseBudget', budget.toString());
+    setShowBudgetDialog(false);
+    setBudgetInput('');
+    toast.success(budget > 0 ? `Monthly budget set to ${formatCurrency(budget)}` : 'Budget limit removed');
+  };
+
+  const exportMonthlySummaryPDF = () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    let y = margin;
+
+    // Header
+    doc.setFillColor(26, 79, 62);
+    doc.rect(0, 0, pageWidth, 8, 'F');
+    doc.setFillColor(212, 175, 55);
+    doc.rect(0, 8, pageWidth, 2, 'F');
+
+    y = 25;
+    doc.setTextColor(26, 79, 62);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Monthly Expense Summary', margin, y);
+    y += 12;
+
+    doc.setTextColor(128, 128, 128);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-NG', { year: 'numeric', month: 'long', day: 'numeric' })}`, margin, y);
+    y += 15;
+
+    // Table header
+    doc.setFillColor(26, 79, 62);
+    doc.rect(margin, y, pageWidth - margin * 2, 10, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Month', margin + 5, y + 7);
+    doc.text('Income', margin + 60, y + 7);
+    doc.text('Expenses', margin + 100, y + 7);
+    doc.text('Net', margin + 140, y + 7);
+    y += 14;
+
+    // Table rows
+    doc.setFont('helvetica', 'normal');
+    sortedMonths.forEach(([, data], index) => {
+      if (index % 2 === 0) {
+        doc.setFillColor(248, 250, 248);
+        doc.rect(margin, y - 4, pageWidth - margin * 2, 10, 'F');
+      }
+      doc.setTextColor(51, 51, 51);
+      doc.text(data.monthName, margin + 5, y + 2);
+      doc.setTextColor(34, 197, 94);
+      doc.text(formatCurrency(data.income), margin + 60, y + 2);
+      doc.setTextColor(239, 68, 68);
+      doc.text(formatCurrency(data.expenses), margin + 100, y + 2);
+      doc.setTextColor(data.net >= 0 ? 34 : 239, data.net >= 0 ? 197 : 68, data.net >= 0 ? 94 : 68);
+      doc.text(formatCurrency(data.net), margin + 140, y + 2);
+      y += 10;
+    });
+
+    // Totals
+    y += 5;
+    const totals = sortedMonths.reduce((acc, [, data]) => ({
+      income: acc.income + data.income,
+      expenses: acc.expenses + data.expenses,
+      net: acc.net + data.net
+    }), { income: 0, expenses: 0, net: 0 });
+
+    doc.setFillColor(26, 79, 62);
+    doc.rect(margin, y, pageWidth - margin * 2, 12, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.text('TOTAL', margin + 5, y + 8);
+    doc.text(formatCurrency(totals.income), margin + 60, y + 8);
+    doc.text(formatCurrency(totals.expenses), margin + 100, y + 8);
+    doc.text(formatCurrency(totals.net), margin + 140, y + 8);
+
+    doc.save('monthly-expense-summary.pdf');
+    toast.success('Monthly summary exported to PDF');
+  };
+
   const totalIncome = filteredExpenses.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
-  const totalExpenses = filteredExpenses.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
+  const totalExpensesAmount = filteredExpenses.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
   const deductibleExpenses = filteredExpenses.filter(e => e.isDeductible).reduce((sum, e) => sum + e.amount, 0);
   const taxableIncome = Math.max(0, totalIncome - deductibleExpenses);
   const estimatedTax = estimateTax(taxableIncome);
@@ -446,7 +547,7 @@ const Expenses = () => {
                 </div>
                 <span className="text-sm text-muted-foreground truncate">Expenses</span>
               </div>
-              <p className="text-lg sm:text-xl font-bold text-destructive truncate">{formatCurrency(totalExpenses)}</p>
+              <p className="text-lg sm:text-xl font-bold text-destructive truncate">{formatCurrency(totalExpensesAmount)}</p>
             </div>
             <div className="neumorphic-sm p-4 rounded-xl overflow-hidden">
               <div className="flex items-center gap-2 mb-2">
@@ -505,6 +606,14 @@ const Expenses = () => {
               >
                 <BarChart3 className="h-4 w-4" />
                 <span className="hidden sm:inline">Monthly</span>
+              </Button>
+              <Button 
+                variant="outline"
+                className="glass"
+                onClick={() => setShowBudgetDialog(true)}
+              >
+                <Target className="h-4 w-4" />
+                <span className="hidden sm:inline">Budget</span>
               </Button>
               <Button 
                 variant={showFilters ? "secondary" : "outline"}
@@ -617,32 +726,70 @@ const Expenses = () => {
             </div>
           )}
 
+          {/* Budget Alert */}
+          {monthlyBudget > 0 && (
+            <div className={`rounded-xl p-4 mb-6 border ${isBudgetExceeded ? 'bg-destructive/10 border-destructive/30' : 'bg-card/50 border-border/50'}`}>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  {isBudgetExceeded ? (
+                    <AlertTriangle className="h-5 w-5 text-destructive" />
+                  ) : (
+                    <Target className="h-5 w-5 text-primary" />
+                  )}
+                  <span className="font-medium text-sm">
+                    {isBudgetExceeded ? 'Budget Exceeded!' : 'Monthly Budget'}
+                  </span>
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  {formatCurrency(currentMonthExpenses)} / {formatCurrency(monthlyBudget)}
+                </span>
+              </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className={`h-full transition-all ${isBudgetExceeded ? 'bg-destructive' : budgetPercentage > 80 ? 'bg-warning' : 'bg-primary'}`}
+                  style={{ width: `${Math.min(budgetPercentage, 100)}%` }}
+                />
+              </div>
+              {isBudgetExceeded && (
+                <p className="text-xs text-destructive mt-2">
+                  You've exceeded your budget by {formatCurrency(currentMonthExpenses - monthlyBudget)}
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Monthly Summary Section */}
           {showMonthlySummary && sortedMonths.length > 0 && (
             <div className="neumorphic p-6 mb-6">
-              <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-primary/10">
-                  <BarChart3 className="h-5 w-5 text-primary" />
-                </div>
-                Monthly Summary
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-semibold text-foreground flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-primary/10">
+                    <BarChart3 className="h-5 w-5 text-primary" />
+                  </div>
+                  Monthly Summary
+                </h2>
+                <Button variant="outline" size="sm" onClick={exportMonthlySummaryPDF}>
+                  <Download className="h-4 w-4" />
+                  <span className="hidden sm:inline">Export PDF</span>
+                </Button>
+              </div>
               <div className="space-y-3">
                 {sortedMonths.map(([key, data]) => (
-                  <div key={key} className="bg-card/50 border border-border/50 rounded-lg p-4">
+                  <div key={key} className="bg-card/50 border border-border/50 rounded-lg p-4 overflow-hidden">
                     <p className="font-medium text-foreground mb-2">{data.monthName}</p>
-                    <div className="grid grid-cols-3 gap-4 text-sm">
-                      <div>
+                    <div className="grid grid-cols-3 gap-2 text-sm">
+                      <div className="min-w-0">
                         <p className="text-muted-foreground text-xs">Income</p>
-                        <p className="text-success font-semibold">{formatCurrency(data.income)}</p>
+                        <p className="text-success font-semibold text-sm truncate">{formatCurrency(data.income)}</p>
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-muted-foreground text-xs">Expenses</p>
-                        <p className="text-destructive font-semibold">{formatCurrency(data.expenses)}</p>
+                        <p className="text-destructive font-semibold text-sm truncate">{formatCurrency(data.expenses)}</p>
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-muted-foreground text-xs">Net</p>
-                        <p className={`font-semibold ${data.net >= 0 ? 'text-success' : 'text-destructive'}`}>
-                          {data.net >= 0 ? '+' : ''}{formatCurrency(data.net)}
+                        <p className={`font-semibold text-sm truncate ${data.net >= 0 ? 'text-success' : 'text-destructive'}`}>
+                          {formatCurrency(Math.abs(data.net))}
                         </p>
                       </div>
                     </div>
@@ -745,8 +892,8 @@ const Expenses = () => {
                             <span className="px-1.5 py-0.5 rounded-full bg-success/10 text-success font-medium">Deductible</span>
                           )}
                         </div>
-                        <span className={`font-bold ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
-                          {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
+                        <span className={`font-bold text-sm shrink-0 ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
+                          {formatCurrency(expense.amount)}
                         </span>
                       </div>
                     </div>
@@ -879,6 +1026,43 @@ const Expenses = () => {
           notifyExpenseAdded(expense.description, expense.amount, expense.type === 'income');
         }}
       />
+
+      {/* Budget Dialog */}
+      <Dialog open={showBudgetDialog} onOpenChange={setShowBudgetDialog}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5 text-primary" />
+              Set Monthly Budget
+            </DialogTitle>
+            <DialogDescription>Set a spending limit to track your expenses</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Monthly Budget (₦)</Label>
+              <Input
+                type="number"
+                placeholder={monthlyBudget > 0 ? monthlyBudget.toString() : "Enter amount"}
+                value={budgetInput}
+                onChange={(e) => setBudgetInput(e.target.value)}
+              />
+              {monthlyBudget > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Current budget: {formatCurrency(monthlyBudget)}
+                </p>
+              )}
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            {monthlyBudget > 0 && (
+              <Button variant="outline" onClick={() => { setMonthlyBudget(0); localStorage.removeItem('expenseBudget'); setShowBudgetDialog(false); toast.success('Budget removed'); }}>
+                Remove
+              </Button>
+            )}
+            <Button onClick={handleSetBudget}>Set Budget</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
