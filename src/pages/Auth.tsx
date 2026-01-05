@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Calculator, Mail, Lock, User, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -11,6 +12,8 @@ import { z } from "zod";
 const emailSchema = z.string().email("Please enter a valid email address");
 const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
 
+const REMEMBER_ME_KEY = 'taxforge-remember-me';
+
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
@@ -18,6 +21,9 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [rememberMe, setRememberMe] = useState(() => {
+    return localStorage.getItem(REMEMBER_ME_KEY) !== 'false';
+  });
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   
   const { signIn, signUp, user, loading } = useAuth();
@@ -56,6 +62,9 @@ const Auth = () => {
     
     setIsSubmitting(true);
     
+    // Save remember me preference
+    localStorage.setItem(REMEMBER_ME_KEY, rememberMe.toString());
+    
     try {
       if (isLogin) {
         const { error } = await signIn(email, password);
@@ -66,6 +75,12 @@ const Auth = () => {
             toast.error(error.message);
           }
         } else {
+          // Set up session cleanup if "Remember me" is unchecked
+          if (!rememberMe) {
+            sessionStorage.setItem('taxforge-session-only', 'true');
+          } else {
+            sessionStorage.removeItem('taxforge-session-only');
+          }
           toast.success("Welcome back!");
           navigate("/");
         }
@@ -78,6 +93,12 @@ const Auth = () => {
             toast.error(error.message);
           }
         } else {
+          // Set up session cleanup if "Remember me" is unchecked
+          if (!rememberMe) {
+            sessionStorage.setItem('taxforge-session-only', 'true');
+          } else {
+            sessionStorage.removeItem('taxforge-session-only');
+          }
           toast.success("Account created successfully! You are now logged in.");
           navigate("/");
         }
@@ -197,6 +218,23 @@ const Auth = () => {
                   <p className="text-sm text-destructive">{errors.password}</p>
                 )}
               </div>
+
+              {/* Remember Me */}
+              {isLogin && (
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="rememberMe"
+                    checked={rememberMe}
+                    onCheckedChange={(checked) => setRememberMe(checked === true)}
+                  />
+                  <Label 
+                    htmlFor="rememberMe" 
+                    className="text-sm text-muted-foreground cursor-pointer select-none"
+                  >
+                    Remember me
+                  </Label>
+                </div>
+              )}
 
               {/* Submit Button */}
               <Button
