@@ -36,6 +36,7 @@ const Auth = () => {
   const [backupCode, setBackupCode] = useState("");
   const [useBackupCode, setUseBackupCode] = useState(false);
   const [mfaUserId, setMfaUserId] = useState<string | null>(null);
+  const [isResendingVerification, setIsResendingVerification] = useState(false);
   
   const { signIn, signUp, user, loading } = useAuth();
   const navigate = useNavigate();
@@ -205,6 +206,43 @@ const Auth = () => {
       }
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!email) {
+      toast.error("Please enter your email address first.");
+      return;
+    }
+
+    const emailResult = emailSchema.safeParse(email);
+    if (!emailResult.success) {
+      setErrors({ email: emailResult.error.errors[0].message });
+      return;
+    }
+
+    setIsResendingVerification(true);
+    
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+        }
+      });
+      
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("Verification email sent! Please check your inbox.", {
+          duration: 5000
+        });
+      }
+    } catch (error: any) {
+      toast.error("Failed to send verification email. Please try again.");
+    } finally {
+      setIsResendingVerification(false);
     }
   };
 
@@ -852,6 +890,20 @@ const Auth = () => {
                         ? "Sign In" 
                         : "Create Account"}
                   </Button>
+
+                  {/* Resend Verification Email */}
+                  {view === 'login' && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="w-full mt-2 text-sm"
+                      onClick={handleResendVerification}
+                      disabled={isResendingVerification || !email}
+                    >
+                      <Mail className="h-4 w-4 mr-2" />
+                      {isResendingVerification ? "Sending..." : "Resend verification email"}
+                    </Button>
+                  )}
                 </form>
 
                 {/* Toggle Login/Signup */}
