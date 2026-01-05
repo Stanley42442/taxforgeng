@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, Mail, Lock, User, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { Calculator, Mail, Lock, User, ArrowLeft, Eye, EyeOff, KeyRound, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -16,7 +16,7 @@ const passwordSchema = z.string().min(6, "Password must be at least 6 characters
 
 const REMEMBER_ME_KEY = 'taxforge-remember-me';
 
-type AuthView = 'login' | 'signup' | 'forgot-password' | 'reset-password';
+type AuthView = 'login' | 'signup' | 'forgot-password' | 'reset-password' | 'mfa-challenge';
 
 const Auth = () => {
   const [view, setView] = useState<AuthView>('login');
@@ -30,6 +30,11 @@ const Auth = () => {
     return localStorage.getItem(REMEMBER_ME_KEY) !== 'false';
   });
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
+  const [totpCode, setTotpCode] = useState("");
+  const [backupCode, setBackupCode] = useState("");
+  const [useBackupCode, setUseBackupCode] = useState(false);
+  const [mfaUserId, setMfaUserId] = useState<string | null>(null);
   
   const { signIn, signUp, user, loading } = useAuth();
   const navigate = useNavigate();
@@ -83,22 +88,39 @@ const Auth = () => {
     
     try {
       if (view === 'login') {
-        const { error } = await signIn(email, password);
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        
         if (error) {
           if (error.message.includes("Invalid login credentials")) {
             toast.error("Invalid email or password. Please try again.");
           } else {
             toast.error(error.message);
           }
-        } else {
-          if (!rememberMe) {
-            sessionStorage.setItem('taxforge-session-only', 'true');
-          } else {
-            sessionStorage.removeItem('taxforge-session-only');
-          }
-          toast.success("Welcome back!");
-          navigate("/");
+          return;
         }
+        
+        // Check if MFA is required
+        const { data: factorsData } = await supabase.auth.mfa.listFactors();
+        const verifiedFactors = factorsData?.totp?.filter(f => f.status === 'verified') || [];
+        
+        if (verifiedFactors.length > 0) {
+          // MFA is enabled, need to verify
+          setMfaFactorId(verifiedFactors[0].id);
+          setMfaUserId(data.user?.id || null);
+          setView('mfa-challenge');
+          return;
+        }
+        
+        if (!rememberMe) {
+          sessionStorage.setItem('taxforge-session-only', 'true');
+        } else {
+          sessionStorage.removeItem('taxforge-session-only');
+        }
+        toast.success("Welcome back!");
+        navigate("/");
       } else if (view === 'signup') {
         const { error } = await signUp(email, password, fullName);
         if (error) {
@@ -200,6 +222,105 @@ const Auth = () => {
     }
   };
 
+  // Hash function for backup code verification
+  const hashCode = async (code: string): Promise<string> => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(code.toUpperCase().replace(/-/g, ''));
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  };
+
+  const handleMfaChallenge = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      if (useBackupCode) {
+        // Verify backup code
+        if (!mfaUserId) {
+          toast.error("Session expired. Please login again.");
+          setView('login');
+          return;
+        }
+
+        const codeHash = await hashCode(backupCode);
+        
+        // Check if backup code exists and is unused
+        const { data: codes, error: fetchError } = await supabase
+          .from('backup_codes')
+          .select('id, used_at')
+          .eq('user_id', mfaUserId)
+          .eq('code_hash', codeHash)
+          .single();
+
+        if (fetchError || !codes) {
+          toast.error("Invalid backup code. Please try again.");
+          return;
+        }
+
+        if (codes.used_at) {
+          toast.error("This backup code has already been used.");
+          return;
+        }
+
+        // Mark backup code as used
+        await supabase
+          .from('backup_codes')
+          .update({ used_at: new Date().toISOString() })
+          .eq('id', codes.id);
+
+        // Complete the login
+        if (!rememberMe) {
+          sessionStorage.setItem('taxforge-session-only', 'true');
+        } else {
+          sessionStorage.removeItem('taxforge-session-only');
+        }
+        
+        toast.success("Welcome back! Remember to generate new backup codes.");
+        navigate("/");
+      } else {
+        // Verify TOTP code
+        if (!mfaFactorId) {
+          toast.error("MFA session expired. Please login again.");
+          setView('login');
+          return;
+        }
+
+        const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+          factorId: mfaFactorId
+        });
+
+        if (challengeError) {
+          toast.error(challengeError.message);
+          return;
+        }
+
+        const { error: verifyError } = await supabase.auth.mfa.verify({
+          factorId: mfaFactorId,
+          challengeId: challengeData.id,
+          code: totpCode
+        });
+
+        if (verifyError) {
+          toast.error("Invalid verification code. Please try again.");
+          return;
+        }
+
+        if (!rememberMe) {
+          sessionStorage.setItem('taxforge-session-only', 'true');
+        } else {
+          sessionStorage.removeItem('taxforge-session-only');
+        }
+        
+        toast.success("Welcome back!");
+        navigate("/");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
@@ -214,6 +335,7 @@ const Auth = () => {
       case 'signup': return "Create Account";
       case 'forgot-password': return "Reset Password";
       case 'reset-password': return "Set New Password";
+      case 'mfa-challenge': return "Two-Factor Authentication";
     }
   };
 
@@ -223,6 +345,9 @@ const Auth = () => {
       case 'signup': return "Start managing your taxes smarter";
       case 'forgot-password': return "Enter your email to receive a reset link";
       case 'reset-password': return "Choose a new password for your account";
+      case 'mfa-challenge': return useBackupCode 
+        ? "Enter one of your backup codes" 
+        : "Enter the code from your authenticator app";
     }
   };
 
@@ -253,6 +378,96 @@ const Auth = () => {
 
           {/* Form Card */}
           <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
+            {/* MFA Challenge View */}
+            {view === 'mfa-challenge' && (
+              <form onSubmit={handleMfaChallenge} className="space-y-4">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                    {useBackupCode ? (
+                      <KeyRound className="h-8 w-8 text-primary" />
+                    ) : (
+                      <Shield className="h-8 w-8 text-primary" />
+                    )}
+                  </div>
+                </div>
+
+                {useBackupCode ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="backupCode">Backup Code</Label>
+                    <div className="relative">
+                      <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="backupCode"
+                        type="text"
+                        placeholder="XXXX-XXXX"
+                        value={backupCode}
+                        onChange={(e) => setBackupCode(e.target.value.toUpperCase())}
+                        className="pl-10 font-mono tracking-wider"
+                        autoComplete="off"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Enter one of your 8-character backup codes
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Label htmlFor="totpCode">Verification Code</Label>
+                    <div className="relative">
+                      <Shield className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="totpCode"
+                        type="text"
+                        placeholder="000000"
+                        value={totpCode}
+                        onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        className="pl-10 font-mono tracking-wider text-center text-lg"
+                        maxLength={6}
+                        autoComplete="one-time-code"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Enter the 6-digit code from your authenticator app
+                    </p>
+                  </div>
+                )}
+
+                <Button type="submit" variant="hero" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? "Verifying..." : "Verify"}
+                </Button>
+
+                <div className="text-center space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUseBackupCode(!useBackupCode);
+                      setTotpCode("");
+                      setBackupCode("");
+                    }}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    {useBackupCode ? "Use authenticator app instead" : "Lost your authenticator? Use a backup code"}
+                  </button>
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setView('login');
+                        setMfaFactorId(null);
+                        setMfaUserId(null);
+                        setTotpCode("");
+                        setBackupCode("");
+                        setUseBackupCode(false);
+                      }}
+                      className="text-sm text-muted-foreground hover:text-foreground"
+                    >
+                      ← Back to Sign In
+                    </button>
+                  </div>
+                </div>
+              </form>
+            )}
+
             {/* Reset Password View */}
             {view === 'reset-password' && (
               <form onSubmit={handleResetPassword} className="space-y-4">
