@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.send-trial-expiry-reminder]
 verify_jwt = false
+
+[functions.send-trial-final-reminder]
+verify_jwt = false
