@@ -65,15 +65,16 @@ export const NavMenu = () => {
   const navLinks = [
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, minTier: 'free', adminOnly: false },
     { to: "/advisory", label: "Get Advice", icon: Lightbulb, minTier: 'free', adminOnly: false },
-    { to: "/calculator", label: "Calculator", icon: Calculator, minTier: 'free', adminOnly: false },
+    { to: "/individual-calculator", label: "Personal Tax", icon: User, minTier: 'free', adminOnly: false },
+    { to: "/calculator", label: "Business Tax", icon: Calculator, minTier: 'free', adminOnly: false },
     { to: "/learn", label: "Learn", icon: GraduationCap, minTier: 'free', adminOnly: false },
     { to: "/pricing", label: "Pricing", icon: DollarSign, minTier: 'free', adminOnly: false },
-    { to: "/businesses", label: "My Businesses", icon: FolderOpen, minTier: 'free', adminOnly: false },
+    { to: "/businesses", label: "My Businesses", icon: FolderOpen, minTier: 'basic', adminOnly: false },
     { to: "/achievements", label: "Achievements", icon: Trophy, minTier: 'basic', adminOnly: false },
     { to: "/reminders", label: "Reminders", icon: Bell, minTier: 'basic', adminOnly: false },
     
     { to: "/expenses", label: "Expenses", icon: Receipt, minTier: 'basic', adminOnly: false },
-    { to: "/scenarios", label: "Scenarios", icon: GitBranch, minTier: 'business', adminOnly: false },
+    { to: "/scenarios", label: "Scenarios", icon: GitBranch, minTier: 'freelancer', adminOnly: false },
     { to: "/business-report", label: "Reports", icon: PieChart, minTier: 'basic', adminOnly: false },
     { to: "/insights", label: "Insights", icon: BarChart3, minTier: 'business', adminOnly: false },
     { to: "/transactions", label: "Transactions", icon: Upload, minTier: 'business', adminOnly: false },
@@ -86,7 +87,7 @@ export const NavMenu = () => {
     { to: "/admin-analytics", label: "Admin Analytics", icon: Shield, minTier: 'free', adminOnly: true },
   ];
 
-  const tierOrder = ['free', 'basic', 'business', 'corporate'];
+  const tierOrder = ['free', 'basic', 'freelancer', 'business', 'corporate'];
   const userTierIndex = tierOrder.indexOf(tier);
   
   const filteredLinks = navLinks.filter(link => {

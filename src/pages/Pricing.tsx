@@ -12,6 +12,7 @@ import {
   ArrowRight,
   MessageCircle,
   Mail,
+  User,
 } from "lucide-react";
 import { useSubscription, SubscriptionTier } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
@@ -26,13 +27,15 @@ interface TierFeature {
 }
 
 const features: TierFeature[] = [
-  { name: 'Unlimited tax calculations', free: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Basic advisory', free: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Pre-2026 & 2026 rules', free: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Personal tax calculator (PIT)', free: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Crypto & investment taxes', free: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Foreign income/DTT credits', free: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Business tax calculator', free: false, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Digital VAT calculator', free: false, basic: false, freelancer: true, business: true, corporate: true },
   { name: 'Saved businesses', free: '0', basic: '2', freelancer: '5', business: '10', corporate: 'Unlimited' },
   { name: 'Data storage', free: false, basic: true, freelancer: true, business: true, corporate: true },
   { name: 'PDF/CSV export', free: false, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Basic integrations', free: false, basic: false, freelancer: true, business: true, corporate: true },
+  { name: 'Sector-specific presets', free: false, basic: true, freelancer: true, business: true, corporate: true },
   { name: 'Scenario modeling', free: false, basic: false, freelancer: 'Basic', business: 'Advanced', corporate: 'Advanced' },
   { name: 'CAC verification (auto)', free: false, basic: false, freelancer: false, business: true, corporate: true },
   { name: 'No watermarks', free: false, basic: false, freelancer: true, business: true, corporate: true },
@@ -41,9 +44,7 @@ const features: TierFeature[] = [
   { name: 'Bulk CAC verification', free: false, basic: false, freelancer: false, business: false, corporate: true },
   { name: 'Multi-user seats', free: false, basic: false, freelancer: false, business: '2 seats', corporate: 'Unlimited' },
   { name: 'Priority support', free: false, basic: false, freelancer: true, business: true, corporate: true },
-  { name: 'Custom reports', free: false, basic: false, freelancer: false, business: false, corporate: true },
-  { name: 'Dedicated support', free: false, basic: false, freelancer: false, business: false, corporate: true },
-  { name: 'API access (coming)', free: false, basic: false, freelancer: false, business: false, corporate: true },
+  { name: 'API access', free: false, basic: false, freelancer: false, business: false, corporate: true },
 ];
 
 const Pricing = () => {
@@ -86,15 +87,15 @@ const Pricing = () => {
 
         {/* Pricing Cards */}
         <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 max-w-7xl mx-auto mb-12 sm:mb-16">
-          {/* Free Tier */}
+          {/* Individual (Free) Tier */}
           <PricingCard
             tier="free"
-            name="Free"
-            icon={<Briefcase className="h-5 w-5 sm:h-6 sm:w-6" />}
+            name="Individual"
+            icon={<User className="h-5 w-5 sm:h-6 sm:w-6" />}
             monthlyPrice={0}
-            description="Get started with basic tax calculations"
-            features={['Unlimited calculations', 'Basic advisory', 'Pre-2026 & 2026 rules', 'Watermarked results']}
-            limitations={['No data storage', 'No exports', 'No saved businesses']}
+            description="For individuals with no business income"
+            features={['Personal tax calculator', 'Employment/Salary PIT', 'Crypto & investment taxes', 'Foreign income credits', 'Informal business guide']}
+            limitations={['No business saves', 'No exports']}
             currentTier={currentTier}
             onUpgrade={handleUpgrade}
           />
@@ -164,7 +165,7 @@ const Pricing = () => {
                 <thead>
                   <tr className="border-b border-border bg-secondary/50">
                     <th className="text-left p-4 font-semibold text-foreground">Feature</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Free</th>
+                    <th className="text-center p-4 font-semibold text-foreground">Individual</th>
                     <th className="text-center p-4 font-semibold text-foreground">Basic</th>
                     <th className="text-center p-4 font-semibold text-foreground">Freelancer</th>
                     <th className="text-center p-4 font-semibold text-foreground bg-primary/5">Business</th>
