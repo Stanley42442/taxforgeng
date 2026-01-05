@@ -19,7 +19,7 @@ import {
   Sparkles,
   Crown
 } from "lucide-react";
-import { calculateTax, type TaxInputs } from "@/lib/taxCalculations";
+import { calculateTax, type TaxInputs, type SectorTaxRules } from "@/lib/taxCalculations";
 import { NavMenu } from "@/components/NavMenu";
 import { SectorPresets } from "@/components/SectorPresets";
 import { toast } from "sonner";
@@ -58,6 +58,8 @@ const CalculatorPage = () => {
     preselectedEntity || 'business_name'
   );
   const [use2026Rules, setUse2026Rules] = useState(false);
+  const [selectedSector, setSelectedSector] = useState<string | undefined>(undefined);
+  const [sectorRules, setSectorRules] = useState<SectorTaxRules | undefined>(undefined);
   
   const [inputs, setInputs] = useState({
     turnover: '',
@@ -93,6 +95,8 @@ const CalculatorPage = () => {
       foreignIncome: Number(inputs.foreignIncome) || 0,
       fixedAssets: Number(inputs.fixedAssets) || 0,
       use2026Rules,
+      sectorId: selectedSector,
+      sectorRules: sectorRules,
     };
 
     const result = calculateTax(taxInputs);
@@ -129,13 +133,19 @@ const CalculatorPage = () => {
               Calculate your Nigerian taxes accurately
             </p>
             <SectorPresets 
+              selectedSector={selectedSector}
               onApplyPreset={(taxRules, sectorId) => {
-                // Apply tax rules to calculation context (not pre-filling data)
-                toast.success(`${sectorId.replace('_', ' ')} sector rules applied`, {
+                // Store sector rules for calculation
+                setSelectedSector(sectorId);
+                setSectorRules(taxRules);
+                
+                toast.success(`${sectorId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} sector rules applied`, {
                   description: taxRules.vatStatus === 'zero' 
-                    ? 'Zero-rated VAT enabled' 
+                    ? 'Zero-rated VAT • Input credits recoverable' 
                     : taxRules.vatStatus === 'exempt'
-                    ? 'VAT exempt status applied'
+                    ? 'VAT exempt • No VAT on supplies'
+                    : taxRules.citRate !== undefined 
+                    ? `CIT: ${taxRules.citRate}% • VAT: ${taxRules.vatRate || 7.5}%`
                     : 'Standard tax rules applied'
                 });
               }} 
