@@ -270,6 +270,30 @@ const Auth = () => {
           .update({ used_at: new Date().toISOString() })
           .eq('id', codes.id);
 
+        // Check remaining backup codes and send alert if low
+        const { count: remainingCount } = await supabase
+          .from('backup_codes')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', mfaUserId)
+          .is('used_at', null);
+
+        const remaining = remainingCount || 0;
+        
+        if (remaining <= 3 && remaining > 0) {
+          // Send low backup codes alert email
+          try {
+            await supabase.functions.invoke('send-backup-code-alert', {
+              body: {
+                userEmail: email,
+                remainingCodes: remaining
+              }
+            });
+            console.log('Backup code alert email sent');
+          } catch (emailError) {
+            console.error('Failed to send backup code alert:', emailError);
+          }
+        }
+
         // Complete the login
         if (!rememberMe) {
           sessionStorage.setItem('taxforge-session-only', 'true');
