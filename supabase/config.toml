@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.expense-insights]
 verify_jwt = false
+
+[functions.check-trial-expiry]
+verify_jwt = false

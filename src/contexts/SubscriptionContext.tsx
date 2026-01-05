@@ -147,10 +147,10 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     }
 
     try {
-      // Fetch profile for subscription tier and created_at for trial calculation
+      // Fetch profile for subscription tier and trial info
       const { data: profile } = await supabase
         .from('profiles')
-        .select('subscription_tier, email, created_at')
+        .select('subscription_tier, email, created_at, trial_started_at, trial_expires_at, has_selected_initial_tier')
         .eq('id', user.id)
         .single();
 
@@ -172,24 +172,26 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         verificationStatus: b.cac_verified ? 'verified' : 'not_verified',
       }));
 
-      // Calculate trial status
+      // Calculate trial status using the dedicated fields
       const baseTier = (profile?.subscription_tier as SubscriptionTier) || 'free';
       let isOnTrial = false;
       let trialEndsAt: Date | null = null;
       let effectiveTier = baseTier;
 
-      if (profile?.created_at && baseTier === 'free') {
-        const createdAt = new Date(profile.created_at);
-        trialEndsAt = new Date(createdAt.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days
+      // Check if user is on business tier with active trial
+      if (profile?.trial_expires_at && baseTier === 'business') {
+        trialEndsAt = new Date(profile.trial_expires_at);
         isOnTrial = new Date() < trialEndsAt;
-        if (isOnTrial) {
-          effectiveTier = 'business';
+        if (!isOnTrial) {
+          // Trial expired - the database function should have downgraded them
+          // but we'll show free tier just in case
+          effectiveTier = 'free';
         }
       }
 
       setState({
         tier: baseTier,
-        effectiveTier,
+        effectiveTier: isOnTrial ? baseTier : baseTier,
         businessCount: mappedBusinesses.length,
         savedBusinesses: mappedBusinesses,
         subscriptionEndDate: null,
