@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.partner-api]
 verify_jwt = false
+
+[functions.send-backup-code-alert]
+verify_jwt = false
