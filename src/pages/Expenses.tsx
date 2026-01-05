@@ -374,14 +374,19 @@ const Expenses = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-hero relative">
+      {/* Background Elements */}
+      <div className="absolute inset-0 bg-mesh pointer-events-none" />
+      <div className="absolute top-20 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-40 right-10 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
+      
       <NavMenu />
 
-      <main className="container mx-auto px-4 py-6 pb-8">
+      <main className="container mx-auto px-4 py-6 pb-8 relative z-10">
         <div className="mx-auto max-w-5xl">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow-primary">
               <Receipt className="h-8 w-8" />
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-2">Expense Tracking</h1>
@@ -390,30 +395,38 @@ const Expenses = () => {
 
           {/* Summary Cards */}
           <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-6">
-            <div className="bg-card border border-border rounded-xl p-4">
+            <div className="glass-frosted rounded-xl p-4 hover-lift">
               <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="h-4 w-4 text-success" />
+                <div className="p-1.5 rounded-lg bg-success/10">
+                  <TrendingUp className="h-4 w-4 text-success" />
+                </div>
                 <span className="text-sm text-muted-foreground">Income</span>
               </div>
               <p className="text-xl font-bold text-success">{formatCurrency(totalIncome)}</p>
             </div>
-            <div className="bg-card border border-border rounded-xl p-4">
+            <div className="glass-frosted rounded-xl p-4 hover-lift">
               <div className="flex items-center gap-2 mb-2">
-                <TrendingDown className="h-4 w-4 text-destructive" />
+                <div className="p-1.5 rounded-lg bg-destructive/10">
+                  <TrendingDown className="h-4 w-4 text-destructive" />
+                </div>
                 <span className="text-sm text-muted-foreground">Expenses</span>
               </div>
               <p className="text-xl font-bold text-destructive">{formatCurrency(totalExpenses)}</p>
             </div>
-            <div className="bg-card border border-border rounded-xl p-4">
+            <div className="glass-frosted rounded-xl p-4 hover-lift">
               <div className="flex items-center gap-2 mb-2">
-                <Receipt className="h-4 w-4 text-primary" />
+                <div className="p-1.5 rounded-lg bg-primary/10">
+                  <Receipt className="h-4 w-4 text-primary" />
+                </div>
                 <span className="text-sm text-muted-foreground">Deductible</span>
               </div>
               <p className="text-xl font-bold text-primary">{formatCurrency(deductibleExpenses)}</p>
             </div>
-            <div className="bg-card border border-border rounded-xl p-4">
+            <div className="glass-frosted rounded-xl p-4 hover-lift">
               <div className="flex items-center gap-2 mb-2">
-                <Calculator className="h-4 w-4 text-warning" />
+                <div className="p-1.5 rounded-lg bg-warning/10">
+                  <Calculator className="h-4 w-4 text-warning" />
+                </div>
                 <span className="text-sm text-muted-foreground">Est. Tax</span>
               </div>
               <p className="text-xl font-bold text-warning">{formatCurrency(estimatedTax)}</p>
@@ -466,7 +479,7 @@ const Expenses = () => {
 
           {/* Filter Panel */}
           {showFilters && (
-            <div className="bg-card border border-border rounded-xl p-4 mb-6">
+            <div className="glass rounded-xl p-4 mb-6 shadow-card">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label className="text-sm">From Date</Label>
@@ -549,9 +562,11 @@ const Expenses = () => {
 
           {/* Charts Section */}
           {showCharts && filteredExpenses.length > 0 && (
-            <div className="bg-card border border-border rounded-xl p-6 mb-6">
+            <div className="neumorphic p-6 mb-6">
               <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                <PieChart className="h-5 w-5 text-primary" />
+                <div className="p-1.5 rounded-lg bg-primary/10">
+                  <PieChart className="h-5 w-5 text-primary" />
+                </div>
                 Expense Analytics
               </h2>
               <ExpenseCharts expenses={filteredExpenses} />
@@ -559,15 +574,19 @@ const Expenses = () => {
           )}
 
           {/* Expense List */}
-          <div className="bg-card border border-border rounded-xl p-6">
+          <div className="glass-frosted rounded-xl p-6 shadow-futuristic">
             <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-              <FileSpreadsheet className="h-5 w-5 text-primary" />
+              <div className="p-1.5 rounded-lg bg-primary/10">
+                <FileSpreadsheet className="h-5 w-5 text-primary" />
+              </div>
               Transactions ({filteredExpenses.length})
             </h2>
 
             {filteredExpenses.length === 0 ? (
               <div className="text-center py-12">
-                <Receipt className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50">
+                  <Receipt className="h-8 w-8 text-muted-foreground" />
+                </div>
                 <p className="text-muted-foreground mb-4">
                   {filterBusinessId !== 'all' ? 'No entries for this business' : 'No entries yet'}
                 </p>
@@ -583,19 +602,19 @@ const Expenses = () => {
                 </div>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {filteredExpenses.map((expense) => {
                   const businessName = getBusinessName(expense.businessId);
                   return (
-                    <div key={expense.id} className="bg-muted/50 border border-border rounded-lg p-4 flex items-center gap-4">
-                      <span className="text-2xl">{getCategoryIcon(expense.category)}</span>
+                    <div key={expense.id} className="neumorphic-sm bg-card/80 p-4 flex items-center gap-4 transition-all hover:shadow-card">
+                      <div className="text-2xl p-2 rounded-xl bg-muted/30">{getCategoryIcon(expense.category)}</div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-foreground truncate">{expense.description}</p>
                         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                           <span>{new Date(expense.date).toLocaleDateString()}</span>
                           {businessName && <span>• {businessName}</span>}
                           {expense.isDeductible && (
-                            <span className="px-2 py-0.5 rounded bg-success/10 text-success">Deductible</span>
+                            <span className="px-2 py-0.5 rounded-full bg-success/10 text-success font-medium">Deductible</span>
                           )}
                         </div>
                       </div>
@@ -604,7 +623,7 @@ const Expenses = () => {
                           {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
                         </span>
                       </div>
-                      <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDeleteExpense(expense.id)}>
+                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => handleDeleteExpense(expense.id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
