@@ -95,8 +95,16 @@ const Expenses = () => {
     description: '',
     amount: '',
     category: 'other' as Expense['category'],
-    businessId: '' as string,
+    businessId: filterBusinessId !== 'all' ? filterBusinessId : '',
   });
+
+  // Update new expense businessId when filter changes
+  useEffect(() => {
+    setNewExpense(prev => ({
+      ...prev,
+      businessId: filterBusinessId !== 'all' ? filterBusinessId : ''
+    }));
+  }, [filterBusinessId]);
 
   const isBasicPlus = tier !== 'free';
 
