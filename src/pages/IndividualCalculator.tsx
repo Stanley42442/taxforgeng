@@ -29,11 +29,12 @@ import {
   AlertCircle
 } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
+import { ForeignIncomeCalculator } from "@/components/ForeignIncomeCalculator";
 import { calculateIndividualTax, formatCurrency, type IndividualTaxInputs } from "@/lib/individualTaxCalculations";
 import { PRESUMPTIVE_TAX_RATES } from "@/lib/sectorConfig";
 import { toast } from "sonner";
 
-type CalculationType = 'pit' | 'crypto' | 'investment' | 'informal';
+type CalculationType = 'pit' | 'crypto' | 'investment' | 'informal' | 'foreign_income';
 
 const IndividualCalculatorPage = () => {
   const navigate = useNavigate();
@@ -101,6 +102,8 @@ const IndividualCalculatorPage = () => {
         return parseNumber(dividendIncome) > 0 || parseNumber(interestIncome) > 0 || parseNumber(capitalGains) > 0;
       case 'informal':
         return parseNumber(estimatedTurnover) > 0;
+      case 'foreign_income':
+        return true; // ForeignIncomeCalculator handles its own calculation
       default:
         return false;
     }
@@ -174,13 +177,21 @@ const IndividualCalculatorPage = () => {
             }}
             className="mb-6 animate-slide-up-delay-1"
           >
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto p-1.5 glass-frosted rounded-2xl">
+            <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 h-auto p-1.5 glass-frosted rounded-2xl">
               <TabsTrigger 
                 value="pit"
                 className="flex items-center gap-2 py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all duration-300"
               >
                 <Briefcase className="h-4 w-4" />
-                <span className="text-sm font-medium">Employment</span>
+                <span className="text-sm font-medium hidden sm:inline">Employment</span>
+                <span className="text-sm font-medium sm:hidden">PIT</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="foreign_income"
+                className="flex items-center gap-2 py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all duration-300"
+              >
+                <Globe className="h-4 w-4" />
+                <span className="text-sm font-medium">Foreign</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="crypto"
@@ -194,7 +205,8 @@ const IndividualCalculatorPage = () => {
                 className="flex items-center gap-2 py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all duration-300"
               >
                 <TrendingUp className="h-4 w-4" />
-                <span className="text-sm font-medium">Investment</span>
+                <span className="text-sm font-medium hidden sm:inline">Investment</span>
+                <span className="text-sm font-medium sm:hidden">Invest</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="informal"
@@ -259,6 +271,11 @@ const IndividualCalculatorPage = () => {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Foreign Income Calculator */}
+            <TabsContent value="foreign_income" className="mt-6">
+              <ForeignIncomeCalculator />
             </TabsContent>
 
             {/* Crypto Calculator */}
