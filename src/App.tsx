@@ -9,6 +9,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { AuthLoadingScreen } from "@/components/AuthLoadingScreen";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ReminderNotificationProvider } from "@/components/ReminderNotificationProvider";
+import { TrialBanner } from "@/components/TrialBanner";
 import { lazy, Suspense } from "react";
 
 // Eagerly load Index for fast initial render
@@ -73,6 +74,7 @@ const App = () => (
               <BrowserRouter>
                 <ScrollToTop />
                 <ReminderNotificationProvider />
+                <TrialBanner />
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
                     <Route path="/" element={<Index />} />
