@@ -375,11 +375,11 @@ const Expenses = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero relative overflow-x-hidden">
-      {/* Background Elements - Hidden on mobile to prevent scroll issues */}
-      <div className="hidden lg:block absolute inset-0 bg-mesh pointer-events-none" />
-      <div className="hidden lg:block absolute top-20 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none animate-float" />
-      <div className="hidden lg:block absolute bottom-40 right-10 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
+    <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 bg-mesh pointer-events-none" />
+      <div className="absolute top-20 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none animate-float" />
+      <div className="absolute bottom-40 right-10 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
       
       <NavMenu />
 
