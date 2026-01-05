@@ -884,17 +884,22 @@ const Expenses = () => {
                           </Button>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                          <span>{new Date(expense.date).toLocaleDateString()}</span>
-                          {businessName && <span>• {businessName}</span>}
-                          {expense.isDeductible && (
-                            <span className="px-1.5 py-0.5 rounded-full bg-success/10 text-success font-medium">Deductible</span>
-                          )}
-                        </div>
-                        <span className={`font-bold text-sm shrink-0 ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
-                          {formatCurrency(expense.amount)}
-                        </span>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                        <span>{new Date(expense.date).toLocaleDateString()}</span>
+                        {businessName && <span>• {businessName}</span>}
+                        {expense.isDeductible && (
+                          <span className="px-1.5 py-0.5 rounded-full bg-success/10 text-success font-medium">Deductible</span>
+                        )}
+                      </div>
+                      <div className={`font-bold text-base mt-1 ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
+                        ₦{expense.amount >= 1_000_000_000 
+                          ? `${(expense.amount / 1_000_000_000).toFixed(1)}B`
+                          : expense.amount >= 1_000_000 
+                            ? `${(expense.amount / 1_000_000).toFixed(1)}M`
+                            : expense.amount >= 1_000 
+                              ? `${(expense.amount / 1_000).toFixed(1)}K`
+                              : expense.amount.toLocaleString()
+                        }
                       </div>
                     </div>
                   );
