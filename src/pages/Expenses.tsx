@@ -185,6 +185,13 @@ const Expenses = () => {
   });
   const [newTemplate, setNewTemplate] = useState({ description: '', amount: '', category: 'rent' as Expense['category'], dueDay: '' });
   const [showComparison, setShowComparison] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(() => {
+    const saved = localStorage.getItem('expenseNotificationsEnabled');
+    return saved === 'true';
+  });
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(
+    typeof Notification !== 'undefined' ? Notification.permission : 'denied'
+  );
   const [budgetInput, setBudgetInput] = useState('');
   
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
@@ -208,6 +215,97 @@ const Expenses = () => {
   }, [filterBusinessId]);
 
   const isBasicPlus = tier !== 'free';
+
+  // Request notification permission
+  const requestNotificationPermission = async () => {
+    if (typeof Notification === 'undefined') {
+      toast.error('Notifications are not supported in this browser');
+      return false;
+    }
+    
+    if (Notification.permission === 'granted') {
+      return true;
+    }
+    
+    if (Notification.permission === 'denied') {
+      toast.error('Notification permission was denied. Please enable it in your browser settings.');
+      return false;
+    }
+    
+    const permission = await Notification.requestPermission();
+    setNotificationPermission(permission);
+    
+    if (permission === 'granted') {
+      toast.success('Notifications enabled!');
+      return true;
+    } else {
+      toast.error('Notification permission denied');
+      return false;
+    }
+  };
+
+  // Toggle notifications
+  const toggleNotifications = async () => {
+    if (!notificationsEnabled) {
+      const granted = await requestNotificationPermission();
+      if (granted) {
+        setNotificationsEnabled(true);
+        localStorage.setItem('expenseNotificationsEnabled', 'true');
+        // Send a test notification
+        sendExpenseNotification('Expense Reminders Enabled', 'You will now receive reminders for upcoming expenses.');
+      }
+    } else {
+      setNotificationsEnabled(false);
+      localStorage.setItem('expenseNotificationsEnabled', 'false');
+      toast.success('Notifications disabled');
+    }
+  };
+
+  // Send notification
+  const sendExpenseNotification = (title: string, body: string) => {
+    if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+    
+    new Notification(title, {
+      body,
+      icon: '/favicon.ico',
+      badge: '/favicon.ico',
+      tag: 'expense-reminder',
+    });
+  };
+
+  // Check for due expenses and notify
+  useEffect(() => {
+    if (!notificationsEnabled || notificationPermission !== 'granted') return;
+    
+    const checkAndNotify = () => {
+      const today = new Date();
+      const currentDay = today.getDate();
+      
+      recurringTemplates.forEach(template => {
+        if (!template.dueDay) return;
+        
+        // Notify 3 days before, 1 day before, and on due date
+        const daysUntilDue = template.dueDay - currentDay;
+        const notifiedKey = `notified_${template.id}_${today.getFullYear()}_${today.getMonth()}_${daysUntilDue}`;
+        
+        if ((daysUntilDue === 3 || daysUntilDue === 1 || daysUntilDue === 0) && !localStorage.getItem(notifiedKey)) {
+          const message = daysUntilDue === 0 
+            ? `${template.description} (${formatCurrency(template.amount)}) is due today!`
+            : `${template.description} (${formatCurrency(template.amount)}) is due in ${daysUntilDue} day${daysUntilDue > 1 ? 's' : ''}.`;
+          
+          sendExpenseNotification('Expense Reminder', message);
+          localStorage.setItem(notifiedKey, 'true');
+        }
+      });
+    };
+    
+    // Check immediately on load
+    checkAndNotify();
+    
+    // Check every hour
+    const interval = setInterval(checkAndNotify, 60 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [notificationsEnabled, notificationPermission, recurringTemplates]);
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -846,6 +944,15 @@ const Expenses = () => {
               >
                 <Repeat className="h-4 w-4" />
                 <span className="hidden sm:inline">Templates</span>
+              </Button>
+              <Button 
+                variant={notificationsEnabled ? "secondary" : "outline"}
+                className={notificationsEnabled ? "" : "glass"}
+                onClick={toggleNotifications}
+                title={notificationsEnabled ? 'Notifications enabled' : 'Enable notifications'}
+              >
+                <Bell className={`h-4 w-4 ${notificationsEnabled ? 'text-warning' : ''}`} />
+                <span className="hidden sm:inline">{notificationsEnabled ? 'Alerts On' : 'Alerts'}</span>
               </Button>
               <Button 
                 variant={showFilters ? "secondary" : "outline"}
