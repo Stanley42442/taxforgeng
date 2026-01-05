@@ -37,6 +37,7 @@ const Auth = () => {
   const [useBackupCode, setUseBackupCode] = useState(false);
   const [mfaUserId, setMfaUserId] = useState<string | null>(null);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
+  const [showEmailNotVerifiedMessage, setShowEmailNotVerifiedMessage] = useState(false);
   
   const { signIn, signUp, user, loading } = useAuth();
   const navigate = useNavigate();
@@ -96,13 +97,19 @@ const Auth = () => {
         });
         
         if (error) {
-          if (error.message.includes("Invalid login credentials")) {
+          if (error.message.includes("Email not confirmed")) {
+            setShowEmailNotVerifiedMessage(true);
+            toast.error("Please verify your email before signing in.");
+          } else if (error.message.includes("Invalid login credentials")) {
+            setShowEmailNotVerifiedMessage(false);
             toast.error("Invalid email or password. Please try again.");
           } else {
+            setShowEmailNotVerifiedMessage(false);
             toast.error(error.message);
           }
           return;
         }
+        setShowEmailNotVerifiedMessage(false);
         
         // Check if MFA is required
         const { data: factorsData } = await supabase.auth.mfa.listFactors();
@@ -778,6 +785,23 @@ const Auth = () => {
                     or continue with email
                   </span>
                 </div>
+
+                {/* Email Not Verified Message */}
+                {view === 'login' && showEmailNotVerifiedMessage && (
+                  <div className="mb-4 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                    <div className="flex items-start gap-3">
+                      <Mail className="h-5 w-5 text-amber-600 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="font-medium text-amber-800 dark:text-amber-200">
+                          Email not verified
+                        </p>
+                        <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                          Please check your inbox and click the verification link. If you didn't receive the email, use the button below to resend it.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Full Name (Sign Up Only) */}
