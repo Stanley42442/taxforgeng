@@ -363,6 +363,42 @@ export type Database = {
         }
         Relationships: []
       }
+      known_devices: {
+        Row: {
+          browser: string | null
+          device_fingerprint: string
+          device_name: string | null
+          first_seen_at: string
+          id: string
+          is_trusted: boolean
+          last_seen_at: string
+          os: string | null
+          user_id: string
+        }
+        Insert: {
+          browser?: string | null
+          device_fingerprint: string
+          device_name?: string | null
+          first_seen_at?: string
+          id?: string
+          is_trusted?: boolean
+          last_seen_at?: string
+          os?: string | null
+          user_id: string
+        }
+        Update: {
+          browser?: string | null
+          device_fingerprint?: string
+          device_name?: string | null
+          first_seen_at?: string
+          id?: string
+          is_trusted?: boolean
+          last_seen_at?: string
+          os?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       partner_api_logs: {
         Row: {
           created_at: string

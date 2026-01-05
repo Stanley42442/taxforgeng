@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
+import { getDeviceInfo } from "@/lib/deviceFingerprint";
 
 const emailSchema = z.string().email("Please enter a valid email address");
 const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
@@ -113,6 +114,9 @@ const Auth = () => {
           setView('mfa-challenge');
           return;
         }
+        
+        // Check device fingerprint for new device detection
+        await checkAndRegisterDevice(data.user?.id || '', email);
         
         if (!rememberMe) {
           sessionStorage.setItem('taxforge-session-only', 'true');
@@ -219,6 +223,59 @@ const Auth = () => {
       }
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Check and register device for new device detection
+  const checkAndRegisterDevice = async (userId: string, userEmail: string) => {
+    try {
+      const deviceInfo = await getDeviceInfo();
+      
+      // Check if this device is known
+      const { data: existingDevice } = await supabase
+        .from('known_devices')
+        .select('id, last_seen_at')
+        .eq('user_id', userId)
+        .eq('device_fingerprint', deviceInfo.fingerprint)
+        .single();
+
+      if (existingDevice) {
+        // Update last seen timestamp
+        await supabase
+          .from('known_devices')
+          .update({ last_seen_at: new Date().toISOString() })
+          .eq('id', existingDevice.id);
+      } else {
+        // New device detected - register it and send alert
+        await supabase.from('known_devices').insert({
+          user_id: userId,
+          device_fingerprint: deviceInfo.fingerprint,
+          device_name: deviceInfo.deviceName,
+          browser: deviceInfo.browser,
+          os: deviceInfo.os
+        } as any);
+
+        // Send new device alert email
+        await supabase.functions.invoke('send-security-alert', {
+          body: {
+            userEmail,
+            alertType: 'new_device',
+            timestamp: new Date().toLocaleString(),
+            deviceInfo: {
+              browser: deviceInfo.browser,
+              os: deviceInfo.os,
+              deviceName: deviceInfo.deviceName
+            }
+          }
+        });
+
+        toast.info("New device detected. You'll receive a security email.", {
+          duration: 5000
+        });
+      }
+    } catch (error) {
+      console.error('Device fingerprint error:', error);
+      // Don't block login on fingerprint errors
     }
   };
 
