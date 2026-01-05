@@ -62,29 +62,6 @@ export const FreeTrialCTA = () => {
                 </p>
               </div>
               
-              {/* Features Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 relative z-10">
-                {[
-                  { icon: CheckCircle2, text: 'Save up to 10 businesses', highlight: true },
-                  { icon: CheckCircle2, text: 'Export PDF & CSV reports', highlight: false },
-                  { icon: CheckCircle2, text: 'Tax filing preparation', highlight: false },
-                  { icon: CheckCircle2, text: 'CAC verification tools', highlight: true },
-                  { icon: CheckCircle2, text: 'Scenario modeling', highlight: false },
-                  { icon: CheckCircle2, text: 'Priority AI assistant', highlight: true },
-                ].map((feature, index) => (
-                  <div
-                    key={index}
-                    className={`flex items-center gap-3 p-4 rounded-xl transition-all duration-300 ${
-                      feature.highlight 
-                        ? 'bg-primary/10 border border-primary/20' 
-                        : 'bg-secondary/50 border border-border/30'
-                    } hover:scale-[1.02] hover:shadow-md`}
-                  >
-                    <feature.icon className={`h-5 w-5 shrink-0 ${feature.highlight ? 'text-primary' : 'text-success'}`} />
-                    <span className="text-sm font-medium text-foreground">{feature.text}</span>
-                  </div>
-                ))}
-              </div>
               
               {/* CTA Button */}
               <div className="flex flex-col items-center gap-4 relative z-10">
