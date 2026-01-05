@@ -17,7 +17,12 @@ import {
   Lock,
   Save,
   Plus,
-  ListOrdered
+  ListOrdered,
+  Sparkles,
+  Percent,
+  Receipt,
+  Fuel,
+  Leaf
 } from "lucide-react";
 import { formatCurrency, calculateTax, type TaxResult, type TaxInputs } from "@/lib/taxCalculations";
 import { downloadPDF } from "@/lib/pdfExport";
@@ -425,6 +430,127 @@ const Results = () => {
                   <p className="text-sm">{alert.message}</p>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Sector Tax Rules Applied */}
+          {result.sectorRules && result.sectorId && (
+            <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 p-6 shadow-card mb-6 animate-slide-up">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary">
+                  <Sparkles className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">Sector Tax Rules Applied</h3>
+                  <p className="text-sm text-muted-foreground capitalize">{result.sectorId.replace(/_/g, ' ')} Sector</p>
+                </div>
+              </div>
+              
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {/* CIT Rate */}
+                {result.sectorRules.citRate !== undefined && (
+                  <div className="flex items-start gap-3 rounded-xl bg-card/60 p-4 border border-border/50">
+                    <Percent className="h-5 w-5 text-primary mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">CIT Rate</p>
+                      <p className="text-lg font-semibold text-primary">{result.sectorRules.citRate}%</p>
+                      {result.sectorRules.citRate === 0 && (
+                        <p className="text-xs text-success">Tax exempt</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* VAT Status */}
+                {result.sectorRules.vatStatus && (
+                  <div className="flex items-start gap-3 rounded-xl bg-card/60 p-4 border border-border/50">
+                    <Receipt className="h-5 w-5 text-primary mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">VAT Status</p>
+                      <p className={`text-sm font-semibold ${result.sectorRules.vatStatus === 'exempt' ? 'text-success' : 'text-foreground'}`}>
+                        {result.sectorRules.vatStatus === 'exempt' ? 'VAT Exempt' : 
+                         result.sectorRules.vatStatus === 'zero' ? 'Zero-Rated' :
+                         result.sectorRules.vatStatus === 'reduced' ? `Reduced (${result.sectorRules.vatRate || 0}%)` : 'Standard VAT'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* WHT Rate */}
+                {result.sectorRules.whtRate !== undefined && result.sectorRules.whtRate > 0 && (
+                  <div className="flex items-start gap-3 rounded-xl bg-card/60 p-4 border border-border/50">
+                    <CheckCircle2 className="h-5 w-5 text-success mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">WHT Rate</p>
+                      <p className="text-sm font-semibold text-success">{result.sectorRules.whtRate}% withholding</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* EDTI Rate */}
+                {result.sectorRules.edtiRate !== undefined && result.sectorRules.edtiRate > 0 && (
+                  <div className="flex items-start gap-3 rounded-xl bg-card/60 p-4 border border-border/50">
+                    <Leaf className="h-5 w-5 text-success mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">EDTI Credit</p>
+                      <p className="text-sm font-semibold text-success">{result.sectorRules.edtiRate}% export credit</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Hydrocarbon Tax */}
+                {(result.sectorRules.hydrocarbonTaxMin || result.sectorRules.hydrocarbonTaxMax) && (
+                  <div className="flex items-start gap-3 rounded-xl bg-card/60 p-4 border border-border/50">
+                    <Fuel className="h-5 w-5 text-warning mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Hydrocarbon Tax</p>
+                      <p className="text-sm font-semibold text-warning">
+                        {result.sectorRules.hydrocarbonTaxMin}% - {result.sectorRules.hydrocarbonTaxMax}%
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Presumptive Tax */}
+                {(result.sectorRules.presumptiveMin || result.sectorRules.presumptiveMax) && (
+                  <div className="flex items-start gap-3 rounded-xl bg-card/60 p-4 border border-border/50">
+                    <Calculator className="h-5 w-5 text-primary mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Presumptive Tax</p>
+                      <p className="text-sm font-semibold text-foreground">
+                        {result.sectorRules.presumptiveMin}% - {result.sectorRules.presumptiveMax}% of turnover
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Pioneer Status */}
+                {result.sectorRules.pioneerStatus && (
+                  <div className="flex items-start gap-3 rounded-xl bg-card/60 p-4 border border-border/50">
+                    <Crown className="h-5 w-5 text-warning mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Pioneer Status</p>
+                      <p className="text-sm font-semibold text-success">Tax holiday eligible</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Green Hire Deduction */}
+                {result.sectorRules.greenHireDeduction !== undefined && result.sectorRules.greenHireDeduction > 0 && (
+                  <div className="flex items-start gap-3 rounded-xl bg-card/60 p-4 border border-border/50">
+                    <Leaf className="h-5 w-5 text-success mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Green Hire Deduction</p>
+                      <p className="text-sm font-semibold text-success">{result.sectorRules.greenHireDeduction}% extra deduction</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <p className="text-xs text-muted-foreground mt-4 flex items-center gap-1">
+                <Info className="h-3 w-3" />
+                These sector-specific rules have been applied to your tax calculation
+              </p>
             </div>
           )}
 

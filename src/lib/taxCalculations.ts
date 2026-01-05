@@ -51,6 +51,7 @@ export interface TaxResult {
   entityType: string;
   isSmallCompany: boolean;
   sectorId?: string;
+  sectorRules?: SectorTaxRules;
   appliedIncentives?: string[];
 }
 
@@ -438,6 +439,7 @@ export function calculateTax(inputs: TaxInputs): TaxResult {
     entityType: inputs.entityType === 'company' ? 'Limited Liability Company' : 'Business Name',
     isSmallCompany,
     sectorId: inputs.sectorId,
+    sectorRules: inputs.sectorRules,
     appliedIncentives: appliedIncentives.length > 0 ? appliedIncentives : undefined,
   };
 }
