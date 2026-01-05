@@ -396,41 +396,41 @@ const Expenses = () => {
 
           {/* Summary Cards */}
           <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-6">
-            <div className="neumorphic-sm p-4 rounded-xl">
+            <div className="neumorphic-sm p-4 rounded-xl overflow-hidden">
               <div className="flex items-center gap-2 mb-2">
-                <div className="p-1.5 rounded-lg bg-success/10">
+                <div className="p-1.5 rounded-lg bg-success/10 shrink-0">
                   <TrendingUp className="h-4 w-4 text-success" />
                 </div>
-                <span className="text-sm text-muted-foreground">Income</span>
+                <span className="text-sm text-muted-foreground truncate">Income</span>
               </div>
-              <p className="text-xl font-bold text-success">{formatCurrency(totalIncome)}</p>
+              <p className="text-lg sm:text-xl font-bold text-success truncate">{formatCurrency(totalIncome)}</p>
             </div>
-            <div className="neumorphic-sm p-4 rounded-xl">
+            <div className="neumorphic-sm p-4 rounded-xl overflow-hidden">
               <div className="flex items-center gap-2 mb-2">
-                <div className="p-1.5 rounded-lg bg-destructive/10">
+                <div className="p-1.5 rounded-lg bg-destructive/10 shrink-0">
                   <TrendingDown className="h-4 w-4 text-destructive" />
                 </div>
-                <span className="text-sm text-muted-foreground">Expenses</span>
+                <span className="text-sm text-muted-foreground truncate">Expenses</span>
               </div>
-              <p className="text-xl font-bold text-destructive">{formatCurrency(totalExpenses)}</p>
+              <p className="text-lg sm:text-xl font-bold text-destructive truncate">{formatCurrency(totalExpenses)}</p>
             </div>
-            <div className="neumorphic-sm p-4 rounded-xl">
+            <div className="neumorphic-sm p-4 rounded-xl overflow-hidden">
               <div className="flex items-center gap-2 mb-2">
-                <div className="p-1.5 rounded-lg bg-primary/10">
+                <div className="p-1.5 rounded-lg bg-primary/10 shrink-0">
                   <Receipt className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-sm text-muted-foreground">Deductible</span>
+                <span className="text-sm text-muted-foreground truncate">Deductible</span>
               </div>
-              <p className="text-xl font-bold text-primary">{formatCurrency(deductibleExpenses)}</p>
+              <p className="text-lg sm:text-xl font-bold text-primary truncate">{formatCurrency(deductibleExpenses)}</p>
             </div>
-            <div className="neumorphic-sm p-4 rounded-xl">
+            <div className="neumorphic-sm p-4 rounded-xl overflow-hidden">
               <div className="flex items-center gap-2 mb-2">
-                <div className="p-1.5 rounded-lg bg-warning/10">
+                <div className="p-1.5 rounded-lg bg-warning/10 shrink-0">
                   <Calculator className="h-4 w-4 text-warning" />
                 </div>
-                <span className="text-sm text-muted-foreground">Est. Tax</span>
+                <span className="text-sm text-muted-foreground truncate">Est. Tax</span>
               </div>
-              <p className="text-xl font-bold text-warning">{formatCurrency(estimatedTax)}</p>
+              <p className="text-lg sm:text-xl font-bold text-warning truncate">{formatCurrency(estimatedTax)}</p>
             </div>
           </div>
 
@@ -611,24 +611,24 @@ const Expenses = () => {
                 {filteredExpenses.map((expense) => {
                   const businessName = getBusinessName(expense.businessId);
                   return (
-                    <div key={expense.id} className="bg-card border border-border rounded-xl p-4 flex items-center gap-4">
+                    <div key={expense.id} className="bg-card border border-border rounded-xl p-4 flex items-center gap-3 overflow-hidden">
                       <div className="text-2xl p-2 rounded-xl bg-muted/30 shrink-0">{getCategoryIcon(expense.category)}</div>
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 overflow-hidden">
                         <p className="font-medium text-foreground truncate">{expense.description}</p>
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                          <span>{new Date(expense.date).toLocaleDateString()}</span>
-                          {businessName && <span>• {businessName}</span>}
+                        <div className="flex flex-wrap items-center gap-1 sm:gap-2 text-xs text-muted-foreground">
+                          <span className="shrink-0">{new Date(expense.date).toLocaleDateString()}</span>
+                          {businessName && <span className="truncate">• {businessName}</span>}
                           {expense.isDeductible && (
-                            <span className="px-2 py-0.5 rounded-full bg-success/10 text-success font-medium">Deductible</span>
+                            <span className="px-1.5 py-0.5 rounded-full bg-success/10 text-success font-medium shrink-0">Deductible</span>
                           )}
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className={`font-bold ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
+                        <span className={`font-bold text-sm sm:text-base ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
                           {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
                         </span>
                       </div>
-                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 shrink-0" onClick={() => handleDeleteExpense(expense.id)}>
+                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 shrink-0 h-8 w-8" onClick={() => handleDeleteExpense(expense.id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
