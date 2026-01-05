@@ -149,7 +149,7 @@ const SavedBusinesses = () => {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
+      <div className="min-h-screen bg-gradient-hero flex flex-col">
         <NavMenu />
 
         <main className="container mx-auto px-4 py-6 pb-8 flex-1">

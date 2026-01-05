@@ -14,28 +14,44 @@
 
 /* Fix container centering */
 @media (max-width: 767px) {
-  /* Prevent any horizontal overflow at root level - use clip to avoid Chrome Android scroll issues */
+  /* CRITICAL FIX: Override overflow-x-hidden everywhere on mobile Chrome Android
+     overflow-x: hidden causes scroll bouncing/locking issues on Chrome Android */
+  html,
+  body,
+  #root,
+  [class*="overflow-x-hidden"],
+  [class*="overflow-hidden"] {
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+  }
+  
+  /* Set proper scrolling on root elements only */
   html {
-    overflow-x: clip;
+    overflow-x: clip !important;
+    overflow-y: auto !important;
     max-width: 100vw;
-    touch-action: pan-y pinch-zoom;
-    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y pinch-zoom !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: none;
   }
   
   body {
-    overflow-x: clip;
+    overflow-x: clip !important;
+    overflow-y: auto !important;
     max-width: 100vw;
     width: 100%;
-    touch-action: pan-y pinch-zoom;
-    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y pinch-zoom !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: none;
   }
   
   #root {
-    overflow-x: clip;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
     max-width: 100vw;
     width: 100%;
     min-height: 100vh;
-    touch-action: pan-y pinch-zoom;
+    touch-action: pan-y pinch-zoom !important;
   }
   
   /* Container resets */
@@ -43,6 +59,12 @@
     max-width: 100% !important;
     padding-left: 1rem !important;
     padding-right: 1rem !important;
+  }
+  
+  /* Ensure main content areas allow scrolling */
+  main {
+    touch-action: pan-y pinch-zoom !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 }
 
