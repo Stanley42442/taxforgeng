@@ -11,7 +11,7 @@ const corsHeaders = {
 
 interface SecurityAlertRequest {
   userEmail: string;
-  alertType: 'failed_backup_codes' | 'suspicious_login' | 'account_locked' | 'new_device' | 'device_removed';
+  alertType: 'failed_backup_codes' | 'suspicious_login' | 'account_locked' | 'new_device' | 'device_removed' | 'sessions_revoked';
   attemptCount?: number;
   timestamp: string;
   deviceInfo?: {
@@ -19,6 +19,7 @@ interface SecurityAlertRequest {
     os: string;
     deviceName: string;
   };
+  sessionCount?: number;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -27,7 +28,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { userEmail, alertType, attemptCount, timestamp, deviceInfo }: SecurityAlertRequest = await req.json();
+    const { userEmail, alertType, attemptCount, timestamp, deviceInfo, sessionCount }: SecurityAlertRequest = await req.json();
 
     console.log("Sending security alert to:", userEmail, "type:", alertType);
 
@@ -93,6 +94,18 @@ const handler = async (req: Request): Promise<Response> => {
             </tr>
           `;
         }
+        break;
+      case 'sessions_revoked':
+        subject = "🔒 Security Alert: All Other Sessions Signed Out";
+        alertTitle = "Sessions Revoked";
+        alertMessage = "All other active sessions on your account have been signed out.";
+        actionMessage = "If this was you, your account is now more secure. If you didn't do this, please change your password immediately.";
+        extraInfo = `
+          <tr>
+            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Action:</td>
+            <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">All other sessions terminated</td>
+          </tr>
+        `;
         break;
       default:
         alertMessage = "Unusual activity was detected on your account.";

@@ -38,3 +38,6 @@ verify_jwt = false
 
 [functions.check-trial-expiry]
 verify_jwt = false
+
+[functions.get-ip-location]
+verify_jwt = false
