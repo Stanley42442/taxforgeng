@@ -611,26 +611,28 @@ const Expenses = () => {
                 {filteredExpenses.map((expense) => {
                   const businessName = getBusinessName(expense.businessId);
                   return (
-                    <div key={expense.id} className="bg-card border border-border rounded-xl p-4 flex items-center gap-3 overflow-hidden">
-                      <div className="text-2xl p-2 rounded-xl bg-muted/30 shrink-0">{getCategoryIcon(expense.category)}</div>
-                      <div className="flex-1 min-w-0 overflow-hidden">
-                        <p className="font-medium text-foreground truncate">{expense.description}</p>
-                        <div className="flex flex-wrap items-center gap-1 sm:gap-2 text-xs text-muted-foreground">
-                          <span className="shrink-0">{new Date(expense.date).toLocaleDateString()}</span>
-                          {businessName && <span className="truncate">• {businessName}</span>}
+                    <div key={expense.id} className="bg-card/80 backdrop-blur-none border border-border/50 rounded-xl p-4">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <span className="text-xl">{getCategoryIcon(expense.category)}</span>
+                          <p className="font-medium text-foreground truncate">{expense.description}</p>
+                        </div>
+                        <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 h-7 w-7 -mt-1 -mr-1" onClick={() => handleDeleteExpense(expense.id)}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                          <span>{new Date(expense.date).toLocaleDateString()}</span>
+                          {businessName && <span>• {businessName}</span>}
                           {expense.isDeductible && (
-                            <span className="px-1.5 py-0.5 rounded-full bg-success/10 text-success font-medium shrink-0">Deductible</span>
+                            <span className="px-1.5 py-0.5 rounded-full bg-success/10 text-success font-medium">Deductible</span>
                           )}
                         </div>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className={`font-bold text-sm sm:text-base ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
+                        <span className={`font-bold ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
                           {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
                         </span>
                       </div>
-                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 shrink-0 h-8 w-8" onClick={() => handleDeleteExpense(expense.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                     </div>
                   );
                 })}
