@@ -11,9 +11,14 @@ const corsHeaders = {
 
 interface SecurityAlertRequest {
   userEmail: string;
-  alertType: 'failed_backup_codes' | 'suspicious_login' | 'account_locked';
-  attemptCount: number;
+  alertType: 'failed_backup_codes' | 'suspicious_login' | 'account_locked' | 'new_device';
+  attemptCount?: number;
   timestamp: string;
+  deviceInfo?: {
+    browser: string;
+    os: string;
+    deviceName: string;
+  };
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -22,27 +27,50 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { userEmail, alertType, attemptCount, timestamp }: SecurityAlertRequest = await req.json();
+    const { userEmail, alertType, attemptCount, timestamp, deviceInfo }: SecurityAlertRequest = await req.json();
 
-    console.log("Sending security alert to:", userEmail, "type:", alertType, "attempts:", attemptCount);
+    console.log("Sending security alert to:", userEmail, "type:", alertType);
 
     let subject = "🚨 Security Alert: Suspicious Activity Detected";
     let alertTitle = "Suspicious Activity Detected";
     let alertMessage = "";
     let actionMessage = "";
+    let extraInfo = "";
 
     switch (alertType) {
       case 'failed_backup_codes':
         subject = "🚨 Security Alert: Multiple Failed Backup Code Attempts";
         alertTitle = "Failed Backup Code Attempts";
-        alertMessage = `We detected ${attemptCount} failed attempts to use a backup code on your account. This could indicate someone is trying to access your account.`;
+        alertMessage = `We detected ${attemptCount || 0} failed attempts to use a backup code on your account. This could indicate someone is trying to access your account.`;
         actionMessage = "If this wasn't you, we recommend changing your password immediately and generating new backup codes.";
         break;
       case 'account_locked':
         subject = "🔒 Security Alert: Account Temporarily Locked";
         alertTitle = "Account Temporarily Locked";
-        alertMessage = `Your account has been temporarily locked after ${attemptCount} failed backup code attempts.`;
+        alertMessage = `Your account has been temporarily locked after ${attemptCount || 0} failed backup code attempts.`;
         actionMessage = "If this was you, please wait 15 minutes before trying again. If this wasn't you, change your password immediately.";
+        break;
+      case 'new_device':
+        subject = "🆕 Security Alert: New Device Login Detected";
+        alertTitle = "New Device Login";
+        alertMessage = "A new device was used to sign in to your account.";
+        actionMessage = "If this was you, you can safely ignore this email. If you don't recognize this login, please change your password immediately.";
+        if (deviceInfo) {
+          extraInfo = `
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Device:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${deviceInfo.deviceName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Browser:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${deviceInfo.browser}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Operating System:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${deviceInfo.os}</td>
+            </tr>
+          `;
+        }
         break;
       default:
         alertMessage = "Unusual activity was detected on your account.";
@@ -82,10 +110,12 @@ const handler = async (req: Request): Promise<Response> => {
                     <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Time:</td>
                     <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${timestamp}</td>
                   </tr>
+                  ${alertType === 'new_device' ? extraInfo : `
                   <tr>
                     <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Failed Attempts:</td>
-                    <td style="padding: 8px 0; color: #dc2626; font-size: 14px; font-weight: 600; text-align: right;">${attemptCount}</td>
+                    <td style="padding: 8px 0; color: #dc2626; font-size: 14px; font-weight: 600; text-align: right;">${attemptCount || 0}</td>
                   </tr>
+                  `}
                 </table>
               </div>
               
