@@ -40,7 +40,9 @@ import {
   BarChart3,
   Download,
   AlertTriangle,
-  Target
+  Target,
+  Repeat,
+  Settings2
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { jsPDF } from "jspdf";
@@ -155,6 +157,27 @@ const Expenses = () => {
     return saved ? Number(saved) : 0;
   });
   const [showBudgetDialog, setShowBudgetDialog] = useState(false);
+  const [showCategoryBudgetsDialog, setShowCategoryBudgetsDialog] = useState(false);
+  const [categoryBudgets, setCategoryBudgets] = useState<Record<string, number>>(() => {
+    const saved = localStorage.getItem('categoryBudgets');
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [showRecurringDialog, setShowRecurringDialog] = useState(false);
+  const [recurringTemplates, setRecurringTemplates] = useState<Array<{
+    id: string;
+    description: string;
+    amount: number;
+    category: Expense['category'];
+    businessId?: string;
+  }>>(() => {
+    const saved = localStorage.getItem('recurringTemplates');
+    return saved ? JSON.parse(saved) : [
+      { id: '1', description: 'Office Rent', amount: 150000, category: 'rent' },
+      { id: '2', description: 'Internet & Phone', amount: 25000, category: 'utilities' },
+      { id: '3', description: 'Staff Salaries', amount: 350000, category: 'salary' },
+    ];
+  });
+  const [newTemplate, setNewTemplate] = useState({ description: '', amount: '', category: 'rent' as Expense['category'] });
   const [budgetInput, setBudgetInput] = useState('');
   
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
@@ -423,6 +446,91 @@ const Expenses = () => {
     toast.success(budget > 0 ? `Monthly budget set to ${formatCurrency(budget)}` : 'Budget limit removed');
   };
 
+  const handleSetCategoryBudget = (category: string, amount: number) => {
+    const updated = { ...categoryBudgets, [category]: amount };
+    if (amount === 0) delete updated[category];
+    setCategoryBudgets(updated);
+    localStorage.setItem('categoryBudgets', JSON.stringify(updated));
+  };
+
+  const getCategorySpending = (category: string) => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    return expenses
+      .filter(e => e.category === category && e.type === 'expense')
+      .filter(e => {
+        const d = new Date(e.date);
+        return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+      })
+      .reduce((sum, e) => sum + e.amount, 0);
+  };
+
+  const handleAddRecurringTemplate = () => {
+    if (!newTemplate.description || !newTemplate.amount) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    const template = {
+      id: Date.now().toString(),
+      description: newTemplate.description,
+      amount: Number(newTemplate.amount),
+      category: newTemplate.category,
+    };
+    const updated = [...recurringTemplates, template];
+    setRecurringTemplates(updated);
+    localStorage.setItem('recurringTemplates', JSON.stringify(updated));
+    setNewTemplate({ description: '', amount: '', category: 'rent' });
+    toast.success('Template added');
+  };
+
+  const handleDeleteTemplate = (id: string) => {
+    const updated = recurringTemplates.filter(t => t.id !== id);
+    setRecurringTemplates(updated);
+    localStorage.setItem('recurringTemplates', JSON.stringify(updated));
+    toast.success('Template removed');
+  };
+
+  const handleApplyTemplate = async (template: typeof recurringTemplates[0]) => {
+    if (!user) {
+      toast.error('Please sign in to add expenses');
+      return;
+    }
+    const categoryConfig = EXPENSE_CATEGORIES.find(c => c.value === template.category);
+    const { data, error } = await supabase
+      .from('expenses')
+      .insert({
+        user_id: user.id,
+        date: new Date().toISOString().split('T')[0],
+        description: template.description,
+        amount: template.amount,
+        category: template.category,
+        type: 'expense',
+        is_deductible: categoryConfig?.deductible || false,
+        business_id: template.businessId || null,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      toast.error('Failed to add expense');
+      return;
+    }
+
+    const expense: Expense = {
+      id: data.id,
+      date: data.date,
+      description: data.description || '',
+      amount: Number(data.amount),
+      category: data.category as Expense['category'],
+      type: 'expense',
+      isDeductible: data.is_deductible,
+      businessId: data.business_id || undefined,
+    };
+    setExpenses(prev => [expense, ...prev]);
+    toast.success(`Added ${template.description}`);
+  };
+
   const exportMonthlySummaryPDF = () => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -628,6 +736,22 @@ const Expenses = () => {
               >
                 <Target className="h-4 w-4" />
                 <span className="hidden sm:inline">Budget</span>
+              </Button>
+              <Button 
+                variant="outline"
+                className="glass"
+                onClick={() => setShowCategoryBudgetsDialog(true)}
+              >
+                <Settings2 className="h-4 w-4" />
+                <span className="hidden sm:inline">Category Budgets</span>
+              </Button>
+              <Button 
+                variant="outline"
+                className="glass"
+                onClick={() => setShowRecurringDialog(true)}
+              >
+                <Repeat className="h-4 w-4" />
+                <span className="hidden sm:inline">Templates</span>
               </Button>
               <Button 
                 variant={showFilters ? "secondary" : "outline"}
@@ -847,7 +971,47 @@ const Expenses = () => {
             </div>
           </div>
 
-          {/* Expense List */}
+          {/* Category Budget Progress */}
+          {Object.keys(categoryBudgets).length > 0 && (
+            <div className="glass-frosted rounded-xl p-4 mb-4 shadow-futuristic">
+              <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
+                <div className="p-1 rounded-lg bg-warning/10">
+                  <Target className="h-4 w-4 text-warning" />
+                </div>
+                Category Budgets This Month
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {EXPENSE_CATEGORIES.filter(c => c.type === 'expense' && categoryBudgets[c.value]).map(cat => {
+                  const spent = getCategorySpending(cat.value);
+                  const budget = categoryBudgets[cat.value] || 0;
+                  const percentage = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
+                  const isOver = spent > budget;
+                  return (
+                    <div key={cat.value} className={`p-3 rounded-lg border ${getCategoryColor(cat.value as Expense['category'])}`}>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">{getCategoryIcon(cat.value as Expense['category'])}</span>
+                          <span className="text-sm font-medium">{cat.label}</span>
+                        </div>
+                        {isOver && <AlertTriangle className="h-4 w-4 text-destructive" />}
+                      </div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span>{formatCurrency(spent)}</span>
+                        <span>{formatCurrency(budget)}</span>
+                      </div>
+                      <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full transition-all ${isOver ? 'bg-destructive' : percentage > 80 ? 'bg-warning' : 'bg-success'}`}
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <div className="glass-frosted rounded-xl p-6 shadow-futuristic">
             <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
               <div className="p-1.5 rounded-lg bg-primary/10">
@@ -1105,6 +1269,161 @@ const Expenses = () => {
               </Button>
             )}
             <Button onClick={handleSetBudget}>Set Budget</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Category Budgets Dialog */}
+      <Dialog open={showCategoryBudgetsDialog} onOpenChange={setShowCategoryBudgetsDialog}>
+        <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings2 className="h-5 w-5 text-primary" />
+              Category Budgets
+            </DialogTitle>
+            <DialogDescription>Set spending limits for each category</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {EXPENSE_CATEGORIES.filter(c => c.type === 'expense').map(cat => {
+              const spent = getCategorySpending(cat.value);
+              const budget = categoryBudgets[cat.value] || 0;
+              const percentage = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
+              const isOver = budget > 0 && spent > budget;
+              return (
+                <div key={cat.value} className={`p-3 rounded-lg border ${getCategoryColor(cat.value as Expense['category'])}`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span>{getCategoryIcon(cat.value as Expense['category'])}</span>
+                      <span className="font-medium">{cat.label}</span>
+                    </div>
+                    <Input
+                      type="number"
+                      placeholder="No limit"
+                      value={categoryBudgets[cat.value] || ''}
+                      onChange={(e) => handleSetCategoryBudget(cat.value, Number(e.target.value) || 0)}
+                      className="w-32 h-8 text-sm"
+                    />
+                  </div>
+                  {budget > 0 && (
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs">
+                        <span>Spent: {formatCurrency(spent)}</span>
+                        <span className={isOver ? 'text-destructive font-medium' : ''}>
+                          {isOver ? 'Over by ' + formatCurrency(spent - budget) : formatCurrency(budget - spent) + ' left'}
+                        </span>
+                      </div>
+                      <div className="h-2 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full transition-all ${isOver ? 'bg-destructive' : percentage > 80 ? 'bg-warning' : 'bg-success'}`}
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCategoryBudgetsDialog(false)}>Done</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Recurring Templates Dialog */}
+      <Dialog open={showRecurringDialog} onOpenChange={setShowRecurringDialog}>
+        <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Repeat className="h-5 w-5 text-primary" />
+              Recurring Expense Templates
+            </DialogTitle>
+            <DialogDescription>Quickly add common monthly expenses</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {/* Existing Templates */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Your Templates</Label>
+              {recurringTemplates.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-4 text-center">No templates yet</p>
+              ) : (
+                <div className="space-y-2">
+                  {recurringTemplates.map(template => (
+                    <div 
+                      key={template.id} 
+                      className={`flex items-center justify-between p-3 rounded-lg border ${getCategoryColor(template.category)}`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span>{getCategoryIcon(template.category)}</span>
+                        <div className="min-w-0">
+                          <p className="font-medium truncate">{template.description}</p>
+                          <p className="text-xs opacity-75">{formatCurrency(template.amount)}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          className="h-8"
+                          onClick={() => handleApplyTemplate(template)}
+                        >
+                          <Plus className="h-4 w-4" />
+                          Add
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          className="h-8 text-destructive hover:text-destructive"
+                          onClick={() => handleDeleteTemplate(template.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Add New Template */}
+            <div className="border-t pt-4 space-y-3">
+              <Label className="text-sm font-medium">Add New Template</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <Input
+                  placeholder="Description"
+                  value={newTemplate.description}
+                  onChange={(e) => setNewTemplate({ ...newTemplate, description: e.target.value })}
+                />
+                <Input
+                  type="number"
+                  placeholder="Amount"
+                  value={newTemplate.amount}
+                  onChange={(e) => setNewTemplate({ ...newTemplate, amount: e.target.value })}
+                />
+              </div>
+              <div className="flex gap-2">
+                <Select 
+                  value={newTemplate.category} 
+                  onValueChange={(v) => setNewTemplate({ ...newTemplate, category: v as Expense['category'] })}
+                >
+                  <SelectTrigger className="flex-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {EXPENSE_CATEGORIES.filter(c => c.type === 'expense').map(cat => (
+                      <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button onClick={handleAddRecurringTemplate}>
+                  <Plus className="h-4 w-4" />
+                  Add
+                </Button>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRecurringDialog(false)}>Done</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
