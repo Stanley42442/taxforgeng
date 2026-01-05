@@ -401,21 +401,18 @@ const Expenses = () => {
   }
 
   return (
-    <div 
-      className="min-h-screen flex flex-col relative bg-gradient-hero"
-      style={{ 
-        overscrollBehavior: 'none',
-        WebkitOverflowScrolling: 'touch',
-        touchAction: 'pan-y'
-      }}
-    >
-      {/* Background - use absolute instead of fixed to prevent Chrome Android bounce */}
-      <div className="absolute inset-0 bg-mesh pointer-events-none" />
-      <div className="absolute inset-0 bg-dots opacity-20 pointer-events-none" />
+    <div className="min-h-screen bg-gradient-hero">
+      {/* Premium Background Effects */}
+      <div className="fixed inset-0 pointer-events-none" style={{ overflow: 'clip' }}>
+        <div className="absolute top-0 left-1/3 w-[600px] h-[600px] rounded-full bg-primary/5 blur-3xl animate-float-slow" />
+        <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] rounded-full bg-accent/5 blur-3xl animate-float" />
+        <div className="bg-mesh absolute inset-0" />
+        <div className="bg-dots absolute inset-0 opacity-30" />
+      </div>
 
       <NavMenu />
 
-      <main className="container mx-auto px-4 py-6 pb-8 relative z-10 flex-1">
+      <main className="container mx-auto px-4 py-6 pb-8 relative z-10">
         <div className="mx-auto max-w-5xl">
           {/* Header */}
           <div className="text-center mb-10 animate-slide-up">

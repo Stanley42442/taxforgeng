@@ -539,8 +539,7 @@
 }
 
 html, body, #root {
-  /* Use 'clip' instead of 'hidden' to prevent Chrome scroll issues */
-  overflow-x: clip;
+  overflow-x: hidden;
   max-width: 100vw;
   width: 100%;
 }

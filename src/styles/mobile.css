@@ -14,26 +14,22 @@
 
 /* Fix container centering */
 @media (max-width: 767px) {
-  /* Prevent horizontal overflow and Chrome Android bounce issues */
+  /* Prevent any horizontal overflow at root level - use clip to avoid Chrome Android scroll issues */
   html {
-    overflow-x: hidden;
+    overflow-x: clip;
     max-width: 100vw;
-    overscroll-behavior-x: none;
   }
   
   body {
-    overflow-x: hidden;
+    overflow-x: clip;
     max-width: 100vw;
     width: 100%;
-    overscroll-behavior: none;
-    -webkit-overflow-scrolling: touch;
   }
   
   #root {
-    overflow-x: hidden;
+    overflow-x: clip;
     max-width: 100vw;
     width: 100%;
-    overscroll-behavior: none;
   }
   
   /* Container resets */
@@ -269,8 +265,12 @@
   padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
 }
 
-/* Prevent ALL Horizontal Overflow - REMOVED global rule that was causing Chrome Android bounce issues */
-/* The fix is applied only within the @media (max-width: 767px) block above */
+/* Prevent ALL Horizontal Overflow - use clip to avoid Chrome Android scroll issues */
+html, body, #root {
+  overflow-x: clip;
+  max-width: 100vw;
+  width: 100%;
+}
 
 .mobile-overflow-fix {
   max-width: 100vw;
