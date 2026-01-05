@@ -14,6 +14,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
+import { FreeTrialCTA } from "@/components/FreeTrialCTA";
 import { useState, useEffect } from "react";
 
 const CAROUSEL_ITEMS = [
@@ -191,6 +192,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Free Trial CTA for Guests */}
+      <FreeTrialCTA />
 
       {/* Features Grid */}
       <section className="relative z-10 py-16 md:py-24">
