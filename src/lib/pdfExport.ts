@@ -272,6 +272,83 @@ export const generateProfessionalPDF = (
 
   y += 10;
 
+  // === SECTOR TAX RULES SECTION ===
+  if (result.sectorId && result.sectorRules) {
+    if (y > pageHeight - 80) {
+      doc.addPage();
+      y = 20;
+    }
+
+    setColor(primaryColor);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Sector Tax Rules Applied', margin, y);
+    y += 4;
+    
+    setColor(mutedColor);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    const sectorName = result.sectorId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    doc.text(`Sector: ${sectorName}`, margin, y + 6);
+    y += 12;
+
+    // Sector rules box
+    setFillColor([240, 253, 244]); // Light green background
+    const rules = result.sectorRules;
+    const ruleItems: string[] = [];
+
+    if (rules.citRate !== undefined) {
+      ruleItems.push(`CIT Rate: ${rules.citRate}%${rules.citRate === 0 ? ' (Tax Exempt)' : ''}`);
+    }
+    if (rules.vatStatus) {
+      const vatLabel = rules.vatStatus === 'exempt' ? 'VAT Exempt' : 
+                       rules.vatStatus === 'zero' ? 'Zero-Rated' :
+                       rules.vatStatus === 'reduced' ? `Reduced VAT (${rules.vatRate || 0}%)` : 'Standard VAT';
+      ruleItems.push(`VAT Status: ${vatLabel}`);
+    }
+    if (rules.whtRate && rules.whtRate > 0) {
+      ruleItems.push(`WHT Rate: ${rules.whtRate}%`);
+    }
+    if (rules.edtiRate && rules.edtiRate > 0) {
+      ruleItems.push(`EDTI Credit: ${rules.edtiRate}%`);
+    }
+    if (rules.hydrocarbonTaxMin || rules.hydrocarbonTaxMax) {
+      ruleItems.push(`Hydrocarbon Tax: ${rules.hydrocarbonTaxMin}% - ${rules.hydrocarbonTaxMax}%`);
+    }
+    if (rules.presumptiveMin || rules.presumptiveMax) {
+      ruleItems.push(`Presumptive Tax: ${rules.presumptiveMin}% - ${rules.presumptiveMax}%`);
+    }
+    if (rules.pioneerStatus) {
+      ruleItems.push('Pioneer Status: Tax Holiday Eligible');
+    }
+    if (rules.greenHireDeduction && rules.greenHireDeduction > 0) {
+      ruleItems.push(`Green Hire Deduction: ${rules.greenHireDeduction}%`);
+    }
+
+    const boxHeight = Math.max(20, ruleItems.length * 8 + 10);
+    doc.roundedRect(margin, y, contentWidth, boxHeight, 2, 2, 'F');
+
+    setColor([34, 127, 94]); // Green text
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    
+    let ruleY = y + 8;
+    const midPoint = Math.ceil(ruleItems.length / 2);
+    
+    ruleItems.forEach((rule, index) => {
+      if (index < midPoint) {
+        doc.text(`✓ ${rule}`, margin + 5, ruleY);
+      } else {
+        doc.text(`✓ ${rule}`, margin + contentWidth / 2, ruleY - (midPoint * 8));
+      }
+      if (index < midPoint - 1 || (index >= midPoint && index < ruleItems.length - 1)) {
+        ruleY += 8;
+      }
+    });
+
+    y += boxHeight + 10;
+  }
+
   // === ALERTS SECTION ===
   if (result.alerts.length > 0 && y < pageHeight - 60) {
     setColor(primaryColor);
