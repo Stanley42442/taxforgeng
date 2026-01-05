@@ -42,7 +42,11 @@ import {
   AlertTriangle,
   Target,
   Repeat,
-  Settings2
+  Settings2,
+  TrendingUp as TrendUp,
+  TrendingDown as TrendDown,
+  Bell,
+  CalendarClock
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { jsPDF } from "jspdf";
@@ -169,15 +173,18 @@ const Expenses = () => {
     amount: number;
     category: Expense['category'];
     businessId?: string;
+    dueDay?: number; // Day of month (1-31)
+    lastPaidDate?: string;
   }>>(() => {
     const saved = localStorage.getItem('recurringTemplates');
     return saved ? JSON.parse(saved) : [
-      { id: '1', description: 'Office Rent', amount: 150000, category: 'rent' },
-      { id: '2', description: 'Internet & Phone', amount: 25000, category: 'utilities' },
-      { id: '3', description: 'Staff Salaries', amount: 350000, category: 'salary' },
+      { id: '1', description: 'Office Rent', amount: 150000, category: 'rent', dueDay: 1 },
+      { id: '2', description: 'Internet & Phone', amount: 25000, category: 'utilities', dueDay: 15 },
+      { id: '3', description: 'Staff Salaries', amount: 350000, category: 'salary', dueDay: 25 },
     ];
   });
-  const [newTemplate, setNewTemplate] = useState({ description: '', amount: '', category: 'rent' as Expense['category'] });
+  const [newTemplate, setNewTemplate] = useState({ description: '', amount: '', category: 'rent' as Expense['category'], dueDay: '' });
+  const [showComparison, setShowComparison] = useState(false);
   const [budgetInput, setBudgetInput] = useState('');
   
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
@@ -420,6 +427,67 @@ const Expenses = () => {
 
   const sortedMonths = Object.entries(monthlySummary).sort((a, b) => b[0].localeCompare(a[0]));
 
+  // Monthly comparison data
+  const getMonthComparison = () => {
+    if (sortedMonths.length < 2) return null;
+    const current = sortedMonths[0];
+    const previous = sortedMonths[1];
+    const expenseChange = current[1].expenses - previous[1].expenses;
+    const incomeChange = current[1].income - previous[1].income;
+    const expenseChangePercent = previous[1].expenses > 0 ? ((expenseChange / previous[1].expenses) * 100) : 0;
+    const incomeChangePercent = previous[1].income > 0 ? ((incomeChange / previous[1].income) * 100) : 0;
+    return {
+      current: current[1],
+      previous: previous[1],
+      expenseChange,
+      incomeChange,
+      expenseChangePercent,
+      incomeChangePercent,
+    };
+  };
+  const monthComparison = getMonthComparison();
+
+  // Recurring expense reminders - find upcoming due dates
+  const getUpcomingDueExpenses = () => {
+    const today = new Date();
+    const currentDay = today.getDate();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    return recurringTemplates
+      .filter(t => t.dueDay)
+      .map(t => {
+        const dueDay = t.dueDay!;
+        let dueDate: Date;
+        
+        // If due day has passed this month, show next month
+        if (dueDay < currentDay) {
+          dueDate = new Date(currentYear, currentMonth + 1, dueDay);
+        } else {
+          dueDate = new Date(currentYear, currentMonth, dueDay);
+        }
+        
+        const daysUntilDue = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        const isPastDue = daysUntilDue < 0;
+        const isDueSoon = daysUntilDue <= 7 && daysUntilDue >= 0;
+        
+        // Check if already paid this month
+        const isPaidThisMonth = t.lastPaidDate && new Date(t.lastPaidDate).getMonth() === currentMonth;
+        
+        return {
+          ...t,
+          dueDate,
+          daysUntilDue,
+          isPastDue,
+          isDueSoon,
+          isPaidThisMonth,
+        };
+      })
+      .filter(t => !t.isPaidThisMonth)
+      .sort((a, b) => a.daysUntilDue - b.daysUntilDue);
+  };
+  const upcomingDueExpenses = getUpcomingDueExpenses();
+
   // Current month expense check for budget
   const currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
   const currentMonthExpenses = monthlySummary[currentMonthKey]?.expenses || 0;
@@ -476,11 +544,12 @@ const Expenses = () => {
       description: newTemplate.description,
       amount: Number(newTemplate.amount),
       category: newTemplate.category,
+      dueDay: newTemplate.dueDay ? Number(newTemplate.dueDay) : undefined,
     };
     const updated = [...recurringTemplates, template];
     setRecurringTemplates(updated);
     localStorage.setItem('recurringTemplates', JSON.stringify(updated));
-    setNewTemplate({ description: '', amount: '', category: 'rent' });
+    setNewTemplate({ description: '', amount: '', category: 'rent', dueDay: '' });
     toast.success('Template added');
   };
 
@@ -528,7 +597,24 @@ const Expenses = () => {
       businessId: data.business_id || undefined,
     };
     setExpenses(prev => [expense, ...prev]);
+    
+    // Mark template as paid this month
+    const updatedTemplates = recurringTemplates.map(t => 
+      t.id === template.id ? { ...t, lastPaidDate: new Date().toISOString().split('T')[0] } : t
+    );
+    setRecurringTemplates(updatedTemplates);
+    localStorage.setItem('recurringTemplates', JSON.stringify(updatedTemplates));
+    
     toast.success(`Added ${template.description}`);
+  };
+
+  const markTemplateAsPaid = (templateId: string) => {
+    const updatedTemplates = recurringTemplates.map(t => 
+      t.id === templateId ? { ...t, lastPaidDate: new Date().toISOString().split('T')[0] } : t
+    );
+    setRecurringTemplates(updatedTemplates);
+    localStorage.setItem('recurringTemplates', JSON.stringify(updatedTemplates));
+    toast.success('Marked as paid');
   };
 
   const exportMonthlySummaryPDF = () => {
@@ -730,6 +816,14 @@ const Expenses = () => {
                 <span className="hidden sm:inline">Monthly</span>
               </Button>
               <Button 
+                variant={showComparison ? "secondary" : "outline"}
+                className={showComparison ? "" : "glass"}
+                onClick={() => setShowComparison(!showComparison)}
+              >
+                <TrendUp className="h-4 w-4" />
+                <span className="hidden sm:inline">Compare</span>
+              </Button>
+              <Button 
                 variant="outline"
                 className="glass"
                 onClick={() => setShowBudgetDialog(true)}
@@ -860,6 +954,102 @@ const Expenses = () => {
                     </Select>
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Upcoming Expense Reminders */}
+          {upcomingDueExpenses.length > 0 && (
+            <div className="glass-frosted rounded-xl p-4 mb-4 shadow-futuristic">
+              <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
+                <div className="p-1 rounded-lg bg-warning/10">
+                  <Bell className="h-4 w-4 text-warning" />
+                </div>
+                Upcoming Expenses
+                <span className="ml-auto text-xs text-muted-foreground">{upcomingDueExpenses.length} due</span>
+              </h3>
+              <div className="space-y-2">
+                {upcomingDueExpenses.slice(0, 5).map(item => (
+                  <div 
+                    key={item.id} 
+                    className={`flex items-center justify-between p-3 rounded-lg border ${
+                      item.isDueSoon ? 'bg-warning/10 border-warning/30' : 'bg-card/50 border-border/50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-lg">{getCategoryIcon(item.category)}</span>
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm truncate">{item.description}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Due: {item.dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          {item.isDueSoon && <span className="ml-2 text-warning font-medium">({item.daysUntilDue === 0 ? 'Today' : `${item.daysUntilDue}d`})</span>}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">{formatCurrency(item.amount)}</span>
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        className="h-7 px-2"
+                        onClick={() => handleApplyTemplate(item)}
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Month Comparison */}
+          {showComparison && monthComparison && (
+            <div className="glass-frosted rounded-xl p-4 mb-4 shadow-futuristic">
+              <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
+                <div className="p-1 rounded-lg bg-primary/10">
+                  <TrendUp className="h-4 w-4 text-primary" />
+                </div>
+                Month-over-Month Comparison
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 rounded-lg bg-card/50 border border-border/50">
+                  <p className="text-xs text-muted-foreground mb-1">Expenses</p>
+                  <div className="flex items-center gap-2">
+                    {monthComparison.expenseChange > 0 ? (
+                      <TrendUp className="h-5 w-5 text-destructive" />
+                    ) : monthComparison.expenseChange < 0 ? (
+                      <TrendDown className="h-5 w-5 text-success" />
+                    ) : null}
+                    <span className={`text-lg font-bold ${monthComparison.expenseChange > 0 ? 'text-destructive' : monthComparison.expenseChange < 0 ? 'text-success' : 'text-muted-foreground'}`}>
+                      {monthComparison.expenseChange > 0 ? '+' : ''}{monthComparison.expenseChangePercent.toFixed(1)}%
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {formatCurrency(monthComparison.current.expenses)} vs {formatCurrency(monthComparison.previous.expenses)}
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg bg-card/50 border border-border/50">
+                  <p className="text-xs text-muted-foreground mb-1">Income</p>
+                  <div className="flex items-center gap-2">
+                    {monthComparison.incomeChange > 0 ? (
+                      <TrendUp className="h-5 w-5 text-success" />
+                    ) : monthComparison.incomeChange < 0 ? (
+                      <TrendDown className="h-5 w-5 text-destructive" />
+                    ) : null}
+                    <span className={`text-lg font-bold ${monthComparison.incomeChange > 0 ? 'text-success' : monthComparison.incomeChange < 0 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                      {monthComparison.incomeChange > 0 ? '+' : ''}{monthComparison.incomeChangePercent.toFixed(1)}%
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {formatCurrency(monthComparison.current.income)} vs {formatCurrency(monthComparison.previous.income)}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 p-3 rounded-lg bg-muted/30">
+                <p className="text-xs text-center text-muted-foreground">
+                  Comparing <span className="font-medium text-foreground">{monthComparison.current.monthName}</span> to <span className="font-medium text-foreground">{monthComparison.previous.monthName}</span>
+                </p>
               </div>
             </div>
           )}
@@ -1357,7 +1547,15 @@ const Expenses = () => {
                         <span>{getCategoryIcon(template.category)}</span>
                         <div className="min-w-0">
                           <p className="font-medium truncate">{template.description}</p>
-                          <p className="text-xs opacity-75">{formatCurrency(template.amount)}</p>
+                          <div className="flex items-center gap-2 text-xs opacity-75">
+                            <span>{formatCurrency(template.amount)}</span>
+                            {template.dueDay && (
+                              <span className="flex items-center gap-1">
+                                <CalendarClock className="h-3 w-3" />
+                                Due: {template.dueDay}{['st', 'nd', 'rd'][((template.dueDay + 90) % 100 - 10) % 10 - 1] || 'th'}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
@@ -1415,11 +1613,20 @@ const Expenses = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <Button onClick={handleAddRecurringTemplate}>
-                  <Plus className="h-4 w-4" />
-                  Add
-                </Button>
+                <Input
+                  type="number"
+                  placeholder="Due day (1-31)"
+                  value={newTemplate.dueDay}
+                  onChange={(e) => setNewTemplate({ ...newTemplate, dueDay: e.target.value })}
+                  className="w-28"
+                  min={1}
+                  max={31}
+                />
               </div>
+              <Button onClick={handleAddRecurringTemplate} className="w-full">
+                <Plus className="h-4 w-4" />
+                Add Template
+              </Button>
             </div>
           </div>
           <DialogFooter>
