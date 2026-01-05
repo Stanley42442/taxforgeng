@@ -292,7 +292,7 @@ const CalculatorPage = () => {
   const canCalculate = Number(inputs.turnover) > 0;
 
   return (
-    <div className="min-h-screen flex flex-col relative" style={{ overflowX: 'clip' }}>
+    <div className="min-h-screen flex flex-col overflow-x-hidden relative">
       {/* Background */}
       <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
       <div className="fixed inset-0 bg-mesh pointer-events-none" />
