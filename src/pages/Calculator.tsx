@@ -86,7 +86,7 @@ const CalculatorPage = () => {
   const handleBusinessSelect = (businessId: string) => {
     setSelectedBusinessId(businessId);
     
-    if (businessId === '') {
+    if (businessId === '__new__') {
       // Reset to defaults when "New calculation" is selected
       return;
     }
@@ -187,7 +187,7 @@ const CalculatorPage = () => {
                       <SelectValue placeholder="Start new calculation or choose a saved business..." />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">
+                      <SelectItem value="__new__">
                         <span className="flex items-center gap-2">
                           <Sparkles className="h-4 w-4 text-accent" />
                           New Calculation
