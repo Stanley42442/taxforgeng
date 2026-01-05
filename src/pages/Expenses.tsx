@@ -49,7 +49,9 @@ import {
   CalendarClock,
   Flag,
   Trophy,
-  Pencil
+  Pencil,
+  Brain,
+  Sparkles as SparklesIcon
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { jsPDF } from "jspdf";
@@ -62,6 +64,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { ExpenseCharts } from "@/components/ExpenseCharts";
+import { ExpenseAnalytics } from "@/components/ExpenseAnalytics";
 import { OCRReceiptScanner } from "@/components/OCRReceiptScanner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -209,6 +212,11 @@ const Expenses = () => {
   });
   const [editingGoalBusiness, setEditingGoalBusiness] = useState<string | null>(null);
   const [newGoal, setNewGoal] = useState({ targetAmount: '', targetDate: '', description: '' });
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [notifiedAchievements, setNotifiedAchievements] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem('notifiedGoalAchievements');
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
   
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -358,6 +366,32 @@ const Expenses = () => {
 
     fetchExpenses();
   }, [user]);
+
+  // Goal achievement notification effect
+  useEffect(() => {
+    if (!notificationsEnabled || expenses.length === 0) return;
+    
+    savedBusinesses.forEach(business => {
+      const goalProgress = getGoalProgress(business.id);
+      if (goalProgress?.isAchieved && !notifiedAchievements.has(business.id)) {
+        // Send notification
+        sendExpenseNotification(
+          '🎉 Goal Achieved!',
+          `Congratulations! ${business.name} has reached the savings goal of ${formatCurrency(goalProgress.targetAmount)}!`
+        );
+        toast.success(`🎉 ${business.name} reached its savings goal!`, {
+          description: `Target of ${formatCurrency(goalProgress.targetAmount)} achieved!`,
+          duration: 8000,
+        });
+        
+        // Mark as notified
+        const newNotified = new Set(notifiedAchievements);
+        newNotified.add(business.id);
+        setNotifiedAchievements(newNotified);
+        localStorage.setItem('notifiedGoalAchievements', JSON.stringify([...newNotified]));
+      }
+    });
+  }, [expenses, savingsGoals, notificationsEnabled, savedBusinesses, notifiedAchievements]);
 
   // Upgrade prompt for free tier
   if (!isBasicPlus) {
@@ -1022,6 +1056,14 @@ const Expenses = () => {
                 <span className="hidden sm:inline">Templates</span>
               </Button>
               <Button 
+                variant={showAnalytics ? "secondary" : "outline"}
+                className={showAnalytics ? "" : "glass"}
+                onClick={() => setShowAnalytics(!showAnalytics)}
+              >
+                <Brain className="h-4 w-4" />
+                <span className="hidden sm:inline">AI Insights</span>
+              </Button>
+              <Button 
                 variant={showGoalsDialog ? "secondary" : "outline"}
                 className={showGoalsDialog ? "" : "glass"}
                 onClick={() => setShowGoalsDialog(!showGoalsDialog)}
@@ -1503,7 +1545,26 @@ const Expenses = () => {
             </div>
           )}
 
-          {/* Category Legend */}
+          {/* AI-Powered Analytics Section */}
+          {showAnalytics && filteredExpenses.length > 0 && (
+            <div className="neumorphic p-6 mb-6">
+              <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20">
+                  <Brain className="h-5 w-5 text-primary" />
+                </div>
+                AI-Powered Analytics
+                <span className="ml-auto text-xs text-muted-foreground font-normal">
+                  Spending patterns & insights
+                </span>
+              </h2>
+              <ExpenseAnalytics 
+                expenses={filteredExpenses} 
+                businessName={filterBusinessId !== 'all' ? savedBusinesses.find(b => b.id === filterBusinessId)?.name : undefined}
+              />
+            </div>
+          )}
+
+
           <div className="glass-frosted rounded-xl p-4 mb-4 shadow-futuristic">
             <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
               <div className="p-1 rounded-lg bg-primary/10">

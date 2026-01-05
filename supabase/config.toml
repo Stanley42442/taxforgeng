@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.send-winback-email]
 verify_jwt = false
+
+[functions.expense-insights]
+verify_jwt = false
