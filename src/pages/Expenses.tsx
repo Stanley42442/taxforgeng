@@ -309,13 +309,8 @@ const Expenses = () => {
 
   useEffect(() => {
     const fetchExpenses = async () => {
-      // Guest mode: load from localStorage
       if (!user) {
-        const guestExpenses = localStorage.getItem('guestExpenses');
-        if (guestExpenses) {
-          const parsed = JSON.parse(guestExpenses);
-          setExpenses(parsed);
-        }
+        setExpenses([]);
         setLoading(false);
         return;
       }
@@ -348,11 +343,6 @@ const Expenses = () => {
     fetchExpenses();
   }, [user]);
 
-  // Save guest expenses to localStorage
-  const saveGuestExpenses = (newExpenses: Expense[]) => {
-    localStorage.setItem('guestExpenses', JSON.stringify(newExpenses));
-  };
-
   // Upgrade prompt for free tier
   if (!isBasicPlus) {
     return (
@@ -378,6 +368,11 @@ const Expenses = () => {
   }
 
   const handleAddExpense = async () => {
+    if (!user) {
+      toast.error("Please sign in to add expenses");
+      return;
+    }
+
     if (!newExpense.description.trim() || !newExpense.amount) {
       toast.error("Please fill all fields");
       return;
@@ -386,35 +381,6 @@ const Expenses = () => {
     const categoryInfo = EXPENSE_CATEGORIES.find(c => c.value === newExpense.category);
     const expenseType = categoryInfo?.type || 'expense';
     const isDeductible = expenseType === 'expense' ? (categoryInfo?.deductible ?? false) : false;
-
-    // Guest mode: save to localStorage
-    if (!user) {
-      const expense: Expense = {
-        id: `guest-${Date.now()}`,
-        date: newExpense.date,
-        description: newExpense.description.trim(),
-        amount: Number(newExpense.amount),
-        category: newExpense.category,
-        type: expenseType,
-        isDeductible,
-        businessId: newExpense.businessId || undefined,
-      };
-      
-      const updatedExpenses = [expense, ...expenses];
-      setExpenses(updatedExpenses);
-      saveGuestExpenses(updatedExpenses);
-      setShowAddDialog(false);
-      setNewExpense({
-        date: new Date().toISOString().split('T')[0],
-        description: '',
-        amount: '',
-        category: 'other',
-        businessId: '',
-      });
-      toast.success("Entry added");
-      notifyExpenseAdded(expense.description, expense.amount, expense.type === 'income');
-      return;
-    }
 
     const { data, error } = await supabase
       .from('expenses')
@@ -462,6 +428,11 @@ const Expenses = () => {
   };
 
   const handleCSVImport = async () => {
+    if (!user) {
+      toast.error("Please sign in to import expenses");
+      return;
+    }
+
     const mockData = [
       { date: '2025-12-01', description: 'Client Payment - Project A', amount: 500000, category: 'income', type: 'income', is_deductible: false },
       { date: '2025-12-05', description: 'Office Rent December', amount: 150000, category: 'rent', type: 'expense', is_deductible: true },
@@ -469,24 +440,6 @@ const Expenses = () => {
       { date: '2025-12-12', description: 'Staff Salaries', amount: 350000, category: 'salary', type: 'expense', is_deductible: true },
       { date: '2025-12-15', description: 'Freelance Work', amount: 200000, category: 'income', type: 'income', is_deductible: false },
     ];
-
-    // Guest mode: save to localStorage
-    if (!user) {
-      const mapped: Expense[] = mockData.map((e, i) => ({
-        id: `guest-csv-${Date.now()}-${i}`,
-        date: e.date,
-        description: e.description,
-        amount: e.amount,
-        category: e.category as Expense['category'],
-        type: e.type as 'income' | 'expense',
-        isDeductible: e.is_deductible,
-      }));
-      const updatedExpenses = [...mapped, ...expenses];
-      setExpenses(updatedExpenses);
-      saveGuestExpenses(updatedExpenses);
-      toast.success("Imported 5 entries from CSV (mock data)");
-      return;
-    }
 
     const { data, error } = await supabase
       .from('expenses')
@@ -514,15 +467,6 @@ const Expenses = () => {
   };
 
   const handleDeleteExpense = async (id: string) => {
-    // Guest mode: delete from localStorage
-    if (!user) {
-      const updatedExpenses = expenses.filter(e => e.id !== id);
-      setExpenses(updatedExpenses);
-      saveGuestExpenses(updatedExpenses);
-      toast.success("Entry deleted");
-      return;
-    }
-
     const { error } = await supabase
       .from('expenses')
       .delete()
@@ -715,36 +659,11 @@ const Expenses = () => {
   };
 
   const handleApplyTemplate = async (template: typeof recurringTemplates[0]) => {
-    const categoryConfig = EXPENSE_CATEGORIES.find(c => c.value === template.category);
-    
-    // Guest mode: save to localStorage
     if (!user) {
-      const expense: Expense = {
-        id: `guest-template-${Date.now()}`,
-        date: new Date().toISOString().split('T')[0],
-        description: template.description,
-        amount: template.amount,
-        category: template.category,
-        type: 'expense',
-        isDeductible: categoryConfig?.deductible || false,
-        businessId: template.businessId || undefined,
-      };
-      
-      const updatedExpenses = [expense, ...expenses];
-      setExpenses(updatedExpenses);
-      saveGuestExpenses(updatedExpenses);
-      
-      // Mark template as paid this month
-      const updatedTemplates = recurringTemplates.map(t => 
-        t.id === template.id ? { ...t, lastPaidDate: new Date().toISOString().split('T')[0] } : t
-      );
-      setRecurringTemplates(updatedTemplates);
-      localStorage.setItem('recurringTemplates', JSON.stringify(updatedTemplates));
-      
-      toast.success(`Added ${template.description}`);
+      toast.error('Please sign in to add expenses');
       return;
     }
-    
+    const categoryConfig = EXPENSE_CATEGORIES.find(c => c.value === template.category);
     const { data, error } = await supabase
       .from('expenses')
       .insert({
@@ -1570,28 +1489,14 @@ const Expenses = () => {
         open={showOCRScanner}
         onOpenChange={setShowOCRScanner}
         onReceiptParsed={async (data) => {
+          if (!user) {
+            toast.error("Please sign in to add expenses");
+            return;
+          }
+
           const categoryInfo = EXPENSE_CATEGORIES.find(c => c.value === data.category);
           const expenseType = categoryInfo?.type || 'expense';
           const isDeductible = expenseType === 'expense' ? (categoryInfo?.deductible ?? false) : false;
-
-          // Guest mode: save to localStorage
-          if (!user) {
-            const expense: Expense = {
-              id: `guest-ocr-${Date.now()}`,
-              date: data.date,
-              description: data.description,
-              amount: data.amount,
-              category: data.category as Expense['category'],
-              type: expenseType,
-              isDeductible,
-            };
-            
-            const updatedExpenses = [expense, ...expenses];
-            setExpenses(updatedExpenses);
-            saveGuestExpenses(updatedExpenses);
-            notifyExpenseAdded(expense.description, expense.amount, expense.type === 'income');
-            return;
-          }
 
           const { data: dbData, error } = await supabase
             .from('expenses')

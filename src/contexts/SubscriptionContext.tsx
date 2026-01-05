@@ -126,20 +126,10 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   // Fetch user profile and businesses from database
   const fetchUserData = useCallback(async () => {
     if (!user) {
-      // GUEST MODE: Give guests full access with 'business' tier
-      // Load any guest businesses from localStorage
-      const guestBusinesses = localStorage.getItem('guestBusinesses');
-      const parsedBusinesses: SavedBusiness[] = guestBusinesses 
-        ? JSON.parse(guestBusinesses).map((b: SavedBusiness) => ({
-            ...b,
-            createdAt: new Date(b.createdAt)
-          }))
-        : [];
-      
       setState({
-        tier: 'business', // Grant business tier to guests for full access
-        businessCount: parsedBusinesses.length,
-        savedBusinesses: parsedBusinesses,
+        tier: 'free',
+        businessCount: 0,
+        savedBusinesses: [],
         subscriptionEndDate: null,
         email: null,
         loading: false,
@@ -215,27 +205,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const addBusiness = async (business: Omit<SavedBusiness, 'id' | 'createdAt'>): Promise<boolean> => {
-    if (!canSaveBusiness()) return false;
-    
-    // Guest mode: save to localStorage
-    if (!user) {
-      const newBusiness: SavedBusiness = {
-        id: `guest-${Date.now()}`,
-        ...business,
-        createdAt: new Date(),
-      };
-      
-      const updatedBusinesses = [newBusiness, ...state.savedBusinesses];
-      localStorage.setItem('guestBusinesses', JSON.stringify(updatedBusinesses));
-      
-      setState(prev => ({
-        ...prev,
-        savedBusinesses: updatedBusinesses,
-        businessCount: prev.businessCount + 1,
-      }));
-      
-      return true;
-    }
+    if (!user || !canSaveBusiness()) return false;
     
     const { data, error } = await supabase
       .from('businesses')
@@ -275,18 +245,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const removeBusiness = async (id: string) => {
-    // Guest mode: remove from localStorage
-    if (!user) {
-      const updatedBusinesses = state.savedBusinesses.filter(b => b.id !== id);
-      localStorage.setItem('guestBusinesses', JSON.stringify(updatedBusinesses));
-      
-      setState(prev => ({
-        ...prev,
-        savedBusinesses: updatedBusinesses,
-        businessCount: Math.max(0, prev.businessCount - 1),
-      }));
-      return;
-    }
+    if (!user) return;
 
     await supabase
       .from('businesses')
@@ -302,19 +261,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateBusiness = async (id: string, updates: Partial<SavedBusiness>) => {
-    // Guest mode: update in localStorage
-    if (!user) {
-      const updatedBusinesses = state.savedBusinesses.map(b => 
-        b.id === id ? { ...b, ...updates } : b
-      );
-      localStorage.setItem('guestBusinesses', JSON.stringify(updatedBusinesses));
-      
-      setState(prev => ({
-        ...prev,
-        savedBusinesses: updatedBusinesses,
-      }));
-      return;
-    }
+    if (!user) return;
 
     const dbUpdates: Record<string, unknown> = {};
     if (updates.name) dbUpdates.name = updates.name;

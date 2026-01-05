@@ -9,20 +9,9 @@ export const AuthLoadingScreen = ({ children }: AuthLoadingScreenProps) => {
   const { loading } = useAuth();
   const [showSplash, setShowSplash] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
-  const [forceShow, setForceShow] = useState(false);
-
-  // Fallback timeout - show content after 3 seconds even if auth is still loading
-  useEffect(() => {
-    const fallbackTimer = setTimeout(() => {
-      if (showSplash) {
-        setForceShow(true);
-      }
-    }, 3000);
-    return () => clearTimeout(fallbackTimer);
-  }, [showSplash]);
 
   useEffect(() => {
-    if ((!loading || forceShow) && showSplash) {
+    if (!loading && showSplash) {
       // Start fade-out animation
       setIsExiting(true);
       // Remove splash after animation completes
@@ -31,7 +20,7 @@ export const AuthLoadingScreen = ({ children }: AuthLoadingScreenProps) => {
       }, 400); // Match animation duration
       return () => clearTimeout(timer);
     }
-  }, [loading, showSplash, forceShow]);
+  }, [loading, showSplash]);
 
   if (showSplash && (loading || isExiting)) {
     return (
