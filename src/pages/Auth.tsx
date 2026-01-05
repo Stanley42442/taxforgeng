@@ -253,6 +253,19 @@ const Auth = () => {
           .gte('attempted_at', fifteenMinutesAgo);
 
         if ((attemptCount || 0) >= 5) {
+          // Send account locked alert
+          try {
+            await supabase.functions.invoke('send-security-alert', {
+              body: {
+                userEmail: email,
+                alertType: 'account_locked',
+                attemptCount: attemptCount || 0,
+                timestamp: new Date().toLocaleString()
+              }
+            });
+          } catch (alertError) {
+            console.error('Failed to send security alert:', alertError);
+          }
           toast.error("Too many failed attempts. Please try again in 15 minutes.");
           return;
         }
@@ -273,7 +286,25 @@ const Auth = () => {
             user_id: mfaUserId
           } as any);
           
-          const remainingAttempts = 4 - (attemptCount || 0);
+          const newAttemptCount = (attemptCount || 0) + 1;
+          const remainingAttempts = 5 - newAttemptCount;
+          
+          // Send security alert at 3 failed attempts
+          if (newAttemptCount === 3) {
+            try {
+              await supabase.functions.invoke('send-security-alert', {
+                body: {
+                  userEmail: email,
+                  alertType: 'failed_backup_codes',
+                  attemptCount: newAttemptCount,
+                  timestamp: new Date().toLocaleString()
+                }
+              });
+            } catch (alertError) {
+              console.error('Failed to send security alert:', alertError);
+            }
+          }
+          
           toast.error(`Invalid backup code. ${remainingAttempts > 0 ? `${remainingAttempts} attempts remaining.` : 'Account temporarily locked.'}`);
           return;
         }
@@ -283,6 +314,24 @@ const Auth = () => {
           await supabase.from('backup_code_attempts').insert({
             user_id: mfaUserId
           } as any);
+          
+          const newAttemptCount = (attemptCount || 0) + 1;
+          
+          // Send security alert at 3 failed attempts
+          if (newAttemptCount === 3) {
+            try {
+              await supabase.functions.invoke('send-security-alert', {
+                body: {
+                  userEmail: email,
+                  alertType: 'failed_backup_codes',
+                  attemptCount: newAttemptCount,
+                  timestamp: new Date().toLocaleString()
+                }
+              });
+            } catch (alertError) {
+              console.error('Failed to send security alert:', alertError);
+            }
+          }
           
           toast.error("This backup code has already been used.");
           return;
