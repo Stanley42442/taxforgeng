@@ -32,6 +32,7 @@ import { SectorPresets } from "@/components/SectorPresets";
 import { toast } from "sonner";
 import { useSubscription, type SavedBusiness } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const CalculatorPage = () => {
   const location = useLocation();
@@ -93,12 +94,41 @@ const CalculatorPage = () => {
     fixedAssets: '',
   });
 
+  // Fetch expenses for selected business
+  const fetchBusinessExpenses = async (businessId: string) => {
+    if (!user || businessId === '__new__') return { totalExpenses: 0, deductibleExpenses: 0 };
+    
+    const { data, error } = await supabase
+      .from('expenses')
+      .select('amount, is_deductible, type')
+      .eq('user_id', user.id)
+      .eq('business_id', businessId);
+    
+    if (error) {
+      console.error('Error fetching expenses:', error);
+      return { totalExpenses: 0, deductibleExpenses: 0 };
+    }
+    
+    const expenses = data || [];
+    const totalExpenses = expenses
+      .filter(e => e.type === 'expense')
+      .reduce((sum, e) => sum + Number(e.amount), 0);
+    const deductibleExpenses = expenses
+      .filter(e => e.is_deductible)
+      .reduce((sum, e) => sum + Number(e.amount), 0);
+    
+    return { totalExpenses, deductibleExpenses };
+  };
+
   // Handle business selection
-  const handleBusinessSelect = (businessId: string) => {
+  const handleBusinessSelect = async (businessId: string) => {
     setSelectedBusinessId(businessId);
     
     if (businessId === '__new__') {
       // Reset to defaults when "New calculation" is selected
+      setInputs(prev => ({ ...prev, turnover: '', expenses: '' }));
+      setSelectedSector(undefined);
+      setSectorRules(undefined);
       return;
     }
     
@@ -108,17 +138,28 @@ const CalculatorPage = () => {
       setEntityType(business.entityType as 'business_name' | 'company');
       
       // Pre-fill turnover
-      if (business.turnover) {
-        setInputs(prev => ({ ...prev, turnover: business.turnover.toString() }));
-      }
+      const turnover = business.turnover ? business.turnover.toString() : '';
+      
+      // Fetch and pre-fill expenses for this business
+      const { deductibleExpenses } = await fetchBusinessExpenses(businessId);
+      
+      setInputs(prev => ({ 
+        ...prev, 
+        turnover,
+        expenses: deductibleExpenses > 0 ? deductibleExpenses.toString() : ''
+      }));
       
       // Pre-fill sector if available
       if (business.sector) {
         setSelectedSector(business.sector);
       }
       
+      const expenseText = deductibleExpenses > 0 
+        ? ` • Expenses: ₦${deductibleExpenses.toLocaleString()}`
+        : '';
+      
       toast.success(`Loaded ${business.name}`, {
-        description: `Entity: ${business.entityType === 'company' ? 'Company (LTD)' : 'Business Name'}${business.sector ? ` • Sector: ${business.sector.replace(/_/g, ' ')}` : ''}`
+        description: `Entity: ${business.entityType === 'company' ? 'Company (LTD)' : 'Business Name'}${business.sector ? ` • Sector: ${business.sector.replace(/_/g, ' ')}` : ''}${expenseText}`
       });
     }
   };
