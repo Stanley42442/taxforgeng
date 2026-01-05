@@ -607,28 +607,26 @@ const Expenses = () => {
                 {filteredExpenses.map((expense) => {
                   const businessName = getBusinessName(expense.businessId);
                   return (
-                    <div key={expense.id} className="neumorphic-sm bg-card/80 p-4 transition-all hover:shadow-card">
-                      <div className="flex items-start gap-4">
-                        <div className="text-2xl p-2 rounded-xl bg-muted/30">{getCategoryIcon(expense.category)}</div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-foreground truncate">{expense.description}</p>
-                          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mt-1">
-                            <span>{new Date(expense.date).toLocaleDateString()}</span>
-                            {businessName && <span>• {businessName}</span>}
-                            {expense.isDeductible && (
-                              <span className="px-2 py-0.5 rounded-full bg-success/10 text-success font-medium">Deductible</span>
-                            )}
-                          </div>
+                    <div key={expense.id} className="neumorphic-sm bg-card/80 p-4 flex items-center gap-4 transition-all hover:shadow-card">
+                      <div className="text-2xl p-2 rounded-xl bg-muted/30">{getCategoryIcon(expense.category)}</div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-foreground truncate">{expense.description}</p>
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                          <span>{new Date(expense.date).toLocaleDateString()}</span>
+                          {businessName && <span>• {businessName}</span>}
+                          {expense.isDeductible && (
+                            <span className="px-2 py-0.5 rounded-full bg-success/10 text-success font-medium">Deductible</span>
+                          )}
                         </div>
-                        <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 shrink-0" onClick={() => handleDeleteExpense(expense.id)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
                       </div>
-                      <div className="flex justify-end mt-3">
-                        <span className={`font-bold text-lg ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
+                      <div className="text-right">
+                        <span className={`font-bold ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
                           {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
                         </span>
                       </div>
+                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => handleDeleteExpense(expense.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   );
                 })}
