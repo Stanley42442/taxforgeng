@@ -10,6 +10,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { 
   Building2, 
   Briefcase,
@@ -17,21 +24,20 @@ import {
   ArrowRight,
   Info,
   Sparkles,
-  Crown
+  Store
 } from "lucide-react";
 import { calculateTax, type TaxInputs, type SectorTaxRules } from "@/lib/taxCalculations";
 import { NavMenu } from "@/components/NavMenu";
 import { SectorPresets } from "@/components/SectorPresets";
 import { toast } from "sonner";
-import { useSubscription } from "@/contexts/SubscriptionContext";
+import { useSubscription, type SavedBusiness } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
-import { Card, CardContent } from "@/components/ui/card";
 
 const CalculatorPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const preselectedEntity = location.state?.entityType;
-  const { tier } = useSubscription();
+  const { tier, savedBusinesses } = useSubscription();
   const { user } = useAuth();
 
   // Redirect free-tier/guest users to Individual Calculator
@@ -53,7 +59,8 @@ const CalculatorPage = () => {
   if (isFreeTierOrGuest) {
     return null;
   }
-
+  
+  const [selectedBusinessId, setSelectedBusinessId] = useState<string>('');
   const [entityType, setEntityType] = useState<'business_name' | 'company'>(
     preselectedEntity || 'business_name'
   );
@@ -74,6 +81,36 @@ const CalculatorPage = () => {
     foreignIncome: '',
     fixedAssets: '',
   });
+
+  // Handle business selection
+  const handleBusinessSelect = (businessId: string) => {
+    setSelectedBusinessId(businessId);
+    
+    if (businessId === '') {
+      // Reset to defaults when "New calculation" is selected
+      return;
+    }
+    
+    const business = savedBusinesses.find(b => b.id === businessId);
+    if (business) {
+      // Pre-fill entity type
+      setEntityType(business.entityType as 'business_name' | 'company');
+      
+      // Pre-fill turnover
+      if (business.turnover) {
+        setInputs(prev => ({ ...prev, turnover: business.turnover.toString() }));
+      }
+      
+      // Pre-fill sector if available
+      if (business.sector) {
+        setSelectedSector(business.sector);
+      }
+      
+      toast.success(`Loaded ${business.name}`, {
+        description: `Entity: ${business.entityType === 'company' ? 'Company (LTD)' : 'Business Name'}${business.sector ? ` • Sector: ${business.sector.replace(/_/g, ' ')}` : ''}`
+      });
+    }
+  };
 
   const updateInput = (field: string, value: string) => {
     const numValue = value.replace(/[^0-9]/g, '');
@@ -132,6 +169,54 @@ const CalculatorPage = () => {
             <p className="text-muted-foreground mb-4">
               Calculate your Nigerian taxes accurately
             </p>
+          </div>
+
+          {/* Business Selector */}
+          {savedBusinesses.length > 0 && (
+            <div className="mb-6 glass-frosted rounded-2xl p-5 shadow-futuristic animate-slide-up">
+              <div className="flex items-center gap-4">
+                <div className="rounded-xl p-3 bg-primary/10 text-primary flex-shrink-0">
+                  <Store className="h-6 w-6" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <Label className="text-sm font-medium text-foreground mb-2 block">
+                    Select Business
+                  </Label>
+                  <Select value={selectedBusinessId} onValueChange={handleBusinessSelect}>
+                    <SelectTrigger className="w-full h-12 rounded-xl border-2 border-border/60 bg-background/80 backdrop-blur-sm">
+                      <SelectValue placeholder="Start new calculation or choose a saved business..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">
+                        <span className="flex items-center gap-2">
+                          <Sparkles className="h-4 w-4 text-accent" />
+                          New Calculation
+                        </span>
+                      </SelectItem>
+                      {savedBusinesses.map((business) => (
+                        <SelectItem key={business.id} value={business.id}>
+                          <span className="flex items-center gap-2">
+                            {business.entityType === 'company' ? (
+                              <Building2 className="h-4 w-4 text-primary" />
+                            ) : (
+                              <Briefcase className="h-4 w-4 text-primary" />
+                            )}
+                            {business.name}
+                            {business.verificationStatus === 'verified' && (
+                              <span className="text-xs bg-success/20 text-success px-1.5 py-0.5 rounded">✓ CAC</span>
+                            )}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Sector Presets */}
+          <div className="mb-6 animate-slide-up">
             <SectorPresets 
               selectedSector={selectedSector}
               onApplyPreset={(taxRules, sectorId) => {

@@ -17,6 +17,8 @@ export interface SavedBusiness {
   entityType: 'company' | 'business_name';
   turnover: number;
   createdAt: Date;
+  sector?: string;
+  subSector?: string;
   // CAC Verification fields
   rcBnNumber?: string;
   verificationStatus?: 'verified' | 'not_verified' | 'pending' | 'manual';
@@ -156,6 +158,8 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         entityType: b.entity_type as 'company' | 'business_name',
         turnover: Number(b.turnover),
         createdAt: new Date(b.created_at),
+        sector: b.sector || undefined,
+        subSector: b.sub_sector || undefined,
         verificationStatus: b.cac_verified ? 'verified' : 'not_verified',
       }));
 
@@ -226,6 +230,8 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       entityType: data.entity_type as 'company' | 'business_name',
       turnover: Number(data.turnover),
       createdAt: new Date(data.created_at),
+      sector: data.sector || undefined,
+      subSector: data.sub_sector || undefined,
       verificationStatus: data.cac_verified ? 'verified' : 'not_verified',
     };
 
