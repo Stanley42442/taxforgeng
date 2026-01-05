@@ -401,15 +401,15 @@ const Expenses = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative w-full max-w-full overflow-x-clip">
-      {/* Background - simplified to prevent Chrome scroll issues */}
+    <div className="min-h-screen flex flex-col overflow-x-hidden relative">
+      {/* Background */}
       <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
       <div className="fixed inset-0 bg-mesh pointer-events-none" />
-      <div className="fixed inset-0 bg-dots opacity-15 pointer-events-none" />
+      <div className="fixed inset-0 bg-dots opacity-20 pointer-events-none" />
 
       <NavMenu />
 
-      <main className="container mx-auto px-4 py-6 pb-8 relative z-10">
+      <main className="container mx-auto px-4 py-6 pb-8 relative z-10 flex-1">
         <div className="mx-auto max-w-5xl">
           {/* Header */}
           <div className="text-center mb-10 animate-slide-up">
