@@ -46,7 +46,10 @@ import {
   TrendingUp as TrendUp,
   TrendingDown as TrendDown,
   Bell,
-  CalendarClock
+  CalendarClock,
+  Flag,
+  Trophy,
+  Pencil
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { jsPDF } from "jspdf";
@@ -193,6 +196,19 @@ const Expenses = () => {
     typeof Notification !== 'undefined' ? Notification.permission : 'denied'
   );
   const [budgetInput, setBudgetInput] = useState('');
+  
+  // Savings Goals per business
+  const [showGoalsDialog, setShowGoalsDialog] = useState(false);
+  const [savingsGoals, setSavingsGoals] = useState<Record<string, {
+    targetAmount: number;
+    targetDate: string;
+    description: string;
+  }>>(() => {
+    const saved = localStorage.getItem('savingsGoals');
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [editingGoalBusiness, setEditingGoalBusiness] = useState<string | null>(null);
+  const [newGoal, setNewGoal] = useState({ targetAmount: '', targetDate: '', description: '' });
   
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -715,6 +731,66 @@ const Expenses = () => {
     toast.success('Marked as paid');
   };
 
+  // Savings Goals Functions
+  const handleSaveGoal = (businessId: string) => {
+    if (!newGoal.targetAmount || !newGoal.targetDate) {
+      toast.error('Please set a target amount and date');
+      return;
+    }
+    const updated = {
+      ...savingsGoals,
+      [businessId]: {
+        targetAmount: Number(newGoal.targetAmount),
+        targetDate: newGoal.targetDate,
+        description: newGoal.description || 'Savings Goal',
+      }
+    };
+    setSavingsGoals(updated);
+    localStorage.setItem('savingsGoals', JSON.stringify(updated));
+    setEditingGoalBusiness(null);
+    setNewGoal({ targetAmount: '', targetDate: '', description: '' });
+    toast.success('Savings goal saved!');
+  };
+
+  const handleDeleteGoal = (businessId: string) => {
+    const updated = { ...savingsGoals };
+    delete updated[businessId];
+    setSavingsGoals(updated);
+    localStorage.setItem('savingsGoals', JSON.stringify(updated));
+    toast.success('Goal removed');
+  };
+
+  const getBusinessSavings = (businessId: string) => {
+    const businessExpenses = expenses.filter(e => e.businessId === businessId);
+    const income = businessExpenses.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
+    const expenseTotal = businessExpenses.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
+    return income - expenseTotal;
+  };
+
+  const getGoalProgress = (businessId: string) => {
+    const goal = savingsGoals[businessId];
+    if (!goal) return null;
+    
+    const currentSavings = getBusinessSavings(businessId);
+    const progress = Math.min((currentSavings / goal.targetAmount) * 100, 100);
+    const remaining = Math.max(goal.targetAmount - currentSavings, 0);
+    const targetDate = new Date(goal.targetDate);
+    const today = new Date();
+    const daysRemaining = Math.max(0, Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
+    const isOverdue = today > targetDate;
+    const isAchieved = currentSavings >= goal.targetAmount;
+    
+    return {
+      ...goal,
+      currentSavings,
+      progress,
+      remaining,
+      daysRemaining,
+      isOverdue,
+      isAchieved,
+    };
+  };
+
   const exportMonthlySummaryPDF = () => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -944,6 +1020,14 @@ const Expenses = () => {
               >
                 <Repeat className="h-4 w-4" />
                 <span className="hidden sm:inline">Templates</span>
+              </Button>
+              <Button 
+                variant={showGoalsDialog ? "secondary" : "outline"}
+                className={showGoalsDialog ? "" : "glass"}
+                onClick={() => setShowGoalsDialog(!showGoalsDialog)}
+              >
+                <Flag className="h-4 w-4" />
+                <span className="hidden sm:inline">Goals</span>
               </Button>
               <Button 
                 variant={notificationsEnabled ? "secondary" : "outline"}
@@ -1189,6 +1273,178 @@ const Expenses = () => {
                 <p className="text-xs text-destructive mt-2">
                   You've exceeded your budget by {formatCurrency(currentMonthExpenses - monthlyBudget)}
                 </p>
+              )}
+            </div>
+          )}
+
+          {/* Savings Goals Section */}
+          {showGoalsDialog && savedBusinesses.length > 0 && (
+            <div className="glass-frosted rounded-xl p-4 mb-6 shadow-futuristic">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-medium text-foreground flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-success/10">
+                    <Flag className="h-5 w-5 text-success" />
+                  </div>
+                  Savings Goals by Business
+                </h3>
+              </div>
+              
+              <div className="space-y-4">
+                {savedBusinesses.map(business => {
+                  const goalProgress = getGoalProgress(business.id);
+                  const isEditing = editingGoalBusiness === business.id;
+                  
+                  return (
+                    <div key={business.id} className="p-4 rounded-xl bg-card/50 border border-border/50">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">🏢</span>
+                          <span className="font-medium">{business.name}</span>
+                        </div>
+                        {!isEditing && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => {
+                              setEditingGoalBusiness(business.id);
+                              if (goalProgress) {
+                                setNewGoal({
+                                  targetAmount: goalProgress.targetAmount.toString(),
+                                  targetDate: goalProgress.targetDate,
+                                  description: goalProgress.description,
+                                });
+                              }
+                            }}
+                          >
+                            <Pencil className="h-4 w-4" />
+                            {goalProgress ? 'Edit' : 'Set Goal'}
+                          </Button>
+                        )}
+                      </div>
+                      
+                      {isEditing ? (
+                        <div className="space-y-3 p-3 bg-muted/30 rounded-lg">
+                          <div className="space-y-1">
+                            <Label className="text-xs">Goal Description</Label>
+                            <Input
+                              placeholder="e.g., Q1 Savings Target"
+                              value={newGoal.description}
+                              onChange={(e) => setNewGoal(prev => ({ ...prev, description: e.target.value }))}
+                              className="h-9"
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <Label className="text-xs">Target Amount (₦)</Label>
+                              <Input
+                                type="number"
+                                placeholder="500000"
+                                value={newGoal.targetAmount}
+                                onChange={(e) => setNewGoal(prev => ({ ...prev, targetAmount: e.target.value }))}
+                                className="h-9"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">Target Date</Label>
+                              <Input
+                                type="date"
+                                value={newGoal.targetDate}
+                                onChange={(e) => setNewGoal(prev => ({ ...prev, targetDate: e.target.value }))}
+                                className="h-9"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex gap-2 pt-2">
+                            <Button size="sm" onClick={() => handleSaveGoal(business.id)}>
+                              Save Goal
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="ghost"
+                              onClick={() => {
+                                setEditingGoalBusiness(null);
+                                setNewGoal({ targetAmount: '', targetDate: '', description: '' });
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                            {goalProgress && (
+                              <Button 
+                                size="sm" 
+                                variant="ghost"
+                                className="text-destructive hover:text-destructive ml-auto"
+                                onClick={() => handleDeleteGoal(business.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ) : goalProgress ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">{goalProgress.description}</span>
+                            <span className="flex items-center gap-1">
+                              {goalProgress.isAchieved ? (
+                                <Trophy className="h-4 w-4 text-warning" />
+                              ) : goalProgress.isOverdue ? (
+                                <AlertTriangle className="h-4 w-4 text-destructive" />
+                              ) : null}
+                              <span className={goalProgress.isAchieved ? 'text-success font-medium' : goalProgress.isOverdue ? 'text-destructive' : 'text-muted-foreground'}>
+                                {goalProgress.isAchieved ? 'Achieved!' : goalProgress.isOverdue ? 'Overdue' : `${goalProgress.daysRemaining}d left`}
+                              </span>
+                            </span>
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-xs">
+                              <span className="text-muted-foreground">
+                                Current: <span className={`font-medium ${goalProgress.currentSavings >= 0 ? 'text-success' : 'text-destructive'}`}>
+                                  {formatCurrency(goalProgress.currentSavings)}
+                                </span>
+                              </span>
+                              <span className="text-muted-foreground">
+                                Target: <span className="font-medium text-foreground">{formatCurrency(goalProgress.targetAmount)}</span>
+                              </span>
+                            </div>
+                            <div className="h-3 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full transition-all ${goalProgress.isAchieved ? 'bg-success' : goalProgress.progress > 50 ? 'bg-primary' : 'bg-warning'}`}
+                                style={{ width: `${goalProgress.progress}%` }}
+                              />
+                            </div>
+                            <div className="flex justify-between text-xs text-muted-foreground">
+                              <span>{goalProgress.progress.toFixed(0)}% complete</span>
+                              {!goalProgress.isAchieved && (
+                                <span>{formatCurrency(goalProgress.remaining)} to go</span>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="text-xs text-muted-foreground pt-1">
+                            Target date: {new Date(goalProgress.targetDate).toLocaleDateString('en-NG', { 
+                              year: 'numeric', month: 'long', day: 'numeric' 
+                            })}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-muted-foreground text-center py-2">
+                          No savings goal set for this business
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {savedBusinesses.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Flag className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                  <p className="text-sm">Save a business first to set savings goals</p>
+                  <Button variant="link" size="sm" onClick={() => navigate('/businesses')}>
+                    Go to Saved Businesses
+                  </Button>
+                </div>
               )}
             </div>
           )}
