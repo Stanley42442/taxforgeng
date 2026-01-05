@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,17 +16,43 @@ import {
   HelpCircle,
   ArrowRight,
   Info,
-  Sparkles
+  Sparkles,
+  Crown
 } from "lucide-react";
 import { calculateTax, type TaxInputs } from "@/lib/taxCalculations";
 import { NavMenu } from "@/components/NavMenu";
 import { SectorPresets } from "@/components/SectorPresets";
 import { toast } from "sonner";
+import { useSubscription } from "@/contexts/SubscriptionContext";
+import { useAuth } from "@/hooks/useAuth";
+import { Card, CardContent } from "@/components/ui/card";
 
 const CalculatorPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const preselectedEntity = location.state?.entityType;
+  const { tier } = useSubscription();
+  const { user } = useAuth();
+
+  // Redirect free-tier/guest users to Individual Calculator
+  const isFreeTierOrGuest = !user || tier === 'free';
+
+  useEffect(() => {
+    if (isFreeTierOrGuest) {
+      toast.info("Business Tax requires a paid plan. Redirecting to Personal Tax Calculator.", {
+        duration: 4000
+      });
+      navigate('/individual-calculator', { 
+        state: { showUpgradePrompt: true },
+        replace: true 
+      });
+    }
+  }, [isFreeTierOrGuest, navigate]);
+
+  // Don't render if redirecting
+  if (isFreeTierOrGuest) {
+    return null;
+  }
 
   const [entityType, setEntityType] = useState<'business_name' | 'company'>(
     preselectedEntity || 'business_name'
