@@ -35,7 +35,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    // Handle session-only mode (clear on browser close)
+    const handleBeforeUnload = () => {
+      const isSessionOnly = sessionStorage.getItem('taxforge-session-only');
+      if (isSessionOnly === 'true') {
+        // Clear auth tokens from localStorage when browser closes
+        // This effectively logs out users who didn't check "Remember me"
+        localStorage.removeItem('sb-uhuxqrrtsiintcwpxxwy-auth-token');
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
   }, []);
 
   const signUp = async (email: string, password: string, fullName?: string) => {
