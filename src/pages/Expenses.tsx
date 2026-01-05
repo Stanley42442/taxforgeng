@@ -401,9 +401,9 @@ const Expenses = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero">
+    <div className="min-h-screen bg-gradient-hero overflow-x-clip">
       {/* Premium Background Effects */}
-      <div className="fixed inset-0 pointer-events-none" style={{ overflow: 'clip' }}>
+      <div className="fixed inset-0 pointer-events-none overflow-clip">
         <div className="absolute top-0 left-1/3 w-[600px] h-[600px] rounded-full bg-primary/5 blur-3xl animate-float-slow" />
         <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] rounded-full bg-accent/5 blur-3xl animate-float" />
         <div className="bg-mesh absolute inset-0" />
