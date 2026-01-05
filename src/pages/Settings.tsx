@@ -600,6 +600,14 @@ const Settings = () => {
                   </Badge>
                 )}
               </div>
+              <div className="pt-2">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/security">
+                    <Shield className="h-4 w-4 mr-2" />
+                    View Security Dashboard
+                  </Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
