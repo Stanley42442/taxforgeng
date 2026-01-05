@@ -607,25 +607,27 @@ const Expenses = () => {
                 {filteredExpenses.map((expense) => {
                   const businessName = getBusinessName(expense.businessId);
                   return (
-                    <div key={expense.id} className="neumorphic-sm bg-card/80 p-4 transition-all hover:shadow-card grid grid-cols-[auto_1fr_auto] gap-x-4 gap-y-2">
-                      <div className="text-2xl p-2 rounded-xl bg-muted/30 row-span-2 self-center">{getCategoryIcon(expense.category)}</div>
-                      <div className="min-w-0">
-                        <p className="font-medium text-foreground truncate">{expense.description}</p>
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                    <div key={expense.id} className="bg-card border border-border rounded-xl p-4 flex items-start gap-4">
+                      <div className="text-2xl p-2 rounded-xl bg-muted/30 shrink-0">{getCategoryIcon(expense.category)}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="font-medium text-foreground truncate">{expense.description}</p>
+                          <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 shrink-0 -mt-1 -mr-2" onClick={() => handleDeleteExpense(expense.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mt-1">
                           <span>{new Date(expense.date).toLocaleDateString()}</span>
                           {businessName && <span>• {businessName}</span>}
                           {expense.isDeductible && (
                             <span className="px-2 py-0.5 rounded-full bg-success/10 text-success font-medium">Deductible</span>
                           )}
                         </div>
-                      </div>
-                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 self-start" onClick={() => handleDeleteExpense(expense.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                      <div className="col-start-2 col-end-4 flex justify-end">
-                        <span className={`font-bold text-lg ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
-                          {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
-                        </span>
+                        <div className="mt-2 text-right">
+                          <span className={`font-bold text-lg ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
+                            {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   );
