@@ -142,6 +142,27 @@ export type Database = {
         }
         Relationships: []
       }
+      backup_code_attempts: {
+        Row: {
+          attempted_at: string
+          id: string
+          ip_address: string | null
+          user_id: string
+        }
+        Insert: {
+          attempted_at?: string
+          id?: string
+          ip_address?: string | null
+          user_id: string
+        }
+        Update: {
+          attempted_at?: string
+          id?: string
+          ip_address?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       backup_codes: {
         Row: {
           code_hash: string
@@ -749,6 +770,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_old_backup_attempts: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

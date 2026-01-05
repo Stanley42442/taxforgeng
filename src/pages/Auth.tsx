@@ -244,6 +244,19 @@ const Auth = () => {
           return;
         }
 
+        // Check rate limiting - max 5 attempts in 15 minutes
+        const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+        const { count: attemptCount } = await supabase
+          .from('backup_code_attempts')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', mfaUserId)
+          .gte('attempted_at', fifteenMinutesAgo);
+
+        if ((attemptCount || 0) >= 5) {
+          toast.error("Too many failed attempts. Please try again in 15 minutes.");
+          return;
+        }
+
         const codeHash = await hashCode(backupCode);
         
         // Check if backup code exists and is unused
@@ -255,14 +268,31 @@ const Auth = () => {
           .single();
 
         if (fetchError || !codes) {
-          toast.error("Invalid backup code. Please try again.");
+          // Log failed attempt
+          await supabase.from('backup_code_attempts').insert({
+            user_id: mfaUserId
+          } as any);
+          
+          const remainingAttempts = 4 - (attemptCount || 0);
+          toast.error(`Invalid backup code. ${remainingAttempts > 0 ? `${remainingAttempts} attempts remaining.` : 'Account temporarily locked.'}`);
           return;
         }
 
         if (codes.used_at) {
+          // Log failed attempt for used code
+          await supabase.from('backup_code_attempts').insert({
+            user_id: mfaUserId
+          } as any);
+          
           toast.error("This backup code has already been used.");
           return;
         }
+
+        // Successful verification - clear failed attempts
+        await supabase
+          .from('backup_code_attempts')
+          .delete()
+          .eq('user_id', mfaUserId);
 
         // Mark backup code as used
         await supabase
