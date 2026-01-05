@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { NavMenu } from "@/components/NavMenu";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -377,6 +378,8 @@ const Expenses = () => {
     <div className="min-h-screen bg-gradient-hero relative">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-mesh pointer-events-none" />
+      <div className="hidden lg:block absolute top-20 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="hidden lg:block absolute bottom-40 right-10 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
       
       <NavMenu />
 
@@ -393,7 +396,7 @@ const Expenses = () => {
 
           {/* Summary Cards */}
           <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-6">
-            <div className="glass-frosted rounded-xl p-4 hover-lift">
+            <Card variant="elevated" glow="success" className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <div className="p-1.5 rounded-lg bg-success/10">
                   <TrendingUp className="h-4 w-4 text-success" />
@@ -401,8 +404,8 @@ const Expenses = () => {
                 <span className="text-sm text-muted-foreground">Income</span>
               </div>
               <p className="text-xl font-bold text-success">{formatCurrency(totalIncome)}</p>
-            </div>
-            <div className="glass-frosted rounded-xl p-4 hover-lift">
+            </Card>
+            <Card variant="elevated" className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <div className="p-1.5 rounded-lg bg-destructive/10">
                   <TrendingDown className="h-4 w-4 text-destructive" />
@@ -410,8 +413,8 @@ const Expenses = () => {
                 <span className="text-sm text-muted-foreground">Expenses</span>
               </div>
               <p className="text-xl font-bold text-destructive">{formatCurrency(totalExpenses)}</p>
-            </div>
-            <div className="glass-frosted rounded-xl p-4 hover-lift">
+            </Card>
+            <Card variant="elevated" glow="primary" className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <div className="p-1.5 rounded-lg bg-primary/10">
                   <Receipt className="h-4 w-4 text-primary" />
@@ -419,8 +422,8 @@ const Expenses = () => {
                 <span className="text-sm text-muted-foreground">Deductible</span>
               </div>
               <p className="text-xl font-bold text-primary">{formatCurrency(deductibleExpenses)}</p>
-            </div>
-            <div className="glass-frosted rounded-xl p-4 hover-lift">
+            </Card>
+            <Card variant="elevated" glow="accent" className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <div className="p-1.5 rounded-lg bg-warning/10">
                   <Calculator className="h-4 w-4 text-warning" />
@@ -428,7 +431,7 @@ const Expenses = () => {
                 <span className="text-sm text-muted-foreground">Est. Tax</span>
               </div>
               <p className="text-xl font-bold text-warning">{formatCurrency(estimatedTax)}</p>
-            </div>
+            </Card>
           </div>
 
           {/* Action Buttons */}
