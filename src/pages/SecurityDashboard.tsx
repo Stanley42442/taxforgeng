@@ -21,12 +21,15 @@ import {
   Lock,
   Unlock,
   Activity,
-  AlertCircle
+  AlertCircle,
+  Monitor,
+  Trash2
 } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow, format } from "date-fns";
+import { toast } from "sonner";
 
 interface AuthEvent {
   id: string;
@@ -42,6 +45,17 @@ interface BackupCodeAttempt {
   user_id: string;
   attempted_at: string;
   ip_address: string | null;
+}
+
+interface KnownDevice {
+  id: string;
+  device_fingerprint: string;
+  device_name: string | null;
+  browser: string | null;
+  os: string | null;
+  is_trusted: boolean;
+  first_seen_at: string;
+  last_seen_at: string;
 }
 
 interface SecurityStats {
@@ -112,6 +126,7 @@ const SecurityDashboard = () => {
 
   const [authEvents, setAuthEvents] = useState<AuthEvent[]>([]);
   const [backupCodeAttempts, setBackupCodeAttempts] = useState<BackupCodeAttempt[]>([]);
+  const [knownDevices, setKnownDevices] = useState<KnownDevice[]>([]);
   const [stats, setStats] = useState<SecurityStats>({
     totalLogins: 0,
     failedAttempts: 0,
@@ -121,6 +136,7 @@ const SecurityDashboard = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [removingDeviceId, setRemovingDeviceId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -152,6 +168,14 @@ const SecurityDashboard = () => {
 
       setBackupCodeAttempts((attempts || []) as BackupCodeAttempt[]);
 
+      // Load known devices
+      const { data: devices } = await supabase
+        .from('known_devices')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('last_seen_at', { ascending: false });
+
+      setKnownDevices((devices || []) as KnownDevice[]);
       // Load MFA status
       const { data: mfaData } = await supabase.auth.mfa.listFactors();
       const mfaEnabled = (mfaData?.totp || []).some(f => f.status === 'verified');
@@ -200,6 +224,29 @@ const SecurityDashboard = () => {
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await loadSecurityData();
+  };
+
+  const handleRemoveDevice = async (deviceId: string) => {
+    if (!user) return;
+    
+    setRemovingDeviceId(deviceId);
+    try {
+      const { error } = await supabase
+        .from('known_devices')
+        .delete()
+        .eq('id', deviceId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setKnownDevices(prev => prev.filter(d => d.id !== deviceId));
+      toast.success("Device removed successfully");
+    } catch (error) {
+      console.error("Error removing device:", error);
+      toast.error("Failed to remove device");
+    } finally {
+      setRemovingDeviceId(null);
+    }
   };
 
   if (loading || isLoading) {
@@ -353,6 +400,15 @@ const SecurityDashboard = () => {
         {/* Activity Tabs */}
         <Tabs defaultValue="events" className="space-y-4">
           <TabsList>
+            <TabsTrigger value="devices" className="gap-2">
+              <Monitor className="h-4 w-4" />
+              Devices
+              {knownDevices.length > 0 && (
+                <Badge variant="secondary" className="ml-1 h-5 px-1.5">
+                  {knownDevices.length}
+                </Badge>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="events" className="gap-2">
               <Activity className="h-4 w-4" />
               Security Events
@@ -367,6 +423,75 @@ const SecurityDashboard = () => {
               )}
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="devices">
+            <Card>
+              <CardHeader>
+                <CardTitle>Known Devices</CardTitle>
+                <CardDescription>
+                  Devices that have logged into your account
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {knownDevices.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Monitor className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>No devices recorded yet</p>
+                  </div>
+                ) : (
+                  <ScrollArea className="h-[400px] pr-4">
+                    <div className="space-y-3">
+                      {knownDevices.map((device) => (
+                        <div 
+                          key={device.id}
+                          className="flex items-start gap-3 p-4 rounded-lg border bg-card"
+                        >
+                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                            <Monitor className="h-5 w-5 text-primary" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <p className="font-medium text-sm">
+                                  {device.device_name || 'Unknown Device'}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-0.5">
+                                  {device.browser} on {device.os}
+                                </p>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                onClick={() => handleRemoveDevice(device.id)}
+                                disabled={removingDeviceId === device.id}
+                              >
+                                {removingDeviceId === device.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </div>
+                            <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                First seen: {format(new Date(device.first_seen_at), 'PP')}
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <RefreshCw className="h-3 w-3" />
+                                Last active: {formatDistanceToNow(new Date(device.last_seen_at), { addSuffix: true })}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="events">
             <Card>
