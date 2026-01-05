@@ -17,6 +17,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { 
   Building2, 
   Briefcase,
@@ -24,7 +31,14 @@ import {
   ArrowRight,
   Info,
   Sparkles,
-  Store
+  Store,
+  Plus,
+  Receipt,
+  Utensils,
+  Car,
+  Plug,
+  Home,
+  Package
 } from "lucide-react";
 import { calculateTax, type TaxInputs, type SectorTaxRules } from "@/lib/taxCalculations";
 import { NavMenu } from "@/components/NavMenu";
@@ -94,18 +108,53 @@ const CalculatorPage = () => {
     fixedAssets: '',
   });
 
-  // Fetch expenses for selected business
+  // Quick-add expense state
+  const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
+  const [expenseBreakdown, setExpenseBreakdown] = useState<Record<string, number>>({});
+  const [quickExpense, setQuickExpense] = useState({
+    description: '',
+    amount: '',
+    category: 'other' as string,
+  });
+
+  type ExpenseCategory = 'office_supplies' | 'travel' | 'utilities' | 'meals' | 'rent' | 'equipment' | 'other';
+
+  const categoryIcons: Record<ExpenseCategory, React.ReactNode> = {
+    office_supplies: <Package className="h-4 w-4" />,
+    travel: <Car className="h-4 w-4" />,
+    utilities: <Plug className="h-4 w-4" />,
+    meals: <Utensils className="h-4 w-4" />,
+    rent: <Home className="h-4 w-4" />,
+    equipment: <Package className="h-4 w-4" />,
+    other: <Receipt className="h-4 w-4" />,
+  };
+
+  const categoryLabels: Record<ExpenseCategory, string> = {
+    office_supplies: 'Office Supplies',
+    travel: 'Travel',
+    utilities: 'Utilities',
+    meals: 'Meals & Entertainment',
+    rent: 'Rent',
+    equipment: 'Equipment',
+    other: 'Other',
+  };
+
+  // Fetch expenses for selected business with category breakdown
   const fetchBusinessExpenses = async (businessId: string) => {
-    if (!user || businessId === '__new__') return { totalExpenses: 0, deductibleExpenses: 0 };
+    if (!user || businessId === '__new__') {
+      setExpenseBreakdown({});
+      return { totalExpenses: 0, deductibleExpenses: 0 };
+    }
     
     const { data, error } = await supabase
       .from('expenses')
-      .select('amount, is_deductible, type')
+      .select('amount, is_deductible, type, category')
       .eq('user_id', user.id)
       .eq('business_id', businessId);
     
     if (error) {
       console.error('Error fetching expenses:', error);
+      setExpenseBreakdown({});
       return { totalExpenses: 0, deductibleExpenses: 0 };
     }
     
@@ -116,8 +165,54 @@ const CalculatorPage = () => {
     const deductibleExpenses = expenses
       .filter(e => e.is_deductible)
       .reduce((sum, e) => sum + Number(e.amount), 0);
+
+    // Calculate category breakdown
+    const breakdown: Record<string, number> = {};
+    expenses.forEach(e => {
+      const cat = e.category || 'other';
+      breakdown[cat] = (breakdown[cat] || 0) + Number(e.amount);
+    });
+    setExpenseBreakdown(breakdown);
     
     return { totalExpenses, deductibleExpenses };
+  };
+
+  // Handle quick expense submission
+  const handleQuickExpenseSubmit = async () => {
+    if (!user || !selectedBusinessId || selectedBusinessId === '__new__') return;
+    
+    const amount = Number(quickExpense.amount.replace(/[^0-9]/g, ''));
+    if (!amount) {
+      toast.error('Please enter an amount');
+      return;
+    }
+
+    const { error } = await supabase.from('expenses').insert({
+      user_id: user.id,
+      business_id: selectedBusinessId,
+      type: 'expense',
+      category: quickExpense.category,
+      description: quickExpense.description || `${categoryLabels[quickExpense.category as ExpenseCategory]} expense`,
+      amount,
+      is_deductible: true,
+    });
+
+    if (error) {
+      toast.error('Failed to add expense');
+      console.error(error);
+      return;
+    }
+
+    toast.success('Expense added');
+    setQuickExpense({ description: '', amount: '', category: 'other' });
+    setExpenseDialogOpen(false);
+
+    // Refresh expenses
+    const { deductibleExpenses } = await fetchBusinessExpenses(selectedBusinessId);
+    setInputs(prev => ({
+      ...prev,
+      expenses: deductibleExpenses > 0 ? deductibleExpenses.toString() : ''
+    }));
   };
 
   // Handle business selection
@@ -129,6 +224,7 @@ const CalculatorPage = () => {
       setInputs(prev => ({ ...prev, turnover: '', expenses: '' }));
       setSelectedSector(undefined);
       setSectorRules(undefined);
+      setExpenseBreakdown({});
       return;
     }
     
@@ -358,13 +454,125 @@ const CalculatorPage = () => {
                     tooltip="Total revenue/sales for the year"
                     required
                   />
-                  <NeumorphicInput
-                    label="Business Expenses"
-                    value={inputs.expenses}
-                    onChange={(v) => updateInput('expenses', v)}
-                    tooltip="Deductible business costs"
-                  />
+                  <div>
+                    <NeumorphicInput
+                      label="Business Expenses"
+                      value={inputs.expenses}
+                      onChange={(v) => updateInput('expenses', v)}
+                      tooltip="Deductible business costs"
+                    />
+                    {/* Quick Add Expense Button */}
+                    {selectedBusinessId && selectedBusinessId !== '__new__' && (
+                      <Dialog open={expenseDialogOpen} onOpenChange={setExpenseDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="mt-2 text-xs text-primary hover:text-primary/80"
+                          >
+                            <Plus className="h-3 w-3 mr-1" />
+                            Quick Add Expense
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="glass-frosted">
+                          <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                              <Receipt className="h-5 w-5 text-primary" />
+                              Add Expense
+                            </DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4 pt-4">
+                            <div>
+                              <Label className="text-sm font-medium mb-2 block">Category</Label>
+                              <Select 
+                                value={quickExpense.category} 
+                                onValueChange={(v) => setQuickExpense(prev => ({ ...prev, category: v }))}
+                              >
+                                <SelectTrigger className="h-12 rounded-xl">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {Object.entries(categoryLabels).map(([key, label]) => (
+                                    <SelectItem key={key} value={key}>
+                                      <span className="flex items-center gap-2">
+                                        {categoryIcons[key as ExpenseCategory]}
+                                        {label}
+                                      </span>
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div>
+                              <Label className="text-sm font-medium mb-2 block">Amount</Label>
+                              <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary font-semibold">₦</span>
+                                <Input
+                                  type="text"
+                                  inputMode="numeric"
+                                  value={quickExpense.amount ? Number(quickExpense.amount.replace(/[^0-9]/g, '')).toLocaleString() : ''}
+                                  onChange={(e) => setQuickExpense(prev => ({ 
+                                    ...prev, 
+                                    amount: e.target.value.replace(/[^0-9]/g, '') 
+                                  }))}
+                                  className="pl-10 h-12 rounded-xl"
+                                  placeholder="0"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <Label className="text-sm font-medium mb-2 block">Description (optional)</Label>
+                              <Input
+                                value={quickExpense.description}
+                                onChange={(e) => setQuickExpense(prev => ({ ...prev, description: e.target.value }))}
+                                className="h-12 rounded-xl"
+                                placeholder="Brief description..."
+                              />
+                            </div>
+                            <Button 
+                              onClick={handleQuickExpenseSubmit}
+                              className="w-full h-12 rounded-xl"
+                              disabled={!quickExpense.amount}
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              Add Expense
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                  </div>
                 </div>
+
+                {/* Expense Breakdown by Category */}
+                {selectedBusinessId && selectedBusinessId !== '__new__' && Object.keys(expenseBreakdown).length > 0 && (
+                  <div className="mt-4 p-4 rounded-xl bg-secondary/30 border border-border/40">
+                    <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
+                      <Receipt className="h-4 w-4 text-primary" />
+                      Expense Breakdown
+                    </h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {Object.entries(expenseBreakdown).map(([category, amount]) => (
+                        <div 
+                          key={category} 
+                          className="flex items-center gap-2 p-2 rounded-lg bg-background/50"
+                        >
+                          <span className="text-muted-foreground">
+                            {categoryIcons[category as ExpenseCategory] || categoryIcons.other}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs text-muted-foreground truncate">
+                              {categoryLabels[category as ExpenseCategory] || category}
+                            </p>
+                            <p className="text-sm font-medium text-foreground">
+                              ₦{amount.toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </InputSection>
 
               {/* Company-specific fields */}
