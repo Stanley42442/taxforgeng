@@ -33,7 +33,11 @@ import {
   CalendarIcon,
   Filter,
   X,
-  Camera
+  Camera,
+  Search,
+  ChevronDown,
+  ChevronUp,
+  BarChart3
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import {
@@ -125,6 +129,9 @@ const Expenses = () => {
   const [filterBusinessId, setFilterBusinessId] = useState<string>('all');
   const [showCharts, setShowCharts] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
+  const [showMonthlySummary, setShowMonthlySummary] = useState(false);
   
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -327,6 +334,10 @@ const Expenses = () => {
     if (filterBusinessId !== 'all' && e.businessId !== filterBusinessId) return false;
     if (filterType !== 'all' && e.type !== filterType) return false;
     if (filterCategory !== 'all' && e.category !== filterCategory) return false;
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      if (!e.description.toLowerCase().includes(query)) return false;
+    }
     if (dateFrom) {
       const expenseDate = new Date(e.date);
       if (expenseDate < dateFrom) return false;
@@ -340,7 +351,29 @@ const Expenses = () => {
     return true;
   });
 
-  const hasActiveFilters = filterType !== 'all' || filterCategory !== 'all' || dateFrom !== undefined || dateTo !== undefined || filterBusinessId !== 'all';
+  // Monthly summary calculation
+  const monthlySummary = filteredExpenses.reduce((acc, expense) => {
+    const date = new Date(expense.date);
+    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    const monthName = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    
+    if (!acc[monthKey]) {
+      acc[monthKey] = { monthName, income: 0, expenses: 0, net: 0 };
+    }
+    
+    if (expense.type === 'income') {
+      acc[monthKey].income += expense.amount;
+    } else {
+      acc[monthKey].expenses += expense.amount;
+    }
+    acc[monthKey].net = acc[monthKey].income - acc[monthKey].expenses;
+    
+    return acc;
+  }, {} as Record<string, { monthName: string; income: number; expenses: number; net: number }>);
+
+  const sortedMonths = Object.entries(monthlySummary).sort((a, b) => b[0].localeCompare(a[0]));
+
+  const hasActiveFilters = filterType !== 'all' || filterCategory !== 'all' || dateFrom !== undefined || dateTo !== undefined || filterBusinessId !== 'all' || searchQuery.trim() !== '';
 
   const clearFilters = () => {
     setFilterType('all');
@@ -348,6 +381,7 @@ const Expenses = () => {
     setDateFrom(undefined);
     setDateTo(undefined);
     setFilterBusinessId('all');
+    setSearchQuery('');
   };
 
   const totalIncome = filteredExpenses.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
@@ -465,6 +499,14 @@ const Expenses = () => {
                 <span className="hidden sm:inline">{showCharts ? 'Hide' : 'Show'} Charts</span>
               </Button>
               <Button 
+                variant={showMonthlySummary ? "secondary" : "outline"}
+                className={showMonthlySummary ? "" : "glass"}
+                onClick={() => setShowMonthlySummary(!showMonthlySummary)}
+              >
+                <BarChart3 className="h-4 w-4" />
+                <span className="hidden sm:inline">Monthly</span>
+              </Button>
+              <Button 
                 variant={showFilters ? "secondary" : "outline"}
                 className={showFilters ? "" : "glass"}
                 onClick={() => setShowFilters(!showFilters)}
@@ -479,6 +521,16 @@ const Expenses = () => {
                   Clear
                 </Button>
               )}
+            </div>
+            {/* Search Bar */}
+            <div className="relative mt-3">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search transactions..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 bg-background/50"
+              />
             </div>
           </div>
 
@@ -565,6 +617,41 @@ const Expenses = () => {
             </div>
           )}
 
+          {/* Monthly Summary Section */}
+          {showMonthlySummary && sortedMonths.length > 0 && (
+            <div className="neumorphic p-6 mb-6">
+              <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-primary/10">
+                  <BarChart3 className="h-5 w-5 text-primary" />
+                </div>
+                Monthly Summary
+              </h2>
+              <div className="space-y-3">
+                {sortedMonths.map(([key, data]) => (
+                  <div key={key} className="bg-card/50 border border-border/50 rounded-lg p-4">
+                    <p className="font-medium text-foreground mb-2">{data.monthName}</p>
+                    <div className="grid grid-cols-3 gap-4 text-sm">
+                      <div>
+                        <p className="text-muted-foreground text-xs">Income</p>
+                        <p className="text-success font-semibold">{formatCurrency(data.income)}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground text-xs">Expenses</p>
+                        <p className="text-destructive font-semibold">{formatCurrency(data.expenses)}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground text-xs">Net</p>
+                        <p className={`font-semibold ${data.net >= 0 ? 'text-success' : 'text-destructive'}`}>
+                          {data.net >= 0 ? '+' : ''}{formatCurrency(data.net)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Charts Section */}
           {showCharts && filteredExpenses.length > 0 && (
             <div className="neumorphic p-6 mb-6">
@@ -610,16 +697,45 @@ const Expenses = () => {
               <div className="space-y-3">
                 {filteredExpenses.map((expense) => {
                   const businessName = getBusinessName(expense.businessId);
+                  const isExpanded = expandedCardId === expense.id;
                   return (
-                    <div key={expense.id} className="bg-card/80 backdrop-blur-none border border-border/50 rounded-xl p-4">
+                    <div 
+                      key={expense.id} 
+                      className="bg-card/80 backdrop-blur-none border border-border/50 rounded-xl p-4 cursor-pointer active:bg-muted/20 transition-colors"
+                      onClick={() => setExpandedCardId(isExpanded ? null : expense.id)}
+                    >
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <div className="flex items-center gap-3 min-w-0 flex-1">
                           <span className="text-xl">{getCategoryIcon(expense.category)}</span>
-                          <p className="font-medium text-foreground truncate">{expense.description}</p>
+                          <div className="min-w-0 flex-1">
+                            <p className={`font-medium text-foreground ${isExpanded ? '' : 'truncate'}`}>
+                              {expense.description}
+                            </p>
+                            {isExpanded && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Category: {EXPENSE_CATEGORIES.find(c => c.value === expense.category)?.label || expense.category}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                        <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 h-7 w-7 -mt-1 -mr-1" onClick={() => handleDeleteExpense(expense.id)}>
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          {isExpanded ? (
+                            <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                          )}
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="text-destructive hover:bg-destructive/10 h-7 w-7" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteExpense(expense.id);
+                            }}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
