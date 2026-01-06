@@ -777,26 +777,26 @@ const SecurityDashboard = () => {
           </div>
 
           <TabsContent value="devices">
-            <Card>
-              <CardHeader>
+            <Card className="overflow-hidden">
+              <CardHeader className="px-3 sm:px-6">
                 <CardTitle>Known Devices</CardTitle>
                 <CardDescription>
                   Devices that have logged into your account
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-3 sm:px-6">
                 {knownDevices.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Monitor className="h-12 w-12 mx-auto mb-3 opacity-50" />
                     <p>No devices recorded yet</p>
                   </div>
                 ) : (
-                  <ScrollArea className="h-[400px] pr-4">
-                    <div className="space-y-3">
+                  <ScrollArea className="h-[400px]">
+                    <div className="space-y-3 pr-2">
                       {knownDevices.map((device) => (
                         <div 
                           key={device.id}
-                          className={`p-4 rounded-lg border bg-card ${
+                          className={`p-3 rounded-lg border bg-card overflow-hidden ${
                             device.is_blocked 
                               ? 'border-destructive/50 bg-destructive/5' 
                               : device.is_trusted 
@@ -804,8 +804,8 @@ const SecurityDashboard = () => {
                                 : ''
                           }`}
                         >
-                          <div className="flex items-start gap-2 sm:gap-3 overflow-hidden">
-                            <div className={`h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-full flex items-center justify-center ${
+                          <div className="flex items-start gap-2 w-full">
+                            <div className={`h-8 w-8 shrink-0 rounded-full flex items-center justify-center ${
                               device.is_blocked 
                                 ? 'bg-destructive/10' 
                                 : device.is_trusted 
@@ -813,16 +813,16 @@ const SecurityDashboard = () => {
                                   : 'bg-primary/10'
                             }`}>
                               {device.is_blocked ? (
-                                <Ban className="h-4 w-4 sm:h-5 sm:w-5 text-destructive" />
+                                <Ban className="h-4 w-4 text-destructive" />
                               ) : device.device_type === 'mobile' ? (
-                                <Smartphone className={`h-4 w-4 sm:h-5 sm:w-5 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
+                                <Smartphone className={`h-4 w-4 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
                               ) : device.device_type === 'tablet' ? (
-                                <Tablet className={`h-4 w-4 sm:h-5 sm:w-5 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
+                                <Tablet className={`h-4 w-4 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
                               ) : (
-                                <Laptop className={`h-4 w-4 sm:h-5 sm:w-5 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
+                                <Laptop className={`h-4 w-4 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
                               )}
                             </div>
-                            <div className="flex-1 min-w-0">
+                            <div className="flex-1 min-w-0 overflow-hidden">
                               {/* Header: Name + Actions */}
                               <div className="flex items-start justify-between gap-1">
                                 <div className="min-w-0 flex-1">
