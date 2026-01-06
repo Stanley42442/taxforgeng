@@ -7,6 +7,7 @@ const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
 const TWILIO_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN");
 const TWILIO_WHATSAPP_FROM = Deno.env.get("TWILIO_WHATSAPP_FROM") || "whatsapp:+14155238886";
+const TWILIO_SMS_FROM = Deno.env.get("TWILIO_SMS_FROM") || Deno.env.get("TWILIO_WHATSAPP_FROM")?.replace("whatsapp:", "") || "+14155238886";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -40,11 +41,52 @@ interface SecurityAlertRequest {
   whatsappNumber?: string;
 }
 
-// Send WhatsApp/SMS notification via Twilio
-async function sendTwilioWhatsApp(to: string, message: string): Promise<boolean> {
+// Send SMS notification via Twilio
+async function sendTwilioSMS(to: string, message: string): Promise<boolean> {
   if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
-    console.log("Twilio credentials not configured, skipping WhatsApp notification");
+    console.log("Twilio credentials not configured, skipping SMS notification");
     return false;
+  }
+
+  try {
+    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
+    
+    // Clean the phone number (remove whatsapp: prefix if present)
+    const smsTo = to.replace("whatsapp:", "");
+    
+    const formData = new URLSearchParams();
+    formData.append("From", TWILIO_SMS_FROM);
+    formData.append("To", smsTo);
+    formData.append("Body", message);
+
+    const response = await fetch(twilioUrl, {
+      method: "POST",
+      headers: {
+        "Authorization": `Basic ${btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`)}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: formData.toString(),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Twilio SMS API error:", errorText);
+      return false;
+    }
+
+    console.log("SMS notification sent successfully via Twilio");
+    return true;
+  } catch (error) {
+    console.error("Error sending Twilio SMS:", error);
+    return false;
+  }
+}
+
+// Send WhatsApp notification via Twilio with SMS fallback
+async function sendTwilioWhatsApp(to: string, message: string): Promise<{ success: boolean; method: 'whatsapp' | 'sms' | 'none' }> {
+  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
+    console.log("Twilio credentials not configured, skipping notification");
+    return { success: false, method: 'none' };
   }
 
   try {
@@ -67,17 +109,40 @@ async function sendTwilioWhatsApp(to: string, message: string): Promise<boolean>
       body: formData.toString(),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Twilio API error:", errorText);
-      return false;
+    if (response.ok) {
+      console.log("WhatsApp notification sent successfully via Twilio");
+      return { success: true, method: 'whatsapp' };
     }
 
-    console.log("WhatsApp notification sent successfully via Twilio");
-    return true;
+    const errorData = await response.json();
+    console.error("Twilio WhatsApp API error:", JSON.stringify(errorData));
+    
+    // Check for WhatsApp-specific errors that warrant SMS fallback
+    // Error codes: 21608 (unregistered), 63016 (not opted in), 63007 (session expired)
+    const whatsappFailureCodes = [21608, 63016, 63007, 63001, 63003, 63005, 63024, 63025];
+    const errorCode = errorData?.code;
+    
+    if (whatsappFailureCodes.includes(errorCode) || !response.ok) {
+      console.log(`WhatsApp failed with code ${errorCode}, falling back to SMS...`);
+      
+      // Try SMS fallback
+      const smsSuccess = await sendTwilioSMS(to, message);
+      if (smsSuccess) {
+        return { success: true, method: 'sms' };
+      }
+    }
+
+    return { success: false, method: 'none' };
   } catch (error) {
-    console.error("Error sending Twilio WhatsApp message:", error);
-    return false;
+    console.error("Error sending Twilio WhatsApp message, trying SMS fallback:", error);
+    
+    // Try SMS fallback on any exception
+    const smsSuccess = await sendTwilioSMS(to, message);
+    if (smsSuccess) {
+      return { success: true, method: 'sms' };
+    }
+    
+    return { success: false, method: 'none' };
   }
 }
 
@@ -354,10 +419,12 @@ const handler = async (req: Request): Promise<Response> => {
         actionMessage = "Please review your recent account activity.";
     }
 
-    // Send WhatsApp notification for high-priority alerts
+    // Send WhatsApp notification for high-priority alerts (with SMS fallback)
+    let notificationResult: { success: boolean; method: 'whatsapp' | 'sms' | 'none' } = { success: false, method: 'none' };
     if (whatsappNumber && whatsappMessage && (alertType === 'account_locked' || alertType === 'failed_backup_codes')) {
-      console.log("Sending WhatsApp notification to:", whatsappNumber);
-      await sendTwilioWhatsApp(whatsappNumber, whatsappMessage);
+      console.log("Sending notification to:", whatsappNumber);
+      notificationResult = await sendTwilioWhatsApp(whatsappNumber, whatsappMessage);
+      console.log(`Notification result: ${notificationResult.method} - ${notificationResult.success ? 'success' : 'failed'}`);
     }
 
     const emailResponse = await resend.emails.send({
