@@ -5,6 +5,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { 
   ArrowLeft, 
   Shield, 
@@ -188,6 +197,12 @@ const SecurityDashboard = () => {
   const [togglingBlockId, setTogglingBlockId] = useState<string | null>(null);
   const [isSigningOutOthers, setIsSigningOutOthers] = useState(false);
   const [loginHistory, setLoginHistory] = useState<AuthEvent[]>([]);
+  
+  // 2FA verification states for unblocking devices
+  const [showUnblockDialog, setShowUnblockDialog] = useState(false);
+  const [unblockDeviceId, setUnblockDeviceId] = useState<string | null>(null);
+  const [unblockTotpCode, setUnblockTotpCode] = useState("");
+  const [isVerifyingUnblock, setIsVerifyingUnblock] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -387,6 +402,21 @@ const SecurityDashboard = () => {
   const handleToggleBlock = async (deviceId: string, currentBlocked: boolean) => {
     if (!user) return;
     
+    // If trying to unblock and 2FA is enabled, require verification
+    if (currentBlocked && stats.mfaEnabled) {
+      setUnblockDeviceId(deviceId);
+      setUnblockTotpCode("");
+      setShowUnblockDialog(true);
+      return;
+    }
+    
+    // Otherwise proceed with blocking/unblocking (no 2FA needed for blocking)
+    await executeToggleBlock(deviceId, currentBlocked);
+  };
+
+  const executeToggleBlock = async (deviceId: string, currentBlocked: boolean) => {
+    if (!user) return;
+    
     const device = knownDevices.find(d => d.id === deviceId);
     
     setTogglingBlockId(deviceId);
@@ -402,7 +432,7 @@ const SecurityDashboard = () => {
       setKnownDevices(prev => prev.map(d => 
         d.id === deviceId ? { ...d, is_blocked: !currentBlocked } : d
       ));
-      toast.success(currentBlocked ? "Device unblocked" : "Device blocked - it won't be able to log in");
+      toast.success(currentBlocked ? "Device unblocked successfully" : "Device blocked - it won't be able to log in");
 
       // Send email notification when blocking a device
       if (!currentBlocked && user.email && device) {
@@ -424,6 +454,65 @@ const SecurityDashboard = () => {
       toast.error("Failed to update device");
     } finally {
       setTogglingBlockId(null);
+    }
+  };
+
+  const handleUnblockWithMfa = async () => {
+    if (!user || !unblockDeviceId) return;
+    
+    if (unblockTotpCode.length !== 6) {
+      toast.error("Please enter a valid 6-digit code");
+      return;
+    }
+    
+    setIsVerifyingUnblock(true);
+    try {
+      // Get MFA factors
+      const { data: factorsData } = await supabase.auth.mfa.listFactors();
+      const verifiedFactor = factorsData?.totp?.find(f => f.status === 'verified');
+      
+      if (!verifiedFactor) {
+        toast.error("No verified 2FA factor found");
+        return;
+      }
+      
+      // Create and verify challenge
+      const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+        factorId: verifiedFactor.id
+      });
+      
+      if (challengeError) throw challengeError;
+      
+      const { error: verifyError } = await supabase.auth.mfa.verify({
+        factorId: verifiedFactor.id,
+        challengeId: challengeData.id,
+        code: unblockTotpCode
+      });
+      
+      if (verifyError) {
+        toast.error("Invalid verification code. Please try again.");
+        return;
+      }
+      
+      // Verification successful, proceed with unblocking
+      setShowUnblockDialog(false);
+      await executeToggleBlock(unblockDeviceId, true);
+      
+      // Log the security event
+      await supabase.from('auth_events').insert({
+        user_id: user.id,
+        event_type: 'device_unblocked_with_mfa',
+        user_agent: navigator.userAgent,
+        metadata: { device_id: unblockDeviceId }
+      });
+      
+    } catch (error: any) {
+      console.error("Error verifying MFA:", error);
+      toast.error(error.message || "Failed to verify. Please try again.");
+    } finally {
+      setIsVerifyingUnblock(false);
+      setUnblockTotpCode("");
+      setUnblockDeviceId(null);
     }
   };
 
@@ -1121,6 +1210,89 @@ const SecurityDashboard = () => {
           </CardContent>
         </Card>
       </main>
+
+      {/* 2FA Verification Dialog for Unblocking Devices */}
+      <Dialog open={showUnblockDialog} onOpenChange={(open) => {
+        if (!open) {
+          setShowUnblockDialog(false);
+          setUnblockDeviceId(null);
+          setUnblockTotpCode("");
+        }
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" />
+              Verify Your Identity
+            </DialogTitle>
+            <DialogDescription>
+              To unblock this device, please enter your 2FA verification code from your authenticator app.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5" />
+                <div className="text-sm text-amber-800 dark:text-amber-200">
+                  <p className="font-medium">Security Notice</p>
+                  <p className="text-xs mt-1">Unblocking a device will allow it to log into your account again. Make sure you recognize this device.</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="unblock-totp">Verification Code</Label>
+              <div className="relative">
+                <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="unblock-totp"
+                  type="text"
+                  placeholder="000000"
+                  value={unblockTotpCode}
+                  onChange={(e) => setUnblockTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  className="pl-10 font-mono tracking-wider text-center text-lg"
+                  maxLength={6}
+                  autoComplete="one-time-code"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Enter the 6-digit code from your authenticator app
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex gap-3 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowUnblockDialog(false);
+                setUnblockDeviceId(null);
+                setUnblockTotpCode("");
+              }}
+              disabled={isVerifyingUnblock}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUnblockWithMfa}
+              disabled={isVerifyingUnblock || unblockTotpCode.length !== 6}
+            >
+              {isVerifyingUnblock ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Verifying...
+                </>
+              ) : (
+                <>
+                  <ShieldCheck className="h-4 w-4 mr-2" />
+                  Verify & Unblock
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
