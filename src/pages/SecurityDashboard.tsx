@@ -196,6 +196,7 @@ const SecurityDashboard = () => {
   const [togglingTrustId, setTogglingTrustId] = useState<string | null>(null);
   const [togglingBlockId, setTogglingBlockId] = useState<string | null>(null);
   const [isSigningOutOthers, setIsSigningOutOthers] = useState(false);
+  const [isClearingHistory, setIsClearingHistory] = useState(false);
   const [loginHistory, setLoginHistory] = useState<AuthEvent[]>([]);
   
   // 2FA verification states for unblocking devices
@@ -803,8 +804,8 @@ const SecurityDashboard = () => {
                                 : ''
                           }`}
                         >
-                          <div className="flex items-start gap-2 sm:gap-3">
-                            <div className={`h-10 w-10 sm:h-12 sm:w-12 shrink-0 rounded-full flex items-center justify-center ${
+                          <div className="flex items-start gap-2 sm:gap-3 overflow-hidden">
+                            <div className={`h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-full flex items-center justify-center ${
                               device.is_blocked 
                                 ? 'bg-destructive/10' 
                                 : device.is_trusted 
@@ -812,145 +813,131 @@ const SecurityDashboard = () => {
                                   : 'bg-primary/10'
                             }`}>
                               {device.is_blocked ? (
-                                <Ban className="h-5 w-5 sm:h-6 sm:w-6 text-destructive" />
+                                <Ban className="h-4 w-4 sm:h-5 sm:w-5 text-destructive" />
                               ) : device.device_type === 'mobile' ? (
-                                <Smartphone className={`h-5 w-5 sm:h-6 sm:w-6 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
+                                <Smartphone className={`h-4 w-4 sm:h-5 sm:w-5 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
                               ) : device.device_type === 'tablet' ? (
-                                <Tablet className={`h-5 w-5 sm:h-6 sm:w-6 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
+                                <Tablet className={`h-4 w-4 sm:h-5 sm:w-5 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
                               ) : (
-                                <Laptop className={`h-5 w-5 sm:h-6 sm:w-6 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
+                                <Laptop className={`h-4 w-4 sm:h-5 sm:w-5 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
                               )}
                             </div>
-                            <div className="flex-1 min-w-0 overflow-hidden">
-                        <div className="flex flex-col gap-2">
-                                {/* Device name and badges row */}
-                                <div className="flex items-start justify-between gap-2">
-                                  <div className="min-w-0 flex-1">
-                                    <div className="flex items-center gap-1.5 flex-wrap">
-                                      <p className={`font-medium text-sm truncate ${device.is_blocked ? 'text-destructive' : ''}`}>
-                                        {device.device_model || device.device_name || 'Unknown Device'}
-                                      </p>
-                                    </div>
-                                    <p className="text-xs text-muted-foreground mt-1 truncate">
-                                      {device.browser}{device.browser_version ? ` v${device.browser_version}` : ''} on {device.os}{device.os_version ? ` ${device.os_version}` : ''}
-                                    </p>
-                                  </div>
-                                  {/* Action buttons - always visible */}
-                                  <div className="flex items-center gap-0.5 shrink-0">
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className={`h-7 w-7 p-0 ${device.is_blocked 
-                                        ? "text-green-600 hover:text-green-700 hover:bg-green-50" 
-                                        : "text-destructive hover:text-destructive hover:bg-destructive/10"
-                                      }`}
-                                      onClick={() => handleToggleBlock(device.id, device.is_blocked)}
-                                      disabled={togglingBlockId === device.id}
-                                      title={device.is_blocked ? "Unblock device" : "Block device from logging in"}
-                                    >
-                                      {togglingBlockId === device.id ? (
-                                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                      ) : device.is_blocked ? (
-                                        <ShieldCheck className="h-3.5 w-3.5" />
-                                      ) : (
-                                        <Ban className="h-3.5 w-3.5" />
-                                      )}
-                                    </Button>
-                                    {!device.is_blocked && (
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className={`h-7 w-7 p-0 ${device.is_trusted ? "text-amber-500 hover:text-amber-600 hover:bg-amber-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}`}
-                                        onClick={() => handleToggleTrust(device.id, device.is_trusted)}
-                                        disabled={togglingTrustId === device.id}
-                                        title={device.is_trusted ? "Remove from trusted devices" : "Mark as trusted device"}
-                                      >
-                                        {togglingTrustId === device.id ? (
-                                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                        ) : device.is_trusted ? (
-                                          <StarOff className="h-3.5 w-3.5" />
-                                        ) : (
-                                          <Star className="h-3.5 w-3.5" />
-                                        )}
-                                      </Button>
-                                    )}
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                      onClick={() => handleRemoveDevice(device.id)}
-                                      disabled={removingDeviceId === device.id}
-                                      title="Remove device from list"
-                                    >
-                                      {removingDeviceId === device.id ? (
-                                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                      ) : (
-                                        <Trash2 className="h-3.5 w-3.5" />
-                                      )}
-                                    </Button>
-                                  </div>
-                                </div>
-                                
-                                {/* Badges row */}
-                                <div className="flex items-center gap-1.5 flex-wrap">
-                                  <Badge variant="outline" className="text-[10px] capitalize h-5 px-1.5">
-                                    {device.device_type || 'desktop'}
-                                  </Badge>
-                                  {device.is_blocked && (
-                                    <Badge variant="destructive" className="text-[10px] h-5 px-1.5">
-                                      Blocked
-                                    </Badge>
-                                  )}
-                                  {device.is_trusted && !device.is_blocked && (
-                                    <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50 dark:bg-green-900/20 text-[10px] h-5 px-1.5">
-                                      Trusted
-                                    </Badge>
-                                  )}
-                                </div>
-                                
-                                {/* Location */}
-                                {(device.last_city || device.last_country) && (
-                                  <p className="text-xs text-muted-foreground flex items-center gap-1">
-                                    <MapPin className="h-3 w-3 text-primary shrink-0" />
-                                    <span className="truncate">{[device.last_city, device.last_country].filter(Boolean).join(', ')}</span>
+                            <div className="flex-1 min-w-0">
+                              {/* Header: Name + Actions */}
+                              <div className="flex items-start justify-between gap-1">
+                                <div className="min-w-0 flex-1">
+                                  <p className={`font-medium text-sm truncate ${device.is_blocked ? 'text-destructive' : ''}`}>
+                                    {device.device_model || device.device_name || 'Unknown Device'}
                                   </p>
+                                  <p className="text-[11px] text-muted-foreground truncate">
+                                    {device.browser}{device.browser_version ? ` ${device.browser_version}` : ''} · {device.os}
+                                  </p>
+                                </div>
+                                <div className="flex items-center shrink-0">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className={`h-7 w-7 ${device.is_blocked 
+                                      ? "text-green-600 hover:text-green-700 hover:bg-green-50" 
+                                      : "text-destructive hover:text-destructive hover:bg-destructive/10"
+                                    }`}
+                                    onClick={() => handleToggleBlock(device.id, device.is_blocked)}
+                                    disabled={togglingBlockId === device.id}
+                                  >
+                                    {togglingBlockId === device.id ? (
+                                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                    ) : device.is_blocked ? (
+                                      <ShieldCheck className="h-3.5 w-3.5" />
+                                    ) : (
+                                      <Ban className="h-3.5 w-3.5" />
+                                    )}
+                                  </Button>
+                                  {!device.is_blocked && (
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className={`h-7 w-7 ${device.is_trusted ? "text-amber-500 hover:text-amber-600 hover:bg-amber-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}`}
+                                      onClick={() => handleToggleTrust(device.id, device.is_trusted)}
+                                      disabled={togglingTrustId === device.id}
+                                    >
+                                      {togglingTrustId === device.id ? (
+                                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                      ) : device.is_trusted ? (
+                                        <StarOff className="h-3.5 w-3.5" />
+                                      ) : (
+                                        <Star className="h-3.5 w-3.5" />
+                                      )}
+                                    </Button>
+                                  )}
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                    onClick={() => handleRemoveDevice(device.id)}
+                                    disabled={removingDeviceId === device.id}
+                                  >
+                                    {removingDeviceId === device.id ? (
+                                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                    ) : (
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                    )}
+                                  </Button>
+                                </div>
+                              </div>
+                              
+                              {/* Badges */}
+                              <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                                <Badge variant="outline" className="text-[10px] capitalize h-5 px-1.5">
+                                  {device.device_type || 'desktop'}
+                                </Badge>
+                                {device.is_blocked && (
+                                  <Badge variant="destructive" className="text-[10px] h-5 px-1.5">Blocked</Badge>
+                                )}
+                                {device.is_trusted && !device.is_blocked && (
+                                  <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50 dark:bg-green-900/20 text-[10px] h-5 px-1.5">Trusted</Badge>
                                 )}
                               </div>
                               
-                              {/* Device Details Grid */}
-                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2 mt-2 sm:mt-3 text-[10px] sm:text-xs">
+                              {/* Location */}
+                              {(device.last_city || device.last_country) && (
+                                <p className="text-[11px] text-muted-foreground mt-1.5 flex items-center gap-1">
+                                  <MapPin className="h-3 w-3 text-primary shrink-0" />
+                                  <span className="truncate">{[device.last_city, device.last_country].filter(Boolean).join(', ')}</span>
+                                </p>
+                              )}
+                              
+                              {/* Details */}
+                              <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-[10px] text-muted-foreground">
                                 {device.screen_resolution && (
-                                  <div className="flex items-center gap-1 text-muted-foreground overflow-hidden">
-                                    <Monitor className="h-3 w-3 shrink-0" />
-                                    <span className="truncate">{device.screen_resolution}</span>
-                                  </div>
+                                  <span className="flex items-center gap-1">
+                                    <Monitor className="h-3 w-3" />
+                                    {device.screen_resolution}
+                                  </span>
                                 )}
                                 {device.timezone && (
-                                  <div className="flex items-center gap-1 text-muted-foreground overflow-hidden">
-                                    <Globe className="h-3 w-3 shrink-0" />
-                                    <span className="truncate" title={device.timezone}>
-                                      {device.timezone.split('/').pop()?.replace(/_/g, ' ')}
-                                    </span>
-                                  </div>
+                                  <span className="flex items-center gap-1">
+                                    <Globe className="h-3 w-3" />
+                                    {device.timezone.split('/').pop()?.replace(/_/g, ' ')}
+                                  </span>
                                 )}
                                 {device.language && (
-                                  <div className="flex items-center gap-1 text-muted-foreground overflow-hidden">
-                                    <Languages className="h-3 w-3 shrink-0" />
-                                    <span className="truncate">{device.language}</span>
-                                  </div>
+                                  <span className="flex items-center gap-1">
+                                    <Languages className="h-3 w-3" />
+                                    {device.language}
+                                  </span>
                                 )}
                               </div>
                               
                               {/* Timestamps */}
-                              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-2 text-[10px] sm:text-xs text-muted-foreground">
-                                <div className="flex items-center gap-1">
-                                  <Clock className="h-3 w-3 shrink-0" />
-                                  <span className="truncate">First: {format(new Date(device.first_seen_at), 'PP')}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <RefreshCw className="h-3 w-3 shrink-0" />
-                                  <span className="truncate">Active: {formatDistanceToNow(new Date(device.last_seen_at), { addSuffix: true })}</span>
-                                </div>
+                              <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1.5 text-[10px] text-muted-foreground">
+                                <span className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  First: {format(new Date(device.first_seen_at), 'PP')}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <RefreshCw className="h-3 w-3" />
+                                  {formatDistanceToNow(new Date(device.last_seen_at), { addSuffix: true })}
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -1076,14 +1063,56 @@ const SecurityDashboard = () => {
 
           <TabsContent value="history">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <History className="h-5 w-5" />
-                  Login History
-                </CardTitle>
-                <CardDescription>
-                  Recent login activity with approximate locations
-                </CardDescription>
+              <CardHeader className="flex flex-row items-start justify-between gap-2">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <History className="h-5 w-5" />
+                    Login History
+                  </CardTitle>
+                  <CardDescription>
+                    Recent login activity with approximate locations
+                  </CardDescription>
+                </div>
+                {loginHistory.length > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    disabled={isClearingHistory}
+                    onClick={async () => {
+                      if (!user) return;
+                      setIsClearingHistory(true);
+                      try {
+                        // Delete login events only
+                        const { error } = await supabase
+                          .from('auth_events')
+                          .delete()
+                          .eq('user_id', user.id)
+                          .in('event_type', ['login', 'login_success']);
+                        
+                        if (error) throw error;
+                        
+                        setLoginHistory([]);
+                        setAuthEvents(prev => prev.filter(e => 
+                          e.event_type !== 'login' && e.event_type !== 'login_success'
+                        ));
+                        setStats(prev => ({ ...prev, totalLogins: 0 }));
+                        toast.success("Login history cleared successfully");
+                      } catch (error: any) {
+                        toast.error(error.message || "Failed to clear login history");
+                      } finally {
+                        setIsClearingHistory(false);
+                      }
+                    }}
+                  >
+                    {isClearingHistory ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                    <span className="hidden sm:inline ml-1.5">Clear History</span>
+                  </Button>
+                )}
               </CardHeader>
               <CardContent>
                 {loginHistory.length === 0 ? (
