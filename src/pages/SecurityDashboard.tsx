@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -43,13 +43,16 @@ import {
   MapPin,
   History,
   Ban,
-  ShieldCheck
+  ShieldCheck,
+  Wifi,
+  WifiOff
 } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow, format } from "date-fns";
 import { toast } from "sonner";
+import { getDeviceInfo } from "@/lib/deviceFingerprint";
 
 interface LocationData {
   city?: string;
@@ -199,6 +202,10 @@ const SecurityDashboard = () => {
   const [isClearingHistory, setIsClearingHistory] = useState(false);
   const [loginHistory, setLoginHistory] = useState<AuthEvent[]>([]);
   
+  // Realtime presence for active devices
+  const [activeDevices, setActiveDevices] = useState<{ fingerprint: string; browser: string; os: string; deviceType: string; lastSeen: string }[]>([]);
+  const [currentFingerprint, setCurrentFingerprint] = useState<string | null>(null);
+  
   // 2FA verification states for unblocking devices
   const [showUnblockDialog, setShowUnblockDialog] = useState(false);
   const [unblockDeviceId, setUnblockDeviceId] = useState<string | null>(null);
@@ -221,6 +228,63 @@ const SecurityDashboard = () => {
       navigate("/auth");
     }
   }, [user, loading, navigate]);
+
+  // Realtime presence tracking for active devices
+  useEffect(() => {
+    if (!user) return;
+
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    const setupPresence = async () => {
+      const deviceInfo = await getDeviceInfo();
+      setCurrentFingerprint(deviceInfo.fingerprint);
+
+      channel = supabase.channel(`user-presence:${user.id}`, {
+        config: { presence: { key: deviceInfo.fingerprint } }
+      });
+
+      channel
+        .on('presence', { event: 'sync' }, () => {
+          const state = channel?.presenceState() || {};
+          const devices: { fingerprint: string; browser: string; os: string; deviceType: string; lastSeen: string }[] = [];
+          
+          Object.keys(state).forEach((key) => {
+            const presences = state[key] as any[];
+            if (presences && presences.length > 0) {
+              const presence = presences[0];
+              devices.push({
+                fingerprint: key,
+                browser: presence.browser || 'Unknown',
+                os: presence.os || 'Unknown',
+                deviceType: presence.deviceType || 'desktop',
+                lastSeen: presence.lastSeen || new Date().toISOString()
+              });
+            }
+          });
+          
+          setActiveDevices(devices);
+        })
+        .subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+            await channel?.track({
+              browser: deviceInfo.browser,
+              os: deviceInfo.os,
+              deviceType: deviceInfo.deviceType,
+              deviceModel: deviceInfo.deviceModel,
+              lastSeen: new Date().toISOString()
+            });
+          }
+        });
+    };
+
+    setupPresence();
+
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
+  }, [user]);
 
   const loadSecurityData = async () => {
     if (!user) return;
@@ -953,53 +1017,94 @@ const SecurityDashboard = () => {
           <TabsContent value="sessions">
             <Card>
               <CardHeader>
-                <CardTitle>Active Sessions</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Active Sessions
+                </CardTitle>
                 <CardDescription>
-                  Manage your active login sessions across devices
+                  Devices currently logged into your account
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {/* Current Session */}
-                  <div className="p-3 sm:p-4 rounded-lg border-2 border-primary bg-primary/5 overflow-hidden">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                        <div className="h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
-                          <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <p className="font-medium text-sm">Current Session</p>
-                            <Badge variant="default" className="text-[10px] sm:text-xs h-5 px-1.5 shrink-0">Active</Badge>
-                          </div>
-                          <p className="text-xs text-muted-foreground truncate">
-                            {navigator.userAgent.includes('Chrome') ? 'Chrome' : 
-                             navigator.userAgent.includes('Firefox') ? 'Firefox' :
-                             navigator.userAgent.includes('Safari') ? 'Safari' : 'Browser'} on {
-                             navigator.userAgent.includes('Windows') ? 'Windows' :
-                             navigator.userAgent.includes('Mac') ? 'macOS' :
-                             navigator.userAgent.includes('Linux') ? 'Linux' :
-                             navigator.userAgent.includes('Android') ? 'Android' :
-                             navigator.userAgent.includes('iPhone') ? 'iOS' : 'Unknown OS'
-                            }
-                          </p>
-                        </div>
-                      </div>
-                      <Badge variant="outline" className="text-green-600 border-green-300 text-[10px] sm:text-xs h-5 px-1.5 shrink-0 self-start sm:self-auto whitespace-nowrap">
-                        This device
-                      </Badge>
+                  {/* Currently Active Devices */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                      <Wifi className="h-4 w-4 text-green-500" />
+                      <span>Currently Online ({activeDevices.length})</span>
                     </div>
+                    
+                    {activeDevices.length === 0 ? (
+                      <div className="p-4 rounded-lg border bg-muted/30 text-center text-sm text-muted-foreground">
+                        <WifiOff className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <p>No active sessions detected</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {activeDevices.map((device) => {
+                          const isCurrentDevice = device.fingerprint === currentFingerprint;
+                          const matchingDevice = knownDevices.find(d => d.device_fingerprint === device.fingerprint);
+                          
+                          return (
+                            <div 
+                              key={device.fingerprint}
+                              className={`p-3 rounded-lg border ${
+                                isCurrentDevice 
+                                  ? 'border-primary bg-primary/5' 
+                                  : 'bg-card hover:bg-muted/50'
+                              } transition-colors`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className={`h-8 w-8 shrink-0 rounded-full flex items-center justify-center ${
+                                  isCurrentDevice ? 'bg-primary/10' : 'bg-green-100 dark:bg-green-900/30'
+                                }`}>
+                                  {device.deviceType === 'mobile' ? (
+                                    <Smartphone className={`h-4 w-4 ${isCurrentDevice ? 'text-primary' : 'text-green-600'}`} />
+                                  ) : device.deviceType === 'tablet' ? (
+                                    <Tablet className={`h-4 w-4 ${isCurrentDevice ? 'text-primary' : 'text-green-600'}`} />
+                                  ) : (
+                                    <Laptop className={`h-4 w-4 ${isCurrentDevice ? 'text-primary' : 'text-green-600'}`} />
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <p className="font-medium text-sm truncate">
+                                      {matchingDevice?.device_model || matchingDevice?.device_name || `${device.browser} on ${device.os}`}
+                                    </p>
+                                    <div className="flex items-center gap-1">
+                                      <span className="relative flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                      </span>
+                                      <span className="text-[10px] text-green-600 font-medium">Online</span>
+                                    </div>
+                                    {isCurrentDevice && (
+                                      <Badge variant="outline" className="text-primary border-primary/30 text-[10px] h-5 px-1.5">
+                                        This device
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-muted-foreground truncate">
+                                    {device.browser} on {device.os}
+                                    {matchingDevice?.last_city && ` · ${matchingDevice.last_city}`}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Other sessions info */}
-                  <div className="p-4 rounded-lg bg-muted/50 border">
-                    <div className="flex items-start gap-3">
-                      <Info className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  {/* Session Management Info */}
+                  <div className="p-3 rounded-lg bg-muted/50 border">
+                    <div className="flex items-start gap-2">
+                      <Info className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                       <div>
                         <p className="text-sm font-medium">Session Management</p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          For security, you can sign out of all other devices by clicking the button below. 
-                          This will invalidate all sessions except your current one.
+                          Sign out of all other devices to secure your account. This will require re-authentication on those devices.
                         </p>
                       </div>
                     </div>
