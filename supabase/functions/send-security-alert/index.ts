@@ -3,6 +3,11 @@ import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
+// Twilio credentials for SMS/WhatsApp notifications
+const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
+const TWILIO_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN");
+const TWILIO_WHATSAPP_FROM = Deno.env.get("TWILIO_WHATSAPP_FROM") || "whatsapp:+14155238886";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -32,6 +37,48 @@ interface SecurityAlertRequest {
     timezone: string;
   };
   ipAddress?: string;
+  whatsappNumber?: string;
+}
+
+// Send WhatsApp/SMS notification via Twilio
+async function sendTwilioWhatsApp(to: string, message: string): Promise<boolean> {
+  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
+    console.log("Twilio credentials not configured, skipping WhatsApp notification");
+    return false;
+  }
+
+  try {
+    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
+    
+    // Format the number for WhatsApp (prepend whatsapp: if not already)
+    const whatsappTo = to.startsWith("whatsapp:") ? to : `whatsapp:${to}`;
+    
+    const formData = new URLSearchParams();
+    formData.append("From", TWILIO_WHATSAPP_FROM);
+    formData.append("To", whatsappTo);
+    formData.append("Body", message);
+
+    const response = await fetch(twilioUrl, {
+      method: "POST",
+      headers: {
+        "Authorization": `Basic ${btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`)}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: formData.toString(),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Twilio API error:", errorText);
+      return false;
+    }
+
+    console.log("WhatsApp notification sent successfully via Twilio");
+    return true;
+  } catch (error) {
+    console.error("Error sending Twilio WhatsApp message:", error);
+    return false;
+  }
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -40,15 +87,16 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { userEmail, alertType, attemptCount, timestamp, deviceInfo, sessionCount, locationInfo, newEmail, timeInfo, ipAddress }: SecurityAlertRequest = await req.json();
+    const { userEmail, alertType, attemptCount, timestamp, deviceInfo, sessionCount, locationInfo, newEmail, timeInfo, ipAddress, whatsappNumber }: SecurityAlertRequest = await req.json();
 
-    console.log("Sending security alert to:", userEmail, "type:", alertType);
+    console.log("Sending security alert to:", userEmail, "type:", alertType, "whatsapp:", whatsappNumber ? "yes" : "no");
 
     let subject = "🚨 Security Alert: Suspicious Activity Detected";
     let alertTitle = "Suspicious Activity Detected";
     let alertMessage = "";
     let actionMessage = "";
     let extraInfo = "";
+    let whatsappMessage = "";
 
     switch (alertType) {
       case 'failed_backup_codes':
@@ -56,12 +104,14 @@ const handler = async (req: Request): Promise<Response> => {
         alertTitle = "Failed Backup Code Attempts";
         alertMessage = `We detected ${attemptCount || 0} failed attempts to use a backup code on your account. This could indicate someone is trying to access your account.`;
         actionMessage = "If this wasn't you, we recommend changing your password immediately and generating new backup codes.";
+        whatsappMessage = `🚨 SECURITY ALERT: ${attemptCount || 0} failed backup code attempts detected on your account at ${timestamp}. If this wasn't you, change your password immediately!`;
         break;
       case 'account_locked':
         subject = "🔒 Security Alert: Account Temporarily Locked";
         alertTitle = "Account Temporarily Locked";
         alertMessage = `Your account has been temporarily locked after ${attemptCount || 0} failed backup code attempts.`;
         actionMessage = "If this was you, please wait 15 minutes before trying again. If this wasn't you, change your password immediately.";
+        whatsappMessage = `🔒 URGENT: Your account has been LOCKED due to ${attemptCount || 0} failed login attempts at ${timestamp}. Wait 15 minutes or reset your password to unlock. If this wasn't you, secure your account immediately!`;
         break;
       case 'new_device':
         subject = "🆕 Security Alert: New Device Login Detected";
@@ -302,6 +352,12 @@ const handler = async (req: Request): Promise<Response> => {
       default:
         alertMessage = "Unusual activity was detected on your account.";
         actionMessage = "Please review your recent account activity.";
+    }
+
+    // Send WhatsApp notification for high-priority alerts
+    if (whatsappNumber && whatsappMessage && (alertType === 'account_locked' || alertType === 'failed_backup_codes')) {
+      console.log("Sending WhatsApp notification to:", whatsappNumber);
+      await sendTwilioWhatsApp(whatsappNumber, whatsappMessage);
     }
 
     const emailResponse = await resend.emails.send({
