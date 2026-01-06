@@ -452,6 +452,7 @@ const Auth = () => {
             await supabase.functions.invoke('send-security-alert', {
               body: {
                 userEmail: email,
+                userId: mfaUserId,
                 alertType: 'account_locked',
                 attemptCount: attemptCount || 0,
                 timestamp: new Date().toLocaleString(),
@@ -497,6 +498,7 @@ const Auth = () => {
               await supabase.functions.invoke('send-security-alert', {
                 body: {
                   userEmail: email,
+                  userId: mfaUserId,
                   alertType: 'failed_backup_codes',
                   attemptCount: newAttemptCount,
                   timestamp: new Date().toLocaleString(),
@@ -533,6 +535,7 @@ const Auth = () => {
               await supabase.functions.invoke('send-security-alert', {
                 body: {
                   userEmail: email,
+                  userId: mfaUserId,
                   alertType: 'failed_backup_codes',
                   attemptCount: newAttemptCount,
                   timestamp: new Date().toLocaleString(),

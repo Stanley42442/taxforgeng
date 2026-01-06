@@ -486,6 +486,42 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_deliveries: {
+        Row: {
+          alert_type: string
+          created_at: string
+          delivery_method: string
+          error_message: string | null
+          id: string
+          message_preview: string | null
+          recipient: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          delivery_method: string
+          error_message?: string | null
+          id?: string
+          message_preview?: string | null
+          recipient: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          delivery_method?: string
+          error_message?: string | null
+          id?: string
+          message_preview?: string | null
+          recipient?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       partner_api_logs: {
         Row: {
           created_at: string

@@ -56,6 +56,7 @@ import { getDeviceInfo } from "@/lib/deviceFingerprint";
 import { IPWhitelistManager } from "@/components/IPWhitelistManager";
 import { TimeAccessManager } from "@/components/TimeAccessManager";
 import { SecurityAnalytics } from "@/components/SecurityAnalytics";
+import { NotificationDeliveryLog } from "@/components/NotificationDeliveryLog";
 
 interface LocationData {
   city?: string;
@@ -838,6 +839,11 @@ const SecurityDashboard = () => {
                 <span className="hidden xs:inline">Security Events</span>
                 <span className="xs:hidden">Events</span>
               </TabsTrigger>
+              <TabsTrigger value="notifications" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
+                <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden xs:inline">Notifications</span>
+                <span className="xs:hidden">Notif</span>
+              </TabsTrigger>
               <TabsTrigger value="attempts" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span className="hidden xs:inline">Failed Attempts</span>
@@ -1365,6 +1371,11 @@ const SecurityDashboard = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Notifications Tab */}
+          <TabsContent value="notifications">
+            <NotificationDeliveryLog />
           </TabsContent>
 
           <TabsContent value="attempts">

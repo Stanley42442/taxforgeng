@@ -1,7 +1,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
+// Supabase client for logging deliveries
+const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 
 // Twilio credentials for SMS/WhatsApp notifications
 const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
@@ -15,8 +20,43 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+// Log notification delivery to database
+async function logNotificationDelivery(
+  userId: string | null,
+  alertType: string,
+  deliveryMethod: 'whatsapp' | 'sms' | 'email' | 'failed',
+  recipient: string,
+  messagePreview?: string,
+  status: 'sent' | 'delivered' | 'failed' | 'pending' = 'sent',
+  errorMessage?: string
+) {
+  if (!supabaseUrl || !supabaseServiceKey || !userId) {
+    console.log("Cannot log delivery - missing config or user ID");
+    return;
+  }
+
+  try {
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    await supabase.from('notification_deliveries').insert({
+      user_id: userId,
+      alert_type: alertType,
+      delivery_method: deliveryMethod,
+      recipient: recipient,
+      message_preview: messagePreview?.substring(0, 200),
+      status: status,
+      error_message: errorMessage
+    });
+    
+    console.log(`Logged ${deliveryMethod} delivery for ${alertType}`);
+  } catch (error) {
+    console.error("Failed to log notification delivery:", error);
+  }
+}
+
 interface SecurityAlertRequest {
   userEmail: string;
+  userId?: string;
   alertType: 'failed_backup_codes' | 'suspicious_login' | 'account_locked' | 'new_device' | 'device_removed' | 'sessions_revoked' | 'new_location' | 'device_blocked' | 'password_changed' | '2fa_enabled' | '2fa_disabled' | 'backup_codes_generated' | 'email_changed' | 'unusual_time' | 'ip_blocked' | 'time_restricted';
   attemptCount?: number;
   timestamp: string;
@@ -152,7 +192,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { userEmail, alertType, attemptCount, timestamp, deviceInfo, sessionCount, locationInfo, newEmail, timeInfo, ipAddress, whatsappNumber }: SecurityAlertRequest = await req.json();
+    const { userEmail, userId, alertType, attemptCount, timestamp, deviceInfo, sessionCount, locationInfo, newEmail, timeInfo, ipAddress, whatsappNumber }: SecurityAlertRequest = await req.json();
 
     console.log("Sending security alert to:", userEmail, "type:", alertType, "whatsapp:", whatsappNumber ? "yes" : "no");
 
@@ -425,6 +465,28 @@ const handler = async (req: Request): Promise<Response> => {
       console.log("Sending notification to:", whatsappNumber);
       notificationResult = await sendTwilioWhatsApp(whatsappNumber, whatsappMessage);
       console.log(`Notification result: ${notificationResult.method} - ${notificationResult.success ? 'success' : 'failed'}`);
+      
+      // Log the notification delivery
+      if (notificationResult.success && (notificationResult.method === 'whatsapp' || notificationResult.method === 'sms')) {
+        await logNotificationDelivery(
+          userId || null,
+          alertType,
+          notificationResult.method,
+          whatsappNumber,
+          whatsappMessage,
+          'sent'
+        );
+      } else {
+        await logNotificationDelivery(
+          userId || null,
+          alertType,
+          'failed',
+          whatsappNumber,
+          whatsappMessage,
+          'failed',
+          'WhatsApp and SMS delivery both failed'
+        );
+      }
     }
 
     const emailResponse = await resend.emails.send({
@@ -489,6 +551,16 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     console.log("Security alert email sent successfully:", emailResponse);
+
+    // Log email delivery
+    await logNotificationDelivery(
+      userId || null,
+      alertType,
+      'email',
+      userEmail,
+      subject,
+      'sent'
+    );
 
     return new Response(JSON.stringify({ success: true, data: emailResponse }), {
       status: 200,
