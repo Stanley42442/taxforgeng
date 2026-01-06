@@ -376,8 +376,11 @@ export type Database = {
           device_type: string | null
           first_seen_at: string
           id: string
+          is_blocked: boolean
           is_trusted: boolean
           language: string | null
+          last_city: string | null
+          last_country: string | null
           last_seen_at: string
           os: string | null
           os_version: string | null
@@ -394,8 +397,11 @@ export type Database = {
           device_type?: string | null
           first_seen_at?: string
           id?: string
+          is_blocked?: boolean
           is_trusted?: boolean
           language?: string | null
+          last_city?: string | null
+          last_country?: string | null
           last_seen_at?: string
           os?: string | null
           os_version?: string | null
@@ -412,8 +418,11 @@ export type Database = {
           device_type?: string | null
           first_seen_at?: string
           id?: string
+          is_blocked?: boolean
           is_trusted?: boolean
           language?: string | null
+          last_city?: string | null
+          last_country?: string | null
           last_seen_at?: string
           os?: string | null
           os_version?: string | null

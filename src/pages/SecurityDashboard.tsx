@@ -32,7 +32,9 @@ import {
   Languages,
   Info,
   MapPin,
-  History
+  History,
+  Ban,
+  ShieldCheck
 } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { useAuth } from "@/hooks/useAuth";
@@ -78,8 +80,11 @@ interface KnownDevice {
   timezone: string | null;
   language: string | null;
   is_trusted: boolean;
+  is_blocked: boolean;
   first_seen_at: string;
   last_seen_at: string;
+  last_country: string | null;
+  last_city: string | null;
 }
 
 interface SecurityStats {
@@ -180,6 +185,7 @@ const SecurityDashboard = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [removingDeviceId, setRemovingDeviceId] = useState<string | null>(null);
   const [togglingTrustId, setTogglingTrustId] = useState<string | null>(null);
+  const [togglingBlockId, setTogglingBlockId] = useState<string | null>(null);
   const [isSigningOutOthers, setIsSigningOutOthers] = useState(false);
   const [loginHistory, setLoginHistory] = useState<AuthEvent[]>([]);
 
@@ -375,6 +381,49 @@ const SecurityDashboard = () => {
       toast.error("Failed to update device");
     } finally {
       setTogglingTrustId(null);
+    }
+  };
+
+  const handleToggleBlock = async (deviceId: string, currentBlocked: boolean) => {
+    if (!user) return;
+    
+    const device = knownDevices.find(d => d.id === deviceId);
+    
+    setTogglingBlockId(deviceId);
+    try {
+      const { error } = await supabase
+        .from('known_devices')
+        .update({ is_blocked: !currentBlocked })
+        .eq('id', deviceId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setKnownDevices(prev => prev.map(d => 
+        d.id === deviceId ? { ...d, is_blocked: !currentBlocked } : d
+      ));
+      toast.success(currentBlocked ? "Device unblocked" : "Device blocked - it won't be able to log in");
+
+      // Send email notification when blocking a device
+      if (!currentBlocked && user.email && device) {
+        supabase.functions.invoke('send-security-alert', {
+          body: {
+            userEmail: user.email,
+            alertType: 'device_blocked',
+            timestamp: new Date().toLocaleString(),
+            deviceInfo: {
+              browser: device.browser || 'Unknown',
+              os: device.os || 'Unknown',
+              deviceName: device.device_name || 'Unknown Device'
+            }
+          }
+        }).catch(err => console.error('Failed to send device blocked alert:', err));
+      }
+    } catch (error) {
+      console.error("Error updating device block status:", error);
+      toast.error("Failed to update device");
+    } finally {
+      setTogglingBlockId(null);
     }
   };
 
@@ -586,11 +635,25 @@ const SecurityDashboard = () => {
                       {knownDevices.map((device) => (
                         <div 
                           key={device.id}
-                          className={`p-4 rounded-lg border bg-card ${device.is_trusted ? 'border-green-200 dark:border-green-800' : ''}`}
+                          className={`p-4 rounded-lg border bg-card ${
+                            device.is_blocked 
+                              ? 'border-destructive/50 bg-destructive/5' 
+                              : device.is_trusted 
+                                ? 'border-green-200 dark:border-green-800' 
+                                : ''
+                          }`}
                         >
                           <div className="flex items-start gap-3">
-                            <div className={`h-12 w-12 rounded-full flex items-center justify-center ${device.is_trusted ? 'bg-green-100 dark:bg-green-900/30' : 'bg-primary/10'}`}>
-                              {device.device_type === 'mobile' ? (
+                            <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
+                              device.is_blocked 
+                                ? 'bg-destructive/10' 
+                                : device.is_trusted 
+                                  ? 'bg-green-100 dark:bg-green-900/30' 
+                                  : 'bg-primary/10'
+                            }`}>
+                              {device.is_blocked ? (
+                                <Ban className="h-6 w-6 text-destructive" />
+                              ) : device.device_type === 'mobile' ? (
                                 <Smartphone className={`h-6 w-6 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
                               ) : device.device_type === 'tablet' ? (
                                 <Tablet className={`h-6 w-6 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
@@ -602,13 +665,18 @@ const SecurityDashboard = () => {
                               <div className="flex items-start justify-between gap-2">
                                 <div>
                                   <div className="flex items-center gap-2 flex-wrap">
-                                    <p className="font-medium text-sm">
+                                    <p className={`font-medium text-sm ${device.is_blocked ? 'text-destructive' : ''}`}>
                                       {device.device_model || device.device_name || 'Unknown Device'}
                                     </p>
                                     <Badge variant="outline" className="text-xs capitalize">
                                       {device.device_type || 'desktop'}
                                     </Badge>
-                                    {device.is_trusted && (
+                                    {device.is_blocked && (
+                                      <Badge variant="destructive" className="text-xs">
+                                        Blocked
+                                      </Badge>
+                                    )}
+                                    {device.is_trusted && !device.is_blocked && (
                                       <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50 dark:bg-green-900/20 text-xs">
                                         Trusted
                                       </Badge>
@@ -617,30 +685,58 @@ const SecurityDashboard = () => {
                                   <p className="text-xs text-muted-foreground mt-1">
                                     {device.browser}{device.browser_version ? ` v${device.browser_version}` : ''} on {device.os}{device.os_version ? ` ${device.os_version}` : ''}
                                   </p>
+                                  {(device.last_city || device.last_country) && (
+                                    <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                                      <MapPin className="h-3 w-3 text-primary" />
+                                      {[device.last_city, device.last_country].filter(Boolean).join(', ')}
+                                    </p>
+                                  )}
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className={device.is_trusted ? "text-amber-500 hover:text-amber-600 hover:bg-amber-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}
-                                    onClick={() => handleToggleTrust(device.id, device.is_trusted)}
-                                    disabled={togglingTrustId === device.id}
-                                    title={device.is_trusted ? "Remove from trusted devices" : "Mark as trusted device"}
+                                    className={device.is_blocked 
+                                      ? "text-green-600 hover:text-green-700 hover:bg-green-50" 
+                                      : "text-destructive hover:text-destructive hover:bg-destructive/10"
+                                    }
+                                    onClick={() => handleToggleBlock(device.id, device.is_blocked)}
+                                    disabled={togglingBlockId === device.id}
+                                    title={device.is_blocked ? "Unblock device" : "Block device from logging in"}
                                   >
-                                    {togglingTrustId === device.id ? (
+                                    {togglingBlockId === device.id ? (
                                       <Loader2 className="h-4 w-4 animate-spin" />
-                                    ) : device.is_trusted ? (
-                                      <StarOff className="h-4 w-4" />
+                                    ) : device.is_blocked ? (
+                                      <ShieldCheck className="h-4 w-4" />
                                     ) : (
-                                      <Star className="h-4 w-4" />
+                                      <Ban className="h-4 w-4" />
                                     )}
                                   </Button>
+                                  {!device.is_blocked && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className={device.is_trusted ? "text-amber-500 hover:text-amber-600 hover:bg-amber-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}
+                                      onClick={() => handleToggleTrust(device.id, device.is_trusted)}
+                                      disabled={togglingTrustId === device.id}
+                                      title={device.is_trusted ? "Remove from trusted devices" : "Mark as trusted device"}
+                                    >
+                                      {togglingTrustId === device.id ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                      ) : device.is_trusted ? (
+                                        <StarOff className="h-4 w-4" />
+                                      ) : (
+                                        <Star className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  )}
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                                     onClick={() => handleRemoveDevice(device.id)}
                                     disabled={removingDeviceId === device.id}
+                                    title="Remove device from list"
                                   >
                                     {removingDeviceId === device.id ? (
                                       <Loader2 className="h-4 w-4 animate-spin" />

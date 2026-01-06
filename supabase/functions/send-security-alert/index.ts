@@ -11,7 +11,7 @@ const corsHeaders = {
 
 interface SecurityAlertRequest {
   userEmail: string;
-  alertType: 'failed_backup_codes' | 'suspicious_login' | 'account_locked' | 'new_device' | 'device_removed' | 'sessions_revoked';
+  alertType: 'failed_backup_codes' | 'suspicious_login' | 'account_locked' | 'new_device' | 'device_removed' | 'sessions_revoked' | 'new_location' | 'device_blocked';
   attemptCount?: number;
   timestamp: string;
   deviceInfo?: {
@@ -20,6 +20,12 @@ interface SecurityAlertRequest {
     deviceName: string;
   };
   sessionCount?: number;
+  locationInfo?: {
+    city?: string;
+    region?: string;
+    country?: string;
+    previousCountry?: string;
+  };
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -28,7 +34,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { userEmail, alertType, attemptCount, timestamp, deviceInfo, sessionCount }: SecurityAlertRequest = await req.json();
+    const { userEmail, alertType, attemptCount, timestamp, deviceInfo, sessionCount, locationInfo }: SecurityAlertRequest = await req.json();
 
     console.log("Sending security alert to:", userEmail, "type:", alertType);
 
@@ -106,6 +112,61 @@ const handler = async (req: Request): Promise<Response> => {
             <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">All other sessions terminated</td>
           </tr>
         `;
+        break;
+      case 'new_location':
+        subject = "🌍 Security Alert: Login from New Location Detected";
+        alertTitle = "Login from New Location";
+        alertMessage = `We detected a login to your account from a new location${locationInfo?.country ? ` (${locationInfo.country})` : ''}. This is different from your usual login location${locationInfo?.previousCountry ? ` (${locationInfo.previousCountry})` : ''}.`;
+        actionMessage = "If this was you, no action is needed. If you don't recognize this login, please change your password immediately and review your account security.";
+        if (locationInfo) {
+          const location = [locationInfo.city, locationInfo.region, locationInfo.country].filter(Boolean).join(', ');
+          extraInfo = `
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Location:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${location || 'Unknown'}</td>
+            </tr>
+            ${locationInfo.previousCountry ? `
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Previous Country:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${locationInfo.previousCountry}</td>
+            </tr>
+            ` : ''}
+          `;
+        }
+        if (deviceInfo) {
+          extraInfo += `
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Device:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${deviceInfo.deviceName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Browser:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${deviceInfo.browser}</td>
+            </tr>
+          `;
+        }
+        break;
+      case 'device_blocked':
+        subject = "🚫 Security Alert: Device Blocked on Your Account";
+        alertTitle = "Device Blocked";
+        alertMessage = "A device has been blocked from accessing your account.";
+        actionMessage = "If this was you, no action is needed. If you didn't block this device, please review your account security.";
+        if (deviceInfo) {
+          extraInfo = `
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Device:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${deviceInfo.deviceName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Browser:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${deviceInfo.browser}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Operating System:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${deviceInfo.os}</td>
+            </tr>
+          `;
+        }
         break;
       default:
         alertMessage = "Unusual activity was detected on your account.";
