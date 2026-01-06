@@ -791,8 +791,8 @@ const SecurityDashboard = () => {
                     <p>No devices recorded yet</p>
                   </div>
                 ) : (
-                  <ScrollArea className="h-[400px]">
-                    <div className="space-y-3 pr-2">
+                  <ScrollArea className="h-[400px] -mr-2">
+                    <div className="space-y-3 pr-4">
                       {knownDevices.map((device) => (
                         <div 
                           key={device.id}
