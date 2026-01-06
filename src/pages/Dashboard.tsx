@@ -238,7 +238,7 @@ const Dashboard = () => {
   }
 
   // Calculate date range start
-  const getDateRangeStart = () => {
+  const dateRangeStart = useMemo(() => {
     const now = new Date();
     switch (dateRange) {
       case 'week': return startOfWeek(now);
@@ -247,9 +247,7 @@ const Dashboard = () => {
       case 'year': return startOfYear(now);
       default: return startOfMonth(now);
     }
-  };
-
-  const dateRangeStart = getDateRangeStart();
+  }, [dateRange]);
 
   // Filter expenses by date range
   const filteredExpenses = useMemo(() => {
