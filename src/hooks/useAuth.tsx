@@ -3,6 +3,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 import { getDeviceInfo } from '@/lib/deviceFingerprint';
+import { notifyIPBlocked, notifyTimeRestricted } from '@/lib/notifications';
 
 interface AuthContextType {
   user: User | null;
@@ -116,6 +117,19 @@ const trackDevice = async (userId: string, userEmail: string) => {
     const clientIP = await getClientIP();
     const location = clientIP ? await getLocationFromIP(clientIP) : null;
     
+    // Fetch user's WhatsApp number for security alerts
+    let whatsappNumber: string | null = null;
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('whatsapp_number')
+        .eq('id', userId)
+        .single();
+      whatsappNumber = profile?.whatsapp_number || null;
+    } catch {
+      // Ignore error, proceed without WhatsApp
+    }
+    
     // Check if device is blocked
     const blocked = await isDeviceBlocked(userId, deviceInfo.fingerprint);
     if (blocked) {
@@ -132,6 +146,7 @@ const trackDevice = async (userId: string, userEmail: string) => {
         supabase.functions.invoke('send-security-alert', {
           body: {
             userEmail,
+            userId,
             alertType: 'ip_blocked',
             timestamp: new Date().toLocaleString(),
             deviceInfo: { 
@@ -144,9 +159,14 @@ const trackDevice = async (userId: string, userEmail: string) => {
               region: location?.region,
               country: location?.country
             },
-            ipAddress: clientIP
+            ipAddress: clientIP,
+            whatsappNumber
           }
         }).catch(err => console.error('Failed to send IP blocked alert:', err));
+        
+        // Also trigger in-app notification
+        const locationText = location ? [location.city, location.country].filter(Boolean).join(', ') : undefined;
+        notifyIPBlocked(clientIP, locationText);
         
         return { blocked: false, ipBlocked: true, timeBlocked: false };
       }
@@ -163,6 +183,7 @@ const trackDevice = async (userId: string, userEmail: string) => {
       supabase.functions.invoke('send-security-alert', {
         body: {
           userEmail,
+          userId,
           alertType: 'time_restricted',
           timestamp: new Date().toLocaleString(),
           deviceInfo: { 
@@ -173,9 +194,15 @@ const trackDevice = async (userId: string, userEmail: string) => {
           timeInfo: {
             hour: new Date().getHours(),
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-          }
+          },
+          whatsappNumber
         }
       }).catch(err => console.error('Failed to send time restricted alert:', err));
+      
+      // Also trigger in-app notification
+      const hour = new Date().getHours();
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      notifyTimeRestricted(hour, timezone);
       
       return { blocked: false, ipBlocked: false, timeBlocked: true };
     }
