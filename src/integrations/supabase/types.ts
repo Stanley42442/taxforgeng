@@ -432,6 +432,30 @@ export type Database = {
         }
         Relationships: []
       }
+      login_attempts: {
+        Row: {
+          attempted_at: string
+          email: string
+          id: string
+          ip_address: string | null
+          success: boolean
+        }
+        Insert: {
+          attempted_at?: string
+          email: string
+          id?: string
+          ip_address?: string | null
+          success?: boolean
+        }
+        Update: {
+          attempted_at?: string
+          email?: string
+          id?: string
+          ip_address?: string | null
+          success?: boolean
+        }
+        Relationships: []
+      }
       partner_api_logs: {
         Row: {
           created_at: string
@@ -560,6 +584,27 @@ export type Database = {
           updated_at?: string
           user_id?: string
           webhook_url?: string | null
+        }
+        Relationships: []
+      }
+      password_history: {
+        Row: {
+          created_at: string
+          id: string
+          password_hash: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          password_hash: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          password_hash?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -848,8 +893,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_account_locked: {
+        Args: { check_email: string }
+        Returns: {
+          failed_count: number
+          is_locked: boolean
+          unlock_at: string
+        }[]
+      }
       check_expired_trials: { Args: never; Returns: undefined }
       cleanup_old_backup_attempts: { Args: never; Returns: undefined }
+      cleanup_old_login_attempts: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
