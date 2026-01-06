@@ -892,31 +892,31 @@ const Settings = () => {
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">{user?.email}</span>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="text-sm truncate max-w-[200px] sm:max-w-none">{user?.email}</span>
                   {isEmailVerified ? (
-                    <Badge variant="outline" className="gap-1 text-green-600 border-green-600">
+                    <Badge variant="outline" className="gap-1 text-green-600 border-green-600 shrink-0">
                       <CheckCircle2 className="h-3 w-3" />
                       Verified
                     </Badge>
                   ) : (
-                    <Badge variant="outline" className="gap-1 text-amber-600 border-amber-600">
+                    <Badge variant="outline" className="gap-1 text-amber-600 border-amber-600 shrink-0">
                       <AlertCircle className="h-3 w-3" />
                       Unverified
                     </Badge>
                   )}
                 </div>
-                <div className="flex items-center gap-3">
-                  <Smartphone className="h-4 w-4 text-muted-foreground" />
+                <div className="flex items-center gap-3 flex-wrap">
+                  <Smartphone className="h-4 w-4 text-muted-foreground shrink-0" />
                   <span className="text-sm">Two-Factor Authentication</span>
                   {hasMfaEnabled ? (
-                    <Badge variant="outline" className="gap-1 text-green-600 border-green-600">
+                    <Badge variant="outline" className="gap-1 text-green-600 border-green-600 shrink-0">
                       <CheckCircle2 className="h-3 w-3" />
                       Enabled
                     </Badge>
                   ) : (
-                    <Badge variant="outline" className="gap-1 text-amber-600 border-amber-600">
+                    <Badge variant="outline" className="gap-1 text-amber-600 border-amber-600 shrink-0">
                       <AlertCircle className="h-3 w-3" />
                       Disabled
                     </Badge>
