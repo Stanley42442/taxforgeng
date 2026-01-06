@@ -8,10 +8,9 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  Legend,
-  AreaChart,
-  Area
+  Legend
 } from "recharts";
+import { ReusableAreaChart } from "@/components/ui/reusable-area-chart";
 import { 
   Activity, 
   TrendingUp,
@@ -250,41 +249,27 @@ export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalytic
           <CardDescription>Successful and failed login attempts over time</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={loginsByDay}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis dataKey="date" className="text-xs" />
-                <YAxis className="text-xs" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'hsl(var(--background))', 
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px'
-                  }} 
-                />
-                <Legend />
-                <Area 
-                  type="monotone" 
-                  dataKey="successful" 
-                  stackId="1"
-                  stroke={CHART_COLORS.success} 
-                  fill={CHART_COLORS.success}
-                  fillOpacity={0.6}
-                  name="Successful"
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="failed" 
-                  stackId="1"
-                  stroke={CHART_COLORS.error} 
-                  fill={CHART_COLORS.error}
-                  fillOpacity={0.6}
-                  name="Failed"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+          <ReusableAreaChart
+            data={loginsByDay}
+            series={[
+              {
+                dataKey: "successful",
+                name: "Successful",
+                color: "#22c55e",
+                stackId: "1",
+                fillOpacity: 0.6
+              },
+              {
+                dataKey: "failed",
+                name: "Failed",
+                color: "#ef4444",
+                stackId: "1",
+                fillOpacity: 0.6
+              }
+            ]}
+            xAxisKey="date"
+            height={300}
+          />
         </CardContent>
       </Card>
 
