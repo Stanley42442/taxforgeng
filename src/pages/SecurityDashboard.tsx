@@ -202,7 +202,18 @@ const SecurityDashboard = () => {
   const [showUnblockDialog, setShowUnblockDialog] = useState(false);
   const [unblockDeviceId, setUnblockDeviceId] = useState<string | null>(null);
   const [unblockTotpCode, setUnblockTotpCode] = useState("");
+  const [unblockBackupCode, setUnblockBackupCode] = useState("");
+  const [useBackupCodeForUnblock, setUseBackupCodeForUnblock] = useState(false);
   const [isVerifyingUnblock, setIsVerifyingUnblock] = useState(false);
+
+  // Hash function for backup code verification
+  const hashCode = async (code: string): Promise<string> => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(code.toUpperCase().replace(/-/g, ''));
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -460,59 +471,113 @@ const SecurityDashboard = () => {
   const handleUnblockWithMfa = async () => {
     if (!user || !unblockDeviceId) return;
     
-    if (unblockTotpCode.length !== 6) {
-      toast.error("Please enter a valid 6-digit code");
-      return;
+    // Validate input based on mode
+    if (useBackupCodeForUnblock) {
+      if (!unblockBackupCode || unblockBackupCode.length < 8) {
+        toast.error("Please enter a valid backup code");
+        return;
+      }
+    } else {
+      if (unblockTotpCode.length !== 6) {
+        toast.error("Please enter a valid 6-digit code");
+        return;
+      }
     }
     
     setIsVerifyingUnblock(true);
     try {
-      // Get MFA factors
-      const { data: factorsData } = await supabase.auth.mfa.listFactors();
-      const verifiedFactor = factorsData?.totp?.find(f => f.status === 'verified');
-      
-      if (!verifiedFactor) {
-        toast.error("No verified 2FA factor found");
-        return;
+      if (useBackupCodeForUnblock) {
+        // Verify using backup code
+        const codeHash = await hashCode(unblockBackupCode);
+        
+        // Check if backup code exists and is unused
+        const { data: codes, error: fetchError } = await supabase
+          .from('backup_codes')
+          .select('id, used_at')
+          .eq('user_id', user.id)
+          .eq('code_hash', codeHash)
+          .single();
+
+        if (fetchError || !codes) {
+          toast.error("Invalid backup code. Please try again.");
+          return;
+        }
+
+        if (codes.used_at) {
+          toast.error("This backup code has already been used.");
+          return;
+        }
+
+        // Mark backup code as used
+        await supabase
+          .from('backup_codes')
+          .update({ used_at: new Date().toISOString() })
+          .eq('id', codes.id);
+
+        // Verification successful with backup code
+        setShowUnblockDialog(false);
+        await executeToggleBlock(unblockDeviceId, true);
+        
+        // Log the security event
+        await supabase.from('auth_events').insert({
+          user_id: user.id,
+          event_type: 'device_unblocked_with_backup_code',
+          user_agent: navigator.userAgent,
+          metadata: { device_id: unblockDeviceId }
+        });
+        
+        toast.success("Device unblocked successfully. Note: The backup code used has been consumed.");
+        
+      } else {
+        // Verify using TOTP
+        const { data: factorsData } = await supabase.auth.mfa.listFactors();
+        const verifiedFactor = factorsData?.totp?.find(f => f.status === 'verified');
+        
+        if (!verifiedFactor) {
+          toast.error("No verified 2FA factor found");
+          return;
+        }
+        
+        // Create and verify challenge
+        const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+          factorId: verifiedFactor.id
+        });
+        
+        if (challengeError) throw challengeError;
+        
+        const { error: verifyError } = await supabase.auth.mfa.verify({
+          factorId: verifiedFactor.id,
+          challengeId: challengeData.id,
+          code: unblockTotpCode
+        });
+        
+        if (verifyError) {
+          toast.error("Invalid verification code. Please try again.");
+          return;
+        }
+        
+        // Verification successful, proceed with unblocking
+        setShowUnblockDialog(false);
+        await executeToggleBlock(unblockDeviceId, true);
+        
+        // Log the security event
+        await supabase.from('auth_events').insert({
+          user_id: user.id,
+          event_type: 'device_unblocked_with_mfa',
+          user_agent: navigator.userAgent,
+          metadata: { device_id: unblockDeviceId }
+        });
       }
-      
-      // Create and verify challenge
-      const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
-        factorId: verifiedFactor.id
-      });
-      
-      if (challengeError) throw challengeError;
-      
-      const { error: verifyError } = await supabase.auth.mfa.verify({
-        factorId: verifiedFactor.id,
-        challengeId: challengeData.id,
-        code: unblockTotpCode
-      });
-      
-      if (verifyError) {
-        toast.error("Invalid verification code. Please try again.");
-        return;
-      }
-      
-      // Verification successful, proceed with unblocking
-      setShowUnblockDialog(false);
-      await executeToggleBlock(unblockDeviceId, true);
-      
-      // Log the security event
-      await supabase.from('auth_events').insert({
-        user_id: user.id,
-        event_type: 'device_unblocked_with_mfa',
-        user_agent: navigator.userAgent,
-        metadata: { device_id: unblockDeviceId }
-      });
       
     } catch (error: any) {
-      console.error("Error verifying MFA:", error);
+      console.error("Error verifying:", error);
       toast.error(error.message || "Failed to verify. Please try again.");
     } finally {
       setIsVerifyingUnblock(false);
       setUnblockTotpCode("");
+      setUnblockBackupCode("");
       setUnblockDeviceId(null);
+      setUseBackupCodeForUnblock(false);
     }
   };
 
@@ -1226,7 +1291,7 @@ const SecurityDashboard = () => {
               Verify Your Identity
             </DialogTitle>
             <DialogDescription>
-              To unblock this device, please enter your 2FA verification code from your authenticator app.
+              To unblock this device, please verify your identity using your authenticator app or a backup code.
             </DialogDescription>
           </DialogHeader>
           
@@ -1241,25 +1306,63 @@ const SecurityDashboard = () => {
               </div>
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="unblock-totp">Verification Code</Label>
-              <div className="relative">
-                <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="unblock-totp"
-                  type="text"
-                  placeholder="000000"
-                  value={unblockTotpCode}
-                  onChange={(e) => setUnblockTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  className="pl-10 font-mono tracking-wider text-center text-lg"
-                  maxLength={6}
-                  autoComplete="one-time-code"
-                />
+            {useBackupCodeForUnblock ? (
+              <div className="space-y-2">
+                <Label htmlFor="unblock-backup">Backup Code</Label>
+                <div className="relative">
+                  <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="unblock-backup"
+                    type="text"
+                    placeholder="XXXX-XXXX"
+                    value={unblockBackupCode}
+                    onChange={(e) => setUnblockBackupCode(e.target.value.toUpperCase())}
+                    className="pl-10 font-mono tracking-wider text-center text-lg"
+                    maxLength={9}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Enter one of your backup codes. Note: This code will be consumed after use.
+                </p>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Enter the 6-digit code from your authenticator app
-              </p>
-            </div>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="unblock-totp">Verification Code</Label>
+                <div className="relative">
+                  <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="unblock-totp"
+                    type="text"
+                    placeholder="000000"
+                    value={unblockTotpCode}
+                    onChange={(e) => setUnblockTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    className="pl-10 font-mono tracking-wider text-center text-lg"
+                    maxLength={6}
+                    autoComplete="one-time-code"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Enter the 6-digit code from your authenticator app
+                </p>
+              </div>
+            )}
+            
+            {stats.backupCodesRemaining > 0 && (
+              <Button
+                variant="link"
+                className="text-xs p-0 h-auto"
+                onClick={() => {
+                  setUseBackupCodeForUnblock(!useBackupCodeForUnblock);
+                  setUnblockTotpCode("");
+                  setUnblockBackupCode("");
+                }}
+              >
+                {useBackupCodeForUnblock 
+                  ? "Use authenticator app instead" 
+                  : "Can't access your authenticator? Use a backup code"
+                }
+              </Button>
+            )}
           </div>
           
           <div className="flex gap-3 justify-end">
@@ -1269,6 +1372,8 @@ const SecurityDashboard = () => {
                 setShowUnblockDialog(false);
                 setUnblockDeviceId(null);
                 setUnblockTotpCode("");
+                setUnblockBackupCode("");
+                setUseBackupCodeForUnblock(false);
               }}
               disabled={isVerifyingUnblock}
             >
@@ -1276,7 +1381,7 @@ const SecurityDashboard = () => {
             </Button>
             <Button
               onClick={handleUnblockWithMfa}
-              disabled={isVerifyingUnblock || unblockTotpCode.length !== 6}
+              disabled={isVerifyingUnblock || (useBackupCodeForUnblock ? unblockBackupCode.length < 8 : unblockTotpCode.length !== 6)}
             >
               {isVerifyingUnblock ? (
                 <>
