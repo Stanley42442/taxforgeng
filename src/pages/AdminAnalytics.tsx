@@ -1,3 +1,4 @@
+// Admin Analytics page for business metrics and revenue analytics
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { NavMenu } from "@/components/NavMenu";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
