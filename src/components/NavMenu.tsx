@@ -9,7 +9,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { useUpcomingReminders } from "@/hooks/useUpcomingReminders";
 import { useNotificationCount } from "@/hooks/useNotificationCount";
+import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
 import { Badge } from "@/components/ui/badge";
+import { LiveIndicator } from "@/components/ui/live-indicator";
 import { 
   Calculator, 
   Crown, 
@@ -52,9 +54,13 @@ export const NavMenu = () => {
   const { isAdmin } = useAdminCheck();
   const { urgentCount } = useUpcomingReminders();
   const { unreadCount: notificationCount } = useNotificationCount();
+  const { isConnected: isRealtimeConnected, newNotificationCount } = useRealtimeNotifications();
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+
+  // Combined notification count
+  const totalNotificationCount = notificationCount + newNotificationCount;
 
   const handleSignOut = async () => {
     await signOut();
@@ -158,22 +164,27 @@ export const NavMenu = () => {
             )}
             <ThemeToggle />
 
+            {/* Realtime Indicator */}
+            {user && isRealtimeConnected && (
+              <LiveIndicator isLive={true} label="" className="hidden sm:flex" />
+            )}
+
             {/* Notification Badge - links to notifications page */}
             <Link 
               to="/notifications" 
               className="relative flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
             >
-              {notificationCount > 0 ? (
+              {totalNotificationCount > 0 ? (
                 <BellRing className="h-4 w-4 sm:h-5 sm:w-5 text-destructive" />
               ) : (
                 <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
               )}
-              {notificationCount > 0 && (
+              {totalNotificationCount > 0 && (
                 <Badge 
                   variant="destructive" 
                   className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center animate-pulse pointer-events-none"
                 >
-                  {notificationCount > 9 ? '9+' : notificationCount}
+                  {totalNotificationCount > 9 ? '9+' : totalNotificationCount}
                 </Badge>
               )}
             </Link>
