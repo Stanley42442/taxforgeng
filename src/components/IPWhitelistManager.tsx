@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,10 +22,19 @@ import {
   CheckCircle2,
   Loader2,
   AlertTriangle,
-  Info
+  Info,
+  MapPin,
+  Download,
+  Upload
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+interface GeoLocation {
+  city?: string | null;
+  country?: string | null;
+  country_code?: string | null;
+}
 
 interface IPWhitelistEntry {
   id: string;
@@ -33,6 +42,7 @@ interface IPWhitelistEntry {
   description: string | null;
   is_active: boolean;
   created_at: string;
+  location?: GeoLocation | null;
 }
 
 interface IPWhitelistManagerProps {
@@ -48,16 +58,49 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
   const [newIpRange, setNewIpRange] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [currentIP, setCurrentIP] = useState<string | null>(null);
+  const [currentIPLocation, setCurrentIPLocation] = useState<GeoLocation | null>(null);
   const [saving, setSaving] = useState(false);
   const [toggling, setToggling] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [geoLocations, setGeoLocations] = useState<Record<string, GeoLocation>>({});
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch current IP
+  // Fetch geolocation for an IP
+  const fetchGeoLocation = async (ip: string): Promise<GeoLocation | null> => {
+    // Skip for wildcards and CIDR ranges
+    if (ip.includes('*') || ip.includes('/')) return null;
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('get-ip-location', {
+        body: { ip }
+      });
+      
+      if (error) throw error;
+      
+      return {
+        city: data.city,
+        country: data.country,
+        country_code: data.country_code
+      };
+    } catch (error) {
+      console.error("Error fetching geolocation:", error);
+      return null;
+    }
+  };
+
+  // Fetch current IP and its location
   useEffect(() => {
     const fetchCurrentIP = async () => {
       try {
         const response = await fetch('https://api.ipify.org?format=json');
         const data = await response.json();
         setCurrentIP(data.ip);
+        
+        // Fetch location for current IP
+        const location = await fetchGeoLocation(data.ip);
+        if (location) {
+          setCurrentIPLocation(location);
+        }
       } catch (error) {
         console.error("Error fetching IP:", error);
       }
@@ -87,6 +130,20 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
 
         if (error) throw error;
         setEntries(whitelistData || []);
+        
+        // Fetch geolocations for all entries
+        if (whitelistData && whitelistData.length > 0) {
+          const locations: Record<string, GeoLocation> = {};
+          await Promise.all(
+            whitelistData.map(async (entry) => {
+              const location = await fetchGeoLocation(entry.ip_range);
+              if (location) {
+                locations[entry.id] = location;
+              }
+            })
+          );
+          setGeoLocations(locations);
+        }
       } catch (error) {
         console.error("Error loading IP whitelist:", error);
         toast.error("Failed to load IP whitelist settings");
@@ -196,6 +253,13 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
       }
 
       setEntries([data, ...entries]);
+      
+      // Fetch geolocation for the new entry
+      const location = await fetchGeoLocation(newIpRange.trim());
+      if (location) {
+        setGeoLocations(prev => ({ ...prev, [data.id]: location }));
+      }
+      
       setNewIpRange("");
       setNewDescription("");
       setShowAddDialog(false);
@@ -232,11 +296,146 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
       }
 
       setEntries([data, ...entries]);
+      
+      // Copy current IP location to the new entry
+      if (currentIPLocation) {
+        setGeoLocations(prev => ({ ...prev, [data.id]: currentIPLocation }));
+      }
+      
       toast.success("Current IP added to whitelist");
     } catch (error: any) {
       toast.error(error.message || "Failed to add IP");
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Export entries to CSV
+  const handleExportCSV = () => {
+    if (entries.length === 0) {
+      toast.error("No entries to export");
+      return;
+    }
+
+    const csvRows = [
+      ['IP Range', 'Description', 'Active', 'City', 'Country', 'Created At'].join(',')
+    ];
+
+    entries.forEach(entry => {
+      const location = geoLocations[entry.id];
+      const row = [
+        `"${entry.ip_range}"`,
+        `"${entry.description || ''}"`,
+        entry.is_active ? 'true' : 'false',
+        `"${location?.city || ''}"`,
+        `"${location?.country || ''}"`,
+        `"${entry.created_at}"`
+      ].join(',');
+      csvRows.push(row);
+    });
+
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ip-whitelist-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast.success("IP whitelist exported successfully");
+  };
+
+  // Import entries from CSV
+  const handleImportCSV = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setImporting(true);
+    
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      // Skip header row
+      const dataLines = lines.slice(1);
+      
+      if (dataLines.length === 0) {
+        toast.error("No data found in CSV file");
+        return;
+      }
+
+      let imported = 0;
+      let skipped = 0;
+
+      for (const line of dataLines) {
+        // Parse CSV line (handle quoted values)
+        const matches = line.match(/("([^"]*)"|[^,]+)/g);
+        if (!matches || matches.length < 2) continue;
+
+        const ipRange = matches[0].replace(/"/g, '').trim();
+        const description = matches[1]?.replace(/"/g, '').trim() || null;
+        const isActive = matches[2]?.toLowerCase().trim() !== 'false';
+
+        if (!ipRange || !validateIPRange(ipRange)) {
+          skipped++;
+          continue;
+        }
+
+        // Check if already exists
+        if (entries.some(e => e.ip_range === ipRange)) {
+          skipped++;
+          continue;
+        }
+
+        const { data, error } = await supabase
+          .from('ip_whitelist')
+          .insert({
+            user_id: userId,
+            ip_range: ipRange,
+            description,
+            is_active: isActive
+          })
+          .select()
+          .single();
+
+        if (error) {
+          if (error.code === '23505') {
+            skipped++;
+            continue;
+          }
+          console.error("Error importing entry:", error);
+          skipped++;
+          continue;
+        }
+
+        setEntries(prev => [data, ...prev]);
+        
+        // Fetch geolocation
+        const location = await fetchGeoLocation(ipRange);
+        if (location) {
+          setGeoLocations(prev => ({ ...prev, [data.id]: location }));
+        }
+        
+        imported++;
+      }
+
+      if (imported > 0) {
+        toast.success(`Imported ${imported} entries${skipped > 0 ? `, ${skipped} skipped` : ''}`);
+      } else {
+        toast.info(`No new entries imported (${skipped} skipped)`);
+      }
+    } catch (error: any) {
+      console.error("Error importing CSV:", error);
+      toast.error("Failed to import CSV file");
+    } finally {
+      setImporting(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -313,24 +512,34 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
           {/* Current IP Info */}
           {currentIP && (
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-muted/50 rounded-lg overflow-hidden">
-              <div className="flex flex-wrap items-center gap-2 min-w-0">
-                <Info className="h-4 w-4 text-muted-foreground shrink-0" />
-                <span className="text-sm whitespace-nowrap">Your IP:</span>
-                <code className="text-xs sm:text-sm font-mono bg-background px-2 py-0.5 rounded truncate max-w-[120px] sm:max-w-none">
-                  {currentIP}
-                </code>
-                {whitelistEnabled && (
-                  isCurrentIPWhitelisted() ? (
-                    <Badge variant="outline" className="text-green-600 border-green-600 text-xs whitespace-nowrap">
-                      <CheckCircle2 className="h-3 w-3 mr-1 shrink-0" />
-                      Whitelisted
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline" className="text-amber-600 border-amber-600 text-xs whitespace-nowrap">
-                      <AlertCircle className="h-3 w-3 mr-1 shrink-0" />
-                      Not whitelisted
-                    </Badge>
-                  )
+              <div className="flex flex-col gap-1 min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Info className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="text-sm whitespace-nowrap">Your IP:</span>
+                  <code className="text-xs sm:text-sm font-mono bg-background px-2 py-0.5 rounded truncate max-w-[120px] sm:max-w-none">
+                    {currentIP}
+                  </code>
+                  {whitelistEnabled && (
+                    isCurrentIPWhitelisted() ? (
+                      <Badge variant="outline" className="text-green-600 border-green-600 text-xs whitespace-nowrap">
+                        <CheckCircle2 className="h-3 w-3 mr-1 shrink-0" />
+                        Whitelisted
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-amber-600 border-amber-600 text-xs whitespace-nowrap">
+                        <AlertCircle className="h-3 w-3 mr-1 shrink-0" />
+                        Not whitelisted
+                      </Badge>
+                    )
+                  )}
+                </div>
+                {currentIPLocation && (currentIPLocation.city || currentIPLocation.country) && (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground ml-5">
+                    <MapPin className="h-3 w-3 shrink-0" />
+                    <span className="truncate">
+                      {[currentIPLocation.city, currentIPLocation.country].filter(Boolean).join(', ')}
+                    </span>
+                  </div>
                 )}
               </div>
               <Button
@@ -361,15 +570,50 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
             </div>
           )}
 
-          {/* Add Entry Button */}
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => setShowAddDialog(true)}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add IP Address or Range
-          </Button>
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => setShowAddDialog(true)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add IP Address
+            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportCSV}
+                disabled={entries.length === 0}
+                className="flex-1 sm:flex-none"
+              >
+                <Download className="h-4 w-4 mr-1" />
+                Export
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={importing}
+                className="flex-1 sm:flex-none"
+              >
+                {importing ? (
+                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                ) : (
+                  <Upload className="h-4 w-4 mr-1" />
+                )}
+                Import
+              </Button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept=".csv"
+                onChange={handleImportCSV}
+                className="hidden"
+              />
+            </div>
+          </div>
 
           {/* Entries List */}
           {entries.length > 0 ? (
@@ -390,14 +634,34 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
                       className="shrink-0"
                     />
                     <div className="min-w-0 flex-1">
-                      <code className={`text-xs sm:text-sm font-mono block truncate ${!entry.is_active && 'text-muted-foreground'}`}>
-                        {entry.ip_range}
-                      </code>
-                      {entry.description && (
-                        <p className="text-xs text-muted-foreground truncate">
-                          {entry.description}
-                        </p>
-                      )}
+                      <div className="flex items-center gap-2">
+                        <code className={`text-xs sm:text-sm font-mono truncate ${!entry.is_active && 'text-muted-foreground'}`}>
+                          {entry.ip_range}
+                        </code>
+                        {geoLocations[entry.id] && (geoLocations[entry.id].city || geoLocations[entry.id].country) && (
+                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 shrink-0 hidden sm:flex items-center gap-0.5">
+                            <MapPin className="h-2.5 w-2.5" />
+                            <span className="truncate max-w-[80px]">
+                              {geoLocations[entry.id].city || geoLocations[entry.id].country}
+                            </span>
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        {entry.description && (
+                          <p className="text-xs text-muted-foreground truncate">
+                            {entry.description}
+                          </p>
+                        )}
+                        {geoLocations[entry.id] && (geoLocations[entry.id].city || geoLocations[entry.id].country) && (
+                          <p className="text-[10px] text-muted-foreground flex items-center gap-1 sm:hidden">
+                            <MapPin className="h-2.5 w-2.5 shrink-0" />
+                            <span className="truncate">
+                              {[geoLocations[entry.id].city, geoLocations[entry.id].country].filter(Boolean).join(', ')}
+                            </span>
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <Button
