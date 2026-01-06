@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 export interface PieChartDataItem {
   name: string;
@@ -136,13 +136,6 @@ export const ReusablePieChart = ({
                 );
               })}
             </Pie>
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: 'hsl(var(--background))', 
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '8px'
-              }} 
-            />
           </PieChart>
         </ResponsiveContainer>
 
