@@ -38,6 +38,9 @@ const Auth = () => {
   const [mfaUserId, setMfaUserId] = useState<string | null>(null);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
   const [showEmailNotVerifiedMessage, setShowEmailNotVerifiedMessage] = useState(false);
+  const [isAccountLocked, setIsAccountLocked] = useState(false);
+  const [lockoutUnlockTime, setLockoutUnlockTime] = useState<Date | null>(null);
+  const [failedAttempts, setFailedAttempts] = useState(0);
   
   const { signIn, signUp, user, loading } = useAuth();
   const navigate = useNavigate();
@@ -77,6 +80,46 @@ const Auth = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Check account lockout status
+  const checkAccountLockout = async (checkEmail: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase.rpc('check_account_locked', { check_email: checkEmail });
+      
+      if (error) {
+        console.error('Error checking lockout:', error);
+        return false;
+      }
+      
+      if (data && data.length > 0 && data[0].is_locked) {
+        setIsAccountLocked(true);
+        setLockoutUnlockTime(new Date(data[0].unlock_at));
+        setFailedAttempts(data[0].failed_count);
+        return true;
+      }
+      
+      setIsAccountLocked(false);
+      setLockoutUnlockTime(null);
+      setFailedAttempts(data?.[0]?.failed_count || 0);
+      return false;
+    } catch (err) {
+      console.error('Lockout check error:', err);
+      return false;
+    }
+  };
+
+  // Record login attempt
+  const recordLoginAttempt = async (attemptEmail: string, success: boolean) => {
+    try {
+      await supabase.from('login_attempts').insert({
+        email: attemptEmail,
+        success,
+        ip_address: null // Could be fetched if needed
+      });
+    } catch (err) {
+      console.error('Failed to record login attempt:', err);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -91,24 +134,46 @@ const Auth = () => {
     
     try {
       if (view === 'login') {
+        // Check if account is locked
+        const isLocked = await checkAccountLockout(email);
+        if (isLocked) {
+          const timeLeft = lockoutUnlockTime ? Math.ceil((lockoutUnlockTime.getTime() - Date.now()) / 60000) : 15;
+          toast.error(`Account temporarily locked. Try again in ${timeLeft} minutes.`);
+          return;
+        }
+
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password
         });
         
         if (error) {
+          // Record failed attempt
+          await recordLoginAttempt(email, false);
+          
+          // Re-check lockout status after failed attempt
+          await checkAccountLockout(email);
+          
           if (error.message.includes("Email not confirmed")) {
             setShowEmailNotVerifiedMessage(true);
             toast.error("Please verify your email before signing in.");
           } else if (error.message.includes("Invalid login credentials")) {
             setShowEmailNotVerifiedMessage(false);
-            toast.error("Invalid email or password. Please try again.");
+            const attemptsLeft = 5 - (failedAttempts + 1);
+            if (attemptsLeft > 0) {
+              toast.error(`Invalid email or password. ${attemptsLeft} attempt${attemptsLeft !== 1 ? 's' : ''} remaining.`);
+            } else {
+              toast.error("Account locked for 15 minutes due to too many failed attempts.");
+            }
           } else {
             setShowEmailNotVerifiedMessage(false);
             toast.error(error.message);
           }
           return;
         }
+        
+        // Record successful attempt
+        await recordLoginAttempt(email, true);
         setShowEmailNotVerifiedMessage(false);
         
         // Check if MFA is required
@@ -806,6 +871,35 @@ const Auth = () => {
                   </span>
                 </div>
 
+                {/* Account Lockout Warning */}
+                {view === 'login' && isAccountLocked && lockoutUnlockTime && (
+                  <div className="mb-4 p-4 rounded-lg bg-destructive/10 border border-destructive/30">
+                    <div className="flex items-start gap-3">
+                      <Shield className="h-5 w-5 text-destructive mt-0.5" />
+                      <div className="flex-1">
+                        <p className="font-medium text-destructive">
+                          Account Temporarily Locked
+                        </p>
+                        <p className="text-sm text-destructive/80 mt-1">
+                          Too many failed login attempts. Please try again after {lockoutUnlockTime.toLocaleTimeString()}.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Failed Attempts Warning */}
+                {view === 'login' && !isAccountLocked && failedAttempts > 0 && failedAttempts < 5 && (
+                  <div className="mb-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-amber-600" />
+                      <p className="text-sm text-amber-700 dark:text-amber-300">
+                        {5 - failedAttempts} login attempt{5 - failedAttempts !== 1 ? 's' : ''} remaining before account lockout.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Email Not Verified Message */}
                 {view === 'login' && showEmailNotVerifiedMessage && (
                   <div className="mb-4 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
@@ -855,6 +949,16 @@ const Auth = () => {
                         onChange={(e) => {
                           setEmail(e.target.value);
                           setErrors((prev) => ({ ...prev, email: undefined }));
+                          // Reset lockout state when email changes
+                          setIsAccountLocked(false);
+                          setLockoutUnlockTime(null);
+                          setFailedAttempts(0);
+                        }}
+                        onBlur={() => {
+                          // Check lockout status when user tabs away from email field
+                          if (email && view === 'login') {
+                            checkAccountLockout(email);
+                          }
                         }}
                         className={`pl-10 ${errors.email ? 'border-destructive' : ''}`}
                       />
@@ -926,13 +1030,15 @@ const Auth = () => {
                     type="submit"
                     variant="hero"
                     className="w-full"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || (view === 'login' && isAccountLocked)}
                   >
                     {isSubmitting 
                       ? "Please wait..." 
-                      : view === 'login' 
-                        ? "Sign In" 
-                        : "Create Account"}
+                      : isAccountLocked && view === 'login'
+                        ? "Account Locked"
+                        : view === 'login' 
+                          ? "Sign In" 
+                          : "Create Account"}
                   </Button>
 
                   {/* Resend Verification Email */}

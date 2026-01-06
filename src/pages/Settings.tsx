@@ -475,12 +475,37 @@ const Settings = () => {
         return;
       }
 
+      // Check password history - prevent reusing last 5 passwords
+      const newPasswordHash = await hashPasswordForHistory(newPassword);
+      const { data: history } = await supabase
+        .from('password_history')
+        .select('password_hash')
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (history && history.length > 0) {
+        for (const entry of history) {
+          if (entry.password_hash === newPasswordHash) {
+            setErrors({ newPassword: "You cannot reuse any of your last 5 passwords. Please choose a different password." });
+            setSavingPassword(false);
+            return;
+          }
+        }
+      }
+
       // Update password
       const { error } = await supabase.auth.updateUser({
         password: newPassword
       });
 
       if (error) throw error;
+
+      // Store the new password hash in history
+      await supabase.from('password_history').insert({
+        user_id: user?.id,
+        password_hash: newPasswordHash
+      });
 
       await logAuthEvent('password_change');
       
@@ -499,6 +524,16 @@ const Settings = () => {
     } finally {
       setSavingPassword(false);
     }
+  };
+
+  // Hash password for history comparison (different from breach check)
+  const hashPasswordForHistory = async (password: string): Promise<string> => {
+    const encoder = new TextEncoder();
+    // Add a salt based on user ID for security
+    const data = encoder.encode(password + (user?.id || ''));
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   };
 
   const handleVerifyAndChangePassword = async () => {
