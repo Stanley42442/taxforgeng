@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { LiveIndicator } from "@/components/ui/live-indicator";
 import { 
   MessageCircle, 
   Smartphone, 
@@ -16,6 +17,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
+import { toast } from "sonner";
 
 interface NotificationDelivery {
   id: string;
@@ -113,6 +115,9 @@ export const NotificationDeliveryLog = () => {
   const [methodFilter, setMethodFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [alertTypeFilter, setAlertTypeFilter] = useState<string>('all');
+  const [isConnected, setIsConnected] = useState(false);
+  const [showNewBadge, setShowNewBadge] = useState(false);
+  const [newCount, setNewCount] = useState(0);
 
   const fetchDeliveries = async () => {
     setLoading(true);
@@ -170,6 +175,17 @@ export const NotificationDeliveryLog = () => {
           
           if (matchesMethod && matchesStatus && matchesAlertType) {
             setDeliveries(prev => [newDelivery, ...prev].slice(0, 50));
+            setShowNewBadge(true);
+            setNewCount(prev => prev + 1);
+            toast.success(`New ${getMethodLabel(newDelivery.delivery_method)} notification delivered`, {
+              description: getAlertTypeLabel(newDelivery.alert_type),
+            });
+            
+            // Auto-hide the new badge after 5 seconds
+            setTimeout(() => {
+              setShowNewBadge(false);
+              setNewCount(0);
+            }, 5000);
           }
         }
       )
@@ -188,7 +204,9 @@ export const NotificationDeliveryLog = () => {
           );
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        setIsConnected(status === 'SUBSCRIBED');
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -215,6 +233,12 @@ export const NotificationDeliveryLog = () => {
             <CardTitle className="flex items-center gap-2">
               <MessageCircle className="h-5 w-5 text-primary" />
               Notification Delivery Log
+              <LiveIndicator isLive={isConnected} label="Live" />
+              {showNewBadge && newCount > 0 && (
+                <Badge variant="default" className="animate-pulse bg-green-500">
+                  +{newCount} new
+                </Badge>
+              )}
             </CardTitle>
             <CardDescription>
               Track which notifications were sent via WhatsApp, SMS, or Email
