@@ -78,6 +78,18 @@ const isDeviceBlocked = async (userId: string, fingerprint: string): Promise<boo
   }
 };
 
+// Check if login time is unusual (outside 6 AM - 11 PM local time)
+const isUnusualLoginTime = (): { isUnusual: boolean; hour: number; timezone: string } => {
+  const now = new Date();
+  const hour = now.getHours();
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  
+  // Consider unusual if between 11 PM (23:00) and 6 AM (06:00)
+  const isUnusual = hour >= 23 || hour < 6;
+  
+  return { isUnusual, hour, timezone };
+};
+
 // Track device on login with location awareness
 const trackDevice = async (userId: string, userEmail: string) => {
   try {
@@ -215,6 +227,24 @@ const trackDevice = async (userId: string, userEmail: string) => {
           }
         }).catch(err => console.error('Failed to send new location alert:', err));
       }
+    }
+    
+    // Check for unusual login time
+    const { isUnusual, hour, timezone } = isUnusualLoginTime();
+    if (isUnusual) {
+      supabase.functions.invoke('send-security-alert', {
+        body: {
+          userEmail,
+          alertType: 'unusual_time',
+          timestamp: new Date().toLocaleString(),
+          timeInfo: { hour, timezone },
+          deviceInfo: { 
+            browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, 
+            os: `${deviceInfo.os} ${deviceInfo.osVersion}`, 
+            deviceName: deviceInfo.deviceName 
+          }
+        }
+      }).catch(err => console.error('Failed to send unusual time alert:', err));
     }
     
     return { blocked: false };

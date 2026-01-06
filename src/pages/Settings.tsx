@@ -44,6 +44,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
 import { formatDistanceToNow } from "date-fns";
+import { SecurityScoreWidget } from "@/components/SecurityScoreWidget";
 
 const nameSchema = z.string().min(1, "Name is required").max(100, "Name must be less than 100 characters");
 const emailSchema = z.string().email("Please enter a valid email address");
@@ -147,6 +148,10 @@ const Settings = () => {
   // Activity log state
   const [authEvents, setAuthEvents] = useState<AuthEvent[]>([]);
   const [eventsLoading, setEventsLoading] = useState(true);
+
+  // Password last changed date
+  const [passwordLastChanged, setPasswordLastChanged] = useState<Date | null>(null);
+  const [hasKnownDevices, setHasKnownDevices] = useState(false);
 
   // Errors
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -252,7 +257,41 @@ const Settings = () => {
     loadAuthEvents();
   }, [user]);
 
-  // Log auth event helper
+  // Load password last changed and known devices status
+  useEffect(() => {
+    const loadSecurityStatus = async () => {
+      if (!user) return;
+
+      try {
+        // Get most recent password change event
+        const { data: passwordEvent } = await supabase
+          .from('auth_events')
+          .select('created_at')
+          .eq('user_id', user.id)
+          .eq('event_type', 'password_change')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (passwordEvent) {
+          setPasswordLastChanged(new Date(passwordEvent.created_at));
+        }
+
+        // Check if user has known devices
+        const { count } = await supabase
+          .from('known_devices')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id);
+
+        setHasKnownDevices((count || 0) > 0);
+      } catch (error) {
+        console.error("Error loading security status:", error);
+      }
+    };
+
+    loadSecurityStatus();
+  }, [user]);
+
   const logAuthEvent = async (eventType: string, metadata: object = {}) => {
     if (!user) return;
     
@@ -778,6 +817,19 @@ const Settings = () => {
           <Badge variant={tier === 'free' ? 'secondary' : 'default'} className="capitalize shrink-0 self-start sm:self-auto">
             {tier} Plan
           </Badge>
+        </div>
+
+        {/* Security Score Widget */}
+        <div className="mb-8">
+          <SecurityScoreWidget
+            isEmailVerified={isEmailVerified}
+            hasMfaEnabled={hasMfaEnabled}
+            hasBackupCodes={hasBackupCodes}
+            remainingBackupCodes={remainingBackupCodes}
+            recentLoginCount={authEvents.length}
+            hasKnownDevices={hasKnownDevices}
+            passwordLastChanged={passwordLastChanged}
+          />
         </div>
 
         {/* Stats Cards */}

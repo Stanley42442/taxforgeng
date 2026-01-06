@@ -11,7 +11,7 @@ const corsHeaders = {
 
 interface SecurityAlertRequest {
   userEmail: string;
-  alertType: 'failed_backup_codes' | 'suspicious_login' | 'account_locked' | 'new_device' | 'device_removed' | 'sessions_revoked' | 'new_location' | 'device_blocked' | 'password_changed' | '2fa_enabled' | '2fa_disabled' | 'backup_codes_generated' | 'email_changed';
+  alertType: 'failed_backup_codes' | 'suspicious_login' | 'account_locked' | 'new_device' | 'device_removed' | 'sessions_revoked' | 'new_location' | 'device_blocked' | 'password_changed' | '2fa_enabled' | '2fa_disabled' | 'backup_codes_generated' | 'email_changed' | 'unusual_time';
   attemptCount?: number;
   timestamp: string;
   deviceInfo?: {
@@ -27,6 +27,10 @@ interface SecurityAlertRequest {
     previousCountry?: string;
   };
   newEmail?: string;
+  timeInfo?: {
+    hour: number;
+    timezone: string;
+  };
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -35,7 +39,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { userEmail, alertType, attemptCount, timestamp, deviceInfo, sessionCount, locationInfo, newEmail }: SecurityAlertRequest = await req.json();
+    const { userEmail, alertType, attemptCount, timestamp, deviceInfo, sessionCount, locationInfo, newEmail, timeInfo }: SecurityAlertRequest = await req.json();
 
     console.log("Sending security alert to:", userEmail, "type:", alertType);
 
@@ -198,6 +202,36 @@ const handler = async (req: Request): Promise<Response> => {
         alertTitle = "Email Change Requested";
         alertMessage = `A request was made to change your account email${newEmail ? ` to ${newEmail}` : ''}. Please check your new email for a verification link.`;
         actionMessage = "If you didn't request this change, please change your password immediately.";
+        break;
+      case 'unusual_time':
+        subject = "🕐 Security Alert: Login at Unusual Time";
+        alertTitle = "Login at Unusual Time";
+        alertMessage = `We detected a login to your account at an unusual hour${timeInfo ? ` (${timeInfo.hour}:00 ${timeInfo.timezone})` : ''}. This is outside your typical login hours.`;
+        actionMessage = "If this was you, you can safely ignore this email. If you don't recognize this login, please change your password immediately.";
+        if (timeInfo) {
+          extraInfo = `
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Login Hour:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${timeInfo.hour}:00</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Timezone:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${timeInfo.timezone}</td>
+            </tr>
+          `;
+        }
+        if (deviceInfo) {
+          extraInfo += `
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Device:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${deviceInfo.deviceName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Browser:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${deviceInfo.browser}</td>
+            </tr>
+          `;
+        }
         break;
       default:
         alertMessage = "Unusual activity was detected on your account.";
