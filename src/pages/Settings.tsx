@@ -122,6 +122,8 @@ const Settings = () => {
   const [showPasswordVerification, setShowPasswordVerification] = useState(false);
   const [passwordVerificationCode, setPasswordVerificationCode] = useState("");
   const [isVerifyingPassword, setIsVerifyingPassword] = useState(false);
+  const [passwordBreached, setPasswordBreached] = useState<boolean | null>(null);
+  const [checkingBreach, setCheckingBreach] = useState(false);
 
   // 2FA state
   const [mfaFactors, setMfaFactors] = useState<MFAFactor[]>([]);
@@ -325,6 +327,10 @@ const Settings = () => {
       if (error) throw error;
 
       await logAuthEvent('email_change', { new_email: newEmail });
+      
+      // Send email notification to current email
+      await sendSecurityNotification('email_changed', { newEmail });
+      
       toast.success("Verification email sent! Check your inbox to confirm the new email.");
       setNewEmail("");
     } catch (error: any) {
@@ -333,6 +339,57 @@ const Settings = () => {
       setSavingEmail(false);
     }
   };
+
+  // Password breach check using Have I Been Pwned API (k-anonymity model)
+  const checkPasswordBreach = async (password: string): Promise<boolean> => {
+    try {
+      // Create SHA-1 hash of the password
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+      
+      // Send only first 5 characters (k-anonymity)
+      const prefix = hashHex.slice(0, 5);
+      const suffix = hashHex.slice(5);
+      
+      const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
+      if (!response.ok) return false;
+      
+      const text = await response.text();
+      const hashes = text.split('\n');
+      
+      // Check if our suffix appears in the results
+      for (const line of hashes) {
+        const [hashSuffix] = line.split(':');
+        if (hashSuffix.trim() === suffix) {
+          return true; // Password has been breached
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error('Error checking password breach:', error);
+      return false; // Fail open - don't block user if API is down
+    }
+  };
+
+  // Debounced password breach check
+  useEffect(() => {
+    if (newPassword.length < 6) {
+      setPasswordBreached(null);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setCheckingBreach(true);
+      const breached = await checkPasswordBreach(newPassword);
+      setPasswordBreached(breached);
+      setCheckingBreach(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [newPassword]);
 
   // Password strength calculation
   const calculatePasswordStrength = (password: string): { score: number; label: string; color: string } => {
@@ -352,6 +409,24 @@ const Settings = () => {
   };
 
   const passwordStrength = calculatePasswordStrength(newPassword);
+
+  // Send security notification email
+  const sendSecurityNotification = async (alertType: string, extraData: object = {}) => {
+    if (!user?.email) return;
+    
+    try {
+      await supabase.functions.invoke('send-security-alert', {
+        body: {
+          userEmail: user.email,
+          alertType,
+          timestamp: new Date().toLocaleString(),
+          ...extraData
+        }
+      });
+    } catch (error) {
+      console.error('Failed to send security notification:', error);
+    }
+  };
 
   const handleInitiatePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -408,10 +483,15 @@ const Settings = () => {
       if (error) throw error;
 
       await logAuthEvent('password_change');
+      
+      // Send email notification
+      await sendSecurityNotification('password_changed');
+      
       toast.success("Password updated successfully!");
       setNewPassword("");
       setConfirmPassword("");
       setCurrentPassword("");
+      setPasswordBreached(null);
       setShowPasswordVerification(false);
       setPasswordVerificationCode("");
     } catch (error: any) {
@@ -502,6 +582,9 @@ const Settings = () => {
 
       await logAuthEvent('2fa_enabled');
       
+      // Send email notification
+      await sendSecurityNotification('2fa_enabled');
+      
       // Refresh MFA factors
       const { data: factors } = await supabase.auth.mfa.listFactors();
       setMfaFactors((factors?.totp || []) as MFAFactor[]);
@@ -526,6 +609,9 @@ const Settings = () => {
       if (error) throw error;
 
       await logAuthEvent('2fa_disabled');
+      
+      // Send email notification
+      await sendSecurityNotification('2fa_disabled');
 
       // Refresh MFA factors
       const { data: factors } = await supabase.auth.mfa.listFactors();
@@ -592,6 +678,9 @@ const Settings = () => {
       setRemainingBackupCodes(10); // 10 new codes generated
       setShowBackupCodes(true);
       await logAuthEvent('backup_codes_generated');
+      
+      // Send email notification
+      await sendSecurityNotification('backup_codes_generated');
       
       toast.success("Backup codes generated successfully!");
     } catch (error: any) {
@@ -1206,6 +1295,31 @@ const Settings = () => {
                             {/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? '✓' : '○'} Special character
                           </li>
                         </ul>
+
+                        {/* Password Breach Warning */}
+                        {checkingBreach && (
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                            Checking password security...
+                          </div>
+                        )}
+                        {passwordBreached === true && (
+                          <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/30">
+                            <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+                            <div>
+                              <p className="text-sm font-medium text-destructive">Password found in data breach!</p>
+                              <p className="text-xs text-destructive/80">
+                                This password has appeared in a known data breach and should not be used. Please choose a different password.
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                        {passwordBreached === false && (
+                          <div className="flex items-center gap-2 text-xs text-green-600">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Password not found in known data breaches
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -1244,7 +1358,7 @@ const Settings = () => {
                     </div>
                   )}
 
-                  <Button type="submit" disabled={savingPassword || !newPassword || !confirmPassword || !currentPassword}>
+                  <Button type="submit" disabled={savingPassword || !newPassword || !confirmPassword || !currentPassword || passwordBreached === true}>
                     {savingPassword ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />

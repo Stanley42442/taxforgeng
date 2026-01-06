@@ -11,7 +11,7 @@ const corsHeaders = {
 
 interface SecurityAlertRequest {
   userEmail: string;
-  alertType: 'failed_backup_codes' | 'suspicious_login' | 'account_locked' | 'new_device' | 'device_removed' | 'sessions_revoked' | 'new_location' | 'device_blocked';
+  alertType: 'failed_backup_codes' | 'suspicious_login' | 'account_locked' | 'new_device' | 'device_removed' | 'sessions_revoked' | 'new_location' | 'device_blocked' | 'password_changed' | '2fa_enabled' | '2fa_disabled' | 'backup_codes_generated' | 'email_changed';
   attemptCount?: number;
   timestamp: string;
   deviceInfo?: {
@@ -26,6 +26,7 @@ interface SecurityAlertRequest {
     country?: string;
     previousCountry?: string;
   };
+  newEmail?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -34,7 +35,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { userEmail, alertType, attemptCount, timestamp, deviceInfo, sessionCount, locationInfo }: SecurityAlertRequest = await req.json();
+    const { userEmail, alertType, attemptCount, timestamp, deviceInfo, sessionCount, locationInfo, newEmail }: SecurityAlertRequest = await req.json();
 
     console.log("Sending security alert to:", userEmail, "type:", alertType);
 
@@ -167,6 +168,36 @@ const handler = async (req: Request): Promise<Response> => {
             </tr>
           `;
         }
+        break;
+      case 'password_changed':
+        subject = "🔐 Security Alert: Your Password Was Changed";
+        alertTitle = "Password Changed";
+        alertMessage = "Your account password was just changed. If you made this change, you can safely ignore this email.";
+        actionMessage = "If you did NOT change your password, your account may be compromised. Please reset your password immediately and enable two-factor authentication.";
+        break;
+      case '2fa_enabled':
+        subject = "🛡️ Security Alert: Two-Factor Authentication Enabled";
+        alertTitle = "2FA Enabled";
+        alertMessage = "Two-factor authentication has been enabled on your account. This adds an extra layer of security.";
+        actionMessage = "If you enabled 2FA, great! Your account is now more secure. If you didn't do this, someone may have access to your account.";
+        break;
+      case '2fa_disabled':
+        subject = "⚠️ Security Alert: Two-Factor Authentication Disabled";
+        alertTitle = "2FA Disabled";
+        alertMessage = "Two-factor authentication has been disabled on your account. Your account is now less secure.";
+        actionMessage = "If you disabled 2FA, consider re-enabling it for better security. If you didn't do this, your account may be compromised.";
+        break;
+      case 'backup_codes_generated':
+        subject = "🔑 Security Alert: New Backup Codes Generated";
+        alertTitle = "Backup Codes Generated";
+        alertMessage = "New backup codes have been generated for your account. Any previous backup codes are now invalid.";
+        actionMessage = "If you generated these codes, make sure to store them securely. If you didn't do this, someone may have access to your account.";
+        break;
+      case 'email_changed':
+        subject = "📧 Security Alert: Email Change Requested";
+        alertTitle = "Email Change Requested";
+        alertMessage = `A request was made to change your account email${newEmail ? ` to ${newEmail}` : ''}. Please check your new email for a verification link.`;
+        actionMessage = "If you didn't request this change, please change your password immediately.";
         break;
       default:
         alertMessage = "Unusual activity was detected on your account.";
