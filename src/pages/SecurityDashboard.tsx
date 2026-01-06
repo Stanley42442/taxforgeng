@@ -784,19 +784,19 @@ const SecurityDashboard = () => {
                   Devices that have logged into your account
                 </CardDescription>
               </CardHeader>
-              <CardContent className="px-3 sm:px-6">
+              <CardContent className="px-2 sm:px-4">
                 {knownDevices.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Monitor className="h-12 w-12 mx-auto mb-3 opacity-50" />
                     <p>No devices recorded yet</p>
                   </div>
                 ) : (
-                  <ScrollArea className="h-[400px] -mr-2">
-                    <div className="space-y-3 pr-4">
+                  <div className="h-[400px] overflow-y-auto pr-1 scrollbar-thin">
+                    <div className="space-y-3 mr-2">
                       {knownDevices.map((device) => (
                         <div 
                           key={device.id}
-                          className={`p-3 rounded-lg border bg-card overflow-hidden ${
+                          className={`p-3 rounded-lg border bg-card ${
                             device.is_blocked 
                               ? 'border-destructive/50 bg-destructive/5' 
                               : device.is_trusted 
@@ -944,7 +944,7 @@ const SecurityDashboard = () => {
                         </div>
                       ))}
                     </div>
-                  </ScrollArea>
+                  </div>
                 )}
               </CardContent>
             </Card>
