@@ -57,6 +57,7 @@ import { IPWhitelistManager } from "@/components/IPWhitelistManager";
 import { TimeAccessManager } from "@/components/TimeAccessManager";
 import { SecurityAnalytics } from "@/components/SecurityAnalytics";
 import { NotificationDeliveryLog } from "@/components/NotificationDeliveryLog";
+import { BlockedLoginAttemptsLog } from "@/components/BlockedLoginAttemptsLog";
 
 interface LocationData {
   city?: string;
@@ -844,6 +845,11 @@ const SecurityDashboard = () => {
                 <span className="hidden xs:inline">Notifications</span>
                 <span className="xs:hidden">Notif</span>
               </TabsTrigger>
+              <TabsTrigger value="blocked" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
+                <Ban className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden xs:inline">Blocked Logins</span>
+                <span className="xs:hidden">Blocked</span>
+              </TabsTrigger>
               <TabsTrigger value="attempts" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span className="hidden xs:inline">Failed Attempts</span>
@@ -1376,6 +1382,11 @@ const SecurityDashboard = () => {
           {/* Notifications Tab */}
           <TabsContent value="notifications">
             <NotificationDeliveryLog />
+          </TabsContent>
+
+          {/* Blocked Logins Tab */}
+          <TabsContent value="blocked">
+            {user && <BlockedLoginAttemptsLog userId={user.id} />}
           </TabsContent>
 
           <TabsContent value="attempts">
