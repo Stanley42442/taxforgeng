@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { NavMenu } from "@/components/NavMenu";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,6 +11,13 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   LayoutDashboard,
   Building2,
@@ -32,9 +39,11 @@ import {
   Maximize2,
   PieChart,
   Activity,
+  Filter,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
-import { format, isAfter, addDays } from "date-fns";
+import { format, isAfter, addDays, subDays, subMonths, startOfWeek, startOfMonth, startOfQuarter, startOfYear, eachDayOfInterval, isWithinInterval } from "date-fns";
+import { SparklineChart } from "@/components/SparklineChart";
 import { ExpenseCharts } from "@/components/ExpenseCharts";
 import { WelcomeSplash } from "@/components/WelcomeSplash";
 import { DisclaimerModal } from "@/components/DisclaimerModal";
@@ -89,6 +98,15 @@ const Dashboard = () => {
     const saved = localStorage.getItem('dashboard_summary_expanded');
     return saved !== 'false'; // Default to expanded
   });
+  const [dateRange, setDateRange] = useState<'week' | 'month' | 'quarter' | 'year'>(() => {
+    const saved = localStorage.getItem('dashboard_date_range');
+    return (saved as 'week' | 'month' | 'quarter' | 'year') || 'month';
+  });
+
+  // Persist date range
+  useEffect(() => {
+    localStorage.setItem('dashboard_date_range', dateRange);
+  }, [dateRange]);
 
   // Persist summary expanded state
   useEffect(() => {
@@ -215,8 +233,67 @@ const Dashboard = () => {
     );
   }
 
-  const netIncome = expenseSummary.totalIncome - expenseSummary.totalExpenses;
+  // Calculate date range start
+  const getDateRangeStart = () => {
+    const now = new Date();
+    switch (dateRange) {
+      case 'week': return startOfWeek(now);
+      case 'month': return startOfMonth(now);
+      case 'quarter': return startOfQuarter(now);
+      case 'year': return startOfYear(now);
+      default: return startOfMonth(now);
+    }
+  };
+
+  const dateRangeStart = getDateRangeStart();
+
+  // Filter expenses by date range
+  const filteredExpenses = useMemo(() => {
+    return expenses.filter(e => {
+      const expenseDate = new Date(e.date);
+      return isWithinInterval(expenseDate, { start: dateRangeStart, end: new Date() });
+    });
+  }, [expenses, dateRangeStart]);
+
+  // Calculate filtered summary
+  const filteredSummary = useMemo(() => {
+    const income = filteredExpenses.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
+    const expense = filteredExpenses.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
+    const deductible = filteredExpenses.filter(e => e.isDeductible).reduce((sum, e) => sum + e.amount, 0);
+    return { totalIncome: income, totalExpenses: expense, deductibleExpenses: deductible };
+  }, [filteredExpenses]);
+
+  // Calculate 7-day sparkline data
+  const sparklineData = useMemo(() => {
+    const today = new Date();
+    const last7Days = eachDayOfInterval({ start: subDays(today, 6), end: today });
+    
+    const incomeByDay = last7Days.map(day => {
+      return expenses
+        .filter(e => e.type === 'income' && format(new Date(e.date), 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd'))
+        .reduce((sum, e) => sum + e.amount, 0);
+    });
+    
+    const expensesByDay = last7Days.map(day => {
+      return expenses
+        .filter(e => e.type === 'expense' && format(new Date(e.date), 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd'))
+        .reduce((sum, e) => sum + e.amount, 0);
+    });
+    
+    const netByDay = incomeByDay.map((inc, i) => inc - expensesByDay[i]);
+    
+    return { income: incomeByDay, expenses: expensesByDay, net: netByDay };
+  }, [expenses]);
+
+  const netIncome = filteredSummary.totalIncome - filteredSummary.totalExpenses;
   const totalTurnover = savedBusinesses.reduce((sum, b) => sum + b.turnover, 0);
+
+  const dateRangeLabels = {
+    week: 'This Week',
+    month: 'This Month',
+    quarter: 'This Quarter',
+    year: 'This Year',
+  };
 
   return (
     <div className="min-h-screen flex flex-col relative w-full max-w-full overflow-x-hidden">
@@ -278,11 +355,11 @@ const Dashboard = () => {
                         </div>
                         <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10">
                           <TrendingUp className="h-3.5 w-3.5 text-success" />
-                          <span className="text-xs font-medium text-success">{formatCurrency(expenseSummary.totalIncome)}</span>
+                          <span className="text-xs font-medium text-success">{formatCurrency(filteredSummary.totalIncome)}</span>
                         </div>
                         <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-destructive/10">
                           <TrendingDown className="h-3.5 w-3.5 text-destructive" />
-                          <span className="text-xs font-medium text-destructive">{formatCurrency(expenseSummary.totalExpenses)}</span>
+                          <span className="text-xs font-medium text-destructive">{formatCurrency(filteredSummary.totalExpenses)}</span>
                         </div>
                         {urgentCount > 0 && (
                           <Badge variant="destructive" className="text-xs">
@@ -304,6 +381,25 @@ const Dashboard = () => {
               
               <CollapsibleContent>
                 <div className="px-4 pb-4 pt-2 border-t border-border/30">
+                  {/* Date Range Filter */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Filter className="h-4 w-4" />
+                      <span>Showing data for:</span>
+                    </div>
+                    <Select value={dateRange} onValueChange={(v) => setDateRange(v as typeof dateRange)}>
+                      <SelectTrigger className="w-[140px] h-8 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="week">This Week</SelectItem>
+                        <SelectItem value="month">This Month</SelectItem>
+                        <SelectItem value="quarter">This Quarter</SelectItem>
+                        <SelectItem value="year">This Year</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   {/* Bento Grid Summary Cards */}
                   <div className="grid gap-3 grid-cols-2 lg:grid-cols-4 [&>*]:min-w-0 [&>*]:overflow-hidden">
                     <StatCard
@@ -318,31 +414,37 @@ const Dashboard = () => {
                     <StatCard
                       icon={TrendingUp}
                       label="Income"
-                      value={formatCurrency(expenseSummary.totalIncome)}
-                      subtext="Tracked entries"
+                      value={formatCurrency(filteredSummary.totalIncome)}
+                      subtext={dateRangeLabels[dateRange]}
                       gradient="from-success/20 to-success/5"
                       iconColor="text-success"
                       valueColor="text-success"
+                      sparklineData={sparklineData.income}
+                      sparklineColor="hsl(var(--success))"
                       compact
                     />
                     <StatCard
                       icon={TrendingDown}
                       label="Expenses"
-                      value={formatCurrency(expenseSummary.totalExpenses)}
-                      subtext={`${formatCurrency(expenseSummary.deductibleExpenses)} deductible`}
+                      value={formatCurrency(filteredSummary.totalExpenses)}
+                      subtext={`${formatCurrency(filteredSummary.deductibleExpenses)} deductible`}
                       gradient="from-destructive/20 to-destructive/5"
                       iconColor="text-destructive"
                       valueColor="text-destructive"
+                      sparklineData={sparklineData.expenses}
+                      sparklineColor="hsl(var(--destructive))"
                       compact
                     />
                     <StatCard
                       icon={Calculator}
                       label="Net Income"
                       value={formatCurrency(netIncome)}
-                      subtext="Income - expenses"
+                      subtext={dateRangeLabels[dateRange]}
                       gradient={netIncome >= 0 ? "from-success/20 to-success/5" : "from-destructive/20 to-destructive/5"}
                       iconColor={netIncome >= 0 ? "text-success" : "text-destructive"}
                       valueColor={netIncome >= 0 ? "text-success" : "text-destructive"}
+                      sparklineData={sparklineData.net}
+                      sparklineColor="auto"
                       compact
                     />
                   </div>
@@ -625,6 +727,8 @@ const StatCard = ({
   iconColor,
   valueColor,
   compact = false,
+  sparklineData,
+  sparklineColor,
 }: {
   icon: React.ElementType;
   label: string;
@@ -634,18 +738,46 @@ const StatCard = ({
   iconColor: string;
   valueColor?: string;
   compact?: boolean;
+  sparklineData?: number[];
+  sparklineColor?: string;
 }) => (
   <div className={`glass-frosted rounded-2xl shadow-futuristic overflow-hidden hover-lift transition-all duration-300 relative group min-w-0 ${compact ? 'p-2.5 sm:p-3' : 'p-3 sm:p-4'}`}>
     <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-50 group-hover:opacity-70 transition-opacity`} />
     <div className="relative z-10 min-w-0">
-      <div className={`flex items-center gap-2 ${compact ? 'mb-1.5 sm:mb-2' : 'mb-2 sm:mb-3'}`}>
-        <div className={`rounded-xl bg-background/50 flex items-center justify-center shrink-0 ${compact ? 'h-7 w-7 sm:h-8 sm:w-8' : 'h-8 w-8 sm:h-9 sm:w-9'}`}>
-          <Icon className={`${compact ? 'h-3.5 w-3.5 sm:h-4 sm:w-4' : 'h-4 w-4 sm:h-5 sm:w-5'} ${iconColor}`} />
+      <div className={`flex items-center justify-between gap-2 ${compact ? 'mb-1.5 sm:mb-2' : 'mb-2 sm:mb-3'}`}>
+        <div className="flex items-center gap-2 min-w-0">
+          <div className={`rounded-xl bg-background/50 flex items-center justify-center shrink-0 ${compact ? 'h-7 w-7 sm:h-8 sm:w-8' : 'h-8 w-8 sm:h-9 sm:w-9'}`}>
+            <Icon className={`${compact ? 'h-3.5 w-3.5 sm:h-4 sm:w-4' : 'h-4 w-4 sm:h-5 sm:w-5'} ${iconColor}`} />
+          </div>
+          <span className={`text-muted-foreground font-medium truncate ${compact ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'}`}>{label}</span>
         </div>
-        <span className={`text-muted-foreground font-medium truncate ${compact ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'}`}>{label}</span>
+        {sparklineData && sparklineData.length > 0 && (
+          <div className="shrink-0 hidden sm:block">
+            <SparklineChart 
+              data={sparklineData} 
+              color={sparklineColor} 
+              width={50} 
+              height={20}
+            />
+          </div>
+        )}
       </div>
-      <p className={`font-bold truncate ${valueColor || 'text-foreground'} ${compact ? 'text-sm sm:text-base lg:text-lg' : 'text-base sm:text-xl lg:text-2xl'}`}>{value}</p>
-      <p className={`text-muted-foreground mt-1 truncate ${compact ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'}`}>{subtext}</p>
+      <div className="flex items-end justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <p className={`font-bold truncate ${valueColor || 'text-foreground'} ${compact ? 'text-sm sm:text-base lg:text-lg' : 'text-base sm:text-xl lg:text-2xl'}`}>{value}</p>
+          <p className={`text-muted-foreground mt-1 truncate ${compact ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'}`}>{subtext}</p>
+        </div>
+        {sparklineData && sparklineData.length > 0 && (
+          <div className="shrink-0 sm:hidden">
+            <SparklineChart 
+              data={sparklineData} 
+              color={sparklineColor} 
+              width={40} 
+              height={16}
+            />
+          </div>
+        )}
+      </div>
     </div>
   </div>
 );
