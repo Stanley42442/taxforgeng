@@ -1,8 +1,9 @@
-import { useMemo, useState, useEffect, useRef } from "react";
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
+import { useMemo, useState, useEffect } from "react";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Receipt, BarChart3 } from "lucide-react";
+import { ReusablePieChart, PieChartDataItem } from "@/components/ui/reusable-pie-chart";
 
 interface Expense {
   id: string;
@@ -43,37 +44,12 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [animationComplete, setAnimationComplete] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const pieContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Trigger entrance animation after mount
     const timer = setTimeout(() => setIsVisible(true), 100);
-    const animTimer = setTimeout(() => setAnimationComplete(true), 1200);
-    return () => {
-      clearTimeout(timer);
-      clearTimeout(animTimer);
-    };
+    return () => clearTimeout(timer);
   }, []);
-
-  // Handle click outside pie chart to deselect
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (pieContainerRef.current && !pieContainerRef.current.contains(event.target as Node)) {
-        setActiveIndex(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  const handlePieClick = (data: any, index: number) => {
-    setActiveIndex(activeIndex === index ? null : index);
-  };
 
   // Category breakdown for pie chart (expenses only)
   const categoryData = useMemo(() => {
@@ -142,101 +118,32 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div 
-            className={`transition-all duration-700 ease-out ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
-          >
-            {categoryData.length > 0 ? (
-              <div className="h-[20rem] relative" ref={pieContainerRef}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={categoryData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={85}
-                      paddingAngle={2}
-                      dataKey="value"
-                      animationBegin={200}
-                      animationDuration={1000}
-                      animationEasing="ease-out"
-                      onClick={handlePieClick}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {categoryData.map((entry, index) => {
-                        const isActive = activeIndex === index;
-                        return (
-                          <Cell 
-                            key={`cell-${index}`} 
-                            fill={entry.color}
-                            stroke={isActive ? 'hsl(var(--foreground))' : 'transparent'}
-                            strokeWidth={isActive ? 3 : 0}
-                            style={{
-                              filter: activeIndex !== null && !isActive ? 'opacity(0.4)' : 'none',
-                              transform: isActive ? 'scale(1.05)' : 'scale(1)',
-                              transformOrigin: 'center',
-                              transition: 'all 0.2s ease-out'
-                            }}
-                          />
-                        );
-                      })}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-                {activeIndex !== null && categoryData[activeIndex] && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="text-center">
-                      <p className="text-lg font-bold text-foreground">{categoryData[activeIndex].name}</p>
-                      <p className="text-sm text-muted-foreground">{formatCurrency(categoryData[activeIndex].value)}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {((categoryData[activeIndex].value / categoryData.reduce((sum, e) => sum + e.value, 0)) * 100).toFixed(1)}%
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="h-[20rem] flex items-center justify-center text-muted-foreground">
-                No expense data yet
-              </div>
-            )}
-            {/* Color Key Legend */}
-            {categoryData.length > 0 && (
-              <div className={`mt-4 grid grid-cols-2 gap-2 transition-all duration-500 delay-300 ${
-                isVisible ? 'opacity-100' : 'opacity-0'
-              }`}>
-                {categoryData.map((entry, index) => {
-                  const total = categoryData.reduce((sum, e) => sum + e.value, 0);
-                  const percent = ((entry.value / total) * 100).toFixed(0);
-                  const isActive = activeIndex === index;
-                  return (
-                    <div 
-                      key={`legend-${index}`} 
-                      className={`flex items-center gap-2 text-sm cursor-pointer rounded-md p-1 transition-all ${
-                        isActive ? 'bg-muted ring-2 ring-primary' : 'hover:bg-muted/50'
-                      } ${activeIndex !== null && !isActive ? 'opacity-40' : ''}`}
-                      onClick={() => setActiveIndex(isActive ? null : index)}
-                    >
-                      <div 
-                        className="w-3 h-3 rounded-full flex-shrink-0" 
-                        style={{ backgroundColor: entry.color }}
-                      />
-                      <span className="text-muted-foreground truncate">{entry.name}</span>
-                      <span className="font-medium text-foreground ml-auto">{percent}%</span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            <ReusablePieChart
+              data={categoryData}
+              height={320}
+              innerRadius={50}
+              outerRadius={85}
+              showCenterLabel
+              selectedIndex={activeIndex}
+              onSliceClick={(_, index) => setActiveIndex(activeIndex === index ? null : index)}
+              centerLabelFormatter={(item, total) => (
+                <div className="text-center">
+                  <p className="text-lg font-bold text-foreground">{item.name}</p>
+                  <p className="text-sm text-muted-foreground">{formatCurrency(item.value)}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {((item.value / total) * 100).toFixed(1)}%
+                  </p>
+                </div>
+              )}
+              legendClassName="grid grid-cols-2 gap-2"
+              emptyMessage="No expense data yet"
+            />
             <div className={`mt-4 text-center transition-all duration-500 delay-500 ${
               isVisible ? 'opacity-100' : 'opacity-0'
             }`}>
               <p className="text-sm text-muted-foreground">Total Expenses</p>
               <p className="text-xl font-bold text-destructive">{formatCurrency(totalExpenses)}</p>
             </div>
-          </div>
         </CardContent>
       </Card>
 

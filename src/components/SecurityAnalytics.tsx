@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { 
   BarChart, 
   Bar, 
@@ -9,11 +8,6 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
   Legend,
   AreaChart,
   Area
@@ -28,6 +22,7 @@ import {
   Globe
 } from "lucide-react";
 import { format, subDays, startOfDay, eachDayOfInterval } from "date-fns";
+import { ReusablePieChart } from "@/components/ui/reusable-pie-chart";
 
 interface AuthEvent {
   id: string;
@@ -177,6 +172,13 @@ export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalytic
 
   const pieColors = [CHART_COLORS.success, CHART_COLORS.info, CHART_COLORS.warning, CHART_COLORS.error, CHART_COLORS.primary, CHART_COLORS.muted];
 
+  // Convert eventsByType to pie chart format
+  const pieChartData = eventsByType.map((item, index) => ({
+    name: item.name,
+    value: item.value,
+    color: pieColors[index % pieColors.length]
+  }));
+
   return (
     <div className="space-y-6">
       {/* Stats Overview */}
@@ -297,48 +299,16 @@ export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalytic
             <CardDescription>Distribution of security events</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[250px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={eventsByType}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {eventsByType.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--background))', 
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px'
-                    }} 
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex flex-wrap justify-center gap-2 mt-2">
-              {eventsByType.map((entry, index) => (
-                <Badge 
-                  key={entry.name} 
-                  variant="outline"
-                  className="text-xs"
-                  style={{ borderColor: pieColors[index % pieColors.length] }}
-                >
-                  <span 
-                    className="w-2 h-2 rounded-full mr-1" 
-                    style={{ backgroundColor: pieColors[index % pieColors.length] }}
-                  />
-                  {entry.name}: {entry.value}
-                </Badge>
-              ))}
-            </div>
+            <ReusablePieChart
+              data={pieChartData}
+              height={250}
+              innerRadius={60}
+              outerRadius={80}
+              paddingAngle={5}
+              showLegend={true}
+              interactive={false}
+              animated={true}
+            />
           </CardContent>
         </Card>
 
