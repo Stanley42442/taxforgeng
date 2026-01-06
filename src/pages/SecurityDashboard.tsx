@@ -593,22 +593,22 @@ const SecurityDashboard = () => {
     <div className="min-h-screen bg-gradient-hero">
       <NavMenu />
       
-      <main className="container mx-auto px-4 py-8 max-w-6xl">
+      <main className="container mx-auto px-4 py-8 max-w-6xl overflow-x-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Link to="/settings" className="text-muted-foreground hover:text-foreground">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div className="flex items-center gap-4 min-w-0">
+            <Link to="/settings" className="text-muted-foreground hover:text-foreground shrink-0">
               <ArrowLeft className="h-5 w-5" />
             </Link>
-            <div>
-              <h1 className="text-2xl font-bold flex items-center gap-2">
-                <Shield className="h-6 w-6 text-primary" />
-                Security Dashboard
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-primary shrink-0" />
+                <span className="truncate">Security Dashboard</span>
               </h1>
-              <p className="text-muted-foreground">Monitor your account security and activity</p>
+              <p className="text-sm text-muted-foreground truncate">Monitor your account security and activity</p>
             </div>
           </div>
-          <Button variant="outline" onClick={handleRefresh} disabled={isRefreshing}>
+          <Button variant="outline" onClick={handleRefresh} disabled={isRefreshing} className="shrink-0 self-start sm:self-auto">
             {isRefreshing ? (
               <Loader2 className="h-4 w-4 animate-spin mr-2" />
             ) : (
@@ -731,43 +731,49 @@ const SecurityDashboard = () => {
 
         {/* Activity Tabs */}
         <Tabs defaultValue="events" className="space-y-4">
-          <TabsList className="flex-wrap">
-            <TabsTrigger value="devices" className="gap-2">
-              <Monitor className="h-4 w-4" />
-              Devices
-              {knownDevices.length > 0 && (
-                <Badge variant="secondary" className="ml-1 h-5 px-1.5">
-                  {knownDevices.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="sessions" className="gap-2">
-              <Activity className="h-4 w-4" />
-              Sessions
-            </TabsTrigger>
-            <TabsTrigger value="history" className="gap-2">
-              <History className="h-4 w-4" />
-              Login History
-              {loginHistory.length > 0 && (
-                <Badge variant="secondary" className="ml-1 h-5 px-1.5">
-                  {loginHistory.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="events" className="gap-2">
-              <Shield className="h-4 w-4" />
-              Security Events
-            </TabsTrigger>
-            <TabsTrigger value="attempts" className="gap-2">
-              <AlertTriangle className="h-4 w-4" />
-              Failed Attempts
-              {backupCodeAttempts.length > 0 && (
-                <Badge variant="destructive" className="ml-1 h-5 px-1.5">
-                  {backupCodeAttempts.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4">
+            <TabsList className="inline-flex h-auto flex-wrap gap-1 p-1 w-auto min-w-full sm:min-w-0">
+              <TabsTrigger value="devices" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
+                <Monitor className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden xs:inline">Devices</span>
+                <span className="xs:hidden">Dev</span>
+                {knownDevices.length > 0 && (
+                  <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+                    {knownDevices.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="sessions" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
+                <Activity className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                Sessions
+              </TabsTrigger>
+              <TabsTrigger value="history" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
+                <History className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden xs:inline">Login History</span>
+                <span className="xs:hidden">History</span>
+                {loginHistory.length > 0 && (
+                  <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+                    {loginHistory.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="events" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
+                <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden xs:inline">Security Events</span>
+                <span className="xs:hidden">Events</span>
+              </TabsTrigger>
+              <TabsTrigger value="attempts" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
+                <AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden xs:inline">Failed Attempts</span>
+                <span className="xs:hidden">Failed</span>
+                {backupCodeAttempts.length > 0 && (
+                  <Badge variant="destructive" className="ml-1 h-5 px-1.5 text-xs">
+                    {backupCodeAttempts.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="devices">
             <Card>
@@ -797,8 +803,8 @@ const SecurityDashboard = () => {
                                 : ''
                           }`}
                         >
-                          <div className="flex items-start gap-3">
-                            <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
+                          <div className="flex items-start gap-2 sm:gap-3">
+                            <div className={`h-10 w-10 sm:h-12 sm:w-12 shrink-0 rounded-full flex items-center justify-center ${
                               device.is_blocked 
                                 ? 'bg-destructive/10' 
                                 : device.is_trusted 
@@ -806,54 +812,54 @@ const SecurityDashboard = () => {
                                   : 'bg-primary/10'
                             }`}>
                               {device.is_blocked ? (
-                                <Ban className="h-6 w-6 text-destructive" />
+                                <Ban className="h-5 w-5 sm:h-6 sm:w-6 text-destructive" />
                               ) : device.device_type === 'mobile' ? (
-                                <Smartphone className={`h-6 w-6 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
+                                <Smartphone className={`h-5 w-5 sm:h-6 sm:w-6 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
                               ) : device.device_type === 'tablet' ? (
-                                <Tablet className={`h-6 w-6 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
+                                <Tablet className={`h-5 w-5 sm:h-6 sm:w-6 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
                               ) : (
-                                <Laptop className={`h-6 w-6 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
+                                <Laptop className={`h-5 w-5 sm:h-6 sm:w-6 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
                               )}
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between gap-2">
-                                <div>
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <p className={`font-medium text-sm ${device.is_blocked ? 'text-destructive' : ''}`}>
+                            <div className="flex-1 min-w-0 overflow-hidden">
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <p className={`font-medium text-sm truncate max-w-[150px] sm:max-w-none ${device.is_blocked ? 'text-destructive' : ''}`}>
                                       {device.device_model || device.device_name || 'Unknown Device'}
                                     </p>
-                                    <Badge variant="outline" className="text-xs capitalize">
+                                    <Badge variant="outline" className="text-[10px] sm:text-xs capitalize shrink-0">
                                       {device.device_type || 'desktop'}
                                     </Badge>
                                     {device.is_blocked && (
-                                      <Badge variant="destructive" className="text-xs">
+                                      <Badge variant="destructive" className="text-[10px] sm:text-xs shrink-0">
                                         Blocked
                                       </Badge>
                                     )}
                                     {device.is_trusted && !device.is_blocked && (
-                                      <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50 dark:bg-green-900/20 text-xs">
+                                      <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50 dark:bg-green-900/20 text-[10px] sm:text-xs shrink-0">
                                         Trusted
                                       </Badge>
                                     )}
                                   </div>
-                                  <p className="text-xs text-muted-foreground mt-1">
+                                  <p className="text-xs text-muted-foreground mt-1 truncate">
                                     {device.browser}{device.browser_version ? ` v${device.browser_version}` : ''} on {device.os}{device.os_version ? ` ${device.os_version}` : ''}
                                   </p>
                                   {(device.last_city || device.last_country) && (
-                                    <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                                      <MapPin className="h-3 w-3 text-primary" />
-                                      {[device.last_city, device.last_country].filter(Boolean).join(', ')}
+                                    <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1 truncate">
+                                      <MapPin className="h-3 w-3 text-primary shrink-0" />
+                                      <span className="truncate">{[device.last_city, device.last_country].filter(Boolean).join(', ')}</span>
                                     </p>
                                   )}
                                 </div>
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-0.5 shrink-0">
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className={device.is_blocked 
+                                    className={`h-8 w-8 p-0 ${device.is_blocked 
                                       ? "text-green-600 hover:text-green-700 hover:bg-green-50" 
                                       : "text-destructive hover:text-destructive hover:bg-destructive/10"
-                                    }
+                                    }`}
                                     onClick={() => handleToggleBlock(device.id, device.is_blocked)}
                                     disabled={togglingBlockId === device.id}
                                     title={device.is_blocked ? "Unblock device" : "Block device from logging in"}
@@ -870,7 +876,7 @@ const SecurityDashboard = () => {
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className={device.is_trusted ? "text-amber-500 hover:text-amber-600 hover:bg-amber-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}
+                                      className={`h-8 w-8 p-0 ${device.is_trusted ? "text-amber-500 hover:text-amber-600 hover:bg-amber-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}`}
                                       onClick={() => handleToggleTrust(device.id, device.is_trusted)}
                                       disabled={togglingTrustId === device.id}
                                       title={device.is_trusted ? "Remove from trusted devices" : "Mark as trusted device"}
@@ -887,7 +893,7 @@ const SecurityDashboard = () => {
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                    className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                                     onClick={() => handleRemoveDevice(device.id)}
                                     disabled={removingDeviceId === device.id}
                                     title="Remove device from list"
@@ -902,38 +908,38 @@ const SecurityDashboard = () => {
                               </div>
                               
                               {/* Device Details Grid */}
-                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 text-xs">
+                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2 mt-2 sm:mt-3 text-[10px] sm:text-xs">
                                 {device.screen_resolution && (
-                                  <div className="flex items-center gap-1 text-muted-foreground">
-                                    <Monitor className="h-3 w-3" />
-                                    <span>{device.screen_resolution}</span>
+                                  <div className="flex items-center gap-1 text-muted-foreground overflow-hidden">
+                                    <Monitor className="h-3 w-3 shrink-0" />
+                                    <span className="truncate">{device.screen_resolution}</span>
                                   </div>
                                 )}
                                 {device.timezone && (
-                                  <div className="flex items-center gap-1 text-muted-foreground">
-                                    <Globe className="h-3 w-3" />
+                                  <div className="flex items-center gap-1 text-muted-foreground overflow-hidden">
+                                    <Globe className="h-3 w-3 shrink-0" />
                                     <span className="truncate" title={device.timezone}>
                                       {device.timezone.split('/').pop()?.replace(/_/g, ' ')}
                                     </span>
                                   </div>
                                 )}
                                 {device.language && (
-                                  <div className="flex items-center gap-1 text-muted-foreground">
-                                    <Languages className="h-3 w-3" />
-                                    <span>{device.language}</span>
+                                  <div className="flex items-center gap-1 text-muted-foreground overflow-hidden">
+                                    <Languages className="h-3 w-3 shrink-0" />
+                                    <span className="truncate">{device.language}</span>
                                   </div>
                                 )}
                               </div>
                               
                               {/* Timestamps */}
-                              <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-2 text-[10px] sm:text-xs text-muted-foreground">
                                 <div className="flex items-center gap-1">
-                                  <Clock className="h-3 w-3" />
-                                  First seen: {format(new Date(device.first_seen_at), 'PP')}
+                                  <Clock className="h-3 w-3 shrink-0" />
+                                  <span className="truncate">First: {format(new Date(device.first_seen_at), 'PP')}</span>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <RefreshCw className="h-3 w-3" />
-                                  Last active: {formatDistanceToNow(new Date(device.last_seen_at), { addSuffix: true })}
+                                  <RefreshCw className="h-3 w-3 shrink-0" />
+                                  <span className="truncate">Active: {formatDistanceToNow(new Date(device.last_seen_at), { addSuffix: true })}</span>
                                 </div>
                               </div>
                             </div>
@@ -1081,27 +1087,27 @@ const SecurityDashboard = () => {
                       {loginHistory.map((event) => (
                         <div 
                           key={event.id}
-                          className="flex items-start gap-3 p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                          className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
                         >
-                          <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                            <LogIn className="h-5 w-5 text-green-600" />
+                          <div className="h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                            <LogIn className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between gap-2">
+                          <div className="flex-1 min-w-0 overflow-hidden">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
                               <p className="font-medium text-sm">
                                 Signed in successfully
                               </p>
-                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <div className="flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground shrink-0">
                                 <Clock className="h-3 w-3" />
-                                {formatDistanceToNow(new Date(event.created_at), { addSuffix: true })}
+                                <span className="truncate">{formatDistanceToNow(new Date(event.created_at), { addSuffix: true })}</span>
                               </div>
                             </div>
                             
                             {/* Location Info */}
                             {event.location && (event.location.city || event.location.country) && (
-                              <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
-                                <MapPin className="h-3.5 w-3.5 text-primary" />
-                                <span>
+                              <div className="flex items-center gap-1 mt-1 text-xs sm:text-sm text-muted-foreground overflow-hidden">
+                                <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary shrink-0" />
+                                <span className="truncate">
                                   {[event.location.city, event.location.region, event.location.country]
                                     .filter(Boolean)
                                     .join(', ')}
@@ -1110,16 +1116,16 @@ const SecurityDashboard = () => {
                             )}
                             
                             {/* IP and Time */}
-                            <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-2 text-[10px] sm:text-xs text-muted-foreground">
                               {event.ip_address && (
-                                <div className="flex items-center gap-1">
-                                  <Globe className="h-3 w-3" />
-                                  <span className="font-mono">{event.ip_address}</span>
+                                <div className="flex items-center gap-1 overflow-hidden">
+                                  <Globe className="h-3 w-3 shrink-0" />
+                                  <span className="font-mono truncate">{event.ip_address}</span>
                                 </div>
                               )}
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                <span>{format(new Date(event.created_at), 'PPpp')}</span>
+                              <div className="flex items-center gap-1 overflow-hidden">
+                                <Clock className="h-3 w-3 shrink-0" />
+                                <span className="truncate">{format(new Date(event.created_at), 'PPpp')}</span>
                               </div>
                             </div>
                           </div>
@@ -1248,25 +1254,25 @@ const SecurityDashboard = () => {
             <CardDescription>Manage your account security settings</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-wrap gap-3">
-              <Button variant="outline" asChild>
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm" asChild>
                 <Link to="/settings">
-                  <Shield className="h-4 w-4 mr-2" />
+                  <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                   Security Settings
                 </Link>
               </Button>
               {!stats.mfaEnabled && (
-                <Button variant="default" asChild>
+                <Button variant="default" size="sm" className="text-xs sm:text-sm" asChild>
                   <Link to="/settings">
-                    <Smartphone className="h-4 w-4 mr-2" />
+                    <Smartphone className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     Enable 2FA
                   </Link>
                 </Button>
               )}
               {stats.backupCodesRemaining <= 3 && stats.mfaEnabled && (
-                <Button variant="outline" className="border-amber-500 text-amber-600 hover:bg-amber-50" asChild>
+                <Button variant="outline" size="sm" className="border-amber-500 text-amber-600 hover:bg-amber-50 text-xs sm:text-sm" asChild>
                   <Link to="/settings">
-                    <Key className="h-4 w-4 mr-2" />
+                    <Key className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     Generate Backup Codes
                   </Link>
                 </Button>
