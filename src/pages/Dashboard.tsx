@@ -40,10 +40,14 @@ import {
   PieChart,
   Activity,
   Filter,
+  Download,
+  FileSpreadsheet,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { format, isAfter, addDays, subDays, subMonths, startOfWeek, startOfMonth, startOfQuarter, startOfYear, eachDayOfInterval, isWithinInterval } from "date-fns";
 import { SparklineChart } from "@/components/SparklineChart";
+import { exportDashboardToPDF, exportDashboardToCSV, DashboardExportData } from "@/lib/dashboardExport";
+import { toast } from "sonner";
 import { ExpenseCharts } from "@/components/ExpenseCharts";
 import { WelcomeSplash } from "@/components/WelcomeSplash";
 import { DisclaimerModal } from "@/components/DisclaimerModal";
@@ -295,6 +299,42 @@ const Dashboard = () => {
     year: 'This Year',
   };
 
+  const handleExport = (format: 'pdf' | 'csv') => {
+    const exportData: DashboardExportData = {
+      dateRange: dateRangeLabels[dateRange],
+      dateRangeStart: dateRangeStart,
+      dateRangeEnd: new Date(),
+      totalIncome: filteredSummary.totalIncome,
+      totalExpenses: filteredSummary.totalExpenses,
+      netIncome: netIncome,
+      deductibleExpenses: filteredSummary.deductibleExpenses,
+      businessCount: savedBusinesses.length,
+      totalTurnover: totalTurnover,
+      transactionCount: expenses.length,
+      reminderCount: upcomingReminders.length,
+      urgentCount: urgentCount,
+      businesses: savedBusinesses.map(b => ({
+        name: b.name,
+        entityType: b.entityType,
+        turnover: b.turnover,
+        sector: b.sector,
+      })),
+    };
+
+    try {
+      if (format === 'pdf') {
+        exportDashboardToPDF(exportData);
+        toast.success('Dashboard report downloaded as PDF');
+      } else {
+        exportDashboardToCSV(exportData);
+        toast.success('Dashboard data exported as CSV');
+      }
+    } catch (error) {
+      toast.error('Failed to export dashboard data');
+      console.error('Export error:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col relative w-full max-w-full overflow-x-hidden">
       {/* Background */}
@@ -381,23 +421,43 @@ const Dashboard = () => {
               
               <CollapsibleContent>
                 <div className="px-4 pb-4 pt-2 border-t border-border/30">
-                  {/* Date Range Filter */}
-                  <div className="flex items-center justify-between mb-4">
+                  {/* Date Range Filter and Export Buttons */}
+                  <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Filter className="h-4 w-4" />
                       <span>Showing data for:</span>
+                      <Select value={dateRange} onValueChange={(v) => setDateRange(v as typeof dateRange)}>
+                        <SelectTrigger className="w-[130px] h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="week">This Week</SelectItem>
+                          <SelectItem value="month">This Month</SelectItem>
+                          <SelectItem value="quarter">This Quarter</SelectItem>
+                          <SelectItem value="year">This Year</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <Select value={dateRange} onValueChange={(v) => setDateRange(v as typeof dateRange)}>
-                      <SelectTrigger className="w-[140px] h-8 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="week">This Week</SelectItem>
-                        <SelectItem value="month">This Month</SelectItem>
-                        <SelectItem value="quarter">This Quarter</SelectItem>
-                        <SelectItem value="year">This Year</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 text-xs gap-1.5"
+                        onClick={() => handleExport('pdf')}
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                        PDF
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 text-xs gap-1.5"
+                        onClick={() => handleExport('csv')}
+                      >
+                        <FileSpreadsheet className="h-3.5 w-3.5" />
+                        CSV
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Bento Grid Summary Cards */}
