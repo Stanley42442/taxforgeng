@@ -45,6 +45,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { formatDistanceToNow } from "date-fns";
 import { SecurityScoreWidget } from "@/components/SecurityScoreWidget";
+import { IPWhitelistManager } from "@/components/IPWhitelistManager";
 
 const nameSchema = z.string().min(1, "Name is required").max(100, "Name must be less than 100 characters");
 const emailSchema = z.string().email("Please enter a valid email address");
@@ -1223,6 +1224,9 @@ const Settings = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* IP Whitelist */}
+            {user && <IPWhitelistManager userId={user.id} />}
 
             {/* Danger Zone */}
             <Card className="border-destructive/50">

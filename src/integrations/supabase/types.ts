@@ -366,6 +366,36 @@ export type Database = {
         }
         Relationships: []
       }
+      ip_whitelist: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          ip_range: string
+          is_active: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          ip_range: string
+          is_active?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          ip_range?: string
+          is_active?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       known_devices: {
         Row: {
           browser: string | null
@@ -615,6 +645,7 @@ export type Database = {
           full_name: string | null
           has_selected_initial_tier: boolean
           id: string
+          ip_whitelist_enabled: boolean
           subscription_tier: string
           total_points: number
           trial_expires_at: string | null
@@ -628,6 +659,7 @@ export type Database = {
           full_name?: string | null
           has_selected_initial_tier?: boolean
           id: string
+          ip_whitelist_enabled?: boolean
           subscription_tier?: string
           total_points?: number
           trial_expires_at?: string | null
@@ -641,6 +673,7 @@ export type Database = {
           full_name?: string | null
           has_selected_initial_tier?: boolean
           id?: string
+          ip_whitelist_enabled?: boolean
           subscription_tier?: string
           total_points?: number
           trial_expires_at?: string | null
@@ -902,6 +935,10 @@ export type Database = {
         }[]
       }
       check_expired_trials: { Args: never; Returns: undefined }
+      check_ip_whitelist: {
+        Args: { check_ip: string; check_user_id: string }
+        Returns: boolean
+      }
       cleanup_old_backup_attempts: { Args: never; Returns: undefined }
       cleanup_old_login_attempts: { Args: never; Returns: undefined }
       has_role: {

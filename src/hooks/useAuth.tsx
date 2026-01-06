@@ -90,6 +90,25 @@ const isUnusualLoginTime = (): { isUnusual: boolean; hour: number; timezone: str
   return { isUnusual, hour, timezone };
 };
 
+// Check if IP is in user's whitelist
+const checkIPWhitelist = async (userId: string, ip: string): Promise<boolean> => {
+  try {
+    const { data, error } = await supabase.rpc('check_ip_whitelist', {
+      check_user_id: userId,
+      check_ip: ip
+    });
+    
+    if (error) {
+      console.error('Error checking IP whitelist:', error);
+      return true; // Fail open if error
+    }
+    
+    return data === true;
+  } catch {
+    return true; // Fail open if error
+  }
+};
+
 // Track device on login with location awareness
 const trackDevice = async (userId: string, userEmail: string) => {
   try {
@@ -101,7 +120,36 @@ const trackDevice = async (userId: string, userEmail: string) => {
     const blocked = await isDeviceBlocked(userId, deviceInfo.fingerprint);
     if (blocked) {
       console.warn('Login from blocked device detected');
-      return { blocked: true };
+      return { blocked: true, ipBlocked: false };
+    }
+    
+    // Check IP whitelist
+    if (clientIP) {
+      const ipAllowed = await checkIPWhitelist(userId, clientIP);
+      if (!ipAllowed) {
+        console.warn('Login from non-whitelisted IP detected');
+        // Send alert for blocked IP
+        supabase.functions.invoke('send-security-alert', {
+          body: {
+            userEmail,
+            alertType: 'ip_blocked',
+            timestamp: new Date().toLocaleString(),
+            deviceInfo: { 
+              browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, 
+              os: `${deviceInfo.os} ${deviceInfo.osVersion}`, 
+              deviceName: deviceInfo.deviceName 
+            },
+            locationInfo: {
+              city: location?.city,
+              region: location?.region,
+              country: location?.country
+            },
+            ipAddress: clientIP
+          }
+        }).catch(err => console.error('Failed to send IP blocked alert:', err));
+        
+        return { blocked: false, ipBlocked: true };
+      }
     }
     
     // Check if device exists
@@ -247,10 +295,10 @@ const trackDevice = async (userId: string, userEmail: string) => {
       }).catch(err => console.error('Failed to send unusual time alert:', err));
     }
     
-    return { blocked: false };
+    return { blocked: false, ipBlocked: false };
   } catch (error) {
     console.error('Failed to track device:', error);
-    return { blocked: false };
+    return { blocked: false, ipBlocked: false };
   }
 };
 
