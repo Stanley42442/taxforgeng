@@ -7,6 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
   LayoutDashboard,
   Building2,
   Receipt,
@@ -23,6 +28,10 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
+  Minimize2,
+  Maximize2,
+  PieChart,
+  Activity,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { format, isAfter, addDays } from "date-fns";
@@ -76,6 +85,15 @@ const Dashboard = () => {
   const [dataSeeded, setDataSeeded] = useState(false);
   const [expandedBusinessId, setExpandedBusinessId] = useState<string | null>(null);
   const [expandedReminderId, setExpandedReminderId] = useState<string | null>(null);
+  const [summaryExpanded, setSummaryExpanded] = useState(() => {
+    const saved = localStorage.getItem('dashboard_summary_expanded');
+    return saved !== 'false'; // Default to expanded
+  });
+
+  // Persist summary expanded state
+  useEffect(() => {
+    localStorage.setItem('dashboard_summary_expanded', summaryExpanded.toString());
+  }, [summaryExpanded]);
 
   useEffect(() => {
     if (user) {
@@ -235,44 +253,125 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Bento Grid Summary Cards */}
-          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-8 animate-slide-up [&>*]:min-w-0 [&>*]:overflow-hidden">
-            <StatCard
-              icon={Building2}
-              label="Businesses"
-              value={savedBusinesses.length.toString()}
-              subtext={`${formatCurrency(totalTurnover)} turnover`}
-              gradient="from-primary/20 to-primary/5"
-              iconColor="text-primary"
-            />
-            <StatCard
-              icon={TrendingUp}
-              label="Income"
-              value={formatCurrency(expenseSummary.totalIncome)}
-              subtext="Tracked entries"
-              gradient="from-success/20 to-success/5"
-              iconColor="text-success"
-              valueColor="text-success"
-            />
-            <StatCard
-              icon={TrendingDown}
-              label="Expenses"
-              value={formatCurrency(expenseSummary.totalExpenses)}
-              subtext={`${formatCurrency(expenseSummary.deductibleExpenses)} deductible`}
-              gradient="from-destructive/20 to-destructive/5"
-              iconColor="text-destructive"
-              valueColor="text-destructive"
-            />
-            <StatCard
-              icon={Calculator}
-              label="Net Income"
-              value={formatCurrency(netIncome)}
-              subtext="Income - expenses"
-              gradient={netIncome >= 0 ? "from-success/20 to-success/5" : "from-destructive/20 to-destructive/5"}
-              iconColor={netIncome >= 0 ? "text-success" : "text-destructive"}
-              valueColor={netIncome >= 0 ? "text-success" : "text-destructive"}
-            />
-          </div>
+          {/* Collapsible Summary Section */}
+          <Collapsible open={summaryExpanded} onOpenChange={setSummaryExpanded} className="mb-6 animate-slide-up">
+            <div className="glass-frosted rounded-2xl shadow-futuristic border-border/40 overflow-hidden">
+              <CollapsibleTrigger asChild>
+                <button className="w-full p-4 flex items-center justify-between hover:bg-secondary/30 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-lg">
+                      <Activity className="h-5 w-5 text-primary-foreground" />
+                    </div>
+                    <div className="text-left">
+                      <h2 className="font-semibold text-foreground">Financial Summary</h2>
+                      <p className="text-xs text-muted-foreground">
+                        {summaryExpanded ? 'Click to collapse' : `${savedBusinesses.length} businesses • ${formatCurrency(netIncome)} net income`}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {!summaryExpanded && (
+                      <div className="hidden sm:flex items-center gap-3 mr-4">
+                        <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-primary/10">
+                          <Building2 className="h-3.5 w-3.5 text-primary" />
+                          <span className="text-xs font-medium text-primary">{savedBusinesses.length}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10">
+                          <TrendingUp className="h-3.5 w-3.5 text-success" />
+                          <span className="text-xs font-medium text-success">{formatCurrency(expenseSummary.totalIncome)}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-destructive/10">
+                          <TrendingDown className="h-3.5 w-3.5 text-destructive" />
+                          <span className="text-xs font-medium text-destructive">{formatCurrency(expenseSummary.totalExpenses)}</span>
+                        </div>
+                        {urgentCount > 0 && (
+                          <Badge variant="destructive" className="text-xs">
+                            {urgentCount} urgent
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+                    <div className="h-8 w-8 rounded-lg bg-secondary/50 flex items-center justify-center">
+                      {summaryExpanded ? (
+                        <Minimize2 className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <Maximize2 className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </div>
+                  </div>
+                </button>
+              </CollapsibleTrigger>
+              
+              <CollapsibleContent>
+                <div className="px-4 pb-4 pt-2 border-t border-border/30">
+                  {/* Bento Grid Summary Cards */}
+                  <div className="grid gap-3 grid-cols-2 lg:grid-cols-4 [&>*]:min-w-0 [&>*]:overflow-hidden">
+                    <StatCard
+                      icon={Building2}
+                      label="Businesses"
+                      value={savedBusinesses.length.toString()}
+                      subtext={`${formatCurrency(totalTurnover)} turnover`}
+                      gradient="from-primary/20 to-primary/5"
+                      iconColor="text-primary"
+                      compact
+                    />
+                    <StatCard
+                      icon={TrendingUp}
+                      label="Income"
+                      value={formatCurrency(expenseSummary.totalIncome)}
+                      subtext="Tracked entries"
+                      gradient="from-success/20 to-success/5"
+                      iconColor="text-success"
+                      valueColor="text-success"
+                      compact
+                    />
+                    <StatCard
+                      icon={TrendingDown}
+                      label="Expenses"
+                      value={formatCurrency(expenseSummary.totalExpenses)}
+                      subtext={`${formatCurrency(expenseSummary.deductibleExpenses)} deductible`}
+                      gradient="from-destructive/20 to-destructive/5"
+                      iconColor="text-destructive"
+                      valueColor="text-destructive"
+                      compact
+                    />
+                    <StatCard
+                      icon={Calculator}
+                      label="Net Income"
+                      value={formatCurrency(netIncome)}
+                      subtext="Income - expenses"
+                      gradient={netIncome >= 0 ? "from-success/20 to-success/5" : "from-destructive/20 to-destructive/5"}
+                      iconColor={netIncome >= 0 ? "text-success" : "text-destructive"}
+                      valueColor={netIncome >= 0 ? "text-success" : "text-destructive"}
+                      compact
+                    />
+                  </div>
+                  
+                  {/* Quick Stats Row */}
+                  <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-secondary/50">
+                      <PieChart className="h-3.5 w-3.5" />
+                      <span>{expenses.length} transactions</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-secondary/50">
+                      <Bell className="h-3.5 w-3.5" />
+                      <span>{upcomingReminders.length} reminders</span>
+                    </div>
+                    {urgentCount > 0 && (
+                      <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-destructive/10 text-destructive">
+                        <AlertTriangle className="h-3.5 w-3.5" />
+                        <span>{urgentCount} urgent due</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-secondary/50">
+                      <Receipt className="h-3.5 w-3.5" />
+                      <span>{formatCurrency(expenseSummary.deductibleExpenses)} deductible</span>
+                    </div>
+                  </div>
+                </div>
+              </CollapsibleContent>
+            </div>
+          </Collapsible>
 
           {/* Main Content Grid */}
           <div className="grid gap-6 lg:grid-cols-2 animate-slide-up-delay-1 [&>*]:min-w-0 [&>*]:overflow-hidden">
@@ -525,6 +624,7 @@ const StatCard = ({
   gradient,
   iconColor,
   valueColor,
+  compact = false,
 }: {
   icon: React.ElementType;
   label: string;
@@ -533,18 +633,19 @@ const StatCard = ({
   gradient: string;
   iconColor: string;
   valueColor?: string;
+  compact?: boolean;
 }) => (
-  <div className="glass-frosted rounded-2xl p-3 sm:p-4 shadow-futuristic overflow-hidden hover-lift transition-all duration-300 relative group min-w-0">
+  <div className={`glass-frosted rounded-2xl shadow-futuristic overflow-hidden hover-lift transition-all duration-300 relative group min-w-0 ${compact ? 'p-2.5 sm:p-3' : 'p-3 sm:p-4'}`}>
     <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-50 group-hover:opacity-70 transition-opacity`} />
     <div className="relative z-10 min-w-0">
-      <div className="flex items-center gap-2 mb-2 sm:mb-3">
-        <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-background/50 flex items-center justify-center shrink-0">
-          <Icon className={`h-4 w-4 sm:h-5 sm:w-5 ${iconColor}`} />
+      <div className={`flex items-center gap-2 ${compact ? 'mb-1.5 sm:mb-2' : 'mb-2 sm:mb-3'}`}>
+        <div className={`rounded-xl bg-background/50 flex items-center justify-center shrink-0 ${compact ? 'h-7 w-7 sm:h-8 sm:w-8' : 'h-8 w-8 sm:h-9 sm:w-9'}`}>
+          <Icon className={`${compact ? 'h-3.5 w-3.5 sm:h-4 sm:w-4' : 'h-4 w-4 sm:h-5 sm:w-5'} ${iconColor}`} />
         </div>
-        <span className="text-[10px] sm:text-xs text-muted-foreground font-medium truncate">{label}</span>
+        <span className={`text-muted-foreground font-medium truncate ${compact ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'}`}>{label}</span>
       </div>
-      <p className={`text-base sm:text-xl lg:text-2xl font-bold truncate ${valueColor || 'text-foreground'}`}>{value}</p>
-      <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 truncate">{subtext}</p>
+      <p className={`font-bold truncate ${valueColor || 'text-foreground'} ${compact ? 'text-sm sm:text-base lg:text-lg' : 'text-base sm:text-xl lg:text-2xl'}`}>{value}</p>
+      <p className={`text-muted-foreground mt-1 truncate ${compact ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'}`}>{subtext}</p>
     </div>
   </div>
 );
