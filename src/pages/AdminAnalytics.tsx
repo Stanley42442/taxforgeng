@@ -749,29 +749,19 @@ const AdminAnalytics = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[240px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={analytics?.dauData || []}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="users" 
-                        stroke="hsl(var(--primary))" 
-                        strokeWidth={2}
-                        dot={{ fill: 'hsl(var(--primary))' }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
+                <ReusableAreaChart
+                  data={analytics?.dauData || []}
+                  series={[
+                    {
+                      dataKey: "users",
+                      name: "Users",
+                      color: "hsl(var(--primary))"
+                    }
+                  ]}
+                  xAxisKey="date"
+                  height={240}
+                  showLegend={false}
+                />
               </CardContent>
             </Card>
 
