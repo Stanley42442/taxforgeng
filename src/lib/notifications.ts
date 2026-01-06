@@ -209,3 +209,32 @@ export const notifyTaxDeadline = (title: string, dueDate: string) =>
     'warning',
     { playSound: true, showBrowserNotification: true, browserRedirectUrl: '/reminders' }
   );
+
+// Security alert notification
+export const notifySecurityAlert = (title: string, message: string) => 
+  addNotification(
+    `🚨 ${title}`,
+    message,
+    'warning',
+    { playSound: true, showBrowserNotification: true, browserRedirectUrl: '/security' }
+  );
+
+// IP blocked notification
+export const notifyIPBlocked = (ip: string, location?: string) => {
+  const locationText = location ? ` from ${location}` : '';
+  return addNotification(
+    `🚫 Login Blocked`,
+    `A login attempt from IP ${ip}${locationText} was blocked (not in whitelist)`,
+    'warning',
+    { playSound: true, showBrowserNotification: true, browserRedirectUrl: '/security' }
+  );
+};
+
+// Time restricted login notification
+export const notifyTimeRestricted = (hour: number, timezone: string) => 
+  addNotification(
+    `🕐 Login Blocked`,
+    `A login attempt at ${hour}:00 (${timezone}) was blocked (outside allowed hours)`,
+    'warning',
+    { playSound: true, showBrowserNotification: true, browserRedirectUrl: '/security' }
+  );

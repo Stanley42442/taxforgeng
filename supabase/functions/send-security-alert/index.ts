@@ -394,6 +394,7 @@ const handler = async (req: Request): Promise<Response> => {
         alertTitle = "Login Blocked - IP Not Whitelisted";
         alertMessage = `A login attempt was blocked because the IP address${ipAddress ? ` (${ipAddress})` : ''} is not in your whitelist.`;
         actionMessage = "If this was you, add the IP address to your whitelist in your security settings. If you don't recognize this attempt, no action is needed - your whitelist protection is working.";
+        whatsappMessage = `🚫 IP BLOCKED: A login attempt from ${ipAddress || 'unknown IP'} was blocked at ${timestamp} because the IP is not in your whitelist. ${locationInfo?.city ? `Location: ${locationInfo.city}, ${locationInfo.country || ''}` : ''} If this was you, add it to your whitelist.`;
         if (ipAddress) {
           extraInfo = `
             <tr>
@@ -429,6 +430,7 @@ const handler = async (req: Request): Promise<Response> => {
         alertTitle = "Login Blocked - Time Restriction";
         alertMessage = `A login attempt was blocked because it occurred outside your allowed login hours${timeInfo ? ` (${timeInfo.hour}:00 ${timeInfo.timezone})` : ''}.`;
         actionMessage = "If this was you, update your time restriction settings to allow logins during this time. Your access controls are working as configured.";
+        whatsappMessage = `🕐 TIME BLOCKED: A login attempt was blocked at ${timestamp} because it was outside your allowed hours (${timeInfo?.hour || 'unknown'}:00 ${timeInfo?.timezone || ''}). If this was you, update your time settings.`;
         if (timeInfo) {
           extraInfo = `
             <tr>
@@ -460,8 +462,11 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Send WhatsApp notification for high-priority alerts (with SMS fallback)
+    // Including ip_blocked and time_restricted as high-priority security events
     let notificationResult: { success: boolean; method: 'whatsapp' | 'sms' | 'none' } = { success: false, method: 'none' };
-    if (whatsappNumber && whatsappMessage && (alertType === 'account_locked' || alertType === 'failed_backup_codes')) {
+    const highPriorityAlerts = ['account_locked', 'failed_backup_codes', 'ip_blocked', 'time_restricted'];
+    
+    if (whatsappNumber && whatsappMessage && highPriorityAlerts.includes(alertType)) {
       console.log("Sending notification to:", whatsappNumber);
       notificationResult = await sendTwilioWhatsApp(whatsappNumber, whatsappMessage);
       console.log(`Notification result: ${notificationResult.method} - ${notificationResult.success ? 'success' : 'failed'}`);
