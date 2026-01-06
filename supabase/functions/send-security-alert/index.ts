@@ -11,7 +11,7 @@ const corsHeaders = {
 
 interface SecurityAlertRequest {
   userEmail: string;
-  alertType: 'failed_backup_codes' | 'suspicious_login' | 'account_locked' | 'new_device' | 'device_removed' | 'sessions_revoked' | 'new_location' | 'device_blocked' | 'password_changed' | '2fa_enabled' | '2fa_disabled' | 'backup_codes_generated' | 'email_changed' | 'unusual_time';
+  alertType: 'failed_backup_codes' | 'suspicious_login' | 'account_locked' | 'new_device' | 'device_removed' | 'sessions_revoked' | 'new_location' | 'device_blocked' | 'password_changed' | '2fa_enabled' | '2fa_disabled' | 'backup_codes_generated' | 'email_changed' | 'unusual_time' | 'ip_blocked';
   attemptCount?: number;
   timestamp: string;
   deviceInfo?: {
@@ -31,6 +31,7 @@ interface SecurityAlertRequest {
     hour: number;
     timezone: string;
   };
+  ipAddress?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -39,7 +40,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { userEmail, alertType, attemptCount, timestamp, deviceInfo, sessionCount, locationInfo, newEmail, timeInfo }: SecurityAlertRequest = await req.json();
+    const { userEmail, alertType, attemptCount, timestamp, deviceInfo, sessionCount, locationInfo, newEmail, timeInfo, ipAddress }: SecurityAlertRequest = await req.json();
 
     console.log("Sending security alert to:", userEmail, "type:", alertType);
 
@@ -217,6 +218,41 @@ const handler = async (req: Request): Promise<Response> => {
             <tr>
               <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Timezone:</td>
               <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${timeInfo.timezone}</td>
+            </tr>
+          `;
+        }
+        if (deviceInfo) {
+          extraInfo += `
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Device:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${deviceInfo.deviceName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Browser:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${deviceInfo.browser}</td>
+            </tr>
+          `;
+        }
+        break;
+      case 'ip_blocked':
+        subject = "🚫 Security Alert: Login Blocked - IP Not Whitelisted";
+        alertTitle = "Login Blocked - IP Not Whitelisted";
+        alertMessage = `A login attempt was blocked because the IP address${ipAddress ? ` (${ipAddress})` : ''} is not in your whitelist.`;
+        actionMessage = "If this was you, add the IP address to your whitelist in your security settings. If you don't recognize this attempt, no action is needed - your whitelist protection is working.";
+        if (ipAddress) {
+          extraInfo = `
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Blocked IP:</td>
+              <td style="padding: 8px 0; color: #dc2626; font-size: 14px; font-weight: 600; text-align: right;">${ipAddress}</td>
+            </tr>
+          `;
+        }
+        if (locationInfo) {
+          const location = [locationInfo.city, locationInfo.region, locationInfo.country].filter(Boolean).join(', ');
+          extraInfo += `
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Location:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${location || 'Unknown'}</td>
             </tr>
           `;
         }
