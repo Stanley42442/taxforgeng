@@ -114,10 +114,14 @@ const Settings = () => {
   const [savingEmail, setSavingEmail] = useState(false);
 
   // Password state
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPasswords, setShowPasswords] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
+  const [showPasswordVerification, setShowPasswordVerification] = useState(false);
+  const [passwordVerificationCode, setPasswordVerificationCode] = useState("");
+  const [isVerifyingPassword, setIsVerifyingPassword] = useState(false);
 
   // 2FA state
   const [mfaFactors, setMfaFactors] = useState<MFAFactor[]>([]);
@@ -330,7 +334,26 @@ const Settings = () => {
     }
   };
 
-  const handleUpdatePassword = async (e: React.FormEvent) => {
+  // Password strength calculation
+  const calculatePasswordStrength = (password: string): { score: number; label: string; color: string } => {
+    let score = 0;
+    
+    if (password.length >= 6) score += 1;
+    if (password.length >= 8) score += 1;
+    if (password.length >= 12) score += 1;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score += 1;
+    if (/\d/.test(password)) score += 1;
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score += 1;
+    
+    if (score <= 2) return { score, label: 'Weak', color: 'bg-destructive' };
+    if (score <= 4) return { score, label: 'Fair', color: 'bg-amber-500' };
+    if (score <= 5) return { score, label: 'Good', color: 'bg-green-500' };
+    return { score, label: 'Strong', color: 'bg-green-600' };
+  };
+
+  const passwordStrength = calculatePasswordStrength(newPassword);
+
+  const handleInitiatePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const newPwResult = passwordSchema.safeParse(newPassword);
@@ -343,10 +366,41 @@ const Settings = () => {
       setErrors({ confirmPassword: "Passwords do not match" });
       return;
     }
+
+    if (!currentPassword) {
+      setErrors({ currentPassword: "Current password is required" });
+      return;
+    }
+
     setErrors({});
 
+    // If 2FA is enabled, require verification
+    const hasMfa = mfaFactors.some(f => f.status === 'verified');
+    if (hasMfa) {
+      setShowPasswordVerification(true);
+      return;
+    }
+
+    // Otherwise, verify current password and update
+    await executePasswordChange();
+  };
+
+  const executePasswordChange = async () => {
     setSavingPassword(true);
     try {
+      // Re-authenticate with current password to verify identity
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user?.email || '',
+        password: currentPassword
+      });
+
+      if (signInError) {
+        setErrors({ currentPassword: "Current password is incorrect" });
+        setSavingPassword(false);
+        return;
+      }
+
+      // Update password
       const { error } = await supabase.auth.updateUser({
         password: newPassword
       });
@@ -357,10 +411,51 @@ const Settings = () => {
       toast.success("Password updated successfully!");
       setNewPassword("");
       setConfirmPassword("");
+      setCurrentPassword("");
+      setShowPasswordVerification(false);
+      setPasswordVerificationCode("");
     } catch (error: any) {
       toast.error(error.message || "Failed to update password");
     } finally {
       setSavingPassword(false);
+    }
+  };
+
+  const handleVerifyAndChangePassword = async () => {
+    if (passwordVerificationCode.length !== 6) return;
+
+    setIsVerifyingPassword(true);
+    try {
+      const verifiedFactor = mfaFactors.find(f => f.status === 'verified');
+      if (!verifiedFactor) {
+        toast.error("No verified 2FA factor found");
+        return;
+      }
+
+      // Create and verify challenge
+      const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+        factorId: verifiedFactor.id
+      });
+
+      if (challengeError) throw challengeError;
+
+      const { error: verifyError } = await supabase.auth.mfa.verify({
+        factorId: verifiedFactor.id,
+        challengeId: challengeData.id,
+        code: passwordVerificationCode
+      });
+
+      if (verifyError) {
+        toast.error("Invalid verification code. Please try again.");
+        return;
+      }
+
+      // 2FA verified, proceed with password change
+      await executePasswordChange();
+    } catch (error: any) {
+      toast.error(error.message || "Verification failed");
+    } finally {
+      setIsVerifyingPassword(false);
     }
   };
 
@@ -1029,7 +1124,36 @@ const Settings = () => {
                 <CardDescription>Update your password to keep your account secure</CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleUpdatePassword} className="space-y-4">
+                <form onSubmit={handleInitiatePasswordChange} className="space-y-4">
+                  {/* Current Password */}
+                  <div className="space-y-2">
+                    <Label htmlFor="currentPassword">Current Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="currentPassword"
+                        type={showPasswords ? "text" : "password"}
+                        value={currentPassword}
+                        onChange={(e) => {
+                          setCurrentPassword(e.target.value);
+                          setErrors((prev) => ({ ...prev, currentPassword: "" }));
+                        }}
+                        placeholder="••••••••"
+                        className={errors.currentPassword ? 'border-destructive pr-10' : 'pr-10'}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPasswords(!showPasswords)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showPasswords ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                    {errors.currentPassword && (
+                      <p className="text-sm text-destructive">{errors.currentPassword}</p>
+                    )}
+                  </div>
+
+                  {/* New Password with Strength Indicator */}
                   <div className="space-y-2">
                     <Label htmlFor="newPassword">New Password</Label>
                     <div className="relative">
@@ -1044,18 +1168,49 @@ const Settings = () => {
                         placeholder="••••••••"
                         className={errors.newPassword ? 'border-destructive pr-10' : 'pr-10'}
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowPasswords(!showPasswords)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                      >
-                        {showPasswords ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
                     </div>
                     {errors.newPassword && (
                       <p className="text-sm text-destructive">{errors.newPassword}</p>
                     )}
+                    
+                    {/* Password Strength Indicator */}
+                    {newPassword && (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground">Password strength</span>
+                          <span className={`font-medium ${
+                            passwordStrength.label === 'Weak' ? 'text-destructive' :
+                            passwordStrength.label === 'Fair' ? 'text-amber-500' :
+                            'text-green-600'
+                          }`}>
+                            {passwordStrength.label}
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full transition-all duration-300 ${passwordStrength.color}`}
+                            style={{ width: `${(passwordStrength.score / 6) * 100}%` }}
+                          />
+                        </div>
+                        <ul className="text-xs text-muted-foreground space-y-0.5">
+                          <li className={newPassword.length >= 8 ? 'text-green-600' : ''}>
+                            {newPassword.length >= 8 ? '✓' : '○'} At least 8 characters
+                          </li>
+                          <li className={/[a-z]/.test(newPassword) && /[A-Z]/.test(newPassword) ? 'text-green-600' : ''}>
+                            {/[a-z]/.test(newPassword) && /[A-Z]/.test(newPassword) ? '✓' : '○'} Upper & lowercase letters
+                          </li>
+                          <li className={/\d/.test(newPassword) ? 'text-green-600' : ''}>
+                            {/\d/.test(newPassword) ? '✓' : '○'} At least one number
+                          </li>
+                          <li className={/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? 'text-green-600' : ''}>
+                            {/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? '✓' : '○'} Special character
+                          </li>
+                        </ul>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Confirm Password */}
                   <div className="space-y-2">
                     <Label htmlFor="confirmPassword">Confirm New Password</Label>
                     <Input
@@ -1072,9 +1227,32 @@ const Settings = () => {
                     {errors.confirmPassword && (
                       <p className="text-sm text-destructive">{errors.confirmPassword}</p>
                     )}
+                    {confirmPassword && newPassword && confirmPassword === newPassword && (
+                      <p className="text-xs text-green-600 flex items-center gap-1">
+                        <CheckCircle2 className="h-3 w-3" /> Passwords match
+                      </p>
+                    )}
                   </div>
-                  <Button type="submit" disabled={savingPassword || !newPassword || !confirmPassword}>
-                    {savingPassword ? "Updating..." : "Update Password"}
+
+                  {/* Security Notice */}
+                  {hasMfaEnabled && (
+                    <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/50 border">
+                      <Shield className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                      <p className="text-xs text-muted-foreground">
+                        For your security, you'll need to verify with your authenticator app before changing your password.
+                      </p>
+                    </div>
+                  )}
+
+                  <Button type="submit" disabled={savingPassword || !newPassword || !confirmPassword || !currentPassword}>
+                    {savingPassword ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Updating...
+                      </>
+                    ) : (
+                      "Update Password"
+                    )}
                   </Button>
                 </form>
               </CardContent>
@@ -1232,6 +1410,65 @@ const Settings = () => {
             >
               I've saved my codes
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Password Change 2FA Verification Dialog */}
+      <Dialog open={showPasswordVerification} onOpenChange={(open) => {
+        setShowPasswordVerification(open);
+        if (!open) {
+          setPasswordVerificationCode("");
+        }
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" />
+              Verify Your Identity
+            </DialogTitle>
+            <DialogDescription>
+              Enter the 6-digit code from your authenticator app to confirm this password change.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="passwordVerificationCode">Verification Code</Label>
+              <Input
+                id="passwordVerificationCode"
+                value={passwordVerificationCode}
+                onChange={(e) => setPasswordVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="000000"
+                maxLength={6}
+                className="text-center text-2xl tracking-widest font-mono"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  setShowPasswordVerification(false);
+                  setPasswordVerificationCode("");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleVerifyAndChangePassword} 
+                className="flex-1"
+                disabled={passwordVerificationCode.length !== 6 || isVerifyingPassword}
+              >
+                {isVerifyingPassword ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Verifying...
+                  </>
+                ) : (
+                  "Verify & Change"
+                )}
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
