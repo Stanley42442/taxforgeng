@@ -47,6 +47,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { formatDistanceToNow } from "date-fns";
 import { SecurityScoreWidget } from "@/components/SecurityScoreWidget";
+import { ReportScheduleSettings } from "@/components/ReportScheduleSettings";
 
 const nameSchema = z.string().min(1, "Name is required").max(100, "Name must be less than 100 characters");
 const emailSchema = z.string().email("Please enter a valid email address");
@@ -1022,6 +1023,10 @@ const Settings = () => {
                 <Lock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 Credentials
               </TabsTrigger>
+              <TabsTrigger value="reports" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
+                <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                Reports
+              </TabsTrigger>
               <TabsTrigger value="activity" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <History className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 Activity
@@ -1609,6 +1614,11 @@ const Settings = () => {
                 </form>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Reports Tab */}
+          <TabsContent value="reports">
+            <ReportScheduleSettings />
           </TabsContent>
 
           {/* Activity Tab */}
