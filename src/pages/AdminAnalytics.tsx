@@ -43,8 +43,6 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/taxCalculations";
 import {
-  AreaChart,
-  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -59,6 +57,7 @@ import {
   LineChart,
   Line
 } from "recharts";
+import { ReusableAreaChart } from "@/components/ui/reusable-area-chart";
 
 interface AnalyticsData {
   totalUsers: number;
@@ -636,36 +635,19 @@ const AdminAnalytics = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[280px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={analytics?.mauData || []}>
-                      <defs>
-                        <linearGradient id="mauGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--info))" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="hsl(var(--info))" stopOpacity={0}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }}
-                        labelStyle={{ color: 'hsl(var(--foreground))' }}
-                      />
-                      <Area 
-                        type="monotone" 
-                        dataKey="users" 
-                        stroke="hsl(var(--info))" 
-                        strokeWidth={2}
-                        fill="url(#mauGradient)" 
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
+                <ReusableAreaChart
+                  data={analytics?.mauData || []}
+                  series={[
+                    {
+                      dataKey: "users",
+                      name: "Users",
+                      color: "hsl(var(--info))"
+                    }
+                  ]}
+                  xAxisKey="month"
+                  height={280}
+                  showLegend={false}
+                />
               </CardContent>
             </Card>
 
