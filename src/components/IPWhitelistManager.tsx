@@ -285,49 +285,49 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5 text-primary" />
-                IP Address Whitelist
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="min-w-0">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Globe className="h-5 w-5 text-primary shrink-0" />
+                <span className="truncate">IP Address Whitelist</span>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs sm:text-sm">
                 Restrict logins to specific IP addresses or ranges
               </CardDescription>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <Switch
                 checked={whitelistEnabled}
                 onCheckedChange={handleToggleWhitelist}
                 disabled={toggling}
               />
-              <Badge variant={whitelistEnabled ? "default" : "secondary"}>
+              <Badge variant={whitelistEnabled ? "default" : "secondary"} className="whitespace-nowrap">
                 {whitelistEnabled ? "Enabled" : "Disabled"}
               </Badge>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 overflow-hidden">
           {/* Current IP Info */}
           {currentIP && (
-            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-              <div className="flex items-center gap-2">
-                <Info className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">Your current IP:</span>
-                <code className="text-sm font-mono bg-background px-2 py-0.5 rounded">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-muted/50 rounded-lg overflow-hidden">
+              <div className="flex flex-wrap items-center gap-2 min-w-0">
+                <Info className="h-4 w-4 text-muted-foreground shrink-0" />
+                <span className="text-sm whitespace-nowrap">Your IP:</span>
+                <code className="text-xs sm:text-sm font-mono bg-background px-2 py-0.5 rounded truncate max-w-[120px] sm:max-w-none">
                   {currentIP}
                 </code>
                 {whitelistEnabled && (
                   isCurrentIPWhitelisted() ? (
-                    <Badge variant="outline" className="text-green-600 border-green-600">
-                      <CheckCircle2 className="h-3 w-3 mr-1" />
+                    <Badge variant="outline" className="text-green-600 border-green-600 text-xs whitespace-nowrap">
+                      <CheckCircle2 className="h-3 w-3 mr-1 shrink-0" />
                       Whitelisted
                     </Badge>
                   ) : (
-                    <Badge variant="outline" className="text-amber-600 border-amber-600">
-                      <AlertCircle className="h-3 w-3 mr-1" />
+                    <Badge variant="outline" className="text-amber-600 border-amber-600 text-xs whitespace-nowrap">
+                      <AlertCircle className="h-3 w-3 mr-1 shrink-0" />
                       Not whitelisted
                     </Badge>
                   )
@@ -338,6 +338,7 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
                 size="sm"
                 onClick={handleAddCurrentIP}
                 disabled={saving || entries.some(e => e.ip_range === currentIP)}
+                className="shrink-0 w-full sm:w-auto"
               >
                 <Plus className="h-4 w-4 mr-1" />
                 Add This IP
@@ -372,23 +373,24 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
 
           {/* Entries List */}
           {entries.length > 0 ? (
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-[300px] overflow-y-auto">
               {entries.map((entry) => (
                 <div
                   key={entry.id}
-                  className={`flex items-center justify-between p-3 rounded-lg border ${
+                  className={`flex items-center justify-between gap-2 p-3 rounded-lg border ${
                     entry.is_active 
                       ? 'bg-background border-border' 
                       : 'bg-muted/50 border-muted'
                   }`}
                 >
-                  <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                     <Switch
                       checked={entry.is_active}
                       onCheckedChange={() => handleToggleEntry(entry.id, entry.is_active)}
+                      className="shrink-0"
                     />
-                    <div className="min-w-0">
-                      <code className={`text-sm font-mono ${!entry.is_active && 'text-muted-foreground'}`}>
+                    <div className="min-w-0 flex-1">
+                      <code className={`text-xs sm:text-sm font-mono block truncate ${!entry.is_active && 'text-muted-foreground'}`}>
                         {entry.ip_range}
                       </code>
                       {entry.description && (
@@ -401,7 +403,7 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0"
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0 h-8 w-8"
                     onClick={() => handleDeleteEntry(entry.id)}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -418,12 +420,12 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
           )}
 
           {/* Help Text */}
-          <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
+          <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t overflow-hidden">
             <p><strong>Supported formats:</strong></p>
             <ul className="list-disc list-inside space-y-0.5 ml-2">
-              <li>Exact IP: <code className="bg-muted px-1 rounded">192.168.1.100</code></li>
-              <li>CIDR range: <code className="bg-muted px-1 rounded">192.168.1.0/24</code></li>
-              <li>Wildcard: <code className="bg-muted px-1 rounded">192.168.1.*</code></li>
+              <li className="truncate">Exact IP: <code className="bg-muted px-1 rounded">192.168.1.100</code></li>
+              <li className="truncate">CIDR range: <code className="bg-muted px-1 rounded">192.168.1.0/24</code></li>
+              <li className="truncate">Wildcard: <code className="bg-muted px-1 rounded">192.168.1.*</code></li>
             </ul>
           </div>
         </CardContent>
