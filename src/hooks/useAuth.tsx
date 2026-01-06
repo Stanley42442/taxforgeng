@@ -229,6 +229,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Track if this is a fresh login vs session restoration
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [lastSessionId, setLastSessionId] = useState<string | null>(null);
+
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -237,13 +241,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(session?.user ?? null);
         setLoading(false);
 
-        // Log auth events based on event type
+        // Only log login events for actual new logins, not session restorations
         if (session?.user) {
+          const currentSessionId = session.access_token;
+          
           setTimeout(() => {
             switch (event) {
               case 'SIGNED_IN':
-                logAuthEvent(session.user.id, 'login_success');
-                trackDevice(session.user.id, session.user.email || '');
+                // Only track as a login if this is a genuinely new session
+                // (not just restoring from localStorage on page refresh)
+                if (!isInitialLoad || lastSessionId !== currentSessionId) {
+                  // Check if this is from a fresh signIn call by looking at iat (issued at)
+                  const tokenPayload = session.access_token.split('.')[1];
+                  try {
+                    const decoded = JSON.parse(atob(tokenPayload));
+                    const issuedAt = decoded.iat * 1000; // Convert to ms
+                    const now = Date.now();
+                    // If token was issued within the last 30 seconds, this is a fresh login
+                    if (now - issuedAt < 30000) {
+                      trackDevice(session.user.id, session.user.email || '');
+                    }
+                  } catch {
+                    // If we can't parse the token, don't log to avoid duplicates
+                  }
+                  setLastSessionId(currentSessionId);
+                }
                 break;
               case 'SIGNED_OUT':
                 // Already logged in signOut function
@@ -257,6 +279,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             }
           }, 0);
         }
+        
+        setIsInitialLoad(false);
       }
     );
 
