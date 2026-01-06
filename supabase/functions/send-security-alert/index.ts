@@ -11,7 +11,7 @@ const corsHeaders = {
 
 interface SecurityAlertRequest {
   userEmail: string;
-  alertType: 'failed_backup_codes' | 'suspicious_login' | 'account_locked' | 'new_device' | 'device_removed' | 'sessions_revoked' | 'new_location' | 'device_blocked' | 'password_changed' | '2fa_enabled' | '2fa_disabled' | 'backup_codes_generated' | 'email_changed' | 'unusual_time' | 'ip_blocked';
+  alertType: 'failed_backup_codes' | 'suspicious_login' | 'account_locked' | 'new_device' | 'device_removed' | 'sessions_revoked' | 'new_location' | 'device_blocked' | 'password_changed' | '2fa_enabled' | '2fa_disabled' | 'backup_codes_generated' | 'email_changed' | 'unusual_time' | 'ip_blocked' | 'time_restricted';
   attemptCount?: number;
   timestamp: string;
   deviceInfo?: {
@@ -253,6 +253,36 @@ const handler = async (req: Request): Promise<Response> => {
             <tr>
               <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Location:</td>
               <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${location || 'Unknown'}</td>
+            </tr>
+          `;
+        }
+        if (deviceInfo) {
+          extraInfo += `
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Device:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${deviceInfo.deviceName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Browser:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${deviceInfo.browser}</td>
+            </tr>
+          `;
+        }
+        break;
+      case 'time_restricted':
+        subject = "🕐 Security Alert: Login Blocked - Outside Allowed Hours";
+        alertTitle = "Login Blocked - Time Restriction";
+        alertMessage = `A login attempt was blocked because it occurred outside your allowed login hours${timeInfo ? ` (${timeInfo.hour}:00 ${timeInfo.timezone})` : ''}.`;
+        actionMessage = "If this was you, update your time restriction settings to allow logins during this time. Your access controls are working as configured.";
+        if (timeInfo) {
+          extraInfo = `
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Attempted Time:</td>
+              <td style="padding: 8px 0; color: #dc2626; font-size: 14px; font-weight: 600; text-align: right;">${timeInfo.hour}:00</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Timezone:</td>
+              <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${timeInfo.timezone}</td>
             </tr>
           `;
         }

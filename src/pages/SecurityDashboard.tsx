@@ -53,6 +53,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow, format } from "date-fns";
 import { toast } from "sonner";
 import { getDeviceInfo } from "@/lib/deviceFingerprint";
+import { IPWhitelistManager } from "@/components/IPWhitelistManager";
+import { TimeAccessManager } from "@/components/TimeAccessManager";
+import { SecurityAnalytics } from "@/components/SecurityAnalytics";
 
 interface LocationData {
   city?: string;
@@ -795,9 +798,17 @@ const SecurityDashboard = () => {
         </div>
 
         {/* Activity Tabs */}
-        <Tabs defaultValue="events" className="space-y-4">
+        <Tabs defaultValue="analytics" className="space-y-4">
           <div className="overflow-x-auto -mx-4 px-4">
             <TabsList className="inline-flex h-auto flex-wrap gap-1 p-1 w-auto min-w-full sm:min-w-0">
+              <TabsTrigger value="analytics" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
+                <Activity className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                Analytics
+              </TabsTrigger>
+              <TabsTrigger value="restrictions" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
+                <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                Access Rules
+              </TabsTrigger>
               <TabsTrigger value="devices" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <Monitor className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span className="hidden xs:inline">Devices</span>
@@ -839,6 +850,21 @@ const SecurityDashboard = () => {
               </TabsTrigger>
             </TabsList>
           </div>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics">
+            <SecurityAnalytics authEvents={authEvents} loginHistory={loginHistory} />
+          </TabsContent>
+
+          {/* Access Restrictions Tab */}
+          <TabsContent value="restrictions" className="space-y-6">
+            {user && (
+              <>
+                <IPWhitelistManager userId={user.id} />
+                <TimeAccessManager userId={user.id} />
+              </>
+            )}
+          </TabsContent>
 
           <TabsContent value="devices">
             <Card className="overflow-hidden">

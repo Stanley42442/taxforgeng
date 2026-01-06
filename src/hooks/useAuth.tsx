@@ -148,10 +148,38 @@ const trackDevice = async (userId: string, userEmail: string) => {
           }
         }).catch(err => console.error('Failed to send IP blocked alert:', err));
         
-        return { blocked: false, ipBlocked: true };
+        return { blocked: false, ipBlocked: true, timeBlocked: false };
       }
     }
     
+    // Check time restrictions
+    const { data: timeAllowed } = await supabase.rpc('check_time_restrictions', {
+      check_user_id: userId
+    });
+    
+    if (timeAllowed === false) {
+      console.warn('Login outside allowed time window');
+      // Send alert for time-restricted login
+      supabase.functions.invoke('send-security-alert', {
+        body: {
+          userEmail,
+          alertType: 'time_restricted',
+          timestamp: new Date().toLocaleString(),
+          deviceInfo: { 
+            browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, 
+            os: `${deviceInfo.os} ${deviceInfo.osVersion}`, 
+            deviceName: deviceInfo.deviceName 
+          },
+          timeInfo: {
+            hour: new Date().getHours(),
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+          }
+        }
+      }).catch(err => console.error('Failed to send time restricted alert:', err));
+      
+      return { blocked: false, ipBlocked: false, timeBlocked: true };
+    }
+
     // Check if device exists
     const { data: existingDevice } = await supabase
       .from('known_devices')
@@ -295,10 +323,10 @@ const trackDevice = async (userId: string, userEmail: string) => {
       }).catch(err => console.error('Failed to send unusual time alert:', err));
     }
     
-    return { blocked: false, ipBlocked: false };
+    return { blocked: false, ipBlocked: false, timeBlocked: false };
   } catch (error) {
     console.error('Failed to track device:', error);
-    return { blocked: false, ipBlocked: false };
+    return { blocked: false, ipBlocked: false, timeBlocked: false };
   }
 };
 

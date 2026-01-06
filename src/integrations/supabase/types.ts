@@ -640,6 +640,9 @@ export type Database = {
       }
       profiles: {
         Row: {
+          allowed_days: number[] | null
+          allowed_end_hour: number | null
+          allowed_start_hour: number | null
           created_at: string
           email: string | null
           full_name: string | null
@@ -647,6 +650,8 @@ export type Database = {
           id: string
           ip_whitelist_enabled: boolean
           subscription_tier: string
+          time_restriction_timezone: string | null
+          time_restrictions_enabled: boolean
           total_points: number
           trial_expires_at: string | null
           trial_started_at: string | null
@@ -654,6 +659,9 @@ export type Database = {
           whatsapp_number: string | null
         }
         Insert: {
+          allowed_days?: number[] | null
+          allowed_end_hour?: number | null
+          allowed_start_hour?: number | null
           created_at?: string
           email?: string | null
           full_name?: string | null
@@ -661,6 +669,8 @@ export type Database = {
           id: string
           ip_whitelist_enabled?: boolean
           subscription_tier?: string
+          time_restriction_timezone?: string | null
+          time_restrictions_enabled?: boolean
           total_points?: number
           trial_expires_at?: string | null
           trial_started_at?: string | null
@@ -668,6 +678,9 @@ export type Database = {
           whatsapp_number?: string | null
         }
         Update: {
+          allowed_days?: number[] | null
+          allowed_end_hour?: number | null
+          allowed_start_hour?: number | null
           created_at?: string
           email?: string | null
           full_name?: string | null
@@ -675,6 +688,8 @@ export type Database = {
           id?: string
           ip_whitelist_enabled?: boolean
           subscription_tier?: string
+          time_restriction_timezone?: string | null
+          time_restrictions_enabled?: boolean
           total_points?: number
           trial_expires_at?: string | null
           trial_started_at?: string | null
@@ -937,6 +952,10 @@ export type Database = {
       check_expired_trials: { Args: never; Returns: undefined }
       check_ip_whitelist: {
         Args: { check_ip: string; check_user_id: string }
+        Returns: boolean
+      }
+      check_time_restrictions: {
+        Args: { check_user_id: string }
         Returns: boolean
       }
       cleanup_old_backup_attempts: { Args: never; Returns: undefined }
