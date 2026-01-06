@@ -440,14 +440,22 @@ const Auth = () => {
           .gte('attempted_at', fifteenMinutesAgo);
 
         if ((attemptCount || 0) >= 5) {
-          // Send account locked alert
+          // Fetch user's WhatsApp number for notification
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('whatsapp_number')
+            .eq('id', mfaUserId)
+            .single();
+
+          // Send account locked alert with WhatsApp notification
           try {
             await supabase.functions.invoke('send-security-alert', {
               body: {
                 userEmail: email,
                 alertType: 'account_locked',
                 attemptCount: attemptCount || 0,
-                timestamp: new Date().toLocaleString()
+                timestamp: new Date().toLocaleString(),
+                whatsappNumber: profile?.whatsapp_number || null
               }
             });
           } catch (alertError) {
@@ -478,13 +486,21 @@ const Auth = () => {
           
           // Send security alert at 3 failed attempts
           if (newAttemptCount === 3) {
+            // Fetch user's WhatsApp number for notification
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('whatsapp_number')
+              .eq('id', mfaUserId)
+              .single();
+
             try {
               await supabase.functions.invoke('send-security-alert', {
                 body: {
                   userEmail: email,
                   alertType: 'failed_backup_codes',
                   attemptCount: newAttemptCount,
-                  timestamp: new Date().toLocaleString()
+                  timestamp: new Date().toLocaleString(),
+                  whatsappNumber: profile?.whatsapp_number || null
                 }
               });
             } catch (alertError) {
@@ -506,13 +522,21 @@ const Auth = () => {
           
           // Send security alert at 3 failed attempts
           if (newAttemptCount === 3) {
+            // Fetch user's WhatsApp number for notification
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('whatsapp_number')
+              .eq('id', mfaUserId)
+              .single();
+
             try {
               await supabase.functions.invoke('send-security-alert', {
                 body: {
                   userEmail: email,
                   alertType: 'failed_backup_codes',
                   attemptCount: newAttemptCount,
-                  timestamp: new Date().toLocaleString()
+                  timestamp: new Date().toLocaleString(),
+                  whatsappNumber: profile?.whatsapp_number || null
                 }
               });
             } catch (alertError) {
