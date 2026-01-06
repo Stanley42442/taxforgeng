@@ -203,6 +203,56 @@ const Dashboard = () => {
     }
   }, [user, businessLoading, savedBusinesses, dataSeeded]);
 
+  // Calculate date range start - must be before early returns
+  const dateRangeStart = useMemo(() => {
+    const now = new Date();
+    switch (dateRange) {
+      case 'week': return startOfWeek(now);
+      case 'month': return startOfMonth(now);
+      case 'quarter': return startOfQuarter(now);
+      case 'year': return startOfYear(now);
+      default: return startOfMonth(now);
+    }
+  }, [dateRange]);
+
+  // Filter expenses by date range - must be before early returns
+  const filteredExpenses = useMemo(() => {
+    return expenses.filter(e => {
+      const expenseDate = new Date(e.date);
+      return isWithinInterval(expenseDate, { start: dateRangeStart, end: new Date() });
+    });
+  }, [expenses, dateRangeStart]);
+
+  // Calculate filtered summary - must be before early returns
+  const filteredSummary = useMemo(() => {
+    const income = filteredExpenses.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
+    const expense = filteredExpenses.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
+    const deductible = filteredExpenses.filter(e => e.isDeductible).reduce((sum, e) => sum + e.amount, 0);
+    return { totalIncome: income, totalExpenses: expense, deductibleExpenses: deductible };
+  }, [filteredExpenses]);
+
+  // Calculate 7-day sparkline data - must be before early returns
+  const sparklineData = useMemo(() => {
+    const today = new Date();
+    const last7Days = eachDayOfInterval({ start: subDays(today, 6), end: today });
+    
+    const incomeByDay = last7Days.map(day => {
+      return expenses
+        .filter(e => e.type === 'income' && format(new Date(e.date), 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd'))
+        .reduce((sum, e) => sum + e.amount, 0);
+    });
+    
+    const expensesByDay = last7Days.map(day => {
+      return expenses
+        .filter(e => e.type === 'expense' && format(new Date(e.date), 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd'))
+        .reduce((sum, e) => sum + e.amount, 0);
+    });
+    
+    const netByDay = incomeByDay.map((inc, i) => inc - expensesByDay[i]);
+    
+    return { income: incomeByDay, expenses: expensesByDay, net: netByDay };
+  }, [expenses]);
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
@@ -236,56 +286,6 @@ const Dashboard = () => {
       </div>
     );
   }
-
-  // Calculate date range start
-  const dateRangeStart = useMemo(() => {
-    const now = new Date();
-    switch (dateRange) {
-      case 'week': return startOfWeek(now);
-      case 'month': return startOfMonth(now);
-      case 'quarter': return startOfQuarter(now);
-      case 'year': return startOfYear(now);
-      default: return startOfMonth(now);
-    }
-  }, [dateRange]);
-
-  // Filter expenses by date range
-  const filteredExpenses = useMemo(() => {
-    return expenses.filter(e => {
-      const expenseDate = new Date(e.date);
-      return isWithinInterval(expenseDate, { start: dateRangeStart, end: new Date() });
-    });
-  }, [expenses, dateRangeStart]);
-
-  // Calculate filtered summary
-  const filteredSummary = useMemo(() => {
-    const income = filteredExpenses.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
-    const expense = filteredExpenses.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
-    const deductible = filteredExpenses.filter(e => e.isDeductible).reduce((sum, e) => sum + e.amount, 0);
-    return { totalIncome: income, totalExpenses: expense, deductibleExpenses: deductible };
-  }, [filteredExpenses]);
-
-  // Calculate 7-day sparkline data
-  const sparklineData = useMemo(() => {
-    const today = new Date();
-    const last7Days = eachDayOfInterval({ start: subDays(today, 6), end: today });
-    
-    const incomeByDay = last7Days.map(day => {
-      return expenses
-        .filter(e => e.type === 'income' && format(new Date(e.date), 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd'))
-        .reduce((sum, e) => sum + e.amount, 0);
-    });
-    
-    const expensesByDay = last7Days.map(day => {
-      return expenses
-        .filter(e => e.type === 'expense' && format(new Date(e.date), 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd'))
-        .reduce((sum, e) => sum + e.amount, 0);
-    });
-    
-    const netByDay = incomeByDay.map((inc, i) => inc - expensesByDay[i]);
-    
-    return { income: incomeByDay, expenses: expensesByDay, net: netByDay };
-  }, [expenses]);
 
   const netIncome = filteredSummary.totalIncome - filteredSummary.totalExpenses;
   const totalTurnover = savedBusinesses.reduce((sum, b) => sum + b.turnover, 0);
