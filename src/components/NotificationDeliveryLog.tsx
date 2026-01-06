@@ -148,6 +148,53 @@ export const NotificationDeliveryLog = () => {
     fetchDeliveries();
   }, [methodFilter, statusFilter, alertTypeFilter]);
 
+  // Subscribe to realtime updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('notification-deliveries-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notification_deliveries'
+        },
+        (payload) => {
+          console.log('New notification delivery:', payload);
+          const newDelivery = payload.new as NotificationDelivery;
+          
+          // Check if it matches current filters
+          const matchesMethod = methodFilter === 'all' || newDelivery.delivery_method === methodFilter;
+          const matchesStatus = statusFilter === 'all' || newDelivery.status === statusFilter;
+          const matchesAlertType = alertTypeFilter === 'all' || newDelivery.alert_type === alertTypeFilter;
+          
+          if (matchesMethod && matchesStatus && matchesAlertType) {
+            setDeliveries(prev => [newDelivery, ...prev].slice(0, 50));
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'notification_deliveries'
+        },
+        (payload) => {
+          console.log('Updated notification delivery:', payload);
+          const updatedDelivery = payload.new as NotificationDelivery;
+          setDeliveries(prev => 
+            prev.map(d => d.id === updatedDelivery.id ? updatedDelivery : d)
+          );
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [methodFilter, statusFilter, alertTypeFilter]);
+
   // Get unique alert types from deliveries
   const uniqueAlertTypes = [...new Set(deliveries.map(d => d.alert_type))];
 
