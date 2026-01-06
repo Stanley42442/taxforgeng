@@ -21,6 +21,8 @@ import {
   AlertTriangle,
   FileText,
   Sparkles,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { format, isAfter, addDays } from "date-fns";
@@ -72,6 +74,8 @@ const Dashboard = () => {
   const [showWelcome, setShowWelcome] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [dataSeeded, setDataSeeded] = useState(false);
+  const [expandedBusinessId, setExpandedBusinessId] = useState<string | null>(null);
+  const [expandedReminderId, setExpandedReminderId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -303,25 +307,45 @@ const Dashboard = () => {
                     </Link>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    {savedBusinesses.slice(0, 4).map((business) => (
-                      <div
-                        key={business.id}
-                        className="flex items-center justify-between p-4 rounded-xl glass-subtle hover:bg-secondary/50 transition-all duration-300 group hover-lift"
-                      >
-                        <div>
-                          <p className="font-medium text-foreground">{business.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {business.entityType === 'company' ? 'LLC' : 'Business Name'} • {formatCurrency(business.turnover)}
-                          </p>
+                  <div className="space-y-3 max-h-[280px] overflow-y-auto">
+                    {savedBusinesses.slice(0, 4).map((business) => {
+                      const isExpanded = expandedBusinessId === business.id;
+                      return (
+                        <div
+                          key={business.id}
+                          className="p-4 rounded-xl glass-subtle hover:bg-secondary/50 transition-all duration-300 group cursor-pointer active:opacity-80"
+                          onClick={() => setExpandedBusinessId(isExpanded ? null : business.id)}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0 flex-1">
+                              <p className={`font-medium text-foreground ${isExpanded ? '' : 'truncate'}`}>
+                                {business.name}
+                              </p>
+                              <p className={`text-sm text-muted-foreground ${isExpanded ? '' : 'truncate'}`}>
+                                {business.entityType === 'company' ? 'LLC' : 'Business Name'} • {formatCurrency(business.turnover)}
+                              </p>
+                              {isExpanded && business.sector && (
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Sector: {business.sector}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              {business.verificationStatus === 'verified' && (
+                                <span className="text-xs bg-success/20 text-success px-2 py-0.5 rounded-full border border-success/30 whitespace-nowrap">
+                                  Verified
+                                </span>
+                              )}
+                              {isExpanded ? (
+                                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        {business.verificationStatus === 'verified' && (
-                          <span className="text-xs bg-success/20 text-success px-3 py-1 rounded-full border border-success/30">
-                            Verified
-                          </span>
-                        )}
-                      </div>
-                    ))}
+                      );
+                    })}
                     {savedBusinesses.length > 4 && (
                       <p className="text-sm text-muted-foreground text-center pt-2">
                         +{savedBusinesses.length - 4} more businesses
@@ -376,20 +400,22 @@ const Dashboard = () => {
                     </Link>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-3 max-h-[280px] overflow-y-auto">
                     {upcomingReminders.map((reminder) => {
                       const dueDate = new Date(reminder.dueDate);
                       const isOverdue = isAfter(new Date(), dueDate);
                       const isDueSoon = isAfter(addDays(new Date(), 7), dueDate) && !isOverdue;
+                      const isExpanded = expandedReminderId === reminder.id;
 
                       return (
                         <div
                           key={reminder.id}
-                          className="flex items-center justify-between p-4 rounded-xl glass-subtle hover-lift transition-all duration-300"
+                          className="p-4 rounded-xl glass-subtle transition-all duration-300 cursor-pointer active:opacity-80"
+                          onClick={() => setExpandedReminderId(isExpanded ? null : reminder.id)}
                         >
-                          <div className="flex items-center gap-3">
-                            <div className={`w-11 h-11 rounded-full flex items-center justify-center ${
-                              isOverdue ? 'bg-destructive/20 glow-primary' : isDueSoon ? 'bg-warning/20' : 'bg-success/20'
+                          <div className="flex items-start gap-3">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+                              isOverdue ? 'bg-destructive/20' : isDueSoon ? 'bg-warning/20' : 'bg-success/20'
                             }`}>
                               {isOverdue ? (
                                 <AlertTriangle className="h-5 w-5 text-destructive" />
@@ -397,14 +423,32 @@ const Dashboard = () => {
                                 <Calendar className={`h-5 w-5 ${isDueSoon ? 'text-warning' : 'text-success'}`} />
                               )}
                             </div>
-                            <div>
-                              <p className="font-medium text-foreground text-sm">{reminder.title}</p>
-                              <p className="text-xs text-muted-foreground">{reminder.businessName}</p>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-start justify-between gap-2">
+                                <p className={`font-medium text-foreground text-sm ${isExpanded ? '' : 'truncate'}`}>
+                                  {reminder.title}
+                                </p>
+                                <div className="flex items-center gap-1 shrink-0">
+                                  <span className={`text-xs font-medium whitespace-nowrap ${isOverdue ? 'text-destructive' : 'text-muted-foreground'}`}>
+                                    {format(dueDate, 'MMM d')}
+                                  </span>
+                                  {isExpanded ? (
+                                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                                  ) : (
+                                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                                  )}
+                                </div>
+                              </div>
+                              <p className={`text-xs text-muted-foreground ${isExpanded ? '' : 'truncate'}`}>
+                                {reminder.businessName}
+                              </p>
+                              {isExpanded && (
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Due: {format(dueDate, 'EEEE, MMMM d, yyyy')}
+                                </p>
+                              )}
                             </div>
                           </div>
-                          <span className={`text-xs font-medium ${isOverdue ? 'text-destructive' : 'text-muted-foreground'}`}>
-                            {format(dueDate, 'MMM d')}
-                          </span>
                         </div>
                       );
                     })}
@@ -437,29 +481,29 @@ const Dashboard = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 animate-slide-up-delay-2">
-            <Link to="/calculator">
-              <Button variant="outline" className="w-full h-14 glass-subtle neon-border hover-lift group">
-                <Calculator className="h-5 w-5 mr-2 text-primary" />
-                <span className="text-foreground">New Calculation</span>
+          <div className="mt-8 grid gap-3 grid-cols-2 lg:grid-cols-4 animate-slide-up-delay-2">
+            <Link to="/calculator" className="block">
+              <Button variant="outline" className="w-full h-12 sm:h-14 glass-subtle neon-border hover-lift group px-3">
+                <Calculator className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-primary shrink-0" />
+                <span className="text-foreground text-sm sm:text-base truncate">New Calculation</span>
               </Button>
             </Link>
-            <Link to="/expenses">
-              <Button variant="outline" className="w-full h-14 glass-subtle neon-border hover-lift group">
-                <Receipt className="h-5 w-5 mr-2 text-success" />
-                <span className="text-foreground">Track Expense</span>
+            <Link to="/expenses" className="block">
+              <Button variant="outline" className="w-full h-12 sm:h-14 glass-subtle neon-border hover-lift group px-3">
+                <Receipt className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-success shrink-0" />
+                <span className="text-foreground text-sm sm:text-base truncate">Track Expense</span>
               </Button>
             </Link>
-            <Link to="/reminders">
-              <Button variant="outline" className="w-full h-14 glass-subtle neon-border hover-lift group">
-                <Bell className="h-5 w-5 mr-2 text-accent" />
-                <span className="text-foreground">Set Reminder</span>
+            <Link to="/reminders" className="block">
+              <Button variant="outline" className="w-full h-12 sm:h-14 glass-subtle neon-border hover-lift group px-3">
+                <Bell className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-accent shrink-0" />
+                <span className="text-foreground text-sm sm:text-base truncate">Set Reminder</span>
               </Button>
             </Link>
-            <Link to="/learn">
-              <Button variant="outline" className="w-full h-14 glass-subtle neon-border hover-lift group">
-                <Sparkles className="h-5 w-5 mr-2 text-warning" />
-                <span className="text-foreground">Tax Tips</span>
+            <Link to="/learn" className="block">
+              <Button variant="outline" className="w-full h-12 sm:h-14 glass-subtle neon-border hover-lift group px-3">
+                <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-warning shrink-0" />
+                <span className="text-foreground text-sm sm:text-base truncate">Tax Tips</span>
               </Button>
             </Link>
           </div>
@@ -490,17 +534,17 @@ const StatCard = ({
   iconColor: string;
   valueColor?: string;
 }) => (
-  <div className={`glass-frosted rounded-2xl p-4 sm:p-5 shadow-futuristic overflow-hidden hover-lift transition-all duration-300 relative group`}>
+  <div className="glass-frosted rounded-2xl p-3 sm:p-4 shadow-futuristic overflow-hidden hover-lift transition-all duration-300 relative group min-w-0">
     <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-50 group-hover:opacity-70 transition-opacity`} />
-    <div className="relative z-10">
-      <div className="flex items-center gap-2 mb-3">
-        <div className={`h-9 w-9 rounded-xl bg-background/50 flex items-center justify-center`}>
-          <Icon className={`h-5 w-5 ${iconColor}`} />
+    <div className="relative z-10 min-w-0">
+      <div className="flex items-center gap-2 mb-2 sm:mb-3">
+        <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-background/50 flex items-center justify-center shrink-0">
+          <Icon className={`h-4 w-4 sm:h-5 sm:w-5 ${iconColor}`} />
         </div>
-        <span className="text-xs sm:text-sm text-muted-foreground font-medium">{label}</span>
+        <span className="text-[10px] sm:text-xs text-muted-foreground font-medium truncate">{label}</span>
       </div>
-      <p className={`text-xl sm:text-2xl font-bold truncate ${valueColor || 'text-foreground'}`}>{value}</p>
-      <p className="text-xs text-muted-foreground mt-1 truncate">{subtext}</p>
+      <p className={`text-base sm:text-xl lg:text-2xl font-bold truncate ${valueColor || 'text-foreground'}`}>{value}</p>
+      <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 truncate">{subtext}</p>
     </div>
   </div>
 );
