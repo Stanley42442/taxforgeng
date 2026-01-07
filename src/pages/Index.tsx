@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { FreeTrialCTA } from "@/components/FreeTrialCTA";
+import { SuccessStories } from "@/components/SuccessStories";
 import { useState, useEffect } from "react";
 
 const CAROUSEL_ITEMS = [
@@ -252,6 +253,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Success Stories Section */}
+      <SuccessStories limit={3} />
+
       {/* Pricing Teaser */}
       <section className="py-16 md:py-20 relative z-10">
         <div className="container mx-auto px-4 text-center">
@@ -312,6 +316,9 @@ const Index = () => {
                 { to: "/advisory", label: "Advisory" },
                 { to: "/calculator", label: "Calculator" },
                 { to: "/learn", label: "Learn" },
+                { to: "/tax-calendar", label: "Tax Calendar" },
+                { to: "/success-stories", label: "Success Stories" },
+                { to: "/referrals", label: "Refer Friends" },
                 { to: "/roadmap", label: "Roadmap" },
                 { to: "/terms", label: "Terms & Privacy" },
                 { to: "/auth", label: "Sign In" },
