@@ -3,7 +3,7 @@ import { NavMenu } from "@/components/NavMenu";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useLanguage, getToastMessage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
@@ -85,7 +85,7 @@ const Dashboard = () => {
   const { tier, savedBusinesses, loading: businessLoading, refreshBusinesses } = useSubscription();
   const { user } = useAuth();
   const { urgentCount } = useUpcomingReminders();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [expenseSummary, setExpenseSummary] = useState<ExpenseSummary>({
     totalIncome: 0,
@@ -324,13 +324,13 @@ const Dashboard = () => {
     try {
       if (format === 'pdf') {
         exportDashboardToPDF(exportData);
-        toast.success('Dashboard report downloaded as PDF');
+        toast.success(getToastMessage('downloadSuccess', language));
       } else {
         exportDashboardToCSV(exportData);
-        toast.success('Dashboard data exported as CSV');
+        toast.success(getToastMessage('exportSuccess', language));
       }
     } catch (error) {
-      toast.error('Failed to export dashboard data');
+      toast.error(getToastMessage('exportFailed', language));
       console.error('Export error:', error);
     }
   };

@@ -49,7 +49,7 @@ import { formatDistanceToNow } from "date-fns";
 import { SecurityScoreWidget } from "@/components/SecurityScoreWidget";
 import { ReportScheduleSettings } from "@/components/ReportScheduleSettings";
 import { WhatsAppVerification } from "@/components/WhatsAppVerification";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useLanguage, getToastMessage } from "@/contexts/LanguageContext";
 
 const nameSchema = z.string().min(1, "Name is required").max(100, "Name must be less than 100 characters");
 const emailSchema = z.string().email("Please enter a valid email address");
@@ -108,7 +108,7 @@ const getEventLabel = (eventType: string) => {
 const Settings = () => {
   const { user, loading } = useAuth();
   const { tier } = useSubscription();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
 
   // Profile state
@@ -351,9 +351,9 @@ const Settings = () => {
         data: { full_name: fullName }
       });
 
-      toast.success("Profile updated successfully!");
+      toast.success(getToastMessage('updateSuccess', language));
     } catch (error: any) {
-      toast.error(error.message || "Failed to update profile");
+      toast.error(error.message || getToastMessage('updateFailed', language));
     } finally {
       setSavingProfile(false);
     }
@@ -381,12 +381,9 @@ const Settings = () => {
 
       if (error) throw error;
       
-      toast.success(cleanNumber 
-        ? "WhatsApp number updated! You'll receive security alerts on this number." 
-        : "WhatsApp notifications disabled."
-      );
+      toast.success(getToastMessage('updateSuccess', language));
     } catch (error: any) {
-      toast.error(error.message || "Failed to update WhatsApp number");
+      toast.error(error.message || getToastMessage('updateFailed', language));
     } finally {
       setSavingWhatsapp(false);
     }
@@ -396,7 +393,7 @@ const Settings = () => {
     const cleanNumber = whatsappNumber.replace(/[\s\-\(\)]/g, '');
     
     if (!cleanNumber) {
-      toast.error("Please enter a WhatsApp number first");
+      toast.error(getToastMessage('invalidInput', language));
       return;
     }
 
@@ -414,9 +411,9 @@ const Settings = () => {
 
       if (error) throw error;
       
-      toast.success("Test notification sent! Check your WhatsApp.");
+      toast.success(getToastMessage('whatsappSent', language));
     } catch (error: any) {
-      toast.error("Failed to send test notification. Check if Twilio credentials are configured.");
+      toast.error(getToastMessage('whatsappFailed', language));
     } finally {
       setTestingWhatsapp(false);
     }
@@ -445,10 +442,10 @@ const Settings = () => {
       // Send email notification to current email
       await sendSecurityNotification('email_changed', { newEmail });
       
-      toast.success("Verification email sent! Check your inbox to confirm the new email.");
+      toast.success(getToastMessage('emailSent', language));
       setNewEmail("");
     } catch (error: any) {
-      toast.error(error.message || "Failed to update email");
+      toast.error(error.message || getToastMessage('updateFailed', language));
     } finally {
       setSavingEmail(false);
     }
@@ -626,7 +623,7 @@ const Settings = () => {
       // Send email notification
       await sendSecurityNotification('password_changed');
       
-      toast.success("Password updated successfully!");
+      toast.success(getToastMessage('updateSuccess', language));
       setNewPassword("");
       setConfirmPassword("");
       setCurrentPassword("");
@@ -634,7 +631,7 @@ const Settings = () => {
       setShowPasswordVerification(false);
       setPasswordVerificationCode("");
     } catch (error: any) {
-      toast.error(error.message || "Failed to update password");
+      toast.error(error.message || getToastMessage('updateFailed', language));
     } finally {
       setSavingPassword(false);
     }
@@ -744,9 +741,9 @@ const Settings = () => {
       setTotpSecret(null);
       setFactorId(null);
       
-      toast.success("Two-factor authentication enabled successfully!");
+      toast.success(getToastMessage('updateSuccess', language));
     } catch (error: any) {
-      toast.error(error.message || "Invalid verification code");
+      toast.error(error.message || getToastMessage('verificationFailed', language));
     } finally {
       setMfaVerifying(false);
     }
@@ -771,9 +768,9 @@ const Settings = () => {
       setHasBackupCodes(false);
       setRemainingBackupCodes(0);
 
-      toast.success("Two-factor authentication disabled");
+      toast.success(getToastMessage('updateSuccess', language));
     } catch (error: any) {
-      toast.error(error.message || "Failed to disable 2FA");
+      toast.error(error.message || getToastMessage('updateFailed', language));
     }
   };
 
@@ -831,9 +828,9 @@ const Settings = () => {
       // Send email notification
       await sendSecurityNotification('backup_codes_generated');
       
-      toast.success("Backup codes generated successfully!");
+      toast.success(getToastMessage('saveSuccess', language));
     } catch (error: any) {
-      toast.error(error.message || "Failed to generate backup codes");
+      toast.error(error.message || getToastMessage('saveFailed', language));
     } finally {
       setGeneratingBackupCodes(false);
     }
@@ -842,7 +839,7 @@ const Settings = () => {
   const handleCopyBackupCodes = () => {
     const codesText = backupCodes.join('\n');
     navigator.clipboard.writeText(codesText);
-    toast.success("Backup codes copied to clipboard!");
+    toast.success(getToastMessage('copySuccess', language));
   };
 
   const handleDownloadBackupCodes = () => {
@@ -856,7 +853,7 @@ const Settings = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast.success("Backup codes downloaded!");
+    toast.success(getToastMessage('downloadSuccess', language));
   };
 
   if (loading || profileLoading) {
