@@ -36,12 +36,9 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
 } from "recharts";
 import { ReusableAreaChart } from "@/components/ui/reusable-area-chart";
+import { ReusablePieChart, PieChartDataItem } from "@/components/ui/reusable-pie-chart";
 import {
   Table,
   TableBody,
@@ -292,19 +289,19 @@ const AIQueryAnalytics = () => {
   const handleRefresh = () => fetchAnalytics(true);
 
   // Prepare chart data
-  const pieData = useMemo(() => {
+  const pieData: PieChartDataItem[] = useMemo(() => {
     return analytics?.categoryBreakdown.map((c, i) => ({
       name: CATEGORY_LABELS[c.category] || c.category,
       value: c.count,
-      fill: CATEGORY_COLORS[i % CATEGORY_COLORS.length]
+      color: CATEGORY_COLORS[i % CATEGORY_COLORS.length]
     })) || [];
   }, [analytics?.categoryBreakdown]);
 
-  const sectorPieData = useMemo(() => {
+  const sectorPieData: PieChartDataItem[] = useMemo(() => {
     return analytics?.sectorBreakdown.map(s => ({
       name: s.sector.charAt(0).toUpperCase() + s.sector.slice(1).replace('_', ' '),
       value: s.count,
-      fill: SECTOR_COLORS[s.sector] || 'hsl(var(--muted))'
+      color: SECTOR_COLORS[s.sector] || 'hsl(var(--muted))'
     })) || [];
   }, [analytics?.sectorBreakdown]);
 
@@ -525,34 +522,14 @@ const AIQueryAnalytics = () => {
                 <CardDescription>Query categories breakdown</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={pieData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={100}
-                        paddingAngle={2}
-                        dataKey="value"
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                        labelLine={false}
-                      >
-                        {pieData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'hsl(var(--card))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
+                <ReusablePieChart
+                  data={pieData}
+                  height={300}
+                  innerRadius={60}
+                  outerRadius={100}
+                  showCenterLabel
+                  emptyMessage="No category data"
+                />
               </CardContent>
             </Card>
 
@@ -566,33 +543,13 @@ const AIQueryAnalytics = () => {
                 <CardDescription>Which business sectors ask the most</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={sectorPieData}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={100}
-                        paddingAngle={2}
-                        dataKey="value"
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                        labelLine={false}
-                      >
-                        {sectorPieData.map((entry, index) => (
-                          <Cell key={`sector-${index}`} fill={entry.fill} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'hsl(var(--card))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
+                <ReusablePieChart
+                  data={sectorPieData}
+                  height={300}
+                  outerRadius={100}
+                  showCenterLabel
+                  emptyMessage="No sector data"
+                />
               </CardContent>
             </Card>
           </div>
