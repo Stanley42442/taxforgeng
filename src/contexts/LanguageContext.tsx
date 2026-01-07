@@ -3431,6 +3431,7 @@ export const translations: Translations = {
   'pricing.contactSales': { en: 'Contact Sales', pcm: 'Contact Sales', yo: 'Kàn sí Àwọn Olùtajà', ha: 'Tuntuɓi Sayarwa', ig: 'Kpọtụrụ Ndị Ahịa' },
   'pricing.startFreeTrial': { en: 'Start Free Trial', pcm: 'Start Free Trial', yo: 'Bẹ̀rẹ̀ Ìdánwò Ọ̀fẹ́', ha: 'Fara Gwajin Kyauta', ig: 'Malite Nnwale N\'efu' },
   'pricing.freeForever': { en: 'Free Forever', pcm: 'Free Forever', yo: 'Ọ̀fẹ́ Láéláé', ha: 'Kyauta Har Abada', ig: 'N\'efu Ruo Mgbe Ebighị Ebi' },
+  'pricing.availableBasic': { en: 'Available on Basic+ plans', pcm: 'Available for Basic+ plans', yo: 'Wà fún àwọn ètò Basic+', ha: 'Ana samun shi akan tsare-tsare na Basic+', ig: 'Dị maka atụmatụ Basic+' },
 
 };
 

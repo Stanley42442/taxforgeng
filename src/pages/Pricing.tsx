@@ -175,20 +175,20 @@ const Pricing = () => {
         {/* Feature Comparison Table */}
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl font-bold text-foreground text-center mb-8">
-            Full Feature Comparison
+            {t('pricing.fullComparison')}
           </h2>
           <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-card">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border bg-secondary/50">
-                    <th className="text-left p-4 font-semibold text-foreground">Feature</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Individual</th>
+                    <th className="text-left p-4 font-semibold text-foreground">{t('pricing.feature')}</th>
+                    <th className="text-center p-4 font-semibold text-foreground">{t('pricing.individual')}</th>
                     <th className="text-center p-4 font-semibold text-foreground">Starter</th>
                     <th className="text-center p-4 font-semibold text-foreground">Basic</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Freelancer</th>
+                    <th className="text-center p-4 font-semibold text-foreground">{t('pricing.freelancer')}</th>
                     <th className="text-center p-4 font-semibold text-foreground bg-primary/5">Business</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Corporate</th>
+                    <th className="text-center p-4 font-semibold text-foreground">{t('pricing.corporate')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -212,7 +212,7 @@ const Pricing = () => {
         {/* Payment Methods */}
         <div className="mt-12 text-center">
           <p className="text-sm text-muted-foreground mb-4">
-            Secure payments via Paystack. Pay with Card, Bank Transfer, or USSD.
+            {t('pricing.securePayments')}
           </p>
           <div className="flex items-center justify-center gap-6 text-muted-foreground">
             <span className="text-xs">💳 Card</span>
@@ -225,20 +225,20 @@ const Pricing = () => {
         <div className="mt-16 max-w-2xl mx-auto text-center">
           <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
             <MessageCircle className="h-10 w-10 text-primary mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-foreground mb-2">Need Help Choosing?</h3>
+            <h3 className="text-xl font-bold text-foreground mb-2">{t('pricing.needHelp')}</h3>
             <p className="text-muted-foreground mb-6">
-              Our team is here to help you find the perfect plan for your business needs.
+              {t('pricing.helpDescription')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="outline" asChild>
                 <a href="mailto:support@taxforge.ng">
                   <Mail className="h-4 w-4" />
-                  Contact Sales
+                  {t('pricing.contactSales')}
                 </a>
               </Button>
               <Link to="/advisory">
                 <Button variant="hero">
-                  Start Free Trial
+                  {t('pricing.startFreeTrial')}
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
