@@ -47,6 +47,7 @@ import { toast } from "sonner";
 import { useSubscription, type SavedBusiness } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const CalculatorPage = () => {
   const location = useLocation();
@@ -54,6 +55,7 @@ const CalculatorPage = () => {
   const preselectedEntity = location.state?.entityType;
   const { tier, savedBusinesses, loading: subscriptionLoading } = useSubscription();
   const { user, loading: authLoading } = useAuth();
+  const { t } = useLanguage();
 
   // ALL HOOKS MUST BE DECLARED BEFORE ANY CONDITIONAL RETURNS
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>('');
@@ -310,13 +312,13 @@ const CalculatorPage = () => {
           <div className="text-center mb-8 animate-slide-up">
             <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-2 text-sm font-medium mb-4">
               <Sparkles className="h-4 w-4 text-accent animate-pulse-soft" />
-              FIRS Compliant Calculator
+              {t('calculator.firsCompliant')}
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-              Tax Calculator
+              {t('calculator.title')}
             </h1>
             <p className="text-muted-foreground mb-4">
-              Calculate your Nigerian taxes accurately
+              {t('calculator.subtitle')}
             </p>
           </div>
 
@@ -329,17 +331,17 @@ const CalculatorPage = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <Label className="text-sm font-medium text-foreground mb-2 block">
-                    Select Business
+                    {t('calculator.selectBusiness')}
                   </Label>
                   <Select value={selectedBusinessId} onValueChange={handleBusinessSelect}>
                     <SelectTrigger className="w-full h-12 rounded-xl border-2 border-border/60 bg-background/80 backdrop-blur-sm">
-                      <SelectValue placeholder="Start new calculation or choose a saved business..." />
+                      <SelectValue placeholder={t('calculator.selectBusiness')} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="__new__">
                         <span className="flex items-center gap-2">
                           <Sparkles className="h-4 w-4 text-accent" />
-                          New Calculation
+                          {t('calculator.newCalculation')}
                         </span>
                       </SelectItem>
                       {savedBusinesses.map((business) => (
@@ -399,7 +401,7 @@ const CalculatorPage = () => {
                 </div>
                 <div className="min-w-0 mr-3">
                   <p className="font-semibold text-foreground">
-                    {use2026Rules ? 'Nigeria Tax Act 2025 Rules' : 'Current (Pre-2026) Rules'}
+                    {use2026Rules ? t('calculator.2026Rules') : t('calculator.pre2026Rules')}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {use2026Rules 
@@ -430,14 +432,14 @@ const CalculatorPage = () => {
                 className="flex items-center gap-2 py-4 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-300"
               >
                 <Briefcase className="h-5 w-5" />
-                <span className="font-semibold">Business Name</span>
+                <span className="font-semibold">{t('calculator.businessName')}</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="company"
                 className="flex items-center gap-2 py-4 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-300"
               >
                 <Building2 className="h-5 w-5" />
-                <span className="font-semibold">Company (LTD)</span>
+                <span className="font-semibold">{t('calculator.company')}</span>
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -446,10 +448,10 @@ const CalculatorPage = () => {
           <div className="glass-frosted rounded-3xl p-6 md:p-8 shadow-futuristic animate-slide-up-delay-2">
             <div className="space-y-8">
               {/* Primary Income */}
-              <InputSection title="Primary Income" tooltip="Your main business revenue and expenses">
+              <InputSection title={t('calculator.primaryIncome')} tooltip="Your main business revenue and expenses">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <NeumorphicInput
-                    label="Annual Turnover"
+                    label={t('calculator.annualTurnover')}
                     value={inputs.turnover}
                     onChange={(v) => updateInput('turnover', v)}
                     tooltip="Total revenue/sales for the year"
@@ -457,7 +459,7 @@ const CalculatorPage = () => {
                   />
                   <div>
                     <NeumorphicInput
-                      label="Business Expenses"
+                      label={t('calculator.expenses')}
                       value={inputs.expenses}
                       onChange={(v) => updateInput('expenses', v)}
                       tooltip="Deductible business costs"
@@ -472,19 +474,19 @@ const CalculatorPage = () => {
                             className="mt-2 text-xs text-primary hover:text-primary/80"
                           >
                             <Plus className="h-3 w-3 mr-1" />
-                            Quick Add Expense
+                            {t('calculator.quickAddExpense')}
                           </Button>
                         </DialogTrigger>
                         <DialogContent className="glass-frosted">
                           <DialogHeader>
                             <DialogTitle className="flex items-center gap-2">
                               <Receipt className="h-5 w-5 text-primary" />
-                              Add Expense
+                              {t('expense.addExpense')}
                             </DialogTitle>
                           </DialogHeader>
                           <div className="space-y-4 pt-4">
                             <div>
-                              <Label className="text-sm font-medium mb-2 block">Category</Label>
+                              <Label className="text-sm font-medium mb-2 block">{t('expense.category')}</Label>
                               <Select 
                                 value={quickExpense.category} 
                                 onValueChange={(v) => setQuickExpense(prev => ({ ...prev, category: v }))}
@@ -505,7 +507,7 @@ const CalculatorPage = () => {
                               </Select>
                             </div>
                             <div>
-                              <Label className="text-sm font-medium mb-2 block">Amount</Label>
+                              <Label className="text-sm font-medium mb-2 block">{t('expense.amount')}</Label>
                               <div className="relative">
                                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary font-semibold">₦</span>
                                 <Input
@@ -522,12 +524,12 @@ const CalculatorPage = () => {
                               </div>
                             </div>
                             <div>
-                              <Label className="text-sm font-medium mb-2 block">Description (optional)</Label>
+                              <Label className="text-sm font-medium mb-2 block">{t('expense.description')}</Label>
                               <Input
                                 value={quickExpense.description}
                                 onChange={(e) => setQuickExpense(prev => ({ ...prev, description: e.target.value }))}
                                 className="h-12 rounded-xl"
-                                placeholder="Brief description..."
+                                placeholder="..."
                               />
                             </div>
                             <Button 
@@ -536,7 +538,7 @@ const CalculatorPage = () => {
                               disabled={!quickExpense.amount}
                             >
                               <Plus className="h-4 w-4 mr-2" />
-                              Add Expense
+                              {t('expense.addExpense')}
                             </Button>
                           </div>
                         </DialogContent>
@@ -580,7 +582,7 @@ const CalculatorPage = () => {
               {entityType === 'company' && (
                 <InputSection title="Company Assets" tooltip="Required to determine small company status">
                   <NeumorphicInput
-                    label="Fixed Assets Value"
+                    label={t('calculator.fixedAssets')}
                     value={inputs.fixedAssets}
                     onChange={(v) => updateInput('fixedAssets', v)}
                     tooltip="Total value of property, equipment, vehicles etc."
@@ -592,7 +594,7 @@ const CalculatorPage = () => {
               {entityType === 'business_name' && use2026Rules && (
                 <InputSection title="Rent Relief" tooltip="2026 rules allow relief for rent paid">
                   <NeumorphicInput
-                    label="Annual Rent Paid"
+                    label={t('calculator.rentPaid')}
                     value={inputs.rentPaid}
                     onChange={(v) => updateInput('rentPaid', v)}
                     tooltip="Relief: min(20% of rent, ₦500k)"
@@ -601,16 +603,16 @@ const CalculatorPage = () => {
               )}
 
               {/* VAT */}
-              <InputSection title="VAT (7.5%)" tooltip="Mandatory if turnover > ₦25m">
+              <InputSection title={t('calculator.vatDetails')} tooltip="Mandatory if turnover > ₦25m">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <NeumorphicInput
-                    label="Vatable Sales"
+                    label={t('calculator.vatableSales')}
                     value={inputs.vatableSales}
                     onChange={(v) => updateInput('vatableSales', v)}
                     tooltip="Sales subject to VAT"
                   />
                   <NeumorphicInput
-                    label="Vatable Purchases"
+                    label={t('calculator.vatablePurchases')}
                     value={inputs.vatablePurchases}
                     onChange={(v) => updateInput('vatablePurchases', v)}
                     tooltip="Purchases with recoverable VAT"
@@ -619,28 +621,28 @@ const CalculatorPage = () => {
               </InputSection>
 
               {/* Other Income */}
-              <InputSection title="Other Income (Optional)" tooltip="Additional income sources">
+              <InputSection title={t('calculator.additionalIncome')} tooltip="Additional income sources">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <NeumorphicInput
-                    label="Rental Income"
+                    label={t('calculator.rentalIncome')}
                     value={inputs.rentalIncome}
                     onChange={(v) => updateInput('rentalIncome', v)}
                     tooltip="10% WHT usually deducted at source"
                   />
                   <NeumorphicInput
-                    label="Consultancy Income"
+                    label={t('calculator.consultancyIncome')}
                     value={inputs.consultancyIncome}
                     onChange={(v) => updateInput('consultancyIncome', v)}
                     tooltip="10% WHT for companies, 5% for individuals"
                   />
                   <NeumorphicInput
-                    label="Dividend Income"
+                    label={t('calculator.dividendIncome')}
                     value={inputs.dividendIncome}
                     onChange={(v) => updateInput('dividendIncome', v)}
                     tooltip="Franked dividends from Nigerian companies are tax-exempt"
                   />
                   <NeumorphicInput
-                    label="Capital Gains"
+                    label={t('calculator.capitalGains')}
                     value={inputs.capitalGains}
                     onChange={(v) => updateInput('capitalGains', v)}
                     tooltip="10% Capital Gains Tax applies"
@@ -658,12 +660,12 @@ const CalculatorPage = () => {
                 onClick={handleCalculate}
                 disabled={!canCalculate}
               >
-                <span>Calculate Tax</span>
+                <span>{t('calculator.calculateTax')}</span>
                 <ArrowRight className="h-5 w-5" />
               </Button>
               {!canCalculate && (
                 <p className="text-center text-sm text-muted-foreground mt-3">
-                  Enter your annual turnover to calculate
+                  {t('calculator.annualTurnover')}
                 </p>
               )}
             </div>
