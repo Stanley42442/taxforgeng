@@ -19,9 +19,9 @@ export const useAdminCheck = () => {
         .from('user_roles')
         .select('role')
         .eq('user_id', user.id)
-        .single();
+        .eq('role', 'admin');
 
-      setIsAdmin(roles?.role === 'admin');
+      setIsAdmin(roles !== null && roles.length > 0);
       setLoading(false);
     };
 
