@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { NavMenu } from "@/components/NavMenu";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Calculator,
   Check,
@@ -52,21 +53,22 @@ const features: TierFeature[] = [
 const Pricing = () => {
   const navigate = useNavigate();
   const { tier: currentTier, upgradeTier } = useSubscription();
+  const { t } = useLanguage();
 
   const handleUpgrade = (tier: SubscriptionTier) => {
     if (tier === 'corporate') {
-      toast.info('Our team will contact you shortly!');
+      toast.info(t('pricing.contactUs'));
       return;
     }
     
     // Mock Paystack checkout - in production, this would open Paystack
-    toast.success(`Upgrading to ${tier.charAt(0).toUpperCase() + tier.slice(1)} plan...`, {
+    toast.success(t('toast.upgradeSuccess'), {
       description: 'This is a test mode transaction'
     });
     
     setTimeout(() => {
       upgradeTier(tier);
-      toast.success(`Successfully upgraded to ${tier.charAt(0).toUpperCase() + tier.slice(1)}!`);
+      toast.success(t('toast.upgradeSuccess'));
       navigate('/calculator');
     }, 1500);
   };
@@ -79,10 +81,10 @@ const Pricing = () => {
         {/* Header */}
         <div className="text-center mb-12 animate-slide-up">
           <h1 className="text-4xl font-extrabold text-foreground mb-4">
-            Simple, Transparent Pricing
+            {t('pricing.title')}
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Choose the plan that fits your business. All prices include VAT. 
+            {t('pricing.subtitle')}. All prices include VAT. 
             Save ~17% with annual billing.
           </p>
         </div>
