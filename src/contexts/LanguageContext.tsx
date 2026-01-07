@@ -89,7 +89,84 @@ export const translations: Translations = {
     ha: 'Kalandar Haraji', 
     ig: 'Kalenda Ụtụ' 
   },
-  'nav.accountantPortal': { 
+  'nav.personalTax': { 
+    en: 'Personal Tax', 
+    pcm: 'Personal Tax', 
+    yo: 'Owó-orí Ti Ara Ẹni', 
+    ha: 'Harajin Kai', 
+    ig: 'Ụtụ Nkeonwe' 
+  },
+  'nav.achievements': { 
+    en: 'Achievements', 
+    pcm: 'Achievements', 
+    yo: 'Àṣeyọrí', 
+    ha: 'Nasarori', 
+    ig: 'Ihe Emere' 
+  },
+  'nav.scenarios': { 
+    en: 'Scenarios', 
+    pcm: 'Scenarios', 
+    yo: 'Àwọn Ìṣẹ̀lẹ̀', 
+    ha: 'Yanayin', 
+    ig: 'Ọnọdụ' 
+  },
+  'nav.reports': { 
+    en: 'Reports', 
+    pcm: 'Reports', 
+    yo: 'Ìròyìn', 
+    ha: 'Rahotanni', 
+    ig: 'Akụkọ' 
+  },
+  'nav.insights': { 
+    en: 'Insights', 
+    pcm: 'Insights', 
+    yo: 'Òye', 
+    ha: 'Fahimta', 
+    ig: 'Nghọta' 
+  },
+  'nav.transactions': { 
+    en: 'Transactions', 
+    pcm: 'Transactions', 
+    yo: 'Àwọn Ìdúnàádúrà', 
+    ha: "Ma'amaloli", 
+    ig: 'Azụmahịa' 
+  },
+  'nav.efiling': { 
+    en: 'E-Filing', 
+    pcm: 'E-Filing', 
+    yo: 'Ìfọwọ́sí Lórí Ayélujára', 
+    ha: 'Shigar Intanet', 
+    ig: "Edere N'ịntanetị" 
+  },
+  'nav.taxFiling': { 
+    en: 'Tax Filing', 
+    pcm: 'Tax Filing', 
+    yo: 'Fọwọ́sí Owó-orí', 
+    ha: 'Shigar Haraji', 
+    ig: 'Edere Ụtụ' 
+  },
+  'nav.team': { 
+    en: 'Team', 
+    pcm: 'Team', 
+    yo: 'Ẹgbẹ́', 
+    ha: 'Tawaga', 
+    ig: 'Ndị Otu' 
+  },
+  'nav.roadmap': { 
+    en: 'Roadmap', 
+    pcm: 'Roadmap', 
+    yo: 'Àtẹ Ọ̀nà', 
+    ha: 'Taswira', 
+    ig: 'Ụzọ' 
+  },
+  'nav.accountSettings': { 
+    en: 'Account Settings', 
+    pcm: 'Account Settings', 
+    yo: 'Ètò Àkọsílẹ̀', 
+    ha: 'Saitin Asusun', 
+    ig: 'Ntọala Akaụntụ' 
+  },
+  'nav.accountantPortal': {
     en: 'Accountant Portal', 
     pcm: 'Accountant Corner', 
     yo: 'Ọ̀nà Àkàwò', 
