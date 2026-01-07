@@ -17,30 +17,32 @@ import { NavMenu } from "@/components/NavMenu";
 import { FreeTrialCTA } from "@/components/FreeTrialCTA";
 import { SuccessStories } from "@/components/SuccessStories";
 import { useState, useEffect } from "react";
-
-const CAROUSEL_ITEMS = [
-  {
-    title: "2026 Tax Reforms Are Here",
-    description: "New 0% CIT for small companies, updated PIT bands, and more. Get ready now.",
-    gradient: "from-primary/20 to-accent/10",
-    icon: Sparkles,
-  },
-  {
-    title: "₦50M Turnover Threshold",
-    description: "Companies under ₦50M turnover may qualify for 0% Company Income Tax.",
-    gradient: "from-success/20 to-primary/10",
-    icon: TrendingUp,
-  },
-  {
-    title: "First ₦800K Tax Free",
-    description: "Personal income exemption increased from ₦300K to ₦800K under new rules.",
-    gradient: "from-accent/20 to-warning/10",
-    icon: Shield,
-  },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const { t } = useLanguage();
+
+  const CAROUSEL_ITEMS = [
+    {
+      title: t('home.carousel1Title'),
+      description: t('home.carousel1Desc'),
+      gradient: "from-primary/20 to-accent/10",
+      icon: Sparkles,
+    },
+    {
+      title: t('home.carousel2Title'),
+      description: t('home.carousel2Desc'),
+      gradient: "from-success/20 to-primary/10",
+      icon: TrendingUp,
+    },
+    {
+      title: t('home.carousel3Title'),
+      description: t('home.carousel3Desc'),
+      gradient: "from-accent/20 to-warning/10",
+      icon: Shield,
+    },
+  ];
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -97,7 +99,7 @@ const Index = () => {
                         </div>
                         <Link to="/calculator" className="shrink-0">
                           <Button variant="glow" size="lg" className="w-full md:w-auto">
-                            Learn More <ArrowRight className="h-4 w-4" />
+                            {t('home.learnMore')} <ArrowRight className="h-4 w-4" />
                           </Button>
                         </Link>
                       </div>
@@ -143,33 +145,32 @@ const Index = () => {
           <div className="text-center animate-slide-up-delay-1">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full glass px-5 py-2.5 text-sm font-medium text-foreground shadow-futuristic">
               <Sparkles className="h-4 w-4 text-accent animate-pulse-soft" />
-              <span>Updated for Nigeria Tax Act 2025</span>
+              <span>{t('home.updatedFor2025')}</span>
             </div>
             
             <h1 className="mb-6 text-4xl font-extrabold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl">
-              Smart Tax Advice for
+              {t('home.heroTitle')}
               <span className="block mt-2 text-gradient bg-gradient-to-r from-primary via-success to-accent bg-clip-text">
-                Nigerian Businesses
+                {t('home.heroSubtitle')}
               </span>
             </h1>
             
             <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl">
-              Get personalized business structure recommendations and accurate tax calculations. 
-              Built for small businesses and individuals navigating Nigeria's tax landscape.
+              {t('home.heroDescription')}
             </p>
             
             {/* Floating CTA Buttons */}
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link to="/advisory">
                 <Button variant="glow" size="xl" className="w-full sm:w-auto group shadow-2xl">
-                  <span>Get Tax Advice</span>
+                  <span>{t('home.getAdvice')}</span>
                   <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
               <Link to="/calculator">
                 <Button variant="glass" size="xl" className="w-full sm:w-auto neumorphic-button">
                   <Calculator className="h-5 w-5" />
-                  <span>Tax Calculator</span>
+                  <span>{t('home.taxCalculator')}</span>
                 </Button>
               </Link>
             </div>
@@ -178,9 +179,9 @@ const Index = () => {
           {/* Trust Badges */}
           <div className="mt-16 flex flex-wrap items-center justify-center gap-4 md:gap-8 animate-slide-up-delay-2">
             {[
-              { icon: CheckCircle2, text: "FIRS Compliant" },
-              { icon: CheckCircle2, text: "Pre-2026 & 2026 Rules" },
-              { icon: CheckCircle2, text: "Free to Use" },
+              { icon: CheckCircle2, text: t('home.firsCompliant') },
+              { icon: CheckCircle2, text: t('home.pre2026Rules') },
+              { icon: CheckCircle2, text: t('home.freeToUse') },
             ].map((badge, index) => (
               <div 
                 key={index}
@@ -203,49 +204,49 @@ const Index = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="mx-auto max-w-3xl text-center mb-14 animate-slide-up">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Everything You Need for Tax Compliance
+              {t('home.featuresTitle')}
             </h2>
             <p className="text-lg text-muted-foreground">
-              From business structure advice to detailed tax calculations
+              {t('home.featuresSubtitle')}
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
             <FeatureCard 
               icon={<Building2 className="h-6 w-6" />}
-              title="Business Structure Advice"
-              description="Get recommendations on whether to register as a Business Name or Limited Liability Company based on your needs."
+              title={t('home.businessAdvice')}
+              description={t('home.businessAdviceDesc')}
               delay={1}
             />
             <FeatureCard 
               icon={<Calculator className="h-6 w-6" />}
-              title="Tax Calculator"
-              description="Calculate CIT, PIT, VAT, and development levies with support for both pre-2026 and 2026+ rules."
+              title={t('home.taxCalculatorTitle')}
+              description={t('home.taxCalculatorDesc')}
               delay={2}
             />
             <FeatureCard 
               icon={<Shield className="h-6 w-6" />}
-              title="Liability Protection"
-              description="Understand how different business structures affect your personal asset protection."
+              title={t('home.liabilityProtection')}
+              description={t('home.liabilityProtectionDesc')}
               delay={3}
             />
             <FeatureCard 
               icon={<TrendingUp className="h-6 w-6" />}
-              title="Small Company Benefits"
-              description="Check if you qualify for 0% CIT rate under the new small company rules."
+              title={t('home.smallCompanyBenefits')}
+              description={t('home.smallCompanyBenefitsDesc')}
               delay={4}
             />
             <FeatureCard 
               icon={<FileText className="h-6 w-6" />}
-              title="Export Reports"
-              description="Download your tax calculations as PDF or CSV for record keeping and filing."
+              title={t('home.exportReports')}
+              description={t('home.exportReportsDesc')}
               badge="Basic+"
               delay={5}
             />
             <FeatureCard 
               icon={<Users className="h-6 w-6" />}
-              title="Tax Filing Preparation"
-              description="Generate pre-filled FIRS forms ready for TaxProMax submission."
+              title={t('home.taxFilingPreparation')}
+              description={t('home.taxFilingPreparationDesc')}
               badge="Business+"
               delay={6}
             />
@@ -261,14 +262,14 @@ const Index = () => {
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-2xl mx-auto glass-frosted rounded-3xl p-8 md:p-12 animate-slide-up hover-glow-primary">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Plans for Every Business
+              {t('home.plansForEveryBusiness')}
             </h2>
             <p className="text-muted-foreground mb-8 text-lg">
-              Start free with unlimited calculations. Upgrade for exports, saved businesses, and filing tools.
+              {t('home.startFreeWithUnlimited')}
             </p>
             <Link to="/pricing">
               <Button variant="outline" size="lg" className="group neon-border">
-                <span>View Pricing Plans</span>
+                <span>{t('home.viewPricingPlans')}</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>
@@ -285,15 +286,14 @@ const Index = () => {
         
         <div className="container mx-auto px-4 text-center relative z-10">
           <h2 className="mb-4 text-3xl md:text-4xl font-bold text-primary-foreground">
-            Ready to Optimize Your Taxes?
+            {t('home.readyToOptimize')}
           </h2>
           <p className="mx-auto mb-10 max-w-xl text-primary-foreground/90 text-lg">
-            Join thousands of Nigerian businesses making smarter tax decisions. 
-            Start with our free advisory tool.
+            {t('home.joinThousands')}
           </p>
           <Link to="/advisory">
             <Button variant="glowAccent" size="xl" className="shadow-2xl">
-              <span>Start Free Assessment</span>
+              <span>{t('home.startFreeAssessment')}</span>
               <ArrowRight className="h-5 w-5" />
             </Button>
           </Link>
@@ -312,16 +312,16 @@ const Index = () => {
             </div>
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm">
               {[
-                { to: "/pricing", label: "Pricing" },
-                { to: "/advisory", label: "Advisory" },
-                { to: "/calculator", label: "Calculator" },
-                { to: "/learn", label: "Learn" },
-                { to: "/tax-calendar", label: "Tax Calendar" },
-                { to: "/success-stories", label: "Success Stories" },
-                { to: "/referrals", label: "Refer Friends" },
+                { to: "/pricing", label: t('nav.pricing') },
+                { to: "/advisory", label: t('nav.getAdvice') },
+                { to: "/calculator", label: t('nav.calculator') },
+                { to: "/learn", label: t('nav.learn') },
+                { to: "/tax-calendar", label: t('nav.taxCalendar') },
+                { to: "/success-stories", label: t('stories.title') },
+                { to: "/referrals", label: t('nav.referrals') },
                 { to: "/roadmap", label: "Roadmap" },
-                { to: "/terms", label: "Terms & Privacy" },
-                { to: "/auth", label: "Sign In" },
+                { to: "/terms", label: t('footer.terms') },
+                { to: "/auth", label: t('common.signIn') },
               ].map((link) => (
                 <Link 
                   key={link.to}
@@ -333,7 +333,7 @@ const Index = () => {
               ))}
             </div>
             <p className="text-sm text-muted-foreground text-center">
-              © 2025 TaxForge NG. For educational purposes only.
+              {t('home.copyright')}
             </p>
           </div>
         </div>
