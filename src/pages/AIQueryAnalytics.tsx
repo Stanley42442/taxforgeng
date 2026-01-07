@@ -39,12 +39,9 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
   Legend,
-  AreaChart,
-  Area
 } from "recharts";
+import { ReusableAreaChart } from "@/components/ui/reusable-area-chart";
 import {
   Table,
   TableBody,
@@ -452,38 +449,29 @@ const AIQueryAnalytics = () => {
                 <CardDescription>Daily queries with positive/negative feedback</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={analytics?.dailyQueries || []}>
-                      <defs>
-                        <linearGradient id="colorQueries" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis dataKey="date" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                      <YAxis tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'hsl(var(--card))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }}
-                      />
-                      <Legend />
-                      <Area
-                        type="monotone"
-                        dataKey="count"
-                        stroke="hsl(var(--primary))"
-                        fill="url(#colorQueries)"
-                        name="Total Queries"
-                      />
-                      <Line type="monotone" dataKey="positive" stroke="hsl(var(--success))" name="Positive" strokeWidth={2} />
-                      <Line type="monotone" dataKey="negative" stroke="hsl(var(--destructive))" name="Negative" strokeWidth={2} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
+                <ReusableAreaChart
+                  data={analytics?.dailyQueries || []}
+                  series={[
+                    {
+                      dataKey: "count",
+                      name: "Total Queries",
+                      color: "hsl(var(--primary))",
+                    },
+                    {
+                      dataKey: "positive",
+                      name: "Positive",
+                      color: "hsl(var(--success))",
+                    },
+                    {
+                      dataKey: "negative",
+                      name: "Negative",
+                      color: "hsl(var(--destructive))",
+                    },
+                  ]}
+                  xAxisKey="date"
+                  height={300}
+                  emptyMessage="No query data available"
+                />
               </CardContent>
             </Card>
 
