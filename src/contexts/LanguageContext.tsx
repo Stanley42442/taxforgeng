@@ -2134,6 +2134,352 @@ export const translations: Translations = {
     ha: 'da suka wuce', 
     ig: 'gara aga' 
   },
+  
+  // Calculator page (new additions that don't duplicate)
+  'calculator.title': { 
+    en: 'Tax Calculator', 
+    pcm: 'Tax Calculator', 
+    yo: 'Ẹ̀rọ Ìṣirò Owó-orí', 
+    ha: 'Na\'urar Ƙididdiga Haraji', 
+    ig: 'Ngwa Mgbako Ụtụ' 
+  },
+  'calculator.subtitle': { 
+    en: 'Calculate your Nigerian taxes accurately', 
+    pcm: 'Calculate your Nigeria tax correct', 
+    yo: 'Ṣe ìṣirò owó-orí Nàìjíríà rẹ dájúdájú', 
+    ha: 'Ƙididdige harajin Najeriya daidai', 
+    ig: 'Gbakọọ ụtụ Naịjirịa gị nke ọma' 
+  },
+  'calculator.firsCompliant': { 
+    en: 'FIRS Compliant Calculator', 
+    pcm: 'FIRS Approved Calculator', 
+    yo: 'Ẹ̀rọ Ìṣirò Tó Bá FIRS Mu', 
+    ha: 'Na\'urar Ƙididdiga ta FIRS', 
+    ig: 'Ngwa Mgbako Kwekọrọ na FIRS' 
+  },
+  'calculator.selectBusiness': { 
+    en: 'Select Business', 
+    pcm: 'Choose Business', 
+    yo: 'Yan Iṣẹ́', 
+    ha: 'Zaɓi Kasuwanci', 
+    ig: 'Họrọ Azụmaahịa' 
+  },
+  'calculator.newCalculation': { 
+    en: 'New Calculation', 
+    pcm: 'New Calculation', 
+    yo: 'Ìṣirò Tuntun', 
+    ha: 'Sabon Ƙididdiga', 
+    ig: 'Mgbako Ọhụrụ' 
+  },
+  'calculator.annualTurnover': { 
+    en: 'Annual Turnover', 
+    pcm: 'Yearly Sales', 
+    yo: 'Ìyípadà Ọdún', 
+    ha: 'Juyawa ta Shekara', 
+    ig: 'Ntụgharị Afọ' 
+  },
+  'calculator.calculateNow': { 
+    en: 'Calculate Now', 
+    pcm: 'Calculate Now', 
+    yo: 'Ṣe Ìṣirò Báyìí', 
+    ha: 'Ƙididdige Yanzu', 
+    ig: 'Gbakọọ Ugbu A' 
+  },
+  'calculator.businessNameOption': { 
+    en: 'Business Name', 
+    pcm: 'Business Name', 
+    yo: 'Orúkọ Iṣẹ́', 
+    ha: 'Sunan Kasuwanci', 
+    ig: 'Aha Azụmaahịa' 
+  },
+  'calculator.companyOption': { 
+    en: 'Company (LTD)', 
+    pcm: 'Company (LTD)', 
+    yo: 'Ilé-iṣẹ́ (LTD)', 
+    ha: 'Kamfani (LTD)', 
+    ig: 'Ụlọ Ọrụ (LTD)' 
+  },
+  'calculator.use2026Rules': { 
+    en: 'Nigeria Tax Act 2025 Rules', 
+    pcm: 'Nigeria Tax Act 2025 Rules', 
+    yo: 'Àwọn Òfin Àṣà Owó-orí Nàìjíríà 2025', 
+    ha: 'Dokokin Dokar Haraji ta Najeriya 2025', 
+    ig: 'Iwu Iwu Ụtụ Naịjirịa 2025' 
+  },
+  'calculator.currentRules': { 
+    en: 'Current (Pre-2026) Rules', 
+    pcm: 'Old Rules (Before 2026)', 
+    yo: 'Àwọn Òfin Lọ́wọ́lọ́wọ́ (Ṣáájú-2026)', 
+    ha: 'Dokokin Yanzu (Kafin-2026)', 
+    ig: 'Iwu Ugbu A (Tupu-2026)' 
+  },
+  
+  // Learn page
+  'learn.title': { 
+    en: 'Tax Academy', 
+    pcm: 'Tax School', 
+    yo: 'Ilé-ẹ̀kọ́ Owó-orí', 
+    ha: 'Makarantar Haraji', 
+    ig: 'Ụlọ Akwụkwọ Ụtụ' 
+  },
+  'learn.subtitle': { 
+    en: 'Master Nigerian tax rules • Bust common myths • Learn sector incentives', 
+    pcm: 'Learn Nigeria tax rules • Clear your doubt • Know your sector', 
+    yo: 'Ṣàkóso àwọn òfin owó-orí Nàìjíríà • Fọ́ àwọn ìtàn àlọ́sọ̀kan • Kọ́ àwọn ìdásílẹ̀ ẹ̀ka', 
+    ha: 'Ƙware dokokin harajin Najeriya • Karya tatsuniyoyi na yau da kullun • Koyi abubuwan karfafawa', 
+    ig: 'Chịkwaa iwu ụtụ Naịjirịa • Kụrie akụkọ ifo • Mụta ihe mkpali' 
+  },
+  'learn.yourTaxTips': { 
+    en: 'Your Tax Tips', 
+    pcm: 'Your Tax Tips', 
+    yo: 'Àwọn Ìmọ̀ràn Owó-orí Rẹ', 
+    ha: 'Shawarwarin Harajin Ku', 
+    ig: 'Ndụmọdụ Ụtụ Gị' 
+  },
+  'learn.myths': { 
+    en: 'Myths', 
+    pcm: 'Myths', 
+    yo: 'Àwọn Ìtàn Àlọ́', 
+    ha: 'Tatsuniyoyi', 
+    ig: 'Akụkọ Ifo' 
+  },
+  'learn.videos': { 
+    en: 'Videos', 
+    pcm: 'Videos', 
+    yo: 'Àwọn Fídíò', 
+    ha: 'Bidiyo', 
+    ig: 'Vidiyo' 
+  },
+  'learn.sectors': { 
+    en: 'Sectors', 
+    pcm: 'Sectors', 
+    yo: 'Àwọn Ẹ̀ka', 
+    ha: 'Sassan', 
+    ig: 'Ngalaba' 
+  },
+  'learn.articles': { 
+    en: 'Articles', 
+    pcm: 'Articles', 
+    yo: 'Àwọn Àpilẹ̀kọ', 
+    ha: 'Labaran', 
+    ig: 'Edemede' 
+  },
+  'learn.faqs': { 
+    en: 'FAQs', 
+    pcm: 'Questions', 
+    yo: 'Àwọn Ìbéèrè', 
+    ha: 'Tambayoyi', 
+    ig: 'Ajụjụ' 
+  },
+  
+  // Referrals page (additional)
+  'referral.inviteFriends': { 
+    en: 'Invite Friends, Earn Rewards', 
+    pcm: 'Bring Your Friends, Get Bonus', 
+    yo: 'Pe Àwọn Ọ̀rẹ́, Gba Ẹ̀bùn', 
+    ha: 'Gayyato Abokai, Sami Lada', 
+    ig: 'Kpọọ Ndị Enyi, Nweta Ụgwọ' 
+  },
+  'referral.freeMonthsEarned': { 
+    en: 'Free Months Earned', 
+    pcm: 'Free Months You Get', 
+    yo: 'Àwọn Oṣù Ọ̀fẹ́ Tí O Gba', 
+    ha: 'Watanni Kyauta da Aka Samu', 
+    ig: 'Ọnwa N\'efu Ị Nwetara' 
+  },
+  'referral.yourLink': { 
+    en: 'Your Referral Link', 
+    pcm: 'Your Referral Link', 
+    yo: 'Ìjápọ̀ Ìpè Rẹ', 
+    ha: 'Hanyar Gayyatar Ku', 
+    ig: 'Njikọ Nkpọpụta Gị' 
+  },
+  'referral.shareYourLink': { 
+    en: 'Share Your Link', 
+    pcm: 'Share Your Link', 
+    yo: 'Pin Ìjápọ̀ Rẹ', 
+    ha: 'Raba Hanyar Ku', 
+    ig: 'Kesaa Njikọ Gị' 
+  },
+  'referral.friendSignsUp': { 
+    en: 'Friend Signs Up', 
+    pcm: 'Friend Register', 
+    yo: 'Ọ̀rẹ́ Forúkọ sílẹ̀', 
+    ha: 'Aboki Ya Yi Rajista', 
+    ig: 'Enyi Debanye Aha' 
+  },
+  'referral.earnRewards': { 
+    en: 'Earn Rewards', 
+    pcm: 'Get Bonus', 
+    yo: 'Gba Ẹ̀bùn', 
+    ha: 'Sami Lada', 
+    ig: 'Nweta Ụgwọ' 
+  },
+  'referral.history': { 
+    en: 'Referral History', 
+    pcm: 'Referral History', 
+    yo: 'Ìtàn Ìpè', 
+    ha: 'Tarihin Gayyata', 
+    ig: 'Akụkọ Nkpọpụta' 
+  },
+  'referral.noReferrals': { 
+    en: 'No referrals yet', 
+    pcm: 'No referral yet', 
+    yo: 'Kò sí ìpè síbẹ̀', 
+    ha: 'Babu gayyata har yanzu', 
+    ig: 'Ọ dịghị nkpọpụta ka ugbu a' 
+  },
+  
+  // Advisory page
+  'advisory.title': { 
+    en: 'Business Advisory', 
+    pcm: 'Business Advice', 
+    yo: 'Ìmọ̀ràn Iṣẹ́', 
+    ha: 'Shawarar Kasuwanci', 
+    ig: 'Ndụmọdụ Azụmaahịa' 
+  },
+  'advisory.ourRecommendation': { 
+    en: 'Our Recommendation', 
+    pcm: 'What We Recommend', 
+    yo: 'Àbá Wa', 
+    ha: 'Shawarar Mu', 
+    ig: 'Ntụnye Anyị' 
+  },
+  'advisory.match': { 
+    en: 'Match', 
+    pcm: 'Match', 
+    yo: 'Ìbámu', 
+    ha: 'Daidaici', 
+    ig: 'Ndakọrịta' 
+  },
+  'advisory.advantages': { 
+    en: 'Advantages', 
+    pcm: 'Good Things', 
+    yo: 'Àwọn Ànfààní', 
+    ha: 'Fa\'idodi', 
+    ig: 'Uru' 
+  },
+  'advisory.considerations': { 
+    en: 'Considerations', 
+    pcm: 'Things To Think About', 
+    yo: 'Àwọn Ohun Tí A Gbọ́dọ̀ Rò', 
+    ha: 'Abubuwan Da Za A Yi La\'akari', 
+    ig: 'Ihe A Ga-Atụle' 
+  },
+  'advisory.taxAuthority': { 
+    en: 'Tax Authority', 
+    pcm: 'Tax Office', 
+    yo: 'Aṣẹ Owó-orí', 
+    ha: 'Hukumar Haraji', 
+    ig: 'Ọchịchị Ụtụ' 
+  },
+  'advisory.registrationCost': { 
+    en: 'Registration Cost', 
+    pcm: 'Registration Cost', 
+    yo: 'Iye Ìforúkọsílẹ̀', 
+    ha: 'Kudin Rajista', 
+    ig: 'Ọnụ Ahịa Ndebanye Aha' 
+  },
+  'advisory.annualCompliance': { 
+    en: 'Annual Compliance', 
+    pcm: 'Yearly Cost', 
+    yo: 'Ìdúróṣinṣin Ọdún', 
+    ha: 'Bin Doka na Shekara-shekara', 
+    ig: 'Ịdebe Iwu Afọ' 
+  },
+  'advisory.calculateTaxes': { 
+    en: 'Calculate Your Taxes', 
+    pcm: 'Calculate Your Tax', 
+    yo: 'Ṣe Ìṣirò Owó-orí Rẹ', 
+    ha: 'Ƙididdige Harajin Ku', 
+    ig: 'Gbakọọ Ụtụ Gị' 
+  },
+  'advisory.startOver': { 
+    en: 'Start Over', 
+    pcm: 'Start Again', 
+    yo: 'Bẹ̀rẹ̀ Láti Ìbẹ̀rẹ̀', 
+    ha: 'Fara Daga Farko', 
+    ig: 'Malite Ọzọ' 
+  },
+  'advisory.skipToCalculator': { 
+    en: 'Skip to Calculator', 
+    pcm: 'Go Straight to Calculator', 
+    yo: 'Fò Lọ sí Ẹ̀rọ Ìṣirò', 
+    ha: 'Tsallake zuwa Na\'ura', 
+    ig: 'Wụfee Gaa Ngwa Mgbako' 
+  },
+  'advisory.question': { 
+    en: 'Question', 
+    pcm: 'Question', 
+    yo: 'Ìbéèrè', 
+    ha: 'Tambaya', 
+    ig: 'Ajụjụ' 
+  },
+  'advisory.complete': { 
+    en: 'Complete', 
+    pcm: 'Done', 
+    yo: 'Parí', 
+    ha: 'An Kammala', 
+    ig: 'Mezue' 
+  },
+  
+  // Tax Calendar page
+  'taxCalendar.title': { 
+    en: 'Tax Calendar', 
+    pcm: 'Tax Calendar', 
+    yo: 'Kàlẹ́ndà Owó-orí', 
+    ha: 'Kalandar Haraji', 
+    ig: 'Kalenda Ụtụ' 
+  },
+  'taxCalendar.subtitle': { 
+    en: 'Track all Nigerian tax deadlines in one place', 
+    pcm: 'See all Nigeria tax deadline for one place', 
+    yo: 'Tọpinpin gbogbo àkókò ìparí owó-orí Nàìjíríà ní ibi kan', 
+    ha: 'Bin sawun duk ƙarshen harajin Najeriya a wuri ɗaya', 
+    ig: 'Soro oge njedebe ụtụ Naịjirịa niile n\'otu ebe' 
+  },
+  'taxCalendar.exportToCalendar': { 
+    en: 'Export to Calendar', 
+    pcm: 'Download Calendar', 
+    yo: 'Gbé Jáde sí Kàlẹ́ndà', 
+    ha: 'Fitar zuwa Kalanda', 
+    ig: 'Bupụ na Kalenda' 
+  },
+  'taxCalendar.upcomingDeadlines': { 
+    en: 'Upcoming Deadlines', 
+    pcm: 'Deadline Wey Dey Come', 
+    yo: 'Àwọn Àkókò Ìparí Tó Ń Bọ̀', 
+    ha: 'Lokutan ƙarshe masu zuwa', 
+    ig: 'Oge njedebe na-abịa' 
+  },
+  'taxCalendar.noDeadlines': { 
+    en: 'No deadlines on this date', 
+    pcm: 'No deadline for this date', 
+    yo: 'Kò sí àkókò ìparí ní ọjọ́ yìí', 
+    ha: 'Babu ƙarshen lokaci a wannan ranar', 
+    ig: 'Ọ dịghị oge njedebe n\'ụbọchị a' 
+  },
+  'taxCalendar.today': { 
+    en: 'Today', 
+    pcm: 'Today', 
+    yo: 'Lónìí', 
+    ha: 'Yau', 
+    ig: 'Taa' 
+  },
+  'taxCalendar.tomorrow': { 
+    en: 'Tomorrow', 
+    pcm: 'Tomorrow', 
+    yo: 'Lọ́la', 
+    ha: 'Gobe', 
+    ig: 'Echi' 
+  },
+  'taxCalendar.days': { 
+    en: 'days', 
+    pcm: 'days', 
+    yo: 'ọjọ́', 
+    ha: 'kwanaki', 
+    ig: 'ụbọchị' 
+  },
 };
 
 // Helper function to get toast messages
