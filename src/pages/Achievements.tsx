@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useAchievements } from "@/hooks/useAchievements";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Trophy,
   Star,
@@ -39,6 +40,7 @@ const Achievements = () => {
   const { tier } = useSubscription();
   const { stats, earnedBadges, loading } = useAchievements();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const isBasicPlus = tier !== 'free';
 
   const getLevel = (points: number) => {

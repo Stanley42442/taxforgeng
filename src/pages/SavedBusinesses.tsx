@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   Building2, 
   Briefcase,
@@ -39,6 +40,7 @@ import {
 
 const SavedBusinesses = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const { 
     tier, 
     savedBusinesses, 

@@ -13,6 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   User, 
   Briefcase,
@@ -38,6 +39,7 @@ type CalculationType = 'pit' | 'crypto' | 'investment' | 'informal' | 'foreign_i
 
 const IndividualCalculatorPage = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [use2026Rules, setUse2026Rules] = useState(true);
   const [calculationType, setCalculationType] = useState<CalculationType>('pit');
   

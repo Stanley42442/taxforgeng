@@ -1,6 +1,7 @@
 import { NavMenu } from "@/components/NavMenu";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   FileText, 
   Shield, 
@@ -15,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 
 const Terms = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const lastUpdated = "December 20, 2025";
 
   return (
