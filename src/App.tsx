@@ -11,6 +11,9 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { ReminderNotificationProvider } from "@/components/ReminderNotificationProvider";
 import { TrialBanner } from "@/components/TrialBanner";
 import { TierSelectionWrapper } from "@/components/TierSelectionWrapper";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
+import { InstallPWAPrompt } from "@/components/InstallPWAPrompt";
 import { lazy, Suspense } from "react";
 
 // Eagerly load Index for fast initial render
@@ -64,12 +67,13 @@ const PageLoader = () => (
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="light" storageKey="taxforge-ng-theme">
-      <AuthProvider>
-        <AuthLoadingScreen>
-          <SubscriptionProvider>
-            <TooltipProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="light" storageKey="taxforge-ng-theme">
+        <AuthProvider>
+          <AuthLoadingScreen>
+            <SubscriptionProvider>
+              <TooltipProvider>
               <Toaster />
               <Sonner />
               <BrowserRouter>
@@ -112,9 +116,14 @@ const App = () => (
                     <Route path="/individual-calculator" element={<IndividualCalculator />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/security" element={<SecurityDashboard />} />
+                    <Route path="/referrals" element={<Referrals />} />
+                    <Route path="/tax-calendar" element={<TaxCalendar />} />
+                    <Route path="/success-stories" element={<SuccessStoriesPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                   <TaxAssistant />
+                  <OfflineIndicator />
+                  <InstallPWAPrompt />
                 </Suspense>
               </BrowserRouter>
             </TooltipProvider>
@@ -123,6 +132,7 @@ const App = () => (
       </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

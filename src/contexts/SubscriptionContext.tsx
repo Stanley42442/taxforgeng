@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
-export type SubscriptionTier = 'free' | 'basic' | 'freelancer' | 'business' | 'corporate';
+export type SubscriptionTier = 'free' | 'starter' | 'basic' | 'freelancer' | 'business' | 'corporate';
 
 export interface CACVerificationDetails {
   companyName: string;
@@ -59,6 +59,7 @@ interface SubscriptionContextType extends SubscriptionState {
 
 const TIER_LIMITS: Record<SubscriptionTier, number | 'unlimited'> = {
   free: 0,
+  starter: 1,
   basic: 2,
   freelancer: 5,
   business: 10,
