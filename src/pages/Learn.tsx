@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Accordion,
@@ -60,6 +61,7 @@ import { Progress } from "@/components/ui/progress";
 const Learn = () => {
   const { tier, savedBusinesses } = useSubscription();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("myths");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -302,10 +304,10 @@ const Learn = () => {
               <GraduationCap className="h-10 w-10 text-primary-foreground" />
             </div>
             <h1 className="text-4xl font-bold text-foreground mb-3">
-              Tax Academy
+              {t('learn.title')}
             </h1>
             <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-              Master Nigerian tax rules • Bust common myths • Learn sector incentives
+              {t('learn.subtitle')}
             </p>
           </div>
 
@@ -313,7 +315,7 @@ const Learn = () => {
           {answeredQuizzes > 0 && (
             <div className="glass-frosted rounded-2xl p-4 mb-6 animate-slide-up">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-foreground">Quiz Progress</span>
+                <span className="text-sm font-medium text-foreground">{t('learn.quizProgress')}</span>
                 <span className="text-sm text-muted-foreground">
                   {correctQuizzes}/{answeredQuizzes} correct
                 </span>
@@ -328,7 +330,7 @@ const Learn = () => {
               <div className="p-2 rounded-xl bg-warning/10">
                 <Sparkles className="h-5 w-5 text-warning" />
               </div>
-              Your Tax Tips
+              {t('learn.yourTaxTips')}
             </h2>
             <div className="grid gap-4 sm:grid-cols-2">
               {personalizedTips.map((tip, index) => (
