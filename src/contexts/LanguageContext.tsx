@@ -1450,6 +1450,62 @@ export const translations: Translations = {
     ha: 'Sanarwar Imel', 
     ig: 'Ọkwa Email' 
   },
+  'settings.emailStatus': { 
+    en: 'Email Status', 
+    pcm: 'Email Status', 
+    yo: 'Ipò Ímeèlì', 
+    ha: 'Matsayin Imel', 
+    ig: 'Ọnọdụ Email' 
+  },
+  'settings.verified': { 
+    en: 'Verified', 
+    pcm: 'Verified', 
+    yo: 'Ti Jẹ́rìí', 
+    ha: 'An Tabbatar', 
+    ig: 'Eziri' 
+  },
+  'settings.unverified': { 
+    en: 'Unverified', 
+    pcm: 'Unverified', 
+    yo: 'Kò Tí Jẹ́rìí', 
+    ha: 'Ba A Tabbatar Ba', 
+    ig: 'Ezighị Ezi' 
+  },
+  'settings.twoFactorStatus': { 
+    en: '2FA Status', 
+    pcm: '2FA Status', 
+    yo: 'Ipò 2FA', 
+    ha: 'Matsayin 2FA', 
+    ig: 'Ọnọdụ 2FA' 
+  },
+  'settings.enabled': { 
+    en: 'Enabled', 
+    pcm: 'Enabled', 
+    yo: 'Ń Ṣiṣẹ́', 
+    ha: 'An Kunna', 
+    ig: 'Enyere Ike' 
+  },
+  'settings.disabled': { 
+    en: 'Disabled', 
+    pcm: 'Disabled', 
+    yo: 'Kò Ṣiṣẹ́', 
+    ha: 'An Kashe', 
+    ig: 'Agbanyụrụ' 
+  },
+  'settings.backupCodes': { 
+    en: 'Backup Codes', 
+    pcm: 'Backup Codes', 
+    yo: 'Àwọn Kóòdù Ìtọ́jú', 
+    ha: 'Lambobin Ajiya', 
+    ig: 'Koodu Nchekwa' 
+  },
+  'settings.recentActivity': { 
+    en: 'Recent Activity', 
+    pcm: 'Recent Activity', 
+    yo: 'Ìṣe Àìpẹ́', 
+    ha: 'Ayyukan Kwanan Nan', 
+    ig: 'Ọrụ Na-adịbeghị' 
+  },
   
   // Auth
   'auth.signIn': { 
@@ -2347,6 +2403,20 @@ export const translations: Translations = {
     yo: 'Àwọn Ìbéèrè', 
     ha: 'Tambayoyi', 
     ig: 'Ajụjụ' 
+  },
+  'learn.searchPlaceholder': { 
+    en: 'Search myths, guides, articles...', 
+    pcm: 'Find myths, guides, articles...', 
+    yo: 'Wá àwọn ìtàn àlọ́, ìtọ́nisọ́nà, àpilẹ̀kọ...', 
+    ha: 'Bincika tatsuniyoyi, jagororori, labarai...', 
+    ig: 'Chọọ akụkọ ifo, nduzi, edemede...' 
+  },
+  'learn.quizProgress': { 
+    en: 'Quiz Progress', 
+    pcm: 'Quiz Progress', 
+    yo: 'Ìlọsíwájú Ìdánwò', 
+    ha: 'Ci gaban Jarrabawa', 
+    ig: 'Ọganihu Ajụjụ' 
   },
   
   // Referrals page (additional)
