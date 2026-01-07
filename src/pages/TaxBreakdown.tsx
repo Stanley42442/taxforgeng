@@ -15,6 +15,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 const TaxBreakdown = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const result = location.state?.result as TaxResult | undefined;
   const inputs = location.state?.inputs as TaxInputs | undefined;
 
@@ -24,10 +25,10 @@ const TaxBreakdown = () => {
         <NavMenu />
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-foreground mb-4">No Results</h1>
-            <p className="text-muted-foreground mb-6">Please use the calculator first</p>
+            <h1 className="text-2xl font-bold text-foreground mb-4">{t('breakdown.noResults')}</h1>
+            <p className="text-muted-foreground mb-6">{t('results.useCalculatorFirst')}</p>
             <Link to="/calculator">
-              <Button variant="hero">Go to Calculator</Button>
+              <Button variant="hero">{t('results.goToCalculator')}</Button>
             </Link>
           </div>
         </div>
@@ -226,7 +227,7 @@ Effective Tax Rate = ${result.effectiveRate.toFixed(2)}%`,
             onClick={() => navigate('/results', { state: { result, inputs } })}
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Results
+            {t('breakdown.backToResults')}
           </Button>
 
           {/* Header */}
@@ -235,10 +236,10 @@ Effective Tax Rate = ${result.effectiveRate.toFixed(2)}%`,
               <BookOpen className="h-8 w-8 text-primary-foreground" />
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              Step-by-Step Breakdown
+              {t('breakdown.title')}
             </h1>
             <p className="text-muted-foreground">
-              Understanding exactly how your {formatCurrency(result.totalTaxPayable)} tax was calculated
+              {t('breakdown.understanding').replace('{amount}', formatCurrency(result.totalTaxPayable))}
             </p>
           </div>
 
@@ -246,11 +247,11 @@ Effective Tax Rate = ${result.effectiveRate.toFixed(2)}%`,
           <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">
             <div className="grid grid-cols-2 gap-4 text-center">
               <div>
-                <p className="text-sm text-muted-foreground">Gross Income</p>
+                <p className="text-sm text-muted-foreground">{t('breakdown.grossIncome')}</p>
                 <p className="text-2xl font-bold text-foreground">{formatCurrency(result.grossIncome)}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Total Tax</p>
+                <p className="text-sm text-muted-foreground">{t('breakdown.totalTax')}</p>
                 <p className="text-2xl font-bold text-primary">{formatCurrency(result.totalTaxPayable)}</p>
               </div>
             </div>
@@ -292,7 +293,7 @@ Effective Tax Rate = ${result.effectiveRate.toFixed(2)}%`,
             <div className="mt-6 pt-6 border-t border-border">
               <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                 <BookOpen className="h-5 w-5 text-primary" />
-                Learn More
+                {t('breakdown.learnMore')}
               </h3>
               <div className="grid gap-2 sm:grid-cols-2">
                 <Link 
@@ -300,28 +301,28 @@ Effective Tax Rate = ${result.effectiveRate.toFixed(2)}%`,
                   className="flex items-center gap-2 p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors text-sm"
                 >
                   <CheckCircle2 className="h-4 w-4 text-success" />
-                  Understanding Nigerian Tax Rates
+                  {t('breakdown.understandingRates')}
                 </Link>
                 <Link 
                   to="/learn" 
                   className="flex items-center gap-2 p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors text-sm"
                 >
                   <CheckCircle2 className="h-4 w-4 text-success" />
-                  2026 Tax Reform Explained
+                  {t('breakdown.reformExplained')}
                 </Link>
                 <Link 
                   to="/learn" 
                   className="flex items-center gap-2 p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors text-sm"
                 >
                   <CheckCircle2 className="h-4 w-4 text-success" />
-                  VAT Registration Guide
+                  {t('breakdown.vatGuide')}
                 </Link>
                 <Link 
                   to="/learn" 
                   className="flex items-center gap-2 p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors text-sm"
                 >
                   <CheckCircle2 className="h-4 w-4 text-success" />
-                  Maximizing Tax Reliefs
+                  {t('breakdown.maximizingReliefs')}
                 </Link>
               </div>
             </div>
@@ -329,7 +330,7 @@ Effective Tax Rate = ${result.effectiveRate.toFixed(2)}%`,
 
           {/* Disclaimer */}
           <p className="text-xs text-muted-foreground text-center mt-6">
-            This breakdown is for educational purposes. Consult a tax professional for official advice.
+            {t('breakdown.disclaimer')}
           </p>
         </div>
       </main>

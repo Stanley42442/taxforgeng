@@ -91,10 +91,10 @@ const Results = () => {
         <NavMenu />
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-foreground mb-4">No Results</h1>
-            <p className="text-muted-foreground mb-6">Please use the calculator first</p>
+            <h1 className="text-2xl font-bold text-foreground mb-4">{t('results.noResults')}</h1>
+            <p className="text-muted-foreground mb-6">{t('results.useCalculatorFirst')}</p>
             <Link to="/calculator">
-              <Button variant="hero">Go to Calculator</Button>
+              <Button variant="hero">{t('results.goToCalculator')}</Button>
             </Link>
           </div>
         </div>
@@ -218,7 +218,7 @@ const Results = () => {
             onClick={() => navigate('/calculator', { state: { entityType: inputs.entityType } })}
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Calculator
+            {t('results.backToCalculator')}
           </Button>
 
           {/* Header */}
@@ -227,7 +227,7 @@ const Results = () => {
               <FileText className="h-8 w-8 text-primary-foreground" />
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              Tax Calculation Results
+              {t('results.title')}
             </h1>
             <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
               <span className="flex items-center gap-1">
@@ -238,7 +238,7 @@ const Results = () => {
                 {result.entityType}
               </span>
               <span className="text-border">•</span>
-              <span>{inputs.use2026Rules ? '2026 Rules' : 'Pre-2026 Rules'}</span>
+              <span>{inputs.use2026Rules ? t('results.rules2026') : t('results.rulesPre2026')}</span>
             </div>
           </div>
 
@@ -247,7 +247,7 @@ const Results = () => {
             <Link to="/tax-breakdown" state={{ result, inputs }}>
               <Button variant="hero">
                 <ListOrdered className="h-4 w-4" />
-                View Breakdown
+                {t('results.viewBreakdown')}
               </Button>
             </Link>
             <Button
@@ -255,7 +255,7 @@ const Results = () => {
               onClick={() => setShowComparison(!showComparison)}
             >
               <BarChart3 className="h-4 w-4" />
-              {showComparison ? 'Hide' : 'Show'} Comparison
+              {showComparison ? t('results.hideComparison') : t('results.showComparison')}
             </Button>
             <Button
               variant="outline"
@@ -263,7 +263,7 @@ const Results = () => {
               disabled={tier === 'free'}
             >
               <Save className="h-4 w-4" />
-              Save Business
+              {t('results.saveBusiness')}
               {tier === 'free' && <Lock className="h-3 w-3 ml-1" />}
             </Button>
             <Button variant="outline" onClick={exportToPDF}>
@@ -281,7 +281,7 @@ const Results = () => {
             <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">
               <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-primary" />
-                Entity Comparison Dashboard
+                {t('results.entityComparisonDashboard')}
               </h3>
               
               {/* Recommendation Banner */}
@@ -294,8 +294,8 @@ const Results = () => {
                   betterOption === inputs.entityType ? 'text-success' : 'text-warning'
                 }`}>
                   {betterOption === inputs.entityType 
-                    ? '✓ You selected the optimal structure!' 
-                    : `💡 Switching to ${betterOption === 'company' ? 'Limited Company' : 'Business Name'} could save you ${formatCurrency(Math.abs(savings))}/year`
+                    ? `✓ ${t('results.optimalStructure')}` 
+                    : `💡 ${t('results.switchingSaves').replace('{entity}', betterOption === 'company' ? t('results.limitedCompany') : t('results.businessName')).replace('{amount}', formatCurrency(Math.abs(savings)))}`
                   }
                 </p>
               </div>
@@ -310,32 +310,32 @@ const Results = () => {
                 }`}>
                   <div className="flex items-center gap-2 mb-4">
                     <Briefcase className="h-5 w-5 text-primary" />
-                    <h4 className="font-semibold text-foreground">Business Name</h4>
+                    <h4 className="font-semibold text-foreground">{t('results.businessName')}</h4>
                     {inputs.entityType === 'business_name' && (
-                      <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">Current</span>
+                      <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">{t('results.current')}</span>
                     )}
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Tax Payable</span>
+                      <span className="text-muted-foreground">{t('results.taxPayable')}</span>
                       <span className="font-semibold text-foreground">{formatCurrency(businessResult.totalTaxPayable)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Effective Rate</span>
+                      <span className="text-muted-foreground">{t('results.effectiveRate')}</span>
                       <span className="font-medium text-foreground">{businessResult.effectiveRate.toFixed(2)}%</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Income Tax</span>
+                      <span className="text-muted-foreground">{t('results.incomeTax')}</span>
                       <span className="text-foreground">{formatCurrency(businessResult.incomeTax)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">VAT</span>
+                      <span className="text-muted-foreground">{t('results.vat')}</span>
                       <span className="text-foreground">{formatCurrency(businessResult.vatPayable)}</span>
                     </div>
                   </div>
                   <div className="mt-4 pt-4 border-t border-border">
                     <p className="text-xs text-muted-foreground">
-                      Personal Income Tax via State IRS. Simpler compliance, unlimited liability.
+                      {t('results.pitDescription')}
                     </p>
                   </div>
                 </div>
@@ -348,38 +348,38 @@ const Results = () => {
                 }`}>
                   <div className="flex items-center gap-2 mb-4">
                     <Building2 className="h-5 w-5 text-primary" />
-                    <h4 className="font-semibold text-foreground">Limited Company</h4>
+                    <h4 className="font-semibold text-foreground">{t('results.limitedCompany')}</h4>
                     {inputs.entityType === 'company' && (
-                      <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">Current</span>
+                      <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">{t('results.current')}</span>
                     )}
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Tax Payable</span>
+                      <span className="text-muted-foreground">{t('results.taxPayable')}</span>
                       <span className="font-semibold text-foreground">{formatCurrency(companyResult.totalTaxPayable)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Effective Rate</span>
+                      <span className="text-muted-foreground">{t('results.effectiveRate')}</span>
                       <span className="font-medium text-foreground">{companyResult.effectiveRate.toFixed(2)}%</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">CIT</span>
+                      <span className="text-muted-foreground">{t('results.cit')}</span>
                       <span className="text-foreground">{formatCurrency(companyResult.incomeTax)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Dev Levy</span>
+                      <span className="text-muted-foreground">{t('results.devLevy')}</span>
                       <span className="text-foreground">{formatCurrency(companyResult.developmentLevy)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">VAT</span>
+                      <span className="text-muted-foreground">{t('results.vat')}</span>
                       <span className="text-foreground">{formatCurrency(companyResult.vatPayable)}</span>
                     </div>
                   </div>
                   <div className="mt-4 pt-4 border-t border-border">
                     <p className="text-xs text-muted-foreground">
                       {companyResult.isSmallCompany 
-                        ? '0% CIT (Small Company). Limited liability protection.'
-                        : 'CIT via FIRS. Limited liability, better for scaling.'
+                        ? t('results.smallCompanyCIT')
+                        : t('results.citDescription')
                       }
                     </p>
                   </div>

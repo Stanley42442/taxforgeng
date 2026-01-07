@@ -3432,13 +3432,6 @@ export const translations: Translations = {
   'pricing.startFreeTrial': { en: 'Start Free Trial', pcm: 'Start Free Trial', yo: 'Bẹ̀rẹ̀ Ìdánwò Ọ̀fẹ́', ha: 'Fara Gwajin Kyauta', ig: 'Malite Nnwale N\'efu' },
   'pricing.freeForever': { en: 'Free Forever', pcm: 'Free Forever', yo: 'Ọ̀fẹ́ Láéláé', ha: 'Kyauta Har Abada', ig: 'N\'efu Ruo Mgbe Ebighị Ebi' },
 
-  // Referrals Page
-  'referral.totalReferrals': { en: 'Total Referrals', pcm: 'Total Referrals', yo: 'Àpapọ̀ Àwọn Ìtọ́kasí', ha: 'Jimlar Bayar da Shawarwari', ig: 'Mkpokọta Ntụnye Aha' },
-  'referral.freeMonthsEarned': { en: 'Free Months Earned', pcm: 'Free Months Earned', yo: 'Àwọn Oṣù Ọ̀fẹ́ Tí A Jèrè', ha: 'Watanni Kyauta da Aka Samu', ig: 'Ọnwa N\'efu Enwetara' },
-  'referral.yourLink': { en: 'Your Referral Link', pcm: 'Your Referral Link', yo: 'Ìjápọ̀ Ìtọ́kasí Rẹ', ha: 'Hanyar Haɗin Bayar da Shawarar Ku', ig: 'Njikọ Ntụnye Aha Gị' },
-  'referral.shareThisLink': { en: 'Share this link with friends', pcm: 'Share this link with your padi dem', yo: 'Pin ìjápọ̀ yìí pẹ̀lú àwọn ọ̀rẹ́', ha: 'Raba wannan hanyar haɗi da abokai', ig: 'Kekọrịta njikọ a na ndị enyi' },
-  'referral.history': { en: 'Referral History', pcm: 'Referral History', yo: 'Ìtàn Ìtọ́kasí', ha: 'Tarihin Bayar da Shawarwari', ig: 'Akụkọ Ntụnye Aha' },
-  'referral.noReferralsYet': { en: 'No referrals yet. Share your link to get started!', pcm: 'No referral yet. Share your link to start!', yo: 'Kò sí ìtọ́kasí síbẹ̀. Pin ìjápọ̀ rẹ láti bẹ̀rẹ̀!', ha: 'Babu bayar da shawara har yanzu. Raba hanyar haɗin ku don fara!', ig: 'Enweghị ntụnye aha. Kekọrịta njikọ gị iji malite!' },
 };
 
 // Helper function to get toast messages

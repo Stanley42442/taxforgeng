@@ -93,7 +93,7 @@ export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
   const defaultTrigger = (
     <Button variant="outline" size="sm" className="gap-2">
       <MessageSquare className="h-4 w-4" />
-      Feedback
+      {t('feedback.giveFeedback')}
     </Button>
   );
 
@@ -108,25 +108,25 @@ export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-success/20">
               <CheckCircle2 className="h-8 w-8 text-success" />
             </div>
-            <h3 className="text-xl font-bold text-foreground mb-2">Thank You!</h3>
-            <p className="text-muted-foreground">Your feedback helps us improve TaxForge NG.</p>
+            <h3 className="text-xl font-bold text-foreground mb-2">{t('feedback.thankYou')}</h3>
+            <p className="text-muted-foreground">{t('feedback.helpUsImprove')}</p>
           </div>
         ) : (
           <>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <MessageSquare className="h-5 w-5 text-primary" />
-                Give Feedback
+                {t('feedback.giveFeedback')}
               </DialogTitle>
               <DialogDescription>
-                Help us improve TaxForge NG. Your feedback is valuable!
+                {t('feedback.helpUsImprove')}
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-5 py-4">
               {/* Star Rating */}
               <div className="space-y-2">
-                <Label>How would you rate your experience?</Label>
+                <Label>{t('feedback.rateExperience')}</Label>
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
