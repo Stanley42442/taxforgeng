@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Phone, CheckCircle2, Send, Loader2 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface WhatsAppVerificationProps {
   currentNumber?: string;
@@ -20,6 +21,7 @@ export const WhatsAppVerification = ({
   onVerified 
 }: WhatsAppVerificationProps) => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [phoneNumber, setPhoneNumber] = useState(currentNumber || "");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState<"phone" | "verify">("phone");
@@ -110,9 +112,9 @@ export const WhatsAppVerification = ({
               <CheckCircle2 className="h-6 w-6 text-success" />
             </div>
             <div>
-              <p className="font-medium text-foreground">WhatsApp Verified</p>
+              <p className="font-medium text-foreground">{t('whatsapp.verified')}</p>
               <p className="text-sm text-muted-foreground">
-                {phoneNumber || currentNumber || "Number connected"}
+                {phoneNumber || currentNumber || t('whatsapp.numberConnected')}
               </p>
             </div>
           </div>
@@ -125,7 +127,7 @@ export const WhatsAppVerification = ({
               setStep("phone");
             }}
           >
-            Change Number
+            {t('btn.changeNumber')}
           </Button>
         </CardContent>
       </Card>
@@ -137,17 +139,17 @@ export const WhatsAppVerification = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <Phone className="h-5 w-5 text-success" />
-          WhatsApp Notifications
+          {t('whatsapp.title')}
         </CardTitle>
         <CardDescription>
-          Get tax reminders and alerts via WhatsApp
+          {t('whatsapp.description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {step === "phone" ? (
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="phone">Nigerian Phone Number</Label>
+              <Label htmlFor="phone">{t('form.nigerianPhoneNumber')}</Label>
               <div className="flex gap-2">
                 <div className="flex items-center px-3 bg-secondary rounded-l-md border border-r-0 border-border">
                   <span className="text-sm text-muted-foreground">+234</span>
@@ -162,7 +164,7 @@ export const WhatsAppVerification = ({
                 />
               </div>
               <p className="text-xs text-muted-foreground">
-                We'll send a verification code to this number
+                {t('whatsapp.sendCodeNote')}
               </p>
             </div>
             <Button 
@@ -175,23 +177,23 @@ export const WhatsAppVerification = ({
               ) : (
                 <Send className="h-4 w-4" />
               )}
-              Send Verification Code
+              {t('btn.sendVerificationCode')}
             </Button>
           </div>
         ) : (
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="otp">Verification Code</Label>
+              <Label htmlFor="otp">{t('form.verificationCode')}</Label>
               <Input
                 id="otp"
                 type="text"
-                placeholder="Enter 6-digit code"
+                placeholder={t('placeholder.enterCode')}
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 maxLength={6}
               />
               <p className="text-xs text-muted-foreground">
-                Enter the code sent to your WhatsApp
+                {t('whatsapp.enterCodeNote')}
               </p>
             </div>
             <div className="flex gap-2">
@@ -200,7 +202,7 @@ export const WhatsAppVerification = ({
                 onClick={() => setStep("phone")}
                 className="flex-1"
               >
-                Back
+                {t('btn.back')}
               </Button>
               <Button 
                 onClick={verifyCode} 
@@ -212,7 +214,7 @@ export const WhatsAppVerification = ({
                 ) : (
                   <CheckCircle2 className="h-4 w-4" />
                 )}
-                Verify
+                {t('btn.verify')}
               </Button>
             </div>
           </div>

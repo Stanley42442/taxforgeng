@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle, Calculator, Info, TrendingUp } from "lucide-react";
 import { calculatePenalty, type PenaltyEstimate } from "@/lib/taxMyths";
 import { formatCurrency } from "@/lib/taxCalculations";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const PenaltyEstimator = () => {
+  const { t } = useLanguage();
   const [taxType, setTaxType] = useState<'cit' | 'vat' | 'pit' | 'paye'>('cit');
   const [taxDue, setTaxDue] = useState(1000000);
   const [monthsLate, setMonthsLate] = useState(3);
@@ -21,57 +23,50 @@ export const PenaltyEstimator = () => {
     setResult(estimate);
   };
 
-  const taxTypeLabels = {
-    cit: 'Company Income Tax (CIT)',
-    vat: 'Value Added Tax (VAT)',
-    pit: 'Personal Income Tax (PIT)',
-    paye: 'Pay As You Earn (PAYE)'
-  };
-
   return (
     <Card className="glass-frosted">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <AlertTriangle className="h-5 w-5 text-warning" />
-          Penalty Estimator
+          {t('penalty.title')}
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Estimate late filing and payment penalties
+          {t('penalty.description')}
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Tax Type */}
         <div className="space-y-2">
-          <Label>Tax Type</Label>
+          <Label>{t('form.taxType')}</Label>
           <Select value={taxType} onValueChange={(v) => setTaxType(v as typeof taxType)}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="cit">Company Income Tax (CIT)</SelectItem>
-              <SelectItem value="vat">Value Added Tax (VAT)</SelectItem>
-              <SelectItem value="pit">Personal Income Tax (PIT)</SelectItem>
-              <SelectItem value="paye">Pay As You Earn (PAYE)</SelectItem>
+              <SelectItem value="cit">{t('penalty.companyIncomeTax')}</SelectItem>
+              <SelectItem value="vat">{t('penalty.valueAddedTax')}</SelectItem>
+              <SelectItem value="pit">{t('penalty.personalIncomeTax')}</SelectItem>
+              <SelectItem value="paye">{t('penalty.payAsYouEarn')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {/* Tax Due */}
         <div className="space-y-2">
-          <Label>Tax Due (₦)</Label>
+          <Label>{t('form.taxDue')} (₦)</Label>
           <Input
             type="number"
             value={taxDue}
             onChange={(e) => setTaxDue(Number(e.target.value) || 0)}
-            placeholder="Enter tax amount due"
+            placeholder={t('placeholder.enterAmount')}
           />
         </div>
 
         {/* Months Late */}
         <div className="space-y-3">
           <div className="flex justify-between">
-            <Label>Months Late</Label>
-            <span className="text-sm font-medium text-primary">{monthsLate} months</span>
+            <Label>{t('form.monthsLate')}</Label>
+            <span className="text-sm font-medium text-primary">{monthsLate} {t('common.months')}</span>
           </div>
           <Slider
             value={[monthsLate]}
@@ -81,8 +76,8 @@ export const PenaltyEstimator = () => {
             step={1}
           />
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>1 month</span>
-            <span>24 months</span>
+            <span>1 {t('common.month')}</span>
+            <span>24 {t('common.months')}</span>
           </div>
         </div>
 
@@ -90,7 +85,7 @@ export const PenaltyEstimator = () => {
         <div className="space-y-3">
           <div className="flex justify-between">
             <Label className="flex items-center gap-1">
-              CBN Lending Rate
+              {t('penalty.cbnLendingRate')}
               <Info className="h-3 w-3 text-muted-foreground" />
             </Label>
             <span className="text-sm font-medium">{cbnRate}%</span>
@@ -106,7 +101,7 @@ export const PenaltyEstimator = () => {
 
         <Button onClick={handleCalculate} className="w-full gap-2">
           <Calculator className="h-4 w-4" />
-          Calculate Penalty
+          {t('btn.calculatePenalty')}
         </Button>
 
         {/* Results */}
@@ -114,20 +109,20 @@ export const PenaltyEstimator = () => {
           <div className="space-y-4 pt-4 border-t">
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 rounded-xl bg-warning/10 border border-warning/20">
-                <p className="text-xs text-muted-foreground mb-1">Late Filing Penalty</p>
+                <p className="text-xs text-muted-foreground mb-1">{t('penalty.lateFilingPenalty')}</p>
                 <p className="text-xl font-bold text-warning">{formatCurrency(result.lateFiling)}</p>
               </div>
               <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20">
-                <p className="text-xs text-muted-foreground mb-1">Interest Charges</p>
+                <p className="text-xs text-muted-foreground mb-1">{t('penalty.interestCharges')}</p>
                 <p className="text-xl font-bold text-destructive">{formatCurrency(result.interest)}</p>
               </div>
             </div>
 
             <div className="p-5 rounded-xl bg-destructive/20 border border-destructive/30 text-center">
-              <p className="text-sm text-muted-foreground mb-2">Total Penalty</p>
+              <p className="text-sm text-muted-foreground mb-2">{t('penalty.totalPenalty')}</p>
               <p className="text-3xl font-bold text-destructive">{formatCurrency(result.totalPenalty)}</p>
               <p className="text-xs text-muted-foreground mt-2">
-                {((result.totalPenalty / taxDue) * 100).toFixed(1)}% of original tax
+                {((result.totalPenalty / taxDue) * 100).toFixed(1)}% {t('penalty.ofOriginalTax')}
               </p>
             </div>
 
@@ -137,7 +132,7 @@ export const PenaltyEstimator = () => {
             </div>
 
             <p className="text-xs text-muted-foreground text-center">
-              * Estimates only. Actual penalties may vary. Consider voluntary disclosure for reduced penalties.
+              * {t('penalty.disclaimer')}
             </p>
           </div>
         )}

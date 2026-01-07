@@ -21,6 +21,7 @@ import { MessageSquare, Star, Loader2, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FeedbackFormProps {
   trigger?: React.ReactNode;
@@ -36,6 +37,7 @@ const CATEGORIES = [
 
 export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
@@ -147,15 +149,15 @@ export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
 
               {/* Category */}
               <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="category">{t('feedback.category')}</Label>
                 <Select value={category} onValueChange={setCategory}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
+                    <SelectValue placeholder={t('placeholder.selectCategory')} />
                   </SelectTrigger>
                   <SelectContent>
                     {CATEGORIES.map((cat) => (
                       <SelectItem key={cat.value} value={cat.value}>
-                        {cat.label}
+                        {getCategoryLabel(cat.value)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -164,10 +166,10 @@ export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
 
               {/* Message */}
               <div className="space-y-2">
-                <Label htmlFor="message">Your Feedback (Optional)</Label>
+                <Label htmlFor="message">{t('feedback.yourFeedback')}</Label>
                 <Textarea
                   id="message"
-                  placeholder="Tell us what you think, suggest features, or report issues..."
+                  placeholder={t('placeholder.tellUsWhatYouThink')}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   rows={4}
@@ -178,7 +180,7 @@ export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
 
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => setOpen(false)} className="flex-1">
-                Cancel
+                {t('btn.cancel')}
               </Button>
               <Button 
                 variant="hero" 
@@ -189,10 +191,10 @@ export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Submitting...
+                    {t('status.submitting')}
                   </>
                 ) : (
-                  'Submit Feedback'
+                  t('btn.submitFeedback')
                 )}
               </Button>
             </div>
