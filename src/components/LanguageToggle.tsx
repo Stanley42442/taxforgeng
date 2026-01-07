@@ -11,6 +11,9 @@ import { Globe } from "lucide-react";
 const languages: { code: Language; label: string; flag: string }[] = [
   { code: 'en', label: 'English', flag: '🇬🇧' },
   { code: 'pcm', label: 'Pidgin', flag: '🇳🇬' },
+  { code: 'yo', label: 'Yorùbá', flag: '🇳🇬' },
+  { code: 'ha', label: 'Hausa', flag: '🇳🇬' },
+  { code: 'ig', label: 'Igbo', flag: '🇳🇬' },
 ];
 
 export const LanguageToggle = () => {
