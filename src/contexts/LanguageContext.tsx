@@ -51,6 +51,13 @@ export const translations: Translations = {
   'common.confirm': { en: 'Confirm', pcm: 'Agree Am' },
   'common.viewAll': { en: 'View All', pcm: 'See Everything' },
   'common.learnMore': { en: 'Learn More', pcm: 'Hear More' },
+  'common.retry': { en: 'Try Again', pcm: 'Try Am Again' },
+  'common.refresh': { en: 'Refresh', pcm: 'Reload Am' },
+  'common.copy': { en: 'Copy', pcm: 'Copy Am' },
+  'common.copied': { en: 'Copied!', pcm: 'E Don Copy!' },
+  'common.download': { en: 'Download', pcm: 'Download Am' },
+  'common.export': { en: 'Export', pcm: 'Carry Comot' },
+  'common.import': { en: 'Import', pcm: 'Bring Enter' },
   
   // Tax related
   'tax.calculate': { en: 'Calculate Tax', pcm: 'Calculate Tax' },
@@ -75,6 +82,8 @@ export const translations: Translations = {
   'business.entityType': { en: 'Entity Type', pcm: 'How Business Dey Registered' },
   
   // Pricing
+  'pricing.title': { en: 'Simple, Transparent Pricing', pcm: 'Price Wey Clear' },
+  'pricing.subtitle': { en: 'Choose the plan that fits your business', pcm: 'Pick the plan wey good for your business' },
   'pricing.free': { en: 'Free', pcm: 'Free' },
   'pricing.starter': { en: 'Starter', pcm: 'Small Money' },
   'pricing.basic': { en: 'Basic', pcm: 'Normal' },
@@ -84,8 +93,11 @@ export const translations: Translations = {
   'pricing.currentPlan': { en: 'Current Plan', pcm: 'Wetin You Dey Use Now' },
   'pricing.choosePlan': { en: 'Choose Plan', pcm: 'Pick Plan' },
   'pricing.features': { en: 'Features', pcm: 'Wetin E Get' },
+  'pricing.mostPopular': { en: 'Most Popular', pcm: 'People Like Am Pass' },
+  'pricing.enterprise': { en: 'Enterprise', pcm: 'Big Company' },
+  'pricing.contactUs': { en: 'Contact Us', pcm: 'Reach Us' },
   
-  // Messages
+  // Messages & Toasts
   'msg.noBusinesses': { en: 'No businesses saved yet', pcm: 'You never save any business' },
   'msg.taxCalculated': { en: 'Tax calculated successfully', pcm: 'We don calculate your tax finish' },
   'msg.saveSuccess': { en: 'Saved successfully', pcm: 'E don save' },
@@ -93,6 +105,72 @@ export const translations: Translations = {
   'msg.noData': { en: 'No data available', pcm: 'Nothing dey here' },
   'msg.tryAgain': { en: 'Please try again', pcm: 'Try am again' },
   'msg.comingSoon': { en: 'Coming Soon', pcm: 'E Dey Come' },
+  'msg.upgradeRequired': { en: 'Upgrade required', pcm: 'You need to level up' },
+  'msg.featureLocked': { en: 'This feature requires upgrade', pcm: 'You go upgrade before you fit use am' },
+  
+  // Toast notifications
+  'toast.saveSuccess': { en: 'Saved successfully!', pcm: 'E don save finish!' },
+  'toast.saveFailed': { en: 'Failed to save', pcm: 'E no gree save' },
+  'toast.deleteSuccess': { en: 'Deleted successfully!', pcm: 'E don comot finish!' },
+  'toast.deleteFailed': { en: 'Failed to delete', pcm: 'E no gree comot' },
+  'toast.updateSuccess': { en: 'Updated successfully!', pcm: 'E don update!' },
+  'toast.updateFailed': { en: 'Failed to update', pcm: 'E no gree update' },
+  'toast.copySuccess': { en: 'Copied to clipboard!', pcm: 'E don copy!' },
+  'toast.copyFailed': { en: 'Failed to copy', pcm: 'E no gree copy' },
+  'toast.downloadSuccess': { en: 'Downloaded successfully!', pcm: 'E don download!' },
+  'toast.downloadFailed': { en: 'Download failed', pcm: 'E no gree download' },
+  'toast.uploadSuccess': { en: 'Uploaded successfully!', pcm: 'E don upload!' },
+  'toast.uploadFailed': { en: 'Upload failed', pcm: 'E no gree upload' },
+  'toast.loginSuccess': { en: 'Welcome back!', pcm: 'You don come back!' },
+  'toast.loginFailed': { en: 'Login failed', pcm: 'E no gree make you enter' },
+  'toast.logoutSuccess': { en: 'Logged out successfully', pcm: 'You don comot' },
+  'toast.signupSuccess': { en: 'Account created!', pcm: 'Account don ready!' },
+  'toast.signupFailed': { en: 'Signup failed', pcm: 'E no gree create account' },
+  'toast.emailSent': { en: 'Email sent!', pcm: 'Email don go!' },
+  'toast.emailFailed': { en: 'Failed to send email', pcm: 'Email no gree go' },
+  'toast.verificationSent': { en: 'Verification code sent!', pcm: 'Code don enter your phone!' },
+  'toast.verificationFailed': { en: 'Verification failed', pcm: 'E no gree verify' },
+  'toast.paymentSuccess': { en: 'Payment successful!', pcm: 'Money don enter!' },
+  'toast.paymentFailed': { en: 'Payment failed', pcm: 'Payment no work' },
+  'toast.networkError': { en: 'Network error. Check your connection.', pcm: 'Network wahala. Check your data.' },
+  'toast.serverError': { en: 'Server error. Please try again.', pcm: 'Server get problem. Try again.' },
+  'toast.sessionExpired': { en: 'Session expired. Please login again.', pcm: 'Session don expire. Login again.' },
+  'toast.upgradeSuccess': { en: 'Plan upgraded successfully!', pcm: 'You don level up!' },
+  'toast.exportSuccess': { en: 'Export completed!', pcm: 'Export don finish!' },
+  'toast.exportFailed': { en: 'Export failed', pcm: 'Export no work' },
+  'toast.reminderSet': { en: 'Reminder set!', pcm: 'Reminder don set!' },
+  'toast.reminderDeleted': { en: 'Reminder deleted', pcm: 'Reminder don comot' },
+  'toast.businessSaved': { en: 'Business saved!', pcm: 'Business don save!' },
+  'toast.businessDeleted': { en: 'Business deleted', pcm: 'Business don comot' },
+  'toast.expenseAdded': { en: 'Expense added!', pcm: 'Expense don enter!' },
+  'toast.expenseDeleted': { en: 'Expense deleted', pcm: 'Expense don comot' },
+  'toast.limitReached': { en: 'Limit reached. Please upgrade.', pcm: 'You don reach limit. Level up first.' },
+  'toast.invalidInput': { en: 'Please check your input', pcm: 'Check wetin you type' },
+  'toast.formError': { en: 'Please fill all required fields', pcm: 'Fill everything wey dey important' },
+  'toast.whatsappSent': { en: 'WhatsApp message sent!', pcm: 'WhatsApp don go!' },
+  'toast.whatsappFailed': { en: 'Failed to send WhatsApp message', pcm: 'WhatsApp no gree send' },
+  
+  // Error messages
+  'error.generic': { en: 'Something went wrong', pcm: 'Wahala don happen' },
+  'error.notFound': { en: 'Not found', pcm: 'We no see am' },
+  'error.unauthorized': { en: 'Unauthorized access', pcm: 'You no get permission' },
+  'error.forbidden': { en: 'Access denied', pcm: 'Dem no allow you' },
+  'error.timeout': { en: 'Request timed out', pcm: 'E take too long' },
+  'error.offline': { en: 'You are offline', pcm: 'You no get network' },
+  'error.invalidEmail': { en: 'Please enter a valid email', pcm: 'Email no correct' },
+  'error.invalidPhone': { en: 'Please enter a valid phone number', pcm: 'Phone number no correct' },
+  'error.invalidPassword': { en: 'Password must be at least 6 characters', pcm: 'Password too short, make am pass 6' },
+  'error.passwordMismatch': { en: 'Passwords do not match', pcm: 'Password dem no match' },
+  'error.requiredField': { en: 'This field is required', pcm: 'You must fill this one' },
+  'error.maxLength': { en: 'Maximum length exceeded', pcm: 'E too long' },
+  'error.minLength': { en: 'Too short', pcm: 'E too short' },
+  'error.invalidAmount': { en: 'Please enter a valid amount', pcm: 'Put correct amount' },
+  'error.negativeAmount': { en: 'Amount cannot be negative', pcm: 'Amount no fit be minus' },
+  'error.fileTooLarge': { en: 'File is too large', pcm: 'File too big' },
+  'error.invalidFileType': { en: 'Invalid file type', pcm: 'This type of file no good' },
+  'error.uploadError': { en: 'Error uploading file', pcm: 'File no gree upload' },
+  'error.accountLocked': { en: 'Account is locked. Try again later.', pcm: 'Account don lock. Try again later.' },
+  'error.tooManyAttempts': { en: 'Too many attempts. Please wait.', pcm: 'You try am too many times. Wait small.' },
   
   // Referrals
   'referral.title': { en: 'Invite Friends, Earn Rewards', pcm: 'Bring Your Padi, Collect Bonus' },
@@ -102,6 +180,10 @@ export const translations: Translations = {
   'referral.pending': { en: 'Pending', pcm: 'E Never Complete' },
   'referral.completed': { en: 'Completed', pcm: 'E Don Complete' },
   'referral.rewards': { en: 'Your Rewards', pcm: 'Your Bonus' },
+  'referral.howItWorks': { en: 'How it works', pcm: 'How e dey work' },
+  'referral.step1': { en: 'Share your unique link', pcm: 'Share your special link' },
+  'referral.step2': { en: 'Friend signs up and subscribes', pcm: 'Your padi go register and pay' },
+  'referral.step3': { en: 'You both get rewarded!', pcm: 'Una two go collect bonus!' },
   
   // Calendar
   'calendar.taxCalendar': { en: 'Tax Calendar', pcm: 'Tax Calendar' },
@@ -110,6 +192,8 @@ export const translations: Translations = {
   'calendar.today': { en: 'Today', pcm: 'Today' },
   'calendar.tomorrow': { en: 'Tomorrow', pcm: 'Tomorrow' },
   'calendar.overdue': { en: 'Overdue', pcm: 'E Don Pass' },
+  'calendar.dueToday': { en: 'Due Today', pcm: 'E Dey For Today' },
+  'calendar.dueSoon': { en: 'Due Soon', pcm: 'E Go Soon Reach' },
   
   // Expenses
   'expense.title': { en: 'Expenses', pcm: 'Money Wey Comot' },
@@ -120,13 +204,19 @@ export const translations: Translations = {
   'expense.description': { en: 'Description', pcm: 'Wetin E Be' },
   'expense.deductible': { en: 'Tax Deductible', pcm: 'Fit Reduce Tax' },
   'expense.totalExpenses': { en: 'Total Expenses', pcm: 'All Money Wey Comot' },
+  'expense.income': { en: 'Income', pcm: 'Money Wey Enter' },
+  'expense.noExpenses': { en: 'No expenses yet', pcm: 'You never add any expense' },
   
   // Dashboard
   'dashboard.title': { en: 'Dashboard', pcm: 'Dashboard' },
+  'dashboard.welcome': { en: 'Welcome back', pcm: 'You do well' },
   'dashboard.overview': { en: 'Overview', pcm: 'Summary' },
   'dashboard.recentActivity': { en: 'Recent Activity', pcm: 'Wetin Happen Recently' },
   'dashboard.quickActions': { en: 'Quick Actions', pcm: 'Quick Moves' },
   'dashboard.taxSummary': { en: 'Tax Summary', pcm: 'Tax Summary' },
+  'dashboard.totalTaxDue': { en: 'Total Tax Due', pcm: 'Total Tax Wey You Go Pay' },
+  'dashboard.upcomingDeadlines': { en: 'Upcoming Deadlines', pcm: 'Deadline Wey Dey Come' },
+  'dashboard.noDeadlines': { en: 'No upcoming deadlines', pcm: 'No deadline dey come' },
   
   // Settings
   'settings.title': { en: 'Settings', pcm: 'Settings' },
@@ -136,6 +226,8 @@ export const translations: Translations = {
   'settings.whatsapp': { en: 'WhatsApp Notifications', pcm: 'WhatsApp Alerts' },
   'settings.language': { en: 'Language', pcm: 'Language' },
   'settings.verifyNumber': { en: 'Verify Number', pcm: 'Verify Your Number' },
+  'settings.darkMode': { en: 'Dark Mode', pcm: 'Dark Mode' },
+  'settings.emailNotifications': { en: 'Email Notifications', pcm: 'Email Alerts' },
   
   // Auth
   'auth.signIn': { en: 'Sign In', pcm: 'Enter Inside' },
@@ -145,6 +237,9 @@ export const translations: Translations = {
   'auth.forgotPassword': { en: 'Forgot Password?', pcm: 'You Forget Password?' },
   'auth.noAccount': { en: "Don't have an account?", pcm: 'You no get account?' },
   'auth.hasAccount': { en: 'Already have an account?', pcm: 'You don get account?' },
+  'auth.resetPassword': { en: 'Reset Password', pcm: 'Reset Password' },
+  'auth.newPassword': { en: 'New Password', pcm: 'New Password' },
+  'auth.confirmPassword': { en: 'Confirm Password', pcm: 'Confirm Password' },
   
   // Accountant Portal
   'accountant.title': { en: 'Accountant Portal', pcm: 'Accountant Corner' },
@@ -152,6 +247,8 @@ export const translations: Translations = {
   'accountant.addClient': { en: 'Add Client', pcm: 'Add Customer' },
   'accountant.bulkActions': { en: 'Bulk Actions', pcm: 'Do Plenty At Once' },
   'accountant.exportAll': { en: 'Export All', pcm: 'Download Everything' },
+  'accountant.totalClients': { en: 'Total Clients', pcm: 'All Your Customer Dem' },
+  'accountant.pendingTasks': { en: 'Pending Tasks', pcm: 'Work Wey Never Finish' },
   
   // Success stories
   'stories.title': { en: 'Success Stories', pcm: 'People Wey Don Win' },
@@ -162,6 +259,38 @@ export const translations: Translations = {
   'footer.contact': { en: 'Contact', pcm: 'Reach Us' },
   'footer.privacy': { en: 'Privacy Policy', pcm: 'Privacy' },
   'footer.terms': { en: 'Terms of Service', pcm: 'Terms' },
+  'footer.faq': { en: 'FAQ', pcm: 'Questions' },
+  'footer.support': { en: 'Support', pcm: 'Help' },
+  
+  // Time & dates
+  'time.today': { en: 'Today', pcm: 'Today' },
+  'time.yesterday': { en: 'Yesterday', pcm: 'Yesterday' },
+  'time.thisWeek': { en: 'This Week', pcm: 'This Week' },
+  'time.thisMonth': { en: 'This Month', pcm: 'This Month' },
+  'time.thisYear': { en: 'This Year', pcm: 'This Year' },
+  'time.lastWeek': { en: 'Last Week', pcm: 'Last Week' },
+  'time.lastMonth': { en: 'Last Month', pcm: 'Last Month' },
+  'time.ago': { en: 'ago', pcm: 'wey don pass' },
+};
+
+// Helper function to get toast messages
+export const getToastMessage = (key: string, language: Language): string => {
+  const toastKey = `toast.${key}`;
+  const translation = translations[toastKey];
+  if (translation) {
+    return translation[language] || translation.en || key;
+  }
+  return key;
+};
+
+// Helper function to get error messages
+export const getErrorMessage = (key: string, language: Language): string => {
+  const errorKey = `error.${key}`;
+  const translation = translations[errorKey];
+  if (translation) {
+    return translation[language] || translation.en || key;
+  }
+  return key;
 };
 
 interface LanguageContextType {
