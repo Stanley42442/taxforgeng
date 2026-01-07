@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage, getToastMessage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 import { 
   Palette, 

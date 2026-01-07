@@ -5,6 +5,7 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/taxCalculations";
+import { useLanguage, getToastMessage } from "@/contexts/LanguageContext";
 import {
   FileCheck,
   Upload,

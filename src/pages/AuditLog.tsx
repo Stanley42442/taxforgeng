@@ -10,6 +10,7 @@ import { History, Crown, Building2, Download, Filter, FileText, Edit, Plus, Tras
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
+import { useLanguage, getToastMessage } from "@/contexts/LanguageContext";
 
 interface AuditEntry {
   id: string;

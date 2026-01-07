@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Upload, FileSpreadsheet, Crown, Building2, Check, X, HelpCircle, ArrowRight, AlertTriangle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useLanguage, getToastMessage } from "@/contexts/LanguageContext";
 
 interface Transaction {
   id: string;
