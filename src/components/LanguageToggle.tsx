@@ -21,9 +21,10 @@ export const LanguageToggle = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-9 w-9" title="Change language">
-          <Globe className="h-4 w-4" />
-          <span className="sr-only">Toggle language</span>
+        <Button variant="ghost" size="sm" className="h-9 gap-2 px-2" title="Change language">
+          <span className="text-base">{currentLanguage.flag}</span>
+          <span className="hidden sm:inline text-xs font-medium">{currentLanguage.label}</span>
+          <Globe className="h-3.5 w-3.5 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -31,10 +32,13 @@ export const LanguageToggle = () => {
           <DropdownMenuItem
             key={lang.code}
             onClick={() => setLanguage(lang.code)}
-            className={language === lang.code ? 'bg-accent' : ''}
+            className={language === lang.code ? 'bg-accent font-medium' : ''}
           >
             <span className="mr-2">{lang.flag}</span>
             {lang.label}
+            {language === lang.code && (
+              <span className="ml-auto text-xs text-primary">✓</span>
+            )}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

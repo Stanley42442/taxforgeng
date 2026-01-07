@@ -3,6 +3,7 @@ import { NavMenu } from "@/components/NavMenu";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
@@ -84,6 +85,7 @@ const Dashboard = () => {
   const { tier, savedBusinesses, loading: businessLoading, refreshBusinesses } = useSubscription();
   const { user } = useAuth();
   const { urgentCount } = useUpcomingReminders();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [expenseSummary, setExpenseSummary] = useState<ExpenseSummary>({
     totalIncome: 0,
@@ -263,9 +265,9 @@ const Dashboard = () => {
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-primary glow-primary">
               <LayoutDashboard className="h-10 w-10 text-primary-foreground" />
             </div>
-            <h1 className="text-2xl font-bold text-foreground mb-3">Dashboard</h1>
-            <p className="text-muted-foreground mb-6">Sign in to view your dashboard overview.</p>
-            <Button variant="glow" size="lg" onClick={() => navigate('/auth')}>Sign In</Button>
+            <h1 className="text-2xl font-bold text-foreground mb-3">{t('dashboard.title')}</h1>
+            <p className="text-muted-foreground mb-6">{t('msg.loginRequired')}</p>
+            <Button variant="glow" size="lg" onClick={() => navigate('/auth')}>{t('common.signIn')}</Button>
           </div>
         </div>
       </div>
@@ -280,7 +282,7 @@ const Dashboard = () => {
         <div className="container mx-auto px-4 py-20 text-center relative z-10">
           <div className="glass-frosted rounded-2xl p-12 max-w-sm mx-auto">
             <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary glow-primary" />
-            <p className="text-muted-foreground mt-4">Loading dashboard...</p>
+            <p className="text-muted-foreground mt-4">{t('common.loading')}</p>
           </div>
         </div>
       </div>
@@ -362,8 +364,8 @@ const Dashboard = () => {
                 <LayoutDashboard className="h-7 w-7 text-primary-foreground" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl md:text-3xl font-bold text-foreground truncate">Dashboard</h1>
-                <p className="text-muted-foreground text-sm truncate">Overview of your businesses, expenses, and reminders</p>
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground truncate">{t('dashboard.title')}</h1>
+                <p className="text-muted-foreground text-sm truncate">{t('dashboard.overview')}</p>
               </div>
             </div>
           </div>
