@@ -221,13 +221,13 @@ const Achievements = () => {
             <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-accent glow-accent">
               <Crown className="h-12 w-12 text-accent-foreground" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground mb-3">Achievements & Progress</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-3">{t('achievements.title')}</h1>
             <p className="text-lg text-muted-foreground mb-8">
-              Track your tax compliance journey with points, badges, and achievements. Available on Basic+ plans.
+              {t('achievements.subtitle')}. {t('pricing.availableBasic')}
             </p>
             <Button variant="glow" size="lg" onClick={() => navigate('/pricing')}>
               <Crown className="h-5 w-5" />
-              Upgrade to Basic
+              {t('reminders.upgradeToBasic')}
             </Button>
           </div>
         </div>
@@ -242,7 +242,7 @@ const Achievements = () => {
         <div className="container mx-auto px-4 py-20 text-center">
           <div className="glass-frosted p-8 rounded-3xl inline-block">
             <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" />
-            <p className="text-muted-foreground mt-4">Loading achievements...</p>
+            <p className="text-muted-foreground mt-4">{t('common.loading')}</p>
           </div>
         </div>
       </div>
@@ -269,10 +269,10 @@ const Achievements = () => {
               <Trophy className="h-10 w-10 text-primary-foreground" />
             </div>
             <h1 className="text-4xl font-bold text-foreground mb-3">
-              Achievements
+              {t('achievements.title')}
             </h1>
             <p className="text-lg text-muted-foreground">
-              Track your tax compliance journey
+              {t('achievements.subtitle')}
             </p>
           </div>
 
@@ -290,7 +290,7 @@ const Achievements = () => {
                 </div>
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-bold text-foreground">{currentLevel.title}</h2>
-                  <p className="text-muted-foreground">{actualPoints} total points</p>
+                  <p className="text-muted-foreground">{actualPoints} {t('achievements.totalPoints')}</p>
                 </div>
               </div>
               

@@ -133,13 +133,13 @@ const CalculatorPage = () => {
   };
 
   const categoryLabels: Record<ExpenseCategory, string> = {
-    office_supplies: 'Office Supplies',
-    travel: 'Travel',
-    utilities: 'Utilities',
-    meals: 'Meals & Entertainment',
-    rent: 'Rent',
-    equipment: 'Equipment',
-    other: 'Other',
+    office_supplies: t('category.officeSupplies'),
+    travel: t('category.travel'),
+    utilities: t('category.utilities'),
+    meals: t('category.meals'),
+    rent: t('category.rent'),
+    equipment: t('category.equipment'),
+    other: t('category.other'),
   };
 
   // Fetch expenses for selected business with category breakdown

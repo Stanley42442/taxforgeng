@@ -166,14 +166,14 @@ END:VEVENT
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">Tax Calendar</h1>
+              <h1 className="text-3xl font-bold text-foreground mb-2">{t('calendar.title')}</h1>
               <p className="text-muted-foreground">
-                Track all Nigerian tax deadlines in one place
+                {t('calendar.subtitle')}
               </p>
             </div>
             <Button onClick={exportToICS} variant="outline" className="gap-2">
               <Download className="h-4 w-4" />
-              Export to Calendar
+              {t('calendar.exportToCalendar')}
             </Button>
           </div>
 

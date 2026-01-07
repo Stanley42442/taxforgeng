@@ -138,21 +138,21 @@ const Referrals = () => {
               <CardContent className="pt-6 text-center">
                 <Users className="h-8 w-8 text-primary mx-auto mb-2" />
                 <p className="text-2xl font-bold text-foreground">{referrals.length}</p>
-                <p className="text-sm text-muted-foreground">Total Referrals</p>
+                <p className="text-sm text-muted-foreground">{t('referral.totalReferrals')}</p>
               </CardContent>
             </Card>
             <Card className="glass-frosted">
               <CardContent className="pt-6 text-center">
                 <Clock className="h-8 w-8 text-warning mx-auto mb-2" />
                 <p className="text-2xl font-bold text-foreground">{pendingReferrals}</p>
-                <p className="text-sm text-muted-foreground">Pending</p>
+                <p className="text-sm text-muted-foreground">{t('referral.pending')}</p>
               </CardContent>
             </Card>
             <Card className="glass-frosted">
               <CardContent className="pt-6 text-center">
                 <Trophy className="h-8 w-8 text-success mx-auto mb-2" />
                 <p className="text-2xl font-bold text-foreground">{totalRewards}</p>
-                <p className="text-sm text-muted-foreground">Free Months Earned</p>
+                <p className="text-sm text-muted-foreground">{t('referral.freeMonthsEarned')}</p>
               </CardContent>
             </Card>
           </div>
@@ -162,10 +162,10 @@ const Referrals = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Share2 className="h-5 w-5 text-primary" />
-                Your Referral Link
+                {t('referral.yourLink')}
               </CardTitle>
               <CardDescription>
-                Share this link with friends. You'll earn a free month when they upgrade.
+                {t('referral.shareThisLink')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -199,7 +199,7 @@ const Referrals = () => {
           {/* How it Works */}
           <Card className="glass-frosted mb-8">
             <CardHeader>
-              <CardTitle>How It Works</CardTitle>
+              <CardTitle>{t('referral.howItWorks')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -237,7 +237,7 @@ const Referrals = () => {
           {/* Referral History */}
           <Card className="glass-frosted">
             <CardHeader>
-              <CardTitle>Referral History</CardTitle>
+              <CardTitle>{t('referral.history')}</CardTitle>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -247,9 +247,9 @@ const Referrals = () => {
               ) : referrals.length === 0 ? (
                 <div className="text-center py-8">
                   <Users className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-muted-foreground">No referrals yet</p>
+                  <p className="text-muted-foreground">{t('referral.noReferralsYet')}</p>
                   <p className="text-sm text-muted-foreground">
-                    Share your link to start earning rewards!
+                    {t('referral.shareThisLink')}
                   </p>
                 </div>
               ) : (
