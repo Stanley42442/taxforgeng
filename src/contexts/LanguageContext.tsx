@@ -2757,14 +2757,7 @@ export const translations: Translations = {
     ha: 'Shigar da Wani', 
     ig: 'Nyefee Ọzọ' 
   },
-  'btn.viewDetails': { 
-    en: 'View Details', 
-    pcm: 'See Details', 
-    yo: 'Wo Àwọn Àlàyé', 
-    ha: 'Duba Cikakkun Bayanai', 
-    ig: 'Lee Nkọwa' 
-  },
-  'btn.markComplete': { 
+  'btn.markComplete': {
     en: 'Mark as Complete', 
     pcm: 'Mark as Done', 
     yo: 'Sàmì Gẹ́gẹ́ bí Tó Parí', 
@@ -3066,8 +3059,6 @@ export const translations: Translations = {
   'btn.clearFilters': { en: 'Clear Filters', pcm: 'Clear Filters', yo: 'Pa Àwọn Àyẹ̀wò', ha: 'Share Tace', ig: 'Kpochapụ Nzacha' },
   'btn.viewDetails': { en: 'View Details', pcm: 'See Details', yo: 'Wo Àwọn Àlàyé', ha: 'Duba Cikakkun Bayanai', ig: 'Lee Nkọwa' },
   'btn.learnMore': { en: 'Learn More', pcm: 'Learn More', yo: 'Kọ́ Púpọ̀ Sí', ha: 'Ƙara Koyo', ig: 'Mụtakwuo' },
-  'btn.exportCSV': { en: 'Export CSV', pcm: 'Export CSV', yo: 'Ṣe Ìkójáde CSV', ha: 'Fitar da CSV', ig: 'Bufee CSV' },
-  'btn.importCSV': { en: 'Import CSV', pcm: 'Import CSV', yo: 'Ṣe Àwọlé CSV', ha: 'Shigo da CSV', ig: 'Bubata CSV' },
   
   // Component-specific - Feedback Form
   'feedback.title': { en: 'Give Feedback', pcm: 'Give Feedback', yo: 'Fun Ní Èsì', ha: 'Ba da Ra\'ayi', ig: 'Nye Nzaghachi' },
@@ -3083,33 +3074,6 @@ export const translations: Translations = {
   'feedback.improvementSuggestion': { en: 'Improvement Suggestion', pcm: 'Improvement Suggestion', yo: 'Àbá Ìlọsíwájú', ha: 'Shawarar Ingantawa', ig: 'Atụmụaka Nkwalite' },
   'feedback.praise': { en: 'Praise / Thanks', pcm: 'Praise / Thanks', yo: 'Ìyìn / Ọpẹ́', ha: 'Yabo / Godiya', ig: 'Otuto / Ekele' },
   
-  // Component-specific - OCR Receipt Scanner
-  'ocr.scanReceipt': { en: 'Scan Receipt', pcm: 'Scan Receipt', yo: 'Ṣayẹ̀wò Ìwé Ìdánilẹ́kọ̀ọ́', ha: 'Duba Rasit', ig: 'Nyochaa Risịtị' },
-  'ocr.uploadDescription': { en: 'Upload a receipt image for automatic data extraction', pcm: 'Upload receipt picture for automatic data extraction', yo: 'Gbé àwòrán ìwé ìdánilẹ́kọ̀ọ́ sókè fún ìyọ̀kúrò dátà', ha: 'Loda hoton rasit don fitar da bayanai ta atomatik', ig: 'Bulite foto risịtị maka nwepụta data ozugbo' },
-  'ocr.aiCategorization': { en: 'AI Categorization', pcm: 'AI Categorization', yo: 'Ìṣọ̀rí AI', ha: 'Tsarin AI', ig: 'Nhazi AI' },
-  'ocr.aiDescription': { en: 'Use AI to categorize & check deductibility', pcm: 'Use AI to sort & check if e dey deductible', yo: 'Lo AI láti ṣọ̀rí & ṣàyẹ̀wò ìdínkù', ha: 'Yi amfani da AI don tsarawa & duba rage-rage', ig: 'Jiri AI ịhazi & ịlele mbelata' },
-  'ocr.clickToUpload': { en: 'Click to upload receipt', pcm: 'Click to upload receipt', yo: 'Tẹ láti gbé ìwé ìdánilẹ́kọ̀ọ́ sókè', ha: 'Danna don loda rasit', ig: 'Pịa iji bulite risịtị' },
-  'ocr.supportedFormats': { en: 'Supports JPG, PNG, PDF', pcm: 'E support JPG, PNG, PDF', yo: 'Ó ṣètìlẹ́yìn JPG, PNG, PDF', ha: 'Yana goyan bayan JPG, PNG, PDF', ig: 'Na-akwado JPG, PNG, PDF' },
-  'ocr.highConfidence': { en: 'High confidence scan', pcm: 'Scan dey accurate well', yo: 'Ṣayẹ̀wò tí ó dájú púpọ̀', ha: 'Dubawa mai inganci', ig: 'Nyocha nwere ntụkwasị obi' },
-  'ocr.verifyDetails': { en: 'Please verify details', pcm: 'Please check am well', yo: 'Jọ̀wọ́ ṣàyẹ̀wò àwọn àlàyé', ha: 'Da fatan za a tabbatar da cikakkun bayanai', ig: 'Biko nyochaa nkọwa' },
-  'ocr.lowConfidence': { en: 'Low confidence - manual entry recommended', pcm: 'E no too sure - better enter am yourself', yo: 'Ìdánilójú kékeré - ìwọ́lé pẹ̀lú ọwọ́ dára jù lọ', ha: 'Ƙarancin tabbaci - ana ba da shawarar shigar da hannu', ig: 'Ntụkwasị obi dị ala - a na-atụ aro itinye aka' },
-  'ocr.taxDeductible': { en: 'Tax Deductible', pcm: 'E fit reduce tax', yo: 'Owó-orí Tí A Lè Dín Kù', ha: 'Mai Rage Haraji', ig: 'Nwere Ike Ibelata Ụtụ' },
-  'ocr.taxTip': { en: 'Tax tip', pcm: 'Tax tip', yo: 'Ìmọ̀ràn Owó-orí', ha: 'Shawarar Haraji', ig: 'Ndụmọdụ Ụtụ' },
-  'ocr.viewExtractedText': { en: 'View extracted text', pcm: 'See the text wey e extract', yo: 'Wo ọ̀rọ̀ tí a yọ kúrò', ha: 'Duba rubutun da aka fitar', ig: 'Lee ederede ewepụtara' },
-  
-  // Component-specific - MultiYear Projection
-  'projection.2026Rules': { en: '2026 Rules', pcm: '2026 Rules', yo: 'Àwọn Òfin 2026', ha: 'Dokokin 2026', ig: 'Iwu 2026' },
-  'projection.pre2026Rules': { en: 'Pre-2026 Rules', pcm: 'Before 2026 Rules', yo: 'Àwọn Òfin Ṣáájú 2026', ha: 'Dokokin Kafin 2026', ig: 'Iwu Tupu 2026' },
-  'projection.taxTransition': { en: 'Tax Transition in', pcm: 'Tax Go Change For', yo: 'Ìyípadà Owó-orí ní', ha: 'Canjin Haraji a', ig: 'Mgbanwe Ụtụ na' },
-  'projection.transitionDescription': { en: 'Your company will exceed ₦50M turnover and transition from 0% to 25% CIT rate.', pcm: 'Your company go pass ₦50M turnover and move from 0% to 25% CIT rate.', yo: 'Ilé-iṣẹ́ rẹ yóò kọjá ₦50M tita kí ó sì yípadà láti 0% sí 25% oṣuwọn CIT.', ha: 'Kamfaninku zai wuce juya ₦50M kuma canza daga 0% zuwa 25% na CIT.', ig: 'Ụlọ ọrụ gị ga-agafe ₦50M ahịa wee gbanwee site na 0% ruo 25% ọnụego CIT.' },
-  'projection.estimatedSavings': { en: 'Estimated savings during exemption period', pcm: 'How much you fit save during exemption time', yo: 'Ìṣírò ìfipamọ́ nígbà àkókò ìdásílẹ̀', ha: 'Ƙiyasin tanadi yayin lokacin keɓantawa', ig: 'Nchekwa akara aka n\'oge oge nnwereonwe' },
-  'projection.revenueVsTax': { en: 'Revenue vs Tax Over Time', pcm: 'Money vs Tax For Time', yo: 'Owó Gbígba vs Owó-orí Ní Àkókò', ha: 'Kuɗaden Shiga vs Haraji A Kan Lokaci', ig: 'Ego Nnata vs Ụtụ N\'oge' },
-  'projection.yearByYear': { en: 'Year-by-Year Breakdown', pcm: 'Year by Year Breakdown', yo: 'Ìpínlẹ̀ Ọdún-sí-Ọdún', ha: 'Rarraba Shekara zuwa Shekara', ig: 'Nkwupụta Afọ-n\'Afọ' },
-  'projection.insights': { en: 'Projection Insights', pcm: 'Projection Insights', yo: 'Àwọn Ìmọ̀ Àsọtẹ́lẹ̀', ha: 'Fahimtar Hasashe', ig: 'Nghọta Atụmatụ' },
-  'projection.totalTaxOverPeriod': { en: 'Total Tax Over Period', pcm: 'Total Tax For The Time', yo: 'Àpapọ̀ Owó-orí Ní Àkókò', ha: 'Jimlar Haraji A Kan Lokaci', ig: 'Mkpokọta Ụtụ N\'oge' },
-  'projection.exemptYearsSavings': { en: 'Exempt Years Savings', pcm: 'Savings From Exempt Years', yo: 'Ìfipamọ́ Àwọn Ọdún Ìdásílẹ̀', ha: 'Tanadin Shekarun Keɓantawa', ig: 'Nchekwa Afọ Nnwereonwe' },
-  'projection.yearRevenue': { en: 'Year Revenue', pcm: 'Year Revenue', yo: 'Owó Gbígba Ọdún', ha: 'Kuɗaden Shiga Shekara', ig: 'Ego Nnata Afọ' },
-  
   // Company Size
   'companySize.small': { en: 'Small', pcm: 'Small', yo: 'Kékeré', ha: 'Ƙarami', ig: 'Obere' },
   'companySize.medium': { en: 'Medium', pcm: 'Medium', yo: 'Àárín', ha: 'Matsakaici', ig: 'Etiti' },
@@ -3119,17 +3083,6 @@ export const translations: Translations = {
   'entityType.company': { en: 'Company', pcm: 'Company', yo: 'Ilé-iṣẹ́', ha: 'Kamfani', ig: 'Ụlọ Ọrụ' },
   'entityType.businessName': { en: 'Business Name', pcm: 'Business Name', yo: 'Orúkọ Iṣẹ́', ha: 'Sunan Kasuwanci', ig: 'Aha Azụmahịa' },
   
-  // IP Whitelist
-  'ipWhitelist.title': { en: 'IP Address Whitelist', pcm: 'IP Address Whitelist', yo: 'Àtòjọ IP Funfun', ha: 'Jerin Farar IP', ig: 'Ndepụta Ọcha IP' },
-  'ipWhitelist.description': { en: 'Restrict logins to specific IP addresses or ranges', pcm: 'Limit login to specific IP addresses', yo: 'Dín àwọn ìwọlé sí àwọn àdírẹ́sì IP pàtó', ha: 'Taƙaita shiga zuwa takamaiman adiresoshin IP', ig: 'Gbochie ịbanye na adreesị IP a kapịrị ọnụ' },
-  'ipWhitelist.enabled': { en: 'Enabled', pcm: 'On', yo: 'Ti Mú Ṣiṣẹ́', ha: 'An Kunna', ig: 'Emere Ka Ọrụ' },
-  'ipWhitelist.disabled': { en: 'Disabled', pcm: 'Off', yo: 'Ti Pa', ha: 'An Kashe', ig: 'Agbanyụrụ' },
-  'ipWhitelist.currentIP': { en: 'Your Current IP', pcm: 'Your Current IP', yo: 'IP Rẹ Lọ́wọ́lọ́wọ́', ha: 'IP ɗinka na Yanzu', ig: 'IP Gị Ugbu a' },
-  'ipWhitelist.whitelisted': { en: 'Whitelisted', pcm: 'Whitelisted', yo: 'Ti Fi Sínú Àtòjọ Funfun', ha: 'An Jera a Farar Jeri', ig: 'E debere na Ndepụta Ọcha' },
-  'ipWhitelist.notWhitelisted': { en: 'Not whitelisted', pcm: 'Not whitelisted', yo: 'Kò Sí Nínú Àtòjọ Funfun', ha: 'Ba a jera a cikin farar jeri ba', ig: 'Ọ nọghị na ndepụta ọcha' },
-  'ipWhitelist.noEntries': { en: 'No IP ranges configured', pcm: 'No IP ranges set up', yo: 'Kò Sí Àwọn Ìbùdó IP Tí A Ṣètò', ha: 'Babu kewayon IP da aka saita', ig: 'Enweghị oke IP edoziri' },
-  'ipWhitelist.addEntry': { en: 'Add IP Range', pcm: 'Add IP Range', yo: 'Fi Ìbùdó IP Kún', ha: 'Ƙara Kewayon IP', ig: 'Tinye Oke IP' },
-  'ipWhitelist.warningEnabled': { en: 'Warning: Your current IP is not in the whitelist!', pcm: 'Warning: Your current IP no dey for whitelist!', yo: 'Ìkìlọ̀: IP rẹ lọ́wọ́lọ́wọ́ kò sí nínú àtòjọ funfun!', ha: 'Gargaɗi: IP ɗinka na yanzu ba ya cikin farar jeri!', ig: 'Ịdọ aka ná ntị: IP gị ugbu a anọghị na ndepụta ọcha!' },
   
   // Component-specific - Foreign Income Calculator
   'foreignIncome.title': { en: 'Foreign Income Calculator', pcm: 'Foreign Income Calculator', yo: 'Ẹ̀rọ Ìṣirò Owó Ilẹ̀ Òkèèrè', ha: 'Na\'urar Ƙididdiga Kuɗin Ƙasashen Waje', ig: 'Ngwa Mgbako Ego Mba Ọzọ' },
