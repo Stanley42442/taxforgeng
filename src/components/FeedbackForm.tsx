@@ -27,13 +27,15 @@ interface FeedbackFormProps {
   trigger?: React.ReactNode;
 }
 
-const CATEGORIES = [
-  { value: 'general', label: 'General Feedback' },
-  { value: 'feature', label: 'Feature Request' },
-  { value: 'bug', label: 'Bug Report' },
-  { value: 'improvement', label: 'Improvement Suggestion' },
-  { value: 'praise', label: 'Praise / Thanks' },
-];
+const CATEGORY_KEYS: Record<string, string> = {
+  'general': 'feedback.generalFeedback',
+  'feature': 'feedback.featureRequest',
+  'bug': 'feedback.bugReport',
+  'improvement': 'feedback.improvementSuggestion',
+  'praise': 'feedback.praise',
+};
+
+const CATEGORIES = ['general', 'feature', 'bug', 'improvement', 'praise'];
 
 export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
   const { user } = useAuth();
@@ -156,8 +158,8 @@ export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
                   </SelectTrigger>
                   <SelectContent>
                     {CATEGORIES.map((cat) => (
-                      <SelectItem key={cat.value} value={cat.value}>
-                        {getCategoryLabel(cat.value)}
+                      <SelectItem key={cat} value={cat}>
+                        {t(CATEGORY_KEYS[cat])}
                       </SelectItem>
                     ))}
                   </SelectContent>

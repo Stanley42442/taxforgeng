@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface GeoLocation {
   city?: string | null;
@@ -50,6 +51,7 @@ interface IPWhitelistManagerProps {
 }
 
 export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
+  const { t } = useLanguage();
   const [entries, setEntries] = useState<IPWhitelistEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [whitelistEnabled, setWhitelistEnabled] = useState(false);

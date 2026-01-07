@@ -13,6 +13,7 @@ import {
   Info,
   Lightbulb
 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface YearProjection {
   year: number;
@@ -26,6 +27,7 @@ interface YearProjection {
 }
 
 export const MultiYearProjection = () => {
+  const { t } = useLanguage();
   const [startingTurnover, setStartingTurnover] = useState(20000000);
   const [startingExpenses, setStartingExpenses] = useState(8000000);
   const [growthRate, setGrowthRate] = useState(25);
@@ -131,7 +133,7 @@ export const MultiYearProjection = () => {
       {/* Controls */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div>
-          <Label className="text-sm mb-2 block">Starting Turnover</Label>
+          <Label className="text-sm mb-2 block">{t('form.startingTurnover')}</Label>
           <Input
             type="number"
             value={startingTurnover}
@@ -139,7 +141,7 @@ export const MultiYearProjection = () => {
           />
         </div>
         <div>
-          <Label className="text-sm mb-2 block">Starting Expenses</Label>
+          <Label className="text-sm mb-2 block">{t('form.startingExpenses')}</Label>
           <Input
             type="number"
             value={startingExpenses}
@@ -148,7 +150,7 @@ export const MultiYearProjection = () => {
         </div>
         <div>
           <div className="flex justify-between items-center mb-2">
-            <Label className="text-sm">Revenue Growth Rate</Label>
+            <Label className="text-sm">{t('form.growthRate')}</Label>
             <span className="text-sm font-medium text-success">{growthRate}%/yr</span>
           </div>
           <Slider
@@ -161,7 +163,7 @@ export const MultiYearProjection = () => {
         </div>
         <div>
           <div className="flex justify-between items-center mb-2">
-            <Label className="text-sm">Expense Growth Rate</Label>
+            <Label className="text-sm">{t('form.expenseGrowthRate')}</Label>
             <span className="text-sm font-medium text-destructive">{expenseGrowthRate}%/yr</span>
           </div>
           <Slider
@@ -176,7 +178,7 @@ export const MultiYearProjection = () => {
 
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex items-center gap-2">
-          <Label className="text-sm">Projection Years:</Label>
+          <Label className="text-sm">{t('form.projectionYears')}:</Label>
           <Input
             type="number"
             value={projectionYears}
@@ -191,7 +193,7 @@ export const MultiYearProjection = () => {
             checked={use2026Rules}
             onCheckedChange={setUse2026Rules}
           />
-          <Label className="text-sm">{use2026Rules ? '2026 Rules' : 'Pre-2026 Rules'}</Label>
+          <Label className="text-sm">{use2026Rules ? t('projection.2026Rules') : t('projection.pre2026Rules')}</Label>
         </div>
         <div className="flex gap-2">
           <Button
@@ -199,14 +201,14 @@ export const MultiYearProjection = () => {
             size="sm"
             onClick={() => setEntityType('company')}
           >
-            Company
+            {t('entityType.company')}
           </Button>
           <Button
             variant={entityType === 'business_name' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setEntityType('business_name')}
           >
-            Business Name
+            {t('entityType.businessName')}
           </Button>
         </div>
       </div>
@@ -217,12 +219,12 @@ export const MultiYearProjection = () => {
           <div className="flex items-start gap-3">
             <Info className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-warning">Tax Transition in {transitionYear.year}</p>
+              <p className="font-semibold text-warning">{t('projection.taxTransition')} {transitionYear.year}</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Your company will exceed ₦50M turnover and transition from 0% to {use2026Rules ? '25%' : '30%'} CIT rate.
+                {t('projection.transitionDescription')}
               </p>
               <p className="text-sm text-success mt-2">
-                Estimated savings during exemption period: {formatCurrency(exemptYearsSavings)}
+                {t('projection.estimatedSavings')}: {formatCurrency(exemptYearsSavings)}
               </p>
             </div>
           </div>
@@ -233,7 +235,7 @@ export const MultiYearProjection = () => {
       <div className="rounded-2xl border border-border bg-card p-4 shadow-card">
         <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-primary" />
-          Revenue vs Tax Over Time
+          {t('projection.revenueVsTax')}
         </h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
@@ -291,19 +293,19 @@ export const MultiYearProjection = () => {
         <div className="p-4 border-b border-border">
           <h3 className="font-semibold text-foreground flex items-center gap-2">
             <Calendar className="h-5 w-5 text-primary" />
-            Year-by-Year Breakdown
+            {t('projection.yearByYear')}
           </h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-secondary/50">
               <tr>
-                <th className="text-left p-3">Year</th>
-                <th className="text-right p-3">Turnover</th>
-                <th className="text-right p-3">Taxable Income</th>
-                <th className="text-right p-3">Total Tax</th>
-                <th className="text-right p-3">Eff. Rate</th>
-                <th className="text-center p-3">Status</th>
+                <th className="text-left p-3">{t('table.year')}</th>
+                <th className="text-right p-3">{t('table.turnover')}</th>
+                <th className="text-right p-3">{t('table.taxableIncome')}</th>
+                <th className="text-right p-3">{t('table.totalTax')}</th>
+                <th className="text-right p-3">{t('table.effectiveRate')}</th>
+                <th className="text-center p-3">{t('table.status')}</th>
               </tr>
             </thead>
             <tbody>
@@ -319,7 +321,7 @@ export const MultiYearProjection = () => {
                   <td className="p-3 text-center">
                     {p.isExempt ? (
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-success/20 text-success">
-                        Exempt
+                        {t('status.exempt')}
                       </span>
                     ) : (
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
@@ -327,7 +329,7 @@ export const MultiYearProjection = () => {
                         p.companySize === 'medium' ? 'bg-warning/20 text-warning' :
                         'bg-destructive/20 text-destructive'
                       }`}>
-                        {p.companySize.charAt(0).toUpperCase() + p.companySize.slice(1)}
+                        {t(`companySize.${p.companySize}`)}
                       </span>
                     )}
                   </td>
@@ -342,23 +344,23 @@ export const MultiYearProjection = () => {
       <div className="rounded-2xl border border-border bg-card p-4 shadow-card">
         <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
           <Lightbulb className="h-5 w-5 text-warning" />
-          Projection Insights
+          {t('projection.insights')}
         </h3>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
-            <p className="text-xs text-muted-foreground">Total Tax Over Period</p>
+            <p className="text-xs text-muted-foreground">{t('projection.totalTaxOverPeriod')}</p>
             <p className="text-lg font-bold text-primary">
               {formatCurrency(projections.reduce((sum, p) => sum + p.totalTax, 0))}
             </p>
           </div>
           <div className="p-3 rounded-lg bg-success/5 border border-success/10">
-            <p className="text-xs text-muted-foreground">Exempt Years Savings</p>
+            <p className="text-xs text-muted-foreground">{t('projection.exemptYearsSavings')}</p>
             <p className="text-lg font-bold text-success">
               {formatCurrency(exemptYearsSavings)}
             </p>
           </div>
           <div className="p-3 rounded-lg bg-warning/5 border border-warning/10">
-            <p className="text-xs text-muted-foreground">Year {projectionYears} Revenue</p>
+            <p className="text-xs text-muted-foreground">{t('projection.yearRevenue')} {projectionYears}</p>
             <p className="text-lg font-bold text-warning">
               {formatCurrency(projections[projections.length - 1]?.turnover || 0)}
             </p>
