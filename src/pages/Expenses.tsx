@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { NavMenu } from "@/components/NavMenu";
 import { Button } from "@/components/ui/button";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useLanguage, getToastMessage } from "@/contexts/LanguageContext";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -152,7 +152,7 @@ const estimateTax = (income: number): number => {
 const Expenses = () => {
   const { tier, savedBusinesses } = useSubscription();
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
@@ -475,13 +475,13 @@ const Expenses = () => {
       category: 'other',
       businessId: '',
     });
-    toast.success("Entry added");
+    toast.success(getToastMessage('expenseAdded', language));
     notifyExpenseAdded(expense.description, expense.amount, expense.type === 'income');
   };
 
   const handleCSVImport = async () => {
     if (!user) {
-      toast.error("Please sign in to import expenses");
+      toast.error(getToastMessage('loginFailed', language));
       return;
     }
 
@@ -500,7 +500,7 @@ const Expenses = () => {
 
     if (error) {
       console.error('Error importing expenses:', error);
-      toast.error('Failed to import expenses');
+      toast.error(getToastMessage('uploadFailed', language));
       return;
     }
 
@@ -515,7 +515,7 @@ const Expenses = () => {
     }));
 
     setExpenses(prev => [...mapped, ...prev]);
-    toast.success("Imported 5 entries from CSV (mock data)");
+    toast.success(getToastMessage('uploadSuccess', language));
   };
 
   const handleDeleteExpense = async (id: string) => {
@@ -526,12 +526,12 @@ const Expenses = () => {
 
     if (error) {
       console.error('Error deleting expense:', error);
-      toast.error('Failed to delete expense');
+      toast.error(getToastMessage('deleteFailed', language));
       return;
     }
 
     setExpenses(prev => prev.filter(e => e.id !== id));
-    toast.success("Entry deleted");
+    toast.success(getToastMessage('expenseDeleted', language));
   };
 
   const filteredExpenses = expenses.filter(e => {
