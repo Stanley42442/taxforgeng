@@ -2494,6 +2494,484 @@ export const translations: Translations = {
     ha: 'Koma Gida', 
     ig: 'Laghachi Ụlọ' 
   },
+  
+  // Form Labels
+  'form.fullName': { 
+    en: 'Full Name', 
+    pcm: 'Your Full Name', 
+    yo: 'Orúkọ Kíkún', 
+    ha: 'Cikakken Suna', 
+    ig: 'Aha Zuru Oke' 
+  },
+  'form.email': { 
+    en: 'Email Address', 
+    pcm: 'Your Email', 
+    yo: 'Àdírẹ́sì Ímeèlì', 
+    ha: 'Adireshin Imel', 
+    ig: 'Adreesị Email' 
+  },
+  'form.password': { 
+    en: 'Password', 
+    pcm: 'Password', 
+    yo: 'Ọ̀rọ̀ Aṣínà', 
+    ha: 'Kalmar Sirri', 
+    ig: 'Okwuntughe' 
+  },
+  'form.currentPassword': { 
+    en: 'Current Password', 
+    pcm: 'Your Current Password', 
+    yo: 'Ọ̀rọ̀ Aṣínà Lọ́wọ́', 
+    ha: 'Kalmar Sirri ta Yanzu', 
+    ig: 'Okwuntughe Ugbu a' 
+  },
+  'form.newPassword': { 
+    en: 'New Password', 
+    pcm: 'New Password', 
+    yo: 'Ọ̀rọ̀ Aṣínà Tuntun', 
+    ha: 'Sabuwar Kalmar Sirri', 
+    ig: 'Okwuntughe Ọhụrụ' 
+  },
+  'form.confirmPassword': { 
+    en: 'Confirm Password', 
+    pcm: 'Type Password Again', 
+    yo: 'Jẹ́rìí Ọ̀rọ̀ Aṣínà', 
+    ha: 'Tabbatar Kalmar Sirri', 
+    ig: 'Kwenye Okwuntughe' 
+  },
+  'form.phoneNumber': { 
+    en: 'Phone Number', 
+    pcm: 'Your Phone Number', 
+    yo: 'Nọ́mbà Fóònù', 
+    ha: 'Lambar Waya', 
+    ig: 'Nọmba Ekwentị' 
+  },
+  'form.whatsappNumber': { 
+    en: 'WhatsApp Number', 
+    pcm: 'Your WhatsApp Number', 
+    yo: 'Nọ́mbà WhatsApp', 
+    ha: 'Lambar WhatsApp', 
+    ig: 'Nọmba WhatsApp' 
+  },
+  'form.description': { 
+    en: 'Description', 
+    pcm: 'Description', 
+    yo: 'Àpèjúwe', 
+    ha: 'Bayani', 
+    ig: 'Nkọwa' 
+  },
+  'form.amount': { 
+    en: 'Amount', 
+    pcm: 'How Much', 
+    yo: 'Iye', 
+    ha: 'Adadi', 
+    ig: 'Ego' 
+  },
+  'form.date': { 
+    en: 'Date', 
+    pcm: 'Date', 
+    yo: 'Ọjọ́', 
+    ha: 'Kwanan Wata', 
+    ig: 'Ụbọchị' 
+  },
+  'form.category': { 
+    en: 'Category', 
+    pcm: 'Category', 
+    yo: 'Ẹ̀ka', 
+    ha: 'Rukunin', 
+    ig: 'Ụdị' 
+  },
+  'form.type': { 
+    en: 'Type', 
+    pcm: 'Type', 
+    yo: 'Irú', 
+    ha: "Nau'i", 
+    ig: 'Ụdị' 
+  },
+  'form.title': { 
+    en: 'Title', 
+    pcm: 'Title', 
+    yo: 'Àkọlé', 
+    ha: 'Take', 
+    ig: 'Aha' 
+  },
+  'form.notes': { 
+    en: 'Notes', 
+    pcm: 'Notes', 
+    yo: 'Àkọsílẹ̀', 
+    ha: 'Bayanan', 
+    ig: 'Ndetu' 
+  },
+  'form.optional': { 
+    en: '(Optional)', 
+    pcm: '(No Be Must)', 
+    yo: '(Kò ṣe dandan)', 
+    ha: '(Ba dole ba)', 
+    ig: '(Ọ dịghị mkpa)' 
+  },
+  'form.required': { 
+    en: 'Required', 
+    pcm: 'E Must', 
+    yo: 'Ó ṣe dandan', 
+    ha: 'Ana buƙata', 
+    ig: 'Achọrọ' 
+  },
+  
+  // Buttons
+  'btn.updateProfile': { 
+    en: 'Update Profile', 
+    pcm: 'Update Your Profile', 
+    yo: 'Ṣe Àtúnṣe Àkọọ́lẹ̀', 
+    ha: 'Sabunta Bayani', 
+    ig: 'Melite Profaịlụ' 
+  },
+  'btn.changePassword': { 
+    en: 'Change Password', 
+    pcm: 'Change Password', 
+    yo: 'Yí Ọ̀rọ̀ Aṣínà Padà', 
+    ha: 'Canja Kalmar Sirri', 
+    ig: 'Gbanwee Okwuntughe' 
+  },
+  'btn.updateEmail': { 
+    en: 'Update Email', 
+    pcm: 'Change Email', 
+    yo: 'Ṣe Àtúnṣe Ímeèlì', 
+    ha: 'Sabunta Imel', 
+    ig: 'Melite Email' 
+  },
+  'btn.enable2FA': { 
+    en: 'Enable 2FA', 
+    pcm: 'Turn On 2FA', 
+    yo: 'Mú 2FA Ṣiṣẹ́', 
+    ha: 'Kunna 2FA', 
+    ig: 'Mee 2FA' 
+  },
+  'btn.disable2FA': { 
+    en: 'Disable 2FA', 
+    pcm: 'Turn Off 2FA', 
+    yo: 'Pa 2FA', 
+    ha: 'Kashe 2FA', 
+    ig: 'Gbanyụọ 2FA' 
+  },
+  'btn.generateBackupCodes': { 
+    en: 'Generate Backup Codes', 
+    pcm: 'Create Backup Codes', 
+    yo: 'Ṣẹ̀dá Àwọn Kóòdù Àfipamọ́', 
+    ha: 'Ƙirƙiri Lambobin Ajiya', 
+    ig: 'Mepụta Koodu Nchekwa' 
+  },
+  'btn.viewBackupCodes': { 
+    en: 'View Backup Codes', 
+    pcm: 'See Backup Codes', 
+    yo: 'Wo Àwọn Kóòdù Àfipamọ́', 
+    ha: 'Duba Lambobin Ajiya', 
+    ig: 'Lee Koodu Nchekwa' 
+  },
+  'btn.signOutAll': { 
+    en: 'Sign Out All Devices', 
+    pcm: 'Sign Out All Devices', 
+    yo: 'Jáde Kúrò Ní Gbogbo Ẹ̀rọ', 
+    ha: 'Fita Daga Dukan Na\'urori', 
+    ig: 'Pụọ na Ngwaọrụ Niile' 
+  },
+  'btn.addExpense': { 
+    en: 'Add Expense', 
+    pcm: 'Add Expense', 
+    yo: 'Fi Inawo Kún', 
+    ha: 'Ƙara Kashewa', 
+    ig: 'Tinye Mmefu' 
+  },
+  'btn.addIncome': { 
+    en: 'Add Income', 
+    pcm: 'Add Income', 
+    yo: 'Fi Owó Wọlé Kún', 
+    ha: 'Ƙara Kuɗin Shiga', 
+    ig: 'Tinye Ego Mbata' 
+  },
+  'btn.createReminder': { 
+    en: 'Create Reminder', 
+    pcm: 'Create Reminder', 
+    yo: 'Ṣẹ̀dá Ìránṣọ́', 
+    ha: 'Ƙirƙiri Tunatarwa', 
+    ig: 'Mepụta Ncheta' 
+  },
+  'btn.inviteMember': { 
+    en: 'Invite Team Member', 
+    pcm: 'Invite Team Member', 
+    yo: 'Pè Ẹlẹ́gbẹ́ Ẹgbẹ́', 
+    ha: 'Gayyaci Memba', 
+    ig: 'Kpọọ Onye Otu' 
+  },
+  'btn.exportPDF': { 
+    en: 'Export PDF', 
+    pcm: 'Download PDF', 
+    yo: 'Gbé PDF Jáde', 
+    ha: 'Fitar PDF', 
+    ig: 'Bupụ PDF' 
+  },
+  'btn.exportCSV': { 
+    en: 'Export CSV', 
+    pcm: 'Download CSV', 
+    yo: 'Gbé CSV Jáde', 
+    ha: 'Fitar CSV', 
+    ig: 'Bupụ CSV' 
+  },
+  'btn.sendTestNotification': { 
+    en: 'Send Test Notification', 
+    pcm: 'Send Test Notification', 
+    yo: 'Fi Ìkìlọ̀ Ìdánwò Ránṣẹ́', 
+    ha: 'Aika Sanarwar Gwaji', 
+    ig: 'Zipu Ọkwa Nnwale' 
+  },
+  'btn.startFiling': { 
+    en: 'Start E-Filing', 
+    pcm: 'Start E-Filing', 
+    yo: 'Bẹ̀rẹ̀ Fífi Ránṣẹ́', 
+    ha: 'Fara Shigar', 
+    ig: 'Malite E-Filing' 
+  },
+  'btn.submitReturn': { 
+    en: 'Submit Return', 
+    pcm: 'Submit Return', 
+    yo: 'Fi Ránṣẹ́', 
+    ha: 'Mika Dawowa', 
+    ig: 'Nyefee Nlọghachi' 
+  },
+  'btn.payNow': { 
+    en: 'Pay Now', 
+    pcm: 'Pay Now', 
+    yo: 'Sanwó Báyìí', 
+    ha: 'Biya Yanzu', 
+    ig: 'Kwụọ Ugbu a' 
+  },
+  'btn.downloadReceipt': { 
+    en: 'Download Receipt', 
+    pcm: 'Download Receipt', 
+    yo: 'Gbà Ìwé-ẹ̀rí Owó', 
+    ha: 'Sauke Rasit', 
+    ig: 'Budata Nnata' 
+  },
+  'btn.fileAnother': { 
+    en: 'File Another Return', 
+    pcm: 'File Another Return', 
+    yo: 'Fi Mìíràn Ránṣẹ́', 
+    ha: 'Shigar da Wani', 
+    ig: 'Nyefee Ọzọ' 
+  },
+  'btn.viewDetails': { 
+    en: 'View Details', 
+    pcm: 'See Details', 
+    yo: 'Wo Àwọn Àlàyé', 
+    ha: 'Duba Cikakkun Bayanai', 
+    ig: 'Lee Nkọwa' 
+  },
+  'btn.markComplete': { 
+    en: 'Mark as Complete', 
+    pcm: 'Mark as Done', 
+    yo: 'Sàmì Gẹ́gẹ́ bí Tó Parí', 
+    ha: 'Yiwa Alamar An Kammala', 
+    ig: 'Kaa ka Emezuru' 
+  },
+  'btn.trustDevice': { 
+    en: 'Trust Device', 
+    pcm: 'Trust This Device', 
+    yo: 'Gbẹ́kẹ̀lé Ẹ̀rọ Yìí', 
+    ha: 'Amince da Na\'ura', 
+    ig: 'Tụkwasị Ngwaọrụ Obi' 
+  },
+  'btn.blockDevice': { 
+    en: 'Block Device', 
+    pcm: 'Block This Device', 
+    yo: 'Dènà Ẹ̀rọ Yìí', 
+    ha: 'Toshe Na\'ura', 
+    ig: 'Gbochie Ngwaọrụ' 
+  },
+  'btn.removeDevice': { 
+    en: 'Remove Device', 
+    pcm: 'Remove This Device', 
+    yo: 'Yọ Ẹ̀rọ Yìí Kúrò', 
+    ha: 'Cire Na\'ura', 
+    ig: 'Wepụ Ngwaọrụ' 
+  },
+  
+  
+  // E-Filing
+  'efiling.title': { 
+    en: 'E-Filing & Payment', 
+    pcm: 'E-Filing & Payment', 
+    yo: 'Fífi Ránṣẹ́ & Ìsanwó', 
+    ha: 'Shigar & Biya', 
+    ig: 'E-Filing & Ịkwụ Ụgwọ' 
+  },
+  'efiling.selectBusiness': { 
+    en: 'Select Business to File', 
+    pcm: 'Choose Business to File', 
+    yo: 'Yan Iṣẹ́ Láti Fí Ránṣẹ́', 
+    ha: 'Zaɓi Kasuwanci don Shigar', 
+    ig: 'Họrọ Azụmaahịa Iji Fanye' 
+  },
+  'efiling.noBusinesses': { 
+    en: 'No saved businesses. Save a business first to file returns.', 
+    pcm: 'You never save any business. Save business first before you fit file.', 
+    yo: 'Kò sí iṣẹ́ tí o fipamọ́. Fi iṣẹ́ pamọ́ kí o tó lè fí ránṣẹ́.', 
+    ha: 'Babu kasuwanci da aka ajiye. Ajiye kasuwanci da farko.', 
+    ig: 'Ọ dịghị azụmaahịa echekwara. Chekwaa azụmaahịa tupu ịfanye.' 
+  },
+  'efiling.chooseBusiness': { 
+    en: 'Choose a business', 
+    pcm: 'Choose a business', 
+    yo: 'Yan iṣẹ́ kan', 
+    ha: 'Zaɓi kasuwanci', 
+    ig: 'Họrọ azụmaahịa' 
+  },
+  'efiling.estTaxDue': { 
+    en: 'Est. Tax Due', 
+    pcm: 'Tax Wey You Go Pay', 
+    yo: 'Owó-orí Tí A Rò', 
+    ha: 'Kiyasin Harajin da za\'a biya', 
+    ig: 'Nkwurịta Ụtụ A Ga-akwụ' 
+  },
+  'efiling.reviewReturn': { 
+    en: 'Review Pre-Filled Return', 
+    pcm: 'Check Return Wey Don Fill', 
+    yo: 'Ṣàyẹ̀wò Ìpadàsí Tí A Ti Kún', 
+    ha: 'Sake duba Dawowa da Aka Cika', 
+    ig: 'Nyochaa Nlọghachi Ejupụtara' 
+  },
+  'efiling.mockDemo': { 
+    en: 'Mock E-Filing', 
+    pcm: 'Mock E-Filing', 
+    yo: 'Ìdánwò Fífi Ránṣẹ́', 
+    ha: 'Gwajin Shigar', 
+    ig: 'Nnwale E-Filing' 
+  },
+  'efiling.realIntegration': { 
+    en: 'This is a demonstration. Real FIRS integration coming soon!', 
+    pcm: 'This na just demo. Real FIRS go come soon!', 
+    yo: 'Èyí jẹ́ ìfihàn. Ìsopọ̀ FIRS gangan ń bọ̀ láìpẹ́!', 
+    ha: 'Wannan nuni ne. Haɗin FIRS na gaske yana zuwa nan da nan!', 
+    ig: 'Nke a bụ ngosi. Njikọ FIRS n\'ezie na-abịa n\'oge adịghị anya!' 
+  },
+  'efiling.processing': { 
+    en: 'Processing Your Return', 
+    pcm: 'Processing Your Return', 
+    yo: 'Ń Ṣàlàyé Ìpadàsí Rẹ', 
+    ha: 'Ana Aiki da Dawowarka', 
+    ig: 'Na-arụ Ọrụ na Nlọghachi Gị' 
+  },
+  'efiling.submittedSuccess': { 
+    en: 'Return Submitted Successfully!', 
+    pcm: 'Return Don Submit!', 
+    yo: 'A Ti Fí Ìpadàsí Ránṣẹ́ Dáadáa!', 
+    ha: 'An Mika Dawowa Cikin Nasara!', 
+    ig: 'Nyefere Nlọghachi Nke Ọma!' 
+  },
+  'efiling.taxDue': { 
+    en: 'Tax Due', 
+    pcm: 'Tax Wey You Go Pay', 
+    yo: 'Owó-orí Tí O Gbọ́dọ̀ San', 
+    ha: 'Harajin da za\'a biya', 
+    ig: 'Ụtụ Aga Akwụ' 
+  },
+  'efiling.filingComplete': { 
+    en: 'Filing Complete!', 
+    pcm: 'Filing Done!', 
+    yo: 'Fífi Ránṣẹ́ Ti Parí!', 
+    ha: 'Shigar Ya Kammala!', 
+    ig: 'Filing Emezula!' 
+  },
+  'efiling.paymentProcessed': { 
+    en: 'Your tax return has been submitted and payment processed.', 
+    pcm: 'Your tax return don submit and payment don process.', 
+    yo: 'A ti fi ìpadàsí owó-orí rẹ ránṣẹ́ àti a ti ṣe ìsanwó.', 
+    ha: 'An mika dawowar harajinka kuma an aiwatar da biyan kuɗi.', 
+    ig: 'Enyefela nlọghachi ụtụ gị ma kwụọ ụgwọ.' 
+  },
+  'efiling.filingReference': { 
+    en: 'Filing Reference', 
+    pcm: 'Filing Reference', 
+    yo: 'Àkọsílẹ̀ Fífi Ránṣẹ́', 
+    ha: 'Maganar Shigar', 
+    ig: 'Nrụaka Filing' 
+  },
+  'efiling.paymentReference': { 
+    en: 'Payment Reference', 
+    pcm: 'Payment Reference', 
+    yo: 'Àkọsílẹ̀ Ìsanwó', 
+    ha: 'Maganar Biyan Kuɗi', 
+    ig: 'Nrụaka Ịkwụ Ụgwọ' 
+  },
+  'efiling.amountPaid': { 
+    en: 'Amount Paid', 
+    pcm: 'Amount Wey You Pay', 
+    yo: 'Iye Owó Tí O San', 
+    ha: 'Adadin da Aka Biya', 
+    ig: 'Ego Akwụrụ' 
+  },
+  'efiling.status': { 
+    en: 'Status', 
+    pcm: 'Status', 
+    yo: 'Ipò', 
+    ha: 'Matsayi', 
+    ig: 'Ọnọdụ' 
+  },
+  'efiling.completed': { 
+    en: 'Completed', 
+    pcm: 'Done', 
+    yo: 'Ti Parí', 
+    ha: 'An Kammala', 
+    ig: 'Emezuru' 
+  },
+  
+  // Tooltips
+  'tooltip.securityScore': { 
+    en: 'Your security score based on account protection measures', 
+    pcm: 'How your account dey protected', 
+    yo: 'Ìwọ̀n ààbò rẹ dá lórí àwọn ètò ààbò àkọọ́lẹ̀', 
+    ha: 'Makin tsaron ku bisa matakan kariyar asusu', 
+    ig: 'Akara nchekwa gị dabere na usoro nchekwa akaụntụ' 
+  },
+  'tooltip.trustedDevice': { 
+    en: 'This device is trusted and can access your account without additional verification', 
+    pcm: 'This device trusted. E fit enter your account without extra check', 
+    yo: 'A gbẹ́kẹ̀lé ẹ̀rọ yìí ó sì lè wọ àkọọ́lẹ̀ rẹ láì sí ìjẹ́rìísí míràn', 
+    ha: 'An amince da wannan na\'ura kuma tana iya samun damar asusunka ba tare da ƙarin tabbatarwa ba', 
+    ig: 'Atụkwasịrị ngwaọrụ a obi ma nwee ike ịbanye akaụntụ gị na-enweghị nyocha ọzọ' 
+  },
+  'tooltip.blockedDevice': { 
+    en: 'This device is blocked and cannot access your account', 
+    pcm: 'This device don block. E no fit enter your account', 
+    yo: 'A ti dínà ẹ̀rọ yìí kò sì lè wọ àkọọ́lẹ̀ rẹ', 
+    ha: 'An toshe wannan na\'ura kuma ba za ta iya samun damar asusunka ba', 
+    ig: 'Egbochiri ngwaọrụ a ma enweghị ike ịbanye akaụntụ gị' 
+  },
+  'tooltip.mfaEnabled': { 
+    en: 'Two-factor authentication adds an extra layer of security to your account', 
+    pcm: '2FA go add extra security to your account', 
+    yo: 'Ìjẹ́rìísí ọ̀nà méjì ń fi àfikún ààbò kún àkọọ́lẹ̀ rẹ', 
+    ha: 'Tabbatarwar hanyoyi biyu yana ƙara wani mataki na tsaro ga asusunka', 
+    ig: 'Nyocha ụzọ abụọ na-etinye nchekwa ọzọ na akaụntụ gị' 
+  },
+  'tooltip.backupCodes': { 
+    en: 'Backup codes can be used to access your account if you lose access to your authenticator', 
+    pcm: 'Backup code fit help you enter your account if your authenticator no dey', 
+    yo: 'Àwọn kóòdù àfipamọ́ lè jẹ́ lílò láti wọ àkọọ́lẹ̀ rẹ tí o bá pàdánù ẹ̀rọ ìjẹ́rìísí rẹ', 
+    ha: 'Ana iya amfani da lambobin ajiya don samun damar asusunka idan ka rasa damar mai tabbatarwa', 
+    ig: 'Enwere ike iji koodu nchekwa banye akaụntụ gị ma ị furu ngwaọrụ nyocha gị' 
+  },
+  'tooltip.deductibleExpense': { 
+    en: 'This expense can be deducted from your taxable income', 
+    pcm: 'This expense fit reduce the tax wey you go pay', 
+    yo: 'Inawo yìí lè yọ kúrò nínú owó tí a gbọ́dọ̀ san owó-orí lórí rẹ̀', 
+    ha: 'Za\'a iya cire wannan kashewa daga kuɗin shigarku da ake biya haraji', 
+    ig: 'Enwere ike iwepụ mmefu a na ego a ga-atụ ụtụ' 
+  },
+  'tooltip.taxSavings': { 
+    en: 'The amount of tax you saved through deductions and exemptions', 
+    pcm: 'How much tax you save through deductions', 
+    yo: 'Iye owó-orí tí o fipamọ́ nípasẹ̀ àwọn ìyọkúrò àti àwọn ìfàsẹ́yìn', 
+    ha: 'Adadin harajin da kuka tanada ta hanyar ragewa da keɓewa', 
+    ig: 'Ego ụtụ ị zọpụtara site na mwepu na mpụnarị' 
+  },
 };
 
 // Helper function to get toast messages
