@@ -1445,6 +1445,477 @@ export const translations: Translations = {
     ha: 'Tabbatar da kalmar wucewa', 
     ig: 'Kwenye okwuntughe' 
   },
+  'auth.welcomeBack': { 
+    en: 'Welcome Back', 
+    pcm: 'You Don Come Back', 
+    yo: 'Ẹ Káàbọ̀ Padà', 
+    ha: 'Barka da dawowa', 
+    ig: 'Nnọọ Azụ' 
+  },
+  'auth.createAccount': { 
+    en: 'Create Account', 
+    pcm: 'Open Account', 
+    yo: 'Ṣẹ̀dá Àkàùntì', 
+    ha: 'Ƙirƙiri Asusu', 
+    ig: 'Mepụta Akaụntụ' 
+  },
+  'auth.setNewPassword': { 
+    en: 'Set New Password', 
+    pcm: 'Put New Password', 
+    yo: 'Ṣètò Ọ̀rọ̀ Aṣínà Tuntun', 
+    ha: 'Saita Sabuwar Kalmar Wucewa', 
+    ig: 'Tọọ Okwuntughe Ọhụrụ' 
+  },
+  'auth.twoFactorAuth': { 
+    en: 'Two-Factor Authentication', 
+    pcm: 'Double Security Check', 
+    yo: 'Ìjẹ́rìísí Méjì', 
+    ha: 'Tabbatarwa ta Biyu', 
+    ig: 'Nkwenye Ugboro Abụọ' 
+  },
+  'auth.signInSubtitle': { 
+    en: 'Sign in to access your tax dashboard', 
+    pcm: 'Login to see your tax things', 
+    yo: 'Wọlé láti wọlé sí pánẹ́ẹ̀lì owó-orí rẹ', 
+    ha: 'Shiga don samun damar dashboard ɗin harajin ku', 
+    ig: 'Banye iji nweta dashboard ụtụ gị' 
+  },
+  'auth.signUpSubtitle': { 
+    en: 'Start managing your taxes smarter', 
+    pcm: 'Start manage your tax well well', 
+    yo: 'Bẹ̀rẹ̀ sí í ṣàkóso owó-orí rẹ dáradára', 
+    ha: 'Fara sarrafa harajin ku da kyau', 
+    ig: 'Malite ijikwa ụtụ gị nke ọma' 
+  },
+  'auth.forgotPasswordSubtitle': { 
+    en: 'Enter your email to receive a reset link', 
+    pcm: 'Put your email make we send link', 
+    yo: 'Tẹ ímeèlì rẹ láti gba ìjápọ̀ àtúnṣe', 
+    ha: 'Shigar da imel ɗin ku don karɓar hanyar haɗin sake saiti', 
+    ig: 'Tinye email gị iji nata njikọ ntọgharia' 
+  },
+  'auth.resetPasswordSubtitle': { 
+    en: 'Choose a new password for your account', 
+    pcm: 'Pick new password for your account', 
+    yo: 'Yan ọ̀rọ̀ aṣínà tuntun fún àkàùntì rẹ', 
+    ha: 'Zaɓi sabuwar kalmar wucewa don asusun ku', 
+    ig: 'Họrọ okwuntughe ọhụrụ maka akaụntụ gị' 
+  },
+  'auth.mfaCodeSubtitle': { 
+    en: 'Enter the code from your authenticator app', 
+    pcm: 'Put the code from your authenticator app', 
+    yo: 'Tẹ kóòdù láti inú àpẹ̀ẹ̀rẹ̀ ìjẹ́rìísí rẹ', 
+    ha: 'Shigar da lambar daga aikace-aikacen tabbatarwa', 
+    ig: 'Tinye koodu sitere na app nkwenye gị' 
+  },
+  'auth.mfaBackupSubtitle': { 
+    en: 'Enter one of your backup codes', 
+    pcm: 'Put one of your backup codes', 
+    yo: 'Tẹ ọ̀kan nínú àwọn kóòdù ìpamọ́ rẹ', 
+    ha: 'Shigar da ɗaya daga cikin lambobin ajiya', 
+    ig: 'Tinye otu n\'ime koodu nchekwa gị' 
+  },
+  'auth.backToHome': { 
+    en: 'Back to Home', 
+    pcm: 'Go Back Home', 
+    yo: 'Padà sí Ilé', 
+    ha: 'Koma Gida', 
+    ig: 'Laghachi n\'ụlọ' 
+  },
+  'auth.fullName': { 
+    en: 'Full Name', 
+    pcm: 'Your Full Name', 
+    yo: 'Orúkọ Kíkún', 
+    ha: 'Cikakken Suna', 
+    ig: 'Aha Zuru Ezu' 
+  },
+  'auth.rememberMe': { 
+    en: 'Remember me', 
+    pcm: 'Remember me', 
+    yo: 'Rántí mi', 
+    ha: 'Tuna ni', 
+    ig: 'Cheta m' 
+  },
+  'auth.continueWithGoogle': { 
+    en: 'Continue with Google', 
+    pcm: 'Use Google Enter', 
+    yo: 'Tẹ̀síwájú pẹ̀lú Google', 
+    ha: 'Ci gaba da Google', 
+    ig: 'Gaa n\'ihu na Google' 
+  },
+  'auth.orContinueWithEmail': { 
+    en: 'or continue with email', 
+    pcm: 'or use email', 
+    yo: 'tàbí tẹ̀síwájú pẹ̀lú ímeèlì', 
+    ha: 'ko ci gaba da imel', 
+    ig: 'maọbụ gaa n\'ihu na email' 
+  },
+  'auth.pleaseWait': { 
+    en: 'Please wait...', 
+    pcm: 'Wait small...', 
+    yo: 'Jọ̀wọ́ dúró...', 
+    ha: 'Da fatan za a jira...', 
+    ig: 'Biko chere...' 
+  },
+  'auth.accountLocked': { 
+    en: 'Account Locked', 
+    pcm: 'Account Don Lock', 
+    yo: 'A Ti Ti Àkàùntì', 
+    ha: 'An Kulle Asusu', 
+    ig: 'Akpọchiri Akaụntụ' 
+  },
+  'auth.sendResetLink': { 
+    en: 'Send Reset Link', 
+    pcm: 'Send Link', 
+    yo: 'Fi Ìjápọ̀ Àtúnṣe Ránṣẹ́', 
+    ha: 'Aika Hanyar Haɗin Sake Saiti', 
+    ig: 'Zipu Njikọ Ntọgharia' 
+  },
+  'auth.sending': { 
+    en: 'Sending...', 
+    pcm: 'E dey send...', 
+    yo: 'Ń fi ránṣẹ́...', 
+    ha: 'Ana aikawa...', 
+    ig: 'Na-ezipu...' 
+  },
+  'auth.backToSignIn': { 
+    en: 'Back to Sign In', 
+    pcm: 'Go Back to Login', 
+    yo: 'Padà sí Wíwọlé', 
+    ha: 'Koma zuwa Shiga', 
+    ig: 'Laghachi na Ịbanye' 
+  },
+  'auth.updatePassword': { 
+    en: 'Update Password', 
+    pcm: 'Change Password', 
+    yo: 'Ṣàtúnṣe Ọ̀rọ̀ Aṣínà', 
+    ha: 'Sabunta Kalmar Wucewa', 
+    ig: 'Melite Okwuntughe' 
+  },
+  'auth.updating': { 
+    en: 'Updating...', 
+    pcm: 'E dey update...', 
+    yo: 'Ń ṣàtúnṣe...', 
+    ha: 'Ana sabuntawa...', 
+    ig: 'Na-emelite...' 
+  },
+  'auth.verify': { 
+    en: 'Verify', 
+    pcm: 'Verify', 
+    yo: 'Ṣàyẹ̀wò', 
+    ha: 'Tabbatar', 
+    ig: 'Kwenye' 
+  },
+  'auth.verifying': { 
+    en: 'Verifying...', 
+    pcm: 'E dey check...', 
+    yo: 'Ń ṣàyẹ̀wò...', 
+    ha: 'Ana tabbatarwa...', 
+    ig: 'Na-ekwenye...' 
+  },
+  'auth.backupCode': { 
+    en: 'Backup Code', 
+    pcm: 'Backup Code', 
+    yo: 'Kóòdù Ìpamọ́', 
+    ha: 'Lambar Ajiya', 
+    ig: 'Koodu Nchekwa' 
+  },
+  'auth.verificationCode': { 
+    en: 'Verification Code', 
+    pcm: 'Verification Code', 
+    yo: 'Kóòdù Ìjẹ́rìísí', 
+    ha: 'Lambar Tabbatarwa', 
+    ig: 'Koodu Nkwenye' 
+  },
+  'auth.enterBackupCode': { 
+    en: 'Enter one of your 8-character backup codes', 
+    pcm: 'Put one of your 8-letter backup codes', 
+    yo: 'Tẹ ọ̀kan nínú àwọn kóòdù ìpamọ́ lẹ́tà 8', 
+    ha: 'Shigar da ɗaya daga cikin lambobin ajiya haruffa 8', 
+    ig: 'Tinye otu n\'ime koodu nchekwa mkpụrụedemede 8' 
+  },
+  'auth.enter6DigitCode': { 
+    en: 'Enter the 6-digit code from your authenticator app', 
+    pcm: 'Put the 6-number code from your authenticator', 
+    yo: 'Tẹ kóòdù àwọn nọ́mbà 6 láti inú àpẹ̀ẹ̀rẹ̀ ìjẹ́rìísí rẹ', 
+    ha: 'Shigar da lambar lambobi 6 daga aikace-aikacen tabbatarwa', 
+    ig: 'Tinye koodu ọnụọgụ 6 sitere na app nkwenye gị' 
+  },
+  'auth.useAuthenticatorApp': { 
+    en: 'Use authenticator app instead', 
+    pcm: 'Use authenticator app instead', 
+    yo: 'Lo àpẹ̀ẹ̀rẹ̀ ìjẹ́rìísí dípò', 
+    ha: 'Yi amfani da aikace-aikacen tabbatarwa maimakon', 
+    ig: 'Jiri app nkwenye kama' 
+  },
+  'auth.lostAuthenticator': { 
+    en: 'Lost your authenticator? Use a backup code', 
+    pcm: 'You lose your authenticator? Use backup code', 
+    yo: 'Ṣé o pàdánù àpẹ̀ẹ̀rẹ̀ ìjẹ́rìísí rẹ? Lo kóòdù ìpamọ́', 
+    ha: 'Kun rasa aikace-aikacen tabbatarwa? Yi amfani da lambar ajiya', 
+    ig: 'Ị tụfuru app nkwenye gị? Jiri koodu nchekwa' 
+  },
+  'auth.resendVerificationEmail': { 
+    en: 'Resend verification email', 
+    pcm: 'Send verification email again', 
+    yo: 'Tún fi ímeèlì ìjẹ́rìísí ránṣẹ́', 
+    ha: 'Sake aika imel ɗin tabbatarwa', 
+    ig: 'Zipugharia email nkwenye' 
+  },
+  'auth.emailNotVerified': { 
+    en: 'Email not verified', 
+    pcm: 'Email never verify', 
+    yo: 'A kò tíì jẹ́rìísí ímeèlì', 
+    ha: 'Ba a tabbatar da imel ba', 
+    ig: 'Akwenyebeghị email' 
+  },
+  'auth.checkInboxMessage': { 
+    en: 'Please check your inbox and click the verification link. If you didn\'t receive the email, use the button below to resend it.', 
+    pcm: 'Check your inbox click the link. If you no see am, click button below make we send again.', 
+    yo: 'Jọ̀wọ́ ṣàyẹ̀wò àpótí ìgbànísọ̀rọ̀ rẹ kí o sì tẹ ìjápọ̀ ìjẹ́rìísí náà. Tí o kò bá rí ímeèlì náà, lo bọ́tìnì ìsàlẹ̀ láti tún fi ránṣẹ́.', 
+    ha: 'Da fatan za a duba akwatin saƙo ku kuma danna hanyar haɗin tabbatarwa. Idan ba ku sami imel ɗin ba, yi amfani da maɓallin da ke ƙasa don sake aika shi.', 
+    ig: 'Biko lelee igbe ozi gị pịa njikọ nkwenye. Ọ bụrụ na ị nataghị email ahụ, jiri bọtịnụ dị n\'okpuru izipu ya ọzọ.' 
+  },
+  'auth.accountLockedTitle': { 
+    en: 'Account Temporarily Locked', 
+    pcm: 'Account Lock For Now', 
+    yo: 'A Ti Ti Àkàùntì Fún Ìgbà Díẹ̀', 
+    ha: 'An Kulle Asusu Na Wani Lokaci', 
+    ig: 'Akpọchiri Akaụntụ Nwa Oge' 
+  },
+  'auth.tooManyAttempts': { 
+    en: 'Too many failed login attempts. Please try again after', 
+    pcm: 'You try login too many times. Try again after', 
+    yo: 'Ìgbìyànjú wíwọlé tí kò ṣe àṣeyọrí púpọ̀ jù. Jọ̀wọ́ gbìyànjú lẹ́ẹ̀kan sí lẹ́yìn', 
+    ha: 'Ƙoƙarin shiga da yawa da suka gaza. Da fatan za a sake gwadawa bayan', 
+    ig: 'Ọtụtụ mbọ ịbanye dara. Biko nwaa ọzọ mgbe' 
+  },
+  'auth.attemptsRemaining': { 
+    en: 'login attempts remaining before account lockout', 
+    pcm: 'try remain before account go lock', 
+    yo: 'ìgbìyànjú wíwọlé kù ṣáájú títi àkàùntì', 
+    ha: 'ƙoƙarin shiga sun rage kafin kulle asusu', 
+    ig: 'mbọ ịbanye fọdụrụ tupu akpọchie akaụntụ' 
+  },
+  'auth.termsAgreement': { 
+    en: 'By continuing, you agree to our Terms of Service and Privacy Policy.', 
+    pcm: 'If you continue, you don agree to our Terms and Privacy.', 
+    yo: 'Nípa títẹ̀síwájú, o ti gba àwọn Òfin Iṣẹ́ àti Ètò Ìpamọ́ wa.', 
+    ha: 'Ta hanyar ci gaba, kun yarda da Sharuɗɗan Sabis da Manufar Sirri.', 
+    ig: 'Site n\'ịga n\'ihu, ị kwenyere na Usoro Ọrụ na Iwu Nzuzo anyị.' 
+  },
+  
+  // Homepage / Index
+  'home.heroTitle': { 
+    en: 'Smart Tax Advice for', 
+    pcm: 'Better Tax Advice for', 
+    yo: 'Ìmọ̀ràn Owó-orí Tó Dára fún', 
+    ha: 'Shawarar Haraji Mai Kyau don', 
+    ig: 'Ndụmọdụ Ụtụ Mara Mma maka' 
+  },
+  'home.heroTitleHighlight': { 
+    en: 'Nigerian Businesses', 
+    pcm: 'Nigerian Business Dem', 
+    yo: 'Àwọn Iṣẹ́ Nàìjíríà', 
+    ha: 'Kasuwancin Najeriya', 
+    ig: 'Azụmaahịa Naịjirịa' 
+  },
+  'home.heroDescription': { 
+    en: 'Get personalized business structure recommendations and accurate tax calculations. Built for small businesses and individuals navigating Nigeria\'s tax landscape.', 
+    pcm: 'Get advice wey fit your business and correct tax calculation. We build am for small business and people wey wan understand Nigeria tax.', 
+    yo: 'Gba àwọn àbá ètò iṣẹ́ tí ó bá ọ mu àti ìṣirò owó-orí tó pé. A ṣe fún àwọn iṣẹ́ kékeré àti àwọn ẹnìkọ̀ọ̀kan tí wọ́n ń sapá nínú ètò owó-orí Nàìjíríà.', 
+    ha: 'Sami shawarar tsarin kasuwanci da ya dace da ku da ƙididdige haraji daidai. An gina shi don ƙananan kasuwanci da mutane da ke bi ta yanayin harajin Najeriya.', 
+    ig: 'Nweta ntụnye usoro azụmaahịa akpọrọ maka gị na ngbako ụtụ ziri ezi. E wuru ya maka obere azụmaahịa na ndị mmadụ na-achọ ụzọ n\'ime ụtụ Naịjirịa.' 
+  },
+  'home.updatedForTaxAct': { 
+    en: 'Updated for Nigeria Tax Act 2025', 
+    pcm: 'We don update am for Nigeria Tax Act 2025', 
+    yo: 'A ti ṣàtúnṣe fún Òfin Owó-orí Nàìjíríà 2025', 
+    ha: 'An sabunta don Dokar Haraji ta Najeriya 2025', 
+    ig: 'Emelitere maka Iwu Ụtụ Naịjirịa 2025' 
+  },
+  'home.getTaxAdvice': { 
+    en: 'Get Tax Advice', 
+    pcm: 'Get Tax Advice', 
+    yo: 'Gba Ìmọ̀ràn Owó-orí', 
+    ha: 'Sami Shawarar Haraji', 
+    ig: 'Nweta Ndụmọdụ Ụtụ' 
+  },
+  'home.taxCalculator': { 
+    en: 'Tax Calculator', 
+    pcm: 'Tax Calculator', 
+    yo: 'Ẹ̀rọ Ìṣirò Owó-orí', 
+    ha: 'Na\'urar Ƙididdiga Haraji', 
+    ig: 'Ngwa Mgbako Ụtụ' 
+  },
+  'home.firsCompliant': { 
+    en: 'FIRS Compliant', 
+    pcm: 'FIRS Approved', 
+    yo: 'Ó Bá FIRS Mu', 
+    ha: 'Ya Dace da FIRS', 
+    ig: 'Kwekọrọ na FIRS' 
+  },
+  'home.pre2026And2026Rules': { 
+    en: 'Pre-2026 & 2026 Rules', 
+    pcm: 'Old and New Rules', 
+    yo: 'Àwọn Òfin Ṣáájú-2026 àti 2026', 
+    ha: 'Dokokin Kafin-2026 da 2026', 
+    ig: 'Iwu Tupu-2026 na 2026' 
+  },
+  'home.freeToUse': { 
+    en: 'Free to Use', 
+    pcm: 'Free to Use', 
+    yo: 'Ọ̀fẹ́ láti Lò', 
+    ha: 'Kyauta don Amfani', 
+    ig: 'N\'efu iji' 
+  },
+  'home.everythingYouNeed': { 
+    en: 'Everything You Need for Tax Compliance', 
+    pcm: 'Everything You Need for Tax', 
+    yo: 'Gbogbo Ohun Tí O Nílò fún Ìdúróṣinṣin Owó-orí', 
+    ha: 'Duk Abin da Kuke Buƙata don Bin Haraji', 
+    ig: 'Ihe Niile Ị Chọrọ maka Ịdebe Ụtụ' 
+  },
+  'home.fromBusinessAdvice': { 
+    en: 'From business structure advice to detailed tax calculations', 
+    pcm: 'From business advice to tax calculation', 
+    yo: 'Láti ìmọ̀ràn ètò iṣẹ́ dé àwọn ìṣirò owó-orí àlàyé', 
+    ha: 'Daga shawarar tsarin kasuwanci zuwa ƙididdige haraji cikakke', 
+    ig: 'Site na ndụmọdụ usoro azụmaahịa ruo ngbako ụtụ zuru ezu' 
+  },
+  'home.businessStructureAdvice': { 
+    en: 'Business Structure Advice', 
+    pcm: 'Business Structure Advice', 
+    yo: 'Ìmọ̀ràn Ètò Iṣẹ́', 
+    ha: 'Shawarar Tsarin Kasuwanci', 
+    ig: 'Ndụmọdụ Usoro Azụmaahịa' 
+  },
+  'home.businessStructureDesc': { 
+    en: 'Get recommendations on whether to register as a Business Name or Limited Liability Company based on your needs.', 
+    pcm: 'Get advice if you go register as Business Name or Limited Company.', 
+    yo: 'Gba àwọn àbá nípa bóyá o yẹ kí o forúkọ sílẹ̀ bí Orúkọ Iṣẹ́ tàbí Ilé-iṣẹ́ Ohun Ìnì Tó Lópin dá lórí àwọn ohun tí o nílò.', 
+    ha: 'Sami shawarwarin ko za ku yi rijista a matsayin Sunan Kasuwanci ko Kamfanin Iyakance Abin Nauyi dangane da buƙatun ku.', 
+    ig: 'Nweta ntụnye ma ị ga-edebanye aha dị ka Aha Azụmaahịa ma ọ bụ Ụlọ Ọrụ Nwere Oke Ntụkwasị dabere n\'ihe ị chọrọ.' 
+  },
+  'home.taxCalculatorTitle': { 
+    en: 'Tax Calculator', 
+    pcm: 'Tax Calculator', 
+    yo: 'Ẹ̀rọ Ìṣirò Owó-orí', 
+    ha: 'Na\'urar Ƙididdiga Haraji', 
+    ig: 'Ngwa Mgbako Ụtụ' 
+  },
+  'home.taxCalculatorDesc': { 
+    en: 'Calculate CIT, PIT, VAT, and development levies with support for both pre-2026 and 2026+ rules.', 
+    pcm: 'Calculate CIT, PIT, VAT, and levies with old and new rules.', 
+    yo: 'Ṣe ìṣirò CIT, PIT, VAT, àti àwọn owó ìdàgbàsókè pẹ̀lú àtìlẹ́yìn fún àwọn òfin ṣáájú-2026 àti 2026+.', 
+    ha: 'Ƙididdige CIT, PIT, VAT, da haraji na ci gaba tare da goyon bayan dokokin kafin-2026 da 2026+.', 
+    ig: 'Gbakọọ CIT, PIT, VAT, na ụtụ mmepe na nkwado maka iwu tupu-2026 na 2026+.' 
+  },
+  'home.liabilityProtection': { 
+    en: 'Liability Protection', 
+    pcm: 'Protection', 
+    yo: 'Ìdáàbòbò Ẹ̀ṣẹ̀', 
+    ha: 'Kariyar Alhaki', 
+    ig: 'Nchekwa Ọrụ' 
+  },
+  'home.liabilityProtectionDesc': { 
+    en: 'Understand how different business structures affect your personal asset protection.', 
+    pcm: 'Understand how different business type fit protect your things.', 
+    yo: 'Mọ̀ bí àwọn ètò iṣẹ́ oríṣiríṣi ṣe ń kan ìdáàbòbò ohun ìní ara ẹni rẹ.', 
+    ha: 'Fahimci yadda tsarin kasuwanci daban-daban ke shafar kariyar dukiyar ku.', 
+    ig: 'Ghọta ka usoro azụmaahịa dị iche iche si emetụta nchekwa akụ nke onwe gị.' 
+  },
+  'home.smallCompanyBenefits': { 
+    en: 'Small Company Benefits', 
+    pcm: 'Small Company Benefits', 
+    yo: 'Àwọn Ànfààní Ilé-iṣẹ́ Kékeré', 
+    ha: 'Fa\'idodin Ƙaramin Kamfani', 
+    ig: 'Uru Obere Ụlọ Ọrụ' 
+  },
+  'home.smallCompanyBenefitsDesc': { 
+    en: 'Check if you qualify for 0% CIT rate under the new small company rules.', 
+    pcm: 'Check if you fit get 0% CIT under new small company rules.', 
+    yo: 'Ṣàyẹ̀wò bóyá o yẹ fún ìwọ̀n CIT 0% lábẹ́ àwọn òfin ilé-iṣẹ́ kékeré tuntun.', 
+    ha: 'Duba ko kun cancanci adadin CIT 0% ƙarƙashin sabbin dokokin ƙaramin kamfani.', 
+    ig: 'Lelee ma ị ruru uru maka ọnụọgụ CIT 0% n\'okpuru iwu ụlọ ọrụ obere ọhụrụ.' 
+  },
+  'home.exportReports': { 
+    en: 'Export Reports', 
+    pcm: 'Download Reports', 
+    yo: 'Gbé Àwọn Ìròyìn Jáde', 
+    ha: 'Fitar da Rahotanni', 
+    ig: 'Bupụ Akụkọ' 
+  },
+  'home.exportReportsDesc': { 
+    en: 'Download your tax calculations as PDF or CSV for record keeping and filing.', 
+    pcm: 'Download your tax calculation as PDF or CSV for record.', 
+    yo: 'Gbàmọ́lé àwọn ìṣirò owó-orí rẹ bí PDF tàbí CSV fún ìtọ́jú àkọsílẹ̀ àti fífi ìfín.', 
+    ha: 'Sauke ƙididdige harajin ku a matsayin PDF ko CSV don adana bayanan da shigarwa.', 
+    ig: 'Budata ngbako ụtụ gị dị ka PDF ma ọ bụ CSV maka nchekwa ndekọ na ntinye.' 
+  },
+  'home.taxFilingPreparation': { 
+    en: 'Tax Filing Preparation', 
+    pcm: 'Tax Filing Preparation', 
+    yo: 'Ìgbékalẹ̀ Fífi Owó-orí Ìfín', 
+    ha: 'Shirye-shiryen Shigar da Haraji', 
+    ig: 'Nkwadebe Ntinye Ụtụ' 
+  },
+  'home.taxFilingPreparationDesc': { 
+    en: 'Generate pre-filled FIRS forms ready for TaxProMax submission.', 
+    pcm: 'Generate FIRS forms wey don ready for TaxProMax.', 
+    yo: 'Ṣe àwọn fọ́ọ̀mù FIRS tí a ti kún tẹ́lẹ̀ tí wọ́n ti ṣetán fún fífi sí TaxProMax.', 
+    ha: 'Ƙirƙiri fom ɗin FIRS da aka riga aka cika shirye don miƙa TaxProMax.', 
+    ig: 'Mepụta fọm FIRS ejiri edebere akwadebere maka ntinye TaxProMax.' 
+  },
+  'home.plansForEveryBusiness': { 
+    en: 'Plans for Every Business', 
+    pcm: 'Plans for Every Business', 
+    yo: 'Àwọn Ètò fún Gbogbo Iṣẹ́', 
+    ha: 'Tsare-tsare don Kowane Kasuwanci', 
+    ig: 'Atụmatụ maka Azụmaahịa Ọ Bụla' 
+  },
+  'home.startFreeWithUnlimited': { 
+    en: 'Start free with unlimited calculations. Upgrade for exports, saved businesses, and filing tools.', 
+    pcm: 'Start free with plenty calculation. Upgrade for export and more features.', 
+    yo: 'Bẹ̀rẹ̀ lọ́fẹ̀ẹ́ pẹ̀lú àwọn ìṣirò àìlópin. Gbéga fún gbígbé jáde, àwọn iṣẹ́ tí a fi pamọ́, àti àwọn ọ̀pá iṣẹ́ fífi ìfín.', 
+    ha: 'Fara kyauta tare da ƙididdiga marasa iyaka. Haɓaka don fitarwa, kasuwancin da aka ajiye, da kayan aikin shigarwa.', 
+    ig: 'Malite n\'efu na ngbako enweghị oke. Kwalite maka mbupụ, azụmaahịa echekwara, na ngwa ntinye.' 
+  },
+  'home.viewPricingPlans': { 
+    en: 'View Pricing Plans', 
+    pcm: 'See All Plans', 
+    yo: 'Wo Àwọn Ètò Iye Owó', 
+    ha: 'Duba Tsarin Farashi', 
+    ig: 'Lee Atụmatụ Ọnụahịa' 
+  },
+  'home.readyToOptimize': { 
+    en: 'Ready to Optimize Your Taxes?', 
+    pcm: 'Ready to Fix Your Tax?', 
+    yo: 'Ṣé O Ti Ṣetán láti Mú Owó-orí Rẹ Dára Sí?', 
+    ha: 'Shirye don Inganta Harajin Ku?', 
+    ig: 'Ọ Dị Njikere Ịkwalite Ụtụ Gị?' 
+  },
+  'home.joinThousands': { 
+    en: 'Join thousands of Nigerian businesses making smarter tax decisions. Start with our free advisory tool.', 
+    pcm: 'Join plenty Nigerian business wey dey make better tax decision. Start with our free tool.', 
+    yo: 'Darapọ̀ mọ́ ẹgbẹẹgbẹ̀rún àwọn iṣẹ́ Nàìjíríà tí wọ́n ń ṣe àwọn ìpinnu owó-orí tó dára jùlọ. Bẹ̀rẹ̀ pẹ̀lú ọ̀pá iṣẹ́ ìmọ̀ràn ọ̀fẹ́ wa.', 
+    ha: 'Ku haɗa da dubbannin kasuwancin Najeriya da ke yanke shawara mafi kyau na haraji. Fara tare da kayan aikin ba da shawara kyauta.', 
+    ig: 'Sonye na puku kwuru puku azụmaahịa Naịjirịa na-eme mkpebi ụtụ ka mma. Malite na ngwa ndụmọdụ n\'efu anyị.' 
+  },
+  'home.startFreeAssessment': { 
+    en: 'Start Free Assessment', 
+    pcm: 'Start Free Check', 
+    yo: 'Bẹ̀rẹ̀ Ìṣàyẹ̀wò Ọ̀fẹ́', 
+    ha: 'Fara Kimantawa Kyauta', 
+    ig: 'Malite Nyocha N\'efu' 
+  },
+  'home.learnMore': { 
+    en: 'Learn More', 
+    pcm: 'Learn More', 
+    yo: 'Kọ́ Síi', 
+    ha: 'Ƙara koyo', 
+    ig: 'Mụtakwuo' 
+  },
   
   // Accountant Portal
   'accountant.title': { 
