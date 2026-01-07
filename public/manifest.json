@@ -1,0 +1,26 @@
+{
+  "name": "TaxForge NG",
+  "short_name": "TaxForge",
+  "description": "Smart tax advice for Nigerian businesses. Calculate CIT, PIT, VAT and get business structure recommendations.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0b",
+  "theme_color": "#16a34a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "business", "productivity"],
+  "lang": "en-NG",
+  "dir": "ltr"
+}
