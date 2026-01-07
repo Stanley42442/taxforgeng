@@ -11,12 +11,14 @@ import {
 } from "@/components/ui/dialog";
 import { AlertTriangle, Shield, Scale, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface DisclaimerModalProps {
   onAccept: () => void;
 }
 
 export const DisclaimerModal = ({ onAccept }: DisclaimerModalProps) => {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(true);
   const [accepted, setAccepted] = useState(false);
 
@@ -38,9 +40,9 @@ export const DisclaimerModal = ({ onAccept }: DisclaimerModalProps) => {
           <div className="mx-auto flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-warning/20">
             <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-warning" />
           </div>
-          <DialogTitle className="text-center text-base sm:text-lg">Important Disclaimer</DialogTitle>
+          <DialogTitle className="text-center text-base sm:text-lg">{t('disclaimer.title')}</DialogTitle>
           <DialogDescription className="text-center text-xs sm:text-sm">
-            Please read and acknowledge before using TaxForge NG
+            {t('disclaimer.readAcknowledge')}
           </DialogDescription>
         </DialogHeader>
 
@@ -49,9 +51,9 @@ export const DisclaimerModal = ({ onAccept }: DisclaimerModalProps) => {
             <div className="flex gap-2 p-2 rounded-lg bg-muted">
               <Scale className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
               <div className="text-xs min-w-0">
-                <p className="font-medium text-foreground">Educational Purposes Only</p>
+                <p className="font-medium text-foreground">{t('disclaimer.educationalTitle')}</p>
                 <p className="text-muted-foreground leading-tight">
-                  This app provides tax estimates based on the Nigeria Tax Act 2025 for educational and planning purposes.
+                  {t('disclaimer.educationalDesc')}
                 </p>
               </div>
             </div>
@@ -59,9 +61,9 @@ export const DisclaimerModal = ({ onAccept }: DisclaimerModalProps) => {
             <div className="flex gap-2 p-2 rounded-lg bg-muted">
               <Shield className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
               <div className="text-xs min-w-0">
-                <p className="font-medium text-foreground">Not Official Tax Advice</p>
+                <p className="font-medium text-foreground">{t('disclaimer.notOfficialTitle')}</p>
                 <p className="text-muted-foreground leading-tight">
-                  Always consult FIRS, your state IRS, or certified tax professionals for official guidance.
+                  {t('disclaimer.notOfficialDesc')}
                 </p>
               </div>
             </div>
@@ -69,9 +71,9 @@ export const DisclaimerModal = ({ onAccept }: DisclaimerModalProps) => {
             <div className="flex gap-2 p-2 rounded-lg bg-destructive/10 border border-destructive/20">
               <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0 mt-0.5" />
               <div className="text-xs min-w-0">
-                <p className="font-medium text-foreground">No Liability</p>
+                <p className="font-medium text-foreground">{t('disclaimer.noLiabilityTitle')}</p>
                 <p className="text-muted-foreground leading-tight">
-                  TaxForge NG is not liable for any errors, omissions, or decisions made based on this platform.
+                  {t('disclaimer.noLiabilityDesc')}
                 </p>
               </div>
             </div>
@@ -85,7 +87,7 @@ export const DisclaimerModal = ({ onAccept }: DisclaimerModalProps) => {
               className="mt-0.5 h-4 w-4"
             />
             <Label htmlFor="accept" className="text-xs leading-relaxed cursor-pointer">
-              I understand this is not official tax advice. I agree to the{" "}
+              {t('disclaimer.agreeTerms').split('Terms of Service')[0]}
               <Link to="/terms" className="text-primary hover:underline" onClick={() => setOpen(false)}>
                 Terms of Service & Privacy Policy
               </Link>.
@@ -99,7 +101,7 @@ export const DisclaimerModal = ({ onAccept }: DisclaimerModalProps) => {
           onClick={handleAccept}
           disabled={!accepted}
         >
-          I Understand, Continue
+          {t('disclaimer.continue')}
         </Button>
       </DialogContent>
     </Dialog>

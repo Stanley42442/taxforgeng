@@ -130,13 +130,13 @@ const IndividualCalculatorPage = () => {
           <div className="text-center mb-8 animate-slide-up">
             <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-2 text-sm font-medium mb-4">
               <User className="h-4 w-4 text-accent animate-pulse-soft" />
-              Individual Tax Calculator
+              {t('individual.pageTitle')}
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-              Personal Tax Calculator
+              {t('individual.title')}
             </h1>
             <p className="text-muted-foreground">
-              Calculate your personal taxes without a registered business
+              {t('individual.subtitle')}
             </p>
           </div>
 
@@ -153,7 +153,7 @@ const IndividualCalculatorPage = () => {
                 </div>
                 <div className="min-w-0 mr-3">
                   <p className="font-semibold text-foreground">
-                    {use2026Rules ? 'Nigeria Tax Act 2025 Rules' : 'Current (Pre-2026) Rules'}
+                    {use2026Rules ? t('individual.nigeriaRules') : t('individual.currentRules')}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {use2026Rules 
@@ -215,7 +215,7 @@ const IndividualCalculatorPage = () => {
                 className="flex items-center gap-2 py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all duration-300"
               >
                 <Store className="h-4 w-4" />
-                <span className="text-sm font-medium">Informal</span>
+                <span className="text-sm font-medium">{t('individual.tabInformal')}</span>
               </TabsTrigger>
             </TabsList>
 

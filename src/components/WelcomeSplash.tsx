@@ -11,52 +11,54 @@ import {
   Sparkles,
   CheckCircle2,
 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface WelcomeSplashProps {
   onComplete: () => void;
 }
 
-const TOUR_STEPS = [
-  {
-    icon: Calculator,
-    title: "Smart Tax Calculator",
-    description: "Calculate CIT, PIT, VAT, and more with Nigeria Tax Act 2026 rules built-in. Get accurate estimates in seconds.",
-    color: "text-primary",
-    bgColor: "bg-primary/10",
-  },
-  {
-    icon: Building2,
-    title: "Multi-Business Support",
-    description: "Save and manage multiple businesses. Track LLCs and Business Names separately with proper tax treatment.",
-    color: "text-success",
-    bgColor: "bg-success/10",
-  },
-  {
-    icon: Receipt,
-    title: "Expense Tracking",
-    description: "Log income and expenses, categorize deductibles, and see real-time tax impact visualizations.",
-    color: "text-warning",
-    bgColor: "bg-warning/10",
-  },
-  {
-    icon: Bell,
-    title: "Filing Reminders",
-    description: "Never miss a deadline. Set reminders for VAT, PAYE, CIT, and other tax filing dates.",
-    color: "text-destructive",
-    bgColor: "bg-destructive/10",
-  },
-  {
-    icon: GraduationCap,
-    title: "Tax Academy",
-    description: "Learn about Nigerian tax laws, exemptions, and compliance requirements. Stay informed.",
-    color: "text-primary",
-    bgColor: "bg-primary/10",
-  },
-];
-
 export const WelcomeSplash = ({ onComplete }: WelcomeSplashProps) => {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(true);
   const [step, setStep] = useState(0);
+
+  const TOUR_STEPS = [
+    {
+      icon: Calculator,
+      title: t('welcome.tourCalculator'),
+      description: t('welcome.tourCalculatorDesc'),
+      color: "text-primary",
+      bgColor: "bg-primary/10",
+    },
+    {
+      icon: Building2,
+      title: t('welcome.tourMultiBusiness'),
+      description: t('welcome.tourMultiBusinessDesc'),
+      color: "text-success",
+      bgColor: "bg-success/10",
+    },
+    {
+      icon: Receipt,
+      title: t('welcome.tourExpense'),
+      description: t('welcome.tourExpenseDesc'),
+      color: "text-warning",
+      bgColor: "bg-warning/10",
+    },
+    {
+      icon: Bell,
+      title: t('welcome.tourReminders'),
+      description: t('welcome.tourRemindersDesc'),
+      color: "text-destructive",
+      bgColor: "bg-destructive/10",
+    },
+    {
+      icon: GraduationCap,
+      title: t('welcome.tourAcademy'),
+      description: t('welcome.tourAcademyDesc'),
+      color: "text-primary",
+      bgColor: "bg-primary/10",
+    },
+  ];
 
   const handleNext = () => {
     if (step < TOUR_STEPS.length - 1) {
@@ -90,34 +92,34 @@ export const WelcomeSplash = ({ onComplete }: WelcomeSplashProps) => {
             </div>
             
             <h2 className="text-2xl font-bold text-foreground mb-2 animate-fade-in">
-              Welcome to TaxForge NG
+              {t('welcome.title')}
             </h2>
             
             <p className="text-muted-foreground mb-6 animate-fade-in">
-              Navigate the 2026 Nigeria Tax Act reforms with confidence. Let's take a quick tour of your tax toolkit.
+              {t('welcome.subtitle')}
             </p>
 
             <div className="space-y-3 mb-6 animate-fade-in">
               <div className="flex items-center gap-3 p-3 rounded-lg bg-success/10 border border-success/20">
                 <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0" />
-                <span className="text-sm text-left">Accurate 2026 tax calculations</span>
+                <span className="text-sm text-left">{t('welcome.accurateCalc')}</span>
               </div>
               <div className="flex items-center gap-3 p-3 rounded-lg bg-success/10 border border-success/20">
                 <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0" />
-                <span className="text-sm text-left">Multi-business expense tracking</span>
+                <span className="text-sm text-left">{t('welcome.multiBusinessExpense')}</span>
               </div>
               <div className="flex items-center gap-3 p-3 rounded-lg bg-success/10 border border-success/20">
                 <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0" />
-                <span className="text-sm text-left">Demo data pre-loaded for you</span>
+                <span className="text-sm text-left">{t('welcome.demoData')}</span>
               </div>
             </div>
 
             <div className="flex gap-3">
               <Button variant="outline" onClick={handleSkip} className="flex-1">
-                Skip Tour
+                {t('welcome.skipTour')}
               </Button>
               <Button variant="hero" onClick={handleNext} className="flex-1">
-                Start Tour
+                {t('welcome.startTour')}
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
@@ -155,10 +157,10 @@ export const WelcomeSplash = ({ onComplete }: WelcomeSplashProps) => {
 
             <div className="flex gap-3">
               <Button variant="outline" onClick={handleSkip} className="flex-1">
-                Skip
+                {t('welcome.skip')}
               </Button>
               <Button variant="hero" onClick={handleNext} className="flex-1">
-                {step === TOUR_STEPS.length - 1 ? "Get Started" : "Next"}
+                {step === TOUR_STEPS.length - 1 ? t('welcome.getStarted') : t('common.next')}
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
