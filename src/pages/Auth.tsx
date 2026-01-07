@@ -750,27 +750,6 @@ const Auth = () => {
                     </p>
                   </div>
                 )}
-                ) : (
-                  <div className="space-y-2">
-                    <Label htmlFor="totpCode">Verification Code</Label>
-                    <div className="relative">
-                      <Shield className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="totpCode"
-                        type="text"
-                        placeholder="000000"
-                        value={totpCode}
-                        onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                        className="pl-10 font-mono tracking-wider text-center text-lg"
-                        maxLength={6}
-                        autoComplete="one-time-code"
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Enter the 6-digit code from your authenticator app
-                    </p>
-                  </div>
-                )}
 
                 <Button type="submit" variant="hero" className="w-full" disabled={isSubmitting}>
                   {isSubmitting ? t('auth.verifying') : t('auth.verify')}

@@ -1705,7 +1705,49 @@ export const translations: Translations = {
     ig: 'Site n\'ịga n\'ihu, ị kwenyere na Usoro Ọrụ na Iwu Nzuzo anyị.' 
   },
   
-  // Homepage / Index
+  // Homepage / Index - Carousel
+  'home.carousel1Title': { 
+    en: '2026 Tax Reforms Are Here', 
+    pcm: '2026 Tax Change Don Land', 
+    yo: 'Àtúnṣe Owó-orí 2026 Ti Dé', 
+    ha: 'Gyaran Haraji na 2026 Ya Zo', 
+    ig: 'Mgbanwe Ụtụ 2026 Abịala' 
+  },
+  'home.carousel1Desc': { 
+    en: 'New 0% CIT for small companies, updated PIT bands, and more. Get ready now.', 
+    pcm: '0% CIT for small company, new PIT bands, and more. Prepare now.', 
+    yo: 'CIT 0% tuntun fún àwọn ilé-iṣẹ́ kékeré, àwọn ìpele PIT tuntun, àti díẹ̀ síi. Múra sílẹ̀ báyìí.', 
+    ha: 'Sabon 0% CIT don ƙananan kamfanoni, sabbin ƙungiyoyin PIT, da ƙari. Shirya yanzu.', 
+    ig: 'Ọhụrụ 0% CIT maka obere ụlọ ọrụ, ogwe PIT emelitere, na ihe ndị ọzọ. Jikere ugbu a.' 
+  },
+  'home.carousel2Title': { 
+    en: '₦50M Turnover Threshold', 
+    pcm: '₦50M Turnover Threshold', 
+    yo: 'Ààlà Ìyípadà ₦50M', 
+    ha: 'Iyakar Juyawa ₦50M', 
+    ig: 'Oke Ntụgharị ₦50M' 
+  },
+  'home.carousel2Desc': { 
+    en: 'Companies under ₦50M turnover may qualify for 0% Company Income Tax.', 
+    pcm: 'Company wey get less than ₦50M fit get 0% Company Tax.', 
+    yo: 'Àwọn ilé-iṣẹ́ tí ìyípadà wọn kéré ju ₦50M lọ lè yẹ fún 0% Owó-orí Ilé-iṣẹ́.', 
+    ha: 'Kamfanonin da ke ƙasa da juyawa ₦50M na iya cancancin 0% Harajin Kudin Shiga na Kamfani.', 
+    ig: 'Ụlọ ọrụ nwere ntụgharị n\'okpuru ₦50M nwere ike iru eru maka 0% Ụtụ Ego Ụlọ Ọrụ.' 
+  },
+  'home.carousel3Title': { 
+    en: 'First ₦800K Tax Free', 
+    pcm: 'First ₦800K No Tax', 
+    yo: 'Àkọ́kọ́ ₦800K Lọ́fẹ̀ẹ́', 
+    ha: 'Na Farko ₦800K Ba Haraji', 
+    ig: 'Nke Mbụ ₦800K Enweghị Ụtụ' 
+  },
+  'home.carousel3Desc': { 
+    en: 'Personal income exemption increased from ₦300K to ₦800K under new rules.', 
+    pcm: 'Tax-free income don increase from ₦300K to ₦800K under new rules.', 
+    yo: 'Àyọ̀kúrò owó wíwọlé ti ara ẹni ti pọ̀ sí láti ₦300K sí ₦800K lábẹ́ àwọn òfin tuntun.', 
+    ha: 'An ƙara keɓancewar kudin shiga daga ₦300K zuwa ₦800K a ƙarƙashin sabbin dokoki.', 
+    ig: 'Enyemaka ego na-abata nke onwe pụtara site na ₦300K ruo ₦800K n\'okpuru iwu ọhụrụ.' 
+  },
   'home.heroTitle': { 
     en: 'Smart Tax Advice for', 
     pcm: 'Better Tax Advice for', 
@@ -1713,7 +1755,7 @@ export const translations: Translations = {
     ha: 'Shawarar Haraji Mai Kyau don', 
     ig: 'Ndụmọdụ Ụtụ Mara Mma maka' 
   },
-  'home.heroTitleHighlight': { 
+  'home.heroSubtitle': { 
     en: 'Nigerian Businesses', 
     pcm: 'Nigerian Business Dem', 
     yo: 'Àwọn Iṣẹ́ Nàìjíríà', 
@@ -1727,14 +1769,14 @@ export const translations: Translations = {
     ha: 'Sami shawarar tsarin kasuwanci da ya dace da ku da ƙididdige haraji daidai. An gina shi don ƙananan kasuwanci da mutane da ke bi ta yanayin harajin Najeriya.', 
     ig: 'Nweta ntụnye usoro azụmaahịa akpọrọ maka gị na ngbako ụtụ ziri ezi. E wuru ya maka obere azụmaahịa na ndị mmadụ na-achọ ụzọ n\'ime ụtụ Naịjirịa.' 
   },
-  'home.updatedForTaxAct': { 
+  'home.updatedFor2025': { 
     en: 'Updated for Nigeria Tax Act 2025', 
     pcm: 'We don update am for Nigeria Tax Act 2025', 
     yo: 'A ti ṣàtúnṣe fún Òfin Owó-orí Nàìjíríà 2025', 
     ha: 'An sabunta don Dokar Haraji ta Najeriya 2025', 
     ig: 'Emelitere maka Iwu Ụtụ Naịjirịa 2025' 
   },
-  'home.getTaxAdvice': { 
+  'home.getAdvice': { 
     en: 'Get Tax Advice', 
     pcm: 'Get Tax Advice', 
     yo: 'Gba Ìmọ̀ràn Owó-orí', 
@@ -1755,7 +1797,7 @@ export const translations: Translations = {
     ha: 'Ya Dace da FIRS', 
     ig: 'Kwekọrọ na FIRS' 
   },
-  'home.pre2026And2026Rules': { 
+  'home.pre2026Rules': { 
     en: 'Pre-2026 & 2026 Rules', 
     pcm: 'Old and New Rules', 
     yo: 'Àwọn Òfin Ṣáájú-2026 àti 2026', 
@@ -1769,35 +1811,42 @@ export const translations: Translations = {
     ha: 'Kyauta don Amfani', 
     ig: 'N\'efu iji' 
   },
-  'home.everythingYouNeed': { 
+  'home.featuresTitle': { 
     en: 'Everything You Need for Tax Compliance', 
     pcm: 'Everything You Need for Tax', 
     yo: 'Gbogbo Ohun Tí O Nílò fún Ìdúróṣinṣin Owó-orí', 
     ha: 'Duk Abin da Kuke Buƙata don Bin Haraji', 
     ig: 'Ihe Niile Ị Chọrọ maka Ịdebe Ụtụ' 
   },
-  'home.fromBusinessAdvice': { 
+  'home.featuresSubtitle': { 
     en: 'From business structure advice to detailed tax calculations', 
     pcm: 'From business advice to tax calculation', 
     yo: 'Láti ìmọ̀ràn ètò iṣẹ́ dé àwọn ìṣirò owó-orí àlàyé', 
     ha: 'Daga shawarar tsarin kasuwanci zuwa ƙididdige haraji cikakke', 
     ig: 'Site na ndụmọdụ usoro azụmaahịa ruo ngbako ụtụ zuru ezu' 
   },
-  'home.businessStructureAdvice': { 
+  'home.businessAdvice': { 
     en: 'Business Structure Advice', 
     pcm: 'Business Structure Advice', 
     yo: 'Ìmọ̀ràn Ètò Iṣẹ́', 
     ha: 'Shawarar Tsarin Kasuwanci', 
     ig: 'Ndụmọdụ Usoro Azụmaahịa' 
   },
-  'home.businessStructureDesc': { 
+  'home.businessAdviceDesc': { 
     en: 'Get recommendations on whether to register as a Business Name or Limited Liability Company based on your needs.', 
     pcm: 'Get advice if you go register as Business Name or Limited Company.', 
     yo: 'Gba àwọn àbá nípa bóyá o yẹ kí o forúkọ sílẹ̀ bí Orúkọ Iṣẹ́ tàbí Ilé-iṣẹ́ Ohun Ìnì Tó Lópin dá lórí àwọn ohun tí o nílò.', 
     ha: 'Sami shawarwarin ko za ku yi rijista a matsayin Sunan Kasuwanci ko Kamfanin Iyakance Abin Nauyi dangane da buƙatun ku.', 
     ig: 'Nweta ntụnye ma ị ga-edebanye aha dị ka Aha Azụmaahịa ma ọ bụ Ụlọ Ọrụ Nwere Oke Ntụkwasị dabere n\'ihe ị chọrọ.' 
   },
-  'home.taxCalculatorTitle': { 
+  'home.copyright': { 
+    en: '© 2025 TaxForge NG. For educational purposes only.', 
+    pcm: '© 2025 TaxForge NG. Na for learning only.', 
+    yo: '© 2025 TaxForge NG. Fún àwọn ète ẹ̀kọ́ nìkan.', 
+    ha: '© 2025 TaxForge NG. Don dalilan ilimi kawai.', 
+    ig: '© 2025 TaxForge NG. Maka ebumnuche mmụta naanị.' 
+  },
+  'home.taxCalculatorTitle': {
     en: 'Tax Calculator', 
     pcm: 'Tax Calculator', 
     yo: 'Ẹ̀rọ Ìṣirò Owó-orí', 
