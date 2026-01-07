@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.send-scheduled-reports]
 verify_jwt = false
+
+[functions.send-whatsapp-notification]
+verify_jwt = false

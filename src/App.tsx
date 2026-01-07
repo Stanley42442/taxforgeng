@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/hooks/useAuth";
 import { AuthLoadingScreen } from "@/components/AuthLoadingScreen";
@@ -55,6 +56,7 @@ const SecurityDashboard = lazy(() => import("./pages/SecurityDashboard"));
 const Referrals = lazy(() => import("./pages/Referrals"));
 const TaxCalendar = lazy(() => import("./pages/TaxCalendar"));
 const SuccessStoriesPage = lazy(() => import("./pages/SuccessStoriesPage"));
+const AccountantPortal = lazy(() => import("./pages/AccountantPortal"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Lazy load TaxAssistant (heavy component with AI chat)
@@ -76,6 +78,7 @@ const App = () => (
         <AuthProvider>
           <AuthLoadingScreen>
             <SubscriptionProvider>
+              <LanguageProvider>
               <TooltipProvider>
               <Toaster />
               <Sonner />
@@ -122,6 +125,7 @@ const App = () => (
                     <Route path="/referrals" element={<Referrals />} />
                     <Route path="/tax-calendar" element={<TaxCalendar />} />
                     <Route path="/success-stories" element={<SuccessStoriesPage />} />
+                    <Route path="/accountant-portal" element={<AccountantPortal />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                   <TaxAssistant />
@@ -130,6 +134,7 @@ const App = () => (
                 </Suspense>
               </BrowserRouter>
             </TooltipProvider>
+            </LanguageProvider>
           </SubscriptionProvider>
         </AuthLoadingScreen>
       </AuthProvider>

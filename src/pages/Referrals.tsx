@@ -21,7 +21,7 @@ import {
 interface Referral {
   id: string;
   referred_email: string;
-  status: "pending" | "completed";
+  status: string;
   reward_claimed: boolean;
   created_at: string;
 }
@@ -45,10 +45,14 @@ const Referrals = () => {
     if (!user) return;
 
     try {
-      // Note: referrals table needs to be created via migration
-      // For now, we'll use an empty array as placeholder
-      const data: Referral[] = [];
-      setReferrals(data);
+      const { data, error } = await supabase
+        .from("referrals")
+        .select("*")
+        .eq("referrer_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setReferrals(data || []);
     } catch (error) {
       console.error("Error fetching referrals:", error);
     } finally {

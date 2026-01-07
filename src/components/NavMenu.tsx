@@ -42,7 +42,9 @@ import {
   Gift,
   Calendar,
   Star,
+  Building2,
 } from "lucide-react";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import {
   Sheet,
   SheetContent,
@@ -98,6 +100,7 @@ export const NavMenu = () => {
     { to: "/team", label: "Team", icon: Users, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
     { to: "/api-docs", label: "API Docs", icon: Code, minTier: 'corporate', adminOnly: false, showCondition: 'always' as const },
     { to: "/audit-log", label: "Audit Log", icon: History, minTier: 'corporate', adminOnly: false, showCondition: 'always' as const },
+    { to: "/accountant-portal", label: "Accountant Portal", icon: Building2, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
     { to: "/tax-calendar", label: "Tax Calendar", icon: Calendar, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
     { to: "/referrals", label: "Refer Friends", icon: Gift, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
     { to: "/success-stories", label: "Success Stories", icon: Star, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
@@ -169,6 +172,7 @@ export const NavMenu = () => {
               </span>
             )}
             <ThemeToggle />
+            <LanguageToggle />
 
             {/* Realtime Indicator */}
             {user && isRealtimeConnected && (
