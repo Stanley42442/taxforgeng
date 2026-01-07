@@ -39,6 +39,9 @@ import {
   PieChart,
   Map,
   Shield,
+  Gift,
+  Calendar,
+  Star,
 } from "lucide-react";
 import {
   Sheet,
@@ -69,8 +72,8 @@ export const NavMenu = () => {
   };
 
   // Determine if user should see personal vs business calculator
-  const isFreeTierOrGuest = !user || tier === 'free';
-  const isPaidTier = user && tier !== 'free';
+  const isFreeTierOrGuest = !user || tier === 'free' || tier === 'starter';
+  const isPaidTier = user && tier !== 'free' && tier !== 'starter';
 
   const navLinks = [
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
@@ -95,11 +98,14 @@ export const NavMenu = () => {
     { to: "/team", label: "Team", icon: Users, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
     { to: "/api-docs", label: "API Docs", icon: Code, minTier: 'corporate', adminOnly: false, showCondition: 'always' as const },
     { to: "/audit-log", label: "Audit Log", icon: History, minTier: 'corporate', adminOnly: false, showCondition: 'always' as const },
+    { to: "/tax-calendar", label: "Tax Calendar", icon: Calendar, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
+    { to: "/referrals", label: "Refer Friends", icon: Gift, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
+    { to: "/success-stories", label: "Success Stories", icon: Star, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
     { to: "/roadmap", label: "Roadmap", icon: Map, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
     { to: "/admin-analytics", label: "Admin Analytics", icon: Shield, minTier: 'free', adminOnly: true, showCondition: 'always' as const },
   ];
 
-  const tierOrder = ['free', 'basic', 'freelancer', 'business', 'corporate'];
+  const tierOrder = ['free', 'starter', 'basic', 'freelancer', 'business', 'corporate'];
   const userTierIndex = tierOrder.indexOf(tier);
   
   const filteredLinks = navLinks.filter(link => {

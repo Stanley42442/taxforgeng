@@ -13,6 +13,7 @@ import {
   MessageCircle,
   Mail,
   User,
+  Zap,
 } from "lucide-react";
 import { useSubscription, SubscriptionTier } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
@@ -20,6 +21,7 @@ import { toast } from "sonner";
 interface TierFeature {
   name: string;
   free: boolean | string;
+  starter: boolean | string;
   basic: boolean | string;
   freelancer: boolean | string;
   business: boolean | string;
@@ -27,24 +29,24 @@ interface TierFeature {
 }
 
 const features: TierFeature[] = [
-  { name: 'Personal tax calculator (PIT)', free: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Crypto & investment taxes', free: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Foreign income/DTT credits', free: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Business tax calculator', free: false, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Digital VAT calculator', free: false, basic: false, freelancer: true, business: true, corporate: true },
-  { name: 'Saved businesses', free: '0', basic: '2', freelancer: '5', business: '10', corporate: 'Unlimited' },
-  { name: 'Data storage', free: false, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'PDF/CSV export', free: false, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Sector-specific presets', free: false, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Scenario modeling', free: false, basic: false, freelancer: 'Basic', business: 'Advanced', corporate: 'Advanced' },
-  { name: 'CAC verification (auto)', free: false, basic: false, freelancer: false, business: true, corporate: true },
-  { name: 'No watermarks', free: false, basic: false, freelancer: true, business: true, corporate: true },
-  { name: 'Tax filing preparation', free: false, basic: false, freelancer: false, business: true, corporate: true },
-  { name: 'Email reminders', free: false, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Bulk CAC verification', free: false, basic: false, freelancer: false, business: false, corporate: true },
-  { name: 'Multi-user seats', free: false, basic: false, freelancer: false, business: '2 seats', corporate: 'Unlimited' },
-  { name: 'Priority support', free: false, basic: false, freelancer: true, business: true, corporate: true },
-  { name: 'API access', free: false, basic: false, freelancer: false, business: false, corporate: true },
+  { name: 'Personal tax calculator (PIT)', free: true, starter: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Crypto & investment taxes', free: true, starter: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Foreign income/DTT credits', free: true, starter: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Business tax calculator', free: false, starter: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Digital VAT calculator', free: false, starter: false, basic: false, freelancer: true, business: true, corporate: true },
+  { name: 'Saved businesses', free: '0', starter: '1', basic: '2', freelancer: '5', business: '10', corporate: 'Unlimited' },
+  { name: 'Data storage', free: false, starter: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'PDF/CSV export', free: false, starter: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Sector-specific presets', free: false, starter: false, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Scenario modeling', free: false, starter: false, basic: false, freelancer: 'Basic', business: 'Advanced', corporate: 'Advanced' },
+  { name: 'CAC verification (auto)', free: false, starter: false, basic: false, freelancer: false, business: true, corporate: true },
+  { name: 'No watermarks', free: false, starter: true, basic: false, freelancer: true, business: true, corporate: true },
+  { name: 'Tax filing preparation', free: false, starter: false, basic: false, freelancer: false, business: true, corporate: true },
+  { name: 'Email reminders', free: false, starter: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Bulk CAC verification', free: false, starter: false, basic: false, freelancer: false, business: false, corporate: true },
+  { name: 'Multi-user seats', free: false, starter: false, basic: false, freelancer: false, business: '2 seats', corporate: 'Unlimited' },
+  { name: 'Priority support', free: false, starter: false, basic: false, freelancer: true, business: true, corporate: true },
+  { name: 'API access', free: false, starter: false, basic: false, freelancer: false, business: false, corporate: true },
 ];
 
 const Pricing = () => {
@@ -86,7 +88,7 @@ const Pricing = () => {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 max-w-7xl mx-auto mb-12 sm:mb-16">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 max-w-7xl mx-auto mb-12 sm:mb-16">
           {/* Individual (Free) Tier */}
           <PricingCard
             tier="free"
@@ -94,8 +96,22 @@ const Pricing = () => {
             icon={<User className="h-5 w-5 sm:h-6 sm:w-6" />}
             monthlyPrice={0}
             description="For individuals with no business income"
-            features={['Personal tax calculator', 'Employment/Salary PIT', 'Crypto & investment taxes', 'Foreign income credits', 'Informal business guide']}
+            features={['Personal tax calculator', 'Employment/Salary PIT', 'Crypto & investment taxes', 'Foreign income credits']}
             limitations={['No business saves', 'No exports']}
+            currentTier={currentTier}
+            onUpgrade={handleUpgrade}
+          />
+
+          {/* Starter Tier - NEW */}
+          <PricingCard
+            tier="starter"
+            name="Starter"
+            icon={<Zap className="h-5 w-5 sm:h-6 sm:w-6" />}
+            monthlyPrice={500}
+            annualPrice={5000}
+            description="For small business owners"
+            features={['Everything in Free', '1 saved business', 'PDF/CSV export', 'No watermarks', 'Email reminders']}
+            limitations={['No scenario modeling']}
             currentTier={currentTier}
             onUpgrade={handleUpgrade}
           />
@@ -108,8 +124,8 @@ const Pricing = () => {
             monthlyPrice={2000}
             annualPrice={20000}
             description="Perfect for side hustlers"
-            features={['Everything in Free', 'Up to 2 saved businesses', 'PDF/CSV export', 'Data storage', 'Email reminders']}
-            limitations={['Watermarked results', 'No scenario modeling']}
+            features={['Everything in Starter', 'Up to 2 businesses', 'Sector presets', 'Data storage']}
+            limitations={['Watermarked results']}
             currentTier={currentTier}
             onUpgrade={handleUpgrade}
           />
@@ -166,6 +182,7 @@ const Pricing = () => {
                   <tr className="border-b border-border bg-secondary/50">
                     <th className="text-left p-4 font-semibold text-foreground">Feature</th>
                     <th className="text-center p-4 font-semibold text-foreground">Individual</th>
+                    <th className="text-center p-4 font-semibold text-foreground">Starter</th>
                     <th className="text-center p-4 font-semibold text-foreground">Basic</th>
                     <th className="text-center p-4 font-semibold text-foreground">Freelancer</th>
                     <th className="text-center p-4 font-semibold text-foreground bg-primary/5">Business</th>
@@ -177,6 +194,7 @@ const Pricing = () => {
                     <tr key={i} className={i % 2 === 0 ? 'bg-background' : 'bg-secondary/20'}>
                       <td className="p-4 text-sm text-foreground">{feature.name}</td>
                       <td className="p-4 text-center"><FeatureValue value={feature.free} /></td>
+                      <td className="p-4 text-center"><FeatureValue value={feature.starter} /></td>
                       <td className="p-4 text-center"><FeatureValue value={feature.basic} /></td>
                       <td className="p-4 text-center"><FeatureValue value={feature.freelancer} /></td>
                       <td className="p-4 text-center bg-primary/5"><FeatureValue value={feature.business} /></td>

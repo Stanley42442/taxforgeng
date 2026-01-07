@@ -52,6 +52,9 @@ const EmbedCalculator = lazy(() => import("./pages/EmbedCalculator"));
 const IndividualCalculator = lazy(() => import("./pages/IndividualCalculator"));
 const Settings = lazy(() => import("./pages/Settings"));
 const SecurityDashboard = lazy(() => import("./pages/SecurityDashboard"));
+const Referrals = lazy(() => import("./pages/Referrals"));
+const TaxCalendar = lazy(() => import("./pages/TaxCalendar"));
+const SuccessStoriesPage = lazy(() => import("./pages/SuccessStoriesPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Lazy load TaxAssistant (heavy component with AI chat)
