@@ -910,15 +910,15 @@ const Settings = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Email Status</p>
+                  <p className="text-sm text-muted-foreground">{t('settings.emailStatus')}</p>
                   <p className="text-lg font-bold">
                     {isEmailVerified ? (
                       <span className="text-green-600 flex items-center gap-1">
-                        <CheckCircle2 className="h-4 w-4" /> Verified
+                        <CheckCircle2 className="h-4 w-4" /> {t('settings.verified')}
                       </span>
                     ) : (
                       <span className="text-amber-600 flex items-center gap-1">
-                        <AlertCircle className="h-4 w-4" /> Unverified
+                        <AlertCircle className="h-4 w-4" /> {t('settings.unverified')}
                       </span>
                     )}
                   </p>
@@ -940,15 +940,15 @@ const Settings = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">2FA Status</p>
+                  <p className="text-sm text-muted-foreground">{t('settings.twoFactorStatus')}</p>
                   <p className="text-lg font-bold">
                     {hasMfaEnabled ? (
                       <span className="text-green-600 flex items-center gap-1">
-                        <CheckCircle2 className="h-4 w-4" /> Enabled
+                        <CheckCircle2 className="h-4 w-4" /> {t('settings.enabled')}
                       </span>
                     ) : (
                       <span className="text-amber-600 flex items-center gap-1">
-                        <AlertCircle className="h-4 w-4" /> Disabled
+                        <AlertCircle className="h-4 w-4" /> {t('settings.disabled')}
                       </span>
                     )}
                   </p>
@@ -970,7 +970,7 @@ const Settings = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Backup Codes</p>
+                  <p className="text-sm text-muted-foreground">{t('settings.backupCodes')}</p>
                   <p className="text-2xl font-bold">{remainingBackupCodes}</p>
                 </div>
                 <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
@@ -996,7 +996,7 @@ const Settings = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Recent Events</p>
+                  <p className="text-sm text-muted-foreground">{t('settings.recentActivity')}</p>
                   <p className="text-2xl font-bold">{authEvents.length}</p>
                 </div>
                 <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
