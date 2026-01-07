@@ -685,6 +685,7 @@ export type Database = {
           has_selected_initial_tier: boolean
           id: string
           ip_whitelist_enabled: boolean
+          language_preference: string | null
           subscription_tier: string
           time_restriction_timezone: string | null
           time_restrictions_enabled: boolean
@@ -693,6 +694,7 @@ export type Database = {
           trial_started_at: string | null
           updated_at: string
           whatsapp_number: string | null
+          whatsapp_verified: boolean | null
         }
         Insert: {
           allowed_days?: number[] | null
@@ -704,6 +706,7 @@ export type Database = {
           has_selected_initial_tier?: boolean
           id: string
           ip_whitelist_enabled?: boolean
+          language_preference?: string | null
           subscription_tier?: string
           time_restriction_timezone?: string | null
           time_restrictions_enabled?: boolean
@@ -712,6 +715,7 @@ export type Database = {
           trial_started_at?: string | null
           updated_at?: string
           whatsapp_number?: string | null
+          whatsapp_verified?: boolean | null
         }
         Update: {
           allowed_days?: number[] | null
@@ -723,6 +727,7 @@ export type Database = {
           has_selected_initial_tier?: boolean
           id?: string
           ip_whitelist_enabled?: boolean
+          language_preference?: string | null
           subscription_tier?: string
           time_restriction_timezone?: string | null
           time_restrictions_enabled?: boolean
@@ -731,6 +736,87 @@ export type Database = {
           trial_started_at?: string | null
           updated_at?: string
           whatsapp_number?: string | null
+          whatsapp_verified?: boolean | null
+        }
+        Relationships: []
+      }
+      referral_rewards: {
+        Row: {
+          applied_at: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          quantity: number
+          referral_id: string | null
+          reward_type: string
+          user_id: string
+        }
+        Insert: {
+          applied_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          quantity?: number
+          referral_id?: string | null
+          reward_type?: string
+          user_id: string
+        }
+        Update: {
+          applied_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          quantity?: number
+          referral_id?: string | null
+          reward_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_rewards_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "referrals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referrals: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          referral_code: string
+          referred_email: string
+          referred_user_id: string | null
+          referrer_id: string
+          reward_claimed: boolean
+          reward_months: number | null
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code: string
+          referred_email: string
+          referred_user_id?: string | null
+          referrer_id: string
+          reward_claimed?: boolean
+          reward_months?: number | null
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code?: string
+          referred_email?: string
+          referred_user_id?: string | null
+          referrer_id?: string
+          reward_claimed?: boolean
+          reward_months?: number | null
+          status?: string
         }
         Relationships: []
       }
