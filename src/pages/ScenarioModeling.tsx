@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useNavigate } from "react-router-dom";
 import { calculateTax, formatCurrency, type TaxInputs } from "@/lib/taxCalculations";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { MultiYearProjection } from "@/components/MultiYearProjection";
 import { PenaltyEstimator } from "@/components/PenaltyEstimator";
 import { ForeignIncomeCalculator } from "@/components/ForeignIncomeCalculator";

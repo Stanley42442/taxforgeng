@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { sectorGuides } from "@/lib/taxMyths";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   ArrowLeft,
   Crown,

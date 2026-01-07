@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { 
-  BarChart3, 
+  BarChart3,
   Users, 
   Calculator, 
   MessageSquare, 

@@ -380,9 +380,9 @@ const Dashboard = () => {
                       <Activity className="h-5 w-5 text-primary-foreground" />
                     </div>
                     <div className="text-left">
-                      <h2 className="font-semibold text-foreground">Financial Summary</h2>
+                      <h2 className="font-semibold text-foreground">{t('dashboard.financialSummary')}</h2>
                       <p className="text-xs text-muted-foreground">
-                        {summaryExpanded ? 'Click to collapse' : `${savedBusinesses.length} businesses • ${formatCurrency(netIncome)} net income`}
+                        {summaryExpanded ? t('dashboard.clickToCollapse') : `${savedBusinesses.length} ${t('dashboard.businesses')} • ${formatCurrency(netIncome)} ${t('dashboard.netIncome')}`}
                       </p>
                     </div>
                   </div>
@@ -403,7 +403,7 @@ const Dashboard = () => {
                         </div>
                         {urgentCount > 0 && (
                           <Badge variant="destructive" className="text-xs">
-                            {urgentCount} urgent
+                            {urgentCount} {t('dashboard.urgent')}
                           </Badge>
                         )}
                       </div>
@@ -425,16 +425,16 @@ const Dashboard = () => {
                   <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Filter className="h-4 w-4" />
-                      <span>Showing data for:</span>
+                      <span>{t('dashboard.showingDataFor')}</span>
                       <Select value={dateRange} onValueChange={(v) => setDateRange(v as typeof dateRange)}>
                         <SelectTrigger className="w-[130px] h-8 text-xs">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="week">This Week</SelectItem>
-                          <SelectItem value="month">This Month</SelectItem>
-                          <SelectItem value="quarter">This Quarter</SelectItem>
-                          <SelectItem value="year">This Year</SelectItem>
+                          <SelectItem value="week">{t('dashboard.thisWeek')}</SelectItem>
+                          <SelectItem value="month">{t('dashboard.thisMonth')}</SelectItem>
+                          <SelectItem value="quarter">{t('dashboard.thisQuarter')}</SelectItem>
+                          <SelectItem value="year">{t('dashboard.thisYear')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

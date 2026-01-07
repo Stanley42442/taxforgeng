@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/taxCalculations";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Code,
   Copy,

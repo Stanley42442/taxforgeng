@@ -10,6 +10,7 @@ import {
 import { ArrowLeft, Calculator, Info, CheckCircle2, BookOpen } from "lucide-react";
 import { formatCurrency, type TaxResult, type TaxInputs } from "@/lib/taxCalculations";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const TaxBreakdown = () => {
   const location = useLocation();
