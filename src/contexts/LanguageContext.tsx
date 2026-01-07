@@ -2480,6 +2480,1473 @@ export const translations: Translations = {
     ha: 'kwanaki', 
     ig: 'ụbọchị' 
   },
+  },
+
+  // Calculator page
+  'calculator.title': { 
+    en: 'Tax Calculator', 
+    pcm: 'Tax Calculator', 
+    yo: 'Ẹ̀rọ Ìṣirò Owó-orí', 
+    ha: 'Na\'urar Ƙididdige Haraji', 
+    ig: 'Ngwa Mgbako Ụtụ' 
+  },
+  'calculator.subtitle': { 
+    en: 'Calculate your Nigerian taxes accurately', 
+    pcm: 'Calculate your Nigeria tax correct', 
+    yo: 'Ṣe ìṣirò owó-orí Nàìjíríà rẹ dáadáa', 
+    ha: 'Ƙididdige harajin Najeriya daidai', 
+    ig: 'Gbakọọ ụtụ Naịjirịa gị nke ọma' 
+  },
+  'calculator.firsCompliant': { 
+    en: 'FIRS Compliant Calculator', 
+    pcm: 'Calculator Wey Follow FIRS Rule', 
+    yo: 'Ẹ̀rọ Ìṣirò tó Bá FIRS Mu', 
+    ha: 'Na\'ura Mai Biyayya ga FIRS', 
+    ig: 'Ngwa Mgbako Na-edebe Iwu FIRS' 
+  },
+  'calculator.selectBusiness': { 
+    en: 'Select Business', 
+    pcm: 'Choose Business', 
+    yo: 'Yan Iṣẹ́', 
+    ha: 'Zaɓi Kasuwanci', 
+    ig: 'Họrọ Azụmaahịa' 
+  },
+  'calculator.newCalculation': { 
+    en: 'New Calculation', 
+    pcm: 'New Calculation', 
+    yo: 'Ìṣirò Tuntun', 
+    ha: 'Sabon Ƙididdiga', 
+    ig: 'Mgbako Ọhụrụ' 
+  },
+  'calculator.annualTurnover': { 
+    en: 'Annual Turnover', 
+    pcm: 'Money Wey Enter For Year', 
+    yo: 'Owó tó Wọlé Lọ́dún', 
+    ha: 'Kuɗin Shekara', 
+    ig: 'Ego Afọ' 
+  },
+  'calculator.expenses': { 
+    en: 'Business Expenses', 
+    pcm: 'Money Wey You Spend', 
+    yo: 'Ìnáwó Iṣẹ́', 
+    ha: 'Kashe Kuɗin Kasuwanci', 
+    ig: 'Mmefu Azụmaahịa' 
+  },
+  'calculator.rentPaid': { 
+    en: 'Rent Paid', 
+    pcm: 'House Rent Wey You Pay', 
+    yo: 'Owó Ilé tó San', 
+    ha: 'Hayar da Aka Biya', 
+    ig: 'Ego Ụlọ E Kwụrụ' 
+  },
+  'calculator.vatableSales': { 
+    en: 'VATable Sales', 
+    pcm: 'Sales With VAT', 
+    yo: 'Àwọn Títà tó Ní VAT', 
+    ha: 'Sayayya mai VAT', 
+    ig: 'Ire Nwere VAT' 
+  },
+  'calculator.vatablePurchases': { 
+    en: 'VATable Purchases', 
+    pcm: 'Things Wey You Buy With VAT', 
+    yo: 'Àwọn Rírà tó Ní VAT', 
+    ha: 'Saye mai VAT', 
+    ig: 'Azụmahịa Nwere VAT' 
+  },
+  'calculator.rentalIncome': { 
+    en: 'Rental Income', 
+    pcm: 'Rent Money Wey You Collect', 
+    yo: 'Owó Ìyálé', 
+    ha: 'Kuɗin Haya', 
+    ig: 'Ego Ụlọ E Natara' 
+  },
+  'calculator.consultancyIncome': { 
+    en: 'Consultancy Income', 
+    pcm: 'Consulting Money', 
+    yo: 'Owó Ìgbìmọ̀ràn', 
+    ha: 'Kuɗin Shawarwari', 
+    ig: 'Ego Ndụmọdụ' 
+  },
+  'calculator.dividendIncome': { 
+    en: 'Dividend Income', 
+    pcm: 'Shares Money', 
+    yo: 'Owó Ìpín', 
+    ha: 'Kuɗin Rabo', 
+    ig: 'Ego Nkesa' 
+  },
+  'calculator.capitalGains': { 
+    en: 'Capital Gains', 
+    pcm: 'Profit From Selling Property', 
+    yo: 'Ẹ̀rè Ohun-ìní', 
+    ha: 'Ribar Jari', 
+    ig: 'Uru Akụ' 
+  },
+  'calculator.foreignIncome': { 
+    en: 'Foreign Income', 
+    pcm: 'Money From Abroad', 
+    yo: 'Owó Láti Ilẹ̀ Òkèèrè', 
+    ha: 'Kuɗin Waje', 
+    ig: 'Ego Si Mba Ọzọ' 
+  },
+  'calculator.fixedAssets': { 
+    en: 'Fixed Assets Value', 
+    pcm: 'Value of Property and Equipment', 
+    yo: 'Iye Ohun-ìní Àgbékalẹ̀', 
+    ha: 'Darajar Kadarori', 
+    ig: 'Uru Akụ Kwụsịrị Ike' 
+  },
+  'calculator.calculateTax': { 
+    en: 'Calculate Tax', 
+    pcm: 'Calculate Tax', 
+    yo: 'Ṣe Ìṣirò Owó-orí', 
+    ha: 'Ƙididdige Haraji', 
+    ig: 'Gbakọọ Ụtụ' 
+  },
+  'calculator.businessName': { 
+    en: 'Business Name', 
+    pcm: 'Business Name', 
+    yo: 'Orúkọ Iṣẹ́', 
+    ha: 'Sunan Kasuwanci', 
+    ig: 'Aha Azụmaahịa' 
+  },
+  'calculator.company': { 
+    en: 'Company (LTD)', 
+    pcm: 'Limited Company', 
+    yo: 'Ilé-iṣẹ́ (LTD)', 
+    ha: 'Kamfani (LTD)', 
+    ig: 'Ụlọ Ọrụ (LTD)' 
+  },
+  'calculator.2026Rules': { 
+    en: 'Nigeria Tax Act 2025 Rules', 
+    pcm: '2026 Tax Rules', 
+    yo: 'Òfin Owó-orí 2025', 
+    ha: 'Dokokin Haraji 2025', 
+    ig: 'Iwu Ụtụ 2025' 
+  },
+  'calculator.pre2026Rules': { 
+    en: 'Current (Pre-2026) Rules', 
+    pcm: 'Old Rules', 
+    yo: 'Òfin Lọ́wọ́lọ́wọ́', 
+    ha: 'Dokokin Yanzu', 
+    ig: 'Iwu Ugbu A' 
+  },
+  'calculator.primaryIncome': { 
+    en: 'Primary Income', 
+    pcm: 'Main Money', 
+    yo: 'Owó Àkọ́kọ́', 
+    ha: 'Kuɗi Na Farko', 
+    ig: 'Ego Mbụ' 
+  },
+  'calculator.additionalIncome': { 
+    en: 'Additional Income', 
+    pcm: 'Extra Money', 
+    yo: 'Owó Àfikún', 
+    ha: 'Ƙarin Kuɗi', 
+    ig: 'Ego Ọzọ' 
+  },
+  'calculator.vatDetails': { 
+    en: 'VAT Details', 
+    pcm: 'VAT Details', 
+    yo: 'Àlàyé VAT', 
+    ha: 'Cikakken Bayani na VAT', 
+    ig: 'Nkọwa VAT' 
+  },
+  'calculator.quickAddExpense': { 
+    en: 'Quick Add Expense', 
+    pcm: 'Quick Add Expense', 
+    yo: 'Fi Ìnáwó Kún Yára', 
+    ha: 'Ƙara Kashewa Cikin Sauri', 
+    ig: 'Tinye Mmefu Ngwa Ngwa' 
+  },
+
+  // Expenses page
+  'expense.title': { 
+    en: 'Expense Tracker', 
+    pcm: 'Track Your Spending', 
+    yo: 'Tẹ̀lé Ìnáwó Rẹ', 
+    ha: 'Binciken Kashewa', 
+    ig: 'Nsoro Mmefu' 
+  },
+  'expense.subtitle': { 
+    en: 'Track income and expenses for all your businesses', 
+    pcm: 'Track money wey enter and comot for your business', 
+    yo: 'Tẹ̀lé owó tó wọlé àti tó jáde fún àwọn iṣẹ́ rẹ', 
+    ha: 'Bin duk kuɗin shiga da kashewa na kasuwancinka', 
+    ig: 'Soro ego batara na pụrụ n\'azụmaahịa gị niile' 
+  },
+  'expense.addExpense': { 
+    en: 'Add Expense', 
+    pcm: 'Add Money Wey Comot', 
+    yo: 'Fi Ìnáwó Kún', 
+    ha: 'Ƙara Kashewa', 
+    ig: 'Tinye Mmefu' 
+  },
+  'expense.addIncome': { 
+    en: 'Add Income', 
+    pcm: 'Add Money Wey Enter', 
+    yo: 'Fi Owó Tó Wọlé Kún', 
+    ha: 'Ƙara Kuɗi', 
+    ig: 'Tinye Ego' 
+  },
+  'expense.totalIncome': { 
+    en: 'Total Income', 
+    pcm: 'All Money Wey Enter', 
+    yo: 'Àpapọ̀ Owó Tó Wọlé', 
+    ha: 'Jimlar Kuɗi', 
+    ig: 'Mkpokọta Ego' 
+  },
+  'expense.totalExpenses': { 
+    en: 'Total Expenses', 
+    pcm: 'All Money Wey Comot', 
+    yo: 'Àpapọ̀ Ìnáwó', 
+    ha: 'Jimlar Kashewa', 
+    ig: 'Mkpokọta Mmefu' 
+  },
+  'expense.netIncome': { 
+    en: 'Net Income', 
+    pcm: 'Profit', 
+    yo: 'Owó Tó Kù', 
+    ha: 'Kuɗin da Ya Rage', 
+    ig: 'Ego Fọdụrụ' 
+  },
+  'expense.deductible': { 
+    en: 'Tax Deductible', 
+    pcm: 'E Fit Reduce Tax', 
+    yo: 'Ó lè dín owó-orí kù', 
+    ha: 'Za a iya rage haraji', 
+    ig: 'Nwere ike belata ụtụ' 
+  },
+  'expense.category': { 
+    en: 'Category', 
+    pcm: 'Type', 
+    yo: 'Ẹ̀ka', 
+    ha: 'Rukuni', 
+    ig: 'Ụdị' 
+  },
+  'expense.date': { 
+    en: 'Date', 
+    pcm: 'Date', 
+    yo: 'Ọjọ́', 
+    ha: 'Kwanan wata', 
+    ig: 'Ụbọchị' 
+  },
+  'expense.description': { 
+    en: 'Description', 
+    pcm: 'Wetin E Be', 
+    yo: 'Àpèjúwe', 
+    ha: 'Bayani', 
+    ig: 'Nkọwa' 
+  },
+  'expense.amount': { 
+    en: 'Amount', 
+    pcm: 'How Much', 
+    yo: 'Iye', 
+    ha: 'Adadin', 
+    ig: 'Ego Ole' 
+  },
+  'expense.scanReceipt': { 
+    en: 'Scan Receipt', 
+    pcm: 'Scan Receipt', 
+    yo: 'Ṣayẹwo Ìwé Ẹ̀rí', 
+    ha: 'Duba Rasiti', 
+    ig: 'Nyochaa Ereesiiti' 
+  },
+  'expense.importCSV': { 
+    en: 'Import CSV', 
+    pcm: 'Upload CSV File', 
+    yo: 'Gbé CSV Wọlé', 
+    ha: 'Shigar da CSV', 
+    ig: 'Bubata CSV' 
+  },
+  'expense.exportPDF': { 
+    en: 'Export PDF', 
+    pcm: 'Download PDF', 
+    yo: 'Gbé PDF Jáde', 
+    ha: 'Sauke PDF', 
+    ig: 'Budata PDF' 
+  },
+  'expense.budget': { 
+    en: 'Monthly Budget', 
+    pcm: 'Monthly Budget', 
+    yo: 'Ìṣúná Oṣù', 
+    ha: 'Kasafin Wata', 
+    ig: 'Mmefu Ọnwa' 
+  },
+  'expense.setBudget': { 
+    en: 'Set Budget', 
+    pcm: 'Set How Much You Wan Spend', 
+    yo: 'Ṣètò Ìṣúná', 
+    ha: 'Saita Kasafin', 
+    ig: 'Tọọ Mmefu' 
+  },
+  'expense.recurring': { 
+    en: 'Recurring Expenses', 
+    pcm: 'Regular Expenses', 
+    yo: 'Ìnáwó Tó Ń Padà Wá', 
+    ha: 'Kashewar da Ke Maimaitawa', 
+    ig: 'Mmefu Na-alaghachi' 
+  },
+  'expense.analytics': { 
+    en: 'Analytics', 
+    pcm: 'See Charts', 
+    yo: 'Àyẹ̀wò', 
+    ha: 'Nazari', 
+    ig: 'Nnyocha' 
+  },
+  'expense.comparison': { 
+    en: 'Monthly Comparison', 
+    pcm: 'Compare Month by Month', 
+    yo: 'Ìfiwé Oṣù', 
+    ha: 'Kwatanta Wata-wata', 
+    ig: 'Ntụnyere Ọnwa' 
+  },
+
+  // Results page
+  'results.title': { 
+    en: 'Tax Calculation Results', 
+    pcm: 'Your Tax Calculation', 
+    yo: 'Èsì Ìṣirò Owó-orí', 
+    ha: 'Sakamakon Ƙididdige Haraji', 
+    ig: 'Nsonaazụ Mgbako Ụtụ' 
+  },
+  'results.grossIncome': { 
+    en: 'Gross Income', 
+    pcm: 'Total Money Wey Enter', 
+    yo: 'Owó Tó Wọlé Lápapọ̀', 
+    ha: 'Jimlar Kuɗi', 
+    ig: 'Mkpokọta Ego' 
+  },
+  'results.taxableIncome': { 
+    en: 'Taxable Income', 
+    pcm: 'Money Wey Get Tax', 
+    yo: 'Owó Tí A Lè Gbá Owó-orí Lé', 
+    ha: 'Kuɗin da Ake Biyan Haraji', 
+    ig: 'Ego Nwere Ụtụ' 
+  },
+  'results.totalTaxPayable': { 
+    en: 'Total Tax Payable', 
+    pcm: 'Total Tax Wey You Go Pay', 
+    yo: 'Àpapọ̀ Owó-orí Láti San', 
+    ha: 'Jimlar Harajin da Za a Biya', 
+    ig: 'Mkpokọta Ụtụ Ị Ga-akwụ' 
+  },
+  'results.effectiveRate': { 
+    en: 'Effective Tax Rate', 
+    pcm: 'Real Tax Percentage', 
+    yo: 'Ìwọ̀n Owó-orí Gangan', 
+    ha: 'Ainihin Farashin Haraji', 
+    ig: 'Ọnụọgụ Ụtụ N\'ezie' 
+  },
+  'results.breakdown': { 
+    en: 'Tax Breakdown', 
+    pcm: 'How Tax Break Down', 
+    yo: 'Ìpínkiri Owó-orí', 
+    ha: 'Ragargaje Harajin', 
+    ig: 'Nkewa Ụtụ' 
+  },
+  'results.viewBreakdown': { 
+    en: 'View Breakdown', 
+    pcm: 'See How E Break Down', 
+    yo: 'Wo Ìpínkiri', 
+    ha: 'Duba Ragargajewa', 
+    ig: 'Lee Nkewa' 
+  },
+  'results.showComparison': { 
+    en: 'Show Comparison', 
+    pcm: 'Compare Am', 
+    yo: 'Fi Ìfiwé Hàn', 
+    ha: 'Nuna Kwatanci', 
+    ig: 'Gosi Ntụnyere' 
+  },
+  'results.saveBusiness': { 
+    en: 'Save Business', 
+    pcm: 'Keep This Business', 
+    yo: 'Fi Iṣẹ́ Pamọ́', 
+    ha: 'Ajiye Kasuwanci', 
+    ig: 'Chekwaa Azụmaahịa' 
+  },
+  'results.downloadPDF': { 
+    en: 'Download PDF', 
+    pcm: 'Download PDF', 
+    yo: 'Gbàmọ́lé PDF', 
+    ha: 'Sauke PDF', 
+    ig: 'Budata PDF' 
+  },
+  'results.downloadCSV': { 
+    en: 'Download CSV', 
+    pcm: 'Download CSV', 
+    yo: 'Gbàmọ́lé CSV', 
+    ha: 'Sauke CSV', 
+    ig: 'Budata CSV' 
+  },
+  'results.backToCalculator': { 
+    en: 'Back to Calculator', 
+    pcm: 'Go Back to Calculator', 
+    yo: 'Padà sí Ẹ̀rọ Ìṣirò', 
+    ha: 'Koma zuwa Na\'ura', 
+    ig: 'Laghachi na Ngwa Mgbako' 
+  },
+  'results.entityComparison': { 
+    en: 'Entity Comparison Dashboard', 
+    pcm: 'Compare Business Types', 
+    yo: 'Pánẹ́ẹ̀lì Ìfiwé Iṣẹ́', 
+    ha: 'Kwatanta Nau\'in Kasuwanci', 
+    ig: 'Tụnyere Ụdị Azụmaahịa' 
+  },
+  'results.optimalStructure': { 
+    en: 'You selected the optimal structure!', 
+    pcm: 'You choose the best one!', 
+    yo: 'O ti yan ètò tó dára jù!', 
+    ha: 'Ka zaɓi tsari mafi kyau!', 
+    ig: 'Ị họọrọ nhọrọ kacha mma!' 
+  },
+  'results.couldSave': { 
+    en: 'Switching could save you', 
+    pcm: 'If you change you fit save', 
+    yo: 'Títí yípadà lè jẹ́ kí o fipamọ́', 
+    ha: 'Sauya zai iya cece maka', 
+    ig: 'Ịgbanwe nwere ike ịchekwa gị' 
+  },
+
+  // Reminders page
+  'reminders.title': { 
+    en: 'Tax Deadline Reminders', 
+    pcm: 'Tax Deadline Reminders', 
+    yo: 'Ìránṣọ́ Àkókò Ìparí Owó-orí', 
+    ha: 'Tunatarwar Ƙarshen Lokacin Haraji', 
+    ig: 'Ncheta Oge Njedebe Ụtụ' 
+  },
+  'reminders.subtitle': { 
+    en: 'Set up automated reminders for your tax filing deadlines', 
+    pcm: 'Set reminder so you no go forget tax deadline', 
+    yo: 'Ṣètò ìránṣọ́ fún àwọn àkókò ìparí owó-orí rẹ', 
+    ha: 'Saita tunatarwar don ƙarshen lokacin harajinka', 
+    ig: 'Tọọ ncheta maka oge njedebe ịkwụ ụtụ gị' 
+  },
+  'reminders.enableNotifications': { 
+    en: 'Enable Push Notifications', 
+    pcm: 'Turn On Notifications', 
+    yo: 'Mú Ìfitónilétí Ṣiṣẹ́', 
+    ha: 'Kunna Sanarwa', 
+    ig: 'Mepee Ọkwa' 
+  },
+  'reminders.notificationsEnabled': { 
+    en: 'Notifications Enabled', 
+    pcm: 'Notifications Don Turn On', 
+    yo: 'Ìfitónilétí Ti Ṣiṣẹ́', 
+    ha: 'An Kunna Sanarwa', 
+    ig: 'Emepeela Ọkwa' 
+  },
+  'reminders.addCustom': { 
+    en: 'Add Custom Reminder', 
+    pcm: 'Add Your Own Reminder', 
+    yo: 'Fi Ìránṣọ́ Àdáni Kún', 
+    ha: 'Ƙara Tunatarwa Na Musamman', 
+    ig: 'Tinye Ncheta Nke Gị' 
+  },
+  'reminders.monthlyVAT': { 
+    en: 'Monthly VAT Filing', 
+    pcm: 'Monthly VAT', 
+    yo: 'Fífi VAT Ránṣẹ́ Oṣù', 
+    ha: 'Fayil VAT na Wata', 
+    ig: 'Ịdekọ VAT Ọnwa' 
+  },
+  'reminders.annualCIT': { 
+    en: 'Annual CIT Return', 
+    pcm: 'Yearly Company Tax', 
+    yo: 'Ìpadà CIT Ọdún', 
+    ha: 'Dawowar CIT ta Shekara', 
+    ig: 'Nlọghachi CIT Afọ' 
+  },
+  'reminders.pitRemittance': { 
+    en: 'PIT Remittance', 
+    pcm: 'Personal Tax Payment', 
+    yo: 'Fífi PIT Ránṣẹ́', 
+    ha: 'Biyan PIT', 
+    ig: 'Ịkwụ PIT' 
+  },
+  'reminders.payeRemittance': { 
+    en: 'PAYE Remittance', 
+    pcm: 'Staff Tax Payment', 
+    yo: 'Fífi PAYE Ránṣẹ́', 
+    ha: 'Biyan PAYE', 
+    ig: 'Ịkwụ PAYE' 
+  },
+  'reminders.sendTestEmail': { 
+    en: 'Send Test Email', 
+    pcm: 'Send Test Email', 
+    yo: 'Fi Ìmèélì Ìdánwò Ránṣẹ́', 
+    ha: 'Aika Imel ɗin Gwaji', 
+    ig: 'Zipu Email Nnwale' 
+  },
+  'reminders.whatsappNotify': { 
+    en: 'WhatsApp Notification', 
+    pcm: 'WhatsApp Alert', 
+    yo: 'Ìfitónilétí WhatsApp', 
+    ha: 'Sanarwar WhatsApp', 
+    ig: 'Ọkwa WhatsApp' 
+  },
+  'reminders.emailNotify': { 
+    en: 'Email Notification', 
+    pcm: 'Email Alert', 
+    yo: 'Ìfitónilétí Ìmèélì', 
+    ha: 'Sanarwar Imel', 
+    ig: 'Ọkwa Email' 
+  },
+
+  // Settings page
+  'settings.title': { 
+    en: 'Settings', 
+    pcm: 'Settings', 
+    yo: 'Ètò', 
+    ha: 'Saituna', 
+    ig: 'Ntọala' 
+  },
+  'settings.profile': { 
+    en: 'Profile', 
+    pcm: 'Your Info', 
+    yo: 'Àkọọ́lẹ̀', 
+    ha: 'Bayanan Kai', 
+    ig: 'Profaịlụ' 
+  },
+  'settings.security': { 
+    en: 'Security', 
+    pcm: 'Security', 
+    yo: 'Ààbò', 
+    ha: 'Tsaro', 
+    ig: 'Nchekwa' 
+  },
+  'settings.notifications': { 
+    en: 'Notifications', 
+    pcm: 'Alerts', 
+    yo: 'Ìfitónilétí', 
+    ha: 'Sanarwa', 
+    ig: 'Ọkwa' 
+  },
+  'settings.reports': { 
+    en: 'Scheduled Reports', 
+    pcm: 'Auto Reports', 
+    yo: 'Ìròyìn tó Ti Gbékalẹ̀', 
+    ha: 'Rahotannin da Aka Tsara', 
+    ig: 'Akụkọ Ahaziri' 
+  },
+  'settings.fullName': { 
+    en: 'Full Name', 
+    pcm: 'Your Name', 
+    yo: 'Orúkọ Kíkún', 
+    ha: 'Cikakken Suna', 
+    ig: 'Aha Zuru Oke' 
+  },
+  'settings.email': { 
+    en: 'Email Address', 
+    pcm: 'Email', 
+    yo: 'Àdírẹ́sì Ìmèélì', 
+    ha: 'Adireshin Imel', 
+    ig: 'Adreesị Email' 
+  },
+  'settings.changeEmail': { 
+    en: 'Change Email', 
+    pcm: 'Change Email', 
+    yo: 'Yí Ìmèélì Padà', 
+    ha: 'Canja Imel', 
+    ig: 'Gbanwee Email' 
+  },
+  'settings.changePassword': { 
+    en: 'Change Password', 
+    pcm: 'Change Password', 
+    yo: 'Yí Ọ̀rọ̀ Aṣínà Padà', 
+    ha: 'Canja Kalmar Wucewa', 
+    ig: 'Gbanwee Okwuntụghe' 
+  },
+  'settings.currentPassword': { 
+    en: 'Current Password', 
+    pcm: 'Your Current Password', 
+    yo: 'Ọ̀rọ̀ Aṣínà Lọ́wọ́', 
+    ha: 'Kalmar Wucewa ta Yanzu', 
+    ig: 'Okwuntụghe Ugbu A' 
+  },
+  'settings.newPassword': { 
+    en: 'New Password', 
+    pcm: 'New Password', 
+    yo: 'Ọ̀rọ̀ Aṣínà Tuntun', 
+    ha: 'Sabuwar Kalmar Wucewa', 
+    ig: 'Okwuntụghe Ọhụrụ' 
+  },
+  'settings.confirmPassword': { 
+    en: 'Confirm Password', 
+    pcm: 'Enter Password Again', 
+    yo: 'Jẹ́rìí Ọ̀rọ̀ Aṣínà', 
+    ha: 'Tabbatar da Kalmar Wucewa', 
+    ig: 'Kwenye Okwuntụghe' 
+  },
+  'settings.enable2FA': { 
+    en: 'Enable Two-Factor Authentication', 
+    pcm: 'Add Extra Security', 
+    yo: 'Mú Ìdánilójú Méjì Ṣiṣẹ́', 
+    ha: 'Kunna Tantancewa Biyu', 
+    ig: 'Mepee Nkwenye Ugboro Abụọ' 
+  },
+  'settings.backupCodes': { 
+    en: 'Backup Codes', 
+    pcm: 'Emergency Codes', 
+    yo: 'Àwọn Kóòdù Ìfipamọ́', 
+    ha: 'Lambobin Ajiya', 
+    ig: 'Koodu Ndabere' 
+  },
+  'settings.activityLog': { 
+    en: 'Activity Log', 
+    pcm: 'Your Activity', 
+    yo: 'Ìwé Ìṣe', 
+    ha: 'Tarihin Aiki', 
+    ig: 'Ndekọ Ọrụ' 
+  },
+  'settings.whatsappNumber': { 
+    en: 'WhatsApp Number', 
+    pcm: 'WhatsApp Number', 
+    yo: 'Nọ́mbà WhatsApp', 
+    ha: 'Lambar WhatsApp', 
+    ig: 'Nọmba WhatsApp' 
+  },
+  'settings.testNotification': { 
+    en: 'Test Notification', 
+    pcm: 'Test Alert', 
+    yo: 'Dán Ìfitónilétí Wò', 
+    ha: 'Gwada Sanarwa', 
+    ig: 'Nwalee Ọkwa' 
+  },
+  'settings.saveChanges': { 
+    en: 'Save Changes', 
+    pcm: 'Keep Changes', 
+    yo: 'Fi Àwọn Àyípadà Pamọ́', 
+    ha: 'Ajiye Canje-canje', 
+    ig: 'Chekwaa Mgbanwe' 
+  },
+  'settings.updateProfile': { 
+    en: 'Update Profile', 
+    pcm: 'Update Your Info', 
+    yo: 'Mú Àkọọ́lẹ̀ Ṣe Tuntun', 
+    ha: 'Sabunta Bayani', 
+    ig: 'Melite Profaịlụ' 
+  },
+
+  // Learn page
+  'learn.title': { 
+    en: 'Tax Academy', 
+    pcm: 'Tax Academy', 
+    yo: 'Ilé Ẹ̀kọ́ Owó-orí', 
+    ha: 'Makarantar Haraji', 
+    ig: 'Ụlọ Akwụkwọ Ụtụ' 
+  },
+  'learn.subtitle': { 
+    en: 'Master Nigerian tax rules • Bust common myths • Learn sector incentives', 
+    pcm: 'Understand Nigeria tax • Know the truth • Learn about different business', 
+    yo: 'Mọ òfin owó-orí Nàìjíríà • Fọ àwọn àsọjáde • Kọ́ àwọn ìmúṣe ẹ̀ka', 
+    ha: 'Koyi dokokin harajin Najeriya • Karyata tatsuniyoyi • Koyi fa\'idodin sashe', 
+    ig: 'Mụta iwu ụtụ Naịjirịa • Kwatụ akụkọ ụgha • Mụta uru ngalaba' 
+  },
+  'learn.yourTaxTips': { 
+    en: 'Your Tax Tips', 
+    pcm: 'Tax Tips For You', 
+    yo: 'Àwọn Ìmọ̀ràn Owó-orí Rẹ', 
+    ha: 'Shawarwarin Haraji', 
+    ig: 'Ndụmọdụ Ụtụ Gị' 
+  },
+  'learn.quizProgress': { 
+    en: 'Quiz Progress', 
+    pcm: 'Quiz Progress', 
+    yo: 'Ìtẹ̀síwájú Ìdánwò', 
+    ha: 'Ci gaban Jarrabawa', 
+    ig: 'Ọganihu Ajụjụ' 
+  },
+  'learn.myths': { 
+    en: 'Myths', 
+    pcm: 'Myths', 
+    yo: 'Àsọjáde', 
+    ha: 'Tatsuniyoyi', 
+    ig: 'Akụkọ Ụgha' 
+  },
+  'learn.videos': { 
+    en: 'Videos', 
+    pcm: 'Videos', 
+    yo: 'Fídíò', 
+    ha: 'Bidiyo', 
+    ig: 'Vidiyo' 
+  },
+  'learn.sectors': { 
+    en: 'Sectors', 
+    pcm: 'Business Types', 
+    yo: 'Àwọn Ẹ̀ka', 
+    ha: 'Sassan', 
+    ig: 'Ngalaba' 
+  },
+  'learn.articles': { 
+    en: 'Articles', 
+    pcm: 'Articles', 
+    yo: 'Àwọn Àkọlé', 
+    ha: 'Labarai', 
+    ig: 'Akụkọ' 
+  },
+  'learn.faqs': { 
+    en: 'FAQs', 
+    pcm: 'Common Questions', 
+    yo: 'Àwọn Ìbéèrè Tó Wọ́pọ̀', 
+    ha: 'Tambayoyi Masu Yawa', 
+    ig: 'Ajụjụ A Na-ajụkarị' 
+  },
+  'learn.mythBusted': { 
+    en: 'Myth Busted!', 
+    pcm: 'E No Be True!', 
+    yo: 'Àsọjáde Ti Fọ́!', 
+    ha: 'An Karyata Tatsuniya!', 
+    ig: 'Akwatụrụ Akụkọ Ụgha!' 
+  },
+  'learn.readMore': { 
+    en: 'Read More', 
+    pcm: 'Read More', 
+    yo: 'Kà Síi', 
+    ha: 'Ƙara Karantawa', 
+    ig: 'Gụkwuo' 
+  },
+
+  // Saved Businesses page
+  'savedBusinesses.title': { 
+    en: 'Saved Businesses', 
+    pcm: 'Your Saved Business Dem', 
+    yo: 'Àwọn Iṣẹ́ Tí A Fi Pamọ́', 
+    ha: 'Kasuwancin da Aka Ajiye', 
+    ig: 'Azụmaahịa Echekwara' 
+  },
+  'savedBusinesses.subtitle': { 
+    en: 'Manage and recalculate taxes for your saved businesses', 
+    pcm: 'Manage your saved business and calculate tax again', 
+    yo: 'Ṣàkóso àti ṣe ìṣirò owó-orí tuntun fún àwọn iṣẹ́ rẹ', 
+    ha: 'Sarrafa kuma sake ƙididdige haraji don kasuwancin da aka ajiye', 
+    ig: 'Jikwaa ma gbakọọ ụtụ ọzọ maka azụmaahịa gị' 
+  },
+  'savedBusinesses.recalculate': { 
+    en: 'Recalculate Tax', 
+    pcm: 'Calculate Tax Again', 
+    yo: 'Ṣe Ìṣirò Owó-orí Lẹ́ẹ̀kan Sí', 
+    ha: 'Sake Ƙididdige Haraji', 
+    ig: 'Gbakọọ Ụtụ Ọzọ' 
+  },
+  'savedBusinesses.deleteBusiness': { 
+    en: 'Delete Business', 
+    pcm: 'Remove Business', 
+    yo: 'Pa Iṣẹ́ Rẹ́', 
+    ha: 'Share Kasuwanci', 
+    ig: 'Hichapụ Azụmaahịa' 
+  },
+  'savedBusinesses.verified': { 
+    en: 'CAC Verified', 
+    pcm: 'CAC Verified', 
+    yo: 'CAC Ti Jẹ́rìí', 
+    ha: 'An Tabbatar da CAC', 
+    ig: 'CAC Kwenyere' 
+  },
+
+  // Team page
+  'team.title': { 
+    en: 'Team Management', 
+    pcm: 'Manage Your Team', 
+    yo: 'Ìṣàkóso Ẹgbẹ́', 
+    ha: 'Gudanar da Ƙungiya', 
+    ig: 'Njikwa Otu' 
+  },
+  'team.subtitle': { 
+    en: 'Invite team members and manage access', 
+    pcm: 'Add team members and control who fit access', 
+    yo: 'Pe àwọn ọmọ ẹgbẹ́ kí o sì ṣàkóso ìráyè', 
+    ha: 'Gayyaci membobi kuma sarrafa isa', 
+    ig: 'Kpọọ ndị otu wee jikwaa ohere' 
+  },
+  'team.inviteMember': { 
+    en: 'Invite Member', 
+    pcm: 'Add Person', 
+    yo: 'Pe Ọmọ Ẹgbẹ́', 
+    ha: 'Gayyaci Memba', 
+    ig: 'Kpọọ Onye' 
+  },
+  'team.pendingInvites': { 
+    en: 'Pending Invites', 
+    pcm: 'Invites Wey Never Accept', 
+    yo: 'Àwọn Ìkésí tó Ń Dúró', 
+    ha: 'Gayyatar Jira', 
+    ig: 'Oku Na-eche' 
+  },
+  'team.activeMembers': { 
+    en: 'Active Members', 
+    pcm: 'Active People', 
+    yo: 'Àwọn Ọmọ Ẹgbẹ́ Tó Ń Ṣiṣẹ́', 
+    ha: 'Membobi Masu Aiki', 
+    ig: 'Ndị Otu Na-arụ Ọrụ' 
+  },
+  'team.role': { 
+    en: 'Role', 
+    pcm: 'Role', 
+    yo: 'Ipò', 
+    ha: 'Matsayi', 
+    ig: 'Ọrụ' 
+  },
+  'team.admin': { 
+    en: 'Admin', 
+    pcm: 'Admin', 
+    yo: 'Alàkóso', 
+    ha: 'Mai Gudanarwa', 
+    ig: 'Onye Njikwa' 
+  },
+  'team.member': { 
+    en: 'Member', 
+    pcm: 'Member', 
+    yo: 'Ọmọ Ẹgbẹ́', 
+    ha: 'Memba', 
+    ig: 'Onye Otu' 
+  },
+  'team.viewer': { 
+    en: 'Viewer', 
+    pcm: 'Viewer Only', 
+    yo: 'Olùwò', 
+    ha: 'Mai Kallo', 
+    ig: 'Onye Na-ele' 
+  },
+  'team.removeAccess': { 
+    en: 'Remove Access', 
+    pcm: 'Remove Access', 
+    yo: 'Yọ Ìráyè Kúrò', 
+    ha: 'Cire Isa', 
+    ig: 'Wepụ Ohere' 
+  },
+
+  // Notifications page
+  'notifications.title': { 
+    en: 'Notifications', 
+    pcm: 'Your Notifications', 
+    yo: 'Ìfitónilétí', 
+    ha: 'Sanarwa', 
+    ig: 'Ọkwa' 
+  },
+  'notifications.settings': { 
+    en: 'Notification Settings', 
+    pcm: 'Settings', 
+    yo: 'Ètò Ìfitónilétí', 
+    ha: 'Saitin Sanarwa', 
+    ig: 'Ntọala Ọkwa' 
+  },
+  'notifications.markAllRead': { 
+    en: 'Mark All as Read', 
+    pcm: 'Mark All as Read', 
+    yo: 'Samisi Gbogbo Rẹ̀ Bí A Ti Kà', 
+    ha: 'Yi Duka alama an karanta', 
+    ig: 'Dee Niile Dịka Agụrụ' 
+  },
+  'notifications.clearAll': { 
+    en: 'Clear All', 
+    pcm: 'Clear Everything', 
+    yo: 'Pa Gbogbo Rẹ̀', 
+    ha: 'Share Duka', 
+    ig: 'Kpochapụ Niile' 
+  },
+  'notifications.noNotifications': { 
+    en: 'No notifications yet', 
+    pcm: 'No notifications yet', 
+    yo: 'Kò sí ìfitónilétí síbẹ̀', 
+    ha: 'Babu sanarwa tukuna', 
+    ig: 'Ọ dịghị ọkwa ka' 
+  },
+  'notifications.enableSound': { 
+    en: 'Enable Sound', 
+    pcm: 'Turn On Sound', 
+    yo: 'Mú Ohùn Ṣiṣẹ́', 
+    ha: 'Kunna Sauti', 
+    ig: 'Mepee Ụda' 
+  },
+  'notifications.enableBrowser': { 
+    en: 'Enable Browser Notifications', 
+    pcm: 'Turn On Browser Alerts', 
+    yo: 'Mú Ìfitónilétí Aṣàwákiri Ṣiṣẹ́', 
+    ha: 'Kunna Sanarwar Burauza', 
+    ig: 'Mepee Ọkwa Nchọgharị' 
+  },
+
+  // Security Dashboard
+  'security.title': { 
+    en: 'Security Dashboard', 
+    pcm: 'Security Dashboard', 
+    yo: 'Pánẹ́ẹ̀lì Ààbò', 
+    ha: 'Dashboard na Tsaro', 
+    ig: 'Dashbọọdụ Nchekwa' 
+  },
+  'security.score': { 
+    en: 'Security Score', 
+    pcm: 'Security Score', 
+    yo: 'Iṣirò Ààbò', 
+    ha: 'Maki Tsaro', 
+    ig: 'Akara Nchekwa' 
+  },
+  'security.devices': { 
+    en: 'Known Devices', 
+    pcm: 'Devices Wey We Know', 
+    yo: 'Àwọn Ẹ̀rọ Tó Mọ̀', 
+    ha: 'Na\'urori da Aka Sani', 
+    ig: 'Ngwaọrụ A Maara' 
+  },
+  'security.ipWhitelist': { 
+    en: 'IP Whitelist', 
+    pcm: 'Allowed IP Addresses', 
+    yo: 'Àtòjọ IP Fúnfún', 
+    ha: 'Jerin Fararen IP', 
+    ig: 'Ndepụta IP' 
+  },
+  'security.timeRestrictions': { 
+    en: 'Time Restrictions', 
+    pcm: 'When You Fit Login', 
+    yo: 'Ìdíwọ́n Àkókò', 
+    ha: 'Ƙayyadaddun Lokaci', 
+    ig: 'Mgbochi Oge' 
+  },
+  'security.blockedAttempts': { 
+    en: 'Blocked Login Attempts', 
+    pcm: 'Failed Login Wey We Block', 
+    yo: 'Àwọn Ìgbìyànjú Wíwọlé Tó Dínà', 
+    ha: 'Ƙoƙarin Shiga da Aka Toshe', 
+    ig: 'Ọgbụgba Ịbanye Egbochiri' 
+  },
+
+  // Referrals page
+  'referrals.title': { 
+    en: 'Referral Program', 
+    pcm: 'Bring Your Padi', 
+    yo: 'Ètò Ìtọkàsí', 
+    ha: 'Shirin Mika Abokai', 
+    ig: 'Mmemme Nkwụsara' 
+  },
+  'referrals.subtitle': { 
+    en: 'Invite friends and earn rewards', 
+    pcm: 'Bring your people, collect rewards', 
+    yo: 'Pe àwọn ọ̀rẹ́ kí o sì jèrè ẹ̀bùn', 
+    ha: 'Gayyaci abokai ka sami lada', 
+    ig: 'Kpọọ ndị enyi nweta ụgwọ' 
+  },
+  'referrals.yourCode': { 
+    en: 'Your Referral Code', 
+    pcm: 'Your Code', 
+    yo: 'Kóòdù Ìtọkàsí Rẹ', 
+    ha: 'Lambar Mika Abokai', 
+    ig: 'Koodu Nkwụsara Gị' 
+  },
+  'referrals.shareLink': { 
+    en: 'Share Link', 
+    pcm: 'Share Link', 
+    yo: 'Pín Àjápọ̀', 
+    ha: 'Raba Haɗin', 
+    ig: 'Kesaa Njikọ' 
+  },
+  'referrals.totalReferrals': { 
+    en: 'Total Referrals', 
+    pcm: 'People Wey You Bring', 
+    yo: 'Àpapọ̀ Àwọn Ìtọkàsí', 
+    ha: 'Jimlar Mika Abokai', 
+    ig: 'Mkpokọta Nkwụsara' 
+  },
+  'referrals.pendingRewards': { 
+    en: 'Pending Rewards', 
+    pcm: 'Rewards Wey Dey Come', 
+    yo: 'Àwọn Ẹ̀bùn Tó Ń Dúró', 
+    ha: 'Ladar Jira', 
+    ig: 'Ụgwọ Na-eche' 
+  },
+  'referrals.earnedRewards': { 
+    en: 'Earned Rewards', 
+    pcm: 'Rewards Wey You Don Get', 
+    yo: 'Àwọn Ẹ̀bùn Tí O Ti Jèrè', 
+    ha: 'Ladar da Aka Samu', 
+    ig: 'Ụgwọ Enwetara' 
+  },
+  'referrals.howItWorks': { 
+    en: 'How It Works', 
+    pcm: 'How E Dey Work', 
+    yo: 'Bí Ó Ṣe Ń Ṣiṣẹ́', 
+    ha: 'Yadda Yake Aiki', 
+    ig: 'Otu Ọ Si Arụ Ọrụ' 
+  },
+  'referrals.step1': { 
+    en: 'Share your unique referral code', 
+    pcm: 'Share your code', 
+    yo: 'Pín kóòdù ìtọkàsí àkànṣe rẹ', 
+    ha: 'Raba lambar mika abokai na musamman', 
+    ig: 'Kesaa koodu nkwụsara pụrụ iche gị' 
+  },
+  'referrals.step2': { 
+    en: 'Friend signs up and subscribes', 
+    pcm: 'Your friend register and pay', 
+    yo: 'Ọ̀rẹ́ forúkọsílẹ̀ tí ó sì san owó', 
+    ha: 'Abokin ya yi rajista ya biyan kuɗi', 
+    ig: 'Enyi debanye aha ma kwụọ ụgwọ' 
+  },
+  'referrals.step3': { 
+    en: 'Both of you get rewarded!', 
+    pcm: 'Una two go chop reward!', 
+    yo: 'Ẹ méjèèjì máa jèrè ẹ̀bùn!', 
+    ha: 'Ku biyu za ku sami lada!', 
+    ig: 'Unu abụọ ga-enweta ụgwọ!' 
+  },
+
+  // Achievements page
+  'achievements.title': { 
+    en: 'Achievements', 
+    pcm: 'Your Achievements', 
+    yo: 'Àwọn Àṣeyọrí', 
+    ha: 'Nasarori', 
+    ig: 'Ihe Emezuru' 
+  },
+  'achievements.subtitle': { 
+    en: 'Track your progress and unlock badges', 
+    pcm: 'See your progress and collect badges', 
+    yo: 'Tẹ̀lé ìtẹ̀síwájú rẹ kí o sì ṣí àmì', 
+    ha: 'Bin sawun ci gabanka kuma buɗe alamomi', 
+    ig: 'Soro ọganihu gị ma meghee akara' 
+  },
+  'achievements.totalPoints': { 
+    en: 'Total Points', 
+    pcm: 'Your Points', 
+    yo: 'Àpapọ̀ Àmì', 
+    ha: 'Jimlar Maki', 
+    ig: 'Mkpokọta Akara' 
+  },
+  'achievements.badgesEarned': { 
+    en: 'Badges Earned', 
+    pcm: 'Badges Wey You Get', 
+    yo: 'Àwọn Àmì Tí O Jèrè', 
+    ha: 'Alamomin da Aka Samu', 
+    ig: 'Akara Enwetara' 
+  },
+  'achievements.locked': { 
+    en: 'Locked', 
+    pcm: 'E Never Open', 
+    yo: 'Tìí', 
+    ha: 'Kulle', 
+    ig: 'Kpọchiri' 
+  },
+  'achievements.unlocked': { 
+    en: 'Unlocked', 
+    pcm: 'E Don Open', 
+    yo: 'Ti Ṣí', 
+    ha: 'An Buɗe', 
+    ig: 'Emepela' 
+  },
+
+  // Accountant Portal
+  'accountant.title': { 
+    en: 'Accountant Portal', 
+    pcm: 'Accountant Portal', 
+    yo: 'Ẹnu-ọ̀nà Àkàwò', 
+    ha: 'Ƙofar Akawo', 
+    ig: 'Ọnụ Ụzọ Akaụntant' 
+  },
+  'accountant.clients': { 
+    en: 'My Clients', 
+    pcm: 'My Clients', 
+    yo: 'Àwọn Oníbàárà Mi', 
+    ha: 'Abokan Cinikin Na', 
+    ig: 'Ndị Ahịa M' 
+  },
+  'accountant.addClient': { 
+    en: 'Add Client', 
+    pcm: 'Add New Client', 
+    yo: 'Fi Oníbàárà Kún', 
+    ha: 'Ƙara Abokin Ciniki', 
+    ig: 'Tinye Onye Ahịa' 
+  },
+  'accountant.viewReport': { 
+    en: 'View Report', 
+    pcm: 'See Report', 
+    yo: 'Wo Ìròyìn', 
+    ha: 'Duba Rahoto', 
+    ig: 'Lee Akụkọ' 
+  },
+  'accountant.calculateForClient': { 
+    en: 'Calculate for Client', 
+    pcm: 'Calculate Tax for Client', 
+    yo: 'Ṣe Ìṣirò Fún Oníbàárà', 
+    ha: 'Ƙididdige don Abokin Ciniki', 
+    ig: 'Gbakọọ maka Onye Ahịa' 
+  },
+
+  // API Docs
+  'apiDocs.title': { 
+    en: 'API Documentation', 
+    pcm: 'API Documentation', 
+    yo: 'Ìwé Àkọsílẹ̀ API', 
+    ha: 'Takardun API', 
+    ig: 'Akwụkwọ API' 
+  },
+  'apiDocs.subtitle': { 
+    en: 'Integrate TaxForge into your applications', 
+    pcm: 'Connect TaxForge to your app', 
+    yo: 'Ṣàkópọ̀ TaxForge sínú àwọn ohun èlò rẹ', 
+    ha: 'Haɗa TaxForge cikin manhajojinku', 
+    ig: 'Jikọọ TaxForge na ngwa gị' 
+  },
+  'apiDocs.authentication': { 
+    en: 'Authentication', 
+    pcm: 'How to Login', 
+    yo: 'Ìfìdánimọ̀', 
+    ha: 'Tantancewa', 
+    ig: 'Nkwenye' 
+  },
+  'apiDocs.endpoints': { 
+    en: 'Endpoints', 
+    pcm: 'API Endpoints', 
+    yo: 'Àwọn Àyè Òpin', 
+    ha: 'Maɓuɓɓuka', 
+    ig: 'Ebe Njedebe' 
+  },
+  'apiDocs.rateLimit': { 
+    en: 'Rate Limits', 
+    pcm: 'Request Limits', 
+    yo: 'Àwọn Ìdíwọ́n Ìdásílẹ̀', 
+    ha: 'Ƙayyadaddun Adadi', 
+    ig: 'Oke Ọnụọgụ' 
+  },
+  'apiDocs.examples': { 
+    en: 'Examples', 
+    pcm: 'Examples', 
+    yo: 'Àwọn Àpẹẹrẹ', 
+    ha: 'Misalai', 
+    ig: 'Ọmụmaatụ' 
+  },
+
+  // Audit Log
+  'auditLog.title': { 
+    en: 'Audit Log', 
+    pcm: 'Activity History', 
+    yo: 'Ìwé Àyẹ̀wò', 
+    ha: 'Tarihin Aiki', 
+    ig: 'Ndekọ Nyocha' 
+  },
+  'auditLog.action': { 
+    en: 'Action', 
+    pcm: 'What Happen', 
+    yo: 'Ìṣe', 
+    ha: 'Aiki', 
+    ig: 'Ihe Emere' 
+  },
+  'auditLog.timestamp': { 
+    en: 'Timestamp', 
+    pcm: 'When E Happen', 
+    yo: 'Àkókò', 
+    ha: 'Lokaci', 
+    ig: 'Oge' 
+  },
+  'auditLog.user': { 
+    en: 'User', 
+    pcm: 'Who Do Am', 
+    yo: 'Olùmúlò', 
+    ha: 'Mai Amfani', 
+    ig: 'Onye Ọrụ' 
+  },
+  'auditLog.details': { 
+    en: 'Details', 
+    pcm: 'More Info', 
+    yo: 'Àlàyé', 
+    ha: 'Cikakken Bayani', 
+    ig: 'Nkọwa' 
+  },
+
+  // E-Filing page
+  'eFiling.title': { 
+    en: 'E-Filing', 
+    pcm: 'File Tax Online', 
+    yo: 'Fífi Ránṣẹ́ Lórí Ayélujára', 
+    ha: 'Aika ta yanar gizo', 
+    ig: 'Iziga na Ịntanetị' 
+  },
+  'eFiling.subtitle': { 
+    en: 'Submit your tax returns electronically', 
+    pcm: 'Send your tax returns online', 
+    yo: 'Fi àwọn ìpadà owó-orí rẹ ránṣẹ́ lórí ẹ̀rọ ayélujára', 
+    ha: 'Aika dawowar harajinka ta yanar gizo', 
+    ig: 'Nyefee nloghachi ụtụ gị n\'ịntanetị' 
+  },
+  'eFiling.selectForm': { 
+    en: 'Select Form', 
+    pcm: 'Choose Form', 
+    yo: 'Yan Fọọ́mù', 
+    ha: 'Zaɓi Fom', 
+    ig: 'Họrọ Fọm' 
+  },
+  'eFiling.submitReturn': { 
+    en: 'Submit Return', 
+    pcm: 'Send Return', 
+    yo: 'Fi Ìpadà Ránṣẹ́', 
+    ha: 'Aika Dawowa', 
+    ig: 'Nyefee Nloghachi' 
+  },
+  'eFiling.filingHistory': { 
+    en: 'Filing History', 
+    pcm: 'Past Filings', 
+    yo: 'Ìtàn Fífi Ránṣẹ́', 
+    ha: 'Tarihin Aika', 
+    ig: 'Akụkọ Ịde' 
+  },
+
+  // Scenario Modeling
+  'scenario.title': { 
+    en: 'Scenario Modeling', 
+    pcm: 'What If Analysis', 
+    yo: 'Ṣíṣe Àwòrán Ìṣẹ̀lẹ̀', 
+    ha: 'Yin Kwatancen Yanayi', 
+    ig: 'Nhazi Ihe Omume' 
+  },
+  'scenario.subtitle': { 
+    en: 'Compare different tax scenarios', 
+    pcm: 'See how different options affect your tax', 
+    yo: 'Fiwé àwọn ìṣẹ̀lẹ̀ owó-orí oriṣiriṣi', 
+    ha: 'Kwatanta yanayin haraji daban-daban', 
+    ig: 'Tụnyere ọnọdụ ụtụ dị iche iche' 
+  },
+  'scenario.addScenario': { 
+    en: 'Add Scenario', 
+    pcm: 'Add New Scenario', 
+    yo: 'Fi Ìṣẹ̀lẹ̀ Kún', 
+    ha: 'Ƙara Yanayi', 
+    ig: 'Tinye Ọnọdụ' 
+  },
+  'scenario.compare': { 
+    en: 'Compare Scenarios', 
+    pcm: 'Compare Them', 
+    yo: 'Fiwé Àwọn Ìṣẹ̀lẹ̀', 
+    ha: 'Kwatanta Yanayi', 
+    ig: 'Tụnyere Ọnọdụ' 
+  },
+
+  // Business Report
+  'businessReport.title': { 
+    en: 'Business Report', 
+    pcm: 'Business Report', 
+    yo: 'Ìròyìn Iṣẹ́', 
+    ha: 'Rahoton Kasuwanci', 
+    ig: 'Akụkọ Azụmaahịa' 
+  },
+  'businessReport.generate': { 
+    en: 'Generate Report', 
+    pcm: 'Create Report', 
+    yo: 'Ṣèdá Ìròyìn', 
+    ha: 'Ƙirƙiri Rahoto', 
+    ig: 'Mepụta Akụkọ' 
+  },
+  'businessReport.period': { 
+    en: 'Report Period', 
+    pcm: 'Time Period', 
+    yo: 'Àsìkò Ìròyìn', 
+    ha: 'Lokacin Rahoto', 
+    ig: 'Oge Akụkọ' 
+  },
+
+  // Insights page
+  'insights.title': { 
+    en: 'Tax Insights', 
+    pcm: 'Smart Tax Tips', 
+    yo: 'Ìmọ̀ràn Owó-orí', 
+    ha: 'Fahimtar Haraji', 
+    ig: 'Nghọta Ụtụ' 
+  },
+  'insights.subtitle': { 
+    en: 'AI-powered recommendations for your business', 
+    pcm: 'Smart advice for your business', 
+    yo: 'Àwọn ìmọ̀ràn tó dá lórí AI fún iṣẹ́ rẹ', 
+    ha: 'Shawarwari masu ƙarfin AI don kasuwancinka', 
+    ig: 'Ndụmọdụ AI maka azụmaahịa gị' 
+  },
+
+  // Terms page
+  'terms.title': { 
+    en: 'Terms of Service', 
+    pcm: 'Terms and Conditions', 
+    yo: 'Àwọn Òfin Ìṣètò', 
+    ha: 'Sharuɗɗan Sabis', 
+    ig: 'Usoro Ọrụ' 
+  },
+  'terms.lastUpdated': { 
+    en: 'Last Updated', 
+    pcm: 'Last Updated', 
+    yo: 'Ìmúdójúìwọ̀n Ìkẹ́yìn', 
+    ha: 'Sabuntawa ta Ƙarshe', 
+    ig: 'Mmelite Ikpeazụ' 
+  },
+
+  // Roadmap page
+  'roadmap.title': { 
+    en: 'Product Roadmap', 
+    pcm: 'What We Dey Plan', 
+    yo: 'Ètò Ọjà', 
+    ha: 'Tsarin Samfuri', 
+    ig: 'Atụmatụ Ngwaahịa' 
+  },
+  'roadmap.subtitle': { 
+    en: 'See what features are coming next', 
+    pcm: 'See wetin dey come next', 
+    yo: 'Wo àwọn ẹ̀yà tó ń bọ̀', 
+    ha: 'Duba fasalolin da ke zuwa', 
+    ig: 'Lee ihe na-abịa' 
+  },
+  'roadmap.planned': { 
+    en: 'Planned', 
+    pcm: 'We Plan Am', 
+    yo: 'Tí A Gbékalẹ̀', 
+    ha: 'An Shirya', 
+    ig: 'Atụmatụ' 
+  },
+  'roadmap.inProgress': { 
+    en: 'In Progress', 
+    pcm: 'We Dey Work On Am', 
+    yo: 'Ń Lọ Lọ́wọ́', 
+    ha: 'Ci Gaba', 
+    ig: 'Na-aga N\'ihu' 
+  },
+  'roadmap.completed': { 
+    en: 'Completed', 
+    pcm: 'E Don Finish', 
+    yo: 'Ti Parí', 
+    ha: 'An Kammala', 
+    ig: 'Emechara' 
+  },
+
+  // Not Found page
+  'notFound.title': { 
+    en: 'Page Not Found', 
+    pcm: 'Page No Dey', 
+    yo: 'Ojú-ìwé Kò Sí', 
+    ha: 'Ba a Sami Shafin ba', 
+    ig: 'Ahụghị Peeji' 
+  },
+  'notFound.message': { 
+    en: 'The page you are looking for does not exist', 
+    pcm: 'The page wey you dey find no dey', 
+    yo: 'Ojú-ìwé tí o ń wá kò sí', 
+    ha: 'Shafin da kake nema ba ya nan', 
+    ig: 'Peeji ị na-achọ adịghị' 
+  },
+  'notFound.goHome': { 
+    en: 'Go to Homepage', 
+    pcm: 'Go Back Home', 
+    yo: 'Lọ sí Ojú-ìwé Àkọ́kọ́', 
+    ha: 'Je zuwa Babban Shafi', 
+    ig: 'Gaa na Peeji Mbụ' 
+  },
+
+  // Individual Calculator
+  'individual.title': { 
+    en: 'Personal Tax Calculator', 
+    pcm: 'Personal Tax Calculator', 
+    yo: 'Ẹ̀rọ Ìṣirò Owó-orí Àdáni', 
+    ha: 'Na\'urar Ƙididdige Harajin Mutum', 
+    ig: 'Ngwa Mgbako Ụtụ Onwe' 
+  },
+  'individual.subtitle': { 
+    en: 'Calculate your personal income tax', 
+    pcm: 'Calculate your own tax', 
+    yo: 'Ṣe ìṣirò owó-orí àkọọ́lẹ̀ rẹ', 
+    ha: 'Ƙididdige harajin samun kuɗinka', 
+    ig: 'Gbakọọ ụtụ ego onwe gị' 
+  },
+  'individual.salary': { 
+    en: 'Monthly Salary', 
+    pcm: 'Your Salary', 
+    yo: 'Owó-oṣù Oṣù', 
+    ha: 'Albashin Wata', 
+    ig: 'Ụgwọ Ọnwa' 
+  },
+  'individual.otherIncome': { 
+    en: 'Other Income', 
+    pcm: 'Other Money', 
+    yo: 'Owó Mìíràn', 
+    ha: 'Sauran Kuɗi', 
+    ig: 'Ego Ọzọ' 
+  },
+  'individual.pension': { 
+    en: 'Pension Contribution', 
+    pcm: 'Pension', 
+    yo: 'Ìfikún Pẹ́ńṣọ̀ọ̀nù', 
+    ha: 'Gudunmuwar Fensho', 
+    ig: 'Ntinye Penshọn' 
+  },
+  'individual.nhf': { 
+    en: 'NHF Contribution', 
+    pcm: 'NHF', 
+    yo: 'Ìfikún NHF', 
+    ha: 'Gudunmuwar NHF', 
+    ig: 'Ntinye NHF' 
+  },
+
+  // Transactions page
+  'transactions.title': { 
+    en: 'Transactions', 
+    pcm: 'Your Transactions', 
+    yo: 'Àwọn Ìṣòwò', 
+    ha: 'Ma\'amaloli', 
+    ig: 'Azụmahịa' 
+  },
+  'transactions.subtitle': { 
+    en: 'View and manage all your financial transactions', 
+    pcm: 'See all your money movement', 
+    yo: 'Wo àti ṣàkóso gbogbo àwọn ìṣòwò owó rẹ', 
+    ha: 'Duba kuma sarrafa duk ma\'amalolinku na kuɗi', 
+    ig: 'Lee ma jikwaa azụmahịa ego gị niile' 
+  },
+
+  // Admin Analytics
+  'adminAnalytics.title': { 
+    en: 'Admin Analytics', 
+    pcm: 'Admin Dashboard', 
+    yo: 'Àyẹ̀wò Alàkóso', 
+    ha: 'Nazarin Mai Gudanarwa', 
+    ig: 'Nnyocha Onye Njikwa' 
+  },
+  'adminAnalytics.users': { 
+    en: 'Total Users', 
+    pcm: 'All Users', 
+    yo: 'Àpapọ̀ Àwọn Olùmúlò', 
+    ha: 'Jimlar Masu Amfani', 
+    ig: 'Mkpokọta Ndị Ọrụ' 
+  },
+  'adminAnalytics.calculations': { 
+    en: 'Total Calculations', 
+    pcm: 'All Calculations', 
+    yo: 'Àpapọ̀ Àwọn Ìṣirò', 
+    ha: 'Jimlar Ƙididdiga', 
+    ig: 'Mkpokọta Mgbako' 
+  },
+  'adminAnalytics.revenue': { 
+    en: 'Total Revenue', 
+    pcm: 'Money Wey Enter', 
+    yo: 'Àpapọ̀ Owó Tó Wọlé', 
+    ha: 'Jimlar Kuɗin Shiga', 
+    ig: 'Mkpokọta Ego' 
+  },
+
+  // AI Query Analytics
+  'aiQuery.title': { 
+    en: 'AI Query Analytics', 
+    pcm: 'AI Questions Analysis', 
+    yo: 'Àyẹ̀wò Ìbéèrè AI', 
+    ha: 'Nazarin Tambayar AI', 
+    ig: 'Nnyocha Ajụjụ AI' 
+  },
+  'aiQuery.topQuestions': { 
+    en: 'Top Questions', 
+    pcm: 'Popular Questions', 
+    yo: 'Àwọn Ìbéèrè Tó Gbajúmọ̀', 
+    ha: 'Tambayoyi Mafi Yawa', 
+    ig: 'Ajụjụ Kachasị' 
+  },
+  'aiQuery.responseTime': { 
+    en: 'Average Response Time', 
+    pcm: 'How Fast We Reply', 
+    yo: 'Àkókò Ìdáhùn Àárín', 
+    ha: 'Matsakaicin Lokacin Amsa', 
+    ig: 'Oge Azịza Nkezi' 
+  },
 };
 
 // Helper function to get toast messages
