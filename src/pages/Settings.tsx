@@ -48,6 +48,8 @@ import { z } from "zod";
 import { formatDistanceToNow } from "date-fns";
 import { SecurityScoreWidget } from "@/components/SecurityScoreWidget";
 import { ReportScheduleSettings } from "@/components/ReportScheduleSettings";
+import { WhatsAppVerification } from "@/components/WhatsAppVerification";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const nameSchema = z.string().min(1, "Name is required").max(100, "Name must be less than 100 characters");
 const emailSchema = z.string().email("Please enter a valid email address");
@@ -1300,7 +1302,7 @@ const Settings = () => {
               </Card>
             )}
 
-            {/* WhatsApp Notifications */}
+            {/* WhatsApp Notifications with Verification */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -1311,72 +1313,79 @@ const Settings = () => {
                   Receive instant WhatsApp notifications when your account is locked or suspicious activity is detected
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handleUpdateWhatsapp} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="whatsappNumber">WhatsApp Phone Number</Label>
-                    <Input
-                      id="whatsappNumber"
-                      type="tel"
-                      value={whatsappNumber}
-                      onChange={(e) => {
-                        setWhatsappNumber(e.target.value);
-                        setErrors((prev) => ({ ...prev, whatsapp: "" }));
-                      }}
-                      placeholder="+234 812 345 6789"
-                      className={errors.whatsapp ? 'border-destructive' : ''}
-                    />
-                    {errors.whatsapp && (
-                      <p className="text-sm text-destructive">{errors.whatsapp}</p>
-                    )}
-                    <p className="text-xs text-muted-foreground">
-                      Enter your number with country code (e.g., +234 for Nigeria). Leave empty to disable.
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <Button type="submit" disabled={savingWhatsapp}>
-                      {savingWhatsapp ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                          Saving...
-                        </>
-                      ) : (
-                        "Save Number"
+              <CardContent className="space-y-6">
+                {/* WhatsApp Verification Component */}
+                <WhatsAppVerification />
+                
+                {/* Manual number entry (fallback) */}
+                <div className="border-t pt-6">
+                  <h4 className="text-sm font-medium mb-3">Or enter number manually</h4>
+                  <form onSubmit={handleUpdateWhatsapp} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="whatsappNumber">WhatsApp Phone Number</Label>
+                      <Input
+                        id="whatsappNumber"
+                        type="tel"
+                        value={whatsappNumber}
+                        onChange={(e) => {
+                          setWhatsappNumber(e.target.value);
+                          setErrors((prev) => ({ ...prev, whatsapp: "" }));
+                        }}
+                        placeholder="+234 812 345 6789"
+                        className={errors.whatsapp ? 'border-destructive' : ''}
+                      />
+                      {errors.whatsapp && (
+                        <p className="text-sm text-destructive">{errors.whatsapp}</p>
                       )}
-                    </Button>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={handleTestWhatsappNotification}
-                      disabled={testingWhatsapp || !whatsappNumber}
-                    >
-                      {testingWhatsapp ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                          Sending...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="h-4 w-4 mr-2" />
-                          Send Test
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                  {whatsappNumber && (
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                      <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
-                      <div>
-                        <p className="text-sm font-medium text-green-800 dark:text-green-200">
-                          WhatsApp notifications enabled
-                        </p>
-                        <p className="text-xs text-green-600 dark:text-green-400">
-                          You'll receive alerts when your account is locked due to failed login attempts
-                        </p>
-                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Enter your number with country code (e.g., +234 for Nigeria). Leave empty to disable.
+                      </p>
                     </div>
-                  )}
-                </form>
+                    <div className="flex flex-wrap gap-2">
+                      <Button type="submit" disabled={savingWhatsapp}>
+                        {savingWhatsapp ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            Saving...
+                          </>
+                        ) : (
+                          "Save Number"
+                        )}
+                      </Button>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={handleTestWhatsappNotification}
+                        disabled={testingWhatsapp || !whatsappNumber}
+                      >
+                        {testingWhatsapp ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="h-4 w-4 mr-2" />
+                            Send Test
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    {whatsappNumber && (
+                      <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                        <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                            WhatsApp notifications enabled
+                          </p>
+                          <p className="text-xs text-green-600 dark:text-green-400">
+                            You'll receive alerts when your account is locked due to failed login attempts
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </form>
+                </div>
               </CardContent>
             </Card>
 
