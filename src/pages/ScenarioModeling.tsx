@@ -30,6 +30,7 @@ import {
 const ScenarioModeling = () => {
   const { tier, canAccessScenarioModeling } = useSubscription();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const hasAccess = canAccessScenarioModeling();
 
@@ -61,13 +62,13 @@ const ScenarioModeling = () => {
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-warning/10">
               <Crown className="h-10 w-10 text-warning" />
             </div>
-            <h1 className="text-2xl font-bold text-foreground mb-3">Scenario Modeling</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-3">{t('scenario.title')}</h1>
             <p className="text-muted-foreground mb-6">
-              Model "what-if" scenarios and multi-year projections. Available on Freelancer+ plans.
+              {t('scenario.availableFreelancer')}
             </p>
             <Button variant="hero" onClick={() => navigate('/pricing')}>
               <Crown className="h-4 w-4" />
-              Upgrade to Freelancer
+              {t('scenario.upgradeToFreelancer')}
             </Button>
           </div>
         </div>
@@ -123,10 +124,10 @@ const ScenarioModeling = () => {
               <BarChart3 className="h-8 w-8 text-primary-foreground" />
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              Scenario Modeling
+              {t('scenario.title')}
             </h1>
             <p className="text-muted-foreground">
-              Model scenarios and project your tax over time
+              {t('scenario.subtitle')}
             </p>
           </div>
 
@@ -157,14 +158,14 @@ const ScenarioModeling = () => {
             <div className="rounded-2xl border border-border bg-card p-6 shadow-card animate-slide-up">
               <h2 className="font-semibold text-foreground mb-6 flex items-center gap-2">
                 <Calculator className="h-5 w-5 text-primary" />
-                Adjust Variables
+                {t('scenario.adjustVariables')}
               </h2>
 
               <div className="space-y-6">
                 {/* Base Turnover */}
                 <div>
                   <Label className="text-sm mb-2 block">
-                    Base Annual Turnover: {formatCurrency(baseValues.turnover)}
+                    {t('scenario.baseTurnover')}: {formatCurrency(baseValues.turnover)}
                   </Label>
                   <Input
                     type="number"
@@ -180,7 +181,7 @@ const ScenarioModeling = () => {
                 {/* Turnover Change */}
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <Label className="text-sm">Turnover Change</Label>
+                    <Label className="text-sm">{t('scenario.turnoverChange')}</Label>
                     <span className={`text-sm font-medium ${adjustments.turnoverChange > 0 ? 'text-success' : adjustments.turnoverChange < 0 ? 'text-destructive' : 'text-muted-foreground'}`}>
                       {formatChange(adjustments.turnoverChange)}
                     </span>
@@ -206,7 +207,7 @@ const ScenarioModeling = () => {
                 {/* Expense Change */}
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <Label className="text-sm">Expense Change</Label>
+                    <Label className="text-sm">{t('scenario.expenseChange')}</Label>
                     <span className={`text-sm font-medium ${adjustments.expenseChange > 0 ? 'text-destructive' : adjustments.expenseChange < 0 ? 'text-success' : 'text-muted-foreground'}`}>
                       {formatChange(adjustments.expenseChange)}
                     </span>
@@ -226,7 +227,7 @@ const ScenarioModeling = () => {
 
                 {/* Bonus Income */}
                 <div>
-                  <Label className="text-sm mb-2 block">Additional Bonus/Income (₦)</Label>
+                  <Label className="text-sm mb-2 block">{t('scenario.bonusIncome')}</Label>
                   <Input
                     type="number"
                     value={adjustments.bonusIncome || ''}
@@ -240,7 +241,7 @@ const ScenarioModeling = () => {
 
                 {/* Additional Rent */}
                 <div>
-                  <Label className="text-sm mb-2 block">Additional Rent Paid (₦)</Label>
+                  <Label className="text-sm mb-2 block">{t('scenario.additionalRent')}</Label>
                   <Input
                     type="number"
                     value={adjustments.newRent || ''}
@@ -250,12 +251,12 @@ const ScenarioModeling = () => {
                     }))}
                     placeholder="0"
                   />
-                  <p className="text-xs text-muted-foreground mt-1">Increases rent relief</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('scenario.increasesRentRelief')}</p>
                 </div>
 
                 {/* Foreign Income */}
                 <div>
-                  <Label className="text-sm mb-2 block">Foreign Income (₦)</Label>
+                  <Label className="text-sm mb-2 block">{t('scenario.foreignIncome')}</Label>
                   <Input
                     type="number"
                     value={adjustments.foreignIncome || ''}
@@ -265,12 +266,12 @@ const ScenarioModeling = () => {
                     }))}
                     placeholder="0"
                   />
-                  <p className="text-xs text-muted-foreground mt-1">Convert at CBN rate</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('scenario.convertCBN')}</p>
                 </div>
 
                 {/* Crypto Gains */}
                 <div>
-                  <Label className="text-sm mb-2 block">Crypto/Capital Gains (₦)</Label>
+                  <Label className="text-sm mb-2 block">{t('scenario.cryptoGains')}</Label>
                   <Input
                     type="number"
                     value={adjustments.cryptoGains || ''}
@@ -280,7 +281,7 @@ const ScenarioModeling = () => {
                     }))}
                     placeholder="0"
                   />
-                  <p className="text-xs text-muted-foreground mt-1">10% CGT applies</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('scenario.cgtApplies')}</p>
                 </div>
 
                 <Button 
@@ -295,7 +296,7 @@ const ScenarioModeling = () => {
                     cryptoGains: 0,
                   })}
                 >
-                  Reset All
+                  {t('scenario.resetAll')}
                 </Button>
               </div>
             </div>
@@ -305,12 +306,12 @@ const ScenarioModeling = () => {
               {/* Side by Side */}
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-card overflow-hidden">
-                  <p className="text-sm text-muted-foreground mb-2">Current Tax</p>
+                  <p className="text-sm text-muted-foreground mb-2">{t('scenario.currentTax')}</p>
                   <p className="text-lg sm:text-2xl font-bold text-foreground truncate">
                     {formatCurrency(baseTax.totalTaxPayable)}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Rate: {baseTax.effectiveRate.toFixed(2)}%
+                    {t('scenario.rate')}: {baseTax.effectiveRate.toFixed(2)}%
                   </p>
                 </div>
                 <div className={`rounded-2xl border p-4 sm:p-5 shadow-card overflow-hidden ${
@@ -320,14 +321,14 @@ const ScenarioModeling = () => {
                     ? 'border-success/20 bg-success/5' 
                     : 'border-border bg-card'
                 }`}>
-                  <p className="text-sm text-muted-foreground mb-2">Scenario Tax</p>
+                  <p className="text-sm text-muted-foreground mb-2">{t('scenario.scenarioTax')}</p>
                   <p className={`text-lg sm:text-2xl font-bold truncate ${
                     taxDifference > 0 ? 'text-destructive' : taxDifference < 0 ? 'text-success' : 'text-foreground'
                   }`}>
                     {formatCurrency(scenarioTax.totalTaxPayable)}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Rate: {scenarioTax.effectiveRate.toFixed(2)}%
+                    {t('scenario.rate')}: {scenarioTax.effectiveRate.toFixed(2)}%
                   </p>
                 </div>
               </div>
@@ -356,10 +357,10 @@ const ScenarioModeling = () => {
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {taxDifference > 0 
-                    ? 'You would pay MORE in taxes' 
+                    ? t('scenario.payMore')
                     : taxDifference < 0 
-                    ? 'You would SAVE on taxes' 
-                    : 'No change in tax liability'}
+                    ? t('scenario.saveMore')
+                    : t('scenario.noChange')}
                 </p>
               </div>
 
@@ -367,7 +368,7 @@ const ScenarioModeling = () => {
               <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
                 <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                   <Lightbulb className="h-5 w-5 text-warning" />
-                  Insights
+                  {t('scenario.insights')}
                 </h3>
                 <div className="space-y-3">
                   {adjustments.turnoverChange > 20 && (

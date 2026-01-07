@@ -3433,6 +3433,37 @@ export const translations: Translations = {
   'pricing.freeForever': { en: 'Free Forever', pcm: 'Free Forever', yo: 'Ọ̀fẹ́ Láéláé', ha: 'Kyauta Har Abada', ig: 'N\'efu Ruo Mgbe Ebighị Ebi' },
   'pricing.availableBasic': { en: 'Available on Basic+ plans', pcm: 'Available for Basic+ plans', yo: 'Wà fún àwọn ètò Basic+', ha: 'Ana samun shi akan tsare-tsare na Basic+', ig: 'Dị maka atụmatụ Basic+' },
 
+  // Scenario Modeling Page
+  'scenario.title': { en: 'Scenario Modeling', pcm: 'Scenario Modeling', yo: 'Ìṣètò Àwọn Ìṣẹ̀lẹ̀', ha: 'Yanayin Tsarawa', ig: 'Nhazi Ọnọdụ' },
+  'scenario.subtitle': { en: 'Model scenarios and project your tax over time', pcm: 'Model scenarios and project your tax over time', yo: 'Ṣètò àwọn ìṣẹ̀lẹ̀ kí o sì ṣe ìkéde owó-orí rẹ lórí àkókò', ha: 'Tsara yanayi kuma ku yi hasashen haraji a kan lokaci', ig: 'Kekọọ ọnọdụ ma kọwaa ụtụ gị n\'oge' },
+  'scenario.whatIf': { en: 'What-If', pcm: 'What-If', yo: 'Kí Ló Bá', ha: 'Menene Idan', ig: 'Gịnị ma ọ bụrụ' },
+  'scenario.multiYear': { en: 'Multi-Year', pcm: 'Multi-Year', yo: 'Ọ̀pọ̀ Ọdún', ha: 'Shekaru Masu Yawa', ig: 'Ọtụtụ Afọ' },
+  'scenario.penalties': { en: 'Penalties', pcm: 'Penalties', yo: 'Àwọn Ìjìyà', ha: 'Hukunci', ig: 'Ntaramahụhụ' },
+  'scenario.foreign': { en: 'Foreign', pcm: 'Foreign', yo: 'Àjèjì', ha: 'Na Waje', ig: 'Mba Ọzọ' },
+  'scenario.adjustVariables': { en: 'Adjust Variables', pcm: 'Adjust Variables', yo: 'Ṣàtúnṣe Àwọn Oníyàtọ̀', ha: 'Daidaita Masu Canji', ig: 'Mezigharịa Agbanwe' },
+  'scenario.baseTurnover': { en: 'Base Annual Turnover', pcm: 'Base Annual Turnover', yo: 'Owó Ìpìlẹ̀ Tí Ó Wọlé Lọ́dún', ha: 'Tushen Kuɗin Shekara', ig: 'Ntọala Ego Afọ' },
+  'scenario.turnoverChange': { en: 'Turnover Change', pcm: 'Turnover Change', yo: 'Ìyípadà Owó Tí Ó Wọlé', ha: 'Canjin Kudaden Shiga', ig: 'Mgbanwe Ego' },
+  'scenario.expenseChange': { en: 'Expense Change', pcm: 'Expense Change', yo: 'Ìyípadà Inawo', ha: 'Canjin Kashe Kuɗi', ig: 'Mgbanwe Mmefu' },
+  'scenario.bonusIncome': { en: 'Additional Bonus/Income (₦)', pcm: 'Additional Bonus/Income (₦)', yo: 'Owó Àfikún/Owó Wíwọlé (₦)', ha: 'Ƙarin Bonus/Kuɗi (₦)', ig: 'Ego Ọzọ/Ego Nnweta (₦)' },
+  'scenario.additionalRent': { en: 'Additional Rent Paid (₦)', pcm: 'Additional Rent Paid (₦)', yo: 'Owó Iyálé Àfikún (₦)', ha: 'Ƙarin Kuɗin Haya (₦)', ig: 'Ụgwọ Ụlọ Ọzọ (₦)' },
+  'scenario.foreignIncome': { en: 'Foreign Income (₦)', pcm: 'Foreign Income (₦)', yo: 'Owó Àjèjì (₦)', ha: 'Kuɗin Waje (₦)', ig: 'Ego Mba Ọzọ (₦)' },
+  'scenario.cryptoGains': { en: 'Crypto/Capital Gains (₦)', pcm: 'Crypto/Capital Gains (₦)', yo: 'Èrè Crypto/Olu (₦)', ha: 'Ribar Crypto/Jari (₦)', ig: 'Uru Crypto/Capital (₦)' },
+  'scenario.resetAll': { en: 'Reset All', pcm: 'Reset All', yo: 'Tún Gbogbo Ṣe', ha: 'Sake Duka', ig: 'Tọgharia Niile' },
+  'scenario.currentTax': { en: 'Current Tax', pcm: 'Current Tax', yo: 'Owó-orí Lọ́wọ́lọ́wọ́', ha: 'Harajin Yanzu', ig: 'Ụtụ Ugbu a' },
+  'scenario.scenarioTax': { en: 'Scenario Tax', pcm: 'Scenario Tax', yo: 'Owó-orí Ìṣẹ̀lẹ̀', ha: 'Harajin Yanayi', ig: 'Ụtụ Ọnọdụ' },
+  'scenario.payMore': { en: 'You would pay MORE in taxes', pcm: 'You go pay MORE tax', yo: 'O máa san PÚPỌ̀ sí owó-orí', ha: 'Za ku biya FIYE a haraji', ig: 'Ị ga-akwụ OTU na ụtụ' },
+  'scenario.saveMore': { en: 'You would SAVE on taxes', pcm: 'You go SAVE tax', yo: 'O máa FÌ PAMỌ́ lórí owó-orí', ha: 'Za ku AJIYE a kan haraji', ig: 'Ị ga-ECHEKWA ụtụ' },
+  'scenario.noChange': { en: 'No change in tax liability', pcm: 'No change in tax', yo: 'Kò sí ìyípadà nínú owó-orí', ha: 'Babu canji a haraji', ig: 'Enweghị mgbanwe na ụtụ' },
+  'scenario.insights': { en: 'Insights', pcm: 'Insights', yo: 'Òye', ha: 'Fahimta', ig: 'Nghọta' },
+  'scenario.useInCalculator': { en: 'Use This Scenario in Calculator', pcm: 'Use This Scenario in Calculator', yo: 'Lo Ìṣẹ̀lẹ̀ Yìí Nínú Ẹ̀rọ Ìṣirò', ha: 'Yi amfani da wannan Yanayi a Ƙididdiga', ig: 'Jiri Ọnọdụ a na Ngwa Mgbako' },
+  'scenario.upgradeToFreelancer': { en: 'Upgrade to Freelancer', pcm: 'Upgrade to Freelancer', yo: 'Gbéga sí Aláṣiṣẹ́-ṣọ́ọ̀ṣì', ha: 'Haɓaka zuwa Freelancer', ig: 'Kwalite na Freelancer' },
+  'scenario.availableFreelancer': { en: 'Model "what-if" scenarios and multi-year projections. Available on Freelancer+ plans.', pcm: 'Model "what-if" scenarios and multi-year projections. Available for Freelancer+ plans.', yo: 'Ṣètò àwọn ìṣẹ̀lẹ̀ "kí ló bá" àti àwọn ìkéde ọ̀pọ̀ ọdún. Wà fún àwọn ètò Freelancer+.', ha: 'Tsara yanayin "menene idan" da hasashen shekaru masu yawa. Ana samun shi akan tsare-tsaren Freelancer+.', ig: 'Kekọọ ọnọdụ "gịnị ma ọ bụrụ" na nkọwa ọtụtụ afọ. Dị maka atụmatụ Freelancer+.' },
+  'scenario.increasesRentRelief': { en: 'Increases rent relief', pcm: 'Increases rent relief', yo: 'Ń mú ìtùnú iyálé pọ̀ sí', ha: 'Yana ƙara sauƙin haya', ig: 'Na-abawanye nkwụsịtụ ụgwọ ụlọ' },
+  'scenario.convertCBN': { en: 'Convert at CBN rate', pcm: 'Convert at CBN rate', yo: 'Yí padà ní ìwọ̀n CBN', ha: 'Canza a farashin CBN', ig: 'Gbanwee na ọnụego CBN' },
+  'scenario.cgtApplies': { en: '10% CGT applies', pcm: '10% CGT applies', yo: '10% CGT máa lò', ha: '10% CGT ya shafi', ig: '10% CGT na-emetụta' },
+  'scenario.rate': { en: 'Rate', pcm: 'Rate', yo: 'Ìwọ̀n', ha: 'Farashin', ig: 'Ọnụego' },
+  'scenario.disclaimer': { en: 'All scenarios are estimates based on current tax laws and may change.', pcm: 'All scenarios na estimate based on current tax law and fit change.', yo: 'Gbogbo àwọn ìṣẹ̀lẹ̀ jẹ́ àpẹẹrẹ tí ó dá lórí àwọn òfin owó-orí lọ́wọ́lọ́wọ́ àti pé ó lè yípadà.', ha: 'Duk yanayin kiyasi ne dangane da dokokin haraji na yanzu kuma na iya canzawa.', ig: 'Ọnọdụ niile bụ nkwurịta dabere na iwu ụtụ ugbu a ma nwere ike ịgbanwe.' },
+
 };
 
 // Helper function to get toast messages
