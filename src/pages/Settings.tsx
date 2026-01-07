@@ -108,6 +108,7 @@ const getEventLabel = (eventType: string) => {
 const Settings = () => {
   const { user, loading } = useAuth();
   const { tier } = useSubscription();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   // Profile state
@@ -883,9 +884,9 @@ const Settings = () => {
             <div className="min-w-0">
               <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
                 <SettingsIcon className="h-5 w-5 sm:h-6 sm:w-6 text-primary shrink-0" />
-                <span className="truncate">Account Settings</span>
+                <span className="truncate">{t('settings.title')}</span>
               </h1>
-              <p className="text-sm text-muted-foreground truncate">Manage your profile and security settings</p>
+              <p className="text-sm text-muted-foreground truncate">{t('settings.profile')}</p>
             </div>
           </div>
           <Badge variant={tier === 'free' ? 'secondary' : 'default'} className="capitalize shrink-0 self-start sm:self-auto">
@@ -1015,11 +1016,11 @@ const Settings = () => {
             <TabsList className="inline-flex h-auto flex-wrap gap-1 p-1 w-auto min-w-full sm:min-w-0">
               <TabsTrigger value="profile" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                Profile
+                {t('settings.profile')}
               </TabsTrigger>
               <TabsTrigger value="security" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                Security
+                {t('settings.security')}
               </TabsTrigger>
               <TabsTrigger value="credentials" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <Lock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -1103,14 +1104,14 @@ const Settings = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <User className="h-5 w-5 text-primary" />
-                  Profile Information
+                  {t('settings.profile')}
                 </CardTitle>
-                <CardDescription>Update your display name</CardDescription>
+                <CardDescription>{t('common.edit')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleUpdateProfile} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="fullName">Full Name</Label>
+                    <Label htmlFor="fullName">{t('settings.profile')}</Label>
                     <Input
                       id="fullName"
                       value={fullName}
@@ -1126,7 +1127,7 @@ const Settings = () => {
                     )}
                   </div>
                   <Button type="submit" disabled={savingProfile}>
-                    {savingProfile ? "Saving..." : "Update Profile"}
+                    {savingProfile ? t('common.loading') : t('common.save')}
                   </Button>
                 </form>
               </CardContent>

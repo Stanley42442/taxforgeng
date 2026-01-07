@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { NavMenu } from "@/components/NavMenu";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -151,6 +152,7 @@ const estimateTax = (income: number): number => {
 const Expenses = () => {
   const { tier, savedBusinesses } = useSubscription();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
@@ -403,13 +405,13 @@ const Expenses = () => {
             <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-accent">
               <Crown className="h-12 w-12 text-accent-foreground" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground mb-3">Expense Tracking</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-3">{t('expense.title')}</h1>
             <p className="text-lg text-muted-foreground mb-8">
-              Track income and expenses to get real-time tax estimates. Available on Basic+ plans.
+              {t('msg.upgradeRequired')}
             </p>
             <Button variant="glow" size="lg" onClick={() => navigate('/pricing')}>
               <Crown className="h-5 w-5" />
-              Upgrade to Basic
+              {t('pricing.upgrade')}
             </Button>
           </div>
         </div>
