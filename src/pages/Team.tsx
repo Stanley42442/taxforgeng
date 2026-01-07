@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavMenu } from "@/components/NavMenu";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,7 @@ const MOCK_MEMBERS: TeamMember[] = [
 
 const Team = () => {
   const { tier, email } = useSubscription();
+  const { t } = useLanguage();
   const [members, setMembers] = useState<TeamMember[]>(() => {
     const saved = localStorage.getItem('taxforge_ng_team');
     return saved ? JSON.parse(saved) : MOCK_MEMBERS;

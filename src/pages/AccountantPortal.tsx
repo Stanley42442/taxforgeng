@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -43,6 +44,7 @@ interface ClientBusiness {
 const AccountantPortal = () => {
   const { user } = useAuth();
   const { tier } = useSubscription();
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedClients, setSelectedClients] = useState<string[]>([]);
 

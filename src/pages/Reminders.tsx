@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { NavMenu } from "@/components/NavMenu";
 import { useSubscription, SavedBusiness } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -83,6 +84,7 @@ const calculateNextDueDate = (type: string): Date => {
 const Reminders = () => {
   const { tier, savedBusinesses } = useSubscription();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedBusiness, setSelectedBusiness] = useState<SavedBusiness | null>(null);

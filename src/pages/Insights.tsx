@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { NavMenu } from "@/components/NavMenu";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +37,7 @@ const COLORS = ['hsl(153, 47%, 25%)', 'hsl(43, 96%, 56%)', 'hsl(199, 89%, 48%)',
 
 const Insights = () => {
   const { tier, savedBusinesses } = useSubscription();
+  const { t } = useLanguage();
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>('all');
   const [isVisible, setIsVisible] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);

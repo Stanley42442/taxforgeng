@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -28,6 +29,7 @@ interface Referral {
 
 const Referrals = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -120,13 +122,13 @@ const Referrals = () => {
           <div className="text-center mb-8 animate-slide-up">
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary mb-4">
               <Gift className="h-4 w-4" />
-              Referral Program
+              {t('referral.program')}
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              Invite Friends, Earn Rewards
+              {t('referral.title')}
             </h1>
             <p className="text-muted-foreground max-w-md mx-auto">
-              Share TaxForge NG with friends and earn a free month for each referral that upgrades!
+              {t('referral.subtitle')}
             </p>
           </div>
 

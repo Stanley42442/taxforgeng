@@ -1,6 +1,7 @@
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   Calculator, 
   Download, 
@@ -46,6 +47,7 @@ const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const result = location.state?.result as TaxResult | undefined;
   const inputs = location.state?.inputs as TaxInputs | undefined;
   const [showComparison, setShowComparison] = useState(false);

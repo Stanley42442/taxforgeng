@@ -943,8 +943,8 @@ const Expenses = () => {
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow-primary animate-glow">
               <Receipt className="h-8 w-8" />
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-text bg-clip-text text-transparent mb-2">Expense Tracking</h1>
-            <p className="text-muted-foreground">Track income and expenses for real-time tax estimates</p>
+            <h1 className="text-3xl font-bold bg-gradient-text bg-clip-text text-transparent mb-2">{t('expense.title')}</h1>
+            <p className="text-muted-foreground">{t('expense.subtitle')}</p>
           </div>
 
           {/* Summary Cards */}

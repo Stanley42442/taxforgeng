@@ -2480,6 +2480,20 @@ export const translations: Translations = {
     ha: 'kwanaki', 
     ig: 'ụbọchị' 
   },
+  'notFound.title': { 
+    en: 'Oops! Page not found', 
+    pcm: 'E no dey! Page no dey', 
+    yo: 'Ó dà bí! Ojú-ìwé kò rí', 
+    ha: 'Kuskure! Ba a sami shafin ba', 
+    ig: 'Ewu! Ahụghị peeji a' 
+  },
+  'notFound.goHome': { 
+    en: 'Return to Home', 
+    pcm: 'Go Back Home', 
+    yo: 'Padà sí Ilé', 
+    ha: 'Koma Gida', 
+    ig: 'Laghachi Ụlọ' 
+  },
 };
 
 // Helper function to get toast messages

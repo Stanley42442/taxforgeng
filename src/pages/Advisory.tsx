@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { NavMenu } from "@/components/NavMenu";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   Users, 
   User, 
@@ -42,6 +43,7 @@ const iconMap: Record<string, React.ReactNode> = {
 
 const Advisory = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<AdvisoryAnswers>({
     hasPartners: null,
