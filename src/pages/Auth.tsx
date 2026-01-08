@@ -11,7 +11,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
 import { getDeviceInfo } from "@/lib/deviceFingerprint";
-import { useLanguage, getToastMessage } from "@/contexts/LanguageContext";
 
 const emailSchema = z.string().email("Please enter a valid email address");
 const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
@@ -45,7 +44,6 @@ const Auth = () => {
   
   const { signIn, signUp, user, loading } = useAuth();
   const navigate = useNavigate();
-  const { t, language } = useLanguage();
 
   // Check for password reset token in URL
   useEffect(() => {
@@ -650,23 +648,23 @@ const Auth = () => {
 
   const getTitle = () => {
     switch (view) {
-      case 'login': return t('auth.welcomeBack');
-      case 'signup': return t('auth.createAccount');
-      case 'forgot-password': return t('auth.resetPassword');
-      case 'reset-password': return t('auth.setNewPassword');
-      case 'mfa-challenge': return t('auth.twoFactorAuth');
+      case 'login': return 'Welcome Back';
+      case 'signup': return 'Create Account';
+      case 'forgot-password': return 'Reset Password';
+      case 'reset-password': return 'Set New Password';
+      case 'mfa-challenge': return 'Two-Factor Authentication';
     }
   };
 
   const getSubtitle = () => {
     switch (view) {
-      case 'login': return t('auth.signInSubtitle');
-      case 'signup': return t('auth.signUpSubtitle');
-      case 'forgot-password': return t('auth.forgotPasswordSubtitle');
-      case 'reset-password': return t('auth.resetPasswordSubtitle');
+      case 'login': return 'Sign in to your account';
+      case 'signup': return 'Start your free trial today';
+      case 'forgot-password': return 'Enter your email to receive a reset link';
+      case 'reset-password': return 'Choose a new password for your account';
       case 'mfa-challenge': return useBackupCode 
-        ? t('auth.mfaBackupSubtitle')
-        : t('auth.mfaCodeSubtitle');
+        ? 'Enter one of your backup codes'
+        : 'Enter the 6-digit code from your authenticator app';
     }
   };
 
@@ -676,7 +674,7 @@ const Auth = () => {
       <header className="p-4">
         <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="h-4 w-4" />
-          {t('auth.backToHome')}
+          Back to Home
         </Link>
       </header>
 
@@ -712,7 +710,7 @@ const Auth = () => {
 
                 {useBackupCode ? (
                   <div className="space-y-2">
-                    <Label htmlFor="backupCode">{t('auth.backupCode')}</Label>
+                    <Label htmlFor="backupCode">Backup Code</Label>
                     <div className="relative">
                       <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -726,12 +724,12 @@ const Auth = () => {
                       />
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {t('auth.enterBackupCode')}
+                      Enter one of your 10 backup codes
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <Label htmlFor="totpCode">{t('auth.verificationCode')}</Label>
+                    <Label htmlFor="totpCode">Verification Code</Label>
                     <div className="relative">
                       <Shield className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -746,13 +744,13 @@ const Auth = () => {
                       />
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {t('auth.enter6DigitCode')}
+                      Enter the 6-digit code from your authenticator app
                     </p>
                   </div>
                 )}
 
                 <Button type="submit" variant="hero" className="w-full" disabled={isSubmitting}>
-                  {isSubmitting ? t('auth.verifying') : t('auth.verify')}
+                  {isSubmitting ? 'Verifying...' : 'Verify'}
                 </Button>
 
                 <div className="text-center space-y-2">
@@ -765,7 +763,7 @@ const Auth = () => {
                     }}
                     className="text-sm text-primary hover:underline"
                   >
-                    {useBackupCode ? t('auth.useAuthenticatorApp') : t('auth.lostAuthenticator')}
+                    {useBackupCode ? 'Use authenticator app instead' : 'Lost access to authenticator?'}
                   </button>
                   <div>
                     <button
@@ -780,7 +778,7 @@ const Auth = () => {
                       }}
                       className="text-sm text-muted-foreground hover:text-foreground"
                     >
-                      ← {t('auth.backToSignIn')}
+                      ← Back to Sign In
                     </button>
                   </div>
                 </div>
@@ -791,7 +789,7 @@ const Auth = () => {
             {view === 'reset-password' && (
               <form onSubmit={handleResetPassword} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword">{t('auth.newPassword')}</Label>
+                  <Label htmlFor="newPassword">New Password</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -818,7 +816,7 @@ const Auth = () => {
                   )}
                 </div>
                 <Button type="submit" variant="hero" className="w-full" disabled={isSubmitting}>
-                  {isSubmitting ? t('auth.updating') : t('auth.updatePassword')}
+                  {isSubmitting ? 'Updating...' : 'Update Password'}
                 </Button>
               </form>
             )}
@@ -827,7 +825,7 @@ const Auth = () => {
             {view === 'forgot-password' && (
               <form onSubmit={handleForgotPassword} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">{t('auth.email')}</Label>
+                  <Label htmlFor="email">Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -847,7 +845,7 @@ const Auth = () => {
                   )}
                 </div>
                 <Button type="submit" variant="hero" className="w-full" disabled={isSubmitting}>
-                  {isSubmitting ? t('auth.sending') : t('auth.sendResetLink')}
+                  {isSubmitting ? 'Sending...' : 'Send Reset Link'}
                 </Button>
                 <div className="text-center">
                   <button
@@ -855,7 +853,7 @@ const Auth = () => {
                     onClick={() => setView('login')}
                     className="text-sm text-primary hover:underline"
                   >
-                    {t('auth.backToSignIn')}
+                    Back to Sign In
                   </button>
                 </div>
               </form>
@@ -890,13 +888,13 @@ const Auth = () => {
                       d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                     />
                   </svg>
-                  {t('auth.continueWithGoogle')}
+                  Continue with Google
                 </Button>
 
                 <div className="relative my-6">
                   <Separator />
                   <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
-                    {t('auth.orContinueWithEmail')}
+                    or continue with email
                   </span>
                 </div>
 
@@ -950,7 +948,7 @@ const Auth = () => {
                   {/* Full Name (Sign Up Only) */}
                   {view === 'signup' && (
                     <div className="space-y-2">
-                      <Label htmlFor="fullName">{t('auth.fullName')}</Label>
+                      <Label htmlFor="fullName">Full Name</Label>
                       <div className="relative">
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -967,7 +965,7 @@ const Auth = () => {
 
                   {/* Email */}
                   <div className="space-y-2">
-                    <Label htmlFor="email">{t('auth.email')}</Label>
+                    <Label htmlFor="email">Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -1000,14 +998,14 @@ const Auth = () => {
                   {/* Password */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="password">{t('auth.password')}</Label>
+                      <Label htmlFor="password">Password</Label>
                       {view === 'login' && (
                         <button
                           type="button"
                           onClick={() => setView('forgot-password')}
                           className="text-xs text-primary hover:underline"
                         >
-                          {t('auth.forgotPassword')}
+                          Forgot password?
                         </button>
                       )}
                     </div>
@@ -1049,7 +1047,7 @@ const Auth = () => {
                         htmlFor="rememberMe" 
                         className="text-sm text-muted-foreground cursor-pointer select-none"
                       >
-                        {t('auth.rememberMe')}
+                        Remember me
                       </Label>
                     </div>
                   )}
@@ -1062,12 +1060,12 @@ const Auth = () => {
                     disabled={isSubmitting || (view === 'login' && isAccountLocked)}
                   >
                     {isSubmitting 
-                      ? t('auth.pleaseWait')
+                      ? 'Please wait...'
                       : isAccountLocked && view === 'login'
-                        ? t('auth.accountLocked')
+                        ? 'Account Locked'
                         : view === 'login' 
-                          ? t('auth.signIn')
-                          : t('auth.createAccount')}
+                          ? 'Sign In'
+                          : 'Create Account'}
                   </Button>
 
                   {/* Resend Verification Email */}
@@ -1080,7 +1078,7 @@ const Auth = () => {
                       disabled={isResendingVerification || !email}
                     >
                       <Mail className="h-4 w-4 mr-2" />
-                      {isResendingVerification ? t('auth.sending') : t('auth.resendVerificationEmail')}
+                      {isResendingVerification ? 'Sending...' : 'Resend verification email'}
                     </Button>
                   )}
                 </form>
@@ -1088,7 +1086,7 @@ const Auth = () => {
                 {/* Toggle Login/Signup */}
                 <div className="mt-6 text-center">
                   <p className="text-sm text-muted-foreground">
-                    {view === 'login' ? t('auth.noAccount') : t('auth.hasAccount')}
+                    {view === 'login' ? "Don't have an account?" : 'Already have an account?'}
                     <button
                       type="button"
                       onClick={() => {
@@ -1097,7 +1095,7 @@ const Auth = () => {
                       }}
                       className="ml-1 text-primary hover:underline font-medium"
                     >
-                      {view === 'login' ? t('auth.signUp') : t('auth.signIn')}
+                      {view === 'login' ? 'Sign Up' : 'Sign In'}
                     </button>
                   </p>
                 </div>
@@ -1107,7 +1105,7 @@ const Auth = () => {
 
           {/* Disclaimer */}
           <p className="text-center text-xs text-muted-foreground mt-6">
-            {t('auth.termsAgreement')}
+            By continuing, you agree to our Terms of Service and Privacy Policy.
           </p>
         </div>
       </main>
