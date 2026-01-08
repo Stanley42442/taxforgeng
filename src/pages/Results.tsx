@@ -1,7 +1,6 @@
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   Calculator, 
   Download, 
@@ -47,7 +46,6 @@ const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { t } = useLanguage();
   const result = location.state?.result as TaxResult | undefined;
   const inputs = location.state?.inputs as TaxInputs | undefined;
   const [showComparison, setShowComparison] = useState(false);
@@ -91,10 +89,10 @@ const Results = () => {
         <NavMenu />
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-foreground mb-4">{t('results.noResults')}</h1>
-            <p className="text-muted-foreground mb-6">{t('results.useCalculatorFirst')}</p>
+            <h1 className="text-2xl font-bold text-foreground mb-4">No Results Available</h1>
+            <p className="text-muted-foreground mb-6">Please use the calculator first to generate results.</p>
             <Link to="/calculator">
-              <Button variant="hero">{t('results.goToCalculator')}</Button>
+              <Button variant="hero">Go to Calculator</Button>
             </Link>
           </div>
         </div>
@@ -110,20 +108,20 @@ const Results = () => {
 
   const handleSaveBusiness = () => {
     if (!businessName.trim()) {
-      toast.error(t('results.pleaseEnterBusinessName'));
+      toast.error("Please enter a business name");
       return;
     }
 
     if (tier === 'free') {
-      toast.error(t('results.upgradeToSave'), {
-        action: { label: t('pricing.upgrade'), onClick: () => navigate('/pricing') }
+      toast.error("Upgrade to save businesses", {
+        action: { label: "Upgrade", onClick: () => navigate('/pricing') }
       });
       return;
     }
 
     if (!canSaveBusiness()) {
-      toast.error(t('results.businessLimitReached'), {
-        action: { label: t('pricing.upgrade'), onClick: () => navigate('/pricing') }
+      toast.error("Business limit reached for your plan", {
+        action: { label: "Upgrade", onClick: () => navigate('/pricing') }
       });
       return;
     }
@@ -135,20 +133,20 @@ const Results = () => {
     });
 
     if (success) {
-      toast.success(t('results.businessSaved').replace('{name}', businessName), {
-        action: { label: t('common.view'), onClick: () => navigate('/businesses') }
+      toast.success(`${businessName} saved successfully!`, {
+        action: { label: "View", onClick: () => navigate('/businesses') }
       });
       setShowSaveDialog(false);
       setBusinessName("");
     } else {
-      toast.error(t('results.failedToSave'));
+      toast.error("Failed to save business");
     }
   };
 
   const exportToCSV = () => {
     if (!canExport()) {
-      toast.error(t('results.upgradeToExport'), {
-        action: { label: t('pricing.upgrade'), onClick: () => navigate('/pricing') }
+      toast.error("Upgrade to export reports", {
+        action: { label: "Upgrade", onClick: () => navigate('/pricing') }
       });
       return;
     }
@@ -182,8 +180,8 @@ const Results = () => {
 
   const exportToPDF = () => {
     if (!canExport()) {
-      toast.error(t('results.upgradeToExport'), {
-        action: { label: t('pricing.upgrade'), onClick: () => navigate('/pricing') }
+      toast.error("Upgrade to export reports", {
+        action: { label: "Upgrade", onClick: () => navigate('/pricing') }
       });
       return;
     }
@@ -218,7 +216,7 @@ const Results = () => {
             onClick={() => navigate('/calculator', { state: { entityType: inputs.entityType } })}
           >
             <ArrowLeft className="h-4 w-4" />
-            {t('results.backToCalculator')}
+            Back to Calculator
           </Button>
 
           {/* Header */}
@@ -227,7 +225,7 @@ const Results = () => {
               <FileText className="h-8 w-8 text-primary-foreground" />
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              {t('results.title')}
+              Tax Calculation Results
             </h1>
             <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
               <span className="flex items-center gap-1">
@@ -238,7 +236,7 @@ const Results = () => {
                 {result.entityType}
               </span>
               <span className="text-border">•</span>
-              <span>{inputs.use2026Rules ? t('results.rules2026') : t('results.rulesPre2026')}</span>
+              <span>{inputs.use2026Rules ? '2026 Rules' : 'Pre-2026 Rules'}</span>
             </div>
           </div>
 
@@ -247,7 +245,7 @@ const Results = () => {
             <Link to="/tax-breakdown" state={{ result, inputs }}>
               <Button variant="hero">
                 <ListOrdered className="h-4 w-4" />
-                {t('results.viewBreakdown')}
+                View Breakdown
               </Button>
             </Link>
             <Button
@@ -255,7 +253,7 @@ const Results = () => {
               onClick={() => setShowComparison(!showComparison)}
             >
               <BarChart3 className="h-4 w-4" />
-              {showComparison ? t('results.hideComparison') : t('results.showComparison')}
+              {showComparison ? 'Hide Comparison' : 'Compare Entities'}
             </Button>
             <Button
               variant="outline"
@@ -263,7 +261,7 @@ const Results = () => {
               disabled={tier === 'free'}
             >
               <Save className="h-4 w-4" />
-              {t('results.saveBusiness')}
+              Save Business
               {tier === 'free' && <Lock className="h-3 w-3 ml-1" />}
             </Button>
             <Button variant="outline" onClick={exportToPDF}>
@@ -281,7 +279,7 @@ const Results = () => {
             <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">
               <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-primary" />
-                {t('results.entityComparisonDashboard')}
+                Entity Comparison Dashboard
               </h3>
               
               {/* Recommendation Banner */}
@@ -294,8 +292,8 @@ const Results = () => {
                   betterOption === inputs.entityType ? 'text-success' : 'text-warning'
                 }`}>
                   {betterOption === inputs.entityType 
-                    ? `✓ ${t('results.optimalStructure')}` 
-                    : `💡 ${t('results.switchingSaves').replace('{entity}', betterOption === 'company' ? t('results.limitedCompany') : t('results.businessName')).replace('{amount}', formatCurrency(Math.abs(savings)))}`
+                    ? `✓ You've selected the optimal structure for your turnover.` 
+                    : `💡 Switching to ${betterOption === 'company' ? 'a Limited Company' : 'a Business Name'} could save you ${formatCurrency(Math.abs(savings))}`
                   }
                 </p>
               </div>
@@ -310,32 +308,32 @@ const Results = () => {
                 }`}>
                   <div className="flex items-center gap-2 mb-4">
                     <Briefcase className="h-5 w-5 text-primary" />
-                    <h4 className="font-semibold text-foreground">{t('results.businessName')}</h4>
+                    <h4 className="font-semibold text-foreground">Business Name</h4>
                     {inputs.entityType === 'business_name' && (
-                      <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">{t('results.current')}</span>
+                      <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">Current</span>
                     )}
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{t('results.taxPayable')}</span>
+                      <span className="text-muted-foreground">Tax Payable</span>
                       <span className="font-semibold text-foreground">{formatCurrency(businessResult.totalTaxPayable)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{t('results.effectiveRate')}</span>
+                      <span className="text-muted-foreground">Effective Rate</span>
                       <span className="font-medium text-foreground">{businessResult.effectiveRate.toFixed(2)}%</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{t('results.incomeTax')}</span>
+                      <span className="text-muted-foreground">Income Tax</span>
                       <span className="text-foreground">{formatCurrency(businessResult.incomeTax)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{t('results.vat')}</span>
+                      <span className="text-muted-foreground">VAT</span>
                       <span className="text-foreground">{formatCurrency(businessResult.vatPayable)}</span>
                     </div>
                   </div>
                   <div className="mt-4 pt-4 border-t border-border">
                     <p className="text-xs text-muted-foreground">
-                      {t('results.pitDescription')}
+                      Personal Income Tax (PIT) based on progressive tax bands
                     </p>
                   </div>
                 </div>
@@ -348,38 +346,38 @@ const Results = () => {
                 }`}>
                   <div className="flex items-center gap-2 mb-4">
                     <Building2 className="h-5 w-5 text-primary" />
-                    <h4 className="font-semibold text-foreground">{t('results.limitedCompany')}</h4>
+                    <h4 className="font-semibold text-foreground">Limited Company</h4>
                     {inputs.entityType === 'company' && (
-                      <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">{t('results.current')}</span>
+                      <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">Current</span>
                     )}
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{t('results.taxPayable')}</span>
+                      <span className="text-muted-foreground">Tax Payable</span>
                       <span className="font-semibold text-foreground">{formatCurrency(companyResult.totalTaxPayable)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{t('results.effectiveRate')}</span>
+                      <span className="text-muted-foreground">Effective Rate</span>
                       <span className="font-medium text-foreground">{companyResult.effectiveRate.toFixed(2)}%</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{t('results.cit')}</span>
+                      <span className="text-muted-foreground">CIT</span>
                       <span className="text-foreground">{formatCurrency(companyResult.incomeTax)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{t('results.devLevy')}</span>
+                      <span className="text-muted-foreground">Dev. Levy</span>
                       <span className="text-foreground">{formatCurrency(companyResult.developmentLevy)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{t('results.vat')}</span>
+                      <span className="text-muted-foreground">VAT</span>
                       <span className="text-foreground">{formatCurrency(companyResult.vatPayable)}</span>
                     </div>
                   </div>
                   <div className="mt-4 pt-4 border-t border-border">
                     <p className="text-xs text-muted-foreground">
                       {companyResult.isSmallCompany 
-                        ? t('results.smallCompanyCIT')
-                        : t('results.citDescription')
+                        ? '0% CIT for small companies (≤₦25M turnover)'
+                        : 'Company Income Tax (CIT) at applicable rate'
                       }
                     </p>
                   </div>
@@ -390,7 +388,7 @@ const Results = () => {
               <div className="mt-6 space-y-3">
                 <div>
                   <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                    <span>{t('results.businessName')}</span>
+                    <span>Business Name</span>
                     <span>{formatCurrency(businessResult.totalTaxPayable)}</span>
                   </div>
                   <div className="h-3 bg-secondary rounded-full overflow-hidden">
@@ -404,7 +402,7 @@ const Results = () => {
                 </div>
                 <div>
                   <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                    <span>{t('results.limitedCompany')}</span>
+                    <span>Limited Company</span>
                     <span>{formatCurrency(companyResult.totalTaxPayable)}</span>
                   </div>
                   <div className="h-3 bg-secondary rounded-full overflow-hidden">
@@ -435,217 +433,61 @@ const Results = () => {
             </div>
           )}
 
-          {/* Sector Tax Rules Applied */}
-          {result.sectorRules && result.sectorId && (
-            <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 p-6 shadow-card mb-6 animate-slide-up">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary">
-                  <Sparkles className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground">Sector Tax Rules Applied</h3>
-                  <p className="text-sm text-muted-foreground capitalize">{result.sectorId.replace(/_/g, ' ')} Sector</p>
-                </div>
-              </div>
-              
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {/* CIT Rate */}
-                {result.sectorRules.citRate !== undefined && (
-                  <div className="flex items-start gap-3 rounded-xl bg-card/60 p-4 border border-border/50">
-                    <Percent className="h-5 w-5 text-primary mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-foreground">CIT Rate</p>
-                      <p className="text-lg font-semibold text-primary">{result.sectorRules.citRate}%</p>
-                      {result.sectorRules.citRate === 0 && (
-                        <p className="text-xs text-success">Tax exempt</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* VAT Status */}
-                {result.sectorRules.vatStatus && (
-                  <div className="flex items-start gap-3 rounded-xl bg-card/60 p-4 border border-border/50">
-                    <Receipt className="h-5 w-5 text-primary mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-foreground">VAT Status</p>
-                      <p className={`text-sm font-semibold ${result.sectorRules.vatStatus === 'exempt' ? 'text-success' : 'text-foreground'}`}>
-                        {result.sectorRules.vatStatus === 'exempt' ? 'VAT Exempt' : 
-                         result.sectorRules.vatStatus === 'zero' ? 'Zero-Rated' :
-                         result.sectorRules.vatStatus === 'reduced' ? `Reduced (${result.sectorRules.vatRate || 0}%)` : 'Standard VAT'}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* WHT Rate */}
-                {result.sectorRules.whtRate !== undefined && result.sectorRules.whtRate > 0 && (
-                  <div className="flex items-start gap-3 rounded-xl bg-card/60 p-4 border border-border/50">
-                    <CheckCircle2 className="h-5 w-5 text-success mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-foreground">WHT Rate</p>
-                      <p className="text-sm font-semibold text-success">{result.sectorRules.whtRate}% withholding</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* EDTI Rate */}
-                {result.sectorRules.edtiRate !== undefined && result.sectorRules.edtiRate > 0 && (
-                  <div className="flex items-start gap-3 rounded-xl bg-card/60 p-4 border border-border/50">
-                    <Leaf className="h-5 w-5 text-success mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-foreground">EDTI Credit</p>
-                      <p className="text-sm font-semibold text-success">{result.sectorRules.edtiRate}% export credit</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Hydrocarbon Tax */}
-                {(result.sectorRules.hydrocarbonTaxMin || result.sectorRules.hydrocarbonTaxMax) && (
-                  <div className="flex items-start gap-3 rounded-xl bg-card/60 p-4 border border-border/50">
-                    <Fuel className="h-5 w-5 text-warning mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-foreground">Hydrocarbon Tax</p>
-                      <p className="text-sm font-semibold text-warning">
-                        {result.sectorRules.hydrocarbonTaxMin}% - {result.sectorRules.hydrocarbonTaxMax}%
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Presumptive Tax */}
-                {(result.sectorRules.presumptiveMin || result.sectorRules.presumptiveMax) && (
-                  <div className="flex items-start gap-3 rounded-xl bg-card/60 p-4 border border-border/50">
-                    <Calculator className="h-5 w-5 text-primary mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-foreground">Presumptive Tax</p>
-                      <p className="text-sm font-semibold text-foreground">
-                        {result.sectorRules.presumptiveMin}% - {result.sectorRules.presumptiveMax}% of turnover
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Pioneer Status */}
-                {result.sectorRules.pioneerStatus && (
-                  <div className="flex items-start gap-3 rounded-xl bg-card/60 p-4 border border-border/50">
-                    <Crown className="h-5 w-5 text-warning mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-foreground">Pioneer Status</p>
-                      <p className="text-sm font-semibold text-success">Tax holiday eligible</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Green Hire Deduction */}
-                {result.sectorRules.greenHireDeduction !== undefined && result.sectorRules.greenHireDeduction > 0 && (
-                  <div className="flex items-start gap-3 rounded-xl bg-card/60 p-4 border border-border/50">
-                    <Leaf className="h-5 w-5 text-success mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-foreground">Green Hire Deduction</p>
-                      <p className="text-sm font-semibold text-success">{result.sectorRules.greenHireDeduction}% extra deduction</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <p className="text-xs text-muted-foreground mt-4 flex items-center gap-1">
-                <Info className="h-3 w-3" />
-                These sector-specific rules have been applied to your tax calculation
-              </p>
+          {/* Summary Cards */}
+          <div className="grid gap-4 md:grid-cols-3 mb-6 animate-slide-up">
+            {/* Gross Income */}
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+              <p className="text-sm text-muted-foreground mb-1">Gross Income</p>
+              <p className="text-2xl font-bold text-foreground">{formatCurrency(result.grossIncome)}</p>
             </div>
-          )}
-
-          {/* Main Result Card */}
-          <div className="rounded-2xl border border-border bg-card p-8 shadow-card mb-6 animate-slide-up">
-            <div className="text-center mb-8">
-              <p className="text-sm text-muted-foreground mb-2">Total Tax Payable</p>
-              <p className="text-4xl font-bold text-foreground">
-                {formatCurrency(result.totalTaxPayable)}
-              </p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Effective Rate: {result.effectiveRate.toFixed(2)}%
-              </p>
+            
+            {/* Total Tax */}
+            <div className="rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/10 to-primary/5 p-6 shadow-card">
+              <p className="text-sm text-muted-foreground mb-1">Total Tax Payable</p>
+              <p className="text-2xl font-bold text-primary">{formatCurrency(result.totalTaxPayable)}</p>
             </div>
-
-            {/* Summary Grid */}
-            <div className="grid gap-4 sm:grid-cols-2 mb-8">
-              <div className="rounded-xl bg-secondary/50 p-4">
-                <p className="text-sm text-muted-foreground mb-1">Gross Income</p>
-                <p className="text-xl font-semibold text-foreground">
-                  {formatCurrency(result.grossIncome)}
-                </p>
-              </div>
-              <div className="rounded-xl bg-secondary/50 p-4">
-                <p className="text-sm text-muted-foreground mb-1">Taxable Income</p>
-                <p className="text-xl font-semibold text-foreground">
-                  {formatCurrency(result.taxableIncome)}
-                </p>
-              </div>
-            </div>
-
-            {/* Breakdown */}
-            <div>
-              <h3 className="font-semibold text-foreground mb-4">Tax Breakdown</h3>
-              <div className="space-y-3">
-                {result.breakdown.map((item, i) => (
-                  <div 
-                    key={i}
-                    className="flex items-center justify-between py-3 border-b border-border last:border-0"
-                  >
-                    <div>
-                      <p className="font-medium text-foreground">{item.label}</p>
-                      {item.description && (
-                        <p className="text-sm text-muted-foreground">{item.description}</p>
-                      )}
-                    </div>
-                    <p className={`font-semibold ${item.amount < 0 ? 'text-success' : 'text-foreground'}`}>
-                      {item.amount < 0 ? '-' : ''}{formatCurrency(Math.abs(item.amount))}
-                    </p>
-                  </div>
-                ))}
-              </div>
+            
+            {/* Effective Rate */}
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+              <p className="text-sm text-muted-foreground mb-1">Effective Tax Rate</p>
+              <p className="text-2xl font-bold text-foreground">{result.effectiveRate.toFixed(2)}%</p>
             </div>
           </div>
 
-          {/* Input Summary */}
-          <div className="rounded-xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">
-            <h3 className="font-semibold text-foreground mb-4">Your Inputs</h3>
-            <div className="grid gap-3 sm:grid-cols-2 text-sm">
-              <InputRow label="Turnover" value={inputs.turnover} />
-              <InputRow label="Expenses" value={inputs.expenses} />
-              {inputs.entityType === 'company' && (
-                <InputRow label="Fixed Assets" value={inputs.fixedAssets} />
-              )}
-              {inputs.entityType === 'business_name' && inputs.use2026Rules && (
-                <InputRow label="Rent Paid" value={inputs.rentPaid} />
-              )}
-              {inputs.vatableSales > 0 && (
-                <InputRow label="Vatable Sales" value={inputs.vatableSales} />
-              )}
-              {inputs.vatablePurchases > 0 && (
-                <InputRow label="Vatable Purchases" value={inputs.vatablePurchases} />
-              )}
-              {inputs.rentalIncome > 0 && (
-                <InputRow label="Rental Income" value={inputs.rentalIncome} />
-              )}
-              {inputs.consultancyIncome > 0 && (
-                <InputRow label="Consultancy Income" value={inputs.consultancyIncome} />
-              )}
-              {inputs.dividendIncome > 0 && (
-                <InputRow label="Dividend Income" value={inputs.dividendIncome} />
-              )}
-              {inputs.capitalGains > 0 && (
-                <InputRow label="Capital Gains" value={inputs.capitalGains} />
-              )}
+          {/* Tax Breakdown */}
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">
+            <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Receipt className="h-5 w-5 text-primary" />
+              Tax Breakdown
+            </h3>
+            <div className="space-y-3">
+              {result.breakdown.map((item, i) => (
+                <div key={i} className="flex justify-between items-center py-2 border-b border-border/50 last:border-0">
+                  <div className="flex items-center gap-2">
+                    {item.label.includes('VAT') && <Percent className="h-4 w-4 text-muted-foreground" />}
+                    {item.label.includes('Income Tax') && <Calculator className="h-4 w-4 text-muted-foreground" />}
+                    {item.label.includes('Levy') && <Leaf className="h-4 w-4 text-muted-foreground" />}
+                    {item.label.includes('WHT') && <FileText className="h-4 w-4 text-muted-foreground" />}
+                    <span className="text-foreground">{item.label}</span>
+                  </div>
+                  <span className="font-medium text-foreground">{formatCurrency(item.amount)}</span>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Disclaimer */}
-          <p className="text-center text-xs text-muted-foreground mt-8">
-            This is an estimate for educational purposes. Consult a certified tax professional 
-            for official advice. References: Nigeria Tax Act 2025, CAMA 2020.
-          </p>
+          {/* Net Income After Tax */}
+          <div className="rounded-2xl border border-success/30 bg-gradient-to-br from-success/10 to-success/5 p-6 shadow-card animate-slide-up">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Net Income After Tax</p>
+                <p className="text-3xl font-bold text-success">{formatCurrency(result.grossIncome - result.totalTaxPayable)}</p>
+              </div>
+              <div className="h-16 w-16 rounded-2xl bg-success/20 flex items-center justify-center">
+                <CheckCircle2 className="h-8 w-8 text-success" />
+              </div>
+            </div>
+          </div>
         </div>
       </main>
 
@@ -653,59 +495,33 @@ const Results = () => {
       <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Save className="h-5 w-5 text-primary" />
-              Save Business Profile
-            </DialogTitle>
+            <DialogTitle>Save Business</DialogTitle>
             <DialogDescription>
-              Save this calculation to your dashboard for future reference and CAC verification.
+              Save this calculation as a business for quick access later.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            <label className="text-sm font-medium text-foreground mb-2 block">
-              Business Name
-            </label>
-            <Input
-              placeholder="e.g., My Trading Company Ltd"
-              value={businessName}
-              onChange={(e) => setBusinessName(e.target.value)}
-            />
-            <div className="mt-4 p-3 rounded-lg bg-secondary/50">
-              <p className="text-xs text-muted-foreground mb-2">Will save:</p>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Entity:</span>{' '}
-                  <span className="font-medium text-foreground">
-                    {inputs.entityType === 'company' ? 'Limited Company' : 'Business Name'}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Turnover:</span>{' '}
-                  <span className="font-medium text-foreground">{formatCurrency(inputs.turnover)}</span>
-                </div>
-              </div>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Business Name</label>
+              <Input
+                placeholder="Enter business name"
+                value={businessName}
+                onChange={(e) => setBusinessName(e.target.value)}
+              />
+            </div>
+            <div className="text-sm text-muted-foreground space-y-1">
+              <p><strong>Entity Type:</strong> {inputs.entityType === 'company' ? 'Limited Company' : 'Business Name'}</p>
+              <p><strong>Turnover:</strong> {formatCurrency(inputs.turnover)}</p>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowSaveDialog(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSaveBusiness} disabled={!businessName.trim()}>
-              <Save className="h-4 w-4" />
-              Save Business
-            </Button>
+            <Button variant="outline" onClick={() => setShowSaveDialog(false)}>Cancel</Button>
+            <Button onClick={handleSaveBusiness}>Save Business</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
   );
 };
-
-const InputRow = ({ label, value }: { label: string; value: number }) => (
-  <div className="flex justify-between">
-    <span className="text-muted-foreground">{label}</span>
-    <span className="font-medium text-foreground">{formatCurrency(value)}</span>
-  </div>
-);
 
 export default Results;
