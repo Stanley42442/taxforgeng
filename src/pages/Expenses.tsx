@@ -82,15 +82,15 @@ interface Expense {
   businessId?: string;
 }
 
-const getExpenseCategories = (t: (key: string) => string) => [
-  { value: 'income', label: t('category.income'), type: 'income' as const },
-  { value: 'rent', label: t('category.rentOffice'), type: 'expense' as const, deductible: true },
-  { value: 'transport', label: t('category.transportTravel'), type: 'expense' as const, deductible: true },
-  { value: 'marketing', label: t('category.marketingAds'), type: 'expense' as const, deductible: true },
-  { value: 'salary', label: t('category.salariesWages'), type: 'expense' as const, deductible: true },
-  { value: 'utilities', label: t('category.utilities'), type: 'expense' as const, deductible: true },
-  { value: 'supplies', label: t('category.suppliesEquipment'), type: 'expense' as const, deductible: true },
-  { value: 'other', label: t('category.otherExpenses'), type: 'expense' as const, deductible: false },
+const getExpenseCategories = () => [
+  { value: 'income', label: 'Income', type: 'income' as const },
+  { value: 'rent', label: 'Rent & Office', type: 'expense' as const, deductible: true },
+  { value: 'transport', label: 'Transport & Travel', type: 'expense' as const, deductible: true },
+  { value: 'marketing', label: 'Marketing & Ads', type: 'expense' as const, deductible: true },
+  { value: 'salary', label: 'Salaries & Wages', type: 'expense' as const, deductible: true },
+  { value: 'utilities', label: 'Utilities', type: 'expense' as const, deductible: true },
+  { value: 'supplies', label: 'Supplies & Equipment', type: 'expense' as const, deductible: true },
+  { value: 'other', label: 'Other Expenses', type: 'expense' as const, deductible: false },
 ];
 
 const getCategoryIcon = (category: Expense['category']) => {
@@ -403,13 +403,13 @@ const Expenses = () => {
             <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-accent">
               <Crown className="h-12 w-12 text-accent-foreground" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground mb-3">{t('expense.title')}</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-3">Expense Tracker</h1>
             <p className="text-lg text-muted-foreground mb-8">
-              {t('msg.upgradeRequired')}
+              Upgrade to access expense tracking features
             </p>
             <Button variant="glow" size="lg" onClick={() => navigate('/pricing')}>
               <Crown className="h-5 w-5" />
-              {t('pricing.upgrade')}
+              Upgrade Now
             </Button>
           </div>
         </div>
@@ -417,16 +417,16 @@ const Expenses = () => {
     );
   }
 
-  const EXPENSE_CATEGORIES = getExpenseCategories(t);
+  const EXPENSE_CATEGORIES = getExpenseCategories();
 
   const handleAddExpense = async () => {
     if (!user) {
-      toast.error(getToastMessage('pleaseSignIn', language));
+      toast.error("Please sign in to add expenses");
       return;
     }
 
     if (!newExpense.description.trim() || !newExpense.amount) {
-      toast.error(getToastMessage('pleaseFillAllFields', language));
+      toast.error("Please fill all required fields");
       return;
     }
 
@@ -451,7 +451,7 @@ const Expenses = () => {
 
     if (error) {
       console.error('Error adding expense:', error);
-      toast.error(getToastMessage('failedToAddExpense', language));
+      toast.error("Failed to add expense");
       return;
     }
 
@@ -475,13 +475,13 @@ const Expenses = () => {
       category: 'other',
       businessId: '',
     });
-    toast.success(getToastMessage('expenseAdded', language));
+    toast.success("Expense added successfully");
     notifyExpenseAdded(expense.description, expense.amount, expense.type === 'income');
   };
 
   const handleCSVImport = async () => {
     if (!user) {
-      toast.error(getToastMessage('loginFailed', language));
+      toast.error("Please sign in first");
       return;
     }
 
@@ -500,7 +500,7 @@ const Expenses = () => {
 
     if (error) {
       console.error('Error importing expenses:', error);
-      toast.error(getToastMessage('uploadFailed', language));
+      toast.error("Failed to import expenses");
       return;
     }
 
@@ -515,7 +515,7 @@ const Expenses = () => {
     }));
 
     setExpenses(prev => [...mapped, ...prev]);
-    toast.success(getToastMessage('uploadSuccess', language));
+    toast.success("Expenses imported successfully");
   };
 
   const handleDeleteExpense = async (id: string) => {
@@ -526,12 +526,12 @@ const Expenses = () => {
 
     if (error) {
       console.error('Error deleting expense:', error);
-      toast.error(getToastMessage('deleteFailed', language));
+      toast.error("Failed to delete expense");
       return;
     }
 
     setExpenses(prev => prev.filter(e => e.id !== id));
-    toast.success(getToastMessage('expenseDeleted', language));
+    toast.success("Expense deleted successfully");
   };
 
   const filteredExpenses = expenses.filter(e => {
@@ -943,8 +943,8 @@ const Expenses = () => {
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow-primary animate-glow">
               <Receipt className="h-8 w-8" />
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-text bg-clip-text text-transparent mb-2">{t('expense.title')}</h1>
-            <p className="text-muted-foreground">{t('expense.subtitle')}</p>
+            <h1 className="text-3xl font-bold bg-gradient-text bg-clip-text text-transparent mb-2">Expense Tracker</h1>
+            <p className="text-muted-foreground">Track and manage your business income and expenses</p>
           </div>
 
           {/* Summary Cards */}

@@ -349,9 +349,9 @@ const Settings = () => {
         data: { full_name: fullName }
       });
 
-      toast.success(getToastMessage('updateSuccess', language));
+      toast.success("Profile updated successfully");
     } catch (error: any) {
-      toast.error(error.message || getToastMessage('updateFailed', language));
+      toast.error(error.message || "Failed to update profile");
     } finally {
       setSavingProfile(false);
     }
@@ -379,9 +379,9 @@ const Settings = () => {
 
       if (error) throw error;
       
-      toast.success(getToastMessage('updateSuccess', language));
+      toast.success("WhatsApp number updated");
     } catch (error: any) {
-      toast.error(error.message || getToastMessage('updateFailed', language));
+      toast.error(error.message || "Failed to update WhatsApp number");
     } finally {
       setSavingWhatsapp(false);
     }
@@ -391,7 +391,7 @@ const Settings = () => {
     const cleanNumber = whatsappNumber.replace(/[\s\-\(\)]/g, '');
     
     if (!cleanNumber) {
-      toast.error(getToastMessage('invalidInput', language));
+      toast.error("Please enter a valid WhatsApp number");
       return;
     }
 
@@ -409,9 +409,9 @@ const Settings = () => {
 
       if (error) throw error;
       
-      toast.success(getToastMessage('whatsappSent', language));
+      toast.success("Test notification sent via WhatsApp");
     } catch (error: any) {
-      toast.error(getToastMessage('whatsappFailed', language));
+      toast.error("Failed to send WhatsApp notification");
     } finally {
       setTestingWhatsapp(false);
     }
@@ -440,10 +440,10 @@ const Settings = () => {
       // Send email notification to current email
       await sendSecurityNotification('email_changed', { newEmail });
       
-      toast.success(getToastMessage('emailSent', language));
+      toast.success("Confirmation email sent to your new address");
       setNewEmail("");
     } catch (error: any) {
-      toast.error(error.message || getToastMessage('updateFailed', language));
+      toast.error(error.message || "Failed to update email");
     } finally {
       setSavingEmail(false);
     }
@@ -621,7 +621,7 @@ const Settings = () => {
       // Send email notification
       await sendSecurityNotification('password_changed');
       
-      toast.success(getToastMessage('updateSuccess', language));
+      toast.success("Password updated successfully");
       setNewPassword("");
       setConfirmPassword("");
       setCurrentPassword("");
@@ -629,7 +629,7 @@ const Settings = () => {
       setShowPasswordVerification(false);
       setPasswordVerificationCode("");
     } catch (error: any) {
-      toast.error(error.message || getToastMessage('updateFailed', language));
+      toast.error(error.message || "Failed to update password");
     } finally {
       setSavingPassword(false);
     }
@@ -739,9 +739,9 @@ const Settings = () => {
       setTotpSecret(null);
       setFactorId(null);
       
-      toast.success(getToastMessage('updateSuccess', language));
+      toast.success("Two-factor authentication enabled");
     } catch (error: any) {
-      toast.error(error.message || getToastMessage('verificationFailed', language));
+      toast.error(error.message || "Verification failed");
     } finally {
       setMfaVerifying(false);
     }
@@ -766,9 +766,9 @@ const Settings = () => {
       setHasBackupCodes(false);
       setRemainingBackupCodes(0);
 
-      toast.success(getToastMessage('updateSuccess', language));
+      toast.success("Two-factor authentication disabled");
     } catch (error: any) {
-      toast.error(error.message || getToastMessage('updateFailed', language));
+      toast.error(error.message || "Failed to disable 2FA");
     }
   };
 
@@ -826,9 +826,9 @@ const Settings = () => {
       // Send email notification
       await sendSecurityNotification('backup_codes_generated');
       
-      toast.success(getToastMessage('saveSuccess', language));
+      toast.success("Backup codes generated successfully");
     } catch (error: any) {
-      toast.error(error.message || getToastMessage('saveFailed', language));
+      toast.error(error.message || "Failed to generate backup codes");
     } finally {
       setGeneratingBackupCodes(false);
     }
@@ -837,7 +837,7 @@ const Settings = () => {
   const handleCopyBackupCodes = () => {
     const codesText = backupCodes.join('\n');
     navigator.clipboard.writeText(codesText);
-    toast.success(getToastMessage('copySuccess', language));
+    toast.success("Backup codes copied to clipboard");
   };
 
   const handleDownloadBackupCodes = () => {
@@ -851,7 +851,7 @@ const Settings = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast.success(getToastMessage('downloadSuccess', language));
+    toast.success("Backup codes downloaded");
   };
 
   if (loading || profileLoading) {
@@ -879,9 +879,9 @@ const Settings = () => {
             <div className="min-w-0">
               <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
                 <SettingsIcon className="h-5 w-5 sm:h-6 sm:w-6 text-primary shrink-0" />
-                <span className="truncate">{t('settings.title')}</span>
+                <span className="truncate">Settings</span>
               </h1>
-              <p className="text-sm text-muted-foreground truncate">{t('settings.profile')}</p>
+              <p className="text-sm text-muted-foreground truncate">Manage your account settings</p>
             </div>
           </div>
           <Badge variant={tier === 'free' ? 'secondary' : 'default'} className="capitalize shrink-0 self-start sm:self-auto">
@@ -908,15 +908,15 @@ const Settings = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">{t('settings.emailStatus')}</p>
+                  <p className="text-sm text-muted-foreground">Email Status</p>
                   <p className="text-lg font-bold">
                     {isEmailVerified ? (
                       <span className="text-green-600 flex items-center gap-1">
-                        <CheckCircle2 className="h-4 w-4" /> {t('settings.verified')}
+                        <CheckCircle2 className="h-4 w-4" /> Verified
                       </span>
                     ) : (
                       <span className="text-amber-600 flex items-center gap-1">
-                        <AlertCircle className="h-4 w-4" /> {t('settings.unverified')}
+                        <AlertCircle className="h-4 w-4" /> Unverified
                       </span>
                     )}
                   </p>
@@ -938,15 +938,15 @@ const Settings = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">{t('settings.twoFactorStatus')}</p>
+                  <p className="text-sm text-muted-foreground">Two-Factor Status</p>
                   <p className="text-lg font-bold">
                     {hasMfaEnabled ? (
                       <span className="text-green-600 flex items-center gap-1">
-                        <CheckCircle2 className="h-4 w-4" /> {t('settings.enabled')}
+                        <CheckCircle2 className="h-4 w-4" /> Enabled
                       </span>
                     ) : (
                       <span className="text-amber-600 flex items-center gap-1">
-                        <AlertCircle className="h-4 w-4" /> {t('settings.disabled')}
+                        <AlertCircle className="h-4 w-4" /> Disabled
                       </span>
                     )}
                   </p>
@@ -968,7 +968,7 @@ const Settings = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">{t('settings.backupCodes')}</p>
+                  <p className="text-sm text-muted-foreground">Backup Codes</p>
                   <p className="text-2xl font-bold">{remainingBackupCodes}</p>
                 </div>
                 <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
@@ -994,7 +994,7 @@ const Settings = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">{t('settings.recentActivity')}</p>
+                  <p className="text-sm text-muted-foreground">Recent Activity</p>
                   <p className="text-2xl font-bold">{authEvents.length}</p>
                 </div>
                 <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -1011,11 +1011,11 @@ const Settings = () => {
             <TabsList className="inline-flex h-auto flex-wrap gap-1 p-1 w-auto min-w-full sm:min-w-0">
               <TabsTrigger value="profile" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                {t('settings.profile')}
+                Profile
               </TabsTrigger>
               <TabsTrigger value="security" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                {t('settings.security')}
+                Security
               </TabsTrigger>
               <TabsTrigger value="credentials" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <Lock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -1099,14 +1099,14 @@ const Settings = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <User className="h-5 w-5 text-primary" />
-                  {t('settings.profile')}
+                  Profile Settings
                 </CardTitle>
-                <CardDescription>{t('common.edit')}</CardDescription>
+                <CardDescription>Update your personal information</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleUpdateProfile} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="fullName">{t('settings.profile')}</Label>
+                    <Label htmlFor="fullName">Full Name</Label>
                     <Input
                       id="fullName"
                       value={fullName}
@@ -1122,7 +1122,7 @@ const Settings = () => {
                     )}
                   </div>
                   <Button type="submit" disabled={savingProfile}>
-                    {savingProfile ? t('common.loading') : t('common.save')}
+                    {savingProfile ? "Saving..." : "Save Changes"}
                   </Button>
                 </form>
               </CardContent>
