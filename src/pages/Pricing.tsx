@@ -283,6 +283,7 @@ const PricingCard = ({
   currentTier: SubscriptionTier;
   onUpgrade: (tier: SubscriptionTier) => void;
 }) => {
+  const { t } = useLanguage();
   const isCurrentTier = currentTier === tier;
   const formatPrice = (price: number) => `₦${price.toLocaleString()}`;
 
