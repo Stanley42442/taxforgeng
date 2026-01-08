@@ -1,7 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { NavMenu } from "@/components/NavMenu";
-import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Calculator,
   Check,
@@ -53,22 +52,21 @@ const features: TierFeature[] = [
 const Pricing = () => {
   const navigate = useNavigate();
   const { tier: currentTier, upgradeTier } = useSubscription();
-  const { t } = useLanguage();
 
   const handleUpgrade = (tier: SubscriptionTier) => {
     if (tier === 'corporate') {
-      toast.info(t('pricing.contactUs'));
+      toast.info("Contact us for Corporate pricing");
       return;
     }
     
     // Mock Paystack checkout - in production, this would open Paystack
-    toast.success(t('toast.upgradeSuccess'), {
+    toast.success("Processing upgrade...", {
       description: 'This is a test mode transaction'
     });
     
     setTimeout(() => {
       upgradeTier(tier);
-      toast.success(t('toast.upgradeSuccess'));
+      toast.success("Upgrade successful!");
       navigate('/calculator');
     }, 1500);
   };
@@ -81,10 +79,10 @@ const Pricing = () => {
         {/* Header */}
         <div className="text-center mb-12 animate-slide-up">
           <h1 className="text-4xl font-extrabold text-foreground mb-4">
-            {t('pricing.title')}
+            Simple, Transparent Pricing
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            {t('pricing.subtitle')}. {t('pricing.saveAnnual')}
+            Choose the plan that fits your needs. Save ~17% with annual billing.
           </p>
         </div>
 
@@ -174,20 +172,20 @@ const Pricing = () => {
         {/* Feature Comparison Table */}
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl font-bold text-foreground text-center mb-8">
-            {t('pricing.fullComparison')}
+            Full Feature Comparison
           </h2>
           <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-card">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border bg-secondary/50">
-                    <th className="text-left p-4 font-semibold text-foreground">{t('pricing.feature')}</th>
-                    <th className="text-center p-4 font-semibold text-foreground">{t('pricing.individual')}</th>
-                    <th className="text-center p-4 font-semibold text-foreground">{t('pricing.starter')}</th>
-                    <th className="text-center p-4 font-semibold text-foreground">{t('pricing.basic')}</th>
-                    <th className="text-center p-4 font-semibold text-foreground">{t('pricing.freelancer')}</th>
+                    <th className="text-left p-4 font-semibold text-foreground">Feature</th>
+                    <th className="text-center p-4 font-semibold text-foreground">Individual</th>
+                    <th className="text-center p-4 font-semibold text-foreground">Starter</th>
+                    <th className="text-center p-4 font-semibold text-foreground">Basic</th>
+                    <th className="text-center p-4 font-semibold text-foreground">Freelancer</th>
                     <th className="text-center p-4 font-semibold text-foreground bg-primary/5">Business</th>
-                    <th className="text-center p-4 font-semibold text-foreground">{t('pricing.corporate')}</th>
+                    <th className="text-center p-4 font-semibold text-foreground">Corporate</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -211,7 +209,7 @@ const Pricing = () => {
         {/* Payment Methods */}
         <div className="mt-12 text-center">
           <p className="text-sm text-muted-foreground mb-4">
-            {t('pricing.securePayments')}
+            Secure payments via Paystack
           </p>
           <div className="flex items-center justify-center gap-6 text-muted-foreground">
             <span className="text-xs">💳 Card</span>
@@ -224,20 +222,20 @@ const Pricing = () => {
         <div className="mt-16 max-w-2xl mx-auto text-center">
           <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
             <MessageCircle className="h-10 w-10 text-primary mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-foreground mb-2">{t('pricing.needHelp')}</h3>
+            <h3 className="text-xl font-bold text-foreground mb-2">Need Help Choosing?</h3>
             <p className="text-muted-foreground mb-6">
-              {t('pricing.helpDescription')}
+              Our team can help you find the right plan for your business needs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="outline" asChild>
                 <a href="mailto:support@taxforge.ng">
                   <Mail className="h-4 w-4" />
-                  {t('pricing.contactSales')}
+                  Contact Sales
                 </a>
               </Button>
               <Link to="/advisory">
                 <Button variant="hero">
-                  {t('pricing.startFreeTrial')}
+                  Start Free Trial
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
@@ -283,7 +281,6 @@ const PricingCard = ({
   currentTier: SubscriptionTier;
   onUpgrade: (tier: SubscriptionTier) => void;
 }) => {
-  const { t } = useLanguage();
   const isCurrentTier = currentTier === tier;
   const formatPrice = (price: number) => `₦${price.toLocaleString()}`;
 
@@ -296,7 +293,7 @@ const PricingCard = ({
       {isPopular && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
           <span className="bg-gradient-primary text-primary-foreground text-[10px] sm:text-xs font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
-            {t('pricing.mostPopular')}
+            Most Popular
           </span>
         </div>
       )}
@@ -304,7 +301,7 @@ const PricingCard = ({
       {isCurrentTier && (
         <div className="absolute -top-3 right-2 sm:right-4">
           <span className="bg-success text-success-foreground text-[10px] sm:text-xs font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
-            {t('pricing.currentPlan')}
+            Current Plan
           </span>
         </div>
       )}
@@ -361,7 +358,7 @@ const PricingCard = ({
         disabled={isCurrentTier || (tier === 'free')}
         onClick={() => onUpgrade(tier)}
       >
-        {isCurrentTier ? t('pricing.currentPlan') : tier === 'free' ? t('pricing.freeForever') : tier === 'corporate' ? t('pricing.contactUs') : t('pricing.upgradeNow')}
+        {isCurrentTier ? 'Current Plan' : tier === 'free' ? 'Free Forever' : tier === 'corporate' ? 'Contact Us' : 'Upgrade Now'}
       </Button>
     </div>
   );
