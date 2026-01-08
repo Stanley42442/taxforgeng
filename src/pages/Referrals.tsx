@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -29,7 +28,6 @@ interface Referral {
 
 const Referrals = () => {
   const { user } = useAuth();
-  const { t } = useLanguage();
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -88,7 +86,7 @@ const Referrals = () => {
 
   const completedReferrals = referrals.filter((r) => r.status === "completed").length;
   const pendingReferrals = referrals.filter((r) => r.status === "pending").length;
-  const totalRewards = completedReferrals; // 1 free month per completed referral
+  const totalRewards = completedReferrals;
 
   if (!user) {
     return (
@@ -122,13 +120,13 @@ const Referrals = () => {
           <div className="text-center mb-8 animate-slide-up">
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary mb-4">
               <Gift className="h-4 w-4" />
-              {t('referral.program')}
+              Referral Program
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              {t('referral.title')}
+              Invite Friends, Earn Rewards
             </h1>
             <p className="text-muted-foreground max-w-md mx-auto">
-              {t('referral.subtitle')}
+              Share TaxForge NG and earn free months when friends upgrade
             </p>
           </div>
 
@@ -138,21 +136,21 @@ const Referrals = () => {
               <CardContent className="pt-6 text-center">
                 <Users className="h-8 w-8 text-primary mx-auto mb-2" />
                 <p className="text-2xl font-bold text-foreground">{referrals.length}</p>
-                <p className="text-sm text-muted-foreground">{t('referral.totalReferrals')}</p>
+                <p className="text-sm text-muted-foreground">Total Referrals</p>
               </CardContent>
             </Card>
             <Card className="glass-frosted">
               <CardContent className="pt-6 text-center">
                 <Clock className="h-8 w-8 text-warning mx-auto mb-2" />
                 <p className="text-2xl font-bold text-foreground">{pendingReferrals}</p>
-                <p className="text-sm text-muted-foreground">{t('referral.pending')}</p>
+                <p className="text-sm text-muted-foreground">Pending</p>
               </CardContent>
             </Card>
             <Card className="glass-frosted">
               <CardContent className="pt-6 text-center">
                 <Trophy className="h-8 w-8 text-success mx-auto mb-2" />
                 <p className="text-2xl font-bold text-foreground">{totalRewards}</p>
-                <p className="text-sm text-muted-foreground">{t('referral.freeMonthsEarned')}</p>
+                <p className="text-sm text-muted-foreground">Free Months Earned</p>
               </CardContent>
             </Card>
           </div>
@@ -162,10 +160,10 @@ const Referrals = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Share2 className="h-5 w-5 text-primary" />
-                {t('referral.yourLink')}
+                Your Referral Link
               </CardTitle>
               <CardDescription>
-                {t('referral.shareThisLink')}
+                Share this link with friends to earn rewards
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -199,7 +197,7 @@ const Referrals = () => {
           {/* How it Works */}
           <Card className="glass-frosted mb-8">
             <CardHeader>
-              <CardTitle>{t('referral.howItWorks')}</CardTitle>
+              <CardTitle>How it Works</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -237,7 +235,7 @@ const Referrals = () => {
           {/* Referral History */}
           <Card className="glass-frosted">
             <CardHeader>
-              <CardTitle>{t('referral.history')}</CardTitle>
+              <CardTitle>Referral History</CardTitle>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -247,9 +245,9 @@ const Referrals = () => {
               ) : referrals.length === 0 ? (
                 <div className="text-center py-8">
                   <Users className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-muted-foreground">{t('referral.noReferralsYet')}</p>
+                  <p className="text-muted-foreground">No referrals yet</p>
                   <p className="text-sm text-muted-foreground">
-                    {t('referral.shareThisLink')}
+                    Share your link to start earning rewards
                   </p>
                 </div>
               ) : (

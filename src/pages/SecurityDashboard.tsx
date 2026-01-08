@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { useLanguage } from "@/contexts/LanguageContext";
+
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
@@ -188,7 +188,7 @@ const getEventSeverity = (eventType: string): 'success' | 'warning' | 'error' | 
 const SecurityDashboard = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  
 
   const [authEvents, setAuthEvents] = useState<AuthEvent[]>([]);
   const [backupCodeAttempts, setBackupCodeAttempts] = useState<BackupCodeAttempt[]>([]);

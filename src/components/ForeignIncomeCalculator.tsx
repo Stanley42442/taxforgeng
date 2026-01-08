@@ -7,12 +7,11 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Globe, Calculator, Info, AlertCircle } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface TreatyCountry {
   name: string;
   code: string;
-  withholdingRate: number; // WHT rate under treaty
+  withholdingRate: number;
   dividendRate: number;
   interestRate: number;
   royaltyRate: number;
@@ -35,7 +34,6 @@ const TREATY_COUNTRIES: TreatyCountry[] = [
 type IncomeType = 'employment' | 'dividend' | 'interest' | 'royalty' | 'business';
 
 export const ForeignIncomeCalculator = () => {
-  const { t } = useLanguage();
   const [incomeType, setIncomeType] = useState<IncomeType>('employment');
   const [country, setCountry] = useState<string>('OTHER');
   const [foreignCurrency, setForeignCurrency] = useState<string>('USD');
@@ -48,20 +46,18 @@ export const ForeignIncomeCalculator = () => {
   const selectedCountry = TREATY_COUNTRIES.find(c => c.code === country);
   const nairaAmount = foreignAmount * exchangeRate;
 
-  // Get applicable rate based on income type and treaty
   const getApplicableRate = (): number => {
     if (!selectedCountry) return 10;
     switch (incomeType) {
       case 'dividend': return selectedCountry.dividendRate;
       case 'interest': return selectedCountry.interestRate;
       case 'royalty': return selectedCountry.royaltyRate;
-      case 'employment': return isResident ? 25 : 10; // Max PIT rate or flat rate
+      case 'employment': return isResident ? 25 : 10;
       case 'business': return isResident ? 25 : selectedCountry.withholdingRate;
       default: return 10;
     }
   };
 
-  // Calculate tax
   const calculateTax = () => {
     const rate = getApplicableRate();
     const grossTax = nairaAmount * (rate / 100);
@@ -81,42 +77,42 @@ export const ForeignIncomeCalculator = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <Globe className="h-5 w-5 text-primary" />
-          {t('foreignIncome.title')}
+          Foreign Income Calculator
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          {t('foreignIncome.description')}
+          Calculate tax on foreign income with treaty benefits
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Residency Status */}
         <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/50">
           <div>
-            <Label>{t('foreignIncome.nigerianResident')}</Label>
-            <p className="text-xs text-muted-foreground">{t('foreignIncome.residencyNote')}</p>
+            <Label>Nigerian Tax Resident</Label>
+            <p className="text-xs text-muted-foreground">Resident for 183+ days in a tax year</p>
           </div>
           <Switch checked={isResident} onCheckedChange={setIsResident} />
         </div>
 
         {/* Income Type */}
         <div className="space-y-2">
-          <Label>{t('form.incomeType')}</Label>
+          <Label>Income Type</Label>
           <Select value={incomeType} onValueChange={(v) => setIncomeType(v as IncomeType)}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="employment">{t('foreignIncome.employmentIncome')}</SelectItem>
-              <SelectItem value="dividend">{t('foreignIncome.dividendIncome')}</SelectItem>
-              <SelectItem value="interest">{t('foreignIncome.interestIncome')}</SelectItem>
-              <SelectItem value="royalty">{t('foreignIncome.royaltyIncome')}</SelectItem>
-              <SelectItem value="business">{t('foreignIncome.businessIncome')}</SelectItem>
+              <SelectItem value="employment">Employment Income</SelectItem>
+              <SelectItem value="dividend">Dividend Income</SelectItem>
+              <SelectItem value="interest">Interest Income</SelectItem>
+              <SelectItem value="royalty">Royalty Income</SelectItem>
+              <SelectItem value="business">Business Income</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {/* Source Country */}
         <div className="space-y-2">
-          <Label>{t('form.sourceCountry')}</Label>
+          <Label>Source Country</Label>
           <Select value={country} onValueChange={setCountry}>
             <SelectTrigger>
               <SelectValue />
@@ -134,7 +130,7 @@ export const ForeignIncomeCalculator = () => {
         {/* Amount */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>{t('form.foreignCurrency')}</Label>
+            <Label>Foreign Currency</Label>
             <Select value={foreignCurrency} onValueChange={setForeignCurrency}>
               <SelectTrigger>
                 <SelectValue />
@@ -148,7 +144,7 @@ export const ForeignIncomeCalculator = () => {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>{t('form.amount')}</Label>
+            <Label>Amount</Label>
             <Input
               type="number"
               value={foreignAmount}
@@ -160,7 +156,7 @@ export const ForeignIncomeCalculator = () => {
         {/* Exchange Rate */}
         <div className="space-y-2">
           <Label className="flex items-center gap-1">
-            {t('form.exchangeRate')} (₦/{foreignCurrency})
+            Exchange Rate (₦/{foreignCurrency})
             <Info className="h-3 w-3 text-muted-foreground" />
           </Label>
           <Input
@@ -168,50 +164,50 @@ export const ForeignIncomeCalculator = () => {
             value={exchangeRate}
             onChange={(e) => setExchangeRate(Number(e.target.value) || 0)}
           />
-          <p className="text-xs text-muted-foreground">{t('foreignIncome.useCBNRate')}</p>
+          <p className="text-xs text-muted-foreground">Use CBN rate on date of receipt</p>
         </div>
 
         {/* Foreign Tax Paid */}
         <div className="space-y-2">
-          <Label>{t('form.foreignTaxPaid')} ({foreignCurrency})</Label>
+          <Label>Foreign Tax Paid ({foreignCurrency})</Label>
           <Input
             type="number"
             value={foreignTaxPaid}
             onChange={(e) => setForeignTaxPaid(Number(e.target.value) || 0)}
             placeholder="0"
           />
-          <p className="text-xs text-muted-foreground">{t('foreignIncome.foreignTaxCredit')}</p>
+          <p className="text-xs text-muted-foreground">Eligible for foreign tax credit</p>
         </div>
 
         <Button onClick={handleCalculate} className="w-full gap-2">
           <Calculator className="h-4 w-4" />
-          {t('btn.calculateTax')}
+          Calculate Tax
         </Button>
 
         {/* Results */}
         {calculated && (
           <div className="space-y-4 pt-4 border-t">
             <div className="p-4 rounded-xl bg-secondary/50">
-              <p className="text-sm text-muted-foreground mb-1">{t('foreignIncome.nairaEquivalent')}</p>
+              <p className="text-sm text-muted-foreground mb-1">Naira Equivalent</p>
               <p className="text-2xl font-bold text-foreground">{formatCurrency(nairaAmount)}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
-                <p className="text-xs text-muted-foreground mb-1">{t('foreignIncome.applicableRate')}</p>
+                <p className="text-xs text-muted-foreground mb-1">Applicable Rate</p>
                 <p className="text-xl font-bold text-primary">{rate}%</p>
                 {country !== 'OTHER' && (
-                  <p className="text-xs text-muted-foreground">{t('foreignIncome.treatyRate')}</p>
+                  <p className="text-xs text-muted-foreground">Treaty rate applied</p>
                 )}
               </div>
               <div className="p-4 rounded-xl bg-success/10 border border-success/20">
-                <p className="text-xs text-muted-foreground mb-1">{t('foreignIncome.foreignTaxCredit')}</p>
+                <p className="text-xs text-muted-foreground mb-1">Foreign Tax Credit</p>
                 <p className="text-xl font-bold text-success">{formatCurrency(foreignTaxCredit)}</p>
               </div>
             </div>
 
             <div className="p-5 rounded-xl bg-primary/20 border border-primary/30 text-center">
-              <p className="text-sm text-muted-foreground mb-2">{t('foreignIncome.netNigerianTax')}</p>
+              <p className="text-sm text-muted-foreground mb-2">Net Nigerian Tax Payable</p>
               <p className="text-3xl font-bold text-primary">{formatCurrency(netTax)}</p>
             </div>
 
@@ -219,7 +215,7 @@ export const ForeignIncomeCalculator = () => {
               <div className="flex items-start gap-2 p-3 rounded-lg bg-info/10 border border-info/20">
                 <AlertCircle className="h-4 w-4 text-info mt-0.5" />
                 <p className="text-sm text-info">
-                  {t('foreignIncome.nonResidentNote')}
+                  As a non-resident, only Nigerian-source income is taxable
                 </p>
               </div>
             )}
@@ -228,7 +224,7 @@ export const ForeignIncomeCalculator = () => {
               <div className="flex items-start gap-2 p-3 rounded-lg bg-success/10 border border-success/20">
                 <Info className="h-4 w-4 text-success mt-0.5" />
                 <p className="text-sm text-success">
-                  {t('foreignIncome.treatyNote').replace('{country}', selectedCountry.name)}
+                  Nigeria has a tax treaty with {selectedCountry.name} that may reduce withholding rates
                 </p>
               </div>
             )}
