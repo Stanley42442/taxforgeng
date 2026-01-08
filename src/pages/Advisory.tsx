@@ -97,32 +97,32 @@ const Advisory = () => {
                 )}
               </div>
               <h1 className="text-3xl font-bold text-foreground mb-2">
-                Our Recommendation
+                {t('advisory.result.title')}
               </h1>
               <div className="inline-flex items-center gap-2 rounded-full bg-success/10 px-4 py-2 text-sm font-medium text-success">
-                {recommendation.suitabilityScore}% Match
+                {recommendation.suitabilityScore}% {t('advisory.result.match')}
               </div>
             </div>
 
             <div className="rounded-2xl border border-border bg-card p-8 shadow-card mb-6">
               <h2 className="text-2xl font-bold text-foreground mb-3">
-                {recommendation.title}
+                {t(recommendation.titleKey)}
               </h2>
               <p className="text-muted-foreground mb-6">
-                {recommendation.summary}
+                {t(recommendation.summaryKey)}
               </p>
 
               <div className="grid gap-6 md:grid-cols-2 mb-6">
                 <div>
                   <h3 className="font-semibold text-success mb-3 flex items-center gap-2">
                     <TrendingUp className="h-4 w-4" />
-                    Advantages
+                    {t('advisory.result.advantages')}
                   </h3>
                   <ul className="space-y-2">
-                    {recommendation.pros.map((pro, i) => (
+                    {recommendation.prosKeys.map((proKey, i) => (
                       <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
                         <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-success flex-shrink-0" />
-                        {pro}
+                        {t(proKey)}
                       </li>
                     ))}
                   </ul>
@@ -130,13 +130,13 @@ const Advisory = () => {
                 <div>
                   <h3 className="font-semibold text-warning mb-3 flex items-center gap-2">
                     <TrendingDown className="h-4 w-4" />
-                    Considerations
+                    {t('advisory.result.considerations')}
                   </h3>
                   <ul className="space-y-2">
-                    {recommendation.cons.map((con, i) => (
+                    {recommendation.consKeys.map((conKey, i) => (
                       <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
                         <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-warning flex-shrink-0" />
-                        {con}
+                        {t(conKey)}
                       </li>
                     ))}
                   </ul>
@@ -145,16 +145,16 @@ const Advisory = () => {
 
               <div className="grid gap-4 rounded-xl bg-secondary/50 p-4 md:grid-cols-3">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Tax Authority</p>
-                  <p className="font-medium text-foreground text-sm">{recommendation.taxAuthority}</p>
+                  <p className="text-xs text-muted-foreground mb-1">{t('advisory.result.taxAuthority')}</p>
+                  <p className="font-medium text-foreground text-sm">{t(recommendation.taxAuthorityKey)}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Registration Cost</p>
-                  <p className="font-medium text-foreground text-sm">{recommendation.estimatedCosts.registration}</p>
+                  <p className="text-xs text-muted-foreground mb-1">{t('advisory.result.registrationCost')}</p>
+                  <p className="font-medium text-foreground text-sm">{t(recommendation.estimatedCosts.registrationKey)}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Annual Compliance</p>
-                  <p className="font-medium text-foreground text-sm">{recommendation.estimatedCosts.annual}</p>
+                  <p className="text-xs text-muted-foreground mb-1">{t('advisory.result.annualCompliance')}</p>
+                  <p className="font-medium text-foreground text-sm">{t(recommendation.estimatedCosts.annualKey)}</p>
                 </div>
               </div>
             </div>
@@ -168,7 +168,7 @@ const Advisory = () => {
                   state: { entityType: recommendation.entityType } 
                 })}
               >
-                Calculate Your Taxes
+                {t('advisory.result.calculateTaxes')}
                 <ArrowRight className="h-5 w-5" />
               </Button>
               <Button 
@@ -188,7 +188,7 @@ const Advisory = () => {
                   });
                 }}
               >
-                Start Over
+                {t('advisory.result.startOver')}
               </Button>
             </div>
           </div>
@@ -205,7 +205,7 @@ const Advisory = () => {
         <div className="mb-6 flex justify-end">
           <Link to="/calculator">
             <Button variant="ghost" size="sm">
-              Skip to Calculator
+              {t('advisory.skipToCalculator')}
             </Button>
           </Link>
         </div>
@@ -213,8 +213,8 @@ const Advisory = () => {
           {/* Progress */}
           <div className="mb-8">
             <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
-              <span>Question {currentStep + 1} of {advisoryQuestions.length}</span>
-              <span>{Math.round(progress)}% Complete</span>
+              <span>{t('advisory.question')} {currentStep + 1} {t('common.of')} {advisoryQuestions.length}</span>
+              <span>{Math.round(progress)}% {t('advisory.complete')}</span>
             </div>
             <Progress value={progress} className="h-2" />
           </div>
@@ -222,10 +222,10 @@ const Advisory = () => {
           {/* Question Card */}
           <div className="animate-slide-up rounded-2xl border border-border bg-card p-8 shadow-card">
             <h2 className="text-2xl font-bold text-foreground mb-2">
-              {currentQuestion.question}
+              {t(currentQuestion.questionKey)}
             </h2>
             <p className="text-muted-foreground mb-8">
-              {currentQuestion.description}
+              {t(currentQuestion.descriptionKey)}
             </p>
 
             <div className="space-y-3">
@@ -246,7 +246,7 @@ const Advisory = () => {
                     }`}>
                       {iconMap[option.icon]}
                     </div>
-                    <span className="font-medium text-foreground">{option.label}</span>
+                    <span className="font-medium text-foreground">{t(option.labelKey)}</span>
                   </button>
                 );
               })}
@@ -261,7 +261,7 @@ const Advisory = () => {
               disabled={currentStep === 0}
             >
               <ArrowLeft className="h-4 w-4" />
-              Back
+              {t('common.back')}
             </Button>
             <div className="flex gap-1">
               {advisoryQuestions.map((_, i) => (
