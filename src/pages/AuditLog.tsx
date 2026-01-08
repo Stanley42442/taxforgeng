@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { NavMenu } from "@/components/NavMenu";
+import { PageLayout } from "@/components/PageLayout";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +10,6 @@ import { History, Crown, Building2, Download, Filter, FileText, Edit, Plus, Tras
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
-
 
 interface AuditEntry {
   id: string;
@@ -24,7 +23,6 @@ interface AuditEntry {
   timestamp: Date;
 }
 
-// Mock audit log data
 const MOCK_AUDIT_LOG: AuditEntry[] = [
   { id: '1', businessId: 'b1', businessName: 'Lagos Tech Hub Ltd', action: 'update', field: 'turnover', oldValue: '₦30,000,000', newValue: '₦35,000,000', user: 'owner@example.com', timestamp: new Date('2024-12-17T14:30:00') },
   { id: '2', businessId: 'b1', businessName: 'Lagos Tech Hub Ltd', action: 'export', user: 'owner@example.com', timestamp: new Date('2024-12-17T12:15:00') },
@@ -125,199 +123,186 @@ const AuditLog = () => {
     toast.success('Audit log exported as CSV');
   };
 
-  // Non-corporate tier - show teaser
   if (!canAccess) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
-        <NavMenu />
-        <div className="container mx-auto px-4 py-16">
-          <Card className="max-w-2xl mx-auto text-center">
-            <CardHeader>
-              <div className="mx-auto w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mb-4">
-                <History className="w-8 h-8 text-accent" />
+      <PageLayout title="Audit Log & History" icon={History} maxWidth="2xl">
+        <Card className="text-center">
+          <CardHeader>
+            <div className="mx-auto w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mb-4">
+              <History className="w-8 h-8 text-accent" />
+            </div>
+            <CardTitle className="text-2xl">Audit Log & History</CardTitle>
+            <CardDescription>
+              Track all changes made to your businesses for compliance
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid gap-3 text-left">
+              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                <History className="w-5 h-5 text-primary" />
+                <span>Complete change history per business</span>
               </div>
-              <CardTitle className="text-2xl">Audit Log & History</CardTitle>
-              <CardDescription>
-                Track all changes made to your businesses for compliance
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid gap-3 text-left">
-                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                  <History className="w-5 h-5 text-primary" />
-                  <span>Complete change history per business</span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                  <Edit className="w-5 h-5 text-primary" />
-                  <span>Track who changed what and when</span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                  <Download className="w-5 h-5 text-primary" />
-                  <span>Export logs as PDF or CSV</span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                  <FileText className="w-5 h-5 text-primary" />
-                  <span>Compliance-ready documentation</span>
-                </div>
+              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                <Edit className="w-5 h-5 text-primary" />
+                <span>Track who changed what and when</span>
               </div>
-              <Link to="/pricing">
-                <Button className="w-full bg-gradient-primary hover:opacity-90">
-                  <Crown className="w-4 h-4 mr-2" />
-                  Upgrade to Corporate for Audit Log
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                <Download className="w-5 h-5 text-primary" />
+                <span>Export logs as PDF or CSV</span>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                <FileText className="w-5 h-5 text-primary" />
+                <span>Compliance-ready documentation</span>
+              </div>
+            </div>
+            <Link to="/pricing">
+              <Button className="w-full bg-gradient-primary hover:opacity-90">
+                <Crown className="w-4 h-4 mr-2" />
+                Upgrade to Corporate for Audit Log
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
-      <NavMenu />
-      
-      <div className="container mx-auto px-4 py-6 pb-8 flex-1">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              <History className="inline-block w-8 h-8 mr-2 text-primary" />
-              Audit Log
-            </h1>
-            <p className="text-muted-foreground">
-              Track all changes for compliance and accountability
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={exportCSV}>
-              <Download className="w-4 h-4 mr-2" />
-              CSV
-            </Button>
-            <Button variant="outline" onClick={exportPDF}>
-              <FileText className="w-4 h-4 mr-2" />
-              PDF
-            </Button>
-          </div>
+    <PageLayout 
+      title="Audit Log" 
+      icon={History}
+      description="Track all changes for compliance and accountability"
+      maxWidth="6xl"
+      headerActions={
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={exportCSV}>
+            <Download className="w-4 h-4 mr-2" />
+            CSV
+          </Button>
+          <Button variant="outline" onClick={exportPDF}>
+            <FileText className="w-4 h-4 mr-2" />
+            PDF
+          </Button>
         </div>
-
-        {/* Filters */}
-        <Card className="mb-6">
-          <CardContent className="p-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Filters:</span>
-              </div>
-              <Select value={filterBusiness} onValueChange={setFilterBusiness}>
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="All businesses" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Businesses</SelectItem>
-                  {savedBusinesses.map(b => (
-                    <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={filterAction} onValueChange={setFilterAction}>
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="All actions" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Actions</SelectItem>
-                  <SelectItem value="create">Created</SelectItem>
-                  <SelectItem value="update">Updated</SelectItem>
-                  <SelectItem value="delete">Deleted</SelectItem>
-                  <SelectItem value="view">Viewed</SelectItem>
-                  <SelectItem value="export">Exported</SelectItem>
-                </SelectContent>
-              </Select>
-              <Badge variant="outline" className="h-10 px-3 flex items-center">
-                {filteredLogs.length} entries
-              </Badge>
+      }
+    >
+      {/* Filters */}
+      <Card className="mb-6">
+        <CardContent className="p-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm font-medium">Filters:</span>
             </div>
-          </CardContent>
-        </Card>
+            <Select value={filterBusiness} onValueChange={setFilterBusiness}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="All businesses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Businesses</SelectItem>
+                {savedBusinesses.map(b => (
+                  <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={filterAction} onValueChange={setFilterAction}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="All actions" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Actions</SelectItem>
+                <SelectItem value="create">Created</SelectItem>
+                <SelectItem value="update">Updated</SelectItem>
+                <SelectItem value="delete">Deleted</SelectItem>
+                <SelectItem value="view">Viewed</SelectItem>
+                <SelectItem value="export">Exported</SelectItem>
+              </SelectContent>
+            </Select>
+            <Badge variant="outline" className="h-10 px-3 flex items-center">
+              {filteredLogs.length} entries
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Audit Log Table */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Activity History</CardTitle>
-            <CardDescription className="text-sm">All recorded changes and actions</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            {filteredLogs.length === 0 ? (
-              <div className="text-center py-8">
-                <History className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
-                <h3 className="text-base font-semibold mb-1">No Activity Found</h3>
-                <p className="text-sm text-muted-foreground">
-                  {filterBusiness !== 'all' || filterAction !== 'all' 
-                    ? 'Try adjusting your filters'
-                    : 'Activity will appear here as you use the app'}
-                </p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto -mx-4 sm:mx-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-10 px-2 sm:px-4">Type</TableHead>
-                      <TableHead className="px-2 sm:px-4">Action</TableHead>
-                      <TableHead className="hidden sm:table-cell px-2 sm:px-4">User</TableHead>
-                      <TableHead className="hidden md:table-cell px-2 sm:px-4">Changes</TableHead>
-                      <TableHead className="text-right px-2 sm:px-4 whitespace-nowrap">Time</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredLogs.map(entry => (
-                      <TableRow key={entry.id}>
-                        <TableCell className="px-2 sm:px-4 py-2">{getActionIcon(entry.action)}</TableCell>
-                        <TableCell className="px-2 sm:px-4 py-2">
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                            <Badge 
-                              variant="outline" 
-                              className={`capitalize text-[10px] sm:text-xs px-1.5 py-0.5 h-5 w-fit ${
-                                entry.action === 'create' ? 'bg-success/10 text-success border-success/30' :
-                                entry.action === 'update' ? 'bg-warning/10 text-warning border-warning/30' :
-                                entry.action === 'delete' ? 'bg-destructive/10 text-destructive border-destructive/30' :
-                                entry.action === 'view' ? 'bg-info/10 text-info border-info/30' :
-                                entry.action === 'export' ? 'bg-primary/10 text-primary border-primary/30' :
-                                'bg-muted'
-                              }`}
-                            >
-                              {entry.action}
-                            </Badge>
-                            <span className="font-medium text-sm truncate max-w-[120px] sm:max-w-none">{entry.businessName}</span>
+      {/* Audit Log Table */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">Activity History</CardTitle>
+          <CardDescription className="text-sm">All recorded changes and actions</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          {filteredLogs.length === 0 ? (
+            <div className="text-center py-8">
+              <History className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
+              <h3 className="text-base font-semibold mb-1">No Activity Found</h3>
+              <p className="text-sm text-muted-foreground">
+                {filterBusiness !== 'all' || filterAction !== 'all' 
+                  ? 'Try adjusting your filters'
+                  : 'Activity will appear here as you use the app'}
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto -mx-6 px-6">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-10 px-2 sm:px-4">Type</TableHead>
+                    <TableHead className="px-2 sm:px-4">Action</TableHead>
+                    <TableHead className="hidden sm:table-cell px-2 sm:px-4">User</TableHead>
+                    <TableHead className="hidden md:table-cell px-2 sm:px-4">Changes</TableHead>
+                    <TableHead className="text-right px-2 sm:px-4 whitespace-nowrap">Time</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredLogs.map(entry => (
+                    <TableRow key={entry.id}>
+                      <TableCell className="px-2 sm:px-4 py-2">{getActionIcon(entry.action)}</TableCell>
+                      <TableCell className="px-2 sm:px-4 py-2">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                          <Badge 
+                            variant="outline" 
+                            className={`capitalize text-[10px] sm:text-xs px-1.5 py-0.5 h-5 w-fit ${
+                              entry.action === 'create' ? 'bg-success/10 text-success border-success/30' :
+                              entry.action === 'update' ? 'bg-warning/10 text-warning border-warning/30' :
+                              entry.action === 'delete' ? 'bg-destructive/10 text-destructive border-destructive/30' :
+                              entry.action === 'view' ? 'bg-info/10 text-info border-info/30' :
+                              entry.action === 'export' ? 'bg-primary/10 text-primary border-primary/30' :
+                              'bg-muted'
+                            }`}
+                          >
+                            {entry.action}
+                          </Badge>
+                          <span className="font-medium text-sm truncate max-w-[120px] sm:max-w-none">{entry.businessName}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell text-muted-foreground text-sm px-2 sm:px-4 py-2 truncate max-w-[150px]">
+                        {entry.user}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell px-2 sm:px-4 py-2">
+                        {entry.oldValue && entry.newValue ? (
+                          <div className="text-xs">
+                            <span className="text-muted-foreground">{entry.field}: </span>
+                            <span className="line-through text-destructive/70">{entry.oldValue}</span>
+                            <span className="mx-1">→</span>
+                            <span className="text-success">{entry.newValue}</span>
                           </div>
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell text-muted-foreground text-sm px-2 sm:px-4 py-2 truncate max-w-[150px]">
-                          {entry.user}
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell px-2 sm:px-4 py-2">
-                          {entry.oldValue && entry.newValue ? (
-                            <div className="text-xs">
-                              <span className="text-muted-foreground">{entry.field}: </span>
-                              <span className="line-through text-destructive/70">{entry.oldValue}</span>
-                              <span className="mx-1">→</span>
-                              <span className="text-success">{entry.newValue}</span>
-                            </div>
-                          ) : (
-                            <span className="text-muted-foreground">—</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right text-xs text-muted-foreground px-2 sm:px-4 py-2 whitespace-nowrap">
-                          {new Date(entry.timestamp).toLocaleDateString()}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right text-xs text-muted-foreground px-2 sm:px-4 py-2 whitespace-nowrap">
+                        {new Date(entry.timestamp).toLocaleDateString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </PageLayout>
   );
 };
 

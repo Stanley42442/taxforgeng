@@ -301,7 +301,7 @@ const Learn = () => {
                               <CheckCircle className="h-4 w-4 text-success" />
                               <span className="font-semibold text-success text-sm">Reality</span>
                             </div>
-                            <p className="text-sm text-foreground">{myth.fact}</p>
+                            <p className="text-sm text-foreground">{myth.truth}</p>
                           </div>
                           <p className="text-sm text-muted-foreground">{myth.explanation}</p>
                         </div>
