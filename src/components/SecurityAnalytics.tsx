@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { format, subDays, startOfDay, eachDayOfInterval } from "date-fns";
 import { ReusablePieChart } from "@/components/ui/reusable-pie-chart";
-import { useLanguage } from "@/contexts/LanguageContext";
+
 
 interface AuthEvent {
   id: string;
@@ -50,7 +50,7 @@ const CHART_COLORS = {
 };
 
 export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalyticsProps) => {
-  const { t } = useLanguage();
+  
 
   // Login activity by day (last 14 days)
   const loginsByDay = useMemo(() => {
@@ -94,16 +94,16 @@ export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalytic
     });
 
     const typeLabels: Record<string, string> = {
-      'login': t('security.analytics.eventTypes.login'),
-      'login_success': t('security.analytics.eventTypes.loginSuccess'),
-      'login_failed': t('security.analytics.eventTypes.loginFailed'),
-      'logout': t('security.analytics.eventTypes.logout'),
-      'password_change': t('security.analytics.eventTypes.passwordChange'),
-      '2fa_enabled': t('security.analytics.eventTypes.2faEnabled'),
-      '2fa_disabled': t('security.analytics.eventTypes.2faDisabled'),
-      'signup': t('security.analytics.eventTypes.signup'),
-      'backup_codes_generated': t('security.analytics.eventTypes.backupCodes'),
-      'profile_updated': t('security.analytics.eventTypes.profileUpdate')
+      'login': 'Login',
+      'login_success': 'Login Success',
+      'login_failed': 'Login Failed',
+      'logout': 'Logout',
+      'password_change': 'Password Change',
+      '2fa_enabled': '2FA Enabled',
+      '2fa_disabled': '2FA Disabled',
+      'signup': 'Signup',
+      'backup_codes_generated': 'Backup Codes',
+      'profile_updated': 'Profile Update'
     };
 
     return Object.entries(counts)
@@ -114,7 +114,7 @@ export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalytic
       }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 6);
-  }, [authEvents, t]);
+  }, [authEvents]);
 
   // Login by hour of day
   const loginsByHour = useMemo(() => {
@@ -137,7 +137,7 @@ export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalytic
     const countryCounts: Record<string, number> = {};
     
     loginHistory.forEach(event => {
-      const country = event.location?.country || t('common.unknown');
+      const country = event.location?.country || 'Unknown';
       countryCounts[country] = (countryCounts[country] || 0) + 1;
     });
 
@@ -145,7 +145,7 @@ export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalytic
       .map(([country, count]) => ({ country, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
-  }, [loginHistory, t]);
+  }, [loginHistory]);
 
   // Security stats
   const securityStats = useMemo(() => {
@@ -189,7 +189,7 @@ export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalytic
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">{t('security.analytics.totalLogins')}</p>
+                <p className="text-sm text-muted-foreground">Total Logins</p>
                 <p className="text-2xl font-bold">{securityStats.totalLogins}</p>
               </div>
               <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
@@ -203,7 +203,7 @@ export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalytic
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">{t('security.analytics.failedAttempts')}</p>
+                <p className="text-sm text-muted-foreground">Failed Attempts</p>
                 <p className="text-2xl font-bold text-destructive">{securityStats.failedLogins}</p>
               </div>
               <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
@@ -217,7 +217,7 @@ export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalytic
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">{t('security.analytics.successRate')}</p>
+                <p className="text-sm text-muted-foreground">Success Rate</p>
                 <p className="text-2xl font-bold">{securityStats.successRate}%</p>
               </div>
               <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -231,7 +231,7 @@ export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalytic
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">{t('security.analytics.uniqueIPs')}</p>
+                <p className="text-sm text-muted-foreground">Unique IPs</p>
                 <p className="text-2xl font-bold">{securityStats.uniqueIPs}</p>
               </div>
               <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
@@ -247,9 +247,9 @@ export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalytic
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5 text-primary" />
-            {t('security.analytics.loginActivity')}
+            Login Activity
           </CardTitle>
-          <CardDescription>{t('security.analytics.loginActivityDesc')}</CardDescription>
+          <CardDescription>Successful and failed login attempts over the last 14 days</CardDescription>
         </CardHeader>
         <CardContent>
           <ReusableAreaChart
@@ -257,14 +257,14 @@ export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalytic
             series={[
               {
                 dataKey: "successful",
-                name: t('security.analytics.successful'),
+                name: "Successful",
                 color: "#22c55e",
                 stackId: "1",
                 fillOpacity: 0.6
               },
               {
                 dataKey: "failed",
-                name: t('security.analytics.failed'),
+                name: "Failed",
                 color: "#ef4444",
                 stackId: "1",
                 fillOpacity: 0.6
@@ -282,9 +282,9 @@ export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalytic
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
-              {t('security.analytics.eventTypes.title')}
-            </CardTitle>
-            <CardDescription>{t('security.analytics.eventTypesDesc')}</CardDescription>
+            Event Types
+          </CardTitle>
+          <CardDescription>Distribution of security events by type</CardDescription>
           </CardHeader>
           <CardContent>
             <ReusablePieChart
@@ -305,9 +305,9 @@ export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalytic
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-primary" />
-              {t('security.analytics.loginTimes')}
-            </CardTitle>
-            <CardDescription>{t('security.analytics.loginTimesDesc')}</CardDescription>
+            Login Times
+          </CardTitle>
+          <CardDescription>When you typically log in</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-[250px]">
@@ -339,14 +339,14 @@ export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalytic
       </div>
 
       {/* Login by Country */}
-      {loginsByCountry.length > 0 && loginsByCountry[0].country !== t('common.unknown') && (
+      {loginsByCountry.length > 0 && loginsByCountry[0].country !== 'Unknown' && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="h-5 w-5 text-primary" />
-              {t('security.analytics.loginLocations')}
+              Login Locations
             </CardTitle>
-            <CardDescription>{t('security.analytics.loginLocationsDesc')}</CardDescription>
+            <CardDescription>Where your logins are coming from</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -358,7 +358,7 @@ export const SecurityAnalytics = ({ authEvents, loginHistory }: SecurityAnalytic
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-medium">{item.country}</span>
-                      <span className="text-sm text-muted-foreground">{item.count} {t('security.analytics.logins')}</span>
+                      <span className="text-sm text-muted-foreground">{item.count} logins</span>
                     </div>
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
                       <div 

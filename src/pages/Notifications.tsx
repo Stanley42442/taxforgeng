@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useLanguage } from "@/contexts/LanguageContext";
+
 import { 
   Bell, 
   BellRing, 
@@ -41,7 +41,7 @@ interface NotificationItem extends Omit<AppNotification, 'timestamp'> {
 }
 
 const Notifications = () => {
-  const { t } = useLanguage();
+  
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | 'unsupported'>('default');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [browserNotificationsEnabled, setBrowserNotificationsEnabled] = useState(true);
