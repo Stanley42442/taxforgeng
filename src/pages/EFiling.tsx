@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavMenu } from "@/components/NavMenu";
+import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useNavigate } from "react-router-dom";
@@ -44,30 +44,25 @@ const EFiling = () => {
 
   if (!isBusinessPlus) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
-        <NavMenu />
-        <div className="container mx-auto px-4 py-20 text-center">
-          <div className="mx-auto max-w-md">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-warning/10">
-              <Crown className="h-10 w-10 text-warning" />
-            </div>
-            <h1 className="text-2xl font-bold text-foreground mb-3">E-Filing & Payment</h1>
-            <p className="text-muted-foreground mb-6">
-              File returns and pay taxes directly through TaxForge NG. Available on Business+ plans.
-            </p>
-            <Button variant="hero" onClick={() => navigate('/pricing')}>
-              <Crown className="h-4 w-4" />
-              Upgrade to Business
-            </Button>
+      <PageLayout title="E-Filing & Payment" icon={FileCheck} maxWidth="md">
+        <div className="text-center py-10">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-warning/10">
+            <Crown className="h-10 w-10 text-warning" />
           </div>
+          <h2 className="text-xl font-bold text-foreground mb-3">E-Filing & Payment</h2>
+          <p className="text-muted-foreground mb-6">
+            File returns and pay taxes directly through TaxForge NG. Available on Business+ plans.
+          </p>
+          <Button variant="hero" onClick={() => navigate('/pricing')}>
+            <Crown className="h-4 w-4" />
+            Upgrade to Business
+          </Button>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   const business = savedBusinesses.find(b => b.id === selectedBusiness);
-  
-  // Mock tax calculation for the selected business
   const mockTaxDue = business ? Math.round(business.turnover * 0.08) : 0;
 
   const handleStartFiling = () => {
@@ -80,7 +75,6 @@ const EFiling = () => {
 
   const handleSubmitFiling = () => {
     setFilingStep('processing');
-    // Simulate processing
     setTimeout(() => {
       setFilingStep('payment');
     }, 3000);
@@ -190,7 +184,6 @@ const EFiling = () => {
               </div>
             </div>
 
-            {/* Mock Form */}
             <div className="space-y-4 mb-6">
               <div className="p-4 rounded-lg border border-border">
                 <h3 className="font-medium text-foreground mb-3">
@@ -207,7 +200,7 @@ const EFiling = () => {
                   </div>
                   <div>
                     <p className="text-muted-foreground">RC/BN Number</p>
-                    <p className="font-medium">{business?.rcBnNumber || 'RC1234567'}</p>
+                    <p className="font-medium">RC1234567</p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">TIN</p>
@@ -354,52 +347,37 @@ const EFiling = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
-      <NavMenu />
-
-      <main className="container mx-auto px-4 py-6 pb-8 flex-1">
-        <div className="mx-auto max-w-2xl">
-          {/* Header */}
-          <div className="text-center mb-8 animate-slide-up">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary">
-              <FileCheck className="h-8 w-8 text-primary-foreground" />
-            </div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              E-Filing & Payment
-            </h1>
-            <p className="text-muted-foreground">
-              File tax returns and pay directly (Mock)
-            </p>
-          </div>
-
-          {/* Progress Steps */}
-          <div className="flex justify-center mb-8">
-            <div className="flex items-center gap-2 text-sm">
-              {['Select', 'Review', 'Submit', 'Pay', 'Done'].map((step, i) => {
-                const stepIndex = ['select', 'review', 'processing', 'payment', 'complete'].indexOf(filingStep);
-                const isActive = i <= stepIndex;
-                return (
-                  <div key={step} className="flex items-center gap-2">
-                    <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-medium ${
-                      isActive ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'
-                    }`}>
-                      {i + 1}
-                    </div>
-                    {i < 4 && <div className={`w-8 h-0.5 ${isActive ? 'bg-primary' : 'bg-secondary'}`} />}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {renderStep()}
-
-          {/* Disclaimer */}
-          <p className="text-xs text-muted-foreground text-center mt-6">
-            Mock e-filing for demonstration. Real FIRS/State IRS integration coming soon.
-          </p>
+    <PageLayout 
+      title="E-Filing & Payment" 
+      icon={FileCheck}
+      description="File tax returns and pay directly (Mock)"
+      maxWidth="2xl"
+    >
+      {/* Progress Steps */}
+      <div className="flex justify-center mb-8">
+        <div className="flex items-center gap-2 text-sm">
+          {['Select', 'Review', 'Submit', 'Pay', 'Done'].map((step, i) => {
+            const stepIndex = ['select', 'review', 'processing', 'payment', 'complete'].indexOf(filingStep);
+            const isActive = i <= stepIndex;
+            return (
+              <div key={step} className="flex items-center gap-2">
+                <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-medium ${
+                  isActive ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'
+                }`}>
+                  {i + 1}
+                </div>
+                {i < 4 && <div className={`w-8 h-0.5 ${isActive ? 'bg-primary' : 'bg-secondary'}`} />}
+              </div>
+            );
+          })}
         </div>
-      </main>
+      </div>
+
+      {renderStep()}
+
+      <p className="text-xs text-muted-foreground text-center mt-6">
+        Mock e-filing for demonstration. Real FIRS/State IRS integration coming soon.
+      </p>
 
       {/* Payment Dialog */}
       <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
@@ -432,7 +410,7 @@ const EFiling = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageLayout>
   );
 };
 

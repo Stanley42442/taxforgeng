@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { NavMenu } from "@/components/NavMenu";
+import { PageLayout } from "@/components/PageLayout";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -74,13 +74,11 @@ const BusinessReport = () => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const pieContainerRef = useRef<HTMLDivElement>(null);
 
-  // Entrance animation
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
-  // Handle click outside pie chart to deselect
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (pieContainerRef.current && !pieContainerRef.current.contains(event.target as Node)) {
@@ -95,7 +93,6 @@ const BusinessReport = () => {
     setActiveIndex(activeIndex === index ? null : index);
   };
 
-  // Fetch all expenses
   useEffect(() => {
     const fetchExpenses = async () => {
       if (!user) {
@@ -128,7 +125,6 @@ const BusinessReport = () => {
     }
   }, [user, businessLoading]);
 
-  // Set first business as default
   useEffect(() => {
     if (savedBusinesses.length > 0 && !selectedBusinessId) {
       setSelectedBusinessId(savedBusinesses[0].id);
@@ -138,21 +134,17 @@ const BusinessReport = () => {
   const selectedBusiness = savedBusinesses.find(b => b.id === selectedBusinessId);
   const businessExpenses = expenses.filter(e => e.businessId === selectedBusinessId);
 
-  // Calculate metrics
   const totalIncome = businessExpenses.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
   const totalExpenses = businessExpenses.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
   const deductibleExpenses = businessExpenses.filter(e => e.isDeductible).reduce((sum, e) => sum + e.amount, 0);
   const netIncome = totalIncome - totalExpenses;
   const taxableIncome = Math.max(0, totalIncome - deductibleExpenses);
 
-  // Calculate estimated tax
   const estimateTax = (income: number, isCompany: boolean, turnover: number): number => {
     if (isCompany) {
-      // CIT calculation
-      if (turnover <= 50000000) return 0; // Small company exemption
-      return income * 0.25 + income * 0.04; // 25% CIT + 4% dev levy
+      if (turnover <= 50000000) return 0;
+      return income * 0.25 + income * 0.04;
     } else {
-      // PIT calculation
       if (income <= 800000) return 0;
       let tax = 0;
       let remaining = income - 800000;
@@ -179,7 +171,6 @@ const BusinessReport = () => {
   const businessTurnover = selectedBusiness?.turnover || 0;
   const estimatedTax = estimateTax(taxableIncome, isCompany, businessTurnover);
 
-  // Category breakdown
   const categoryData = businessExpenses
     .filter(e => e.type === 'expense')
     .reduce((acc: Record<string, number>, e) => {
@@ -195,37 +186,34 @@ const BusinessReport = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
-        <NavMenu />
-        <div className="container mx-auto px-4 py-20 text-center">
-          <p className="text-muted-foreground">Please sign in to view business reports</p>
-          <Button variant="hero" className="mt-4" onClick={() => navigate('/auth')}>
+      <PageLayout title="Business Report" icon={FileText}>
+        <div className="text-center py-10">
+          <p className="text-muted-foreground mb-4">Please sign in to view business reports</p>
+          <Button variant="hero" onClick={() => navigate('/auth')}>
             Sign In
           </Button>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   if (loading || businessLoading) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
-        <NavMenu />
-        <div className="container mx-auto px-4 py-20 text-center">
+      <PageLayout title="Business Report" icon={FileText}>
+        <div className="text-center py-10">
           <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
           <p className="text-muted-foreground mt-4">Loading business report...</p>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   if (savedBusinesses.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
-        <NavMenu />
-        <div className="container mx-auto px-4 py-20 text-center">
+      <PageLayout title="Business Report" icon={FileText}>
+        <div className="text-center py-10">
           <Building2 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-foreground mb-2">No Businesses Found</h1>
+          <h2 className="text-xl font-bold text-foreground mb-2">No Businesses Found</h2>
           <p className="text-muted-foreground mb-6">
             Add a business first to generate reports
           </p>
@@ -233,385 +221,281 @@ const BusinessReport = () => {
             Add Business
           </Button>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
-      <NavMenu />
-
-      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 pb-8 flex-1">
-        <div className="mx-auto max-w-5xl">
-          {/* Header */}
-          <div className="flex flex-col gap-4 mb-4 sm:mb-6 animate-slide-up">
-            <div className="flex items-center gap-2 sm:gap-4">
-              <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8 sm:h-10 sm:w-10" onClick={() => navigate(-1)}>
-                <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-              </Button>
-              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                <div className="flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-gradient-primary shrink-0">
-                  <FileText className="h-4 w-4 sm:h-6 sm:w-6 text-primary-foreground" />
-                </div>
-                <div className="min-w-0">
-                  <h1 className="text-lg sm:text-2xl font-bold text-foreground truncate">Business Report</h1>
-                  <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                    Financial overview and tax estimates
-                  </p>
-                </div>
+    <PageLayout 
+      title="Business Report" 
+      icon={FileText}
+      description="Financial overview and tax estimates"
+      maxWidth="6xl"
+      headerActions={
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <Select value={selectedBusinessId} onValueChange={setSelectedBusinessId}>
+            <SelectTrigger className="w-full sm:w-[200px] h-9 text-sm">
+              <SelectValue placeholder="Select Business" />
+            </SelectTrigger>
+            <SelectContent>
+              {savedBusinesses.map((business) => (
+                <SelectItem key={business.id} value={business.id}>
+                  {business.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 text-sm"
+            onClick={() => {
+              if (selectedBusiness && tier !== 'free') {
+                downloadBusinessReportPDF({
+                  businessName: selectedBusiness.name,
+                  entityType: selectedBusiness.entityType,
+                  turnover: businessTurnover,
+                  totalIncome,
+                  totalExpenses,
+                  deductibleExpenses,
+                  netIncome,
+                  taxableIncome,
+                  estimatedTax,
+                  expenses: businessExpenses,
+                  categoryBreakdown: categoryData,
+                });
+                toast.success('Report downloaded!');
+              } else if (tier === 'free') {
+                toast.error('Upgrade to Basic+ to export PDF');
+              }
+            }}
+            disabled={!selectedBusiness || tier === 'free'}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export PDF
+          </Button>
+        </div>
+      }
+    >
+      {/* Business Info Card */}
+      {selectedBusiness && (
+        <Card className="mb-6 shadow-card animate-slide-up">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Building2 className="h-5 w-5 text-primary" />
+              {selectedBusiness.name}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-4 text-sm">
+              <div>
+                <span className="text-muted-foreground">Type:</span>{' '}
+                <span className="font-medium">{isCompany ? 'LLC (CIT)' : 'Business Name (PIT)'}</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Registered Turnover:</span>{' '}
+                <span className="font-medium">{formatCurrency(businessTurnover)}</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Transactions:</span>{' '}
+                <span className="font-medium">{businessExpenses.length}</span>
               </div>
             </div>
+          </CardContent>
+        </Card>
+      )}
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-              <Select value={selectedBusinessId} onValueChange={setSelectedBusinessId}>
-                <SelectTrigger className="w-full sm:w-[200px] h-9 text-sm">
-                  <SelectValue placeholder="Select Business" />
-                </SelectTrigger>
-                <SelectContent>
-                  {savedBusinesses.map((business) => (
-                    <SelectItem key={business.id} value={business.id}>
-                      {business.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-9 text-sm"
-                onClick={() => {
-                  if (selectedBusiness && tier !== 'free') {
-                    downloadBusinessReportPDF({
-                      businessName: selectedBusiness.name,
-                      entityType: selectedBusiness.entityType,
-                      turnover: businessTurnover,
-                      totalIncome,
-                      totalExpenses,
-                      deductibleExpenses,
-                      netIncome,
-                      taxableIncome,
-                      estimatedTax,
-                      expenses: businessExpenses,
-                      categoryBreakdown: categoryData,
-                    });
-                    toast.success('Report downloaded!');
-                  } else if (tier === 'free') {
-                    toast.error('Upgrade to Basic+ to export PDF');
-                  }
-                }}
-                disabled={!selectedBusiness || tier === 'free'}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Export PDF
-              </Button>
+      {/* Summary Cards */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6 animate-slide-up">
+        <Card className="shadow-card">
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-2 mb-1">
+              <TrendingUp className="h-4 w-4 text-success" />
+              <span className="text-xs text-muted-foreground">Total Income</span>
             </div>
-          </div>
+            <p className="text-xl font-bold text-success">{formatCurrency(totalIncome)}</p>
+          </CardContent>
+        </Card>
 
-          {/* Business Info Card */}
-          {selectedBusiness && (
-            <Card className="mb-6 shadow-card animate-slide-up">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Building2 className="h-5 w-5 text-primary" />
-                  {selectedBusiness.name}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-4 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Type:</span>{' '}
-                    <span className="font-medium">{isCompany ? 'LLC (CIT)' : 'Business Name (PIT)'}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Registered Turnover:</span>{' '}
-                    <span className="font-medium">{formatCurrency(businessTurnover)}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Transactions:</span>{' '}
-                    <span className="font-medium">{businessExpenses.length}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+        <Card className="shadow-card">
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-2 mb-1">
+              <TrendingDown className="h-4 w-4 text-destructive" />
+              <span className="text-xs text-muted-foreground">Total Expenses</span>
+            </div>
+            <p className="text-xl font-bold text-destructive">{formatCurrency(totalExpenses)}</p>
+          </CardContent>
+        </Card>
 
-          {/* Summary Cards */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6 animate-slide-up">
-            <Card className="shadow-card">
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <TrendingUp className="h-4 w-4 text-success" />
-                  <span className="text-xs text-muted-foreground">Total Income</span>
-                </div>
-                <p className="text-xl font-bold text-success">{formatCurrency(totalIncome)}</p>
-              </CardContent>
-            </Card>
+        <Card className="shadow-card">
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-2 mb-1">
+              <Receipt className="h-4 w-4 text-primary" />
+              <span className="text-xs text-muted-foreground">Tax Deductible</span>
+            </div>
+            <p className="text-xl font-bold text-foreground">{formatCurrency(deductibleExpenses)}</p>
+          </CardContent>
+        </Card>
 
-            <Card className="shadow-card">
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <TrendingDown className="h-4 w-4 text-destructive" />
-                  <span className="text-xs text-muted-foreground">Total Expenses</span>
-                </div>
-                <p className="text-xl font-bold text-destructive">{formatCurrency(totalExpenses)}</p>
-              </CardContent>
-            </Card>
+        <Card className="shadow-card">
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-2 mb-1">
+              <PieChart className="h-4 w-4 text-success" />
+              <span className="text-xs text-muted-foreground">Net Income</span>
+            </div>
+            <p className={`text-xl font-bold ${netIncome >= 0 ? 'text-success' : 'text-destructive'}`}>
+              {formatCurrency(netIncome)}
+            </p>
+          </CardContent>
+        </Card>
 
-            <Card className="shadow-card">
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <Receipt className="h-4 w-4 text-primary" />
-                  <span className="text-xs text-muted-foreground">Tax Deductible</span>
-                </div>
-                <p className="text-xl font-bold text-foreground">{formatCurrency(deductibleExpenses)}</p>
-              </CardContent>
-            </Card>
+        <Card className="shadow-card">
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-2 mb-1">
+              <Calculator className="h-4 w-4 text-warning" />
+              <span className="text-xs text-muted-foreground">Est. Tax Due</span>
+            </div>
+            <p className="text-xl font-bold text-warning">{formatCurrency(estimatedTax)}</p>
+          </CardContent>
+        </Card>
+      </div>
 
-            <Card className="shadow-card">
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <PieChart className="h-4 w-4 text-success" />
-                  <span className="text-xs text-muted-foreground">Net Income</span>
-                </div>
-                <p className={`text-xl font-bold ${netIncome >= 0 ? 'text-success' : 'text-destructive'}`}>
-                  {formatCurrency(netIncome)}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-card">
-              <CardContent className="pt-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <Calculator className="h-4 w-4 text-warning" />
-                  <span className="text-xs text-muted-foreground">Est. Tax Due</span>
-                </div>
-                <p className="text-xl font-bold text-warning">{formatCurrency(estimatedTax)}</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Charts and Details */}
-          <div className="grid gap-6 lg:grid-cols-2 animate-slide-up">
-            {/* Expense Breakdown Chart */}
-            <Card className="glass-frosted shadow-futuristic border-border/40">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <PieChart className="h-4 w-4 text-primary" />
-                  </div>
-                  Expense Breakdown
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div 
-                  className={`transition-all duration-700 ease-out ${
-                    isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                  }`}
-                >
-                  {pieData.length > 0 ? (
-                    <div className="h-[16rem] relative" ref={pieContainerRef}>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <RechartsPie>
-                          <Pie
-                            data={pieData}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={50}
-                            outerRadius={75}
-                            paddingAngle={2}
-                            dataKey="value"
-                            animationBegin={200}
-                            animationDuration={1000}
-                            animationEasing="ease-out"
-                            onClick={handlePieClick}
-                            style={{ cursor: 'pointer' }}
-                          >
-                            {pieData.map((entry, index) => {
-                              const isActive = activeIndex === index;
-                              return (
-                                <Cell 
-                                  key={`cell-${index}`} 
-                                  fill={entry.color}
-                                  stroke={isActive ? 'hsl(var(--foreground))' : 'transparent'}
-                                  strokeWidth={isActive ? 3 : 0}
-                                  style={{
-                                    filter: activeIndex !== null && !isActive ? 'opacity(0.4)' : 'none',
-                                    transform: isActive ? 'scale(1.05)' : 'scale(1)',
-                                    transformOrigin: 'center',
-                                    transition: 'all 0.2s ease-out',
-                                    cursor: 'pointer'
-                                  }}
-                                />
-                              );
-                            })}
-                          </Pie>
-                        </RechartsPie>
-                      </ResponsiveContainer>
-                      {activeIndex !== null && pieData[activeIndex] && (
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                          <div className="text-center">
-                            <p className="text-lg font-bold text-foreground">{pieData[activeIndex].name}</p>
-                            <p className="text-sm text-muted-foreground">{formatCurrency(pieData[activeIndex].value)}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {((pieData[activeIndex].value / pieData.reduce((sum, e) => sum + e.value, 0)) * 100).toFixed(1)}%
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="h-[16rem] flex items-center justify-center text-muted-foreground">
-                      No expense data yet
-                    </div>
-                  )}
-                  {/* Legend */}
-                  {pieData.length > 0 && (
-                    <div className={`mt-4 grid grid-cols-2 gap-2 transition-all duration-500 delay-300 ${
-                      isVisible ? 'opacity-100' : 'opacity-0'
-                    }`}>
-                      {pieData.map((entry, index) => {
-                        const total = pieData.reduce((sum, e) => sum + e.value, 0);
-                        const percent = ((entry.value / total) * 100).toFixed(0);
-                        const isActive = activeIndex === index;
-                        return (
-                          <div 
-                            key={`legend-${index}`} 
-                            className={`flex items-center gap-2 text-sm cursor-pointer rounded-md p-1 transition-all ${
-                              isActive ? 'bg-muted ring-2 ring-primary' : 'hover:bg-muted/50'
-                            } ${activeIndex !== null && !isActive ? 'opacity-40' : ''}`}
-                            onClick={() => setActiveIndex(isActive ? null : index)}
-                          >
-                            <div 
-                              className="w-3 h-3 rounded-full flex-shrink-0" 
-                              style={{ backgroundColor: entry.color }}
+      {/* Charts and Details */}
+      <div className="grid gap-6 lg:grid-cols-2 animate-slide-up">
+        {/* Expense Breakdown Chart */}
+        <Card className="glass-frosted shadow-futuristic border-border/40">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <PieChart className="h-4 w-4 text-primary" />
+              </div>
+              Expense Breakdown
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div 
+              className={`transition-all duration-700 ease-out ${
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              }`}
+            >
+              {pieData.length > 0 ? (
+                <div className="h-[16rem] relative" ref={pieContainerRef}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsPie>
+                      <Pie
+                        data={pieData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={75}
+                        paddingAngle={2}
+                        dataKey="value"
+                        animationBegin={200}
+                        animationDuration={1000}
+                        animationEasing="ease-out"
+                        onClick={handlePieClick}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        {pieData.map((entry, index) => {
+                          const isActive = activeIndex === index;
+                          return (
+                            <Cell 
+                              key={`cell-${index}`} 
+                              fill={entry.color}
+                              stroke={isActive ? 'hsl(var(--foreground))' : 'transparent'}
+                              strokeWidth={isActive ? 3 : 0}
+                              style={{
+                                filter: activeIndex !== null && !isActive ? 'opacity(0.4)' : 'none',
+                                transform: isActive ? 'scale(1.05)' : 'scale(1)',
+                                transformOrigin: 'center',
+                                transition: 'all 0.2s ease-out',
+                                cursor: 'pointer'
+                              }}
                             />
-                            <span className="text-muted-foreground truncate">{entry.name}</span>
-                            <span className="font-medium text-foreground ml-auto">{percent}%</span>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </Pie>
+                    </RechartsPie>
+                  </ResponsiveContainer>
+                  {activeIndex !== null && pieData[activeIndex] && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="text-center">
+                        <p className="text-lg font-bold text-foreground">{pieData[activeIndex].name}</p>
+                        <p className="text-sm text-muted-foreground">{formatCurrency(pieData[activeIndex].value)}</p>
+                      </div>
                     </div>
                   )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Tax Summary */}
-            <Card className="glass-frosted shadow-futuristic border-border/40">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <div className="h-8 w-8 rounded-lg bg-accent/10 flex items-center justify-center">
-                    <Calculator className="h-4 w-4 text-accent" />
-                  </div>
-                  Tax Summary
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between py-2 border-b border-border">
-                    <span className="text-muted-foreground">Total Income</span>
-                    <span className="font-medium text-success">{formatCurrency(totalIncome)}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-border">
-                    <span className="text-muted-foreground">Deductible Expenses</span>
-                    <span className="font-medium text-foreground">- {formatCurrency(deductibleExpenses)}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-border">
-                    <span className="text-muted-foreground">Taxable Income</span>
-                    <span className="font-bold text-foreground">{formatCurrency(taxableIncome)}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-border">
-                    <span className="text-muted-foreground">Tax Type</span>
-                    <span className="font-medium">{isCompany ? 'CIT (25%/30%)' : 'PIT (Progressive)'}</span>
-                  </div>
-                  {isCompany && businessTurnover <= 50000000 && (
-                    <div className="p-3 rounded-lg bg-success/10 border border-success/20 text-sm">
-                      <span className="text-success font-medium">Small Company Exemption</span>
-                      <p className="text-muted-foreground mt-1">
-                        Companies with ≤₦50M turnover may qualify for 0% CIT
-                      </p>
-                    </div>
-                  )}
-                  <div className="flex justify-between py-3 rounded-lg bg-warning/10 px-3">
-                    <span className="font-semibold text-foreground">Estimated Tax Due</span>
-                    <span className="font-bold text-warning text-lg">{formatCurrency(estimatedTax)}</span>
-                  </div>
-
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => navigate('/calculator', {
-                      state: {
-                        prefill: {
-                          entityType: isCompany ? 'company' : 'business_name',
-                          turnover: totalIncome || businessTurnover,
-                          expenses: deductibleExpenses,
-                        }
-                      }
-                    })}
-                  >
-                    <Calculator className="h-4 w-4 mr-2" />
-                    Open Full Calculator
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Recent Transactions */}
-          <Card className="mt-6 shadow-card animate-slide-up">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Receipt className="h-5 w-5 text-primary" />
-                Recent Transactions ({businessExpenses.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {businessExpenses.length === 0 ? (
-                <div className="text-center py-8">
-                  <Receipt className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-muted-foreground mb-4">No transactions recorded yet</p>
-                  <Button variant="outline" onClick={() => navigate('/expenses')}>
-                    Add Expenses
-                  </Button>
                 </div>
               ) : (
-                <div className="space-y-2 max-h-80 overflow-y-auto">
-                  {businessExpenses.slice(0, 20).map((expense) => (
-                    <div
-                      key={expense.id}
-                      className="flex items-center justify-between gap-4 p-3 rounded-lg border border-border"
+                <div className="h-[16rem] flex items-center justify-center text-muted-foreground">
+                  No expense data available
+                </div>
+              )}
+              
+              {/* Legend */}
+              {pieData.length > 0 && (
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  {pieData.map((entry, index) => (
+                    <div 
+                      key={entry.name}
+                      className={`flex items-center gap-2 text-sm cursor-pointer rounded-md p-1 transition-all ${
+                        activeIndex === index ? 'bg-muted ring-1 ring-primary' : 'hover:bg-muted/50'
+                      }`}
+                      onClick={() => setActiveIndex(activeIndex === index ? null : index)}
                     >
-                      <div className="min-w-0 flex-1 mr-3">
-                        <p className="font-medium text-foreground text-sm truncate">{expense.description}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(expense.date).toLocaleDateString('en-NG', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric'
-                          })}
-                          {expense.isDeductible && (
-                            <span className="ml-2 text-success">• Deductible</span>
-                          )}
-                        </p>
-                      </div>
-                      <span className={`font-semibold flex-shrink-0 ${expense.type === 'income' ? 'text-success' : 'text-destructive'}`}>
-                        {expense.type === 'income' ? '+' : '-'}{formatCurrency(expense.amount)}
-                      </span>
+                      <div 
+                        className="w-3 h-3 rounded-full flex-shrink-0" 
+                        style={{ backgroundColor: entry.color }}
+                      />
+                      <span className="text-muted-foreground truncate">{entry.name}</span>
                     </div>
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Disclaimer */}
-          <div className="mt-6 p-4 rounded-lg bg-muted/50 border border-border text-center text-sm text-muted-foreground animate-slide-up">
-            This report is for informational purposes only. Please consult a professional accountant for tax filing.
-          </div>
-        </div>
-      </main>
-    </div>
+        {/* Tax Estimate Details */}
+        <Card className="glass-frosted shadow-futuristic border-border/40">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <div className="h-8 w-8 rounded-lg bg-warning/10 flex items-center justify-center">
+                <Calculator className="h-4 w-4 text-warning" />
+              </div>
+              Tax Estimate
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between py-2 border-b border-border">
+                <span className="text-muted-foreground">Total Income</span>
+                <span className="font-medium">{formatCurrency(totalIncome)}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-border">
+                <span className="text-muted-foreground">Deductible Expenses</span>
+                <span className="font-medium text-success">-{formatCurrency(deductibleExpenses)}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-border">
+                <span className="text-muted-foreground">Taxable Income</span>
+                <span className="font-medium">{formatCurrency(taxableIncome)}</span>
+              </div>
+              <div className="flex justify-between py-3 bg-warning/10 rounded-lg px-3">
+                <span className="font-medium text-foreground">Estimated Tax</span>
+                <span className="font-bold text-warning">{formatCurrency(estimatedTax)}</span>
+              </div>
+              
+              <p className="text-xs text-muted-foreground mt-4">
+                {isCompany 
+                  ? 'Based on Company Income Tax (CIT) rates for 2026'
+                  : 'Based on Personal Income Tax (PIT) rates for 2026'
+                }
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </PageLayout>
   );
 };
 
