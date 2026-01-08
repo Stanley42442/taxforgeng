@@ -1,18 +1,37 @@
-import { NavMenu } from "@/components/NavMenu";
+import { useNavigate } from "react-router-dom";
+import { PageLayout } from "@/components/PageLayout";
 import { PayrollCalculator } from "@/components/PayrollCalculator";
+import { useSubscription } from "@/contexts/SubscriptionContext";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Users, Crown } from "lucide-react";
 
 const Payroll = () => {
+  const { tier } = useSubscription();
+  const navigate = useNavigate();
+  
+  const tierOrder = ['free', 'starter', 'basic', 'freelancer', 'business', 'corporate'];
+  const canAccess = tierOrder.indexOf(tier) >= tierOrder.indexOf('freelancer');
+
+  if (!canAccess) {
+    return (
+      <PageLayout title="Payroll Calculator" description="Calculate PAYE, pension, and net salary" icon={Users}>
+        <Card className="max-w-2xl mx-auto text-center p-8">
+          <Crown className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+          <h2 className="text-2xl font-bold mb-2">Payroll Calculator</h2>
+          <p className="text-muted-foreground mb-6">
+            Calculate PAYE, pension, and net salary for employees. Available on Freelancer plan and above.
+          </p>
+          <Button onClick={() => navigate('/pricing')}>Upgrade to Access</Button>
+        </Card>
+      </PageLayout>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-background">
-      <NavMenu />
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold">Payroll Calculator</h1>
-          <p className="text-muted-foreground">Calculate PAYE, pension, and net salary for employees</p>
-        </div>
-        <PayrollCalculator />
-      </div>
-    </div>
+    <PageLayout title="Payroll Calculator" description="Calculate PAYE, pension, and net salary for employees" icon={Users}>
+      <PayrollCalculator />
+    </PageLayout>
   );
 };
 

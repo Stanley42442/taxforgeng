@@ -60,7 +60,8 @@ const Compliance = () => {
   const [dueDate, setDueDate] = useState("");
   const [selectedBusiness, setSelectedBusiness] = useState<string>("");
 
-  const canAccess = tier === 'basic' || tier === 'business';
+  const tierOrder = ['free', 'starter', 'basic', 'freelancer', 'business', 'corporate'];
+  const canAccess = tierOrder.indexOf(tier) >= tierOrder.indexOf('freelancer');
 
   useEffect(() => {
     if (user && canAccess) {
@@ -184,7 +185,7 @@ const Compliance = () => {
             <FileCheck className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h2 className="text-2xl font-bold mb-2">Compliance Tracker</h2>
             <p className="text-muted-foreground mb-6">
-              Track all your tax and regulatory compliance deadlines. Available on Professional and Business plans.
+              Track all your tax and regulatory compliance deadlines. Available on Freelancer plan and above.
             </p>
             <Button onClick={() => navigate('/pricing')}>Upgrade to Access</Button>
           </Card>
