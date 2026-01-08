@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { NavMenu } from "@/components/NavMenu";
 import { Button } from "@/components/ui/button";
-import { useLanguage, getToastMessage } from "@/contexts/LanguageContext";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -152,7 +151,6 @@ const estimateTax = (income: number): number => {
 const Expenses = () => {
   const { tier, savedBusinesses } = useSubscription();
   const { user } = useAuth();
-  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);

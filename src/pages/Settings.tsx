@@ -49,7 +49,6 @@ import { formatDistanceToNow } from "date-fns";
 import { SecurityScoreWidget } from "@/components/SecurityScoreWidget";
 import { ReportScheduleSettings } from "@/components/ReportScheduleSettings";
 import { WhatsAppVerification } from "@/components/WhatsAppVerification";
-import { useLanguage, getToastMessage } from "@/contexts/LanguageContext";
 
 const nameSchema = z.string().min(1, "Name is required").max(100, "Name must be less than 100 characters");
 const emailSchema = z.string().email("Please enter a valid email address");
@@ -108,7 +107,6 @@ const getEventLabel = (eventType: string) => {
 const Settings = () => {
   const { user, loading } = useAuth();
   const { tier } = useSubscription();
-  const { t, language } = useLanguage();
   const navigate = useNavigate();
 
   // Profile state
