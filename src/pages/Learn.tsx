@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useNavigate } from "react-router-dom";
-import { useLanguage } from "@/contexts/LanguageContext";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Accordion,
@@ -61,7 +61,7 @@ import { Progress } from "@/components/ui/progress";
 const Learn = () => {
   const { tier, savedBusinesses } = useSubscription();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("myths");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -304,10 +304,10 @@ const Learn = () => {
               <GraduationCap className="h-10 w-10 text-primary-foreground" />
             </div>
             <h1 className="text-4xl font-bold text-foreground mb-3">
-              {t('learn.title')}
+              Tax Learning Center
             </h1>
             <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-              {t('learn.subtitle')}
+              Master Nigerian tax laws with our comprehensive guides and resources
             </p>
           </div>
 
@@ -315,7 +315,7 @@ const Learn = () => {
           {answeredQuizzes > 0 && (
             <div className="glass-frosted rounded-2xl p-4 mb-6 animate-slide-up">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-foreground">{t('learn.quizProgress')}</span>
+                <span className="text-sm font-medium text-foreground">Quiz Progress</span>
                 <span className="text-sm text-muted-foreground">
                   {correctQuizzes}/{answeredQuizzes} correct
                 </span>
@@ -330,7 +330,7 @@ const Learn = () => {
               <div className="p-2 rounded-xl bg-warning/10">
                 <Sparkles className="h-5 w-5 text-warning" />
               </div>
-              {t('learn.yourTaxTips')}
+              Your Tax Tips
             </h2>
             <div className="grid gap-4 sm:grid-cols-2">
               {personalizedTips.map((tip, index) => (
@@ -361,7 +361,7 @@ const Learn = () => {
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
-                  placeholder={t('learn.searchPlaceholder')}
+                  placeholder="Search myths, guides, articles..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-12 h-14 text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
@@ -375,28 +375,28 @@ const Learn = () => {
             <TabsList className="grid w-full grid-cols-5 h-auto p-1.5 glass-frosted rounded-2xl mb-6">
               <TabsTrigger value="myths" className="py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
                 <ShieldAlert className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">{t('learn.myths')}</span>
-                <span className="sm:hidden">{t('learn.myths')}</span>
+                <span className="hidden sm:inline">Myths</span>
+                <span className="sm:hidden">Myths</span>
               </TabsTrigger>
               <TabsTrigger value="videos" className="py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
                 <Play className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">{t('learn.videos')}</span>
-                <span className="sm:hidden">{t('learn.videos')}</span>
+                <span className="hidden sm:inline">Videos</span>
+                <span className="sm:hidden">Videos</span>
               </TabsTrigger>
               <TabsTrigger value="sectors" className="py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
                 <Factory className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">{t('learn.sectors')}</span>
-                <span className="sm:hidden">{t('learn.sectors')}</span>
+                <span className="hidden sm:inline">Sectors</span>
+                <span className="sm:hidden">Sectors</span>
               </TabsTrigger>
               <TabsTrigger value="articles" className="py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
                 <FileText className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">{t('learn.articles')}</span>
-                <span className="sm:hidden">{t('learn.articles')}</span>
+                <span className="hidden sm:inline">Articles</span>
+                <span className="sm:hidden">Articles</span>
               </TabsTrigger>
               <TabsTrigger value="faqs" className="py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
                 <HelpCircle className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">{t('learn.faqs')}</span>
-                <span className="sm:hidden">{t('learn.faqs')}</span>
+                <span className="hidden sm:inline">FAQs</span>
+                <span className="sm:hidden">FAQs</span>
               </TabsTrigger>
             </TabsList>
 
