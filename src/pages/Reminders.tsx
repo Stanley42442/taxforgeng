@@ -388,34 +388,34 @@ const Reminders = () => {
               <div className="mx-auto w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mb-4">
                 <Bell className="w-8 h-8 text-accent" />
               </div>
-              <CardTitle className="text-2xl">{t('reminders.automatedReminders')}</CardTitle>
+              <CardTitle className="text-2xl">Automated Tax Reminders</CardTitle>
               <CardDescription>
-                {t('reminders.neverMiss')}
+                Never miss a tax deadline again
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid gap-3 text-left">
                 <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                   <CalendarIcon className="w-5 h-5 text-primary" />
-                  <span>{t('reminders.vatFiling')}</span>
+                  <span>Monthly VAT filing reminders</span>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                   <Clock className="w-5 h-5 text-primary" />
-                  <span>{t('reminders.citDeadline')}</span>
+                  <span>Annual CIT deadline alerts</span>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                   <Mail className="w-5 h-5 text-primary" />
-                  <span>{t('reminders.emailNotifications')}</span>
+                  <span>Email notifications</span>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                   <Settings className="w-5 h-5 text-primary" />
-                  <span>{t('reminders.customReminders')}</span>
+                  <span>Custom reminders</span>
                 </div>
               </div>
               <Link to="/pricing">
                 <Button className="w-full bg-gradient-primary hover:opacity-90">
                   <Crown className="w-4 h-4 mr-2" />
-                  {t('reminders.upgradeToBasic')}
+                  Upgrade to Basic
                 </Button>
               </Link>
             </CardContent>
@@ -431,7 +431,7 @@ const Reminders = () => {
         <NavMenu />
         <div className="container mx-auto px-4 py-20 text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground mt-4">{t('reminders.loadingReminders')}</p>
+          <p className="text-muted-foreground mt-4">Loading reminders...</p>
         </div>
       </div>
     );
@@ -447,10 +447,10 @@ const Reminders = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
             <Bell className="inline-block w-8 h-8 mr-2 text-primary" />
-            {t('reminders.title')}
+            Tax Reminders
           </h1>
           <p className="text-muted-foreground">
-            {t('reminders.subtitle')}
+            Stay on top of your tax filing deadlines
           </p>
         </div>
 
@@ -464,7 +464,7 @@ const Reminders = () => {
                     <BellRing className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">{t('reminders.enablePush')}</p>
+                    <p className="font-medium text-foreground">Enable Push Notifications</p>
                     <p className="text-sm text-muted-foreground">
                       Get notified when reminders are due, even when the app is in the background
                     </p>
@@ -472,7 +472,7 @@ const Reminders = () => {
                 </div>
                 <Button onClick={handleEnableNotifications} size="sm" className="shrink-0">
                   <Volume2 className="w-4 h-4 mr-2" />
-                  {t('reminders.enableNotifications')}
+                  Enable Notifications
                 </Button>
               </div>
             </CardContent>
@@ -487,7 +487,7 @@ const Reminders = () => {
                   <CheckCircle2 className="w-5 h-5 text-success" />
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">{t('reminders.pushEnabled')}</p>
+                  <p className="font-medium text-foreground">Push Notifications Enabled</p>
                   <p className="text-sm text-muted-foreground">
                     You'll receive sound and push notifications when reminders are due
                   </p>
