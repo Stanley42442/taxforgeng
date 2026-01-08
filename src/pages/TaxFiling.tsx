@@ -16,7 +16,6 @@ import {
   Info,
 } from "lucide-react";
 import { useSubscription } from "@/contexts/SubscriptionContext";
-import { useLanguage, getToastMessage } from "@/contexts/LanguageContext";
 import { NavMenu } from "@/components/NavMenu";
 import { toast } from "sonner";
 import { useState } from "react";

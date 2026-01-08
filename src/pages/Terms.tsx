@@ -1,7 +1,6 @@
 import { NavMenu } from "@/components/NavMenu";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   FileText, 
   Shield, 
@@ -16,7 +15,6 @@ import { useNavigate } from "react-router-dom";
 
 const Terms = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
   const lastUpdated = "December 20, 2025";
 
   return (
@@ -29,15 +27,15 @@ const Terms = () => {
           <div className="mb-8 animate-fade-in">
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              {t('common.back')}
+              Back
             </Button>
             <div className="flex items-center gap-3 mb-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary">
                 <FileText className="h-6 w-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">{t('terms.title')}</h1>
-                <p className="text-sm text-muted-foreground">{t('terms.lastUpdated')} {lastUpdated}</p>
+                <h1 className="text-2xl font-bold text-foreground">Terms & Privacy</h1>
+                <p className="text-sm text-muted-foreground">Last updated: {lastUpdated}</p>
               </div>
             </div>
           </div>
@@ -48,9 +46,9 @@ const Terms = () => {
               <div className="flex gap-3">
                 <AlertTriangle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-medium text-foreground mb-1">{t('terms.importantDisclaimer')}</p>
+                  <p className="font-medium text-foreground mb-1">Important Disclaimer</p>
                   <p className="text-sm text-muted-foreground">
-                    {t('terms.disclaimerText')}
+                    TaxForge NG provides tax estimates for planning purposes only. This is NOT professional tax advice. Always consult a qualified tax professional before making tax decisions.
                   </p>
                 </div>
               </div>
@@ -63,7 +61,7 @@ const Terms = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Scale className="h-5 w-5 text-primary" />
-                  {t('terms.termsOfService')}
+                  Terms of Service
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm text-muted-foreground">
@@ -147,7 +145,7 @@ const Terms = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Shield className="h-5 w-5 text-primary" />
-                  {t('terms.privacyPolicy')}
+                  Privacy Policy
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm text-muted-foreground">
@@ -251,12 +249,12 @@ const Terms = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Mail className="h-5 w-5 text-primary" />
-                  {t('terms.contactUs')}
+                  Contact Us
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-muted-foreground">
                 <p>
-                  {t('terms.contactText')}
+                  For questions about these terms or our privacy practices, please contact our legal and privacy team.
                 </p>
                 <div className="mt-3 p-3 rounded-lg bg-muted">
                   <p className="font-medium text-foreground">TaxForge NG Legal & Privacy</p>
@@ -269,7 +267,7 @@ const Terms = () => {
 
           {/* Footer */}
           <p className="text-xs text-muted-foreground text-center mt-8">
-            {t('terms.footer')}
+            By using TaxForge NG, you acknowledge that you have read, understood, and agree to these Terms of Service and Privacy Policy.
           </p>
         </div>
       </main>

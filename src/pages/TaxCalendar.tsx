@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -74,7 +73,6 @@ const getStandardDeadlines = (year: number): TaxDeadline[] => [
 
 const TaxCalendar = () => {
   const { user } = useAuth();
-  const { t } = useLanguage();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
@@ -166,14 +164,14 @@ END:VEVENT
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">{t('calendar.title')}</h1>
+              <h1 className="text-3xl font-bold text-foreground mb-2">Tax Calendar</h1>
               <p className="text-muted-foreground">
-                {t('calendar.subtitle')}
+                Track important tax deadlines and filing dates
               </p>
             </div>
             <Button onClick={exportToICS} variant="outline" className="gap-2">
               <Download className="h-4 w-4" />
-              {t('calendar.exportToCalendar')}
+              Export to Calendar
             </Button>
           </div>
 
