@@ -75,7 +75,8 @@ const Invoices = () => {
     { description: "", quantity: 1, unit_price: 0, amount: 0, is_vatable: true }
   ]);
 
-  const canAccess = tier === 'basic' || tier === 'business';
+  const tierOrder = ['free', 'starter', 'basic', 'freelancer', 'business', 'corporate'];
+  const canAccess = tierOrder.indexOf(tier) >= tierOrder.indexOf('basic');
 
   useEffect(() => {
     if (user && canAccess) {
@@ -255,7 +256,7 @@ const Invoices = () => {
             <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h2 className="text-2xl font-bold mb-2">Invoicing System</h2>
             <p className="text-muted-foreground mb-6">
-              Create professional invoices with automatic VAT calculation. Available on Professional and Business plans.
+              Create professional invoices with automatic VAT calculation. Available on Basic plan and above.
             </p>
             <Button onClick={() => navigate('/pricing')}>Upgrade to Access</Button>
           </Card>

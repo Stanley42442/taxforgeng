@@ -37,7 +37,8 @@ const ProfitLoss = () => {
   const [selectedBusiness, setSelectedBusiness] = useState<string>("all");
   const [period, setPeriod] = useState<string>("month");
 
-  const canAccess = tier === 'basic' || tier === 'business';
+  const tierOrder = ['free', 'starter', 'basic', 'freelancer', 'business', 'corporate'];
+  const canAccess = tierOrder.indexOf(tier) >= tierOrder.indexOf('basic');
 
   useEffect(() => {
     if (user && canAccess) {
@@ -151,7 +152,7 @@ const ProfitLoss = () => {
             <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h2 className="text-2xl font-bold mb-2">Profit & Loss Statement</h2>
             <p className="text-muted-foreground mb-6">
-              Auto-generate P&L statements from your expense and invoice data. Available on Professional and Business plans.
+              Auto-generate P&L statements from your expense and invoice data. Available on Basic plan and above.
             </p>
             <Button onClick={() => navigate('/pricing')}>Upgrade to Access</Button>
           </Card>

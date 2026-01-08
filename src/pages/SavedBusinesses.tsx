@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Building2, 
   Briefcase,
@@ -16,12 +17,19 @@ import {
   HelpCircle,
   Shield,
   Upload,
-  Sparkles
+  Sparkles,
+  FileText,
+  Users,
+  PieChart,
+  ClipboardCheck,
+  Receipt,
+  Calculator,
+  Bell
 } from "lucide-react";
 import { useSubscription, SavedBusiness } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/taxCalculations";
-import { NavMenu } from "@/components/NavMenu";
+import { PageLayout } from "@/components/PageLayout";
 import {
   Tooltip,
   TooltipContent,
@@ -124,16 +132,33 @@ const SavedBusinesses = () => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
+  // Business tools configuration
+  const businessTools = [
+    { to: "/invoices", label: "Invoices", icon: FileText, description: "Create & manage invoices", minTier: 'basic' },
+    { to: "/payroll", label: "Payroll", icon: Users, description: "Calculate salaries & PAYE", minTier: 'freelancer' },
+    { to: "/profit-loss", label: "P&L Statement", icon: PieChart, description: "View financial performance", minTier: 'basic' },
+    { to: "/compliance", label: "Compliance", icon: ClipboardCheck, description: "Track tax deadlines", minTier: 'freelancer' },
+    { to: "/expenses", label: "Expenses", icon: Receipt, description: "Track business expenses", minTier: 'starter' },
+    { to: "/reminders", label: "Reminders", icon: Bell, description: "Set tax reminders", minTier: 'starter' },
+  ];
+
+  const tierOrder = ['free', 'starter', 'basic', 'freelancer', 'business', 'corporate'];
+  const userTierIndex = tierOrder.indexOf(tier);
+
+  const accessibleTools = businessTools.filter(tool => {
+    const toolTierIndex = tierOrder.indexOf(tool.minTier);
+    return toolTierIndex <= userTierIndex;
+  });
+
   if (tier === 'free') {
     return (
-      <div className="min-h-screen bg-gradient-hero">
-        <NavMenu />
-        <main className="container mx-auto px-4 py-20">
-          <div className="max-w-2xl mx-auto text-center">
+      <PageLayout title="My Businesses" description="Manage your saved businesses" icon={Building2}>
+        <div className="max-w-2xl mx-auto text-center">
+          <Card className="p-8">
             <Building2 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h1 className="text-3xl font-bold text-foreground mb-4">Saved Businesses</h1>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Saved Businesses</h2>
             <p className="text-lg text-muted-foreground mb-8">
-              Upgrade to Basic or higher to save businesses.
+              Upgrade to Starter or higher to save businesses.
             </p>
             <Link to="/pricing">
               <Button variant="hero" size="lg">
@@ -141,84 +166,112 @@ const SavedBusinesses = () => {
                 Upgrade Now
               </Button>
             </Link>
-          </div>
-        </main>
-      </div>
+          </Card>
+        </div>
+      </PageLayout>
     );
   }
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-gradient-hero flex flex-col">
-        <NavMenu />
+      <PageLayout 
+        title="Business Hub" 
+        description={`${limitText} businesses saved`} 
+        icon={Building2}
+        headerActions={
+          <div className="flex flex-wrap items-center gap-2">
+            {savedBusinesses.length === 0 && canSaveBusiness() && (
+              <Button variant="outline" size="sm" onClick={handleAddSamples}>
+                <Sparkles className="h-4 w-4" />
+                Add Samples
+              </Button>
+            )}
+            {tier === 'corporate' && (
+              <Button variant="outline" size="sm" onClick={() => setShowBulkDialog(true)}>
+                <Upload className="h-4 w-4" />
+                Bulk Verify
+              </Button>
+            )}
+            <Link to="/calculator">
+              <Button variant="hero" size="sm" disabled={!canSaveBusiness()}>
+                <Plus className="h-4 w-4" />
+                Add Business
+              </Button>
+            </Link>
+          </div>
+        }
+      >
+        {/* Business Tools Section */}
+        {accessibleTools.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Calculator className="h-5 w-5 text-primary" />
+              Business Tools
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              {accessibleTools.map((tool) => (
+                <Link key={tool.to} to={tool.to}>
+                  <Card className="h-full hover:shadow-lg hover:border-primary/30 transition-all cursor-pointer group">
+                    <CardContent className="p-4 text-center">
+                      <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-primary/20 transition-colors">
+                        <tool.icon className="h-5 w-5 text-primary" />
+                      </div>
+                      <h3 className="font-medium text-sm">{tool.label}</h3>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{tool.description}</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
-        <main className="container mx-auto px-4 py-6 pb-8 flex-1">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-              <div>
-                <h1 className="text-3xl font-bold text-foreground mb-2">Saved Businesses</h1>
-                <p className="text-muted-foreground">{limitText} businesses</p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                {savedBusinesses.length === 0 && canSaveBusiness() && (
+        {/* Saved Businesses Section */}
+        <div>
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <Building2 className="h-5 w-5 text-primary" />
+            Saved Businesses
+          </h2>
+
+          {savedBusinesses.length === 0 ? (
+            <Card className="p-12 text-center">
+              <Building2 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-foreground mb-2">No Saved Businesses</h3>
+              <p className="text-muted-foreground mb-6">Use the calculator and save your results.</p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link to="/calculator">
+                  <Button variant="hero">Go to Calculator</Button>
+                </Link>
+                {canSaveBusiness() && (
                   <Button variant="outline" onClick={handleAddSamples}>
                     <Sparkles className="h-4 w-4" />
-                    Add Samples
+                    Add Sample Businesses
                   </Button>
                 )}
-                {tier === 'corporate' && (
-                  <Button variant="outline" onClick={() => setShowBulkDialog(true)}>
-                    <Upload className="h-4 w-4" />
-                    Bulk Verify
-                  </Button>
-                )}
-                <Link to="/calculator">
-                  <Button variant="hero" disabled={!canSaveBusiness()}>
-                    <Plus className="h-4 w-4" />
-                    Add Business
-                  </Button>
-                </Link>
               </div>
-            </div>
-
-            {savedBusinesses.length === 0 ? (
-              <div className="rounded-2xl border border-border bg-card p-12 text-center">
-                <Building2 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h2 className="text-xl font-semibold text-foreground mb-2">No Saved Businesses</h2>
-                <p className="text-muted-foreground mb-6">Use the calculator and save your results.</p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Link to="/calculator">
-                    <Button variant="hero">Go to Calculator</Button>
-                  </Link>
-                  {canSaveBusiness() && (
-                    <Button variant="outline" onClick={handleAddSamples}>
-                      <Sparkles className="h-4 w-4" />
-                      Add Sample Businesses
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
-                {sortedBusinesses.map((business) => (
-                  <div 
-                    key={business.id}
-                    className={`rounded-xl border bg-card p-5 shadow-card ${
-                      business.verificationStatus === 'verified' ? 'border-success/30' : 'border-border'
-                    }`}
-                  >
+            </Card>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {sortedBusinesses.map((business) => (
+                <Card 
+                  key={business.id}
+                  className={`shadow-card hover:shadow-lg transition-shadow ${
+                    business.verificationStatus === 'verified' ? 'border-success/30' : ''
+                  }`}
+                >
+                  <CardContent className="p-5">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
+                        <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${
                           business.entityType === 'company' ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'
                         }`}>
                           {business.entityType === 'company' ? <Building2 className="h-5 w-5" /> : <Briefcase className="h-5 w-5" />}
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-foreground">{business.name}</h3>
+                            <h3 className="font-semibold text-foreground truncate">{business.name}</h3>
                             {business.verificationStatus === 'verified' && (
-                              <CheckCircle2 className="h-4 w-4 text-success" />
+                              <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
                             )}
                           </div>
                           <p className="text-xs text-muted-foreground">
@@ -238,12 +291,12 @@ const SavedBusinesses = () => {
                       <Shield className="h-4 w-4" />
                       {business.verificationStatus === 'verified' ? 'View Verification' : 'Verify CAC'}
                     </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </main>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Verify Dialog */}
         <Dialog open={showVerifyDialog} onOpenChange={setShowVerifyDialog}>
@@ -299,7 +352,7 @@ const SavedBusinesses = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
+      </PageLayout>
     </TooltipProvider>
   );
 };

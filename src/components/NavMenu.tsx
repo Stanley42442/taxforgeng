@@ -85,13 +85,19 @@ export const NavMenu = () => {
     { to: "/calculator", label: "Calculator", icon: Calculator, minTier: 'basic', adminOnly: false, showCondition: 'paidOnly' as const },
     { to: "/learn", label: "Learn", icon: GraduationCap, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
     { to: "/pricing", label: "Pricing", icon: DollarSign, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/businesses", label: "My Businesses", icon: FolderOpen, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
+    { to: "/businesses", label: "My Businesses", icon: FolderOpen, minTier: 'starter', adminOnly: false, showCondition: 'always' as const },
     { to: "/achievements", label: "Achievements", icon: Trophy, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
-    { to: "/reminders", label: "Reminders", icon: Bell, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
+    { to: "/reminders", label: "Reminders", icon: Bell, minTier: 'starter', adminOnly: false, showCondition: 'always' as const },
     
-    { to: "/expenses", label: "Expenses", icon: Receipt, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
+    // Business Management Features
+    { to: "/expenses", label: "Expenses", icon: Receipt, minTier: 'starter', adminOnly: false, showCondition: 'always' as const },
+    { to: "/invoices", label: "Invoices", icon: FileText, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
+    { to: "/payroll", label: "Payroll", icon: Users, minTier: 'freelancer', adminOnly: false, showCondition: 'always' as const },
+    { to: "/profit-loss", label: "P&L Statement", icon: PieChart, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
+    { to: "/compliance", label: "Compliance", icon: Building2, minTier: 'freelancer', adminOnly: false, showCondition: 'always' as const },
+    
     { to: "/scenarios", label: "Scenarios", icon: GitBranch, minTier: 'freelancer', adminOnly: false, showCondition: 'always' as const },
-    { to: "/business-report", label: "Reports", icon: PieChart, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
+    { to: "/business-report", label: "Reports", icon: BarChart3, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
     { to: "/insights", label: "Insights", icon: BarChart3, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
     { to: "/transactions", label: "Transactions", icon: Upload, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
     { to: "/e-filing", label: "E-Filing", icon: Send, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
