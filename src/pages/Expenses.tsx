@@ -83,15 +83,15 @@ interface Expense {
   businessId?: string;
 }
 
-const EXPENSE_CATEGORIES = [
-  { value: 'income', label: 'Income', type: 'income' as const },
-  { value: 'rent', label: 'Rent & Office', type: 'expense' as const, deductible: true },
-  { value: 'transport', label: 'Transport & Travel', type: 'expense' as const, deductible: true },
-  { value: 'marketing', label: 'Marketing & Ads', type: 'expense' as const, deductible: true },
-  { value: 'salary', label: 'Salaries & Wages', type: 'expense' as const, deductible: true },
-  { value: 'utilities', label: 'Utilities', type: 'expense' as const, deductible: true },
-  { value: 'supplies', label: 'Supplies & Equipment', type: 'expense' as const, deductible: true },
-  { value: 'other', label: 'Other Expenses', type: 'expense' as const, deductible: false },
+const getExpenseCategories = (t: (key: string) => string) => [
+  { value: 'income', label: t('category.income'), type: 'income' as const },
+  { value: 'rent', label: t('category.rentOffice'), type: 'expense' as const, deductible: true },
+  { value: 'transport', label: t('category.transportTravel'), type: 'expense' as const, deductible: true },
+  { value: 'marketing', label: t('category.marketingAds'), type: 'expense' as const, deductible: true },
+  { value: 'salary', label: t('category.salariesWages'), type: 'expense' as const, deductible: true },
+  { value: 'utilities', label: t('category.utilities'), type: 'expense' as const, deductible: true },
+  { value: 'supplies', label: t('category.suppliesEquipment'), type: 'expense' as const, deductible: true },
+  { value: 'other', label: t('category.otherExpenses'), type: 'expense' as const, deductible: false },
 ];
 
 const getCategoryIcon = (category: Expense['category']) => {
@@ -419,14 +419,16 @@ const Expenses = () => {
     );
   }
 
+  const EXPENSE_CATEGORIES = getExpenseCategories(t);
+
   const handleAddExpense = async () => {
     if (!user) {
-      toast.error("Please sign in to add expenses");
+      toast.error(getToastMessage('pleaseSignIn', language));
       return;
     }
 
     if (!newExpense.description.trim() || !newExpense.amount) {
-      toast.error("Please fill all fields");
+      toast.error(getToastMessage('pleaseFillAllFields', language));
       return;
     }
 
@@ -451,7 +453,7 @@ const Expenses = () => {
 
     if (error) {
       console.error('Error adding expense:', error);
-      toast.error('Failed to add expense');
+      toast.error(getToastMessage('failedToAddExpense', language));
       return;
     }
 

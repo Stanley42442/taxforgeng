@@ -110,20 +110,20 @@ const Results = () => {
 
   const handleSaveBusiness = () => {
     if (!businessName.trim()) {
-      toast.error("Please enter a business name");
+      toast.error(t('results.pleaseEnterBusinessName'));
       return;
     }
 
     if (tier === 'free') {
-      toast.error("Upgrade to Basic or higher to save businesses", {
-        action: { label: 'Upgrade', onClick: () => navigate('/pricing') }
+      toast.error(t('results.upgradeToSave'), {
+        action: { label: t('pricing.upgrade'), onClick: () => navigate('/pricing') }
       });
       return;
     }
 
     if (!canSaveBusiness()) {
-      toast.error("You've reached your business limit", {
-        action: { label: 'Upgrade', onClick: () => navigate('/pricing') }
+      toast.error(t('results.businessLimitReached'), {
+        action: { label: t('pricing.upgrade'), onClick: () => navigate('/pricing') }
       });
       return;
     }
@@ -135,20 +135,20 @@ const Results = () => {
     });
 
     if (success) {
-      toast.success(`"${businessName}" saved successfully!`, {
-        action: { label: 'View', onClick: () => navigate('/businesses') }
+      toast.success(t('results.businessSaved').replace('{name}', businessName), {
+        action: { label: t('common.view'), onClick: () => navigate('/businesses') }
       });
       setShowSaveDialog(false);
       setBusinessName("");
     } else {
-      toast.error("Failed to save business");
+      toast.error(t('results.failedToSave'));
     }
   };
 
   const exportToCSV = () => {
     if (!canExport()) {
-      toast.error('Upgrade to Basic or higher to export CSV', {
-        action: { label: 'Upgrade', onClick: () => navigate('/pricing') }
+      toast.error(t('results.upgradeToExport'), {
+        action: { label: t('pricing.upgrade'), onClick: () => navigate('/pricing') }
       });
       return;
     }
@@ -182,8 +182,8 @@ const Results = () => {
 
   const exportToPDF = () => {
     if (!canExport()) {
-      toast.error('Upgrade to Basic or higher to export PDF', {
-        action: { label: 'Upgrade', onClick: () => navigate('/pricing') }
+      toast.error(t('results.upgradeToExport'), {
+        action: { label: t('pricing.upgrade'), onClick: () => navigate('/pricing') }
       });
       return;
     }
@@ -390,7 +390,7 @@ const Results = () => {
               <div className="mt-6 space-y-3">
                 <div>
                   <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                    <span>Business Name</span>
+                    <span>{t('results.businessName')}</span>
                     <span>{formatCurrency(businessResult.totalTaxPayable)}</span>
                   </div>
                   <div className="h-3 bg-secondary rounded-full overflow-hidden">
@@ -404,7 +404,7 @@ const Results = () => {
                 </div>
                 <div>
                   <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                    <span>Limited Company</span>
+                    <span>{t('results.limitedCompany')}</span>
                     <span>{formatCurrency(companyResult.totalTaxPayable)}</span>
                   </div>
                   <div className="h-3 bg-secondary rounded-full overflow-hidden">

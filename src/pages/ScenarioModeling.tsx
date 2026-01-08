@@ -136,15 +136,15 @@ const ScenarioModeling = () => {
             <TabsList className="grid w-full grid-cols-4 mb-6">
               <TabsTrigger value="what-if" className="gap-2">
                 <Calculator className="h-4 w-4" />
-                <span className="hidden sm:inline">What-If</span>
+                <span className="hidden sm:inline">{t('scenario.tabWhatIf')}</span>
               </TabsTrigger>
               <TabsTrigger value="multi-year" className="gap-2">
                 <Calendar className="h-4 w-4" />
-                <span className="hidden sm:inline">Multi-Year</span>
+                <span className="hidden sm:inline">{t('scenario.tabMultiYear')}</span>
               </TabsTrigger>
               <TabsTrigger value="penalties" className="gap-2">
                 <AlertTriangle className="h-4 w-4" />
-                <span className="hidden sm:inline">Penalties</span>
+                <span className="hidden sm:inline">{t('scenario.tabPenalties')}</span>
               </TabsTrigger>
               <TabsTrigger value="foreign" className="gap-2">
                 <Globe className="h-4 w-4" />
@@ -374,35 +374,35 @@ const ScenarioModeling = () => {
                   {adjustments.turnoverChange > 20 && (
                     <div className="p-3 rounded-lg bg-info/10 border border-info/20">
                       <p className="text-sm text-info">
-                        📊 With {adjustments.turnoverChange}% growth, consider registering for VAT if not already.
+                        📊 {t('scenario.insightVAT').replace('{percent}', adjustments.turnoverChange.toString())}
                       </p>
                     </div>
                   )}
                   {adjustments.newRent > 0 && (
                     <div className="p-3 rounded-lg bg-success/10 border border-success/20">
                       <p className="text-sm text-success">
-                        🏠 Additional rent of {formatCurrency(adjustments.newRent)} increases your relief (up to ₦500k max).
+                        🏠 {t('scenario.insightRent').replace('{amount}', formatCurrency(adjustments.newRent))}
                       </p>
                     </div>
                   )}
                   {adjustments.cryptoGains > 0 && (
                     <div className="p-3 rounded-lg bg-warning/10 border border-warning/20">
                       <p className="text-sm text-warning">
-                        💰 Crypto gains of {formatCurrency(adjustments.cryptoGains)} attract 10% CGT = {formatCurrency(adjustments.cryptoGains * 0.1)}
+                        💰 {t('scenario.insightCrypto').replace('{gains}', formatCurrency(adjustments.cryptoGains)).replace('{tax}', formatCurrency(adjustments.cryptoGains * 0.1))}
                       </p>
                     </div>
                   )}
                   {adjustments.foreignIncome > 0 && (
                     <div className="p-3 rounded-lg bg-info/10 border border-info/20">
                       <p className="text-sm text-info">
-                        🌍 Foreign income is taxable. Consider forex timing for conversion.
+                        🌍 {t('scenario.insightForeign')}
                       </p>
                     </div>
                   )}
                   {Object.values(adjustments).every(v => v === 0) && (
                     <div className="p-3 rounded-lg bg-secondary">
                       <p className="text-sm text-muted-foreground">
-                        Adjust the sliders and inputs to see how changes affect your tax.
+                        {t('scenario.adjustSliders')}
                       </p>
                     </div>
                   )}

@@ -225,38 +225,38 @@ const IndividualCalculatorPage = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Briefcase className="h-5 w-5 text-primary" />
-                    Employment Income Tax
+                    {t('individual.employmentIncomeTax')}
                   </CardTitle>
                   <CardDescription>
-                    Calculate PAYE for salaried employees
+                    {t('individual.calculatePAYE')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <InputField
-                      label="Annual Gross Income"
+                      label={t('individual.annualGrossIncome')}
                       value={formatInput(employmentIncome)}
                       onChange={(v) => setEmploymentIncome(v)}
-                      tooltip="Total annual salary including allowances"
+                      tooltip={t('individual.annualGrossIncomeTooltip')}
                       required
                     />
                     <InputField
-                      label="Pension Contribution"
+                      label={t('individual.pensionContribution')}
                       value={formatInput(pensionContribution)}
                       onChange={(v) => setPensionContribution(v)}
-                      tooltip="8% employee contribution to RSA"
+                      tooltip={t('individual.pensionTooltip')}
                     />
                     <InputField
-                      label="NHF Contribution"
+                      label={t('individual.nhfContribution')}
                       value={formatInput(nhfContribution)}
                       onChange={(v) => setNhfContribution(v)}
-                      tooltip="2.5% National Housing Fund"
+                      tooltip={t('individual.nhfTooltip')}
                     />
                     <InputField
-                      label="Life Insurance Premium"
+                      label={t('individual.lifeInsurance')}
                       value={formatInput(lifeInsurance)}
                       onChange={(v) => setLifeInsurance(v)}
-                      tooltip="Premium on policy for own life"
+                      tooltip={t('individual.lifeInsuranceTooltip')}
                     />
                   </div>
                   
@@ -264,10 +264,10 @@ const IndividualCalculatorPage = () => {
                     <div className="p-4 rounded-xl bg-success/10 border border-success/20">
                       <div className="flex items-center gap-2 text-success">
                         <CheckCircle className="h-4 w-4" />
-                        <span className="font-medium text-sm">2026 Benefits Active</span>
+                        <span className="font-medium text-sm">{t('individual.2026BenefitsActive')}</span>
                       </div>
                       <p className="text-sm text-muted-foreground mt-1">
-                        First ₦800,000 is tax-exempt. Consolidated Relief Allowance applies.
+                        {t('individual.2026BenefitsInfo')}
                       </p>
                     </div>
                   )}
@@ -286,31 +286,31 @@ const IndividualCalculatorPage = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Bitcoin className="h-5 w-5 text-primary" />
-                    Cryptocurrency Tax
+                    {t('individual.cryptoTax')}
                   </CardTitle>
                   <CardDescription>
-                    Calculate tax on crypto income and capital gains
+                    {t('individual.cryptoTaxDescription')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <InputField
-                      label="Crypto Income (Mining, Staking)"
+                      label={t('individual.cryptoIncome')}
                       value={formatInput(cryptoIncome)}
                       onChange={(v) => setCryptoIncome(v)}
-                      tooltip="Income from mining, staking, airdrops"
+                      tooltip={t('individual.cryptoIncomeTooltip')}
                     />
                     <InputField
-                      label="Capital Gains from Trading"
+                      label={t('individual.capitalGainsTrading')}
                       value={formatInput(cryptoGains)}
                       onChange={(v) => setCryptoGains(v)}
-                      tooltip="Profits from buying/selling crypto"
+                      tooltip={t('individual.capitalGainsTradingTooltip')}
                     />
                     <InputField
-                      label="Capital Losses"
+                      label={t('individual.capitalLosses')}
                       value={formatInput(cryptoLosses)}
                       onChange={(v) => setCryptoLosses(v)}
-                      tooltip="Losses can offset gains"
+                      tooltip={t('individual.capitalLossesTooltip')}
                     />
                   </div>
                   
@@ -318,14 +318,14 @@ const IndividualCalculatorPage = () => {
                     <div className="p-4 rounded-xl bg-info/10 border border-info/20">
                       <div className="flex items-center gap-2 text-info">
                         <Info className="h-4 w-4" />
-                        <span className="font-medium text-sm">2026 Crypto Rules</span>
+                        <span className="font-medium text-sm">{t('individual.2026CryptoRules')}</span>
                       </div>
                       <ul className="text-sm text-muted-foreground mt-2 space-y-1">
-                        <li>• Gains under ₦10M: Exempt from CGT</li>
-                        <li>• ₦10M - ₦50M: 10% CGT</li>
-                        <li>• ₦50M - ₦150M: 15% CGT</li>
-                        <li>• Above ₦150M: 25% CGT</li>
-                        <li>• Losses carry forward for 4 years</li>
+                        <li>• {t('individual.cryptoRule1')}</li>
+                        <li>• {t('individual.cryptoRule2')}</li>
+                        <li>• {t('individual.cryptoRule3')}</li>
+                        <li>• {t('individual.cryptoRule4')}</li>
+                        <li>• {t('individual.cryptoRule5')}</li>
                       </ul>
                     </div>
                   )}
@@ -339,43 +339,43 @@ const IndividualCalculatorPage = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="h-5 w-5 text-primary" />
-                    Investment Income Tax
+                    {t('individual.investmentTax')}
                   </CardTitle>
                   <CardDescription>
-                    Calculate tax on dividends, interest, and capital gains
+                    {t('individual.investmentTaxDescription')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <InputField
-                      label="Dividend Income"
+                      label={t('individual.dividendIncome')}
                       value={formatInput(dividendIncome)}
                       onChange={(v) => setDividendIncome(v)}
-                      tooltip="Dividends from Nigerian companies (often exempt)"
+                      tooltip={t('individual.dividendIncomeTooltip')}
                     />
                     <InputField
-                      label="Interest Income"
+                      label={t('individual.interestIncome')}
                       value={formatInput(interestIncome)}
                       onChange={(v) => setInterestIncome(v)}
-                      tooltip="Bank interest, bonds, fixed deposits"
+                      tooltip={t('individual.interestIncomeTooltip')}
                     />
                     <InputField
-                      label="Capital Gains"
+                      label={t('individual.capitalGains')}
                       value={formatInput(capitalGains)}
                       onChange={(v) => setCapitalGains(v)}
-                      tooltip="Gains from selling assets, shares, property"
+                      tooltip={t('individual.capitalGainsTooltip')}
                     />
                   </div>
                   
                   <div className="p-4 rounded-xl bg-success/10 border border-success/20">
                     <div className="flex items-center gap-2 text-success">
                       <CheckCircle className="h-4 w-4" />
-                      <span className="font-medium text-sm">Tax-Efficient Investments</span>
+                      <span className="font-medium text-sm">{t('individual.taxEfficientInvestments')}</span>
                     </div>
                     <ul className="text-sm text-muted-foreground mt-2 space-y-1">
-                      <li>• Franked dividends from Nigerian companies: Exempt</li>
-                      <li>• FGN Bonds interest: Exempt</li>
-                      <li>• Treasury Bills: 10% WHT (final)</li>
+                      <li>• {t('individual.investmentRule1')}</li>
+                      <li>• {t('individual.investmentRule2')}</li>
+                      <li>• {t('individual.investmentRule3')}</li>
                     </ul>
                   </div>
                 </CardContent>
@@ -388,10 +388,10 @@ const IndividualCalculatorPage = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Store className="h-5 w-5 text-primary" />
-                    Informal Business Tax
+                    {t('individual.informalTax')}
                   </CardTitle>
                   <CardDescription>
-                    Presumptive tax for unregistered traders and micro-enterprises
+                    {t('individual.informalTaxDescription')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
