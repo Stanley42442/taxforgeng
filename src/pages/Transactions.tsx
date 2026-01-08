@@ -11,7 +11,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Upload, FileSpreadsheet, Crown, Building2, Check, X, HelpCircle, ArrowRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Transaction {
   id: string;
@@ -37,7 +36,6 @@ const Transactions = () => {
   const { tier, savedBusinesses } = useSubscription();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { t } = useLanguage();
   
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>('');
@@ -113,38 +111,38 @@ const Transactions = () => {
               <div className="mx-auto w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mb-4">
                 <FileSpreadsheet className="w-8 h-8 text-accent" />
               </div>
-              <CardTitle className="text-2xl">{t('transactions.bankImport')}</CardTitle>
+              <CardTitle className="text-2xl">Bank Statement Import</CardTitle>
               <CardDescription>
-                {t('transactions.bankImportDesc')}
+                Import bank statements to auto-categorize transactions and populate your tax calculator
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid gap-3 text-left">
                 <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                   <Upload className="w-5 h-5 text-primary" />
-                  <span>{t('transactions.uploadCsv')}</span>
+                  <span>Upload CSV from your bank</span>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                   <Check className="w-5 h-5 text-primary" />
-                  <span>{t('transactions.autoCategorize')}</span>
+                  <span>AI auto-categorizes income & expenses</span>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                   <ArrowRight className="w-5 h-5 text-primary" />
-                  <span>{t('transactions.autoPopulate')}</span>
+                  <span>One-click populate tax calculator</span>
                 </div>
               </div>
               <div className="p-4 bg-muted rounded-lg text-left">
                 <div className="flex items-start gap-2">
                   <HelpCircle className="w-4 h-4 text-muted-foreground mt-0.5" />
                   <p className="text-sm text-muted-foreground">
-                    {t('transactions.mockNotice')}
+                    This is a prototype feature. Real bank integration requires Business tier.
                   </p>
                 </div>
               </div>
               <Link to="/pricing">
                 <Button className="w-full bg-gradient-primary hover:opacity-90">
                   <Crown className="w-4 h-4 mr-2" />
-                  {t('transactions.upgradeForImport')}
+                  Upgrade to Import Statements
                 </Button>
               </Link>
             </CardContent>
@@ -164,29 +162,29 @@ const Transactions = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
             <FileSpreadsheet className="inline-block w-8 h-8 mr-2 text-primary" />
-            {t('transactions.title')}
+            Bank Import
           </h1>
           <p className="text-muted-foreground">
-            {t('transactions.subtitle')}
+            Import bank statements and auto-categorize transactions
           </p>
         </div>
 
         {/* Upload Section */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>{t('transactions.uploadBankStatement')}</CardTitle>
+            <CardTitle>Upload Bank Statement</CardTitle>
             <CardDescription>
-              {t('transactions.uploadDescription')}
+              Upload a CSV export from your bank to auto-categorize transactions
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
                 <div className="space-y-2">
-                  <Label htmlFor="business">{t('transactions.selectBusiness')}</Label>
+                  <Label htmlFor="business">Select Business</Label>
                   <Select value={selectedBusinessId} onValueChange={setSelectedBusinessId}>
                     <SelectTrigger>
-                      <SelectValue placeholder={t('transactions.chooseBusiness')} />
+                      <SelectValue placeholder="Choose a business" />
                     </SelectTrigger>
                     <SelectContent>
                       {savedBusinesses.map(b => (
@@ -209,14 +207,14 @@ const Transactions = () => {
                   disabled={isProcessing || !selectedBusinessId}
                 >
                   <Upload className="w-4 h-4 mr-2" />
-                  {isProcessing ? t('transactions.processing') : t('transactions.uploadCsvBtn')}
+                  {isProcessing ? "Processing..." : "Upload CSV"}
                 </Button>
               </div>
             </div>
             <div className="mt-4 p-3 bg-muted rounded-lg flex items-start gap-2">
               <HelpCircle className="w-4 h-4 text-muted-foreground mt-0.5" />
               <p className="text-sm text-muted-foreground">
-                {t('transactions.mockNotice')}
+                This is a prototype feature. Real bank integration requires Business tier.
               </p>
             </div>
           </CardContent>
@@ -229,10 +227,10 @@ const Transactions = () => {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>{t('transactions.importedTransactions')}</CardTitle>
-                    <CardDescription>{transactions.length} {t('transactions.transactionsFound')}</CardDescription>
+                    <CardTitle>Imported Transactions</CardTitle>
+                    <CardDescription>{transactions.length} transactions found</CardDescription>
                   </div>
-                  <Badge variant="outline">{transactions.filter(t => t.auto).length} {t('transactions.autoCategorized')}</Badge>
+                  <Badge variant="outline">{transactions.filter(t => t.auto).length} auto-categorized</Badge>
                 </div>
               </CardHeader>
               <CardContent>
@@ -240,11 +238,11 @@ const Transactions = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>{t('transactions.date')}</TableHead>
-                        <TableHead>{t('transactions.description')}</TableHead>
-                        <TableHead className="text-right">{t('transactions.amount')}</TableHead>
-                        <TableHead>{t('transactions.category')}</TableHead>
-                        <TableHead className="text-center">{t('transactions.auto')}</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead className="text-right">Amount</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead className="text-center">Auto</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -266,10 +264,10 @@ const Transactions = () => {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="income">{t('transactions.income')}</SelectItem>
-                                <SelectItem value="expense">{t('transactions.expense')}</SelectItem>
-                                <SelectItem value="vatable_income">{t('transactions.vatableIncome')}</SelectItem>
-                                <SelectItem value="vatable_expense">{t('transactions.vatableExpense')}</SelectItem>
+                                <SelectItem value="income">Income</SelectItem>
+                                <SelectItem value="expense">Expense</SelectItem>
+                                <SelectItem value="vatable_income">VATable Income</SelectItem>
+                                <SelectItem value="vatable_expense">VATable Expense</SelectItem>
                               </SelectContent>
                             </Select>
                           </TableCell>
@@ -279,7 +277,7 @@ const Transactions = () => {
                                 <TooltipTrigger>
                                   <Check className="w-4 h-4 text-success mx-auto" />
                                 </TooltipTrigger>
-                                <TooltipContent>{t('transactions.autoCategorized')}</TooltipContent>
+                                <TooltipContent>Auto-categorized</TooltipContent>
                               </Tooltip>
                             ) : (
                               <X className="w-4 h-4 text-muted-foreground mx-auto" />
@@ -296,24 +294,24 @@ const Transactions = () => {
             {/* Summary */}
             <Card className="mb-6">
               <CardHeader>
-                <CardTitle>{t('transactions.summary')}</CardTitle>
+                <CardTitle>Summary</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                   <div className="p-4 bg-success/10 rounded-lg">
-                    <p className="text-sm text-muted-foreground">{t('transactions.totalIncome')}</p>
+                    <p className="text-sm text-muted-foreground">Total Income</p>
                     <p className="text-2xl font-bold text-success">₦{totals.income.toLocaleString()}</p>
                   </div>
                   <div className="p-4 bg-destructive/10 rounded-lg">
-                    <p className="text-sm text-muted-foreground">{t('transactions.totalExpenses')}</p>
+                    <p className="text-sm text-muted-foreground">Total Expenses</p>
                     <p className="text-2xl font-bold text-destructive">₦{totals.expenses.toLocaleString()}</p>
                   </div>
                   <div className="p-4 bg-accent/10 rounded-lg">
-                    <p className="text-sm text-muted-foreground">{t('transactions.vatableIncomeTotal')}</p>
+                    <p className="text-sm text-muted-foreground">VATable Income</p>
                     <p className="text-2xl font-bold">₦{totals.vatableIncome.toLocaleString()}</p>
                   </div>
                   <div className="p-4 bg-accent/10 rounded-lg">
-                    <p className="text-sm text-muted-foreground">{t('transactions.vatableExpenseTotal')}</p>
+                    <p className="text-sm text-muted-foreground">VATable Expenses</p>
                     <p className="text-2xl font-bold">₦{totals.vatableExpenses.toLocaleString()}</p>
                   </div>
                 </div>
@@ -324,14 +322,14 @@ const Transactions = () => {
             <Card className="border-primary/30 bg-primary/5">
               <CardContent className="flex flex-col sm:flex-row items-center justify-between p-6 gap-4">
                 <div>
-                  <h3 className="font-semibold">{t('transactions.readyToCalculate')}</h3>
+                  <h3 className="font-semibold">Ready to Calculate?</h3>
                   <p className="text-sm text-muted-foreground">
-                    {t('transactions.applyTotals')}
+                    Apply these totals to the tax calculator
                   </p>
                 </div>
                 <Button onClick={applyToCalculator} size="lg">
                   <ArrowRight className="w-4 h-4 mr-2" />
-                  {t('transactions.applyToCalculator')}
+                  Apply to Calculator
                 </Button>
               </CardContent>
             </Card>
@@ -342,12 +340,12 @@ const Transactions = () => {
           <Card className="text-center py-12">
             <CardContent>
               <Building2 className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">{t('transactions.noSavedBusinesses')}</h3>
+              <h3 className="text-lg font-semibold mb-2">No Saved Businesses</h3>
               <p className="text-muted-foreground mb-4">
-                {t('transactions.saveBusinessFirst')}
+                Save a business first to import transactions
               </p>
               <Link to="/calculator">
-                <Button>{t('transactions.goToCalculator')}</Button>
+                <Button>Go to Calculator</Button>
               </Link>
             </CardContent>
           </Card>
