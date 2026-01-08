@@ -882,16 +882,16 @@ const SecurityDashboard = () => {
           <TabsContent value="devices">
             <Card className="overflow-hidden">
               <CardHeader className="px-3 sm:px-6">
-                <CardTitle>Known Devices</CardTitle>
+                <CardTitle>{t('security.dashboard.knownDevices')}</CardTitle>
                 <CardDescription>
-                  Devices that have logged into your account
+                  {t('security.dashboard.knownDevicesDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="px-2 sm:px-4">
                 {knownDevices.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Monitor className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                    <p>No devices recorded yet</p>
+                    <p>{t('security.dashboard.noDevices')}</p>
                   </div>
                 ) : (
                   <div className="h-[400px] overflow-y-auto pr-1 scrollbar-thin">
@@ -994,10 +994,10 @@ const SecurityDashboard = () => {
                                   {device.device_type || 'desktop'}
                                 </Badge>
                                 {device.is_blocked && (
-                                  <Badge variant="destructive" className="text-[10px] h-5 px-1.5">Blocked</Badge>
+                                  <Badge variant="destructive" className="text-[10px] h-5 px-1.5">{t('security.dashboard.blocked')}</Badge>
                                 )}
                                 {device.is_trusted && !device.is_blocked && (
-                                  <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50 dark:bg-green-900/20 text-[10px] h-5 px-1.5">Trusted</Badge>
+                                  <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50 dark:bg-green-900/20 text-[10px] h-5 px-1.5">{t('security.dashboard.trusted')}</Badge>
                                 )}
                               </div>
                               
@@ -1035,7 +1035,7 @@ const SecurityDashboard = () => {
                               <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1.5 text-[10px] text-muted-foreground">
                                 <span className="flex items-center gap-1">
                                   <Clock className="h-3 w-3" />
-                                  First: {format(new Date(device.first_seen_at), 'PP')}
+                                  {t('security.dashboard.firstSeen')}: {format(new Date(device.first_seen_at), 'PP')}
                                 </span>
                                 <span className="flex items-center gap-1">
                                   <RefreshCw className="h-3 w-3" />
@@ -1058,10 +1058,10 @@ const SecurityDashboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Activity className="h-5 w-5" />
-                  Active Sessions
+                  {t('security.dashboard.activeSessions')}
                 </CardTitle>
                 <CardDescription>
-                  Devices currently logged into your account
+                  {t('security.dashboard.activeSessionsDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -1070,13 +1070,13 @@ const SecurityDashboard = () => {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                       <Wifi className="h-4 w-4 text-green-500" />
-                      <span>Currently Online ({activeDevices.length})</span>
+                      <span>{t('security.dashboard.currentlyOnline')} ({activeDevices.length})</span>
                     </div>
                     
                     {activeDevices.length === 0 ? (
                       <div className="p-4 rounded-lg border bg-muted/30 text-center text-sm text-muted-foreground">
                         <WifiOff className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                        <p>No active sessions detected</p>
+                        <p>{t('security.dashboard.noActiveSessions')}</p>
                       </div>
                     ) : (
                       <div className="space-y-2">
@@ -1115,11 +1115,11 @@ const SecurityDashboard = () => {
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                         <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                                       </span>
-                                      <span className="text-[10px] text-green-600 font-medium">Online</span>
+                                      <span className="text-[10px] text-green-600 font-medium">{t('security.dashboard.online')}</span>
                                     </div>
                                     {isCurrentDevice && (
                                       <Badge variant="outline" className="text-primary border-primary/30 text-[10px] h-5 px-1.5">
-                                        This device
+                                        {t('security.dashboard.thisDevice')}
                                       </Badge>
                                     )}
                                   </div>
@@ -1141,9 +1141,9 @@ const SecurityDashboard = () => {
                     <div className="flex items-start gap-2">
                       <Info className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                       <div>
-                        <p className="text-sm font-medium">Session Management</p>
+                        <p className="text-sm font-medium">{t('security.dashboard.sessionManagement')}</p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          Sign out of all other devices to secure your account. This will require re-authentication on those devices.
+                          {t('security.dashboard.sessionManagementDesc')}
                         </p>
                       </div>
                     </div>
@@ -1194,11 +1194,11 @@ const SecurityDashboard = () => {
                     ) : (
                       <Lock className="h-4 w-4 mr-2" />
                     )}
-                    Sign Out All Other Devices
+                    {t('security.dashboard.signOutAllOtherDevices')}
                   </Button>
 
                   <p className="text-xs text-muted-foreground text-center">
-                    Last login: {user?.last_sign_in_at ? format(new Date(user.last_sign_in_at), 'PPpp') : 'Unknown'}
+                    {t('security.dashboard.lastLogin')}: {user?.last_sign_in_at ? format(new Date(user.last_sign_in_at), 'PPpp') : t('common.unknown')}
                   </p>
                 </div>
               </CardContent>
@@ -1211,10 +1211,10 @@ const SecurityDashboard = () => {
                 <div>
                   <CardTitle className="flex items-center gap-2">
                     <History className="h-5 w-5" />
-                    Login History
+                    {t('security.dashboard.loginHistory')}
                   </CardTitle>
                   <CardDescription>
-                    Recent login activity with approximate locations
+                    {t('security.dashboard.loginHistoryDesc')}
                   </CardDescription>
                 </div>
                 {loginHistory.length > 0 && (
@@ -1254,7 +1254,7 @@ const SecurityDashboard = () => {
                     ) : (
                       <Trash2 className="h-4 w-4" />
                     )}
-                    <span className="hidden sm:inline ml-1.5">Clear History</span>
+                    <span className="hidden sm:inline ml-1.5">{t('security.dashboard.clearHistory')}</span>
                   </Button>
                 )}
               </CardHeader>
@@ -1262,7 +1262,7 @@ const SecurityDashboard = () => {
                 {loginHistory.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                    <p>No login history recorded yet</p>
+                    <p>{t('security.dashboard.noLoginHistory')}</p>
                   </div>
                 ) : (
                   <ScrollArea className="h-[400px] pr-4">
@@ -1278,7 +1278,7 @@ const SecurityDashboard = () => {
                           <div className="flex-1 min-w-0 overflow-hidden">
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
                               <p className="font-medium text-sm">
-                                Signed in successfully
+                                {t('security.dashboard.signedInSuccessfully')}
                               </p>
                               <div className="flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground shrink-0">
                                 <Clock className="h-3 w-3" />
@@ -1324,16 +1324,16 @@ const SecurityDashboard = () => {
           <TabsContent value="events">
             <Card>
               <CardHeader>
-                <CardTitle>Recent Security Events</CardTitle>
+                <CardTitle>{t('security.dashboard.recentSecurityEvents')}</CardTitle>
                 <CardDescription>
-                  Login activity, password changes, and 2FA updates
+                  {t('security.dashboard.recentSecurityEventsDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {authEvents.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Shield className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                    <p>No security events recorded yet</p>
+                    <p>{t('security.dashboard.noSecurityEvents')}</p>
                   </div>
                 ) : (
                   <ScrollArea className="h-[400px] pr-4">
@@ -1393,17 +1393,17 @@ const SecurityDashboard = () => {
           <TabsContent value="attempts">
             <Card>
               <CardHeader>
-                <CardTitle>Failed Backup Code Attempts</CardTitle>
+                <CardTitle>{t('security.dashboard.failedBackupCodeAttempts')}</CardTitle>
                 <CardDescription>
-                  Recent failed attempts to use backup codes for login
+                  {t('security.dashboard.failedBackupCodeAttemptsDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {backupCodeAttempts.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-green-500 opacity-70" />
-                    <p className="font-medium text-green-600">No failed attempts</p>
-                    <p className="text-sm">Your account has no recent failed backup code attempts</p>
+                    <p className="font-medium text-green-600">{t('security.dashboard.noFailedAttempts')}</p>
+                    <p className="text-sm">{t('security.dashboard.noFailedAttemptsDesc')}</p>
                   </div>
                 ) : (
                   <ScrollArea className="h-[400px] pr-4">
@@ -1419,7 +1419,7 @@ const SecurityDashboard = () => {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-2">
                               <p className="font-medium text-sm text-destructive">
-                                Failed backup code attempt
+                                {t('security.dashboard.failedBackupCodeAttempt')}
                               </p>
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                 <Clock className="h-3 w-3" />
@@ -1443,22 +1443,22 @@ const SecurityDashboard = () => {
         {/* Quick Actions */}
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Manage your account security settings</CardDescription>
+            <CardTitle>{t('security.dashboard.quickActions')}</CardTitle>
+            <CardDescription>{t('security.dashboard.quickActionsDesc')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2 sm:gap-3">
               <Button variant="outline" size="sm" className="text-xs sm:text-sm" asChild>
                 <Link to="/settings">
                   <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                  Security Settings
+                  {t('security.dashboard.securitySettings')}
                 </Link>
               </Button>
               {!stats.mfaEnabled && (
                 <Button variant="default" size="sm" className="text-xs sm:text-sm" asChild>
                   <Link to="/settings">
                     <Smartphone className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                    Enable 2FA
+                    {t('security.dashboard.enable2fa')}
                   </Link>
                 </Button>
               )}
@@ -1466,7 +1466,7 @@ const SecurityDashboard = () => {
                 <Button variant="outline" size="sm" className="border-amber-500 text-amber-600 hover:bg-amber-50 text-xs sm:text-sm" asChild>
                   <Link to="/settings">
                     <Key className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                    Generate Backup Codes
+                    {t('security.dashboard.generateBackupCodes')}
                   </Link>
                 </Button>
               )}
@@ -1487,10 +1487,10 @@ const SecurityDashboard = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
-              Verify Your Identity
+              {t('security.dashboard.verifyIdentity')}
             </DialogTitle>
             <DialogDescription>
-              To unblock this device, please verify your identity using your authenticator app or a backup code.
+              {t('security.dashboard.verifyIdentityDesc')}
             </DialogDescription>
           </DialogHeader>
           
@@ -1499,15 +1499,15 @@ const SecurityDashboard = () => {
               <div className="flex items-start gap-2">
                 <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5" />
                 <div className="text-sm text-amber-800 dark:text-amber-200">
-                  <p className="font-medium">Security Notice</p>
-                  <p className="text-xs mt-1">Unblocking a device will allow it to log into your account again. Make sure you recognize this device.</p>
+                  <p className="font-medium">{t('security.dashboard.securityNotice')}</p>
+                  <p className="text-xs mt-1">{t('security.dashboard.securityNoticeDesc')}</p>
                 </div>
               </div>
             </div>
             
             {useBackupCodeForUnblock ? (
               <div className="space-y-2">
-                <Label htmlFor="unblock-backup">Backup Code</Label>
+                <Label htmlFor="unblock-backup">{t('security.dashboard.backupCode')}</Label>
                 <div className="relative">
                   <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -1521,12 +1521,12 @@ const SecurityDashboard = () => {
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Enter one of your backup codes. Note: This code will be consumed after use.
+                  {t('security.dashboard.backupCodeNote')}
                 </p>
               </div>
             ) : (
               <div className="space-y-2">
-                <Label htmlFor="unblock-totp">Verification Code</Label>
+                <Label htmlFor="unblock-totp">{t('security.dashboard.verificationCode')}</Label>
                 <div className="relative">
                   <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -1541,7 +1541,7 @@ const SecurityDashboard = () => {
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Enter the 6-digit code from your authenticator app
+                  {t('security.dashboard.verificationCodeDesc')}
                 </p>
               </div>
             )}
@@ -1557,8 +1557,8 @@ const SecurityDashboard = () => {
                 }}
               >
                 {useBackupCodeForUnblock 
-                  ? "Use authenticator app instead" 
-                  : "Can't access your authenticator? Use a backup code"
+                  ? t('security.dashboard.useAuthenticator')
+                  : t('security.dashboard.useBackupCode')
                 }
               </Button>
             )}
@@ -1576,7 +1576,7 @@ const SecurityDashboard = () => {
               }}
               disabled={isVerifyingUnblock}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               onClick={handleUnblockWithMfa}
@@ -1585,12 +1585,12 @@ const SecurityDashboard = () => {
               {isVerifyingUnblock ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Verifying...
+                  {t('security.dashboard.verifying')}
                 </>
               ) : (
                 <>
                   <ShieldCheck className="h-4 w-4 mr-2" />
-                  Verify & Unblock
+                  {t('security.dashboard.verifyAndUnblock')}
                 </>
               )}
             </Button>

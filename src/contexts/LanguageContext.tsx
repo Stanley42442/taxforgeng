@@ -3963,6 +3963,8 @@ export const translations: Translations = {
   'security.dashboard.useBackupCode': { en: 'Can\'t access your authenticator? Use a backup code', pcm: 'Can\'t access your authenticator? Use a backup code', yo: 'Ṣe o kò lè wọlé sí olùfọwọ́sí rẹ? Lo kóòdù ìpamọ́', ha: 'Ba za ku iya shiga aikace-aikacen tabbatarwa ba? Yi amfani da lambar adana', ig: 'Enweghị ike ịnweta ngwa nkwenye gị? Jiri koodu ndabere' },
   'security.dashboard.verifyAndUnblock': { en: 'Verify & Unblock', pcm: 'Verify & Unblock', yo: 'Jẹ́rìísí & Mú Sílẹ̀', ha: 'Tabbatar & Buɗe', ig: 'Gosi & Kpọghee' },
   'security.dashboard.verifying': { en: 'Verifying...', pcm: 'Verifying...', yo: 'Ń Jẹ́rìísí...', ha: 'Ana Tabbatarwa...', ig: 'Na-agosi...' },
+  'security.dashboard.firstSeen': { en: 'First', pcm: 'First', yo: 'Àkọ́kọ́', ha: 'Na Farko', ig: 'Nke Mbụ' },
+  'common.unknown': { en: 'Unknown', pcm: 'Unknown', yo: 'Àìmọ̀', ha: 'Ba a Sani ba', ig: 'Amaghị' },
 
 };
 
