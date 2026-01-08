@@ -293,10 +293,10 @@ const Dashboard = () => {
   const totalTurnover = savedBusinesses.reduce((sum, b) => sum + b.turnover, 0);
 
   const dateRangeLabels = {
-    week: 'This Week',
-    month: 'This Month',
-    quarter: 'This Quarter',
-    year: 'This Year',
+    week: t('dashboard.thisWeek'),
+    month: t('dashboard.thisMonth'),
+    quarter: t('dashboard.thisQuarter'),
+    year: t('dashboard.thisYear'),
   };
 
   const handleExport = (format: 'pdf' | 'csv') => {
