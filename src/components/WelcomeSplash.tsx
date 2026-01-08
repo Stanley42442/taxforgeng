@@ -11,50 +11,48 @@ import {
   Sparkles,
   CheckCircle2,
 } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface WelcomeSplashProps {
   onComplete: () => void;
 }
 
 export const WelcomeSplash = ({ onComplete }: WelcomeSplashProps) => {
-  const { t } = useLanguage();
   const [open, setOpen] = useState(true);
   const [step, setStep] = useState(0);
 
   const TOUR_STEPS = [
     {
       icon: Calculator,
-      title: t('welcome.tourCalculator'),
-      description: t('welcome.tourCalculatorDesc'),
+      title: "Tax Calculator",
+      description: "Calculate CIT, VAT, PIT with 2026 rules support",
       color: "text-primary",
       bgColor: "bg-primary/10",
     },
     {
       icon: Building2,
-      title: t('welcome.tourMultiBusiness'),
-      description: t('welcome.tourMultiBusinessDesc'),
+      title: "Multi-Business Support",
+      description: "Manage multiple businesses with separate profiles",
       color: "text-success",
       bgColor: "bg-success/10",
     },
     {
       icon: Receipt,
-      title: t('welcome.tourExpense'),
-      description: t('welcome.tourExpenseDesc'),
+      title: "Expense Tracking",
+      description: "Track deductible expenses to reduce your tax burden",
       color: "text-warning",
       bgColor: "bg-warning/10",
     },
     {
       icon: Bell,
-      title: t('welcome.tourReminders'),
-      description: t('welcome.tourRemindersDesc'),
+      title: "Smart Reminders",
+      description: "Never miss a tax deadline with automated reminders",
       color: "text-destructive",
       bgColor: "bg-destructive/10",
     },
     {
       icon: GraduationCap,
-      title: t('welcome.tourAcademy'),
-      description: t('welcome.tourAcademyDesc'),
+      title: "Tax Academy",
+      description: "Learn Nigerian tax laws with our educational content",
       color: "text-primary",
       bgColor: "bg-primary/10",
     },
@@ -92,34 +90,34 @@ export const WelcomeSplash = ({ onComplete }: WelcomeSplashProps) => {
             </div>
             
             <h2 className="text-2xl font-bold text-foreground mb-2 animate-fade-in">
-              {t('welcome.title')}
+              Welcome to TaxForge NG!
             </h2>
             
             <p className="text-muted-foreground mb-6 animate-fade-in">
-              {t('welcome.subtitle')}
+              Your intelligent Nigerian tax companion
             </p>
 
             <div className="space-y-3 mb-6 animate-fade-in">
               <div className="flex items-center gap-3 p-3 rounded-lg bg-success/10 border border-success/20">
                 <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0" />
-                <span className="text-sm text-left">{t('welcome.accurateCalc')}</span>
+                <span className="text-sm text-left">Accurate tax calculations for Nigerian businesses</span>
               </div>
               <div className="flex items-center gap-3 p-3 rounded-lg bg-success/10 border border-success/20">
                 <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0" />
-                <span className="text-sm text-left">{t('welcome.multiBusinessExpense')}</span>
+                <span className="text-sm text-left">Multi-business & expense tracking</span>
               </div>
               <div className="flex items-center gap-3 p-3 rounded-lg bg-success/10 border border-success/20">
                 <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0" />
-                <span className="text-sm text-left">{t('welcome.demoData')}</span>
+                <span className="text-sm text-left">Demo data loaded for exploration</span>
               </div>
             </div>
 
             <div className="flex gap-3">
               <Button variant="outline" onClick={handleSkip} className="flex-1">
-                {t('welcome.skipTour')}
+                Skip Tour
               </Button>
               <Button variant="hero" onClick={handleNext} className="flex-1">
-                {t('welcome.startTour')}
+                Start Tour
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
@@ -157,10 +155,10 @@ export const WelcomeSplash = ({ onComplete }: WelcomeSplashProps) => {
 
             <div className="flex gap-3">
               <Button variant="outline" onClick={handleSkip} className="flex-1">
-                {t('welcome.skip')}
+                Skip
               </Button>
               <Button variant="hero" onClick={handleNext} className="flex-1">
-                {step === TOUR_STEPS.length - 1 ? t('welcome.getStarted') : t('common.next')}
+                {step === TOUR_STEPS.length - 1 ? "Get Started" : "Next"}
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
