@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import { Camera, Upload, Loader2, Sparkles, CheckCircle2, AlertCircle, Brain, FileText } from "lucide-react";
 import { createWorker, type Worker } from "tesseract.js";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ParsedReceipt {
   amount: number | null;
@@ -51,7 +50,6 @@ const CATEGORY_KEYWORDS: Record<string, string[]> = {
 };
 
 export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRReceiptScannerProps) => {
-  const { t } = useLanguage();
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [progressText, setProgressText] = useState('');
@@ -288,10 +286,10 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Camera className="h-5 w-5 text-primary" />
-            {t('ocr.scanReceipt')}
+            Scan Receipt
           </DialogTitle>
           <DialogDescription>
-            {t('ocr.uploadDescription')}
+            Upload a receipt image to automatically extract expense details
           </DialogDescription>
         </DialogHeader>
 
@@ -302,9 +300,9 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
               <div className="flex items-center gap-2">
                 <Brain className="h-4 w-4 text-primary" />
                 <div>
-                  <p className="text-sm font-medium">{t('ocr.aiCategorization')}</p>
+                  <p className="text-sm font-medium">AI Categorization</p>
                   <p className="text-xs text-muted-foreground">
-                    {t('ocr.aiDescription')}
+                    Auto-detect expense category & tax deductibility
                   </p>
                 </div>
               </div>
@@ -318,9 +316,9 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm font-medium">{t('ocr.clickToUpload')}</p>
+              <p className="text-sm font-medium">Click to upload or take photo</p>
               <p className="text-xs text-muted-foreground mt-1">
-                {t('ocr.supportedFormats')}
+                Supports JPEG, PNG, HEIC
               </p>
               <input
                 ref={fileInputRef}
@@ -357,17 +355,17 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
                 )}
                 <span className="text-sm font-medium">
                   {parsedData.confidence > 60 
-                    ? t('ocr.highConfidence')
+                    ? 'High confidence match'
                     : parsedData.confidence > 30
-                    ? t('ocr.verifyDetails')
-                    : t('ocr.lowConfidence')}
+                    ? 'Please verify details'
+                    : 'Low confidence - check carefully'}
                 </span>
               </div>
 
               {/* Editable fields */}
               <div className="space-y-3">
                 <div>
-                  <Label className="text-sm">{t('form.amount')} (₦)</Label>
+                  <Label className="text-sm">Amount (₦)</Label>
                   <Input
                     type="number"
                     value={editableData.amount}
@@ -377,16 +375,16 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
                 </div>
 
                 <div>
-                  <Label className="text-sm">{t('form.description')}</Label>
+                  <Label className="text-sm">Description</Label>
                   <Input
                     value={editableData.description}
                     onChange={(e) => setEditableData(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder={t('placeholder.receiptDescription')}
+                    placeholder="e.g. Office supplies from store"
                   />
                 </div>
 
                 <div>
-                  <Label className="text-sm">{t('form.date')}</Label>
+                  <Label className="text-sm">Date</Label>
                   <Input
                     type="date"
                     value={editableData.date}
@@ -395,7 +393,7 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
                 </div>
 
                 <div>
-                  <Label className="text-sm">{t('form.category')}</Label>
+                  <Label className="text-sm">Category</Label>
                   <Select
                     value={editableData.category}
                     onValueChange={(value) => setEditableData(prev => ({ ...prev, category: value }))}
@@ -417,7 +415,7 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
                 <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                   <div className="flex items-center gap-2">
                     <FileText className="h-4 w-4 text-primary" />
-                    <span className="text-sm">{t('ocr.taxDeductible')}</span>
+                    <span className="text-sm">Tax Deductible</span>
                   </div>
                   <Switch
                     checked={editableData.isDeductible}
@@ -428,7 +426,7 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
                 {/* AI Tax Note */}
                 {parsedData.taxNote && (
                   <div className="p-2 rounded-lg bg-info/10 text-info text-xs">
-                    <span className="font-medium">{t('ocr.taxTip')}:</span> {parsedData.taxNote}
+                    <span className="font-medium">Tax Tip:</span> {parsedData.taxNote}
                   </div>
                 )}
               </div>
@@ -437,7 +435,7 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
               {rawText && (
                 <details className="text-xs">
                   <summary className="text-muted-foreground cursor-pointer hover:text-foreground">
-                    {t('ocr.viewExtractedText')}
+                    View extracted text
                   </summary>
                   <pre className="mt-2 p-2 bg-secondary/50 rounded text-xs max-h-32 overflow-auto whitespace-pre-wrap">
                     {rawText}
@@ -455,17 +453,17 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
                 setParsedData(null);
                 setRawText('');
               }}>
-                {t('btn.scanAnother')}
+                Scan Another
               </Button>
               <Button variant="glow" onClick={handleConfirm}>
                 <Sparkles className="h-4 w-4" />
-                {t('btn.addEntry')}
+                Add Entry
               </Button>
             </>
           )}
           {!parsedData && !processing && (
             <Button variant="outline" onClick={handleClose}>
-              {t('btn.cancel')}
+              Cancel
             </Button>
           )}
         </DialogFooter>
