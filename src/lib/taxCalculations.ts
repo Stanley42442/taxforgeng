@@ -16,6 +16,7 @@ export interface SectorTaxRules {
   donationCap?: number;
   specialIncentives?: string[];
   pioneerStatus?: boolean;
+  ediEligible?: boolean; // Economic Development Incentive (replaces Pioneer Status)
   greenHireDeduction?: number;
 }
 
@@ -130,17 +131,20 @@ export function calculateCompanyTax(
   
   if (use2026Rules) {
     // 2026 Rules: Small companies (turnover ≤ ₦50m AND fixed assets ≤ ₦250m)
+    // Note: Some sources cite ₦100m, but we follow the dual threshold approach
     const isSmall = turnover <= 50000000 && fixedAssets <= 250000000;
     
     // Sector override for CIT (e.g., agriculture 0%, oil & gas 30%)
     if (hasSectorCIT) {
       const sectorRate = sectorRules!.citRate! / 100;
       const cit = Math.max(0, profit * sectorRate);
-      const devLevy = sectorRate > 0 ? Math.max(0, profit * 0.04) : 0;
-      return { cit, devLevy, isSmall: sectorRate === 0, appliedRate: sectorRules!.citRate! };
+      // Small company exemption scope includes dev levy
+      const devLevy = (sectorRate > 0 && !isSmall) ? Math.max(0, profit * 0.04) : 0;
+      return { cit, devLevy, isSmall: sectorRate === 0 || isSmall, appliedRate: sectorRules!.citRate! };
     }
     
     if (isSmall) {
+      // Small company exemption: 0% CIT AND 0% Development Levy
       return { cit: 0, devLevy: 0, isSmall: true, appliedRate: 0 };
     }
     
@@ -160,26 +164,36 @@ export function calculateCompanyTax(
 export function calculateVAT(
   vatableSales: number,
   vatablePurchases: number,
-  sectorRules?: SectorTaxRules
-): { outputVat: number; inputVat: number; netVat: number; vatStatus: string } {
+  sectorRules?: SectorTaxRules,
+  use2026Rules?: boolean
+): { outputVat: number; inputVat: number; netVat: number; vatStatus: string; fullInputRecovery: boolean } {
   // Check sector-specific VAT rules
   if (sectorRules?.vatStatus === 'exempt') {
-    return { outputVat: 0, inputVat: 0, netVat: 0, vatStatus: 'exempt' };
+    return { outputVat: 0, inputVat: 0, netVat: 0, vatStatus: 'exempt', fullInputRecovery: false };
   }
   
   if (sectorRules?.vatStatus === 'zero') {
     // Zero-rated: No output VAT, but can claim input VAT credits
     const inputVat = vatablePurchases * 0.075;
-    return { outputVat: 0, inputVat, netVat: -inputVat, vatStatus: 'zero-rated' };
+    return { outputVat: 0, inputVat, netVat: -inputVat, vatStatus: 'zero-rated', fullInputRecovery: true };
   }
   
   // Standard VAT rate (or sector-specific reduced rate)
   const vatRate = sectorRules?.vatRate !== undefined ? sectorRules.vatRate / 100 : 0.075;
   const outputVat = vatableSales * vatRate;
+  
+  // 2026 rules: Full input VAT recovery on ALL purchases (services + capital assets), not just goods
+  // Pre-2026: Only goods purchases qualified for input VAT
   const inputVat = vatablePurchases * vatRate;
   const netVat = Math.max(0, outputVat - inputVat);
   
-  return { outputVat, inputVat, netVat, vatStatus: 'standard' };
+  return { 
+    outputVat, 
+    inputVat, 
+    netVat, 
+    vatStatus: 'standard',
+    fullInputRecovery: use2026Rules === true
+  };
 }
 
 export function calculateWHTCredits(
@@ -213,12 +227,21 @@ export function calculateTax(inputs: TaxInputs): TaxResult {
 
   // Add sector-specific alerts and incentives
   if (sectorRules && inputs.sectorId) {
-    if (sectorRules.pioneerStatus) {
-      alerts.push({
-        type: 'info',
-        message: `${inputs.sectorId.replace('_', ' ')} sector may qualify for Pioneer Status (tax holiday)`,
-      });
-      appliedIncentives.push('Pioneer Status eligibility');
+    // EDI (Economic Development Incentive) replaces Pioneer Status under 2026 rules
+    if (sectorRules.ediEligible || sectorRules.pioneerStatus) {
+      if (inputs.use2026Rules) {
+        alerts.push({
+          type: 'info',
+          message: `${inputs.sectorId.replace('_', ' ')} sector may qualify for Economic Development Incentive (EDI): 5% annual tax credit for 5 years on qualifying capex`,
+        });
+        appliedIncentives.push('EDI eligibility (5% credit/year for 5 years)');
+      } else {
+        alerts.push({
+          type: 'info',
+          message: `${inputs.sectorId.replace('_', ' ')} sector may qualify for Pioneer Status (tax holiday)`,
+        });
+        appliedIncentives.push('Pioneer Status eligibility');
+      }
     }
     
     if (sectorRules.edtiRate) {
@@ -259,7 +282,9 @@ export function calculateTax(inputs: TaxInputs): TaxResult {
     if (isSmallCompany) {
       alerts.push({
         type: 'success',
-        message: 'Qualifies as Small Company - 0% CIT rate applies!',
+        message: inputs.use2026Rules 
+          ? 'Qualifies as Small Company - 0% CIT, 0% CGT, and 0% Development Levy applies!'
+          : 'Qualifies as Small Company - 0% CIT rate applies!',
       });
     } else if (sectorRules?.citRate !== undefined && sectorRules.citRate !== 25) {
       alerts.push({
@@ -344,8 +369,8 @@ export function calculateTax(inputs: TaxInputs): TaxResult {
     }
   }
 
-  // VAT Calculation with sector rules
-  const vatResult = calculateVAT(inputs.vatableSales, inputs.vatablePurchases, sectorRules);
+  // VAT Calculation with sector rules and 2026 full input recovery
+  const vatResult = calculateVAT(inputs.vatableSales, inputs.vatablePurchases, sectorRules, inputs.use2026Rules);
   
   if (vatResult.vatStatus === 'exempt') {
     alerts.push({
@@ -369,6 +394,14 @@ export function calculateTax(inputs: TaxInputs): TaxResult {
       label: 'VAT Payable',
       amount: vatResult.netVat,
       description: `${sectorRules?.vatRate || 7.5}% on vatable supplies`,
+    });
+  }
+  
+  // 2026 Full Input VAT Recovery Alert
+  if (inputs.use2026Rules && vatResult.fullInputRecovery && inputs.vatablePurchases > 0) {
+    alerts.push({
+      type: 'info',
+      message: '2026 rule: Full input VAT recovery available on services and capital assets (not just goods)',
     });
   }
 
@@ -399,15 +432,65 @@ export function calculateTax(inputs: TaxInputs): TaxResult {
     });
   }
 
-  // Capital Gains
+  // Capital Gains Tax
   if (inputs.capitalGains > 0) {
-    const cgt = inputs.capitalGains * 0.10;
-    breakdown.push({
-      label: 'Capital Gains Tax',
-      amount: cgt,
-      description: '10% on capital gains',
-    });
-    incomeTax += cgt;
+    // 2026 rules: Small companies exempt from CGT
+    if (inputs.use2026Rules && isSmallCompany && inputs.entityType === 'company') {
+      breakdown.push({
+        label: 'Capital Gains Tax',
+        amount: 0,
+        description: 'Exempt (Small Company)',
+      });
+      alerts.push({
+        type: 'success',
+        message: 'Small companies are exempt from CGT under 2026 rules',
+      });
+    } else {
+      // 2026 rules: Companies pay 30% CGT, individuals pay 10% (or progressive PIT rates for large gains)
+      let cgtRate = 0.10;
+      let cgtDescription = '10% on capital gains';
+      
+      if (inputs.use2026Rules && inputs.entityType === 'company') {
+        cgtRate = 0.30;
+        cgtDescription = '30% CGT (Company rate under 2026 rules)';
+      } else if (inputs.use2026Rules && inputs.entityType === 'business_name') {
+        // For individuals (business names), check for small investor exemption
+        // Exempt if proceeds < ₦150M AND gains ≤ ₦10M
+        if (inputs.capitalGains <= 10000000) {
+          breakdown.push({
+            label: 'Capital Gains Tax',
+            amount: 0,
+            description: 'Exempt (gains ≤ ₦10M small investor exemption)',
+          });
+          alerts.push({
+            type: 'success',
+            message: 'Capital gains ≤ ₦10M are exempt under 2026 small investor rules',
+          });
+        } else {
+          // Progressive rates same as PIT for individuals under 2026
+          const cgtResult = calculatePersonalIncomeTax(inputs.capitalGains, true);
+          const cgt = cgtResult.tax;
+          breakdown.push({
+            label: 'Capital Gains Tax',
+            amount: cgt,
+            description: 'Progressive PIT rates (0-25%) on capital gains',
+          });
+          incomeTax += cgt;
+        }
+      }
+      
+      // Apply standard rate for companies or pre-2026 rules
+      if (!(inputs.use2026Rules && inputs.entityType === 'business_name' && inputs.capitalGains <= 10000000) &&
+          !(inputs.use2026Rules && inputs.entityType === 'business_name' && inputs.capitalGains > 10000000)) {
+        const cgt = inputs.capitalGains * cgtRate;
+        breakdown.push({
+          label: 'Capital Gains Tax',
+          amount: cgt,
+          description: cgtDescription,
+        });
+        incomeTax += cgt;
+      }
+    }
   }
 
   // EDTI credit reduction
