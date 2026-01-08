@@ -21,25 +21,21 @@ import { MessageSquare, Star, Loader2, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FeedbackFormProps {
   trigger?: React.ReactNode;
 }
 
-const CATEGORY_KEYS: Record<string, string> = {
-  'general': 'feedback.generalFeedback',
-  'feature': 'feedback.featureRequest',
-  'bug': 'feedback.bugReport',
-  'improvement': 'feedback.improvementSuggestion',
-  'praise': 'feedback.praise',
-};
-
-const CATEGORIES = ['general', 'feature', 'bug', 'improvement', 'praise'];
+const CATEGORIES = [
+  { value: 'general', label: 'General Feedback' },
+  { value: 'feature', label: 'Feature Request' },
+  { value: 'bug', label: 'Bug Report' },
+  { value: 'improvement', label: 'Improvement Suggestion' },
+  { value: 'praise', label: 'Praise' },
+];
 
 export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
   const { user } = useAuth();
-  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
@@ -93,7 +89,7 @@ export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
   const defaultTrigger = (
     <Button variant="outline" size="sm" className="gap-2">
       <MessageSquare className="h-4 w-4" />
-      {t('feedback.giveFeedback')}
+      Give Feedback
     </Button>
   );
 
@@ -108,25 +104,25 @@ export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-success/20">
               <CheckCircle2 className="h-8 w-8 text-success" />
             </div>
-            <h3 className="text-xl font-bold text-foreground mb-2">{t('feedback.thankYou')}</h3>
-            <p className="text-muted-foreground">{t('feedback.helpUsImprove')}</p>
+            <h3 className="text-xl font-bold text-foreground mb-2">Thank You!</h3>
+            <p className="text-muted-foreground">Your feedback helps us improve TaxForge NG.</p>
           </div>
         ) : (
           <>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <MessageSquare className="h-5 w-5 text-primary" />
-                {t('feedback.giveFeedback')}
+                Give Feedback
               </DialogTitle>
               <DialogDescription>
-                {t('feedback.helpUsImprove')}
+                Your feedback helps us improve TaxForge NG.
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-5 py-4">
               {/* Star Rating */}
               <div className="space-y-2">
-                <Label>{t('feedback.rateExperience')}</Label>
+                <Label>Rate your experience</Label>
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
@@ -151,15 +147,15 @@ export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
 
               {/* Category */}
               <div className="space-y-2">
-                <Label htmlFor="category">{t('feedback.category')}</Label>
+                <Label htmlFor="category">Category</Label>
                 <Select value={category} onValueChange={setCategory}>
                   <SelectTrigger>
-                    <SelectValue placeholder={t('placeholder.selectCategory')} />
+                    <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
                     {CATEGORIES.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
-                        {t(CATEGORY_KEYS[cat])}
+                      <SelectItem key={cat.value} value={cat.value}>
+                        {cat.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -168,10 +164,10 @@ export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
 
               {/* Message */}
               <div className="space-y-2">
-                <Label htmlFor="message">{t('feedback.yourFeedback')}</Label>
+                <Label htmlFor="message">Your Feedback (Optional)</Label>
                 <Textarea
                   id="message"
-                  placeholder={t('placeholder.tellUsWhatYouThink')}
+                  placeholder="Tell us what you think..."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   rows={4}
@@ -182,7 +178,7 @@ export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
 
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => setOpen(false)} className="flex-1">
-                {t('btn.cancel')}
+                Cancel
               </Button>
               <Button 
                 variant="hero" 
@@ -193,10 +189,10 @@ export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    {t('status.submitting')}
+                    Submitting...
                   </>
                 ) : (
-                  t('btn.submitFeedback')
+                  "Submit Feedback"
                 )}
               </Button>
             </div>

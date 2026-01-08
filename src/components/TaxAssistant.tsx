@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Bot, Send, User, Loader2, X, MessageCircle, Sparkles, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { useSubscription } from "@/contexts/SubscriptionContext";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Message {
   role: "user" | "assistant";
@@ -30,7 +29,12 @@ interface UserContext {
 const STORAGE_KEY = "taxbot-position";
 const DEFAULT_POSITION: Position = { x: 24, y: 24 };
 
-// Suggested questions will be translated in component
+const SUGGESTED_QUESTIONS = [
+  "What is the current VAT rate in Nigeria?",
+  "When is CIT due for companies?",
+  "How do I calculate PAYE?",
+  "What items are VAT exempt?",
+];
 
 const getStoredPosition = (): Position => {
   try {
@@ -52,7 +56,6 @@ const savePosition = (pos: Position) => {
 };
 
 export function TaxAssistant() {
-  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -66,13 +69,6 @@ export function TaxAssistant() {
   
   const { savedBusinesses } = useSubscription();
   const primaryBusiness = savedBusinesses[0];
-
-  const SUGGESTED_QUESTIONS = [
-    t('taxbot.vatRateQuestion'),
-    t('taxbot.citDueQuestion'),
-    t('taxbot.payeQuestion'),
-    t('taxbot.vatExemptQuestion'),
-  ];
 
   // Lock body scroll when chat is open
   useEffect(() => {
@@ -324,8 +320,8 @@ export function TaxAssistant() {
               <Bot className="h-4 w-4" />
             </div>
             <div>
-              <CardTitle className="text-sm font-semibold">{t('taxbot.title')}</CardTitle>
-              <p className="text-[10px] text-white/80">{t('taxbot.subtitle')}</p>
+              <CardTitle className="text-sm font-semibold">TaxBot</CardTitle>
+              <p className="text-[10px] text-white/80">Your AI Tax Assistant</p>
             </div>
           </div>
           <Button
@@ -347,12 +343,12 @@ export function TaxAssistant() {
               <div className="flex items-center gap-2 min-w-0">
                 <Building2 className="h-3 w-3 text-primary flex-shrink-0" />
                 <span className="text-[10px] text-muted-foreground truncate">
-                  {useContext ? `${t('taxbot.personalizedFor').replace('{businessName}', primaryBusiness.name)}` : t('taxbot.personalize')}
+                  {useContext ? `Personalized for ${primaryBusiness.name}` : "Enable personalization"}
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Label htmlFor="use-context" className="text-[10px] text-muted-foreground">
-                  {t('taxbot.context')}
+                  Context
                 </Label>
                 <Switch
                   id="use-context"
@@ -371,16 +367,16 @@ export function TaxAssistant() {
               <div className="text-center py-2">
                 <Sparkles className="h-6 w-6 mx-auto text-primary mb-1" />
                 <p className="text-xs text-muted-foreground">
-                  {t('taxbot.greeting')}
+                  Ask me anything about Nigerian taxes!
                 </p>
                 {useContext && primaryBusiness && (
                   <p className="text-[10px] text-primary mt-1">
-                    {t('taxbot.personalizedFor').replace('{businessName}', primaryBusiness.name)}
+                    Personalized for {primaryBusiness.name}
                   </p>
                 )}
               </div>
               <div className="space-y-1.5">
-                <p className="text-[10px] text-muted-foreground font-medium">{t('taxbot.tryAsking')}</p>
+                <p className="text-[10px] text-muted-foreground font-medium">Try asking:</p>
                 {SUGGESTED_QUESTIONS.map((q, i) => (
                   <Button
                     key={i}
@@ -445,7 +441,7 @@ export function TaxAssistant() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={t('placeholder.askAboutTaxes')}
+              placeholder="Ask about Nigerian taxes..."
               disabled={isLoading}
               className="text-xs h-9"
             />

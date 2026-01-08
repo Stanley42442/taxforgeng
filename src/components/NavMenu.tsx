@@ -10,7 +10,6 @@ import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { useUpcomingReminders } from "@/hooks/useUpcomingReminders";
 import { useNotificationCount } from "@/hooks/useNotificationCount";
 import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { Badge } from "@/components/ui/badge";
 import { LiveIndicator } from "@/components/ui/live-indicator";
 import { 
@@ -45,7 +44,6 @@ import {
   Star,
   Building2,
 } from "lucide-react";
-import { LanguageToggle } from "@/components/LanguageToggle";
 import {
   Sheet,
   SheetContent,
@@ -61,7 +59,6 @@ export const NavMenu = () => {
   const { urgentCount } = useUpcomingReminders();
   const { unreadCount: notificationCount } = useNotificationCount();
   const { isConnected: isRealtimeConnected, newNotificationCount } = useRealtimeNotifications();
-  const { t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -71,7 +68,7 @@ export const NavMenu = () => {
 
   const handleSignOut = async () => {
     await signOut();
-    toast.success(t('toast.logoutSuccess'));
+    toast.success("Logged out successfully");
     navigate("/");
   };
 
@@ -80,33 +77,33 @@ export const NavMenu = () => {
   const isPaidTier = user && tier !== 'free' && tier !== 'starter';
 
   const navLinks = [
-    { to: "/dashboard", label: t('nav.dashboard'), icon: LayoutDashboard, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/advisory", label: t('nav.getAdvice'), icon: Lightbulb, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
+    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
+    { to: "/advisory", label: "Get Advice", icon: Lightbulb, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
     // Personal Tax: only for guests or free tier
-    { to: "/individual-calculator", label: t('nav.personalTax'), icon: User, minTier: 'free', adminOnly: false, showCondition: 'freeOnly' as const },
+    { to: "/individual-calculator", label: "Personal Tax", icon: User, minTier: 'free', adminOnly: false, showCondition: 'freeOnly' as const },
     // Business Tax: only for basic tier and above
-    { to: "/calculator", label: t('nav.calculator'), icon: Calculator, minTier: 'basic', adminOnly: false, showCondition: 'paidOnly' as const },
-    { to: "/learn", label: t('nav.learn'), icon: GraduationCap, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/pricing", label: t('nav.pricing'), icon: DollarSign, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/businesses", label: t('business.myBusinesses'), icon: FolderOpen, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
-    { to: "/achievements", label: t('nav.achievements'), icon: Trophy, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
-    { to: "/reminders", label: t('nav.reminders'), icon: Bell, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
+    { to: "/calculator", label: "Calculator", icon: Calculator, minTier: 'basic', adminOnly: false, showCondition: 'paidOnly' as const },
+    { to: "/learn", label: "Learn", icon: GraduationCap, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
+    { to: "/pricing", label: "Pricing", icon: DollarSign, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
+    { to: "/businesses", label: "My Businesses", icon: FolderOpen, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
+    { to: "/achievements", label: "Achievements", icon: Trophy, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
+    { to: "/reminders", label: "Reminders", icon: Bell, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
     
-    { to: "/expenses", label: t('nav.expenses'), icon: Receipt, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
-    { to: "/scenarios", label: t('nav.scenarios'), icon: GitBranch, minTier: 'freelancer', adminOnly: false, showCondition: 'always' as const },
-    { to: "/business-report", label: t('nav.reports'), icon: PieChart, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
-    { to: "/insights", label: t('nav.insights'), icon: BarChart3, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
-    { to: "/transactions", label: t('nav.transactions'), icon: Upload, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
-    { to: "/e-filing", label: t('nav.efiling'), icon: Send, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
-    { to: "/tax-filing", label: t('nav.taxFiling'), icon: FileText, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
-    { to: "/team", label: t('nav.team'), icon: Users, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
+    { to: "/expenses", label: "Expenses", icon: Receipt, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
+    { to: "/scenarios", label: "Scenarios", icon: GitBranch, minTier: 'freelancer', adminOnly: false, showCondition: 'always' as const },
+    { to: "/business-report", label: "Reports", icon: PieChart, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
+    { to: "/insights", label: "Insights", icon: BarChart3, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
+    { to: "/transactions", label: "Transactions", icon: Upload, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
+    { to: "/e-filing", label: "E-Filing", icon: Send, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
+    { to: "/tax-filing", label: "Tax Filing", icon: FileText, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
+    { to: "/team", label: "Team", icon: Users, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
     { to: "/api-docs", label: "API Docs", icon: Code, minTier: 'corporate', adminOnly: false, showCondition: 'always' as const },
     { to: "/audit-log", label: "Audit Log", icon: History, minTier: 'corporate', adminOnly: false, showCondition: 'always' as const },
-    { to: "/accountant-portal", label: t('accountant.title'), icon: Building2, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
-    { to: "/tax-calendar", label: t('nav.taxCalendar'), icon: Calendar, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/referrals", label: t('nav.referrals'), icon: Gift, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/success-stories", label: t('stories.title'), icon: Star, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/roadmap", label: t('nav.roadmap'), icon: Map, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
+    { to: "/accountant-portal", label: "Accountant Portal", icon: Building2, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
+    { to: "/tax-calendar", label: "Tax Calendar", icon: Calendar, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
+    { to: "/referrals", label: "Referrals", icon: Gift, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
+    { to: "/success-stories", label: "Success Stories", icon: Star, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
+    { to: "/roadmap", label: "Roadmap", icon: Map, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
     { to: "/admin-analytics", label: "Admin Analytics", icon: Shield, minTier: 'free', adminOnly: true, showCondition: 'always' as const },
   ];
 
@@ -174,7 +171,6 @@ export const NavMenu = () => {
               </span>
             )}
             <ThemeToggle />
-            <LanguageToggle />
 
             {/* Realtime Indicator */}
             {user && isRealtimeConnected && (
@@ -268,14 +264,14 @@ export const NavMenu = () => {
                           <Link to="/settings" className="block">
                             <Button variant="ghost" className="w-full h-9 text-sm justify-start">
                               <User className="h-4 w-4 shrink-0" />
-                              <span className="truncate">{t('nav.accountSettings')}</span>
+                              <span className="truncate">Account Settings</span>
                             </Button>
                           </Link>
                         </SheetClose>
                         <SheetClose asChild>
                           <Button variant="outline" className="w-full h-9 text-sm" onClick={handleSignOut}>
                             <LogOut className="h-4 w-4 shrink-0" />
-                            <span className="truncate">{t('common.signOut')}</span>
+                            <span className="truncate">Sign Out</span>
                           </Button>
                         </SheetClose>
                       </>
@@ -284,7 +280,7 @@ export const NavMenu = () => {
                         <Link to="/auth" className="block">
                           <Button variant="hero" className="w-full h-9 text-sm">
                             <LogIn className="h-4 w-4 shrink-0" />
-                            <span className="truncate">{t('common.signIn')}</span>
+                            <span className="truncate">Sign In</span>
                           </Button>
                         </Link>
                       </SheetClose>
