@@ -47,7 +47,6 @@ import { toast } from "sonner";
 import { useSubscription, type SavedBusiness } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 const CalculatorPage = () => {
   const location = useLocation();
@@ -55,7 +54,6 @@ const CalculatorPage = () => {
   const preselectedEntity = location.state?.entityType;
   const { tier, savedBusinesses, loading: subscriptionLoading } = useSubscription();
   const { user, loading: authLoading } = useAuth();
-  const { t } = useLanguage();
 
   // ALL HOOKS MUST BE DECLARED BEFORE ANY CONDITIONAL RETURNS
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>('');
@@ -133,13 +131,13 @@ const CalculatorPage = () => {
   };
 
   const categoryLabels: Record<ExpenseCategory, string> = {
-    office_supplies: t('category.officeSupplies'),
-    travel: t('category.travel'),
-    utilities: t('category.utilities'),
-    meals: t('category.meals'),
-    rent: t('category.rent'),
-    equipment: t('category.equipment'),
-    other: t('category.other'),
+    office_supplies: 'Office Supplies',
+    travel: 'Travel',
+    utilities: 'Utilities',
+    meals: 'Meals',
+    rent: 'Rent',
+    equipment: 'Equipment',
+    other: 'Other',
   };
 
   // Fetch expenses for selected business with category breakdown
@@ -312,13 +310,13 @@ const CalculatorPage = () => {
           <div className="text-center mb-8 animate-slide-up">
             <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-2 text-sm font-medium mb-4">
               <Sparkles className="h-4 w-4 text-accent animate-pulse-soft" />
-              {t('calculator.firsCompliant')}
+              FIRS Compliant
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-              {t('calculator.title')}
+              Business Tax Calculator
             </h1>
             <p className="text-muted-foreground mb-4">
-              {t('calculator.subtitle')}
+              Calculate your Nigerian business taxes accurately
             </p>
           </div>
 
@@ -331,17 +329,17 @@ const CalculatorPage = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <Label className="text-sm font-medium text-foreground mb-2 block">
-                    {t('calculator.selectBusiness')}
+                    Select Business
                   </Label>
                   <Select value={selectedBusinessId} onValueChange={handleBusinessSelect}>
                     <SelectTrigger className="w-full h-12 rounded-xl border-2 border-border/60 bg-background/80 backdrop-blur-sm">
-                      <SelectValue placeholder={t('calculator.selectBusiness')} />
+                      <SelectValue placeholder="Select a business" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="__new__">
                         <span className="flex items-center gap-2">
                           <Sparkles className="h-4 w-4 text-accent" />
-                          {t('calculator.newCalculation')}
+                          New Calculation
                         </span>
                       </SelectItem>
                       {savedBusinesses.map((business) => (
@@ -401,7 +399,7 @@ const CalculatorPage = () => {
                 </div>
                 <div className="min-w-0 mr-3">
                   <p className="font-semibold text-foreground">
-                    {use2026Rules ? t('calculator.2026Rules') : t('calculator.pre2026Rules')}
+                    {use2026Rules ? '2026 Tax Rules' : 'Pre-2026 Tax Rules'}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {use2026Rules 
@@ -432,14 +430,14 @@ const CalculatorPage = () => {
                 className="flex items-center gap-2 py-4 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-300"
               >
                 <Briefcase className="h-5 w-5" />
-                <span className="font-semibold">{t('calculator.businessName')}</span>
+                <span className="font-semibold">Business Name</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="company"
                 className="flex items-center gap-2 py-4 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-300"
               >
                 <Building2 className="h-5 w-5" />
-                <span className="font-semibold">{t('calculator.company')}</span>
+                <span className="font-semibold">Company (LTD)</span>
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -448,50 +446,39 @@ const CalculatorPage = () => {
           <div className="glass-frosted rounded-3xl p-6 md:p-8 shadow-futuristic animate-slide-up-delay-2">
             <div className="space-y-8">
               {/* Primary Income */}
-              <InputSection title={t('calculator.primaryIncome')} tooltip="Your main business revenue and expenses">
+              <InputSection title="Primary Income" tooltip="Your main business revenue and expenses">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <NeumorphicInput
-                    label={t('calculator.annualTurnover')}
+                    label="Annual Turnover"
                     value={inputs.turnover}
                     onChange={(v) => updateInput('turnover', v)}
-                    tooltip="Total revenue/sales for the year"
+                    placeholder="0"
                     required
                   />
-                  <div>
+                  <div className="space-y-2">
                     <NeumorphicInput
-                      label={t('calculator.expenses')}
+                      label="Deductible Expenses"
                       value={inputs.expenses}
                       onChange={(v) => updateInput('expenses', v)}
-                      tooltip="Deductible business costs"
+                      placeholder="0"
                     />
-                    {/* Quick Add Expense Button */}
                     {selectedBusinessId && selectedBusinessId !== '__new__' && (
                       <Dialog open={expenseDialogOpen} onOpenChange={setExpenseDialogOpen}>
                         <DialogTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="mt-2 text-xs text-primary hover:text-primary/80"
-                          >
+                          <Button variant="outline" size="sm" className="w-full text-xs">
                             <Plus className="h-3 w-3 mr-1" />
-                            {t('calculator.quickAddExpense')}
+                            Quick Add Expense
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="glass-frosted">
+                        <DialogContent>
                           <DialogHeader>
-                            <DialogTitle className="flex items-center gap-2">
-                              <Receipt className="h-5 w-5 text-primary" />
-                              {t('expense.addExpense')}
-                            </DialogTitle>
+                            <DialogTitle>Add Quick Expense</DialogTitle>
                           </DialogHeader>
-                          <div className="space-y-4 pt-4">
-                            <div>
-                              <Label className="text-sm font-medium mb-2 block">{t('expense.category')}</Label>
-                              <Select 
-                                value={quickExpense.category} 
-                                onValueChange={(v) => setQuickExpense(prev => ({ ...prev, category: v }))}
-                              >
-                                <SelectTrigger className="h-12 rounded-xl">
+                          <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                              <Label>Category</Label>
+                              <Select value={quickExpense.category} onValueChange={(v) => setQuickExpense(prev => ({ ...prev, category: v }))}>
+                                <SelectTrigger>
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -506,168 +493,130 @@ const CalculatorPage = () => {
                                 </SelectContent>
                               </Select>
                             </div>
-                            <div>
-                              <Label className="text-sm font-medium mb-2 block">{t('expense.amount')}</Label>
-                              <div className="relative">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary font-semibold">₦</span>
-                                <Input
-                                  type="text"
-                                  inputMode="numeric"
-                                  value={quickExpense.amount ? Number(quickExpense.amount.replace(/[^0-9]/g, '')).toLocaleString() : ''}
-                                  onChange={(e) => setQuickExpense(prev => ({ 
-                                    ...prev, 
-                                    amount: e.target.value.replace(/[^0-9]/g, '') 
-                                  }))}
-                                  className="pl-10 h-12 rounded-xl"
-                                  placeholder="0"
-                                />
-                              </div>
-                            </div>
-                            <div>
-                              <Label className="text-sm font-medium mb-2 block">{t('expense.description')}</Label>
-                              <Input
+                            <div className="space-y-2">
+                              <Label>Description (optional)</Label>
+                              <Input 
+                                placeholder="Enter description"
                                 value={quickExpense.description}
                                 onChange={(e) => setQuickExpense(prev => ({ ...prev, description: e.target.value }))}
-                                className="h-12 rounded-xl"
-                                placeholder="..."
                               />
                             </div>
-                            <Button 
-                              onClick={handleQuickExpenseSubmit}
-                              className="w-full h-12 rounded-xl"
-                              disabled={!quickExpense.amount}
-                            >
-                              <Plus className="h-4 w-4 mr-2" />
-                              {t('expense.addExpense')}
+                            <div className="space-y-2">
+                              <Label>Amount (₦)</Label>
+                              <Input 
+                                placeholder="0"
+                                value={quickExpense.amount}
+                                onChange={(e) => setQuickExpense(prev => ({ ...prev, amount: e.target.value.replace(/[^0-9]/g, '') }))}
+                              />
+                            </div>
+                            <Button className="w-full" onClick={handleQuickExpenseSubmit}>
+                              Add Expense
                             </Button>
                           </div>
                         </DialogContent>
                       </Dialog>
                     )}
+                    {Object.keys(expenseBreakdown).length > 0 && (
+                      <div className="text-xs text-muted-foreground space-y-1 mt-2 p-2 bg-secondary/30 rounded-lg">
+                        {Object.entries(expenseBreakdown).map(([cat, amount]) => (
+                          <div key={cat} className="flex justify-between">
+                            <span className="flex items-center gap-1">
+                              {categoryIcons[cat as ExpenseCategory] || <Receipt className="h-3 w-3" />}
+                              {categoryLabels[cat as ExpenseCategory] || cat}
+                            </span>
+                            <span>₦{amount.toLocaleString()}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
-
-                {/* Expense Breakdown by Category */}
-                {selectedBusinessId && selectedBusinessId !== '__new__' && Object.keys(expenseBreakdown).length > 0 && (
-                  <div className="mt-4 p-4 rounded-xl bg-secondary/30 border border-border/40">
-                    <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-                      <Receipt className="h-4 w-4 text-primary" />
-                      Expense Breakdown
-                    </h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {Object.entries(expenseBreakdown).map(([category, amount]) => (
-                        <div 
-                          key={category} 
-                          className="flex items-center gap-2 p-2 rounded-lg bg-background/50"
-                        >
-                          <span className="text-muted-foreground">
-                            {categoryIcons[category as ExpenseCategory] || categoryIcons.other}
-                          </span>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs text-muted-foreground truncate">
-                              {categoryLabels[category as ExpenseCategory] || category}
-                            </p>
-                            <p className="text-sm font-medium text-foreground">
-                              ₦{amount.toLocaleString()}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </InputSection>
 
-              {/* Company-specific fields */}
-              {entityType === 'company' && (
-                <InputSection title="Company Assets" tooltip="Required to determine small company status">
-                  <NeumorphicInput
-                    label={t('calculator.fixedAssets')}
-                    value={inputs.fixedAssets}
-                    onChange={(v) => updateInput('fixedAssets', v)}
-                    tooltip="Total value of property, equipment, vehicles etc."
-                  />
-                </InputSection>
-              )}
-
-              {/* Rent (for Business Name PIT relief) */}
-              {entityType === 'business_name' && use2026Rules && (
-                <InputSection title="Rent Relief" tooltip="2026 rules allow relief for rent paid">
-                  <NeumorphicInput
-                    label={t('calculator.rentPaid')}
-                    value={inputs.rentPaid}
-                    onChange={(v) => updateInput('rentPaid', v)}
-                    tooltip="Relief: min(20% of rent, ₦500k)"
-                  />
-                </InputSection>
-              )}
-
-              {/* VAT */}
-              <InputSection title={t('calculator.vatDetails')} tooltip="Mandatory if turnover > ₦25m">
+              {/* VAT Details */}
+              <InputSection title="VAT Details" tooltip="Value Added Tax on sales and purchases">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <NeumorphicInput
-                    label={t('calculator.vatableSales')}
+                    label="VATable Sales"
                     value={inputs.vatableSales}
                     onChange={(v) => updateInput('vatableSales', v)}
-                    tooltip="Sales subject to VAT"
+                    placeholder="0"
                   />
                   <NeumorphicInput
-                    label={t('calculator.vatablePurchases')}
+                    label="VATable Purchases"
                     value={inputs.vatablePurchases}
                     onChange={(v) => updateInput('vatablePurchases', v)}
-                    tooltip="Purchases with recoverable VAT"
+                    placeholder="0"
                   />
                 </div>
               </InputSection>
 
-              {/* Other Income */}
-              <InputSection title={t('calculator.additionalIncome')} tooltip="Additional income sources">
+              {/* Additional Income */}
+              <InputSection title="Additional Income" tooltip="Other income sources that may be taxed differently">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <NeumorphicInput
-                    label={t('calculator.rentalIncome')}
+                    label="Rental Income"
                     value={inputs.rentalIncome}
                     onChange={(v) => updateInput('rentalIncome', v)}
-                    tooltip="10% WHT usually deducted at source"
+                    placeholder="0"
                   />
                   <NeumorphicInput
-                    label={t('calculator.consultancyIncome')}
+                    label="Consultancy Income"
                     value={inputs.consultancyIncome}
                     onChange={(v) => updateInput('consultancyIncome', v)}
-                    tooltip="10% WHT for companies, 5% for individuals"
+                    placeholder="0"
                   />
                   <NeumorphicInput
-                    label={t('calculator.dividendIncome')}
+                    label="Dividend Income"
                     value={inputs.dividendIncome}
                     onChange={(v) => updateInput('dividendIncome', v)}
-                    tooltip="Franked dividends from Nigerian companies are tax-exempt"
+                    placeholder="0"
                   />
                   <NeumorphicInput
-                    label={t('calculator.capitalGains')}
+                    label="Capital Gains"
                     value={inputs.capitalGains}
                     onChange={(v) => updateInput('capitalGains', v)}
-                    tooltip="10% Capital Gains Tax applies"
+                    placeholder="0"
+                  />
+                </div>
+              </InputSection>
+
+              {/* Other Details */}
+              <InputSection title="Other Details" tooltip="Additional deductions and income">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <NeumorphicInput
+                    label="Rent Paid (WHT)"
+                    value={inputs.rentPaid}
+                    onChange={(v) => updateInput('rentPaid', v)}
+                    placeholder="0"
+                  />
+                  <NeumorphicInput
+                    label="Foreign Income"
+                    value={inputs.foreignIncome}
+                    onChange={(v) => updateInput('foreignIncome', v)}
+                    placeholder="0"
+                  />
+                  <NeumorphicInput
+                    label="Fixed Assets (Capital Allowance)"
+                    value={inputs.fixedAssets}
+                    onChange={(v) => updateInput('fixedAssets', v)}
+                    placeholder="0"
+                    className="sm:col-span-2"
                   />
                 </div>
               </InputSection>
             </div>
 
             {/* Calculate Button */}
-            <div className="mt-10">
-              <Button 
-                variant="glow" 
-                size="xl" 
-                className="w-full text-lg shadow-2xl"
+            <div className="mt-8">
+              <Button
+                className="w-full h-14 text-lg rounded-2xl bg-gradient-primary hover:shadow-lg hover:scale-[1.02] transition-all duration-300 glow-primary"
                 onClick={handleCalculate}
                 disabled={!canCalculate}
               >
-                <span>{t('calculator.calculateTax')}</span>
-                <ArrowRight className="h-5 w-5" />
+                Calculate Tax
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              {!canCalculate && (
-                <p className="text-center text-sm text-muted-foreground mt-3">
-                  {t('calculator.annualTurnover')}
-                </p>
-              )}
             </div>
           </div>
         </div>
@@ -676,81 +625,66 @@ const CalculatorPage = () => {
   );
 };
 
-const InputSection = ({
-  title,
-  tooltip,
-  children,
-}: {
-  title: string;
-  tooltip: string;
-  children: React.ReactNode;
+// Reusable Input Section Component
+const InputSection = ({ 
+  title, 
+  tooltip, 
+  children 
+}: { 
+  title: string; 
+  tooltip: string; 
+  children: React.ReactNode 
 }) => (
-  <div>
-    <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-      {title}
-      <TooltipHelper content={tooltip} />
-    </h3>
+  <div className="space-y-4">
+    <div className="flex items-center gap-2">
+      <h3 className="font-semibold text-foreground">{title}</h3>
+      <Popover>
+        <PopoverTrigger asChild>
+          <button className="text-muted-foreground hover:text-foreground transition-colors">
+            <HelpCircle className="h-4 w-4" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="text-sm">
+          {tooltip}
+        </PopoverContent>
+      </Popover>
+    </div>
     {children}
   </div>
 );
 
+// Neumorphic Input Component
 const NeumorphicInput = ({
   label,
   value,
   onChange,
-  tooltip,
+  placeholder,
   required,
+  className,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
-  tooltip: string;
+  placeholder?: string;
   required?: boolean;
-}) => {
-  const displayValue = value ? Number(value).toLocaleString('en-NG') : '';
-
-  return (
-    <div>
-      <Label className="flex items-center gap-1.5 mb-2.5 text-sm font-medium text-foreground">
-        {label}
-        {required && <span className="text-destructive">*</span>}
-        <TooltipHelper content={tooltip} />
-      </Label>
-      <div className="relative group">
-        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary font-semibold text-lg z-10">
-          ₦
-        </span>
-        <Input
-          type="text"
-          inputMode="numeric"
-          value={displayValue}
-          onChange={(e) => onChange(e.target.value)}
-          className="pl-10 h-14 rounded-xl border-2 border-border/60 bg-background/80 backdrop-blur-sm shadow-md text-lg font-medium text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-4 focus:ring-primary/20 focus:shadow-lg focus:shadow-primary/10 hover:border-primary/50 hover:shadow-md transition-all duration-300"
-          placeholder="0"
-        />
-        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
-      </div>
+  className?: string;
+}) => (
+  <div className={`space-y-2 ${className}`}>
+    <Label className="text-sm font-medium text-muted-foreground">
+      {label}
+      {required && <span className="text-destructive ml-1">*</span>}
+    </Label>
+    <div className="relative">
+      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">₦</span>
+      <Input
+        type="text"
+        value={value ? Number(value).toLocaleString() : ''}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="pl-8 h-12 rounded-xl border-2 border-border/60 bg-background/80 backdrop-blur-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+      />
     </div>
-  );
-};
-
-const TooltipHelper = ({ content }: { content: string }) => (
-  <Popover>
-    <PopoverTrigger asChild>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="h-5 w-5 text-muted-foreground hover:text-foreground rounded-full"
-        aria-label="Help"
-      >
-        <HelpCircle className="h-4 w-4" />
-      </Button>
-    </PopoverTrigger>
-    <PopoverContent className="max-w-xs p-3 glass-frosted" side="top">
-      <p className="text-sm">{content}</p>
-    </PopoverContent>
-  </Popover>
+  </div>
 );
 
 export default CalculatorPage;
