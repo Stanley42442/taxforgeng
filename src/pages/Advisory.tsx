@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { NavMenu } from "@/components/NavMenu";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   Users, 
   User, 
@@ -43,7 +42,6 @@ const iconMap: Record<string, React.ReactNode> = {
 
 const Advisory = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<AdvisoryAnswers>({
     hasPartners: null,
@@ -97,32 +95,34 @@ const Advisory = () => {
                 )}
               </div>
               <h1 className="text-3xl font-bold text-foreground mb-2">
-                {t('advisory.result.title')}
+                Our Recommendation
               </h1>
               <div className="inline-flex items-center gap-2 rounded-full bg-success/10 px-4 py-2 text-sm font-medium text-success">
-                {recommendation.suitabilityScore}% {t('advisory.result.match')}
+                {recommendation.suitabilityScore}% Match
               </div>
             </div>
 
             <div className="rounded-2xl border border-border bg-card p-8 shadow-card mb-6">
               <h2 className="text-2xl font-bold text-foreground mb-3">
-                {t(recommendation.titleKey)}
+                {recommendation.entityType === 'company' ? 'Limited Liability Company (LLC)' : 'Business Name / Sole Proprietorship'}
               </h2>
               <p className="text-muted-foreground mb-6">
-                {t(recommendation.summaryKey)}
+                {recommendation.entityType === 'company' 
+                  ? 'A separate legal entity that offers liability protection and is suitable for growth-oriented businesses.'
+                  : 'A simple business structure ideal for solo entrepreneurs with lower compliance requirements.'}
               </p>
 
               <div className="grid gap-6 md:grid-cols-2 mb-6">
                 <div>
                   <h3 className="font-semibold text-success mb-3 flex items-center gap-2">
                     <TrendingUp className="h-4 w-4" />
-                    {t('advisory.result.advantages')}
+                    Advantages
                   </h3>
                   <ul className="space-y-2">
                     {recommendation.prosKeys.map((proKey, i) => (
                       <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
                         <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-success flex-shrink-0" />
-                        {t(proKey)}
+                        {proKey.replace('advisory.pros.', '').replace(/([A-Z])/g, ' $1').trim()}
                       </li>
                     ))}
                   </ul>
@@ -130,13 +130,13 @@ const Advisory = () => {
                 <div>
                   <h3 className="font-semibold text-warning mb-3 flex items-center gap-2">
                     <TrendingDown className="h-4 w-4" />
-                    {t('advisory.result.considerations')}
+                    Considerations
                   </h3>
                   <ul className="space-y-2">
                     {recommendation.consKeys.map((conKey, i) => (
                       <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
                         <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-warning flex-shrink-0" />
-                        {t(conKey)}
+                        {conKey.replace('advisory.cons.', '').replace(/([A-Z])/g, ' $1').trim()}
                       </li>
                     ))}
                   </ul>
@@ -145,16 +145,22 @@ const Advisory = () => {
 
               <div className="grid gap-4 rounded-xl bg-secondary/50 p-4 md:grid-cols-3">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">{t('advisory.result.taxAuthority')}</p>
-                  <p className="font-medium text-foreground text-sm">{t(recommendation.taxAuthorityKey)}</p>
+                  <p className="text-xs text-muted-foreground mb-1">Tax Authority</p>
+                  <p className="font-medium text-foreground text-sm">
+                    {recommendation.entityType === 'company' ? 'FIRS (Federal)' : 'State IRS'}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">{t('advisory.result.registrationCost')}</p>
-                  <p className="font-medium text-foreground text-sm">{t(recommendation.estimatedCosts.registrationKey)}</p>
+                  <p className="text-xs text-muted-foreground mb-1">Registration Cost</p>
+                  <p className="font-medium text-foreground text-sm">
+                    {recommendation.entityType === 'company' ? '₦50,000 - ₦150,000' : '₦10,000 - ₦25,000'}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">{t('advisory.result.annualCompliance')}</p>
-                  <p className="font-medium text-foreground text-sm">{t(recommendation.estimatedCosts.annualKey)}</p>
+                  <p className="text-xs text-muted-foreground mb-1">Annual Compliance</p>
+                  <p className="font-medium text-foreground text-sm">
+                    {recommendation.entityType === 'company' ? '₦100,000+' : '₦20,000 - ₦50,000'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -168,7 +174,7 @@ const Advisory = () => {
                   state: { entityType: recommendation.entityType } 
                 })}
               >
-                {t('advisory.result.calculateTaxes')}
+                Calculate Your Taxes
                 <ArrowRight className="h-5 w-5" />
               </Button>
               <Button 
@@ -188,7 +194,7 @@ const Advisory = () => {
                   });
                 }}
               >
-                {t('advisory.result.startOver')}
+                Start Over
               </Button>
             </div>
           </div>
@@ -205,7 +211,7 @@ const Advisory = () => {
         <div className="mb-6 flex justify-end">
           <Link to="/calculator">
             <Button variant="ghost" size="sm">
-              {t('advisory.skipToCalculator')}
+              Skip to Calculator
             </Button>
           </Link>
         </div>
@@ -213,8 +219,8 @@ const Advisory = () => {
           {/* Progress */}
           <div className="mb-8">
             <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
-              <span>{t('advisory.question')} {currentStep + 1} {t('common.of')} {advisoryQuestions.length}</span>
-              <span>{Math.round(progress)}% {t('advisory.complete')}</span>
+              <span>Question {currentStep + 1} of {advisoryQuestions.length}</span>
+              <span>{Math.round(progress)}% Complete</span>
             </div>
             <Progress value={progress} className="h-2" />
           </div>
@@ -222,10 +228,10 @@ const Advisory = () => {
           {/* Question Card */}
           <div className="animate-slide-up rounded-2xl border border-border bg-card p-8 shadow-card">
             <h2 className="text-2xl font-bold text-foreground mb-2">
-              {t(currentQuestion.questionKey)}
+              {currentQuestion.questionKey.replace('advisory.questions.', '').replace(/([A-Z])/g, ' $1').trim()}?
             </h2>
             <p className="text-muted-foreground mb-8">
-              {t(currentQuestion.descriptionKey)}
+              This helps us understand your business needs
             </p>
 
             <div className="space-y-3">
@@ -246,7 +252,9 @@ const Advisory = () => {
                     }`}>
                       {iconMap[option.icon]}
                     </div>
-                    <span className="font-medium text-foreground">{t(option.labelKey)}</span>
+                    <span className="font-medium text-foreground">
+                      {option.labelKey.replace('advisory.options.', '').replace(/([A-Z])/g, ' $1').trim()}
+                    </span>
                   </button>
                 );
               })}
@@ -261,7 +269,7 @@ const Advisory = () => {
               disabled={currentStep === 0}
             >
               <ArrowLeft className="h-4 w-4" />
-              {t('common.back')}
+              Back
             </Button>
             <div className="flex gap-1">
               {advisoryQuestions.map((_, i) => (

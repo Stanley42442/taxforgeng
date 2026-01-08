@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface TimeAccessManagerProps {
   userId: string;
@@ -59,7 +58,6 @@ const TIMEZONES = [
 ];
 
 export const TimeAccessManager = ({ userId }: TimeAccessManagerProps) => {
-  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [enabled, setEnabled] = useState(false);
@@ -165,10 +163,10 @@ export const TimeAccessManager = ({ userId }: TimeAccessManagerProps) => {
           <div>
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-primary" />
-              {t('timeAccess.title')}
+              Time-Based Access
             </CardTitle>
             <CardDescription>
-              {t('timeAccess.description')}
+              Restrict account access to specific hours and days
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">
@@ -177,7 +175,7 @@ export const TimeAccessManager = ({ userId }: TimeAccessManagerProps) => {
               onCheckedChange={setEnabled}
             />
             <Badge variant={enabled ? "default" : "secondary"}>
-              {enabled ? t('status.enabled') : t('status.disabled')}
+              {enabled ? "Enabled" : "Disabled"}
             </Badge>
           </div>
         </div>
@@ -194,14 +192,14 @@ export const TimeAccessManager = ({ userId }: TimeAccessManagerProps) => {
               <>
                 <CheckCircle2 className="h-5 w-5 text-green-600" />
                 <span className="text-sm text-green-800 dark:text-green-200">
-                  {t('timeAccess.canCurrentlyLogin')}
+                  You can currently log in based on your settings
                 </span>
               </>
             ) : (
               <>
                 <AlertTriangle className="h-5 w-5 text-amber-600" />
                 <span className="text-sm text-amber-800 dark:text-amber-200">
-                  {t('timeAccess.outsideAllowedHours')}
+                  Currently outside allowed hours
                 </span>
               </>
             )}
@@ -212,7 +210,7 @@ export const TimeAccessManager = ({ userId }: TimeAccessManagerProps) => {
         <div className="space-y-3">
           <Label className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-muted-foreground" />
-            {t('timeAccess.allowedDays')}
+            Allowed Days
           </Label>
           <div className="flex flex-wrap gap-2">
             {DAYS_OF_WEEK.map((day) => (
@@ -230,14 +228,14 @@ export const TimeAccessManager = ({ userId }: TimeAccessManagerProps) => {
             ))}
           </div>
           {enabled && allowedDays.length === 0 && (
-            <p className="text-xs text-destructive">{t('timeAccess.selectAtLeastOneDay')}</p>
+            <p className="text-xs text-destructive">Please select at least one day</p>
           )}
         </div>
 
         {/* Time Range */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>{t('form.startTime')}</Label>
+            <Label>Start Time</Label>
             <Select
               value={String(startHour)}
               onValueChange={(v) => setStartHour(Number(v))}
@@ -256,7 +254,7 @@ export const TimeAccessManager = ({ userId }: TimeAccessManagerProps) => {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>{t('form.endTime')}</Label>
+            <Label>End Time</Label>
             <Select
               value={String(endHour)}
               onValueChange={(v) => setEndHour(Number(v))}
@@ -278,7 +276,7 @@ export const TimeAccessManager = ({ userId }: TimeAccessManagerProps) => {
 
         {/* Timezone */}
         <div className="space-y-2">
-          <Label>{t('form.timezone')}</Label>
+          <Label>Timezone</Label>
           <Select
             value={timezone}
             onValueChange={setTimezone}
@@ -301,8 +299,8 @@ export const TimeAccessManager = ({ userId }: TimeAccessManagerProps) => {
         <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
           <Info className="h-4 w-4 text-muted-foreground mt-0.5" />
           <div className="text-xs text-muted-foreground">
-            <p>{t('timeAccess.whenEnabled')}</p>
-            <p className="mt-1">{t('timeAccess.existingSessionsNote')}</p>
+            <p>When enabled, login attempts outside allowed hours will be blocked.</p>
+            <p className="mt-1">Existing sessions will not be affected until they expire.</p>
           </div>
         </div>
 
@@ -311,10 +309,10 @@ export const TimeAccessManager = ({ userId }: TimeAccessManagerProps) => {
           {saving ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              {t('status.saving')}
+              Saving...
             </>
           ) : (
-            t('btn.saveTimeRestrictions')
+            "Save Time Restrictions"
           )}
         </Button>
       </CardContent>
