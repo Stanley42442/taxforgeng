@@ -84,8 +84,7 @@ const Pricing = () => {
             {t('pricing.title')}
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            {t('pricing.subtitle')}. All prices include VAT. 
-            Save ~17% with annual billing.
+            {t('pricing.subtitle')}. {t('pricing.saveAnnual')}
           </p>
         </div>
 
@@ -184,8 +183,8 @@ const Pricing = () => {
                   <tr className="border-b border-border bg-secondary/50">
                     <th className="text-left p-4 font-semibold text-foreground">{t('pricing.feature')}</th>
                     <th className="text-center p-4 font-semibold text-foreground">{t('pricing.individual')}</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Starter</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Basic</th>
+                    <th className="text-center p-4 font-semibold text-foreground">{t('pricing.starter')}</th>
+                    <th className="text-center p-4 font-semibold text-foreground">{t('pricing.basic')}</th>
                     <th className="text-center p-4 font-semibold text-foreground">{t('pricing.freelancer')}</th>
                     <th className="text-center p-4 font-semibold text-foreground bg-primary/5">Business</th>
                     <th className="text-center p-4 font-semibold text-foreground">{t('pricing.corporate')}</th>
@@ -296,7 +295,7 @@ const PricingCard = ({
       {isPopular && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
           <span className="bg-gradient-primary text-primary-foreground text-[10px] sm:text-xs font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
-            Most Popular
+            {t('pricing.mostPopular')}
           </span>
         </div>
       )}
@@ -304,7 +303,7 @@ const PricingCard = ({
       {isCurrentTier && (
         <div className="absolute -top-3 right-2 sm:right-4">
           <span className="bg-success text-success-foreground text-[10px] sm:text-xs font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
-            Current Plan
+            {t('pricing.currentPlan')}
           </span>
         </div>
       )}
@@ -361,7 +360,7 @@ const PricingCard = ({
         disabled={isCurrentTier || (tier === 'free')}
         onClick={() => onUpgrade(tier)}
       >
-        {isCurrentTier ? 'Current Plan' : tier === 'free' ? 'Free Forever' : tier === 'corporate' ? 'Contact Us' : 'Upgrade Now'}
+        {isCurrentTier ? t('pricing.currentPlan') : tier === 'free' ? t('pricing.freeForever') : tier === 'corporate' ? t('pricing.contactUs') : t('pricing.upgradeNow')}
       </Button>
     </div>
   );

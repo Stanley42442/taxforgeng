@@ -112,35 +112,35 @@ const Insights = () => {
               <div className="mx-auto w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mb-4">
                 <BarChart3 className="w-8 h-8 text-accent" />
               </div>
-              <CardTitle className="text-2xl">Tax Insights Dashboard</CardTitle>
+              <CardTitle className="text-2xl">{t('insights.title')}</CardTitle>
               <CardDescription>
-                Visualize your tax data with charts, trends, and benchmarks
+                {t('insights.subtitle')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid gap-3 text-left">
                 <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                   <PieChart className="w-5 h-5 text-primary" />
-                  <span>Tax breakdown visualizations</span>
+                  <span>{t('insights.taxBreakdown')}</span>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                   <TrendingUp className="w-5 h-5 text-primary" />
-                  <span>Monthly trends & patterns</span>
+                  <span>{t('insights.monthlyTrends')}</span>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                   <Percent className="w-5 h-5 text-primary" />
-                  <span>Effective tax rate tracking</span>
+                  <span>{t('insights.effectiveTracking')}</span>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                   <Wallet className="w-5 h-5 text-primary" />
-                  <span>Relief savings analysis</span>
+                  <span>{t('insights.reliefAnalysis')}</span>
                 </div>
               </div>
               <div className="relative h-48 bg-muted rounded-lg overflow-hidden">
                 <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm bg-background/50">
                   <Badge variant="secondary" className="text-sm">
                     <Crown className="w-4 h-4 mr-1" />
-                    Business+ Feature
+                    {t('insights.businessFeature')}
                   </Badge>
                 </div>
                 <div className="opacity-30 p-4">
@@ -154,7 +154,7 @@ const Insights = () => {
               <Link to="/pricing">
                 <Button className="w-full bg-gradient-primary hover:opacity-90">
                   <Crown className="w-4 h-4 mr-2" />
-                  Upgrade to Business for Insights
+                  {t('insights.upgradeForInsights')}
                 </Button>
               </Link>
             </CardContent>
@@ -173,18 +173,18 @@ const Insights = () => {
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">
               <BarChart3 className="inline-block w-8 h-8 mr-2 text-primary" />
-              Tax Insights
+              {t('insights.taxInsights')}
             </h1>
             <p className="text-muted-foreground">
-              Analyze your tax data and discover savings opportunities
+              {t('insights.analyzeData')}
             </p>
           </div>
           <Select value={selectedBusinessId} onValueChange={setSelectedBusinessId}>
             <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Select business" />
+              <SelectValue placeholder={t('insights.selectBusiness')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Businesses</SelectItem>
+              <SelectItem value="all">{t('insights.allBusinesses')}</SelectItem>
               {savedBusinesses.map(b => (
                 <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
               ))}
@@ -196,12 +196,12 @@ const Insights = () => {
           <Card className="text-center py-12">
             <CardContent>
               <Building2 className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No Data Yet</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('insights.noDataYet')}</h3>
               <p className="text-muted-foreground mb-4">
-                Save businesses and run calculations to see insights
+                {t('insights.saveAndCalculate')}
               </p>
               <Link to="/calculator">
-                <Button>Go to Calculator</Button>
+                <Button>{t('insights.goToCalculator')}</Button>
               </Link>
             </CardContent>
           </Card>
@@ -213,7 +213,7 @@ const Insights = () => {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Total Turnover</p>
+                      <p className="text-sm text-muted-foreground">{t('insights.totalTurnover')}</p>
                       <p className="text-2xl font-bold">₦{insights?.totalTurnover.toLocaleString()}</p>
                     </div>
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -231,7 +231,7 @@ const Insights = () => {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Effective Tax Rate</p>
+                      <p className="text-sm text-muted-foreground">{t('insights.effectiveTaxRate')}</p>
                       <p className="text-2xl font-bold">{insights?.effectiveRate}%</p>
                     </div>
                     <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
@@ -249,7 +249,7 @@ const Insights = () => {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Est. Annual Tax</p>
+                      <p className="text-sm text-muted-foreground">{t('insights.estAnnualTax')}</p>
                       <p className="text-2xl font-bold">₦{insights?.estimatedTax.toLocaleString()}</p>
                     </div>
                     <div className="w-12 h-12 rounded-xl bg-info/10 flex items-center justify-center">
@@ -263,7 +263,7 @@ const Insights = () => {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Relief Savings</p>
+                      <p className="text-sm text-muted-foreground">{t('insights.reliefSavings')}</p>
                       <p className="text-2xl font-bold text-success">₦{insights?.reliefSavings.toLocaleString()}</p>
                     </div>
                     <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center">
@@ -283,9 +283,9 @@ const Insights = () => {
                     <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
                       <PieChart className="w-4 h-4 text-primary" />
                     </div>
-                    Tax Breakdown
+                    {t('insights.taxBreakdownChart')}
                   </CardTitle>
-                  <CardDescription>Current period tax composition</CardDescription>
+                  <CardDescription>{t('insights.currentPeriod')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div 
@@ -380,9 +380,9 @@ const Insights = () => {
                     <div className="h-8 w-8 rounded-lg bg-accent/10 flex items-center justify-center">
                       <TrendingUp className="w-4 h-4 text-accent" />
                     </div>
-                    Monthly Trends
+                    {t('insights.monthlyTrendsChart')}
                   </CardTitle>
-                  <CardDescription>Tax liability over time</CardDescription>
+                  <CardDescription>{t('insights.taxLiabilityOverTime')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[20rem]">
@@ -451,31 +451,31 @@ const Insights = () => {
                   <div className="h-8 w-8 rounded-lg bg-info/10 flex items-center justify-center">
                     <Info className="w-4 h-4 text-info" />
                   </div>
-                  Industry Benchmarks
-                </CardTitle>
-                <CardDescription>Compare your tax profile with similar businesses</CardDescription>
+                    {t('insights.industryBenchmarks')}
+                  </CardTitle>
+                  <CardDescription>{t('insights.compareTaxProfile')}</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4 sm:grid-cols-3">
+                  <div className="grid gap-4 sm:grid-cols-3">
                   <div className="p-4 bg-muted rounded-lg text-center">
-                    <p className="text-sm text-muted-foreground mb-1">Avg. Effective Rate</p>
+                    <p className="text-sm text-muted-foreground mb-1">{t('insights.avgEffectiveRate')}</p>
                     <p className="text-2xl font-bold">{MOCK_BENCHMARKS.company.avgEffectiveRate}%</p>
-                    <p className="text-xs text-muted-foreground mt-1">Similar companies</p>
+                    <p className="text-xs text-muted-foreground mt-1">{t('insights.similarCompanies')}</p>
                   </div>
                   <div className="p-4 bg-muted rounded-lg text-center">
-                    <p className="text-sm text-muted-foreground mb-1">Avg. VAT %</p>
+                    <p className="text-sm text-muted-foreground mb-1">{t('insights.avgVAT')}</p>
                     <p className="text-2xl font-bold">{MOCK_BENCHMARKS.company.avgVatPayable}%</p>
-                    <p className="text-xs text-muted-foreground mt-1">Of turnover</p>
+                    <p className="text-xs text-muted-foreground mt-1">{t('insights.ofTurnover')}</p>
                   </div>
                   <div className="p-4 bg-muted rounded-lg text-center">
-                    <p className="text-sm text-muted-foreground mb-1">Top Relief Used</p>
+                    <p className="text-sm text-muted-foreground mb-1">{t('insights.topReliefUsed')}</p>
                     <p className="text-2xl font-bold">{MOCK_BENCHMARKS.company.topRelief}</p>
-                    <p className="text-xs text-muted-foreground mt-1">Most effective</p>
+                    <p className="text-xs text-muted-foreground mt-1">{t('insights.mostEffective')}</p>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground mt-4 flex items-center gap-1">
                   <Info className="w-3 h-3" />
-                  Benchmarks are based on anonymized aggregate data from businesses with similar profiles
+                  {t('insights.benchmarkDisclaimer')}
                 </p>
               </CardContent>
             </Card>
