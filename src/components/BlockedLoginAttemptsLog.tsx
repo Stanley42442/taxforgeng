@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   Shield, 
   Ban, 
@@ -45,6 +46,7 @@ interface BlockedLoginAttemptsLogProps {
 }
 
 export const BlockedLoginAttemptsLog = ({ userId }: BlockedLoginAttemptsLogProps) => {
+  const { t } = useLanguage();
   const [attempts, setAttempts] = useState<BlockedAttempt[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -164,11 +166,11 @@ export const BlockedLoginAttemptsLog = ({ userId }: BlockedLoginAttemptsLogProps
   const getAlertLabel = (alertType: string) => {
     switch (alertType) {
       case 'ip_blocked':
-        return 'IP Not Whitelisted';
+        return t('security.blocked.ipNotWhitelisted');
       case 'time_restricted':
-        return 'Outside Allowed Hours';
+        return t('security.blocked.outsideAllowedHours');
       default:
-        return 'Blocked';
+        return t('security.blocked.blocked');
     }
   };
 
@@ -193,10 +195,10 @@ export const BlockedLoginAttemptsLog = ({ userId }: BlockedLoginAttemptsLogProps
           <div>
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-amber-500" />
-              Blocked Login Attempts
+              {t('security.blocked.title')}
             </CardTitle>
             <CardDescription>
-              Recent login attempts that were blocked by your security rules
+              {t('security.blocked.description')}
             </CardDescription>
           </div>
           <Button
@@ -206,7 +208,7 @@ export const BlockedLoginAttemptsLog = ({ userId }: BlockedLoginAttemptsLogProps
             disabled={refreshing}
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-            Refresh
+            {t('security.blocked.refresh')}
           </Button>
         </div>
       </CardHeader>
@@ -214,8 +216,8 @@ export const BlockedLoginAttemptsLog = ({ userId }: BlockedLoginAttemptsLogProps
         {attempts.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
             <Shield className="h-12 w-12 mx-auto mb-3 opacity-50" />
-            <p className="font-medium">No blocked attempts</p>
-            <p className="text-sm">When login attempts are blocked, they'll appear here</p>
+            <p className="font-medium">{t('security.blocked.noAttempts')}</p>
+            <p className="text-sm">{t('security.blocked.noAttemptsDesc')}</p>
           </div>
         ) : (
           <ScrollArea className="h-[400px] pr-4">
@@ -280,7 +282,7 @@ export const BlockedLoginAttemptsLog = ({ userId }: BlockedLoginAttemptsLogProps
                         <div className="flex items-center gap-2 text-muted-foreground">
                           <Monitor className="h-3.5 w-3.5 shrink-0" />
                           <span className="text-xs capitalize">
-                            Alert via {attempt.delivery_method}
+                            {t('security.blocked.alertVia')} {attempt.delivery_method}
                           </span>
                         </div>
                       </div>

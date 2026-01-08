@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   Shield, 
   CheckCircle2, 
@@ -42,14 +43,15 @@ export const SecurityScoreWidget = ({
   hasKnownDevices = true,
   passwordLastChanged
 }: SecurityScoreWidgetProps) => {
+  const { t } = useLanguage();
   
   const factors = useMemo<SecurityFactor[]>(() => {
     const result: SecurityFactor[] = [];
     
     // Email verification (20 points)
     result.push({
-      name: "Email Verified",
-      description: isEmailVerified ? "Your email is verified" : "Verify your email for account recovery",
+      name: t('security.score.emailVerified'),
+      description: isEmailVerified ? t('security.score.emailVerifiedDesc') : t('security.score.emailNotVerifiedDesc'),
       points: isEmailVerified ? 20 : 0,
       maxPoints: 20,
       status: isEmailVerified ? 'good' : 'critical',
@@ -58,8 +60,8 @@ export const SecurityScoreWidget = ({
     
     // 2FA enabled (30 points)
     result.push({
-      name: "Two-Factor Authentication",
-      description: hasMfaEnabled ? "2FA is protecting your account" : "Enable 2FA for stronger security",
+      name: t('security.score.twoFactor'),
+      description: hasMfaEnabled ? t('security.score.twoFactorEnabledDesc') : t('security.score.twoFactorDisabledDesc'),
       points: hasMfaEnabled ? 30 : 0,
       maxPoints: 30,
       status: hasMfaEnabled ? 'good' : 'critical',
@@ -81,10 +83,10 @@ export const SecurityScoreWidget = ({
     }
     
     result.push({
-      name: "Backup Codes",
+      name: t('security.score.backupCodes'),
       description: hasBackupCodes 
-        ? `${remainingBackupCodes} backup codes remaining` 
-        : "Generate backup codes for account recovery",
+        ? t('security.score.backupCodesRemaining').replace('{count}', String(remainingBackupCodes))
+        : t('security.score.generateBackupCodes'),
       points: backupPoints,
       maxPoints: 15,
       status: backupStatus,
@@ -94,31 +96,31 @@ export const SecurityScoreWidget = ({
     // Password age (20 points) - newer is better
     let passwordPoints = 10; // Base points if we don't know
     let passwordStatus: 'good' | 'warning' | 'critical' = 'warning';
-    let passwordDesc = "Consider updating your password periodically";
+    let passwordDesc = t('security.score.passwordGeneral');
     
     if (passwordLastChanged) {
       const daysSinceChange = Math.floor((Date.now() - passwordLastChanged.getTime()) / (1000 * 60 * 60 * 24));
       if (daysSinceChange < 90) {
         passwordPoints = 20;
         passwordStatus = 'good';
-        passwordDesc = "Password recently updated";
+        passwordDesc = t('security.score.passwordRecent');
       } else if (daysSinceChange < 180) {
         passwordPoints = 15;
         passwordStatus = 'good';
-        passwordDesc = "Password is up to date";
+        passwordDesc = t('security.score.passwordUpToDate');
       } else if (daysSinceChange < 365) {
         passwordPoints = 10;
         passwordStatus = 'warning';
-        passwordDesc = "Consider updating your password soon";
+        passwordDesc = t('security.score.passwordOldWarning');
       } else {
         passwordPoints = 5;
         passwordStatus = 'critical';
-        passwordDesc = "Password hasn't been changed in over a year";
+        passwordDesc = t('security.score.passwordVeryOld');
       }
     }
     
     result.push({
-      name: "Password Health",
+      name: t('security.score.passwordHealth'),
       description: passwordDesc,
       points: passwordPoints,
       maxPoints: 20,
@@ -128,8 +130,8 @@ export const SecurityScoreWidget = ({
     
     // Known devices (15 points)
     result.push({
-      name: "Device Recognition",
-      description: hasKnownDevices ? "Your devices are being tracked" : "Enable device tracking for security alerts",
+      name: t('security.score.deviceRecognition'),
+      description: hasKnownDevices ? t('security.score.deviceTrackingEnabled') : t('security.score.deviceTrackingDisabled'),
       points: hasKnownDevices ? 15 : 0,
       maxPoints: 15,
       status: hasKnownDevices ? 'good' : 'warning',
@@ -137,7 +139,7 @@ export const SecurityScoreWidget = ({
     });
     
     return result;
-  }, [isEmailVerified, hasMfaEnabled, hasBackupCodes, remainingBackupCodes, hasKnownDevices, passwordLastChanged]);
+  }, [isEmailVerified, hasMfaEnabled, hasBackupCodes, remainingBackupCodes, hasKnownDevices, passwordLastChanged, t]);
   
   const totalScore = useMemo(() => 
     factors.reduce((sum, f) => sum + f.points, 0), 
@@ -158,11 +160,11 @@ export const SecurityScoreWidget = ({
   };
   
   const getScoreLabel = (percentage: number) => {
-    if (percentage >= 90) return 'Excellent';
-    if (percentage >= 80) return 'Very Good';
-    if (percentage >= 60) return 'Good';
-    if (percentage >= 40) return 'Fair';
-    return 'Needs Improvement';
+    if (percentage >= 90) return t('security.score.excellent');
+    if (percentage >= 80) return t('security.score.veryGood');
+    if (percentage >= 60) return t('security.score.good');
+    if (percentage >= 40) return t('security.score.fair');
+    return t('security.score.needsImprovement');
   };
   
   const getProgressColor = (percentage: number) => {
@@ -189,9 +191,9 @@ export const SecurityScoreWidget = ({
           <div>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
-              Security Score
+              {t('security.score.title')}
             </CardTitle>
-            <CardDescription>Your overall account security health</CardDescription>
+            <CardDescription>{t('security.score.description')}</CardDescription>
           </div>
           <div className="text-right">
             <div className={`text-3xl font-bold ${getScoreColor(scorePercentage)}`}>
@@ -216,7 +218,7 @@ export const SecurityScoreWidget = ({
             />
           </div>
           <p className="text-sm text-muted-foreground text-center">
-            {totalScore} / {maxScore} points
+            {totalScore} / {maxScore} {t('security.score.points')}
           </p>
         </div>
         
@@ -264,7 +266,7 @@ export const SecurityScoreWidget = ({
         {/* Recommendations */}
         {scorePercentage < 100 && (
           <div className="pt-2 border-t">
-            <p className="text-xs text-muted-foreground mb-2">Quick improvements:</p>
+            <p className="text-xs text-muted-foreground mb-2">{t('security.score.quickImprovements')}</p>
             <div className="space-y-1">
               {factors
                 .filter(f => f.points < f.maxPoints)
