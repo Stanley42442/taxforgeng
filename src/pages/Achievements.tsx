@@ -4,7 +4,6 @@ import { Progress } from "@/components/ui/progress";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useAchievements } from "@/hooks/useAchievements";
 import { useNavigate } from "react-router-dom";
-import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Trophy,
   Star,
@@ -40,7 +39,6 @@ const Achievements = () => {
   const { tier } = useSubscription();
   const { stats, earnedBadges, loading } = useAchievements();
   const navigate = useNavigate();
-  const { t } = useLanguage();
   const isBasicPlus = tier !== 'free';
 
   const getLevel = (points: number) => {
@@ -221,13 +219,13 @@ const Achievements = () => {
             <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-accent glow-accent">
               <Crown className="h-12 w-12 text-accent-foreground" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground mb-3">{t('achievements.title')}</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-3">Achievements & Badges</h1>
             <p className="text-lg text-muted-foreground mb-8">
-              {t('achievements.subtitle')}. {t('pricing.availableBasic')}
+              Track your tax compliance journey. Available on Basic+ plans.
             </p>
             <Button variant="glow" size="lg" onClick={() => navigate('/pricing')}>
               <Crown className="h-5 w-5" />
-              {t('reminders.upgradeToBasic')}
+              Upgrade to Basic+
             </Button>
           </div>
         </div>
@@ -242,7 +240,7 @@ const Achievements = () => {
         <div className="container mx-auto px-4 py-20 text-center">
           <div className="glass-frosted p-8 rounded-3xl inline-block">
             <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" />
-            <p className="text-muted-foreground mt-4">{t('common.loading')}</p>
+            <p className="text-muted-foreground mt-4">Loading achievements...</p>
           </div>
         </div>
       </div>
@@ -269,10 +267,10 @@ const Achievements = () => {
               <Trophy className="h-10 w-10 text-primary-foreground" />
             </div>
             <h1 className="text-4xl font-bold text-foreground mb-3">
-              {t('achievements.title')}
+              Achievements & Badges
             </h1>
             <p className="text-lg text-muted-foreground">
-              {t('achievements.subtitle')}
+              Track your tax compliance journey
             </p>
           </div>
 
@@ -290,7 +288,7 @@ const Achievements = () => {
                 </div>
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-bold text-foreground">{currentLevel.title}</h2>
-                  <p className="text-muted-foreground">{actualPoints} {t('achievements.totalPoints')}</p>
+                  <p className="text-muted-foreground">{actualPoints} Total Points</p>
                 </div>
               </div>
               
@@ -427,16 +425,6 @@ const Achievements = () => {
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-
-          {/* Motivation Banner */}
-          <div className="mt-8 glass p-5 rounded-2xl text-center animate-fade-in">
-            <div className="flex items-center justify-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              <p className="text-primary font-medium">
-                {nextUnlockMessage}
-              </p>
             </div>
           </div>
         </div>
