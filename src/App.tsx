@@ -57,6 +57,10 @@ const Referrals = lazy(() => import("./pages/Referrals"));
 const TaxCalendar = lazy(() => import("./pages/TaxCalendar"));
 const SuccessStoriesPage = lazy(() => import("./pages/SuccessStoriesPage"));
 const AccountantPortal = lazy(() => import("./pages/AccountantPortal"));
+const Invoices = lazy(() => import("./pages/Invoices"));
+const Payroll = lazy(() => import("./pages/Payroll"));
+const ProfitLoss = lazy(() => import("./pages/ProfitLoss"));
+const Compliance = lazy(() => import("./pages/Compliance"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Lazy load TaxAssistant (heavy component with AI chat)
@@ -126,6 +130,10 @@ const App = () => (
                     <Route path="/tax-calendar" element={<TaxCalendar />} />
                     <Route path="/success-stories" element={<SuccessStoriesPage />} />
                     <Route path="/accountant-portal" element={<AccountantPortal />} />
+                    <Route path="/invoices" element={<Invoices />} />
+                    <Route path="/payroll" element={<Payroll />} />
+                    <Route path="/profit-loss" element={<ProfitLoss />} />
+                    <Route path="/compliance" element={<Compliance />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                   <TaxAssistant />
