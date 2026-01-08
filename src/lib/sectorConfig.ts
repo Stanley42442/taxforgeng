@@ -20,7 +20,8 @@ export interface SectorTaxRules {
   rentReliefPercent?: number;
   donationCap?: number;
   specialIncentives?: string[];
-  pioneerStatus?: boolean;
+  pioneerStatus?: boolean; // Legacy: replaced by EDI under 2026 rules
+  ediEligible?: boolean; // Economic Development Incentive (2026): 5% annual credit for 5 years
   greenHireDeduction?: number;
 }
 
@@ -71,7 +72,8 @@ export const SECTOR_PRESETS: SectorPreset[] = [
       vatRate: 7.5,
       edtiRate: 5,
       pioneerStatus: true,
-      specialIncentives: ['NSA labeling (<₦1.5B)', 'EDTI 5% credit', 'R&D 120% deduction']
+      ediEligible: true,
+      specialIncentives: ['NSA labeling (<₦1.5B)', 'EDTI 5% credit', 'R&D 120% deduction', 'EDI 5% annual credit (5 years)']
     },
     myths: [
       { myth: 'All tech companies are tax-free', truth: 'Only NSA-approved software companies qualify for reduced rates' }
@@ -223,7 +225,8 @@ export const SECTOR_PRESETS: SectorPreset[] = [
       vatRate: 7.5,
       edtiRate: 5,
       pioneerStatus: true,
-      specialIncentives: ['CBN sandbox benefits', 'Platform development deductions']
+      ediEligible: true,
+      specialIncentives: ['CBN sandbox benefits', 'Platform development deductions', 'EDI 5% annual credit (5 years)']
     },
     myths: [
       { myth: 'Fintech companies are always exempt from VAT', truth: 'Financial service fees are VATable; some interest income may be exempt' }
@@ -249,7 +252,8 @@ export const SECTOR_PRESETS: SectorPreset[] = [
       vatStatus: 'exempt',
       vatRate: 0,
       pioneerStatus: true,
-      specialIncentives: ['Duty-free medical equipment', 'NAFDAC fast-track']
+      ediEligible: true,
+      specialIncentives: ['Duty-free medical equipment', 'NAFDAC fast-track', 'EDI 5% annual credit (5 years)']
     },
     myths: [
       { myth: 'All healthcare is tax-free', truth: 'Medical services are VAT-exempt, but CIT still applies' }

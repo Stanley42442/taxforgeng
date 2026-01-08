@@ -416,31 +416,52 @@ export function calculateInvestmentTax(inputs: IndividualTaxInputs): IndividualT
     });
   }
 
-  // Capital gains - 10% CGT
+  // Capital gains - 2026 rules: progressive PIT rates for individuals, with small investor exemption
   if (capitalGains > 0) {
-    const cgt = capitalGains * 0.10;
-    totalTax += cgt;
-    breakdown.push({
-      label: 'Capital Gains Tax',
-      amount: cgt,
-      description: '10% on gains from asset disposal'
-    });
-    
-    if (inputs.use2026Rules && capitalGains <= 10000000) {
-      alerts.push({
-        type: 'info',
-        message: 'Small capital gains may qualify for exemptions under 2026 rules'
+    if (inputs.use2026Rules) {
+      // Small investor exemption: gains ≤ ₦10M AND proceeds < ₦150M are exempt
+      if (capitalGains <= 10000000) {
+        breakdown.push({
+          label: 'Capital Gains Tax',
+          amount: 0,
+          description: 'Exempt (small investor - gains ≤ ₦10M)'
+        });
+        alerts.push({
+          type: 'success',
+          message: 'Your capital gains qualify for the small investor exemption (gains ≤ ₦10M)'
+        });
+      } else {
+        // Progressive PIT rates apply for individuals under 2026 rules
+        const cgtResult = calculateProgressiveTax(capitalGains, PIT_BANDS_2026);
+        totalTax += cgtResult.tax;
+        breakdown.push({
+          label: 'Capital Gains Tax',
+          amount: cgtResult.tax,
+          description: 'Progressive rates (0-25%) on capital gains'
+        });
+        alerts.push({
+          type: 'info',
+          message: 'Under 2026 rules, individual CGT uses progressive PIT rates (0-25%)'
+        });
+      }
+    } else {
+      // Pre-2026: flat 10% CGT
+      const cgt = capitalGains * 0.10;
+      totalTax += cgt;
+      breakdown.push({
+        label: 'Capital Gains Tax',
+        amount: cgt,
+        description: '10% on gains from asset disposal'
       });
     }
+    
+    recommendations.push('Consider timing of asset sales for tax planning');
   }
 
   const totalIncome = dividendIncome + interestIncome + capitalGains;
   const effectiveRate = totalIncome > 0 ? (totalTax / totalIncome) * 100 : 0;
 
   recommendations.push('Diversify investments to optimize tax efficiency');
-  if (capitalGains > 0) {
-    recommendations.push('Consider timing of asset sales for tax planning');
-  }
 
   return {
     taxableIncome: totalIncome,
