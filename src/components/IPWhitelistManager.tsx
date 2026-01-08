@@ -492,10 +492,10 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
             <div className="min-w-0">
               <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <Globe className="h-5 w-5 text-primary shrink-0" />
-                <span className="truncate">IP Address Whitelist</span>
+                <span className="truncate">{t('security.ipWhitelist.title')}</span>
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                Restrict logins to specific IP addresses or ranges
+                {t('security.ipWhitelist.description')}
               </CardDescription>
             </div>
             <div className="flex items-center gap-2 shrink-0">
@@ -505,7 +505,7 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
                 disabled={toggling}
               />
               <Badge variant={whitelistEnabled ? "default" : "secondary"} className="whitespace-nowrap">
-                {whitelistEnabled ? "Enabled" : "Disabled"}
+                {whitelistEnabled ? t('security.ipWhitelist.enabled') : t('security.ipWhitelist.disabled')}
               </Badge>
             </div>
           </div>
@@ -517,7 +517,7 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
               <div className="flex flex-col gap-1 min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <Info className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <span className="text-sm whitespace-nowrap">Your IP:</span>
+                  <span className="text-sm whitespace-nowrap">{t('security.ipWhitelist.yourIp')}:</span>
                   <code className="text-xs sm:text-sm font-mono bg-background px-2 py-0.5 rounded truncate max-w-[120px] sm:max-w-none">
                     {currentIP}
                   </code>
@@ -525,12 +525,12 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
                     isCurrentIPWhitelisted() ? (
                       <Badge variant="outline" className="text-green-600 border-green-600 text-xs whitespace-nowrap">
                         <CheckCircle2 className="h-3 w-3 mr-1 shrink-0" />
-                        Whitelisted
+                        {t('security.ipWhitelist.whitelisted')}
                       </Badge>
                     ) : (
                       <Badge variant="outline" className="text-amber-600 border-amber-600 text-xs whitespace-nowrap">
                         <AlertCircle className="h-3 w-3 mr-1 shrink-0" />
-                        Not whitelisted
+                        {t('security.ipWhitelist.notWhitelisted')}
                       </Badge>
                     )
                   )}
@@ -552,7 +552,7 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
                 className="shrink-0 w-full sm:w-auto"
               >
                 <Plus className="h-4 w-4 mr-1" />
-                Add This IP
+                {t('security.ipWhitelist.addThisIp')}
               </Button>
             </div>
           )}
@@ -563,10 +563,10 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
               <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                  No active IP addresses whitelisted
+                  {t('security.ipWhitelist.noActiveWarning')}
                 </p>
                 <p className="text-sm text-amber-700 dark:text-amber-300">
-                  You won't be able to log in from any IP address. Add at least one IP to avoid being locked out.
+                  {t('security.ipWhitelist.lockoutWarning')}
                 </p>
               </div>
             </div>
@@ -580,7 +580,7 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
               onClick={() => setShowAddDialog(true)}
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add IP Address
+              {t('security.ipWhitelist.addIpAddress')}
             </Button>
             <div className="flex gap-2">
               <Button
@@ -591,7 +591,7 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
                 className="flex-1 sm:flex-none"
               >
                 <Download className="h-4 w-4 mr-1" />
-                Export
+                {t('security.ipWhitelist.export')}
               </Button>
               <Button
                 variant="outline"
@@ -605,7 +605,7 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
                 ) : (
                   <Upload className="h-4 w-4 mr-1" />
                 )}
-                Import
+                {t('security.ipWhitelist.import')}
               </Button>
               <input
                 type="file"
@@ -680,18 +680,18 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
           ) : (
             <div className="text-center py-8 text-muted-foreground">
               <Shield className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">No IP addresses whitelisted</p>
-              <p className="text-xs">Add IP addresses to restrict login access</p>
+              <p className="text-sm">{t('security.ipWhitelist.noEntries')}</p>
+              <p className="text-xs">{t('security.ipWhitelist.addToRestrict')}</p>
             </div>
           )}
 
           {/* Help Text */}
           <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t overflow-hidden">
-            <p><strong>Supported formats:</strong></p>
+            <p><strong>{t('security.ipWhitelist.supportedFormats')}:</strong></p>
             <ul className="list-disc list-inside space-y-0.5 ml-2">
-              <li className="truncate">Exact IP: <code className="bg-muted px-1 rounded">192.168.1.100</code></li>
-              <li className="truncate">CIDR range: <code className="bg-muted px-1 rounded">192.168.1.0/24</code></li>
-              <li className="truncate">Wildcard: <code className="bg-muted px-1 rounded">192.168.1.*</code></li>
+              <li className="truncate">{t('security.ipWhitelist.exactIp')}: <code className="bg-muted px-1 rounded">192.168.1.100</code></li>
+              <li className="truncate">{t('security.ipWhitelist.cidrRange')}: <code className="bg-muted px-1 rounded">192.168.1.0/24</code></li>
+              <li className="truncate">{t('security.ipWhitelist.wildcard')}: <code className="bg-muted px-1 rounded">192.168.1.*</code></li>
             </ul>
           </div>
         </CardContent>
@@ -701,43 +701,43 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add IP Address</DialogTitle>
+            <DialogTitle>{t('security.ipWhitelist.addIp')}</DialogTitle>
             <DialogDescription>
-              Add an IP address or range to your whitelist
+              {t('security.ipWhitelist.addIpDesc')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="ipRange">IP Address or Range</Label>
+              <Label htmlFor="ipRange">{t('security.ipWhitelist.ipAddressOrRange')}</Label>
               <Input
                 id="ipRange"
                 value={newIpRange}
                 onChange={(e) => setNewIpRange(e.target.value)}
-                placeholder="e.g., 192.168.1.100 or 192.168.1.0/24"
+                placeholder={t('security.ipWhitelist.ipPlaceholder')}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Description (optional)</Label>
+              <Label htmlFor="description">{t('security.ipWhitelist.descriptionLabel')}</Label>
               <Input
                 id="description"
                 value={newDescription}
                 onChange={(e) => setNewDescription(e.target.value)}
-                placeholder="e.g., Home network, Office IP"
+                placeholder={t('security.ipWhitelist.descriptionPlaceholder')}
               />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button onClick={handleAddEntry} disabled={saving}>
               {saving ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Adding...
+                  {t('common.adding')}
                 </>
               ) : (
-                "Add to Whitelist"
+                t('security.ipWhitelist.addToWhitelist')
               )}
             </Button>
           </DialogFooter>
@@ -750,10 +750,10 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-amber-600">
               <AlertTriangle className="h-5 w-5" />
-              Enable IP Whitelist?
+              {t('security.ipWhitelist.enableTitle')}
             </DialogTitle>
             <DialogDescription>
-              You're about to enable IP whitelisting without adding your current IP address.
+              {t('security.ipWhitelist.enableDesc')}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -761,10 +761,10 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
               <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                  Warning: You may lock yourself out
+                  {t('security.ipWhitelist.warningTitle')}
                 </p>
                 <p className="text-sm text-amber-700 dark:text-amber-300">
-                  If you enable the whitelist without adding any IP addresses, you won't be able to log in from any location.
+                  {t('security.ipWhitelist.warningText')}
                 </p>
               </div>
             </div>
@@ -779,22 +779,22 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
                   }}
                   disabled={saving || toggling}
                 >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add my IP ({currentIP}) and enable
+                <Plus className="h-4 w-4 mr-2" />
+                  {t('security.ipWhitelist.addMyIpAndEnable')} ({currentIP})
                 </Button>
               </div>
             )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button 
               variant="destructive" 
               onClick={toggleWhitelist}
               disabled={toggling}
             >
-              Enable anyway
+              {t('security.ipWhitelist.proceed')}
             </Button>
           </DialogFooter>
         </DialogContent>

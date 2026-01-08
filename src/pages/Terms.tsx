@@ -29,15 +29,15 @@ const Terms = () => {
           <div className="mb-8 animate-fade-in">
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
+              {t('common.back')}
             </Button>
             <div className="flex items-center gap-3 mb-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary">
                 <FileText className="h-6 w-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">Terms of Service & Privacy Policy</h1>
-                <p className="text-sm text-muted-foreground">Last updated: {lastUpdated}</p>
+                <h1 className="text-2xl font-bold text-foreground">{t('terms.title')}</h1>
+                <p className="text-sm text-muted-foreground">{t('terms.lastUpdated')} {lastUpdated}</p>
               </div>
             </div>
           </div>
@@ -48,12 +48,9 @@ const Terms = () => {
               <div className="flex gap-3">
                 <AlertTriangle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-medium text-foreground mb-1">Important Disclaimer</p>
+                  <p className="font-medium text-foreground mb-1">{t('terms.importantDisclaimer')}</p>
                   <p className="text-sm text-muted-foreground">
-                    TaxForge NG provides educational tax estimates based on the Nigeria Tax Act 2025. 
-                    This is NOT official tax advice. Always consult FIRS, state IRS, or certified tax 
-                    professionals for official guidance. We are not liable for any errors, omissions, 
-                    or decisions made based on information from this platform.
+                    {t('terms.disclaimerText')}
                   </p>
                 </div>
               </div>
@@ -66,7 +63,7 @@ const Terms = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Scale className="h-5 w-5 text-primary" />
-                  Terms of Service
+                  {t('terms.termsOfService')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm text-muted-foreground">
@@ -150,7 +147,7 @@ const Terms = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Shield className="h-5 w-5 text-primary" />
-                  Privacy Policy
+                  {t('terms.privacyPolicy')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm text-muted-foreground">
@@ -254,12 +251,12 @@ const Terms = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Mail className="h-5 w-5 text-primary" />
-                  Contact Us
+                  {t('terms.contactUs')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-muted-foreground">
                 <p>
-                  For questions about these terms, privacy concerns, or data requests, contact us at:
+                  {t('terms.contactText')}
                 </p>
                 <div className="mt-3 p-3 rounded-lg bg-muted">
                   <p className="font-medium text-foreground">TaxForge NG Legal & Privacy</p>
@@ -272,8 +269,7 @@ const Terms = () => {
 
           {/* Footer */}
           <p className="text-xs text-muted-foreground text-center mt-8">
-            By using TaxForge NG, you acknowledge that you have read, understood, and agree 
-            to these Terms of Service and Privacy Policy.
+            {t('terms.footer')}
           </p>
         </div>
       </main>
