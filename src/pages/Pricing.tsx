@@ -1,6 +1,6 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { NavMenu } from "@/components/NavMenu";
+import { PageLayout } from "@/components/PageLayout";
 import {
   Calculator,
   Check,
@@ -14,12 +14,22 @@ import {
   Mail,
   User,
   Zap,
+  FileText,
+  Receipt,
+  Users,
+  Shield,
+  BarChart3,
+  Clock,
+  Bot,
+  Key,
+  ClipboardCheck,
 } from "lucide-react";
 import { useSubscription, SubscriptionTier } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
 
 interface TierFeature {
   name: string;
+  category: string;
   free: boolean | string;
   starter: boolean | string;
   basic: boolean | string;
@@ -29,24 +39,54 @@ interface TierFeature {
 }
 
 const features: TierFeature[] = [
-  { name: 'Personal tax calculator (PIT)', free: true, starter: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Crypto & investment taxes', free: true, starter: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Foreign income/DTT credits', free: true, starter: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Business tax calculator', free: false, starter: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Digital VAT calculator', free: false, starter: false, basic: false, freelancer: true, business: true, corporate: true },
-  { name: 'Saved businesses', free: '0', starter: '1', basic: '2', freelancer: '5', business: '10', corporate: 'Unlimited' },
-  { name: 'Data storage', free: false, starter: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'PDF/CSV export', free: false, starter: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Sector-specific presets', free: false, starter: false, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Scenario modeling', free: false, starter: false, basic: false, freelancer: 'Basic', business: 'Advanced', corporate: 'Advanced' },
-  { name: 'CAC verification (auto)', free: false, starter: false, basic: false, freelancer: false, business: true, corporate: true },
-  { name: 'No watermarks', free: false, starter: true, basic: false, freelancer: true, business: true, corporate: true },
-  { name: 'Tax filing preparation', free: false, starter: false, basic: false, freelancer: false, business: true, corporate: true },
-  { name: 'Email reminders', free: false, starter: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Bulk CAC verification', free: false, starter: false, basic: false, freelancer: false, business: false, corporate: true },
-  { name: 'Multi-user seats', free: false, starter: false, basic: false, freelancer: false, business: '2 seats', corporate: 'Unlimited' },
-  { name: 'Priority support', free: false, starter: false, basic: false, freelancer: true, business: true, corporate: true },
-  { name: 'API access', free: false, starter: false, basic: false, freelancer: false, business: false, corporate: true },
+  // Tax Calculators
+  { name: 'Personal Tax Calculator (PIT)', category: 'Tax Tools', free: true, starter: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Crypto & Investment Taxes', category: 'Tax Tools', free: true, starter: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Foreign Income / DTT Credits', category: 'Tax Tools', free: true, starter: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Business Tax Calculator', category: 'Tax Tools', free: false, starter: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Digital VAT Calculator', category: 'Tax Tools', free: false, starter: false, basic: false, freelancer: true, business: true, corporate: true },
+  
+  // Business Management
+  { name: 'Saved Businesses', category: 'Business', free: '0', starter: '1', basic: '2', freelancer: '5', business: '10', corporate: 'Unlimited' },
+  { name: 'Expense Tracking', category: 'Business', free: false, starter: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Invoices', category: 'Business', free: false, starter: false, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Payroll Calculator', category: 'Business', free: false, starter: false, basic: false, freelancer: true, business: true, corporate: true },
+  { name: 'Profit & Loss Statement', category: 'Business', free: false, starter: false, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Compliance Tracker', category: 'Business', free: false, starter: false, basic: false, freelancer: true, business: true, corporate: true },
+  
+  // Features & Tools
+  { name: 'PDF/CSV Export', category: 'Features', free: false, starter: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Tax Reminders', category: 'Features', free: false, starter: true, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'Sector-Specific Presets', category: 'Features', free: false, starter: false, basic: true, freelancer: true, business: true, corporate: true },
+  { name: 'OCR Receipt Scanner', category: 'Features', free: false, starter: false, basic: false, freelancer: true, business: true, corporate: true },
+  { name: 'Scenario Modeling', category: 'Features', free: false, starter: false, basic: false, freelancer: 'Basic', business: 'Advanced', corporate: 'Advanced' },
+  { name: 'Multi-Year Projection', category: 'Features', free: false, starter: false, basic: false, freelancer: false, business: true, corporate: true },
+  
+  // Verification & Filing
+  { name: 'CAC Verification (Auto)', category: 'Verification', free: false, starter: false, basic: false, freelancer: false, business: true, corporate: true },
+  { name: 'Bulk CAC Verification', category: 'Verification', free: false, starter: false, basic: false, freelancer: false, business: false, corporate: true },
+  { name: 'Tax Filing Preparation', category: 'Verification', free: false, starter: false, basic: false, freelancer: false, business: true, corporate: true },
+  
+  // AI & Advisory
+  { name: 'AI Tax Assistant', category: 'AI & Support', free: '5 queries', starter: '20 queries', basic: '50 queries', freelancer: '100 queries', business: 'Unlimited', corporate: 'Priority' },
+  { name: 'Priority Support', category: 'AI & Support', free: false, starter: false, basic: false, freelancer: true, business: true, corporate: true },
+  
+  // Security & Admin
+  { name: 'No Watermarks', category: 'Security', free: false, starter: true, basic: false, freelancer: true, business: true, corporate: true },
+  { name: 'Audit Log', category: 'Security', free: false, starter: false, basic: false, freelancer: false, business: false, corporate: true },
+  { name: 'IP Whitelist', category: 'Security', free: false, starter: false, basic: false, freelancer: false, business: false, corporate: true },
+  { name: 'Multi-User Seats', category: 'Team', free: false, starter: false, basic: false, freelancer: false, business: '2 seats', corporate: 'Unlimited' },
+  { name: 'API Access', category: 'Team', free: false, starter: false, basic: false, freelancer: false, business: false, corporate: true },
+];
+
+const featureCategories = [
+  { name: 'Tax Tools', icon: Calculator },
+  { name: 'Business', icon: Building2 },
+  { name: 'Features', icon: FileText },
+  { name: 'Verification', icon: ClipboardCheck },
+  { name: 'AI & Support', icon: Bot },
+  { name: 'Security', icon: Shield },
+  { name: 'Team', icon: Users },
 ];
 
 const Pricing = () => {
@@ -72,187 +112,193 @@ const Pricing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
-      <NavMenu />
+    <PageLayout maxWidth="7xl" showBackground={true}>
+      {/* Header */}
+      <div className="text-center mb-12 animate-slide-up">
+        <h1 className="text-4xl font-extrabold text-foreground mb-4">
+          Simple, Transparent Pricing
+        </h1>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          Choose the plan that fits your needs. Save ~17% with annual billing.
+        </p>
+      </div>
 
-      <main className="container mx-auto px-4 py-8 pb-12 flex-1">
-        {/* Header */}
-        <div className="text-center mb-12 animate-slide-up">
-          <h1 className="text-4xl font-extrabold text-foreground mb-4">
-            Simple, Transparent Pricing
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Choose the plan that fits your needs. Save ~17% with annual billing.
-          </p>
-        </div>
+      {/* Pricing Cards */}
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 mb-12 sm:mb-16">
+        {/* Individual (Free) Tier */}
+        <PricingCard
+          tier="free"
+          name="Individual"
+          icon={<User className="h-5 w-5 sm:h-6 sm:w-6" />}
+          monthlyPrice={0}
+          description="For individuals with no business income"
+          features={['Personal tax calculator', 'Employment/Salary PIT', 'Crypto & investment taxes', 'Foreign income credits']}
+          limitations={['No business saves', 'No exports']}
+          currentTier={currentTier}
+          onUpgrade={handleUpgrade}
+        />
 
-        {/* Pricing Cards */}
-        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 max-w-7xl mx-auto mb-12 sm:mb-16">
-          {/* Individual (Free) Tier */}
-          <PricingCard
-            tier="free"
-            name="Individual"
-            icon={<User className="h-5 w-5 sm:h-6 sm:w-6" />}
-            monthlyPrice={0}
-            description="For individuals with no business income"
-            features={['Personal tax calculator', 'Employment/Salary PIT', 'Crypto & investment taxes', 'Foreign income credits']}
-            limitations={['No business saves', 'No exports']}
-            currentTier={currentTier}
-            onUpgrade={handleUpgrade}
-          />
+        {/* Starter Tier */}
+        <PricingCard
+          tier="starter"
+          name="Starter"
+          icon={<Zap className="h-5 w-5 sm:h-6 sm:w-6" />}
+          monthlyPrice={500}
+          annualPrice={5000}
+          description="For small business owners"
+          features={['Everything in Free', '1 saved business', 'PDF/CSV export', 'No watermarks', 'Email reminders']}
+          limitations={['No scenario modeling']}
+          currentTier={currentTier}
+          onUpgrade={handleUpgrade}
+        />
 
-          {/* Starter Tier - NEW */}
-          <PricingCard
-            tier="starter"
-            name="Starter"
-            icon={<Zap className="h-5 w-5 sm:h-6 sm:w-6" />}
-            monthlyPrice={500}
-            annualPrice={5000}
-            description="For small business owners"
-            features={['Everything in Free', '1 saved business', 'PDF/CSV export', 'No watermarks', 'Email reminders']}
-            limitations={['No scenario modeling']}
-            currentTier={currentTier}
-            onUpgrade={handleUpgrade}
-          />
+        {/* Basic Tier */}
+        <PricingCard
+          tier="basic"
+          name="Basic"
+          icon={<Star className="h-5 w-5 sm:h-6 sm:w-6" />}
+          monthlyPrice={2000}
+          annualPrice={20000}
+          description="Perfect for side hustlers"
+          features={['Everything in Starter', 'Up to 2 businesses', 'Invoices & P&L', 'Sector presets', 'Data storage']}
+          limitations={['Watermarked results']}
+          currentTier={currentTier}
+          onUpgrade={handleUpgrade}
+        />
 
-          {/* Basic Tier */}
-          <PricingCard
-            tier="basic"
-            name="Basic"
-            icon={<Star className="h-5 w-5 sm:h-6 sm:w-6" />}
-            monthlyPrice={2000}
-            annualPrice={20000}
-            description="Perfect for side hustlers"
-            features={['Everything in Starter', 'Up to 2 businesses', 'Sector presets', 'Data storage']}
-            limitations={['Watermarked results']}
-            currentTier={currentTier}
-            onUpgrade={handleUpgrade}
-          />
+        {/* Freelancer Tier */}
+        <PricingCard
+          tier="freelancer"
+          name="Freelancer"
+          icon={<Briefcase className="h-5 w-5 sm:h-6 sm:w-6" />}
+          monthlyPrice={4999}
+          annualPrice={49990}
+          description="For solo professionals & freelancers"
+          features={['Everything in Basic', 'Up to 5 businesses', 'Payroll & Compliance', 'OCR receipts', 'Basic scenarios', 'Priority support']}
+          currentTier={currentTier}
+          onUpgrade={handleUpgrade}
+        />
 
-          {/* Freelancer Tier - NEW */}
-          <PricingCard
-            tier="freelancer"
-            name="Freelancer"
-            icon={<Briefcase className="h-5 w-5 sm:h-6 sm:w-6" />}
-            monthlyPrice={4999}
-            annualPrice={49990}
-            description="For solo professionals & freelancers"
-            features={['Everything in Basic', 'Up to 5 businesses', 'Basic scenario modeling', 'Basic integrations', 'No watermarks', 'Priority support']}
-            currentTier={currentTier}
-            onUpgrade={handleUpgrade}
-          />
+        {/* Business Tier */}
+        <PricingCard
+          tier="business"
+          name="Business"
+          icon={<Building2 className="h-5 w-5 sm:h-6 sm:w-6" />}
+          monthlyPrice={8999}
+          annualPrice={89990}
+          description="For growing businesses"
+          features={['Everything in Freelancer', 'Up to 10 businesses', 'CAC verification', 'Advanced scenarios', 'Tax filing prep', '2 user seats']}
+          isPopular
+          currentTier={currentTier}
+          onUpgrade={handleUpgrade}
+        />
 
-          {/* Business Tier */}
-          <PricingCard
-            tier="business"
-            name="Business"
-            icon={<Building2 className="h-5 w-5 sm:h-6 sm:w-6" />}
-            monthlyPrice={8999}
-            annualPrice={89990}
-            description="For growing businesses"
-            features={['Everything in Freelancer', 'Up to 10 businesses', 'CAC verification', 'Advanced scenarios', 'Tax filing prep', '2 user seats']}
-            isPopular
-            currentTier={currentTier}
-            onUpgrade={handleUpgrade}
-          />
+        {/* Corporate Tier */}
+        <PricingCard
+          tier="corporate"
+          name="Corporate"
+          icon={<Crown className="h-5 w-5 sm:h-6 sm:w-6" />}
+          monthlyPrice="Custom"
+          description="Enterprise solution"
+          features={['Everything in Business', 'Unlimited businesses', 'Unlimited users', 'API access', 'Audit log & IP whitelist', 'Dedicated support']}
+          currentTier={currentTier}
+          onUpgrade={handleUpgrade}
+        />
+      </div>
 
-          {/* Corporate Tier */}
-          <PricingCard
-            tier="corporate"
-            name="Corporate"
-            icon={<Crown className="h-5 w-5 sm:h-6 sm:w-6" />}
-            monthlyPrice="Custom"
-            description="Enterprise solution"
-            features={['Everything in Business', 'Unlimited businesses', 'Unlimited users', 'Custom reports', 'Dedicated support', 'API access (coming)']}
-            currentTier={currentTier}
-            onUpgrade={handleUpgrade}
-          />
-        </div>
-
-        {/* Feature Comparison Table */}
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-8">
-            Full Feature Comparison
-          </h2>
-          <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-card">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border bg-secondary/50">
-                    <th className="text-left p-4 font-semibold text-foreground">Feature</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Individual</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Starter</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Basic</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Freelancer</th>
-                    <th className="text-center p-4 font-semibold text-foreground bg-primary/5">Business</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Corporate</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {features.map((feature, i) => (
-                    <tr key={i} className={i % 2 === 0 ? 'bg-background' : 'bg-secondary/20'}>
-                      <td className="p-4 text-sm text-foreground">{feature.name}</td>
-                      <td className="p-4 text-center"><FeatureValue value={feature.free} /></td>
-                      <td className="p-4 text-center"><FeatureValue value={feature.starter} /></td>
-                      <td className="p-4 text-center"><FeatureValue value={feature.basic} /></td>
-                      <td className="p-4 text-center"><FeatureValue value={feature.freelancer} /></td>
-                      <td className="p-4 text-center bg-primary/5"><FeatureValue value={feature.business} /></td>
-                      <td className="p-4 text-center"><FeatureValue value={feature.corporate} /></td>
+      {/* Feature Comparison Table */}
+      <div className="mb-16">
+        <h2 className="text-2xl font-bold text-foreground text-center mb-8">
+          Full Feature Comparison
+        </h2>
+        <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-card">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border bg-secondary/50">
+                  <th className="text-left p-4 font-semibold text-foreground min-w-[200px]">Feature</th>
+                  <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Individual</th>
+                  <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Starter</th>
+                  <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Basic</th>
+                  <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Freelancer</th>
+                  <th className="text-center p-4 font-semibold text-foreground bg-primary/5 min-w-[80px]">Business</th>
+                  <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Corporate</th>
+                </tr>
+              </thead>
+              <tbody>
+                {featureCategories.map((category, catIndex) => (
+                  <>
+                    {/* Category Header */}
+                    <tr key={`cat-${catIndex}`} className="bg-muted/30">
+                      <td colSpan={7} className="p-3">
+                        <div className="flex items-center gap-2 font-semibold text-foreground">
+                          <category.icon className="h-4 w-4 text-primary" />
+                          {category.name}
+                        </div>
+                      </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                    {/* Features in this category */}
+                    {features.filter(f => f.category === category.name).map((feature, i) => (
+                      <tr key={`${category.name}-${i}`} className={i % 2 === 0 ? 'bg-background' : 'bg-secondary/20'}>
+                        <td className="p-4 text-sm text-foreground">{feature.name}</td>
+                        <td className="p-4 text-center"><FeatureValue value={feature.free} /></td>
+                        <td className="p-4 text-center"><FeatureValue value={feature.starter} /></td>
+                        <td className="p-4 text-center"><FeatureValue value={feature.basic} /></td>
+                        <td className="p-4 text-center"><FeatureValue value={feature.freelancer} /></td>
+                        <td className="p-4 text-center bg-primary/5"><FeatureValue value={feature.business} /></td>
+                        <td className="p-4 text-center"><FeatureValue value={feature.corporate} /></td>
+                      </tr>
+                    ))}
+                  </>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
+      </div>
 
-        {/* Payment Methods */}
-        <div className="mt-12 text-center">
-          <p className="text-sm text-muted-foreground mb-4">
-            Secure payments via Paystack
+      {/* Payment Methods */}
+      <div className="text-center mb-12">
+        <p className="text-sm text-muted-foreground mb-4">
+          Secure payments via Paystack
+        </p>
+        <div className="flex items-center justify-center gap-6 text-muted-foreground">
+          <span className="text-xs">💳 Card</span>
+          <span className="text-xs">🏦 Bank Transfer</span>
+          <span className="text-xs">📱 USSD</span>
+        </div>
+      </div>
+
+      {/* Contact Section */}
+      <div className="max-w-2xl mx-auto text-center">
+        <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
+          <MessageCircle className="h-10 w-10 text-primary mx-auto mb-4" />
+          <h3 className="text-xl font-bold text-foreground mb-2">Need Help Choosing?</h3>
+          <p className="text-muted-foreground mb-6">
+            Our team can help you find the right plan for your business needs.
           </p>
-          <div className="flex items-center justify-center gap-6 text-muted-foreground">
-            <span className="text-xs">💳 Card</span>
-            <span className="text-xs">🏦 Bank Transfer</span>
-            <span className="text-xs">📱 USSD</span>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button variant="outline" asChild>
+              <a href="mailto:support@taxforge.ng">
+                <Mail className="h-4 w-4" />
+                Contact Sales
+              </a>
+            </Button>
+            <Button variant="hero" onClick={() => navigate('/advisory')}>
+              Start Free Trial
+              <ArrowRight className="h-4 w-4" />
+            </Button>
           </div>
         </div>
-
-        {/* Contact Section */}
-        <div className="mt-16 max-w-2xl mx-auto text-center">
-          <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
-            <MessageCircle className="h-10 w-10 text-primary mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-foreground mb-2">Need Help Choosing?</h3>
-            <p className="text-muted-foreground mb-6">
-              Our team can help you find the right plan for your business needs.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="outline" asChild>
-                <a href="mailto:support@taxforge.ng">
-                  <Mail className="h-4 w-4" />
-                  Contact Sales
-                </a>
-              </Button>
-              <Link to="/advisory">
-                <Button variant="hero">
-                  Start Free Trial
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </main>
+      </div>
 
       {/* Footer */}
-      <footer className="bg-card py-6 border-t border-border mt-auto">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-sm text-muted-foreground">
-            © 2025 TaxForge NG. All prices include VAT. For educational purposes.
-          </p>
-        </div>
-      </footer>
-    </div>
+      <div className="mt-16 pt-6 border-t border-border text-center">
+        <p className="text-sm text-muted-foreground">
+          © 2025 TaxForge NG. All prices include VAT. For educational purposes.
+        </p>
+      </div>
+    </PageLayout>
   );
 };
 
