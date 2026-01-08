@@ -13,7 +13,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
-import { useLanguage, getToastMessage } from "@/contexts/LanguageContext";
 import {
   Building2,
   TrendingUp,
@@ -194,16 +193,14 @@ const BusinessReport = () => {
     color: CATEGORY_COLORS[category] || '#6b7280',
   }));
 
-  const { t } = useLanguage();
-
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-hero">
         <NavMenu />
         <div className="container mx-auto px-4 py-20 text-center">
-          <p className="text-muted-foreground">{t('businessReport.signIn')}</p>
+          <p className="text-muted-foreground">Please sign in to view business reports</p>
           <Button variant="hero" className="mt-4" onClick={() => navigate('/auth')}>
-            {t('common.signIn')}
+            Sign In
           </Button>
         </div>
       </div>
@@ -216,7 +213,7 @@ const BusinessReport = () => {
         <NavMenu />
         <div className="container mx-auto px-4 py-20 text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground mt-4">{t('businessReport.loadingReport')}</p>
+          <p className="text-muted-foreground mt-4">Loading business report...</p>
         </div>
       </div>
     );
@@ -228,12 +225,12 @@ const BusinessReport = () => {
         <NavMenu />
         <div className="container mx-auto px-4 py-20 text-center">
           <Building2 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-foreground mb-2">{t('businessReport.noBusinesses')}</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">No Businesses Found</h1>
           <p className="text-muted-foreground mb-6">
-            {t('businessReport.addBusinessFirst')}
+            Add a business first to generate reports
           </p>
           <Button variant="hero" onClick={() => navigate('/businesses')}>
-            {t('businessReport.addBusiness')}
+            Add Business
           </Button>
         </div>
       </div>
@@ -257,9 +254,9 @@ const BusinessReport = () => {
                   <FileText className="h-4 w-4 sm:h-6 sm:w-6 text-primary-foreground" />
                 </div>
                 <div className="min-w-0">
-                  <h1 className="text-lg sm:text-2xl font-bold text-foreground truncate">{t('businessReport.title')}</h1>
+                  <h1 className="text-lg sm:text-2xl font-bold text-foreground truncate">Business Report</h1>
                   <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                    {t('businessReport.subtitle')}
+                    Financial overview and tax estimates
                   </p>
                 </div>
               </div>
@@ -268,7 +265,7 @@ const BusinessReport = () => {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <Select value={selectedBusinessId} onValueChange={setSelectedBusinessId}>
                 <SelectTrigger className="w-full sm:w-[200px] h-9 text-sm">
-                  <SelectValue placeholder={t('businessReport.selectBusiness')} />
+                  <SelectValue placeholder="Select Business" />
                 </SelectTrigger>
                 <SelectContent>
                   {savedBusinesses.map((business) => (
@@ -305,7 +302,7 @@ const BusinessReport = () => {
                 disabled={!selectedBusiness || tier === 'free'}
               >
                 <Download className="h-4 w-4 mr-2" />
-                {t('businessReport.exportPdf')}
+                Export PDF
               </Button>
             </div>
           </div>
@@ -322,15 +319,15 @@ const BusinessReport = () => {
               <CardContent>
                 <div className="flex flex-wrap gap-4 text-sm">
                   <div>
-                    <span className="text-muted-foreground">{t('businessReport.type')}</span>{' '}
-                    <span className="font-medium">{isCompany ? t('businessReport.llcCit') : t('businessReport.bnPit')}</span>
+                    <span className="text-muted-foreground">Type:</span>{' '}
+                    <span className="font-medium">{isCompany ? 'LLC (CIT)' : 'Business Name (PIT)'}</span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">{t('businessReport.registeredTurnover')}</span>{' '}
+                    <span className="text-muted-foreground">Registered Turnover:</span>{' '}
                     <span className="font-medium">{formatCurrency(businessTurnover)}</span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">{t('businessReport.transactionsCount')}</span>{' '}
+                    <span className="text-muted-foreground">Transactions:</span>{' '}
                     <span className="font-medium">{businessExpenses.length}</span>
                   </div>
                 </div>
@@ -344,7 +341,7 @@ const BusinessReport = () => {
               <CardContent className="pt-4">
                 <div className="flex items-center gap-2 mb-1">
                   <TrendingUp className="h-4 w-4 text-success" />
-                  <span className="text-xs text-muted-foreground">{t('businessReport.incomeLabel')}</span>
+                  <span className="text-xs text-muted-foreground">Total Income</span>
                 </div>
                 <p className="text-xl font-bold text-success">{formatCurrency(totalIncome)}</p>
               </CardContent>
@@ -354,7 +351,7 @@ const BusinessReport = () => {
               <CardContent className="pt-4">
                 <div className="flex items-center gap-2 mb-1">
                   <TrendingDown className="h-4 w-4 text-destructive" />
-                  <span className="text-xs text-muted-foreground">{t('businessReport.expensesLabel')}</span>
+                  <span className="text-xs text-muted-foreground">Total Expenses</span>
                 </div>
                 <p className="text-xl font-bold text-destructive">{formatCurrency(totalExpenses)}</p>
               </CardContent>
@@ -364,7 +361,7 @@ const BusinessReport = () => {
               <CardContent className="pt-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Receipt className="h-4 w-4 text-primary" />
-                  <span className="text-xs text-muted-foreground">{t('businessReport.deductible')}</span>
+                  <span className="text-xs text-muted-foreground">Tax Deductible</span>
                 </div>
                 <p className="text-xl font-bold text-foreground">{formatCurrency(deductibleExpenses)}</p>
               </CardContent>
@@ -374,7 +371,7 @@ const BusinessReport = () => {
               <CardContent className="pt-4">
                 <div className="flex items-center gap-2 mb-1">
                   <PieChart className="h-4 w-4 text-success" />
-                  <span className="text-xs text-muted-foreground">{t('businessReport.netIncome')}</span>
+                  <span className="text-xs text-muted-foreground">Net Income</span>
                 </div>
                 <p className={`text-xl font-bold ${netIncome >= 0 ? 'text-success' : 'text-destructive'}`}>
                   {formatCurrency(netIncome)}
@@ -386,7 +383,7 @@ const BusinessReport = () => {
               <CardContent className="pt-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Calculator className="h-4 w-4 text-warning" />
-                  <span className="text-xs text-muted-foreground">{t('businessReport.estTax')}</span>
+                  <span className="text-xs text-muted-foreground">Est. Tax Due</span>
                 </div>
                 <p className="text-xl font-bold text-warning">{formatCurrency(estimatedTax)}</p>
               </CardContent>
@@ -402,7 +399,7 @@ const BusinessReport = () => {
                   <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
                     <PieChart className="h-4 w-4 text-primary" />
                   </div>
-                  {t('businessReport.expenseBreakdown')}
+                  Expense Breakdown
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -464,7 +461,7 @@ const BusinessReport = () => {
                     </div>
                   ) : (
                     <div className="h-[16rem] flex items-center justify-center text-muted-foreground">
-                      {t('businessReport.noExpenses')}
+                      No expense data yet
                     </div>
                   )}
                   {/* Legend */}
@@ -506,37 +503,37 @@ const BusinessReport = () => {
                   <div className="h-8 w-8 rounded-lg bg-accent/10 flex items-center justify-center">
                     <Calculator className="h-4 w-4 text-accent" />
                   </div>
-                  {t('businessReport.taxSummary')}
+                  Tax Summary
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex justify-between py-2 border-b border-border">
-                    <span className="text-muted-foreground">{t('businessReport.totalIncomeLabel')}</span>
+                    <span className="text-muted-foreground">Total Income</span>
                     <span className="font-medium text-success">{formatCurrency(totalIncome)}</span>
                   </div>
                   <div className="flex justify-between py-2 border-b border-border">
-                    <span className="text-muted-foreground">{t('businessReport.deductibleExpenses')}</span>
+                    <span className="text-muted-foreground">Deductible Expenses</span>
                     <span className="font-medium text-foreground">- {formatCurrency(deductibleExpenses)}</span>
                   </div>
                   <div className="flex justify-between py-2 border-b border-border">
-                    <span className="text-muted-foreground">{t('businessReport.taxableIncome')}</span>
+                    <span className="text-muted-foreground">Taxable Income</span>
                     <span className="font-bold text-foreground">{formatCurrency(taxableIncome)}</span>
                   </div>
                   <div className="flex justify-between py-2 border-b border-border">
-                    <span className="text-muted-foreground">{t('businessReport.taxType')}</span>
-                    <span className="font-medium">{isCompany ? t('businessReport.citRate') : t('businessReport.pitProgressive')}</span>
+                    <span className="text-muted-foreground">Tax Type</span>
+                    <span className="font-medium">{isCompany ? 'CIT (25%/30%)' : 'PIT (Progressive)'}</span>
                   </div>
                   {isCompany && businessTurnover <= 50000000 && (
                     <div className="p-3 rounded-lg bg-success/10 border border-success/20 text-sm">
-                      <span className="text-success font-medium">{t('businessReport.smallCompanyExemption')}</span>
+                      <span className="text-success font-medium">Small Company Exemption</span>
                       <p className="text-muted-foreground mt-1">
-                        {t('businessReport.smallCompanyDesc')}
+                        Companies with ≤₦50M turnover may qualify for 0% CIT
                       </p>
                     </div>
                   )}
                   <div className="flex justify-between py-3 rounded-lg bg-warning/10 px-3">
-                    <span className="font-semibold text-foreground">{t('businessReport.estimatedTaxDue')}</span>
+                    <span className="font-semibold text-foreground">Estimated Tax Due</span>
                     <span className="font-bold text-warning text-lg">{formatCurrency(estimatedTax)}</span>
                   </div>
 
@@ -554,7 +551,7 @@ const BusinessReport = () => {
                     })}
                   >
                     <Calculator className="h-4 w-4 mr-2" />
-                    {t('businessReport.openFullCalculator')}
+                    Open Full Calculator
                   </Button>
                 </div>
               </CardContent>
@@ -566,16 +563,16 @@ const BusinessReport = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Receipt className="h-5 w-5 text-primary" />
-                {t('businessReport.recentTransactions')} ({businessExpenses.length})
+                Recent Transactions ({businessExpenses.length})
               </CardTitle>
             </CardHeader>
             <CardContent>
               {businessExpenses.length === 0 ? (
                 <div className="text-center py-8">
                   <Receipt className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-muted-foreground mb-4">{t('businessReport.noTransactions')}</p>
+                  <p className="text-muted-foreground mb-4">No transactions recorded yet</p>
                   <Button variant="outline" onClick={() => navigate('/expenses')}>
-                    {t('businessReport.addExpenses')}
+                    Add Expenses
                   </Button>
                 </div>
               ) : (
@@ -610,7 +607,7 @@ const BusinessReport = () => {
 
           {/* Disclaimer */}
           <div className="mt-6 p-4 rounded-lg bg-muted/50 border border-border text-center text-sm text-muted-foreground animate-slide-up">
-            {t('businessReport.disclaimer')}
+            This report is for informational purposes only. Please consult a professional accountant for tax filing.
           </div>
         </div>
       </main>

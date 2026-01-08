@@ -18,7 +18,6 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface NotificationDelivery {
   id: string;
@@ -60,7 +59,6 @@ const maskRecipient = (recipient: string, method: string) => {
 };
 
 export const NotificationDeliveryLog = () => {
-  const { t } = useLanguage();
   const [deliveries, setDeliveries] = useState<NotificationDelivery[]>([]);
   const [loading, setLoading] = useState(true);
   const [methodFilter, setMethodFilter] = useState<string>('all');
@@ -77,9 +75,9 @@ export const NotificationDeliveryLog = () => {
       case 'sms':
         return 'SMS';
       case 'email':
-        return t('security.notifications.email');
+        return 'Email';
       case 'failed':
-        return t('security.notifications.failed');
+        return 'Failed';
       default:
         return method;
     }
@@ -88,13 +86,13 @@ export const NotificationDeliveryLog = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'sent':
-        return <Badge variant="outline" className="text-green-600 border-green-600"><CheckCircle2 className="h-3 w-3 mr-1" />{t('security.notifications.sent')}</Badge>;
+        return <Badge variant="outline" className="text-green-600 border-green-600"><CheckCircle2 className="h-3 w-3 mr-1" />Sent</Badge>;
       case 'delivered':
-        return <Badge variant="outline" className="text-blue-600 border-blue-600"><CheckCircle2 className="h-3 w-3 mr-1" />{t('security.notifications.delivered')}</Badge>;
+        return <Badge variant="outline" className="text-blue-600 border-blue-600"><CheckCircle2 className="h-3 w-3 mr-1" />Delivered</Badge>;
       case 'failed':
-        return <Badge variant="destructive"><XCircle className="h-3 w-3 mr-1" />{t('security.notifications.failed')}</Badge>;
+        return <Badge variant="destructive"><XCircle className="h-3 w-3 mr-1" />Failed</Badge>;
       case 'pending':
-        return <Badge variant="secondary"><Loader2 className="h-3 w-3 mr-1 animate-spin" />{t('security.notifications.pending')}</Badge>;
+        return <Badge variant="secondary"><Loader2 className="h-3 w-3 mr-1 animate-spin" />Pending</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -102,21 +100,21 @@ export const NotificationDeliveryLog = () => {
 
   const getAlertTypeLabel = (alertType: string) => {
     const labels: Record<string, string> = {
-      'failed_backup_codes': t('security.notifications.alertTypes.failedBackupCodes'),
-      'account_locked': t('security.notifications.alertTypes.accountLocked'),
-      'new_device': t('security.notifications.alertTypes.newDevice'),
-      'device_removed': t('security.notifications.alertTypes.deviceRemoved'),
-      'sessions_revoked': t('security.notifications.alertTypes.sessionsRevoked'),
-      'new_location': t('security.notifications.alertTypes.newLocation'),
-      'device_blocked': t('security.notifications.alertTypes.deviceBlocked'),
-      'password_changed': t('security.notifications.alertTypes.passwordChanged'),
-      '2fa_enabled': t('security.notifications.alertTypes.2faEnabled'),
-      '2fa_disabled': t('security.notifications.alertTypes.2faDisabled'),
-      'backup_codes_generated': t('security.notifications.alertTypes.backupCodesGenerated'),
-      'email_changed': t('security.notifications.alertTypes.emailChanged'),
-      'unusual_time': t('security.notifications.alertTypes.unusualTime'),
-      'ip_blocked': t('security.notifications.alertTypes.ipBlocked'),
-      'time_restricted': t('security.notifications.alertTypes.timeRestricted'),
+      'failed_backup_codes': 'Failed Backup Codes',
+      'account_locked': 'Account Locked',
+      'new_device': 'New Device',
+      'device_removed': 'Device Removed',
+      'sessions_revoked': 'Sessions Revoked',
+      'new_location': 'New Location',
+      'device_blocked': 'Device Blocked',
+      'password_changed': 'Password Changed',
+      '2fa_enabled': '2FA Enabled',
+      '2fa_disabled': '2FA Disabled',
+      'backup_codes_generated': 'Backup Codes Generated',
+      'email_changed': 'Email Changed',
+      'unusual_time': 'Unusual Time',
+      'ip_blocked': 'IP Blocked',
+      'time_restricted': 'Time Restricted',
     };
     return labels[alertType] || alertType;
   };
@@ -179,7 +177,7 @@ export const NotificationDeliveryLog = () => {
             setDeliveries(prev => [newDelivery, ...prev].slice(0, 50));
             setShowNewBadge(true);
             setNewCount(prev => prev + 1);
-            toast.success(`${t('security.notifications.new')} ${getMethodLabel(newDelivery.delivery_method)} ${t('security.notifications.notificationDelivered')}`, {
+            toast.success(`New ${getMethodLabel(newDelivery.delivery_method)} notification delivered`, {
               description: getAlertTypeLabel(newDelivery.alert_type),
             });
             
@@ -213,7 +211,7 @@ export const NotificationDeliveryLog = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [methodFilter, statusFilter, alertTypeFilter, t]);
+  }, [methodFilter, statusFilter, alertTypeFilter]);
 
   // Calculate stats
   const stats = {
@@ -231,21 +229,21 @@ export const NotificationDeliveryLog = () => {
           <div>
             <CardTitle className="flex items-center gap-2">
               <MessageCircle className="h-5 w-5 text-primary" />
-              {t('security.notifications.title')}
-              <LiveIndicator isLive={isConnected} label={t('common.live')} />
+              Notification Delivery Log
+              <LiveIndicator isLive={isConnected} label="Live" />
               {showNewBadge && newCount > 0 && (
                 <Badge variant="default" className="animate-pulse bg-green-500">
-                  +{newCount} {t('common.new')}
+                  +{newCount} New
                 </Badge>
               )}
             </CardTitle>
             <CardDescription>
-              {t('security.notifications.description')}
+              Track security alerts sent via email, SMS, and WhatsApp
             </CardDescription>
           </div>
           <Button variant="outline" size="sm" onClick={fetchDeliveries} disabled={loading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            {t('common.refresh')}
+            Refresh
           </Button>
         </div>
       </CardHeader>
@@ -254,7 +252,7 @@ export const NotificationDeliveryLog = () => {
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
           <div className="text-center p-2 rounded-lg bg-muted">
             <p className="text-2xl font-bold">{stats.total}</p>
-            <p className="text-xs text-muted-foreground">{t('common.total')}</p>
+            <p className="text-xs text-muted-foreground">Total</p>
           </div>
           <div className="text-center p-2 rounded-lg bg-green-50 dark:bg-green-900/20">
             <p className="text-2xl font-bold text-green-600">{stats.whatsapp}</p>
@@ -266,11 +264,11 @@ export const NotificationDeliveryLog = () => {
           </div>
           <div className="text-center p-2 rounded-lg bg-purple-50 dark:bg-purple-900/20">
             <p className="text-2xl font-bold text-purple-600">{stats.email}</p>
-            <p className="text-xs text-purple-600">{t('security.notifications.email')}</p>
+            <p className="text-xs text-purple-600">Email</p>
           </div>
           <div className="text-center p-2 rounded-lg bg-red-50 dark:bg-red-900/20">
             <p className="text-2xl font-bold text-red-600">{stats.failed}</p>
-            <p className="text-xs text-red-600">{t('security.notifications.failed')}</p>
+            <p className="text-xs text-red-600">Failed</p>
           </div>
         </div>
 
@@ -279,40 +277,40 @@ export const NotificationDeliveryLog = () => {
           <Filter className="h-4 w-4 text-muted-foreground" />
           <Select value={methodFilter} onValueChange={setMethodFilter}>
             <SelectTrigger className="w-[130px]">
-              <SelectValue placeholder={t('security.notifications.method')} />
+              <SelectValue placeholder="Method" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t('security.notifications.allMethods')}</SelectItem>
+              <SelectItem value="all">All Methods</SelectItem>
               <SelectItem value="whatsapp">WhatsApp</SelectItem>
               <SelectItem value="sms">SMS</SelectItem>
-              <SelectItem value="email">{t('security.notifications.email')}</SelectItem>
-              <SelectItem value="failed">{t('security.notifications.failed')}</SelectItem>
+              <SelectItem value="email">Email</SelectItem>
+              <SelectItem value="failed">Failed</SelectItem>
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder={t('security.notifications.status')} />
+              <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t('security.notifications.allStatus')}</SelectItem>
-              <SelectItem value="sent">{t('security.notifications.sent')}</SelectItem>
-              <SelectItem value="delivered">{t('security.notifications.delivered')}</SelectItem>
-              <SelectItem value="failed">{t('security.notifications.failed')}</SelectItem>
-              <SelectItem value="pending">{t('security.notifications.pending')}</SelectItem>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="sent">Sent</SelectItem>
+              <SelectItem value="delivered">Delivered</SelectItem>
+              <SelectItem value="failed">Failed</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
             </SelectContent>
           </Select>
           <Select value={alertTypeFilter} onValueChange={setAlertTypeFilter}>
             <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder={t('security.notifications.alertType')} />
+              <SelectValue placeholder="Alert Type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t('security.notifications.allAlerts')}</SelectItem>
-              <SelectItem value="account_locked">{t('security.notifications.alertTypes.accountLocked')}</SelectItem>
-              <SelectItem value="failed_backup_codes">{t('security.notifications.alertTypes.failedBackupCodes')}</SelectItem>
-              <SelectItem value="new_device">{t('security.notifications.alertTypes.newDevice')}</SelectItem>
-              <SelectItem value="password_changed">{t('security.notifications.alertTypes.passwordChanged')}</SelectItem>
-              <SelectItem value="ip_blocked">{t('security.notifications.alertTypes.ipBlocked')}</SelectItem>
-              <SelectItem value="time_restricted">{t('security.notifications.alertTypes.timeRestricted')}</SelectItem>
+              <SelectItem value="all">All Alerts</SelectItem>
+              <SelectItem value="account_locked">Account Locked</SelectItem>
+              <SelectItem value="failed_backup_codes">Failed Backup Codes</SelectItem>
+              <SelectItem value="new_device">New Device</SelectItem>
+              <SelectItem value="password_changed">Password Changed</SelectItem>
+              <SelectItem value="ip_blocked">IP Blocked</SelectItem>
+              <SelectItem value="time_restricted">Time Restricted</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -325,8 +323,8 @@ export const NotificationDeliveryLog = () => {
         ) : deliveries.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <MessageCircle className="h-12 w-12 mx-auto mb-2 opacity-50" />
-            <p>{t('security.notifications.noDeliveries')}</p>
-            <p className="text-sm">{t('security.notifications.noDeliveriesHint')}</p>
+            <p>No notification deliveries yet</p>
+            <p className="text-sm">Security alerts will appear here when triggered</p>
           </div>
         ) : (
           <ScrollArea className="h-[400px]">
@@ -350,7 +348,7 @@ export const NotificationDeliveryLog = () => {
                       {getStatusBadge(delivery.status)}
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span>{t('security.notifications.to')}: {maskRecipient(delivery.recipient, delivery.delivery_method)}</span>
+                      <span>To: {maskRecipient(delivery.recipient, delivery.delivery_method)}</span>
                       <span>•</span>
                       <span>{formatDistanceToNow(new Date(delivery.created_at), { addSuffix: true })}</span>
                     </div>
@@ -361,7 +359,7 @@ export const NotificationDeliveryLog = () => {
                     )}
                     {delivery.error_message && (
                       <p className="text-xs text-destructive">
-                        {t('common.error')}: {delivery.error_message}
+                        Error: {delivery.error_message}
                       </p>
                     )}
                   </div>
