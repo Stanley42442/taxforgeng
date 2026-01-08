@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { useLanguage, getToastMessage } from "@/contexts/LanguageContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
@@ -188,6 +188,7 @@ const getEventSeverity = (eventType: string): 'success' | 'warning' | 'error' | 
 const SecurityDashboard = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [authEvents, setAuthEvents] = useState<AuthEvent[]>([]);
   const [backupCodeAttempts, setBackupCodeAttempts] = useState<BackupCodeAttempt[]>([]);
@@ -674,9 +675,9 @@ const SecurityDashboard = () => {
             <div className="min-w-0">
               <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
                 <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-primary shrink-0" />
-                <span className="truncate">Security Dashboard</span>
+                <span className="truncate">{t('security.dashboard.title')}</span>
               </h1>
-              <p className="text-sm text-muted-foreground truncate">Monitor your account security and activity</p>
+              <p className="text-sm text-muted-foreground truncate">{t('security.dashboard.subtitle')}</p>
             </div>
           </div>
           <Button variant="outline" onClick={handleRefresh} disabled={isRefreshing} className="shrink-0 self-start sm:self-auto">
@@ -685,7 +686,7 @@ const SecurityDashboard = () => {
             ) : (
               <RefreshCw className="h-4 w-4 mr-2" />
             )}
-            Refresh
+            {t('security.dashboard.refresh')}
           </Button>
         </div>
 
@@ -694,10 +695,9 @@ const SecurityDashboard = () => {
           <div className="mb-6 p-4 rounded-lg bg-destructive/10 border border-destructive/30 flex items-start gap-3">
             <AlertTriangle className="h-5 w-5 text-destructive mt-0.5" />
             <div>
-              <p className="font-medium text-destructive">Suspicious Activity Detected</p>
+              <p className="font-medium text-destructive">{t('security.dashboard.suspiciousActivity')}</p>
               <p className="text-sm text-destructive/80">
-                Multiple failed backup code attempts were detected in the last 24 hours. 
-                If this wasn't you, please change your password and generate new backup codes.
+                {t('security.dashboard.suspiciousDesc')}
               </p>
             </div>
           </div>
@@ -709,7 +709,7 @@ const SecurityDashboard = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Logins</p>
+                  <p className="text-sm text-muted-foreground">{t('security.dashboard.totalLogins')}</p>
                   <p className="text-2xl font-bold">{stats.totalLogins}</p>
                 </div>
                 <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
@@ -723,7 +723,7 @@ const SecurityDashboard = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Failed Attempts</p>
+                  <p className="text-sm text-muted-foreground">{t('security.dashboard.failedAttempts')}</p>
                   <p className="text-2xl font-bold">{stats.failedAttempts}</p>
                 </div>
                 <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
@@ -745,15 +745,15 @@ const SecurityDashboard = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">2FA Status</p>
+                  <p className="text-sm text-muted-foreground">{t('security.dashboard.mfaStatus')}</p>
                   <p className="text-lg font-bold">
                     {stats.mfaEnabled ? (
                       <span className="text-green-600 flex items-center gap-1">
-                        <CheckCircle2 className="h-4 w-4" /> Enabled
+                        <CheckCircle2 className="h-4 w-4" /> {t('security.dashboard.enabled')}
                       </span>
                     ) : (
                       <span className="text-amber-600 flex items-center gap-1">
-                        <AlertCircle className="h-4 w-4" /> Disabled
+                        <AlertCircle className="h-4 w-4" /> {t('security.dashboard.disabled')}
                       </span>
                     )}
                   </p>
@@ -777,7 +777,7 @@ const SecurityDashboard = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Backup Codes</p>
+                  <p className="text-sm text-muted-foreground">{t('security.dashboard.backupCodes')}</p>
                   <p className="text-2xl font-bold">{stats.backupCodesRemaining}</p>
                 </div>
                 <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
@@ -806,15 +806,15 @@ const SecurityDashboard = () => {
             <TabsList className="inline-flex h-auto flex-wrap gap-1 p-1 w-auto min-w-full sm:min-w-0">
               <TabsTrigger value="analytics" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <Activity className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                Analytics
+                {t('security.dashboard.analytics')}
               </TabsTrigger>
               <TabsTrigger value="restrictions" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                Access Rules
+                {t('security.dashboard.accessRules')}
               </TabsTrigger>
               <TabsTrigger value="devices" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <Monitor className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="hidden xs:inline">Devices</span>
+                <span className="hidden xs:inline">{t('security.dashboard.devices')}</span>
                 <span className="xs:hidden">Dev</span>
                 {knownDevices.length > 0 && (
                   <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
@@ -824,11 +824,11 @@ const SecurityDashboard = () => {
               </TabsTrigger>
               <TabsTrigger value="sessions" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <Activity className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                Sessions
+                {t('security.dashboard.sessions')}
               </TabsTrigger>
               <TabsTrigger value="history" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <History className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="hidden xs:inline">Login History</span>
+                <span className="hidden xs:inline">{t('security.dashboard.loginHistory')}</span>
                 <span className="xs:hidden">History</span>
                 {loginHistory.length > 0 && (
                   <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
@@ -838,22 +838,22 @@ const SecurityDashboard = () => {
               </TabsTrigger>
               <TabsTrigger value="events" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="hidden xs:inline">Security Events</span>
+                <span className="hidden xs:inline">{t('security.dashboard.securityEvents')}</span>
                 <span className="xs:hidden">Events</span>
               </TabsTrigger>
               <TabsTrigger value="notifications" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="hidden xs:inline">Notifications</span>
+                <span className="hidden xs:inline">{t('security.dashboard.notifications')}</span>
                 <span className="xs:hidden">Notif</span>
               </TabsTrigger>
               <TabsTrigger value="blocked" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <Ban className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="hidden xs:inline">Blocked Logins</span>
+                <span className="hidden xs:inline">{t('security.dashboard.blockedLogins')}</span>
                 <span className="xs:hidden">Blocked</span>
               </TabsTrigger>
               <TabsTrigger value="attempts" className="gap-1.5 text-xs sm:text-sm whitespace-nowrap">
                 <AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="hidden xs:inline">Failed Attempts</span>
+                <span className="hidden xs:inline">{t('security.dashboard.failedAttemptsTab')}</span>
                 <span className="xs:hidden">Failed</span>
                 {backupCodeAttempts.length > 0 && (
                   <Badge variant="destructive" className="ml-1 h-5 px-1.5 text-xs">
