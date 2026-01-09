@@ -427,3 +427,67 @@ html, body, #root {
     padding: 0.625rem 0.75rem;
   }
 }
+
+/* ============================================
+   DARK MODE MOBILE ENHANCEMENTS
+   ============================================ */
+@media (max-width: 767px) {
+  .dark .glass-premium {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--card) / 0.92) 0%,
+      hsl(var(--card) / 0.8) 100%
+    );
+    border-color: hsl(var(--border) / 0.4);
+    box-shadow: 
+      0 4px 16px hsl(0 0% 0% / 0.25),
+      0 0 0 1px hsl(var(--border) / 0.2),
+      inset 0 1px 0 hsl(var(--primary) / 0.08);
+  }
+  
+  .dark .neumorphic-inset {
+    box-shadow: 
+      inset 2px 2px 4px hsl(0 0% 0% / 0.2),
+      inset -2px -2px 4px hsl(var(--muted) / 0.03);
+    background: hsl(var(--muted) / 0.25);
+  }
+  
+  .dark .floating-card:active {
+    box-shadow: 
+      0 8px 16px hsl(0 0% 0% / 0.35),
+      0 4px 8px hsl(0 0% 0% / 0.2);
+  }
+  
+  .dark .input-neumorphic {
+    background: hsl(var(--muted) / 0.35);
+    border-color: hsl(var(--border) / 0.4);
+    box-shadow: 
+      inset 2px 2px 4px hsl(0 0% 0% / 0.15),
+      inset -2px -2px 4px hsl(var(--muted) / 0.03);
+  }
+  
+  .dark .input-neumorphic:focus {
+    border-color: hsl(var(--primary) / 0.5);
+    box-shadow: 
+      inset 2px 2px 4px hsl(0 0% 0% / 0.15),
+      0 0 0 2px hsl(var(--primary) / 0.15);
+  }
+  
+  .dark .modal-content-premium {
+    background: hsl(var(--card) / 0.98);
+    border-color: hsl(var(--border) / 0.4);
+    box-shadow: 
+      0 12px 32px hsl(0 0% 0% / 0.4),
+      0 0 0 1px hsl(var(--border) / 0.25);
+  }
+  
+  .dark .gradient-mesh-hero {
+    opacity: 0.9;
+  }
+  
+  /* Enhanced touch feedback in dark mode */
+  .dark .touch-feedback:active {
+    opacity: 0.85;
+    background: hsl(var(--primary) / 0.1);
+  }
+}

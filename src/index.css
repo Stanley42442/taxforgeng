@@ -143,17 +143,17 @@
     --input: 150 22% 18%;
     --ring: 152 75% 48%;
 
-    /* Dark Gradients */
+  /* Dark Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(152 75% 48%) 0%, hsl(152 70% 55%) 50%, hsl(145 65% 58%) 100%);
     --gradient-accent: linear-gradient(135deg, hsl(38 100% 58%) 0%, hsl(32 95% 55%) 50%, hsl(28 90% 52%) 100%);
-    --gradient-hero: linear-gradient(180deg, hsl(150 30% 5%) 0%, hsl(150 25% 8%) 50%, hsl(150 22% 10%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(150 25% 9%) 0%, hsl(150 22% 12%) 100%);
-    --gradient-glass: linear-gradient(135deg, hsl(150 25% 9% / 0.9) 0%, hsl(150 25% 9% / 0.7) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(150 30% 5%) 0%, hsl(150 25% 7%) 50%, hsl(150 22% 9%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(150 25% 10%) 0%, hsl(150 22% 13%) 100%);
+    --gradient-glass: linear-gradient(135deg, hsl(150 25% 12% / 0.95) 0%, hsl(150 25% 10% / 0.85) 100%);
     --gradient-mesh: 
-      radial-gradient(ellipse 80% 50% at 20% -10%, hsl(152 75% 48% / 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse 60% 40% at 80% 0%, hsl(38 100% 58% / 0.18) 0%, transparent 50%),
-      radial-gradient(ellipse 40% 60% at 0% 50%, hsl(152 75% 48% / 0.1) 0%, transparent 50%),
-      radial-gradient(ellipse 50% 40% at 100% 60%, hsl(38 100% 58% / 0.12) 0%, transparent 50%);
+      radial-gradient(ellipse 80% 50% at 20% -10%, hsl(152 75% 48% / 0.18) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 40% at 80% 0%, hsl(38 100% 58% / 0.22) 0%, transparent 50%),
+      radial-gradient(ellipse 40% 60% at 0% 50%, hsl(152 75% 48% / 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 40% at 100% 60%, hsl(38 100% 58% / 0.15) 0%, transparent 50%);
 
     /* Dark Shadows */
     --shadow-sm: 0 2px 4px hsl(0 0% 0% / 0.3);
@@ -712,4 +712,142 @@ html, body, #root {
 .scrollbar-thin::-webkit-scrollbar-thumb {
   background-color: hsl(var(--border));
   border-radius: 3px;
+}
+
+/* ================================================
+   DARK MODE ENHANCEMENTS
+   ================================================ */
+.dark {
+  /* Enhanced card visibility in dark mode */
+  .glass {
+    background: hsl(var(--card) / 0.85);
+    border-color: hsl(var(--border) / 0.5);
+    box-shadow: 
+      0 8px 32px hsl(0 0% 0% / 0.3),
+      0 0 0 1px hsl(var(--border) / 0.3),
+      inset 0 1px 0 hsl(var(--primary) / 0.08);
+  }
+
+  .glass-subtle {
+    background: hsl(var(--card) / 0.65);
+    border-color: hsl(var(--border) / 0.35);
+  }
+
+  .glass-frosted {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--card) / 0.9) 0%,
+      hsl(var(--card) / 0.75) 100%
+    );
+    border-color: hsl(var(--border) / 0.4);
+    box-shadow: 
+      0 12px 48px hsl(0 0% 0% / 0.35),
+      0 0 0 1px hsl(var(--border) / 0.25),
+      inset 0 2px 0 hsl(var(--primary) / 0.1);
+  }
+
+  .glass-dark {
+    background: hsl(var(--background) / 0.9);
+    border-color: hsl(var(--border) / 0.4);
+  }
+
+  /* Neumorphic adjustments for dark mode */
+  .neumorphic {
+    background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--muted) / 0.4));
+    box-shadow: 
+      10px 10px 20px hsl(0 0% 0% / 0.35),
+      -10px -10px 20px hsl(150 22% 16% / 0.12),
+      0 0 0 1px hsl(var(--border) / 0.3);
+  }
+
+  .neumorphic-inset {
+    box-shadow: 
+      inset 5px 5px 10px hsl(0 0% 0% / 0.25),
+      inset -5px -5px 10px hsl(150 22% 16% / 0.08);
+    background: hsl(var(--muted) / 0.3);
+  }
+
+  /* Better text contrast in dark mode */
+  .text-muted-foreground {
+    color: hsl(145 15% 62%);
+  }
+
+  /* Enhanced shadows for floating elements */
+  .shadow-card {
+    box-shadow: 
+      0 4px 12px hsl(0 0% 0% / 0.3),
+      0 0 0 1px hsl(var(--border) / 0.3);
+  }
+
+  .shadow-elevated {
+    box-shadow: 
+      0 20px 50px hsl(0 0% 0% / 0.45),
+      0 0 30px hsl(var(--primary) / 0.12);
+  }
+
+  /* Glow effects more prominent in dark mode */
+  .glow-primary {
+    box-shadow: 
+      0 0 50px hsl(152 75% 48% / 0.4),
+      0 0 100px hsl(152 75% 48% / 0.2);
+  }
+
+  .glow-accent {
+    box-shadow: 
+      0 0 50px hsl(38 100% 58% / 0.45),
+      0 0 100px hsl(38 100% 58% / 0.25);
+  }
+
+  /* Hover effects enhanced in dark mode */
+  .hover-lift:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 
+      0 20px 40px hsl(0 0% 0% / 0.4),
+      0 0 30px hsl(var(--primary) / 0.15);
+  }
+
+  .hover-glow-primary:hover {
+    box-shadow: 
+      0 0 50px hsl(152 75% 48% / 0.4),
+      0 0 100px hsl(152 75% 48% / 0.2);
+  }
+
+  /* Better input styling in dark mode */
+  input, textarea, select {
+    background: hsl(var(--muted) / 0.4);
+    border-color: hsl(var(--border) / 0.5);
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: hsl(var(--primary) / 0.6);
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.15);
+  }
+
+  /* Better badge/pill contrast in dark mode */
+  .bg-success\/10, .bg-success\/20 {
+    background-color: hsl(152 80% 52% / 0.15);
+  }
+
+  .bg-warning\/10, .bg-warning\/20 {
+    background-color: hsl(38 100% 60% / 0.15);
+  }
+
+  .bg-destructive\/10, .bg-destructive\/20 {
+    background-color: hsl(0 75% 58% / 0.15);
+  }
+
+  /* Floating orbs more visible in dark mode */
+  .bg-primary\/8 {
+    background-color: hsl(152 75% 48% / 0.12);
+  }
+
+  .bg-accent\/12 {
+    background-color: hsl(38 100% 58% / 0.18);
+  }
+
+  /* Selection colors in dark mode */
+  ::selection {
+    background: hsl(152 75% 48% / 0.35);
+    color: hsl(var(--foreground));
+  }
 }
