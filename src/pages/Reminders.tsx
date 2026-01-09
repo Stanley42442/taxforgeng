@@ -295,9 +295,9 @@ const Reminders = () => {
   if (!canAccessReminders) {
     return (
       <PageLayout title="Tax Reminders" description="Stay on top of your tax filing deadlines" icon={Bell} maxWidth="4xl">
-        <Card className="text-center">
+        <Card className="text-center glass-frosted shadow-futuristic">
           <CardHeader>
-            <div className="mx-auto w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mb-4">
+            <div className="mx-auto w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mb-4 animate-float glow-sm">
               <Bell className="w-8 h-8 text-accent" />
             </div>
             <CardTitle className="text-2xl">Automated Tax Reminders</CardTitle>
@@ -305,24 +305,24 @@ const Reminders = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid gap-3 text-left">
-              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+              <div className="flex items-center gap-3 p-3 glass rounded-lg hover-lift stagger-1">
                 <CalendarIcon className="w-5 h-5 text-primary" />
                 <span>Monthly VAT filing reminders</span>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+              <div className="flex items-center gap-3 p-3 glass rounded-lg hover-lift stagger-2">
                 <Clock className="w-5 h-5 text-primary" />
                 <span>Annual CIT deadline alerts</span>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+              <div className="flex items-center gap-3 p-3 glass rounded-lg hover-lift stagger-3">
                 <Mail className="w-5 h-5 text-primary" />
                 <span>Email notifications</span>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+              <div className="flex items-center gap-3 p-3 glass rounded-lg hover-lift stagger-4">
                 <Settings className="w-5 h-5 text-primary" />
                 <span>Custom reminders</span>
               </div>
             </div>
-            <Button className="w-full" variant="hero" onClick={() => navigate('/pricing')}>
+            <Button className="w-full glow-sm" variant="hero" onClick={() => navigate('/pricing')}>
               <Crown className="w-4 h-4 mr-2" />
               Upgrade to Starter
             </Button>
@@ -336,7 +336,10 @@ const Reminders = () => {
     return (
       <PageLayout title="Tax Reminders" description="Stay on top of your tax filing deadlines" icon={Bell} maxWidth="4xl">
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <div className="glass-frosted rounded-2xl p-8 shadow-futuristic">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
+            <p className="text-sm text-muted-foreground mt-3">Loading reminders...</p>
+          </div>
         </div>
       </PageLayout>
     );
@@ -348,11 +351,11 @@ const Reminders = () => {
     <PageLayout title="Tax Reminders" description="Stay on top of your tax filing deadlines" icon={Bell} maxWidth="4xl">
       {/* Notification Permission Card */}
       {notificationPermission !== 'granted' && notificationPermission !== 'unsupported' && (
-        <Card className="mb-6 border-primary/20 bg-primary/5">
+        <Card className="mb-6 glass-frosted border-primary/20 glow-sm">
           <CardContent className="py-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-primary/10">
+                <div className="p-2 rounded-full bg-primary/10 animate-pulse">
                   <BellRing className="w-5 h-5 text-primary" />
                 </div>
                 <div>
@@ -362,7 +365,7 @@ const Reminders = () => {
                   </p>
                 </div>
               </div>
-              <Button onClick={handleEnableNotifications} size="sm" className="shrink-0">
+              <Button onClick={handleEnableNotifications} size="sm" className="shrink-0 glow-sm">
                 <Volume2 className="w-4 h-4 mr-2" />
                 Enable Notifications
               </Button>
@@ -372,7 +375,7 @@ const Reminders = () => {
       )}
 
       {notificationPermission === 'granted' && (
-        <Card className="mb-6 border-success/20 bg-success/5">
+        <Card className="mb-6 glass-frosted border-success/20">
           <CardContent className="py-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-full bg-success/10">
@@ -391,14 +394,14 @@ const Reminders = () => {
 
       {/* No Businesses State */}
       {savedBusinesses.length === 0 ? (
-        <Card className="text-center">
+        <Card className="text-center glass-frosted shadow-futuristic">
           <CardContent className="py-12">
-            <Building2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <Building2 className="w-12 h-12 text-muted-foreground mx-auto mb-4 animate-float" />
             <h3 className="text-lg font-semibold text-foreground mb-2">No Businesses Yet</h3>
             <p className="text-muted-foreground mb-6">
               Add a business first to set up tax reminders
             </p>
-            <Button asChild>
+            <Button asChild className="glow-sm">
               <Link to="/businesses">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Business
@@ -480,8 +483,8 @@ const Reminders = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {DEFAULT_REMINDERS.map((template) => (
-                      <div key={template.type} className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
+                    {DEFAULT_REMINDERS.map((template, index) => (
+                      <div key={template.type} className={`flex items-center justify-between p-3 rounded-lg glass hover-lift stagger-${Math.min(index + 1, 4)}`}>
                         <div className="flex items-center gap-3">
                           <Bell className="h-4 w-4 text-muted-foreground" />
                           <div>
@@ -498,7 +501,7 @@ const Reminders = () => {
                     
                     {/* Custom reminders */}
                     {businessReminders.filter(r => r.type === 'custom').map((reminder) => (
-                      <div key={reminder.id} className="flex items-center justify-between p-3 rounded-lg bg-accent/10 border border-accent/20">
+                      <div key={reminder.id} className="flex items-center justify-between p-3 rounded-lg glass border border-accent/20 hover-lift">
                         <div className="flex items-center gap-3">
                           <Badge variant="secondary" className="text-xs">Custom</Badge>
                           <div>

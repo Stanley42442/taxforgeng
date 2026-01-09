@@ -16,7 +16,8 @@ import {
 import { NavMenu } from "@/components/NavMenu";
 import { FreeTrialCTA } from "@/components/FreeTrialCTA";
 import { SuccessStories } from "@/components/SuccessStories";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const Index = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -197,83 +198,13 @@ const Index = () => {
       <FreeTrialCTA />
 
       {/* Features Grid */}
-      <section className="relative z-10 py-16 md:py-24">
-        <div className="absolute inset-0 glass-dark" />
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="mx-auto max-w-3xl text-center mb-14 animate-slide-up">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Everything You Need for Nigerian Taxes
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              From basic calculations to advanced tax planning
-            </p>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
-            <FeatureCard 
-              icon={<Building2 className="h-6 w-6" />}
-              title="Business Structure Advice"
-              description="Get personalized guidance on whether to register as a Business Name or Limited Company"
-              delay={1}
-            />
-            <FeatureCard 
-              icon={<Calculator className="h-6 w-6" />}
-              title="Tax Calculator"
-              description="Calculate CIT, VAT, WHT, and PIT instantly with our comprehensive calculator"
-              delay={2}
-            />
-            <FeatureCard 
-              icon={<Shield className="h-6 w-6" />}
-              title="Liability Protection"
-              description="Understand how different structures protect your personal assets"
-              delay={3}
-            />
-            <FeatureCard 
-              icon={<TrendingUp className="h-6 w-6" />}
-              title="Small Company Benefits"
-              description="See if you qualify for reduced CIT rates and other incentives"
-              delay={4}
-            />
-            <FeatureCard 
-              icon={<FileText className="h-6 w-6" />}
-              title="Export Reports"
-              description="Download professional PDF and CSV reports for your records"
-              badge="Basic+"
-              delay={5}
-            />
-            <FeatureCard 
-              icon={<Users className="h-6 w-6" />}
-              title="Tax Filing Preparation"
-              description="Get your documents ready for seamless FIRS filing"
-              badge="Business+"
-              delay={6}
-            />
-          </div>
-        </div>
-      </section>
+      <FeaturesSection />
 
       {/* Success Stories Section */}
       <SuccessStories limit={3} />
 
       {/* Pricing Teaser */}
-      <section className="py-16 md:py-20 relative z-10">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-2xl mx-auto glass-frosted rounded-3xl p-8 md:p-12 animate-slide-up hover-glow-primary">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Plans for Every Business
-            </h2>
-            <p className="text-muted-foreground mb-8 text-lg">
-              Start free with unlimited personal tax calculations. Upgrade for business features.
-            </p>
-            <Link to="/pricing">
-              <Button variant="outline" size="lg" className="group neon-border">
-                <span>View Pricing Plans</span>
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      <PricingTeaser />
 
       {/* CTA Section */}
       <section className="relative z-10 py-16 md:py-20 overflow-hidden">
@@ -340,21 +271,94 @@ const Index = () => {
   );
 };
 
+// Features Section with scroll animations
+const FeaturesSection = () => {
+  const { ref: sectionRef, isVisible: sectionVisible } = useScrollAnimation();
+  
+  const features = [
+    { icon: <Building2 className="h-6 w-6" />, title: "Business Structure Advice", description: "Get personalized guidance on whether to register as a Business Name or Limited Company" },
+    { icon: <Calculator className="h-6 w-6" />, title: "Tax Calculator", description: "Calculate CIT, VAT, WHT, and PIT instantly with our comprehensive calculator" },
+    { icon: <Shield className="h-6 w-6" />, title: "Liability Protection", description: "Understand how different structures protect your personal assets" },
+    { icon: <TrendingUp className="h-6 w-6" />, title: "Small Company Benefits", description: "See if you qualify for reduced CIT rates and other incentives" },
+    { icon: <FileText className="h-6 w-6" />, title: "Export Reports", description: "Download professional PDF and CSV reports for your records", badge: "Basic+" },
+    { icon: <Users className="h-6 w-6" />, title: "Tax Filing Preparation", description: "Get your documents ready for seamless FIRS filing", badge: "Business+" },
+  ];
+
+  return (
+    <section ref={sectionRef} className="relative z-10 py-16 md:py-24">
+      <div className="absolute inset-0 glass-dark" />
+      <div className="container mx-auto px-4 relative z-10">
+        <div className={`mx-auto max-w-3xl text-center mb-14 transition-all duration-700 ${sectionVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            Everything You Need for Nigerian Taxes
+          </h2>
+          <p className="text-lg text-muted-foreground">
+            From basic calculations to advanced tax planning
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+          {features.map((feature, index) => (
+            <FeatureCard 
+              key={index}
+              icon={feature.icon}
+              title={feature.title}
+              description={feature.description}
+              badge={feature.badge}
+              delay={index + 1}
+              isVisible={sectionVisible}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// Pricing Teaser with scroll animation
+const PricingTeaser = () => {
+  const { ref, isVisible } = useScrollAnimation();
+  
+  return (
+    <section ref={ref} className="py-16 md:py-20 relative z-10">
+      <div className="container mx-auto px-4 text-center">
+        <div className={`max-w-2xl mx-auto glass-frosted rounded-3xl p-8 md:p-12 hover-glow-primary transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'}`}>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            Plans for Every Business
+          </h2>
+          <p className="text-muted-foreground mb-8 text-lg">
+            Start free with unlimited personal tax calculations. Upgrade for business features.
+          </p>
+          <Link to="/pricing">
+            <Button variant="outline" size="lg" className="group neon-border">
+              <span>View Pricing Plans</span>
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const FeatureCard = ({ 
   icon, 
   title, 
   description,
   badge,
-  delay = 0
+  delay = 0,
+  isVisible = true
 }: { 
   icon: React.ReactNode; 
   title: string; 
   description: string;
   badge?: string;
   delay?: number;
+  isVisible?: boolean;
 }) => (
   <div 
-    className={`group relative rounded-2xl glass-frosted p-6 shadow-futuristic transition-all duration-400 hover-lift hover-glow-primary animate-slide-up stagger-${delay}`}
+    className={`group relative rounded-2xl glass-frosted p-6 shadow-futuristic transition-all duration-500 hover-lift hover-glow-primary ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+    style={{ transitionDelay: isVisible ? `${delay * 100}ms` : '0ms' }}
   >
     {/* Gradient Border on Hover */}
     <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-400 neon-border -z-10" />
