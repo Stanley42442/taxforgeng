@@ -41,6 +41,9 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { useFormFeedback } from "@/hooks/useFormFeedback";
+import { SuccessCelebration } from "@/components/ui/form-feedback";
+import { SharedElement } from "@/components/PageTransition";
 
 const Results = () => {
   const location = useLocation();
@@ -101,6 +104,15 @@ const Results = () => {
   const companyResult = calculateTax(companyInputs);
   const businessResult = calculateTax(businessInputs);
 
+  // Form feedback for saving business
+  const saveFormFeedback = useFormFeedback({
+    successDuration: 3000,
+    onSuccess: () => {
+      setShowSaveDialog(false);
+      setBusinessName("");
+    }
+  });
+
   const handleSaveBusiness = () => {
     if (!businessName.trim()) {
       toast.error("Please enter a business name");
@@ -121,6 +133,8 @@ const Results = () => {
       return;
     }
 
+    saveFormFeedback.setLoading();
+
     const success = addBusiness({
       name: businessName.trim(),
       entityType: inputs.entityType,
@@ -128,13 +142,12 @@ const Results = () => {
     });
 
     if (success) {
-      toast.success(`${businessName} saved successfully!`, {
-        action: { label: "View", onClick: () => navigate('/businesses') }
-      });
-      setShowSaveDialog(false);
-      setBusinessName("");
+      saveFormFeedback.setSuccess(
+        `${businessName} Saved! 🎉`,
+        `Business added to your portfolio`
+      );
     } else {
-      toast.error("Failed to save business");
+      saveFormFeedback.setError("Failed to save business");
     }
   };
 
@@ -214,6 +227,13 @@ const Results = () => {
         </Button>
       }
     >
+      {/* Success Celebration with Confetti */}
+      <SuccessCelebration 
+        isVisible={saveFormFeedback.isSuccess} 
+        message={saveFormFeedback.message}
+        description={saveFormFeedback.description}
+        onComplete={saveFormFeedback.reset}
+      />
       {/* Action Buttons Row */}
       <div className="flex flex-wrap justify-center gap-3 mb-6">
         <Link to="/tax-breakdown" state={{ result, inputs }}>

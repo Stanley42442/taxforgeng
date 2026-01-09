@@ -55,6 +55,8 @@ import { FeedbackForm } from "@/components/FeedbackForm";
 import { seedSampleData } from "@/lib/sampleData";
 import { useUpcomingReminders } from "@/hooks/useUpcomingReminders";
 import { Badge } from "@/components/ui/badge";
+import { SharedElement } from "@/components/PageTransition";
+import { motion } from "framer-motion";
 
 interface Expense {
   id: string;
@@ -601,41 +603,52 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="space-y-3 max-h-[300px] overflow-y-auto">
-                {savedBusinesses.slice(0, 5).map((business) => (
-                  <Collapsible
-                    key={business.id}
-                    open={expandedBusinessId === business.id}
-                    onOpenChange={() => setExpandedBusinessId(expandedBusinessId === business.id ? null : business.id)}
-                  >
-                    <div className="glass p-3 rounded-xl">
-                      <CollapsibleTrigger className="w-full">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${
-                              business.entityType === 'company' ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'
-                            }`}>
-                              <Building2 className="h-4 w-4" />
+                {savedBusinesses.slice(0, 5).map((business, index) => (
+                  <SharedElement key={business.id} id={`business-card-${business.id}`}>
+                    <motion.div
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <Collapsible
+                        open={expandedBusinessId === business.id}
+                        onOpenChange={() => setExpandedBusinessId(expandedBusinessId === business.id ? null : business.id)}
+                      >
+                        <div className="glass p-3 rounded-xl hover:bg-muted/50 transition-colors">
+                          <CollapsibleTrigger className="w-full">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <SharedElement id={`business-icon-${business.id}`}>
+                                  <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${
+                                    business.entityType === 'company' ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'
+                                  }`}>
+                                    <Building2 className="h-4 w-4" />
+                                  </div>
+                                </SharedElement>
+                                <div className="text-left">
+                                  <SharedElement id={`business-name-${business.id}`}>
+                                    <p className="font-medium text-sm">{business.name}</p>
+                                  </SharedElement>
+                                  <p className="text-xs text-muted-foreground">{formatCurrency(business.turnover)}</p>
+                                </div>
+                              </div>
+                              {expandedBusinessId === business.id ? (
+                                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                              )}
                             </div>
-                            <div className="text-left">
-                              <p className="font-medium text-sm">{business.name}</p>
-                              <p className="text-xs text-muted-foreground">{formatCurrency(business.turnover)}</p>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <div className="mt-3 pt-3 border-t border-border/50 text-xs text-muted-foreground">
+                              <p>Entity: {business.entityType === 'company' ? 'Limited Company' : 'Business Name'}</p>
+                              {business.sector && <p>Sector: {business.sector.replace(/_/g, ' ')}</p>}
                             </div>
-                          </div>
-                          {expandedBusinessId === business.id ? (
-                            <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                          ) : (
-                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                          )}
+                          </CollapsibleContent>
                         </div>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <div className="mt-3 pt-3 border-t border-border/50 text-xs text-muted-foreground">
-                          <p>Entity: {business.entityType === 'company' ? 'Limited Company' : 'Business Name'}</p>
-                          {business.sector && <p>Sector: {business.sector.replace(/_/g, ' ')}</p>}
-                        </div>
-                      </CollapsibleContent>
-                    </div>
-                  </Collapsible>
+                      </Collapsible>
+                    </motion.div>
+                  </SharedElement>
                 ))}
               </div>
             )}
