@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { NavMenu } from "@/components/NavMenu";
+import { PageLayout } from "@/components/PageLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -308,48 +308,28 @@ const AIQueryAnalytics = () => {
 
   if (loading || adminLoading) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
-        <NavMenu />
-        <main className="container mx-auto px-4 py-8 flex items-center justify-center">
+      <PageLayout title="AI TaxBot Analytics" icon={Bot} maxWidth="7xl">
+        <div className="flex items-center justify-center py-20">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </main>
-      </div>
+        </div>
+      </PageLayout>
     );
   }
 
   if (!user || !isAdmin) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
-        <NavMenu />
-        <main className="container mx-auto px-4 py-8">
-          <div className="text-center py-12">
-            <Bot className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold text-foreground mb-2">Admin Access Required</h2>
-            <p className="text-muted-foreground">Please sign in with an admin account to view AI analytics.</p>
-          </div>
-        </main>
-      </div>
+      <PageLayout title="AI TaxBot Analytics" icon={Bot} maxWidth="7xl">
+        <div className="text-center py-12">
+          <Bot className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+          <h2 className="text-xl font-semibold text-foreground mb-2">Admin Access Required</h2>
+          <p className="text-muted-foreground">Please sign in with an admin account to view AI analytics.</p>
+        </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
-      <NavMenu />
-
-      <main className="container mx-auto px-4 py-6 pb-8 flex-1">
-        <div className="mx-auto max-w-7xl">
-          {/* Header */}
-          <div className="text-center mb-8 animate-slide-up">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary">
-              <Bot className="h-8 w-8 text-primary-foreground" />
-            </div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              AI TaxBot Analytics
-            </h1>
-            <p className="text-muted-foreground">
-              Query insights, feedback metrics, and topic trends
-            </p>
-          </div>
+    <PageLayout title="AI TaxBot Analytics" description="Query insights, feedback metrics, and topic trends" icon={Bot} maxWidth="7xl">
 
           {/* Controls */}
           <Card className="mb-6 animate-slide-up">

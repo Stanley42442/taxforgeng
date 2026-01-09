@@ -186,29 +186,29 @@ export const ForeignIncomeCalculator = () => {
 
         {/* Results */}
         {calculated && (
-          <div className="space-y-4 pt-4 border-t">
-            <div className="p-4 rounded-xl bg-secondary/50">
+          <div className="space-y-4 pt-4 border-t overflow-hidden">
+            <div className="p-4 rounded-xl bg-secondary/50 overflow-hidden">
               <p className="text-sm text-muted-foreground mb-1">Naira Equivalent</p>
-              <p className="text-2xl font-bold text-foreground">{formatCurrency(nairaAmount)}</p>
+              <p className="text-lg sm:text-2xl font-bold text-foreground break-all">{formatCurrency(nairaAmount)}</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 sm:p-4 rounded-xl bg-primary/10 border border-primary/20 overflow-hidden">
                 <p className="text-xs text-muted-foreground mb-1">Applicable Rate</p>
-                <p className="text-xl font-bold text-primary">{rate}%</p>
+                <p className="text-lg sm:text-xl font-bold text-primary">{rate}%</p>
                 {country !== 'OTHER' && (
                   <p className="text-xs text-muted-foreground">Treaty rate applied</p>
                 )}
               </div>
-              <div className="p-4 rounded-xl bg-success/10 border border-success/20">
+              <div className="p-3 sm:p-4 rounded-xl bg-success/10 border border-success/20 overflow-hidden">
                 <p className="text-xs text-muted-foreground mb-1">Foreign Tax Credit</p>
-                <p className="text-xl font-bold text-success">{formatCurrency(foreignTaxCredit)}</p>
+                <p className="text-base sm:text-xl font-bold text-success break-all">{formatCurrency(foreignTaxCredit)}</p>
               </div>
             </div>
 
-            <div className="p-5 rounded-xl bg-primary/20 border border-primary/30 text-center">
+            <div className="p-4 sm:p-5 rounded-xl bg-primary/20 border border-primary/30 text-center overflow-hidden">
               <p className="text-sm text-muted-foreground mb-2">Net Nigerian Tax Payable</p>
-              <p className="text-3xl font-bold text-primary">{formatCurrency(netTax)}</p>
+              <p className="text-xl sm:text-3xl font-bold text-primary break-all">{formatCurrency(netTax)}</p>
             </div>
 
             {!isResident && (

@@ -209,33 +209,33 @@ const ScenarioModeling = () => {
 
             {/* Comparison Panel */}
             <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
-                  <p className="text-sm text-muted-foreground mb-2">Current Tax</p>
-                  <p className="text-2xl font-bold text-foreground">{formatCurrency(baseTax.totalTaxPayable)}</p>
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                <div className="rounded-2xl border border-border bg-card p-3 sm:p-5 shadow-card overflow-hidden">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-2">Current Tax</p>
+                  <p className="text-lg sm:text-2xl font-bold text-foreground break-all">{formatCurrency(baseTax.totalTaxPayable)}</p>
                   <p className="text-xs text-muted-foreground mt-1">Rate: {baseTax.effectiveRate.toFixed(2)}%</p>
                 </div>
-                <div className={`rounded-2xl border p-5 shadow-card ${
+                <div className={`rounded-2xl border p-3 sm:p-5 shadow-card overflow-hidden ${
                   taxDifference > 0 ? 'border-destructive/20 bg-destructive/5' : taxDifference < 0 ? 'border-success/20 bg-success/5' : 'border-border bg-card'
                 }`}>
-                  <p className="text-sm text-muted-foreground mb-2">Scenario Tax</p>
-                  <p className={`text-2xl font-bold ${taxDifference > 0 ? 'text-destructive' : taxDifference < 0 ? 'text-success' : 'text-foreground'}`}>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-2">Scenario Tax</p>
+                  <p className={`text-lg sm:text-2xl font-bold break-all ${taxDifference > 0 ? 'text-destructive' : taxDifference < 0 ? 'text-success' : 'text-foreground'}`}>
                     {formatCurrency(scenarioTax.totalTaxPayable)}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">Rate: {scenarioTax.effectiveRate.toFixed(2)}%</p>
                 </div>
               </div>
 
-              <div className={`rounded-2xl p-6 text-center ${
+              <div className={`rounded-2xl p-4 sm:p-6 text-center overflow-hidden ${
                 taxDifference > 0 ? 'bg-destructive/10 border border-destructive/20' : taxDifference < 0 ? 'bg-success/10 border border-success/20' : 'bg-secondary/50 border border-border'
               }`}>
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  {taxDifference > 0 ? <ArrowUp className="h-6 w-6 text-destructive" /> : taxDifference < 0 ? <ArrowDown className="h-6 w-6 text-success" /> : <Minus className="h-6 w-6 text-muted-foreground" />}
-                  <span className={`text-3xl font-bold ${taxDifference > 0 ? 'text-destructive' : taxDifference < 0 ? 'text-success' : 'text-muted-foreground'}`}>
+                  {taxDifference > 0 ? <ArrowUp className="h-5 w-5 sm:h-6 sm:w-6 text-destructive flex-shrink-0" /> : taxDifference < 0 ? <ArrowDown className="h-5 w-5 sm:h-6 sm:w-6 text-success flex-shrink-0" /> : <Minus className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground flex-shrink-0" />}
+                  <span className={`text-xl sm:text-3xl font-bold break-all ${taxDifference > 0 ? 'text-destructive' : taxDifference < 0 ? 'text-success' : 'text-muted-foreground'}`}>
                     {taxDifference > 0 ? '+' : ''}{formatCurrency(Math.abs(taxDifference))}
                   </span>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   {taxDifference > 0 ? "You'll pay more in this scenario" : taxDifference < 0 ? "You'll save money in this scenario" : 'No change from current tax'}
                 </p>
               </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { NavMenu } from "@/components/NavMenu";
+import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -249,23 +249,7 @@ console.log(data.data.totalTaxPayable);`;
   }'`;
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
-      <NavMenu />
-
-      <main className="container mx-auto px-4 py-6 pb-8 flex-1">
-        <div className="mx-auto max-w-4xl">
-          {/* Header */}
-          <div className="text-center mb-8 animate-slide-up">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary">
-              <Code className="h-8 w-8 text-primary-foreground" />
-            </div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              Partnership API
-            </h1>
-            <p className="text-muted-foreground">
-              Integrate Nigerian tax calculations into your fintech applications
-            </p>
-          </div>
+    <PageLayout title="Partnership API" description="Integrate Nigerian tax calculations into your fintech applications" icon={Code} maxWidth="4xl">
 
           {/* API Key Management Section */}
           <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">

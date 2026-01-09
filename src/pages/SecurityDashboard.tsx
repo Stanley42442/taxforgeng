@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-
+import { PageLayout } from "@/components/PageLayout";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
@@ -48,7 +48,6 @@ import {
   Wifi,
   WifiOff
 } from "lucide-react";
-import { NavMenu } from "@/components/NavMenu";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow, format } from "date-fns";
@@ -655,40 +654,31 @@ const SecurityDashboard = () => {
 
   if (loading || isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
+      <PageLayout title="Security Dashboard" icon={Shield} maxWidth="6xl">
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero">
-      <NavMenu />
-      
-      <main className="container mx-auto px-4 py-8 max-w-6xl overflow-x-hidden">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-4 min-w-0">
-            <Link to="/settings" className="text-muted-foreground hover:text-foreground shrink-0">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-            <div className="min-w-0">
-              <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-                <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-primary shrink-0" />
-                <span className="truncate">Security Dashboard</span>
-              </h1>
-              <p className="text-sm text-muted-foreground truncate">Monitor your account security</p>
-            </div>
-          </div>
-          <Button variant="outline" onClick={handleRefresh} disabled={isRefreshing} className="shrink-0 self-start sm:self-auto">
-            {isRefreshing ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : (
-              <RefreshCw className="h-4 w-4 mr-2" />
-            )}
-            Refresh
-          </Button>
-        </div>
+    <PageLayout 
+      title="Security Dashboard" 
+      description="Monitor your account security" 
+      icon={Shield} 
+      maxWidth="6xl"
+      headerActions={
+        <Button variant="outline" onClick={handleRefresh} disabled={isRefreshing} className="shrink-0">
+          {isRefreshing ? (
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+          ) : (
+            <RefreshCw className="h-4 w-4 mr-2" />
+          )}
+          Refresh
+        </Button>
+      }
+    >
 
         {/* Suspicious Activity Alert */}
         {stats.recentSuspiciousActivity && (
@@ -1473,7 +1463,6 @@ const SecurityDashboard = () => {
             </div>
           </CardContent>
         </Card>
-      </main>
 
       {/* 2FA Verification Dialog for Unblocking Devices */}
       <Dialog open={showUnblockDialog} onOpenChange={(open) => {
@@ -1597,7 +1586,7 @@ const SecurityDashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageLayout>
   );
 };
 

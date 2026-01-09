@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { NavMenu } from "@/components/NavMenu";
+import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -197,67 +197,46 @@ const PartnerBranding = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
-        <NavMenu />
-        <main className="container mx-auto px-4 py-8 flex items-center justify-center">
+      <PageLayout title="White-Label Branding" icon={Palette} maxWidth="7xl">
+        <div className="flex items-center justify-center py-20">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </main>
-      </div>
+        </div>
+      </PageLayout>
     );
   }
 
   if (!isCorporate) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
-        <NavMenu />
-        <main className="container mx-auto px-4 py-8">
-          <div className="text-center py-12">
-            <Palette className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold text-foreground mb-2">White-Label Access Required</h2>
-            <p className="text-muted-foreground mb-6">Upgrade to Business or Corporate plan to access white-label branding.</p>
-            <Button variant="hero" onClick={() => window.location.href = '/pricing'}>
-              View Plans
-            </Button>
-          </div>
-        </main>
-      </div>
+      <PageLayout title="White-Label Branding" icon={Palette} maxWidth="7xl">
+        <div className="text-center py-12">
+          <Palette className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+          <h2 className="text-xl font-semibold text-foreground mb-2">White-Label Access Required</h2>
+          <p className="text-muted-foreground mb-6">Upgrade to Business or Corporate plan to access white-label branding.</p>
+          <Button variant="hero" onClick={() => window.location.href = '/pricing'}>
+            View Plans
+          </Button>
+        </div>
+      </PageLayout>
     );
   }
 
   if (partners.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
-        <NavMenu />
-        <main className="container mx-auto px-4 py-8">
-          <div className="text-center py-12">
-            <Palette className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold text-foreground mb-2">No API Keys Found</h2>
-            <p className="text-muted-foreground mb-6">Create an API key first to customize your embedded calculator.</p>
-            <Button variant="hero" onClick={() => window.location.href = '/api-docs'}>
-              Create API Key
-            </Button>
-          </div>
-        </main>
-      </div>
+      <PageLayout title="White-Label Branding" icon={Palette} maxWidth="7xl">
+        <div className="text-center py-12">
+          <Palette className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+          <h2 className="text-xl font-semibold text-foreground mb-2">No API Keys Found</h2>
+          <p className="text-muted-foreground mb-6">Create an API key first to customize your embedded calculator.</p>
+          <Button variant="hero" onClick={() => window.location.href = '/api-docs'}>
+            Create API Key
+          </Button>
+        </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
-      <NavMenu />
-
-      <main className="container mx-auto px-4 py-6 pb-8 flex-1">
-        <div className="mx-auto max-w-7xl">
-          {/* Header */}
-          <div className="text-center mb-8 animate-slide-up">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary">
-              <Palette className="h-8 w-8 text-primary-foreground" />
-            </div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              White-Label Branding
-            </h1>
-            <p className="text-muted-foreground">
-              Customize your embedded tax calculator with your brand
+    <PageLayout title="White-Label Branding" description="Customize your embedded tax calculator with your brand" icon={Palette} maxWidth="7xl">
             </p>
           </div>
 
