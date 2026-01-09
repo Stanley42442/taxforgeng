@@ -168,21 +168,23 @@ const App = () => (
             <SubscriptionProvider>
               <LanguageProvider>
               <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <ScrollToTop />
-                <ReminderNotificationProvider />
-                <TrialBanner />
-                <TierSelectionWrapper />
-                <Suspense fallback={<PageLoader />}>
-                  <AnimatedRoutes />
-                  <TaxAssistant />
-                  <OfflineIndicator />
-                  <InstallPWAPrompt />
-                </Suspense>
-              </BrowserRouter>
-            </TooltipProvider>
+                <>
+                  <Toaster />
+                  <Sonner />
+                  <BrowserRouter>
+                    <ScrollToTop />
+                    <ReminderNotificationProvider />
+                    <TrialBanner />
+                    <TierSelectionWrapper />
+                    <Suspense fallback={<PageLoader />}>
+                      <AnimatedRoutes />
+                      <TaxAssistant />
+                      <OfflineIndicator />
+                      <InstallPWAPrompt />
+                    </Suspense>
+                  </BrowserRouter>
+                </>
+              </TooltipProvider>
             </LanguageProvider>
           </SubscriptionProvider>
         </AuthLoadingScreen>
