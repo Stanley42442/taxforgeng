@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "relative inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 overflow-hidden active:scale-[0.98] group",
+  "relative inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 overflow-hidden active:scale-[0.98] group isolate",
   {
     variants: {
       variant: {
@@ -68,11 +68,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref} 
         {...props}
       >
-        {/* Hover shine effect */}
-        <span className="absolute inset-0 overflow-hidden rounded-lg">
+        {/* Hover shine effect - pointer-events-none to prevent interfering with clicks */}
+        <span className="absolute inset-0 overflow-hidden rounded-lg pointer-events-none" aria-hidden="true">
           <span className="absolute inset-0 translate-x-[-100%] bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
         </span>
-        <span className="relative z-10 flex items-center gap-2">{children}</span>
+        <span className="relative z-10 flex items-center gap-2 pointer-events-none">{children}</span>
       </Comp>
     );
   },
