@@ -15,8 +15,9 @@ import { TierSelectionWrapper } from "@/components/TierSelectionWrapper";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { InstallPWAPrompt } from "@/components/InstallPWAPrompt";
+import { SharedElementProvider } from "@/components/PageTransition";
 import { lazy, Suspense } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, LayoutGroup } from "framer-motion";
 
 // Eagerly load Index for fast initial render
 import Index from "./pages/Index";
@@ -93,66 +94,68 @@ const pageTransition = {
   duration: 0.35,
 };
 
-// Animated Routes wrapper
+// Animated Routes wrapper with shared elements support
 const AnimatedRoutes = () => {
   const location = useLocation();
   
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={location.pathname}
-        initial="initial"
-        animate="in"
-        exit="out"
-        variants={pageVariants}
-        transition={pageTransition}
-      >
-        <Routes location={location}>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/advisory" element={<Advisory />} />
-          <Route path="/calculator" element={<Calculator />} />
-          <Route path="/results" element={<Results />} />
-          <Route path="/tax-breakdown" element={<TaxBreakdown />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/tax-filing" element={<TaxFiling />} />
-          <Route path="/businesses" element={<SavedBusinesses />} />
-          <Route path="/reminders" element={<Reminders />} />
-          <Route path="/insights" element={<Insights />} />
-          <Route path="/team" element={<Team />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/audit-log" element={<AuditLog />} />
-          <Route path="/learn" element={<Learn />} />
-          <Route path="/expenses" element={<Expenses />} />
-          <Route path="/scenarios" element={<ScenarioModeling />} />
-          <Route path="/e-filing" element={<EFiling />} />
-          <Route path="/api-docs" element={<ApiDocs />} />
-          <Route path="/achievements" element={<Achievements />} />
-          <Route path="/business-report" element={<BusinessReport />} />
-          <Route path="/roadmap" element={<Roadmap />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/admin-analytics" element={<AdminAnalytics />} />
-          <Route path="/ai-analytics" element={<AIQueryAnalytics />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/sector/:id" element={<SectorGuide />} />
-          <Route path="/partner-branding" element={<PartnerBranding />} />
-          <Route path="/embed/calculator" element={<EmbedCalculator />} />
-          <Route path="/individual-calculator" element={<IndividualCalculator />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/security" element={<SecurityDashboard />} />
-          <Route path="/referrals" element={<Referrals />} />
-          <Route path="/tax-calendar" element={<TaxCalendar />} />
-          <Route path="/success-stories" element={<SuccessStoriesPage />} />
-          <Route path="/accountant-portal" element={<AccountantPortal />} />
-          <Route path="/invoices" element={<Invoices />} />
-          <Route path="/payroll" element={<Payroll />} />
-          <Route path="/profit-loss" element={<ProfitLoss />} />
-          <Route path="/compliance" element={<Compliance />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </motion.div>
-    </AnimatePresence>
+    <LayoutGroup>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={location.pathname}
+          initial="initial"
+          animate="in"
+          exit="out"
+          variants={pageVariants}
+          transition={pageTransition}
+        >
+          <Routes location={location}>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/advisory" element={<Advisory />} />
+            <Route path="/calculator" element={<Calculator />} />
+            <Route path="/results" element={<Results />} />
+            <Route path="/tax-breakdown" element={<TaxBreakdown />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/tax-filing" element={<TaxFiling />} />
+            <Route path="/businesses" element={<SavedBusinesses />} />
+            <Route path="/reminders" element={<Reminders />} />
+            <Route path="/insights" element={<Insights />} />
+            <Route path="/team" element={<Team />} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/audit-log" element={<AuditLog />} />
+            <Route path="/learn" element={<Learn />} />
+            <Route path="/expenses" element={<Expenses />} />
+            <Route path="/scenarios" element={<ScenarioModeling />} />
+            <Route path="/e-filing" element={<EFiling />} />
+            <Route path="/api-docs" element={<ApiDocs />} />
+            <Route path="/achievements" element={<Achievements />} />
+            <Route path="/business-report" element={<BusinessReport />} />
+            <Route path="/roadmap" element={<Roadmap />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/admin-analytics" element={<AdminAnalytics />} />
+            <Route path="/ai-analytics" element={<AIQueryAnalytics />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/sector/:id" element={<SectorGuide />} />
+            <Route path="/partner-branding" element={<PartnerBranding />} />
+            <Route path="/embed/calculator" element={<EmbedCalculator />} />
+            <Route path="/individual-calculator" element={<IndividualCalculator />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/security" element={<SecurityDashboard />} />
+            <Route path="/referrals" element={<Referrals />} />
+            <Route path="/tax-calendar" element={<TaxCalendar />} />
+            <Route path="/success-stories" element={<SuccessStoriesPage />} />
+            <Route path="/accountant-portal" element={<AccountantPortal />} />
+            <Route path="/invoices" element={<Invoices />} />
+            <Route path="/payroll" element={<Payroll />} />
+            <Route path="/profit-loss" element={<ProfitLoss />} />
+            <Route path="/compliance" element={<Compliance />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </motion.div>
+      </AnimatePresence>
+    </LayoutGroup>
   );
 };
 
