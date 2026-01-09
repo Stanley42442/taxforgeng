@@ -83,9 +83,9 @@ const Team = () => {
   if (tier === 'free' || tier === 'basic') {
     return (
       <PageLayout title="Team Settings" description="Manage team members and access" icon={Users}>
-        <Card className="max-w-2xl mx-auto text-center">
+        <Card className="max-w-2xl mx-auto text-center glass-frosted shadow-futuristic">
           <CardHeader>
-            <div className="mx-auto w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mb-4">
+            <div className="mx-auto w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mb-4 animate-float glow-sm">
               <Users className="w-8 h-8 text-accent" />
             </div>
             <CardTitle className="text-2xl">Team Collaboration</CardTitle>
@@ -95,14 +95,14 @@ const Team = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid gap-3 text-left">
-              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+              <div className="flex items-center gap-3 p-3 glass rounded-lg hover-lift stagger-1">
                 <UserPlus className="w-5 h-5 text-primary" />
                 <div>
                   <span className="font-medium">Business: </span>
                   <span className="text-muted-foreground">Up to 2 team members</span>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+              <div className="flex items-center gap-3 p-3 glass rounded-lg hover-lift stagger-2">
                 <Users className="w-5 h-5 text-primary" />
                 <div>
                   <span className="font-medium">Corporate: </span>
@@ -111,7 +111,7 @@ const Team = () => {
               </div>
             </div>
             <Link to="/pricing">
-              <Button className="w-full bg-gradient-primary hover:opacity-90">
+              <Button className="w-full bg-gradient-primary hover:opacity-90 glow-sm">
                 <Crown className="w-4 h-4 mr-2" />
                 Upgrade to Business for Team Features
               </Button>
@@ -188,7 +188,7 @@ const Team = () => {
       }
     >
       {/* Team Members List */}
-      <Card className="mb-6">
+      <Card className="mb-6 glass-frosted">
         <CardHeader>
           <CardTitle>Team Members</CardTitle>
           <CardDescription>People with access to your tax management workspace</CardDescription>
@@ -196,7 +196,7 @@ const Team = () => {
         <CardContent>
           <div className="space-y-4">
             {members.map((member, index) => (
-              <div key={member.id} className="flex items-center justify-between gap-4 p-4 border rounded-lg">
+              <div key={member.id} className={`flex items-center justify-between gap-4 p-4 glass rounded-lg hover-lift stagger-${Math.min(index + 1, 6)}`}>
                 <div className="flex items-center gap-4 min-w-0 flex-1">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                     <span className="text-lg font-medium text-primary">{member.email.charAt(0).toUpperCase()}</span>
@@ -261,7 +261,7 @@ const Team = () => {
       )}
 
       {/* Permissions Table */}
-      <Card>
+      <Card className="glass-frosted">
         <CardHeader>
           <CardTitle>Role Permissions</CardTitle>
           <CardDescription>What each role can do in your workspace</CardDescription>
