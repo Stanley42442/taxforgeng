@@ -172,12 +172,12 @@ const AccountantPortal = () => {
         </Card>
         <Card className="glass-frosted">
           <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-xl bg-success/10 flex items-center justify-center">
+            <div className="flex items-center gap-4 overflow-hidden">
+              <div className="h-12 w-12 rounded-xl bg-success/10 flex items-center justify-center shrink-0">
                 <DollarSign className="h-6 w-6 text-success" />
               </div>
-              <div>
-                <p className="text-2xl font-bold">{formatCurrency(totalTurnover)}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-lg sm:text-2xl font-bold break-all">{formatCurrency(totalTurnover)}</p>
                 <p className="text-sm text-muted-foreground">Total Turnover</p>
               </div>
             </div>

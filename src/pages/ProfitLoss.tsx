@@ -121,11 +121,11 @@ const ProfitLoss = () => {
       ) : (
         <>
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <Card><CardContent className="p-4"><div className="flex items-center gap-2 text-sm text-muted-foreground mb-1"><TrendingUp className="h-4 w-4 text-green-500" />Total Revenue</div><div className="text-2xl font-bold text-green-600">{formatCurrency(periodData.income)}</div></CardContent></Card>
-            <Card><CardContent className="p-4"><div className="flex items-center gap-2 text-sm text-muted-foreground mb-1"><TrendingDown className="h-4 w-4 text-red-500" />Total Expenses</div><div className="text-2xl font-bold text-red-600">{formatCurrency(periodData.expenses)}</div></CardContent></Card>
-            <Card><CardContent className="p-4"><div className="flex items-center gap-2 text-sm text-muted-foreground mb-1"><DollarSign className="h-4 w-4" />Net Profit</div><div className={`text-2xl font-bold ${periodData.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatCurrency(periodData.netProfit)}</div></CardContent></Card>
-            <Card><CardContent className="p-4"><div className="text-sm text-muted-foreground mb-1">Profit Margin</div><div className="text-2xl font-bold">{profitMargin}%</div><Badge variant={Number(profitMargin) >= 20 ? "default" : "secondary"} className="mt-1">{Number(profitMargin) >= 20 ? 'Healthy' : 'Needs Attention'}</Badge></CardContent></Card>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <Card><CardContent className="p-4 overflow-hidden"><div className="flex items-center gap-2 text-sm text-muted-foreground mb-1"><TrendingUp className="h-4 w-4 text-green-500 shrink-0" />Total Revenue</div><div className="text-lg sm:text-2xl font-bold text-green-600 break-all">{formatCurrency(periodData.income)}</div></CardContent></Card>
+            <Card><CardContent className="p-4 overflow-hidden"><div className="flex items-center gap-2 text-sm text-muted-foreground mb-1"><TrendingDown className="h-4 w-4 text-red-500 shrink-0" />Total Expenses</div><div className="text-lg sm:text-2xl font-bold text-red-600 break-all">{formatCurrency(periodData.expenses)}</div></CardContent></Card>
+            <Card><CardContent className="p-4 overflow-hidden"><div className="flex items-center gap-2 text-sm text-muted-foreground mb-1"><DollarSign className="h-4 w-4 shrink-0" />Net Profit</div><div className={`text-lg sm:text-2xl font-bold break-all ${periodData.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatCurrency(periodData.netProfit)}</div></CardContent></Card>
+            <Card><CardContent className="p-4"><div className="text-sm text-muted-foreground mb-1">Profit Margin</div><div className="text-lg sm:text-2xl font-bold">{profitMargin}%</div><Badge variant={Number(profitMargin) >= 20 ? "default" : "secondary"} className="mt-1">{Number(profitMargin) >= 20 ? 'Healthy' : 'Needs Attention'}</Badge></CardContent></Card>
           </div>
 
           {/* P&L Statement */}

@@ -223,10 +223,10 @@ export const DigitalVATCalculator = () => {
 
             {/* VAT Liability */}
             {result.vatLiability > 0 && (
-              <div className="p-5 rounded-xl bg-primary/10 border border-primary/20 text-center">
+              <div className="p-4 sm:p-5 rounded-xl bg-primary/10 border border-primary/20 text-center overflow-hidden">
                 <p className="text-sm text-muted-foreground mb-1">Estimated Annual VAT Liability</p>
-                <p className="text-3xl font-bold text-primary">{formatCurrency(result.vatLiability)}</p>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xl sm:text-3xl font-bold text-primary break-all">{formatCurrency(result.vatLiability)}</p>
+                <p className="text-xs text-muted-foreground mt-1 truncate">
                   {DIGITAL_VAT_CONFIG.vatRate}% on {formatCurrency(result.annualRevenue)}
                 </p>
               </div>
