@@ -1,4 +1,4 @@
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { ReactNode, createContext, useContext, useState } from "react";
 
@@ -42,9 +42,7 @@ export const SharedElementProvider = ({ children }: { children: ReactNode }) => 
 
   return (
     <SharedElementContext.Provider value={{ registerElement, getElement, clearElement }}>
-      <LayoutGroup>
-        <>{children}</>
-      </LayoutGroup>
+      {children}
     </SharedElementContext.Provider>
   );
 };
