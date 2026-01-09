@@ -237,9 +237,6 @@ const PartnerBranding = () => {
 
   return (
     <PageLayout title="White-Label Branding" description="Customize your embedded tax calculator with your brand" icon={Palette} maxWidth="7xl">
-            </p>
-          </div>
-
           {/* Partner Selector */}
           {partners.length > 1 && (
             <Card className="mb-6">
@@ -511,9 +508,7 @@ const PartnerBranding = () => {
               </Card>
             </div>
           </div>
-        </div>
-      </main>
-    </div>
+    </PageLayout>
   );
 };
 

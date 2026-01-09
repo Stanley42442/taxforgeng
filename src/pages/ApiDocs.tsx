@@ -250,9 +250,8 @@ console.log(data.data.totalTaxPayable);`;
 
   return (
     <PageLayout title="Partnership API" description="Integrate Nigerian tax calculations into your fintech applications" icon={Code} maxWidth="4xl">
-
-          {/* API Key Management Section */}
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">
+      {/* API Key Management Section */}
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">
             <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
               <Key className="h-5 w-5 text-primary" />
               API Keys
@@ -528,9 +527,7 @@ console.log(data.data.totalTaxPayable);`;
               <li><code>X-RateLimit-Remaining</code> - Requests remaining today</li>
             </ul>
           </div>
-        </div>
-      </main>
-    </div>
+    </PageLayout>
   );
 };
 

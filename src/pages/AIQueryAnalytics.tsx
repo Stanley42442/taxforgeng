@@ -330,9 +330,8 @@ const AIQueryAnalytics = () => {
 
   return (
     <PageLayout title="AI TaxBot Analytics" description="Query insights, feedback metrics, and topic trends" icon={Bot} maxWidth="7xl">
-
-          {/* Controls */}
-          <Card className="mb-6 animate-slide-up">
+      {/* Controls */}
+      <Card className="mb-6 animate-slide-up">
             <CardContent className="pt-6">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -625,9 +624,7 @@ const AIQueryAnalytics = () => {
               )}
             </CardContent>
           </Card>
-        </div>
-      </main>
-    </div>
+    </PageLayout>
   );
 };
 
