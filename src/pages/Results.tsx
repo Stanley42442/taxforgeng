@@ -250,7 +250,7 @@ const Results = () => {
 
       {/* Comparison Dashboard */}
       {showComparison && (
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">
+        <div className="rounded-2xl border border-border glass-frosted p-6 shadow-card mb-6 animate-slide-up">
           <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-primary" />
             Entity Comparison Dashboard
@@ -410,19 +410,19 @@ const Results = () => {
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-3 mb-6 animate-slide-up">
         {/* Gross Income */}
-        <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card overflow-hidden">
+        <div className="rounded-2xl border border-border glass-frosted p-4 sm:p-6 shadow-card overflow-hidden card-interactive">
           <p className="text-sm text-muted-foreground mb-1">Gross Income</p>
           <p className="text-lg sm:text-2xl font-bold text-foreground break-all">{formatCurrency(result.grossIncome)}</p>
         </div>
 
         {/* Taxable Income */}
-        <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card overflow-hidden">
+        <div className="rounded-2xl border border-border glass-frosted p-4 sm:p-6 shadow-card overflow-hidden card-interactive">
           <p className="text-sm text-muted-foreground mb-1">Taxable Income</p>
           <p className="text-lg sm:text-2xl font-bold text-foreground break-all">{formatCurrency(result.taxableIncome)}</p>
         </div>
 
         {/* Total Tax */}
-        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:p-6 shadow-card overflow-hidden">
+        <div className="rounded-2xl border border-primary/30 glass-frosted p-4 sm:p-6 shadow-card overflow-hidden glow-sm">
           <p className="text-sm text-muted-foreground mb-1">Total Tax Payable</p>
           <p className="text-lg sm:text-2xl font-bold text-primary break-all">{formatCurrency(result.totalTaxPayable)}</p>
           <p className="text-xs text-muted-foreground mt-1">

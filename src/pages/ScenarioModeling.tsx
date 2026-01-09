@@ -119,9 +119,11 @@ const ScenarioModeling = () => {
         <TabsContent value="what-if">
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Adjustments Panel */}
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+            <div className="rounded-2xl border border-border glass-frosted p-6 shadow-card animate-slide-up">
               <h2 className="font-semibold text-foreground mb-6 flex items-center gap-2">
-                <Calculator className="h-5 w-5 text-primary" />
+                <div className="p-2 rounded-lg bg-primary/10 glow-sm">
+                  <Calculator className="h-5 w-5 text-primary" />
+                </div>
                 Adjust Variables
               </h2>
 
@@ -210,13 +212,13 @@ const ScenarioModeling = () => {
             {/* Comparison Panel */}
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                <div className="rounded-2xl border border-border bg-card p-3 sm:p-5 shadow-card overflow-hidden">
+                <div className="rounded-2xl border border-border glass-frosted p-3 sm:p-5 shadow-card overflow-hidden card-interactive">
                   <p className="text-xs sm:text-sm text-muted-foreground mb-2">Current Tax</p>
                   <p className="text-lg sm:text-2xl font-bold text-foreground break-all">{formatCurrency(baseTax.totalTaxPayable)}</p>
                   <p className="text-xs text-muted-foreground mt-1">Rate: {baseTax.effectiveRate.toFixed(2)}%</p>
                 </div>
-                <div className={`rounded-2xl border p-3 sm:p-5 shadow-card overflow-hidden ${
-                  taxDifference > 0 ? 'border-destructive/20 bg-destructive/5' : taxDifference < 0 ? 'border-success/20 bg-success/5' : 'border-border bg-card'
+                <div className={`rounded-2xl border p-3 sm:p-5 shadow-card overflow-hidden card-interactive ${
+                  taxDifference > 0 ? 'border-destructive/20 bg-destructive/5' : taxDifference < 0 ? 'border-success/20 bg-success/5 glow-sm' : 'border-border glass-frosted'
                 }`}>
                   <p className="text-xs sm:text-sm text-muted-foreground mb-2">Scenario Tax</p>
                   <p className={`text-lg sm:text-2xl font-bold break-all ${taxDifference > 0 ? 'text-destructive' : taxDifference < 0 ? 'text-success' : 'text-foreground'}`}>
@@ -241,9 +243,11 @@ const ScenarioModeling = () => {
               </div>
 
               {/* Insights */}
-              <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+              <div className="rounded-2xl border border-border glass-frosted p-6 shadow-card animate-slide-up stagger-2">
                 <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Lightbulb className="h-5 w-5 text-warning" />
+                  <div className="p-2 rounded-lg bg-warning/10">
+                    <Lightbulb className="h-5 w-5 text-warning" />
+                  </div>
                   Insights
                 </h3>
                 <div className="space-y-3">

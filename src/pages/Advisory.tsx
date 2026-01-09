@@ -99,7 +99,7 @@ const Advisory = () => {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-8 shadow-card mb-6">
+          <div className="rounded-2xl border border-border glass-frosted p-8 shadow-card mb-6 animate-slide-up">
             <h2 className="text-2xl font-bold text-foreground mb-3">
               {recommendation.entityType === 'company' ? 'Limited Liability Company (LLC)' : 'Business Name / Sole Proprietorship'}
             </h2>
@@ -219,7 +219,7 @@ const Advisory = () => {
       </div>
 
       {/* Question Card */}
-      <div className="animate-slide-up rounded-2xl border border-border bg-card p-8 shadow-card">
+      <div className="animate-slide-up rounded-2xl border border-border glass-frosted p-8 shadow-card">
         <h2 className="text-2xl font-bold text-foreground mb-2">
           {currentQuestion.questionKey.replace('advisory.questions.', '').replace(/([A-Z])/g, ' $1').trim()}?
         </h2>
@@ -234,10 +234,10 @@ const Advisory = () => {
               <button
                 key={String(option.value)}
                 onClick={() => handleAnswer(option.value)}
-                className={`w-full flex items-center gap-4 rounded-xl border-2 p-4 text-left transition-all duration-200 ${
+                className={`w-full flex items-center gap-4 rounded-xl border-2 p-4 text-left transition-all duration-300 btn-press ${
                   isSelected
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border hover:border-primary/50 hover:bg-secondary/50'
+                    ? 'border-primary bg-primary/10 glow-sm'
+                    : 'border-border hover:border-primary/50 hover:bg-secondary/50 glass-frosted'
                 }`}
               >
                 <div className={`flex h-10 w-10 items-center justify-center rounded-lg transition-colors ${

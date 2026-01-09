@@ -154,8 +154,10 @@ const SavedBusinesses = () => {
     return (
       <PageLayout title="My Businesses" description="Manage your saved businesses" icon={Building2}>
         <div className="max-w-2xl mx-auto text-center">
-          <Card className="p-8">
-            <Building2 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <Card className="p-8 glass-frosted text-center">
+            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 animate-float">
+              <Building2 className="h-10 w-10 text-muted-foreground" />
+            </div>
             <h2 className="text-2xl font-bold text-foreground mb-4">Saved Businesses</h2>
             <p className="text-lg text-muted-foreground mb-8">
               Upgrade to Starter or higher to save businesses.
@@ -211,9 +213,9 @@ const SavedBusinesses = () => {
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
               {accessibleTools.map((tool) => (
                 <Link key={tool.to} to={tool.to}>
-                  <Card className="h-full hover:shadow-lg hover:border-primary/30 transition-all cursor-pointer group">
+                  <Card className="h-full glass-frosted hover:shadow-lg hover:border-primary/30 transition-all cursor-pointer group card-interactive">
                     <CardContent className="p-4 text-center">
-                      <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-primary/20 transition-colors">
+                      <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary/20 to-accent/10 flex items-center justify-center mx-auto mb-2 group-hover:glow-sm transition-all">
                         <tool.icon className="h-5 w-5 text-primary" />
                       </div>
                       <h3 className="font-medium text-sm">{tool.label}</h3>
@@ -234,16 +236,18 @@ const SavedBusinesses = () => {
           </h2>
 
           {savedBusinesses.length === 0 ? (
-            <Card className="p-12 text-center">
-              <Building2 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+            <Card className="p-12 text-center glass-frosted">
+              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/10 animate-float">
+                <Building2 className="h-10 w-10 text-muted-foreground" />
+              </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">No Saved Businesses</h3>
               <p className="text-muted-foreground mb-6">Use the calculator and save your results.</p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link to="/calculator">
-                  <Button variant="hero">Go to Calculator</Button>
+                  <Button variant="hero" className="hover-lift">Go to Calculator</Button>
                 </Link>
                 {canSaveBusiness() && (
-                  <Button variant="outline" onClick={handleAddSamples}>
+                  <Button variant="outline" onClick={handleAddSamples} className="hover-scale">
                     <Sparkles className="h-4 w-4" />
                     Add Sample Businesses
                   </Button>
@@ -252,12 +256,13 @@ const SavedBusinesses = () => {
             </Card>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {sortedBusinesses.map((business) => (
+              {sortedBusinesses.map((business, index) => (
                 <Card 
                   key={business.id}
-                  className={`shadow-card hover:shadow-lg transition-shadow ${
-                    business.verificationStatus === 'verified' ? 'border-success/30' : ''
+                  className={`shadow-card glass-frosted card-interactive animate-slide-up ${
+                    business.verificationStatus === 'verified' ? 'border-success/30 glow-sm' : ''
                   }`}
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between mb-3">
