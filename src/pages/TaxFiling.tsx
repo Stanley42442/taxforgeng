@@ -76,7 +76,7 @@ const TaxFiling = () => {
     return (
       <PageLayout title="Prepare & File Taxes" icon={FileText} maxWidth="2xl">
         <div className="text-center">
-          <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-secondary">
+          <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-2xl glass-frosted shadow-futuristic animate-float">
             <Lock className="h-10 w-10 text-muted-foreground" />
           </div>
           <h2 className="text-2xl font-bold text-foreground mb-4">
@@ -87,8 +87,8 @@ const TaxFiling = () => {
             including pre-filled FIRS forms and step-by-step filing guides.
           </p>
           
-          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 mb-8">
-            <Crown className="h-8 w-8 text-accent mx-auto mb-3" />
+          <div className="glass-frosted rounded-2xl border border-primary/20 p-6 mb-8 glow-sm">
+            <Crown className="h-8 w-8 text-accent mx-auto mb-3 animate-pulse" />
             <h3 className="font-semibold text-foreground mb-2">Business Tier Features</h3>
             <ul className="text-sm text-muted-foreground space-y-2">
               <li>✓ Auto-generate pre-filled CIT, PIT, VAT forms</li>
@@ -100,7 +100,7 @@ const TaxFiling = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/pricing">
-              <Button variant="hero" size="lg">
+              <Button variant="hero" size="lg" className="glow-sm">
                 <Crown className="h-4 w-4" />
                 Upgrade to Business
               </Button>
@@ -124,7 +124,7 @@ const TaxFiling = () => {
       maxWidth="4xl"
     >
       {/* Advisory Banner */}
-      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 mb-8 flex items-start gap-3">
+      <div className="glass-frosted rounded-xl border border-primary/20 p-4 mb-8 flex items-start gap-3 glow-sm">
         <Info className="h-5 w-5 text-primary shrink-0 mt-0.5" />
         <div>
           <p className="text-sm text-foreground font-medium">Coming Soon: Direct Filing</p>
@@ -135,7 +135,7 @@ const TaxFiling = () => {
       </div>
 
       {/* Business Selection */}
-      <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6">
+      <div className="glass-frosted rounded-2xl p-6 shadow-futuristic mb-6">
         <h2 className="font-semibold text-foreground mb-4">Select Business</h2>
         
         {savedBusinesses.length === 0 ? (
@@ -180,7 +180,7 @@ const TaxFiling = () => {
 
       {/* Form Generation */}
       {selectedBusiness && (
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">
+        <div className="glass-frosted rounded-2xl p-6 shadow-futuristic mb-6 animate-slide-up">
           <h2 className="font-semibold text-foreground mb-4">Generate Tax Forms</h2>
           <p className="text-sm text-muted-foreground mb-6">
             Forms are pre-filled based on your saved business data and calculations.
@@ -210,7 +210,7 @@ const TaxFiling = () => {
       )}
 
       {/* Filing Guide */}
-      <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6">
+      <div className="glass-frosted rounded-2xl p-6 shadow-futuristic mb-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-foreground">Filing Guide</h2>
           <Button variant="ghost" size="sm" onClick={() => setShowGuide(!showGuide)}>
@@ -247,14 +247,14 @@ const TaxFiling = () => {
 
       {/* Mock Submit */}
       {selectedBusiness && (
-        <div className="rounded-2xl border border-accent/20 bg-accent/5 p-6 text-center">
-          <Upload className="h-10 w-10 text-accent mx-auto mb-3" />
+        <div className="glass-frosted rounded-2xl border border-accent/20 p-6 text-center glow-sm">
+          <Upload className="h-10 w-10 text-accent mx-auto mb-3 animate-float" />
           <h3 className="font-semibold text-foreground mb-2">Ready to File?</h3>
           <p className="text-sm text-muted-foreground mb-4">
             Click below to prepare your filing package. We'll email you a copy and guide.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button variant="hero" onClick={handleMockSubmit}>
+            <Button variant="hero" onClick={handleMockSubmit} className="glow-sm">
               <CheckCircle2 className="h-4 w-4" />
               Prepare Filing Package
             </Button>
@@ -282,9 +282,9 @@ const FormCard = ({
   icon: React.ReactNode;
   onGenerate: () => void;
 }) => (
-  <div className="rounded-xl border border-border p-4 hover:border-primary/50 transition-colors">
+  <div className="glass rounded-xl p-4 hover-lift card-interactive">
     <div className="flex items-center gap-3 mb-3">
-      <div className="h-10 w-10 rounded-lg bg-secondary flex items-center justify-center text-primary">
+      <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
         {icon}
       </div>
       <div>

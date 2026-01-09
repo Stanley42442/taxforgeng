@@ -126,11 +126,11 @@ const Compliance = () => {
   if (!canAccess) {
     return (
       <PageLayout title="Compliance Tracker" description="Track tax and regulatory deadlines" icon={FileCheck}>
-        <Card className="max-w-2xl mx-auto text-center p-8">
-          <FileCheck className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+        <Card className="max-w-2xl mx-auto text-center p-8 glass-frosted shadow-futuristic">
+          <FileCheck className="h-16 w-16 mx-auto text-muted-foreground mb-4 animate-float" />
           <h2 className="text-2xl font-bold mb-2">Compliance Tracker</h2>
           <p className="text-muted-foreground mb-6">Available on Freelancer plan and above.</p>
-          <Button onClick={() => navigate('/pricing')}>Upgrade to Access</Button>
+          <Button onClick={() => navigate('/pricing')} className="glow-sm">Upgrade to Access</Button>
         </Card>
       </PageLayout>
     );
@@ -184,14 +184,14 @@ const Compliance = () => {
     >
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Card><CardContent className="p-4"><div className="text-sm text-muted-foreground">Total Items</div><div className="text-2xl font-bold">{totalItems}</div></CardContent></Card>
-        <Card><CardContent className="p-4"><div className="text-sm text-muted-foreground">Completed</div><div className="text-2xl font-bold text-green-600">{completedItems}</div></CardContent></Card>
-        <Card><CardContent className="p-4"><div className="text-sm text-muted-foreground">Overdue</div><div className="text-2xl font-bold text-red-600">{overdueItems}</div></CardContent></Card>
-        <Card><CardContent className="p-4"><div className="text-sm text-muted-foreground mb-2">Completion Rate</div><Progress value={completionRate} className="h-2" /><div className="text-sm font-medium mt-1">{completionRate.toFixed(0)}%</div></CardContent></Card>
+        <Card className="glass-frosted hover-lift stagger-1"><CardContent className="p-4"><div className="text-sm text-muted-foreground">Total Items</div><div className="text-2xl font-bold">{totalItems}</div></CardContent></Card>
+        <Card className="glass-frosted hover-lift stagger-2 border-success/20"><CardContent className="p-4"><div className="text-sm text-muted-foreground">Completed</div><div className="text-2xl font-bold text-success">{completedItems}</div></CardContent></Card>
+        <Card className="glass-frosted hover-lift stagger-3 border-destructive/20"><CardContent className="p-4"><div className="text-sm text-muted-foreground">Overdue</div><div className="text-2xl font-bold text-destructive">{overdueItems}</div></CardContent></Card>
+        <Card className="glass-frosted hover-lift stagger-4"><CardContent className="p-4"><div className="text-sm text-muted-foreground mb-2">Completion Rate</div><Progress value={completionRate} className="h-2" /><div className="text-sm font-medium mt-1">{completionRate.toFixed(0)}%</div></CardContent></Card>
       </div>
 
       {/* Items List */}
-      <Card>
+      <Card className="glass-frosted">
         <CardHeader><CardTitle>All Compliance Items</CardTitle><CardDescription>Click the checkbox to mark items as complete</CardDescription></CardHeader>
         <CardContent>
           {loading ? (
@@ -200,12 +200,12 @@ const Compliance = () => {
             <div className="text-center py-8 text-muted-foreground">No compliance items yet. Add your first item to start tracking.</div>
           ) : (
             <div className="space-y-3">
-              {items.map((item) => {
+              {items.map((item, index) => {
                 const daysUntilDue = differenceInDays(new Date(item.due_date), new Date());
                 const isUrgent = daysUntilDue <= 7 && item.status !== 'completed';
                 
                 return (
-                  <div key={item.id} className={`flex items-center justify-between p-4 border rounded-lg transition-colors ${item.status === 'completed' ? 'bg-muted/30' : isUrgent ? 'border-red-200 bg-red-50/50 dark:border-red-900 dark:bg-red-950/30' : 'hover:bg-muted/50'}`}>
+                  <div key={item.id} className={`flex items-center justify-between p-4 glass rounded-lg transition-all hover-lift stagger-${Math.min(index + 1, 6)} ${item.status === 'completed' ? 'opacity-60' : isUrgent ? 'border-destructive/30 glow-sm' : ''}`}>
                     <div className="flex items-center gap-4">
                       <Checkbox checked={item.status === 'completed'} onCheckedChange={() => toggleComplete(item)} />
                       <div>

@@ -99,9 +99,9 @@ const Transactions = () => {
   if (!canAccess) {
     return (
       <PageLayout title="Bank Statement Import" icon={FileSpreadsheet} maxWidth="2xl">
-        <Card className="text-center">
+        <Card className="text-center glass-frosted shadow-futuristic">
           <CardHeader>
-            <div className="mx-auto w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mb-4">
+            <div className="mx-auto w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mb-4 animate-float glow-sm">
               <FileSpreadsheet className="w-8 h-8 text-accent" />
             </div>
             <CardTitle className="text-2xl">Bank Statement Import</CardTitle>
@@ -111,20 +111,20 @@ const Transactions = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid gap-3 text-left">
-              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+              <div className="flex items-center gap-3 p-3 glass rounded-lg hover-lift stagger-1">
                 <Upload className="w-5 h-5 text-primary" />
                 <span>Upload CSV from your bank</span>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+              <div className="flex items-center gap-3 p-3 glass rounded-lg hover-lift stagger-2">
                 <Check className="w-5 h-5 text-primary" />
                 <span>AI auto-categorizes income & expenses</span>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+              <div className="flex items-center gap-3 p-3 glass rounded-lg hover-lift stagger-3">
                 <ArrowRight className="w-5 h-5 text-primary" />
                 <span>One-click populate tax calculator</span>
               </div>
             </div>
-            <div className="p-4 bg-muted rounded-lg text-left">
+            <div className="p-4 glass rounded-lg text-left">
               <div className="flex items-start gap-2">
                 <HelpCircle className="w-4 h-4 text-muted-foreground mt-0.5" />
                 <p className="text-sm text-muted-foreground">
@@ -133,7 +133,7 @@ const Transactions = () => {
               </div>
             </div>
             <Link to="/pricing">
-              <Button className="w-full bg-gradient-primary hover:opacity-90">
+              <Button className="w-full bg-gradient-primary hover:opacity-90 glow-sm">
                 <Crown className="w-4 h-4 mr-2" />
                 Upgrade to Import Statements
               </Button>
@@ -154,7 +154,7 @@ const Transactions = () => {
       maxWidth="6xl"
     >
       {/* Upload Section */}
-      <Card className="mb-6">
+      <Card className="mb-6 glass-frosted">
         <CardHeader>
           <CardTitle>Upload Bank Statement</CardTitle>
           <CardDescription>
@@ -207,7 +207,7 @@ const Transactions = () => {
       {/* Transactions Table */}
       {transactions.length > 0 && (
         <>
-          <Card className="mb-6">
+          <Card className="mb-6 glass-frosted">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -276,25 +276,25 @@ const Transactions = () => {
           </Card>
 
           {/* Summary */}
-          <Card className="mb-6">
+          <Card className="mb-6 glass-frosted">
             <CardHeader>
               <CardTitle>Summary</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="p-4 bg-success/10 rounded-lg">
+                <div className="p-4 glass rounded-lg hover-lift glow-sm border-success/20">
                   <p className="text-sm text-muted-foreground">Total Income</p>
                   <p className="text-2xl font-bold text-success">₦{totals.income.toLocaleString()}</p>
                 </div>
-                <div className="p-4 bg-destructive/10 rounded-lg">
+                <div className="p-4 glass rounded-lg hover-lift border-destructive/20">
                   <p className="text-sm text-muted-foreground">Total Expenses</p>
                   <p className="text-2xl font-bold text-destructive">₦{totals.expenses.toLocaleString()}</p>
                 </div>
-                <div className="p-4 bg-accent/10 rounded-lg">
+                <div className="p-4 glass rounded-lg hover-lift border-accent/20">
                   <p className="text-sm text-muted-foreground">VATable Income</p>
                   <p className="text-2xl font-bold">₦{totals.vatableIncome.toLocaleString()}</p>
                 </div>
-                <div className="p-4 bg-accent/10 rounded-lg">
+                <div className="p-4 glass rounded-lg hover-lift border-accent/20">
                   <p className="text-sm text-muted-foreground">VATable Expenses</p>
                   <p className="text-2xl font-bold">₦{totals.vatableExpenses.toLocaleString()}</p>
                 </div>
@@ -303,7 +303,7 @@ const Transactions = () => {
           </Card>
 
           {/* Apply to Calculator */}
-          <Card className="border-primary/30 bg-primary/5">
+          <Card className="glass-frosted border-primary/30 glow-sm">
             <CardContent className="flex flex-col sm:flex-row items-center justify-between p-6 gap-4">
               <div>
                 <h3 className="font-semibold">Ready to Calculate?</h3>
@@ -311,7 +311,7 @@ const Transactions = () => {
                   Apply these totals to the tax calculator
                 </p>
               </div>
-              <Button onClick={applyToCalculator} size="lg">
+              <Button onClick={applyToCalculator} size="lg" className="glow-sm">
                 <ArrowRight className="w-4 h-4 mr-2" />
                 Apply to Calculator
               </Button>
