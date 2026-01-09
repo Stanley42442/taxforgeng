@@ -1,6 +1,6 @@
 // Admin Analytics page for business metrics and revenue analytics
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { NavMenu } from "@/components/NavMenu";
+import { PageLayout } from "@/components/PageLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -423,48 +423,28 @@ const AdminAnalytics = () => {
 
   if (loading || adminLoading) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
-        <NavMenu />
-        <main className="container mx-auto px-4 py-8 flex items-center justify-center">
+      <PageLayout title="Admin Analytics" icon={BarChart3} maxWidth="7xl">
+        <div className="flex items-center justify-center py-20">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </main>
-      </div>
+        </div>
+      </PageLayout>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
-        <NavMenu />
-        <main className="container mx-auto px-4 py-8">
-          <div className="text-center py-12">
-            <BarChart3 className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold text-foreground mb-2">Admin Access Required</h2>
-            <p className="text-muted-foreground">Please sign in with an admin account to view analytics.</p>
-          </div>
-        </main>
-      </div>
+      <PageLayout title="Admin Analytics" icon={BarChart3} maxWidth="7xl">
+        <div className="text-center py-12">
+          <BarChart3 className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+          <h2 className="text-xl font-semibold text-foreground mb-2">Admin Access Required</h2>
+          <p className="text-muted-foreground">Please sign in with an admin account to view analytics.</p>
+        </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
-      <NavMenu />
-
-      <main className="container mx-auto px-4 py-6 pb-8 flex-1">
-        <div className="mx-auto max-w-7xl">
-          {/* Header */}
-          <div className="text-center mb-8 animate-slide-up">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary">
-              <BarChart3 className="h-8 w-8 text-primary-foreground" />
-            </div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              Admin Analytics
-            </h1>
-            <p className="text-muted-foreground">
-              Business metrics, user insights, and revenue analytics
-            </p>
-          </div>
+    <PageLayout title="Admin Analytics" description="Business metrics, user insights, and revenue analytics" icon={BarChart3} maxWidth="7xl">
 
           {/* Date Filter & Controls */}
           <Card className="mb-6 animate-slide-up">
@@ -854,9 +834,7 @@ const AdminAnalytics = () => {
           <p className="text-xs text-muted-foreground text-center">
             Analytics update in real-time. Some metrics are estimated based on current data.
           </p>
-        </div>
-      </main>
-    </div>
+    </PageLayout>
   );
 };
 

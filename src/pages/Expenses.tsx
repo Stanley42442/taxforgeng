@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { NavMenu } from "@/components/NavMenu";
+import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -917,35 +917,17 @@ const Expenses = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <NavMenu />
-        <div className="container mx-auto px-4 py-20 text-center">
+      <PageLayout title="Expense Tracker" icon={Receipt} maxWidth="6xl">
+        <div className="text-center py-20">
           <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" />
           <p className="text-muted-foreground mt-4">Loading expenses...</p>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 bg-mesh pointer-events-none" />
-      <div className="absolute top-20 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none animate-float" />
-      <div className="absolute bottom-40 right-10 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none animate-float-delayed" />
-      
-      <NavMenu />
-
-      <main className="container mx-auto px-4 py-6 pb-8 relative z-10">
-        <div className="mx-auto max-w-5xl">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow-primary animate-glow">
-              <Receipt className="h-8 w-8" />
-            </div>
-            <h1 className="text-3xl font-bold bg-gradient-text bg-clip-text text-transparent mb-2">Expense Tracker</h1>
-            <p className="text-muted-foreground">Track and manage your business income and expenses</p>
-          </div>
+    <PageLayout title="Expense Tracker" description="Track and manage your business income and expenses" icon={Receipt} maxWidth="6xl">
 
           {/* Summary Cards */}
           <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-6">

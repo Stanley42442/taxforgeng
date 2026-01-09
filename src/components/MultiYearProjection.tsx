@@ -294,40 +294,40 @@ export const MultiYearProjection = () => {
             Year-by-Year Breakdown
           </h3>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <table className="w-full text-xs sm:text-sm min-w-[500px]">
             <thead className="bg-secondary/50">
               <tr>
-                <th className="text-left p-3">Year</th>
-                <th className="text-right p-3">Turnover</th>
-                <th className="text-right p-3">Taxable Income</th>
-                <th className="text-right p-3">Total Tax</th>
-                <th className="text-right p-3">Effective Rate</th>
-                <th className="text-center p-3">Status</th>
+                <th className="text-left p-2 sm:p-3 whitespace-nowrap">Year</th>
+                <th className="text-right p-2 sm:p-3 whitespace-nowrap">Turnover</th>
+                <th className="text-right p-2 sm:p-3 whitespace-nowrap">Taxable</th>
+                <th className="text-right p-2 sm:p-3 whitespace-nowrap">Tax</th>
+                <th className="text-right p-2 sm:p-3 whitespace-nowrap">Rate</th>
+                <th className="text-center p-2 sm:p-3 whitespace-nowrap">Status</th>
               </tr>
             </thead>
             <tbody>
               {projections.map((p, i) => (
                 <tr key={p.year} className={`border-t border-border ${p.isExempt ? 'bg-success/5' : ''}`}>
-                  <td className="p-3 font-medium">{p.year}</td>
-                  <td className="p-3 text-right">{formatCurrency(p.turnover)}</td>
-                  <td className="p-3 text-right">{formatCurrency(p.taxableIncome)}</td>
-                  <td className="p-3 text-right font-medium text-destructive">
+                  <td className="p-2 sm:p-3 font-medium whitespace-nowrap">{p.year}</td>
+                  <td className="p-2 sm:p-3 text-right whitespace-nowrap">{formatCurrency(p.turnover)}</td>
+                  <td className="p-2 sm:p-3 text-right whitespace-nowrap">{formatCurrency(p.taxableIncome)}</td>
+                  <td className="p-2 sm:p-3 text-right font-medium text-destructive whitespace-nowrap">
                     {formatCurrency(p.totalTax)}
                   </td>
-                  <td className="p-3 text-right">{p.effectiveRate.toFixed(1)}%</td>
-                  <td className="p-3 text-center">
+                  <td className="p-2 sm:p-3 text-right whitespace-nowrap">{p.effectiveRate.toFixed(1)}%</td>
+                  <td className="p-2 sm:p-3 text-center">
                     {p.isExempt ? (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-success/20 text-success">
+                      <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-medium bg-success/20 text-success">
                         Exempt
                       </span>
                     ) : (
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                      <span className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-medium ${
                         p.companySize === 'small' ? 'bg-primary/20 text-primary' :
                         p.companySize === 'medium' ? 'bg-warning/20 text-warning' :
                         'bg-destructive/20 text-destructive'
                       }`}>
-                        {p.companySize === 'small' ? 'Small' : p.companySize === 'medium' ? 'Medium' : 'Large'}
+                        {p.companySize === 'small' ? 'S' : p.companySize === 'medium' ? 'M' : 'L'}
                       </span>
                     )}
                   </td>
@@ -345,21 +345,21 @@ export const MultiYearProjection = () => {
           Projection Insights
         </h3>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
+          <div className="p-3 rounded-lg bg-primary/5 border border-primary/10 overflow-hidden">
             <p className="text-xs text-muted-foreground">Total Tax Over Period</p>
-            <p className="text-lg font-bold text-primary">
+            <p className="text-sm sm:text-lg font-bold text-primary break-all">
               {formatCurrency(projections.reduce((sum, p) => sum + p.totalTax, 0))}
             </p>
           </div>
-          <div className="p-3 rounded-lg bg-success/5 border border-success/10">
+          <div className="p-3 rounded-lg bg-success/5 border border-success/10 overflow-hidden">
             <p className="text-xs text-muted-foreground">Exempt Years Savings</p>
-            <p className="text-lg font-bold text-success">
+            <p className="text-sm sm:text-lg font-bold text-success break-all">
               {formatCurrency(exemptYearsSavings)}
             </p>
           </div>
-          <div className="p-3 rounded-lg bg-warning/5 border border-warning/10">
+          <div className="p-3 rounded-lg bg-warning/5 border border-warning/10 overflow-hidden">
             <p className="text-xs text-muted-foreground">Year {projectionYears} Revenue</p>
-            <p className="text-lg font-bold text-warning">
+            <p className="text-sm sm:text-lg font-bold text-warning break-all">
               {formatCurrency(projections[projections.length - 1]?.turnover || 0)}
             </p>
           </div>

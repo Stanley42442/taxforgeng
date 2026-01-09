@@ -104,21 +104,21 @@ export const PenaltyEstimator = () => {
 
         {/* Results */}
         {result && (
-          <div className="space-y-4 pt-4 border-t">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 rounded-xl bg-warning/10 border border-warning/20">
+          <div className="space-y-4 pt-4 border-t overflow-hidden">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 sm:p-4 rounded-xl bg-warning/10 border border-warning/20 overflow-hidden">
                 <p className="text-xs text-muted-foreground mb-1">Late Filing Penalty</p>
-                <p className="text-xl font-bold text-warning">{formatCurrency(result.lateFiling)}</p>
+                <p className="text-base sm:text-xl font-bold text-warning break-all">{formatCurrency(result.lateFiling)}</p>
               </div>
-              <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20">
+              <div className="p-3 sm:p-4 rounded-xl bg-destructive/10 border border-destructive/20 overflow-hidden">
                 <p className="text-xs text-muted-foreground mb-1">Interest Charges</p>
-                <p className="text-xl font-bold text-destructive">{formatCurrency(result.interest)}</p>
+                <p className="text-base sm:text-xl font-bold text-destructive break-all">{formatCurrency(result.interest)}</p>
               </div>
             </div>
 
-            <div className="p-5 rounded-xl bg-destructive/20 border border-destructive/30 text-center">
+            <div className="p-4 sm:p-5 rounded-xl bg-destructive/20 border border-destructive/30 text-center overflow-hidden">
               <p className="text-sm text-muted-foreground mb-2">Total Penalty</p>
-              <p className="text-3xl font-bold text-destructive">{formatCurrency(result.totalPenalty)}</p>
+              <p className="text-xl sm:text-3xl font-bold text-destructive break-all">{formatCurrency(result.totalPenalty)}</p>
               <p className="text-xs text-muted-foreground mt-2">
                 {((result.totalPenalty / taxDue) * 100).toFixed(1)}% of original tax
               </p>
