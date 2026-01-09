@@ -262,8 +262,18 @@ const AccountantPortal = () => {
             </CardHeader>
             <CardContent className="p-0">
               {isLoading ? (
-                <div className="p-8 text-center">
-                  <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto" />
+                <div className="divide-y divide-border/50">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="flex items-center gap-4 p-4" style={{ animationDelay: `${i * 50}ms` }}>
+                      <div className="skeleton-shimmer h-4 w-4 rounded" />
+                      <div className="skeleton-shimmer h-10 w-10 rounded-lg" />
+                      <div className="flex-1 space-y-2">
+                        <div className="skeleton-shimmer h-4 w-3/4 rounded" />
+                        <div className="skeleton-shimmer h-3 w-1/2 rounded" />
+                      </div>
+                      <div className="skeleton-shimmer h-8 w-24 rounded-lg" />
+                    </div>
+                  ))}
                 </div>
               ) : filteredClients.length === 0 ? (
                 <div className="p-8 text-center">

@@ -291,8 +291,31 @@ const Settings = () => {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="w-full max-w-4xl space-y-6 animate-fade-in">
+          {/* Header skeleton */}
+          <div className="flex items-center gap-4">
+            <div className="skeleton-shimmer h-12 w-12 rounded-xl" />
+            <div className="space-y-2">
+              <div className="skeleton-shimmer h-6 w-32 rounded" />
+              <div className="skeleton-shimmer h-4 w-48 rounded" />
+            </div>
+          </div>
+          
+          {/* Tabs skeleton */}
+          <div className="skeleton-shimmer h-12 w-full rounded-xl" />
+          
+          {/* Form skeleton */}
+          <div className="glass-frosted rounded-xl p-6 space-y-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="space-y-2">
+                <div className="skeleton-shimmer h-4 w-20 rounded" />
+                <div className="skeleton-shimmer h-10 w-full rounded-lg" />
+              </div>
+            ))}
+            <div className="skeleton-shimmer h-10 w-32 rounded-lg" />
+          </div>
+        </div>
       </div>
     );
   }

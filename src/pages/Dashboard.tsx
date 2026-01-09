@@ -49,7 +49,7 @@ import { SparklineChart } from "@/components/SparklineChart";
 import { exportDashboardToPDF, exportDashboardToCSV, DashboardExportData } from "@/lib/dashboardExport";
 import { toast } from "sonner";
 import { ExpenseCharts } from "@/components/ExpenseCharts";
-import { WelcomeSplash } from "@/components/WelcomeSplash";
+import { PremiumOnboarding } from "@/components/PremiumOnboarding";
 import { DisclaimerModal } from "@/components/DisclaimerModal";
 import { FeedbackForm } from "@/components/FeedbackForm";
 import { seedSampleData } from "@/lib/sampleData";
@@ -263,13 +263,60 @@ const Dashboard = () => {
   if (loading || businessLoading) {
     return (
       <PageLayout title="Dashboard" icon={LayoutDashboard}>
-        <div className="flex justify-center py-20">
-          <div className="glass-frosted rounded-2xl p-12 max-w-sm mx-auto text-center shadow-futuristic">
-            <div className="relative mx-auto w-16 h-16 mb-4">
-              <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl animate-pulse" />
-              <Loader2 className="h-16 w-16 animate-spin mx-auto text-primary relative" />
+        <div className="space-y-6 animate-fade-in">
+          {/* Summary section skeleton */}
+          <div className="glass-frosted rounded-2xl p-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="skeleton-shimmer h-10 w-10 rounded-xl" />
+              <div className="space-y-2">
+                <div className="skeleton-shimmer h-5 w-40 rounded" />
+                <div className="skeleton-shimmer h-3 w-24 rounded" />
+              </div>
             </div>
-            <p className="text-muted-foreground">Loading your dashboard...</p>
+            
+            {/* Stats grid skeleton */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="glass rounded-xl p-4">
+                  <div className="skeleton-shimmer h-3 w-16 mb-2 rounded" />
+                  <div className="skeleton-shimmer h-6 w-24 mb-1 rounded" />
+                  <div className="skeleton-shimmer h-3 w-12 rounded" />
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Quick actions skeleton */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="glass-frosted rounded-xl p-5 flex flex-col items-center gap-3">
+                <div className="skeleton-shimmer h-12 w-12 rounded-xl" />
+                <div className="skeleton-shimmer h-4 w-20 rounded" />
+              </div>
+            ))}
+          </div>
+          
+          {/* Content grid skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div key={i} className="glass-frosted rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="skeleton-shimmer h-5 w-32 rounded" />
+                  <div className="skeleton-shimmer h-8 w-20 rounded-lg" />
+                </div>
+                <div className="space-y-3">
+                  {Array.from({ length: 3 }).map((_, j) => (
+                    <div key={j} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+                      <div className="skeleton-shimmer h-10 w-10 rounded-lg" />
+                      <div className="flex-1 space-y-2">
+                        <div className="skeleton-shimmer h-4 w-3/4 rounded" />
+                        <div className="skeleton-shimmer h-3 w-1/2 rounded" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </PageLayout>
@@ -333,7 +380,7 @@ const Dashboard = () => {
         }} />
       )}
       
-      {showWelcome && <WelcomeSplash onComplete={() => setShowWelcome(false)} />}
+      {showWelcome && <PremiumOnboarding onComplete={() => setShowWelcome(false)} />}
 
       {/* Collapsible Summary Section */}
       <Collapsible open={summaryExpanded} onOpenChange={setSummaryExpanded} className="mb-6 animate-slide-up">

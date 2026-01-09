@@ -655,8 +655,38 @@ const SecurityDashboard = () => {
   if (loading || isLoading) {
     return (
       <PageLayout title="Security Dashboard" icon={Shield} maxWidth="6xl">
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="space-y-6 animate-fade-in">
+          {/* Stats skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="glass-frosted rounded-xl p-5">
+                <div className="skeleton-shimmer h-3 w-24 mb-3 rounded" />
+                <div className="skeleton-shimmer h-8 w-32 mb-2 rounded" />
+                <div className="skeleton-shimmer h-3 w-16 rounded" />
+              </div>
+            ))}
+          </div>
+          
+          {/* Tabs skeleton */}
+          <div className="glass-frosted rounded-xl p-6">
+            <div className="flex gap-2 mb-6">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="skeleton-shimmer h-10 w-24 rounded-lg" />
+              ))}
+            </div>
+            <div className="space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-4 p-4 rounded-lg border border-border/30">
+                  <div className="skeleton-shimmer h-12 w-12 rounded-full" />
+                  <div className="flex-1 space-y-2">
+                    <div className="skeleton-shimmer h-4 w-3/4 rounded" />
+                    <div className="skeleton-shimmer h-3 w-1/2 rounded" />
+                  </div>
+                  <div className="skeleton-shimmer h-8 w-20 rounded-lg" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </PageLayout>
     );

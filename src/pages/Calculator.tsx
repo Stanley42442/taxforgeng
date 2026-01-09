@@ -104,7 +104,18 @@ const CalculatorPage = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="glass-frosted rounded-2xl p-8 shadow-futuristic">
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative">
+              <div className="h-12 w-12 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
+              <div className="absolute inset-0 h-12 w-12 rounded-full bg-primary/10 animate-pulse" />
+            </div>
+            <div className="space-y-2 text-center">
+              <div className="skeleton-shimmer h-4 w-32 mx-auto rounded" />
+              <div className="skeleton-shimmer h-3 w-24 mx-auto rounded" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
