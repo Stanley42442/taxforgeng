@@ -273,13 +273,13 @@ const EFiling = () => {
               </p>
             </div>
 
-            <div className="p-4 rounded-lg bg-primary/5 border border-primary/20 mb-6">
-              <div className="flex justify-between items-center">
-                <div>
+            <div className="p-4 rounded-lg bg-primary/5 border border-primary/20 mb-6 overflow-hidden">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div className="min-w-0 flex-1">
                   <p className="text-sm text-muted-foreground">Tax Due</p>
-                  <p className="text-2xl font-bold text-primary">{formatCurrency(mockTaxDue)}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-primary break-all">{formatCurrency(mockTaxDue)}</p>
                 </div>
-                <Button variant="hero" onClick={handlePayment}>
+                <Button variant="hero" onClick={handlePayment} className="shrink-0">
                   <CreditCard className="h-4 w-4" />
                   Pay Now
                 </Button>
@@ -389,10 +389,10 @@ const EFiling = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="py-6">
-            <div className="p-4 rounded-lg bg-secondary/50 mb-4">
-              <div className="flex justify-between items-center">
+            <div className="p-4 rounded-lg bg-secondary/50 mb-4 overflow-hidden">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <span className="text-muted-foreground">Amount</span>
-                <span className="text-2xl font-bold text-primary">{formatCurrency(mockTaxDue)}</span>
+                <span className="text-lg sm:text-2xl font-bold text-primary break-all">{formatCurrency(mockTaxDue)}</span>
               </div>
             </div>
             <p className="text-xs text-muted-foreground text-center">

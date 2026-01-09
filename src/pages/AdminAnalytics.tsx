@@ -535,8 +535,8 @@ const AdminAnalytics = () => {
                 </CardTitle>
                 <DollarSign className="h-5 w-5 text-success" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-foreground">{formatCurrency(currentMrr)}</div>
+              <CardContent className="overflow-hidden">
+                <div className="text-lg sm:text-2xl font-bold text-foreground break-all">{formatCurrency(currentMrr)}</div>
                 <div className="flex items-center gap-1 mt-1">
                   {mrrGrowth >= 0 ? (
                     <ArrowUpRight className="h-4 w-4 text-success" />
@@ -558,8 +558,8 @@ const AdminAnalytics = () => {
                 </CardTitle>
                 <TrendingUp className="h-5 w-5 text-primary" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-foreground">{formatCurrency(currentMrr * 12)}</div>
+              <CardContent className="overflow-hidden">
+                <div className="text-lg sm:text-2xl font-bold text-foreground break-all">{formatCurrency(currentMrr * 12)}</div>
                 <p className="text-sm text-muted-foreground mt-1">
                   Based on current MRR
                 </p>

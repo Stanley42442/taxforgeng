@@ -410,21 +410,21 @@ const Results = () => {
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-3 mb-6 animate-slide-up">
         {/* Gross Income */}
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+        <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card overflow-hidden">
           <p className="text-sm text-muted-foreground mb-1">Gross Income</p>
-          <p className="text-2xl font-bold text-foreground">{formatCurrency(result.grossIncome)}</p>
+          <p className="text-lg sm:text-2xl font-bold text-foreground break-all">{formatCurrency(result.grossIncome)}</p>
         </div>
 
         {/* Taxable Income */}
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+        <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card overflow-hidden">
           <p className="text-sm text-muted-foreground mb-1">Taxable Income</p>
-          <p className="text-2xl font-bold text-foreground">{formatCurrency(result.taxableIncome)}</p>
+          <p className="text-lg sm:text-2xl font-bold text-foreground break-all">{formatCurrency(result.taxableIncome)}</p>
         </div>
 
         {/* Total Tax */}
-        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 shadow-card">
+        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:p-6 shadow-card overflow-hidden">
           <p className="text-sm text-muted-foreground mb-1">Total Tax Payable</p>
-          <p className="text-2xl font-bold text-primary">{formatCurrency(result.totalTaxPayable)}</p>
+          <p className="text-lg sm:text-2xl font-bold text-primary break-all">{formatCurrency(result.totalTaxPayable)}</p>
           <p className="text-xs text-muted-foreground mt-1">
             Effective Rate: {result.effectiveRate.toFixed(2)}%
           </p>
