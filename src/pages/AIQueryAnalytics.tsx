@@ -309,8 +309,27 @@ const AIQueryAnalytics = () => {
   if (loading || adminLoading) {
     return (
       <PageLayout title="AI TaxBot Analytics" icon={Bot} maxWidth="7xl">
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="space-y-6 animate-fade-in">
+          {/* Stats skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="glass-frosted rounded-xl p-5">
+                <div className="skeleton-shimmer h-3 w-24 mb-3 rounded" />
+                <div className="skeleton-shimmer h-8 w-20 mb-2 rounded" />
+                <div className="skeleton-shimmer h-3 w-16 rounded" />
+              </div>
+            ))}
+          </div>
+          
+          {/* Charts skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="glass-frosted rounded-xl p-6">
+                <div className="skeleton-shimmer h-5 w-32 mb-6 rounded" />
+                <div className="skeleton-shimmer h-48 w-full rounded-lg" />
+              </div>
+            ))}
+          </div>
         </div>
       </PageLayout>
     );
