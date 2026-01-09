@@ -917,9 +917,55 @@ const Expenses = () => {
   if (loading) {
     return (
       <PageLayout title="Expense Tracker" icon={Receipt} maxWidth="6xl">
-        <div className="text-center py-20">
-          <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground mt-4">Loading expenses...</p>
+        <div className="space-y-6 animate-fade-in">
+          {/* Summary cards skeleton */}
+          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="neumorphic-sm p-4 rounded-xl">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="skeleton-shimmer h-8 w-8 rounded-lg" />
+                  <div className="skeleton-shimmer h-3 w-16 rounded" />
+                </div>
+                <div className="skeleton-shimmer h-6 w-24 rounded" />
+              </div>
+            ))}
+          </div>
+          
+          {/* Filter bar skeleton */}
+          <div className="glass-frosted rounded-xl p-4 flex gap-3 flex-wrap">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="skeleton-shimmer h-10 w-32 rounded-lg" />
+            ))}
+          </div>
+          
+          {/* Expenses list skeleton */}
+          <div className="glass-frosted rounded-xl p-6">
+            <div className="flex justify-between items-center mb-4">
+              <div className="skeleton-shimmer h-6 w-32 rounded" />
+              <div className="skeleton-shimmer h-9 w-28 rounded-lg" />
+            </div>
+            <div className="space-y-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div 
+                  key={i} 
+                  className="flex items-center justify-between p-4 rounded-lg bg-muted/30"
+                  style={{ animationDelay: `${i * 50}ms` }}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="skeleton-shimmer h-10 w-10 rounded-lg" />
+                    <div className="space-y-2">
+                      <div className="skeleton-shimmer h-4 w-40 rounded" />
+                      <div className="skeleton-shimmer h-3 w-24 rounded" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="skeleton-shimmer h-5 w-20 rounded" />
+                    <div className="skeleton-shimmer h-6 w-16 rounded-full" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </PageLayout>
     );
