@@ -42,7 +42,9 @@ export const SharedElementProvider = ({ children }: { children: ReactNode }) => 
 
   return (
     <SharedElementContext.Provider value={{ registerElement, getElement, clearElement }}>
-      <LayoutGroup>{children}</LayoutGroup>
+      <LayoutGroup>
+        <>{children}</>
+      </LayoutGroup>
     </SharedElementContext.Provider>
   );
 };
