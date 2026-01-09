@@ -146,7 +146,7 @@ const TaxCalendar = () => {
       icon={Calendar} 
       maxWidth="6xl"
       headerActions={
-        <Button onClick={exportToICS} variant="outline" className="gap-2">
+        <Button onClick={exportToICS} variant="outline" className="gap-2 hover-lift">
           <Download className="h-4 w-4" />
           Export
         </Button>
@@ -154,17 +154,17 @@ const TaxCalendar = () => {
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Calendar */}
-        <Card className="glass-frosted lg:col-span-2">
+        <Card className="glass-frosted shadow-futuristic lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-primary" />
               {format(currentDate, "MMMM yyyy")}
             </CardTitle>
             <div className="flex gap-2">
-              <Button variant="ghost" size="icon" onClick={() => setCurrentDate(subMonths(currentDate, 1))}>
+              <Button variant="ghost" size="icon" onClick={() => setCurrentDate(subMonths(currentDate, 1))} className="hover-lift">
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => setCurrentDate(addMonths(currentDate, 1))}>
+              <Button variant="ghost" size="icon" onClick={() => setCurrentDate(addMonths(currentDate, 1))} className="hover-lift">
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
@@ -190,18 +190,18 @@ const TaxCalendar = () => {
                 const hasDeadlines = deadlines.length > 0;
                 const isSelected = selectedDate && isSameDay(day, selectedDate);
 
-                return (
-                  <button
-                    key={day.toISOString()}
-                    onClick={() => setSelectedDate(day)}
-                    className={`h-16 p-1 rounded-lg border transition-all text-left ${
-                      isToday(day)
-                        ? "border-primary bg-primary/10"
-                        : isSelected
-                        ? "border-primary bg-primary/5"
-                        : "border-transparent hover:bg-secondary/50"
-                    } ${!isSameMonth(day, currentDate) ? "opacity-50" : ""}`}
-                  >
+                    return (
+                      <button
+                        key={day.toISOString()}
+                        onClick={() => setSelectedDate(day)}
+                        className={`h-16 p-1 rounded-lg border transition-all hover-lift ${
+                          isToday(day)
+                            ? 'border-primary bg-primary/10 glow-sm'
+                            : isSelected
+                            ? 'border-primary bg-primary/5'
+                            : 'border-transparent hover:bg-secondary/50 hover:glass'
+                        } ${!isSameMonth(day, currentDate) ? 'opacity-50' : ''}`}
+                      >
                     <span className={`text-sm font-medium ${isToday(day) ? "text-primary" : "text-foreground"}`}>
                       {format(day, "d")}
                     </span>
@@ -236,7 +236,7 @@ const TaxCalendar = () => {
         <div className="space-y-6">
           {/* Selected Date Details */}
           {selectedDate && (
-            <Card className="glass-frosted">
+            <Card className="glass-frosted shadow-futuristic animate-slide-up">
               <CardHeader>
                 <CardTitle className="text-base">{format(selectedDate, "MMMM d, yyyy")}</CardTitle>
               </CardHeader>
@@ -249,7 +249,7 @@ const TaxCalendar = () => {
                       const config = TAX_TYPE_CONFIG[deadline.type];
                       const Icon = config.icon;
                       return (
-                        <div key={deadline.id} className="flex items-start gap-3 p-3 rounded-lg bg-secondary/50">
+                        <div key={deadline.id} className="flex items-start gap-3 p-3 rounded-lg glass hover-lift">
                           <div className={`h-8 w-8 rounded-lg ${config.color} flex items-center justify-center shrink-0`}>
                             <Icon className="h-4 w-4 text-white" />
                           </div>
@@ -270,25 +270,25 @@ const TaxCalendar = () => {
           )}
 
           {/* Upcoming Deadlines */}
-          <Card className="glass-frosted">
+          <Card className="glass-frosted shadow-futuristic">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
-                <AlertCircle className="h-4 w-4 text-warning" />
+                <AlertCircle className="h-4 w-4 text-warning animate-pulse" />
                 Upcoming Deadlines
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {upcomingDeadlines.map((deadline) => {
+                {upcomingDeadlines.map((deadline, index) => {
                   const config = TAX_TYPE_CONFIG[deadline.type];
                   const daysUntil = Math.ceil((deadline.date.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
                   return (
-                    <div key={deadline.id} className="flex items-center justify-between">
+                    <div key={deadline.id} className={`flex items-center justify-between hover-lift p-2 rounded-lg glass stagger-${Math.min(index + 1, 5)}`}>
                       <div className="flex items-center gap-2">
                         <div className={`h-2 w-2 rounded-full ${config.color}`} />
                         <span className="text-sm font-medium truncate max-w-[150px]">{deadline.title}</span>
                       </div>
-                      <Badge variant={daysUntil <= 7 ? "destructive" : "secondary"} className="text-xs">
+                      <Badge variant={daysUntil <= 7 ? "destructive" : "secondary"} className={`text-xs ${daysUntil <= 7 ? 'animate-pulse' : ''}`}>
                         {daysUntil === 0 ? "Today" : daysUntil === 1 ? "Tomorrow" : `${daysUntil} days`}
                       </Badge>
                     </div>

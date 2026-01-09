@@ -264,9 +264,12 @@ const Dashboard = () => {
     return (
       <PageLayout title="Dashboard" icon={LayoutDashboard}>
         <div className="flex justify-center py-20">
-          <div className="glass-frosted rounded-2xl p-12 max-w-sm mx-auto text-center">
-            <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary glow-primary" />
-            <p className="text-muted-foreground mt-4">Loading...</p>
+          <div className="glass-frosted rounded-2xl p-12 max-w-sm mx-auto text-center shadow-futuristic">
+            <div className="relative mx-auto w-16 h-16 mb-4">
+              <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl animate-pulse" />
+              <Loader2 className="h-16 w-16 animate-spin mx-auto text-primary relative" />
+            </div>
+            <p className="text-muted-foreground">Loading your dashboard...</p>
           </div>
         </div>
       </PageLayout>
@@ -467,9 +470,9 @@ const Dashboard = () => {
       {/* Quick Actions */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 animate-slide-up-delay-1">
         <Link to="/calculator">
-          <Card className="h-full hover:shadow-lg hover:border-primary/30 transition-all cursor-pointer group">
+          <Card className="h-full glass-frosted hover:shadow-futuristic hover:border-primary/30 transition-all cursor-pointer group hover-lift">
             <CardContent className="p-4 text-center">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-primary/20 transition-colors">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-primary/20 transition-colors group-hover:glow-primary">
                 <Calculator className="h-5 w-5 text-primary" />
               </div>
               <h3 className="font-medium text-sm">Calculator</h3>
@@ -478,7 +481,7 @@ const Dashboard = () => {
           </Card>
         </Link>
         <Link to="/expenses">
-          <Card className="h-full hover:shadow-lg hover:border-primary/30 transition-all cursor-pointer group">
+          <Card className="h-full glass-frosted hover:shadow-futuristic hover:border-accent/30 transition-all cursor-pointer group hover-lift">
             <CardContent className="p-4 text-center">
               <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-accent/20 transition-colors">
                 <Receipt className="h-5 w-5 text-accent" />
@@ -489,7 +492,7 @@ const Dashboard = () => {
           </Card>
         </Link>
         <Link to="/reminders">
-          <Card className="h-full hover:shadow-lg hover:border-primary/30 transition-all cursor-pointer group relative">
+          <Card className="h-full glass-frosted hover:shadow-futuristic hover:border-warning/30 transition-all cursor-pointer group relative hover-lift">
             <CardContent className="p-4 text-center">
               <div className="h-10 w-10 rounded-lg bg-warning/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-warning/20 transition-colors">
                 <Bell className="h-5 w-5 text-warning" />
@@ -497,7 +500,7 @@ const Dashboard = () => {
               <h3 className="font-medium text-sm">Reminders</h3>
               <p className="text-xs text-muted-foreground">Tax deadlines</p>
               {urgentCount > 0 && (
-                <Badge variant="destructive" className="absolute -top-1 -right-1 text-xs">
+                <Badge variant="destructive" className="absolute -top-1 -right-1 text-xs animate-pulse">
                   {urgentCount}
                 </Badge>
               )}
@@ -505,7 +508,7 @@ const Dashboard = () => {
           </Card>
         </Link>
         <Link to="/saved-businesses">
-          <Card className="h-full hover:shadow-lg hover:border-primary/30 transition-all cursor-pointer group">
+          <Card className="h-full glass-frosted hover:shadow-futuristic hover:border-success/30 transition-all cursor-pointer group hover-lift">
             <CardContent className="p-4 text-center">
               <div className="h-10 w-10 rounded-lg bg-success/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-success/20 transition-colors">
                 <Building2 className="h-5 w-5 text-success" />
@@ -520,7 +523,7 @@ const Dashboard = () => {
       {/* Main Content Grid */}
       <div className="grid gap-6 lg:grid-cols-2 animate-slide-up-delay-2">
         {/* Businesses Card */}
-        <Card className="shadow-card">
+        <Card className="glass-frosted shadow-futuristic">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
@@ -593,7 +596,7 @@ const Dashboard = () => {
         </Card>
 
         {/* Reminders Card */}
-        <Card className="shadow-card">
+        <Card className="glass-frosted shadow-futuristic">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">

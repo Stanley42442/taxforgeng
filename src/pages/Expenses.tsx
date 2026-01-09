@@ -398,15 +398,15 @@ const Expenses = () => {
     return (
       <PageLayout title="Expense Tracker" icon={Receipt} maxWidth="6xl">
         <div className="text-center py-12">
-          <div className="mx-auto max-w-md">
-            <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-accent">
+          <div className="mx-auto max-w-md glass-frosted rounded-3xl p-10 shadow-futuristic">
+            <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-accent animate-float glow-sm">
               <Crown className="h-12 w-12 text-accent-foreground" />
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-3">Expense Tracker</h1>
             <p className="text-lg text-muted-foreground mb-8">
               Upgrade to access expense tracking features
             </p>
-            <Button variant="glow" size="lg" onClick={() => navigate('/pricing')}>
+            <Button variant="glow" size="lg" onClick={() => navigate('/pricing')} className="glow-sm">
               <Crown className="h-5 w-5" />
               Upgrade Now
             </Button>
