@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { NavMenu } from "@/components/NavMenu";
+import { PageLayout } from "@/components/PageLayout";
 import { Plus, FileText, Send, Check, Clock, X, Trash2, Eye } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 
@@ -249,9 +249,8 @@ const Invoices = () => {
 
   if (!canAccess) {
     return (
-      <div className="min-h-screen bg-background">
-        <NavMenu />
-        <div className="container mx-auto px-4 py-8">
+      <PageLayout title="Invoices" icon={FileText} maxWidth="6xl">
+        <div className="text-center py-12">
           <Card className="max-w-2xl mx-auto text-center p-8">
             <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h2 className="text-2xl font-bold mb-2">Invoicing System</h2>
@@ -261,34 +260,31 @@ const Invoices = () => {
             <Button onClick={() => navigate('/pricing')}>Upgrade to Access</Button>
           </Card>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   const { subtotal, vatAmount, total } = calculateTotals();
 
   return (
-    <div className="min-h-screen bg-background">
-      <NavMenu />
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold">Invoices</h1>
-            <p className="text-muted-foreground">Create and manage professional invoices</p>
-          </div>
-          <Dialog open={isCreating} onOpenChange={setIsCreating}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                New Invoice
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Create New Invoice</DialogTitle>
-              </DialogHeader>
-              
-              <div className="space-y-6">
+    <PageLayout 
+      title="Invoices" 
+      description="Create and manage professional invoices" 
+      icon={FileText} 
+      maxWidth="6xl"
+    >
+      <Dialog open={isCreating} onOpenChange={setIsCreating}>
+        <DialogTrigger asChild>
+          <Button className="mb-6">
+            <Plus className="h-4 w-4 mr-2" />
+            New Invoice
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Create New Invoice</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
                 {savedBusinesses.length > 0 && (
                   <div>
                     <Label>Business (Optional)</Label>
@@ -518,8 +514,7 @@ const Invoices = () => {
             )}
           </CardContent>
         </Card>
-      </div>
-    </div>
+    </PageLayout>
   );
 };
 

@@ -396,9 +396,8 @@ const Expenses = () => {
   // Upgrade prompt for free tier
   if (!isBasicPlus) {
     return (
-      <div className="min-h-screen bg-background">
-        <NavMenu />
-        <div className="container mx-auto px-4 py-20 text-center">
+      <PageLayout title="Expense Tracker" icon={Receipt} maxWidth="6xl">
+        <div className="text-center py-12">
           <div className="mx-auto max-w-md">
             <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-accent">
               <Crown className="h-12 w-12 text-accent-foreground" />
@@ -413,7 +412,7 @@ const Expenses = () => {
             </Button>
           </div>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
@@ -928,9 +927,8 @@ const Expenses = () => {
 
   return (
     <PageLayout title="Expense Tracker" description="Track and manage your business income and expenses" icon={Receipt} maxWidth="6xl">
-
-          {/* Summary Cards */}
-          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-6">
+      {/* Summary Cards */}
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-6">
             <div className="neumorphic-sm p-4 rounded-xl overflow-hidden">
               <div className="flex items-center gap-2 mb-2">
                 <div className="p-1.5 rounded-lg bg-success/10 shrink-0">
@@ -1709,8 +1707,6 @@ const Expenses = () => {
               </div>
             )}
           </div>
-        </div>
-      </main>
 
       {/* Add Expense Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
@@ -2042,7 +2038,7 @@ const Expenses = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageLayout>
   );
 };
 
