@@ -251,13 +251,15 @@ const Invoices = () => {
     return (
       <PageLayout title="Invoices" icon={FileText} maxWidth="6xl">
         <div className="text-center py-12">
-          <Card className="max-w-2xl mx-auto text-center p-8">
-            <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+          <Card className="glass-frosted max-w-2xl mx-auto text-center p-8 hover-lift">
+            <div className="h-20 w-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6 glow-sm">
+              <FileText className="h-10 w-10 text-primary" />
+            </div>
             <h2 className="text-2xl font-bold mb-2">Invoicing System</h2>
             <p className="text-muted-foreground mb-6">
               Create professional invoices with automatic VAT calculation. Available on Basic plan and above.
             </p>
-            <Button onClick={() => navigate('/pricing')}>Upgrade to Access</Button>
+            <Button variant="glow" onClick={() => navigate('/pricing')}>Upgrade to Access</Button>
           </Card>
         </div>
       </PageLayout>
@@ -275,12 +277,12 @@ const Invoices = () => {
     >
       <Dialog open={isCreating} onOpenChange={setIsCreating}>
         <DialogTrigger asChild>
-          <Button className="mb-6">
+          <Button variant="glow" className="mb-6">
             <Plus className="h-4 w-4 mr-2" />
             New Invoice
           </Button>
         </DialogTrigger>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="glass-frosted max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create New Invoice</DialogTitle>
           </DialogHeader>
@@ -310,6 +312,7 @@ const Invoices = () => {
                       value={clientName} 
                       onChange={(e) => setClientName(e.target.value)}
                       placeholder="Client name"
+                      className="input-premium"
                     />
                   </div>
                   <div>
@@ -319,6 +322,7 @@ const Invoices = () => {
                       value={clientEmail} 
                       onChange={(e) => setClientEmail(e.target.value)}
                       placeholder="client@email.com"
+                      className="input-premium"
                     />
                   </div>
                 </div>
@@ -424,7 +428,7 @@ const Invoices = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card>
+          <Card className="glass-frosted hover-lift stagger-1">
             <CardContent className="p-4">
               <div className="text-sm text-muted-foreground">Total Invoiced</div>
               <div className="text-2xl font-bold">
@@ -432,26 +436,26 @@ const Invoices = () => {
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="glass-frosted hover-lift stagger-2">
             <CardContent className="p-4">
               <div className="text-sm text-muted-foreground">Paid</div>
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-2xl font-bold text-success">
                 {formatCurrency(invoices.filter(i => i.status === 'paid').reduce((sum, inv) => sum + Number(inv.total), 0))}
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="glass-frosted hover-lift stagger-3">
             <CardContent className="p-4">
               <div className="text-sm text-muted-foreground">Pending</div>
-              <div className="text-2xl font-bold text-yellow-600">
+              <div className="text-2xl font-bold text-warning">
                 {formatCurrency(invoices.filter(i => i.status === 'sent').reduce((sum, inv) => sum + Number(inv.total), 0))}
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="glass-frosted hover-lift stagger-4">
             <CardContent className="p-4">
               <div className="text-sm text-muted-foreground">Overdue</div>
-              <div className="text-2xl font-bold text-red-600">
+              <div className="text-2xl font-bold text-destructive">
                 {formatCurrency(invoices.filter(i => i.status === 'overdue').reduce((sum, inv) => sum + Number(inv.total), 0))}
               </div>
             </CardContent>
@@ -459,21 +463,24 @@ const Invoices = () => {
         </div>
 
         {/* Invoice List */}
-        <Card>
+        <Card className="glass-frosted">
           <CardHeader>
             <CardTitle>All Invoices</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
-              <div className="text-center py-8">Loading...</div>
+              <div className="text-center py-8">
+                <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto glow-primary" />
+                <p className="text-muted-foreground mt-4">Loading invoices...</p>
+              </div>
             ) : invoices.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 No invoices yet. Create your first invoice to get started.
               </div>
             ) : (
               <div className="space-y-3">
-                {invoices.map((invoice) => (
-                  <div key={invoice.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                {invoices.map((invoice, index) => (
+                  <div key={invoice.id} className={`flex items-center justify-between p-4 rounded-lg glass hover-lift transition-all stagger-${Math.min(index + 1, 6)}`}>
                     <div className="flex items-center gap-4">
                       <div>
                         <div className="font-medium">{invoice.invoice_number}</div>

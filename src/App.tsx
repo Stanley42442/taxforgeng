@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -16,6 +16,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { InstallPWAPrompt } from "@/components/InstallPWAPrompt";
 import { lazy, Suspense } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 // Eagerly load Index for fast initial render
 import Index from "./pages/Index";
@@ -66,12 +67,94 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 // Lazy load TaxAssistant (heavy component with AI chat)
 const TaxAssistant = lazy(() => import("./components/TaxAssistant").then(m => ({ default: m.TaxAssistant })));
 
-// Minimal loading fallback
+// Minimal loading fallback with premium styling
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center">
-    <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="glass-frosted rounded-2xl p-8"
+    >
+      <div className="h-10 w-10 rounded-full border-2 border-primary border-t-transparent animate-spin glow-primary" />
+    </motion.div>
   </div>
 );
+
+// Page transition variants
+const pageVariants = {
+  initial: { opacity: 0, y: 20 },
+  in: { opacity: 1, y: 0 },
+  out: { opacity: 0, y: -10 },
+};
+
+const pageTransition = {
+  type: "tween" as const,
+  ease: [0.25, 0.46, 0.45, 0.94] as const,
+  duration: 0.35,
+};
+
+// Animated Routes wrapper
+const AnimatedRoutes = () => {
+  const location = useLocation();
+  
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        initial="initial"
+        animate="in"
+        exit="out"
+        variants={pageVariants}
+        transition={pageTransition}
+      >
+        <Routes location={location}>
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/advisory" element={<Advisory />} />
+          <Route path="/calculator" element={<Calculator />} />
+          <Route path="/results" element={<Results />} />
+          <Route path="/tax-breakdown" element={<TaxBreakdown />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/tax-filing" element={<TaxFiling />} />
+          <Route path="/businesses" element={<SavedBusinesses />} />
+          <Route path="/reminders" element={<Reminders />} />
+          <Route path="/insights" element={<Insights />} />
+          <Route path="/team" element={<Team />} />
+          <Route path="/transactions" element={<Transactions />} />
+          <Route path="/audit-log" element={<AuditLog />} />
+          <Route path="/learn" element={<Learn />} />
+          <Route path="/expenses" element={<Expenses />} />
+          <Route path="/scenarios" element={<ScenarioModeling />} />
+          <Route path="/e-filing" element={<EFiling />} />
+          <Route path="/api-docs" element={<ApiDocs />} />
+          <Route path="/achievements" element={<Achievements />} />
+          <Route path="/business-report" element={<BusinessReport />} />
+          <Route path="/roadmap" element={<Roadmap />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/admin-analytics" element={<AdminAnalytics />} />
+          <Route path="/ai-analytics" element={<AIQueryAnalytics />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/sector/:id" element={<SectorGuide />} />
+          <Route path="/partner-branding" element={<PartnerBranding />} />
+          <Route path="/embed/calculator" element={<EmbedCalculator />} />
+          <Route path="/individual-calculator" element={<IndividualCalculator />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/security" element={<SecurityDashboard />} />
+          <Route path="/referrals" element={<Referrals />} />
+          <Route path="/tax-calendar" element={<TaxCalendar />} />
+          <Route path="/success-stories" element={<SuccessStoriesPage />} />
+          <Route path="/accountant-portal" element={<AccountantPortal />} />
+          <Route path="/invoices" element={<Invoices />} />
+          <Route path="/payroll" element={<Payroll />} />
+          <Route path="/profit-loss" element={<ProfitLoss />} />
+          <Route path="/compliance" element={<Compliance />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
 
 const queryClient = new QueryClient();
 
@@ -92,50 +175,7 @@ const App = () => (
                 <TrialBanner />
                 <TierSelectionWrapper />
                 <Suspense fallback={<PageLoader />}>
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/advisory" element={<Advisory />} />
-                    <Route path="/calculator" element={<Calculator />} />
-                    <Route path="/results" element={<Results />} />
-                    <Route path="/tax-breakdown" element={<TaxBreakdown />} />
-                    <Route path="/pricing" element={<Pricing />} />
-                    <Route path="/tax-filing" element={<TaxFiling />} />
-                    <Route path="/businesses" element={<SavedBusinesses />} />
-                    <Route path="/reminders" element={<Reminders />} />
-                    <Route path="/insights" element={<Insights />} />
-                    <Route path="/team" element={<Team />} />
-                    <Route path="/transactions" element={<Transactions />} />
-                    <Route path="/audit-log" element={<AuditLog />} />
-                    <Route path="/learn" element={<Learn />} />
-                    <Route path="/expenses" element={<Expenses />} />
-                    <Route path="/scenarios" element={<ScenarioModeling />} />
-                    <Route path="/e-filing" element={<EFiling />} />
-                    <Route path="/api-docs" element={<ApiDocs />} />
-                    <Route path="/achievements" element={<Achievements />} />
-                    <Route path="/business-report" element={<BusinessReport />} />
-                    <Route path="/roadmap" element={<Roadmap />} />
-                    <Route path="/terms" element={<Terms />} />
-                    <Route path="/admin-analytics" element={<AdminAnalytics />} />
-                    <Route path="/ai-analytics" element={<AIQueryAnalytics />} />
-                    <Route path="/notifications" element={<Notifications />} />
-                    <Route path="/sector/:id" element={<SectorGuide />} />
-                    <Route path="/partner-branding" element={<PartnerBranding />} />
-                    <Route path="/embed/calculator" element={<EmbedCalculator />} />
-                    <Route path="/individual-calculator" element={<IndividualCalculator />} />
-                    <Route path="/settings" element={<Settings />} />
-                    <Route path="/security" element={<SecurityDashboard />} />
-                    <Route path="/referrals" element={<Referrals />} />
-                    <Route path="/tax-calendar" element={<TaxCalendar />} />
-                    <Route path="/success-stories" element={<SuccessStoriesPage />} />
-                    <Route path="/accountant-portal" element={<AccountantPortal />} />
-                    <Route path="/invoices" element={<Invoices />} />
-                    <Route path="/payroll" element={<Payroll />} />
-                    <Route path="/profit-loss" element={<ProfitLoss />} />
-                    <Route path="/compliance" element={<Compliance />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
+                  <AnimatedRoutes />
                   <TaxAssistant />
                   <OfflineIndicator />
                   <InstallPWAPrompt />

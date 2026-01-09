@@ -641,7 +641,9 @@ const Auth = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="glass-frosted rounded-2xl p-8">
+          <div className="h-10 w-10 rounded-full border-2 border-primary border-t-transparent animate-spin glow-primary" />
+        </div>
       </div>
     );
   }
@@ -684,7 +686,7 @@ const Auth = () => {
           {/* Logo */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-flex items-center gap-2 mb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary shadow-lg glow-primary">
                 <Calculator className="h-6 w-6 text-primary-foreground" />
               </div>
               <span className="text-2xl font-bold text-foreground">TaxForge NG</span>
@@ -694,12 +696,12 @@ const Auth = () => {
           </div>
 
           {/* Form Card */}
-          <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
+          <div className="glass-frosted rounded-2xl p-8 shadow-futuristic">
             {/* MFA Challenge View */}
             {view === 'mfa-challenge' && (
               <form onSubmit={handleMfaChallenge} className="space-y-4">
                 <div className="flex items-center justify-center mb-4">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 glow-sm">
                     {useBackupCode ? (
                       <KeyRound className="h-8 w-8 text-primary" />
                     ) : (
@@ -719,7 +721,7 @@ const Auth = () => {
                         placeholder="XXXX-XXXX"
                         value={backupCode}
                         onChange={(e) => setBackupCode(e.target.value.toUpperCase())}
-                        className="pl-10 font-mono tracking-wider"
+                        className="pl-10 font-mono tracking-wider input-premium"
                         autoComplete="off"
                       />
                     </div>
@@ -738,7 +740,7 @@ const Auth = () => {
                         placeholder="000000"
                         value={totpCode}
                         onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                        className="pl-10 font-mono tracking-wider text-center text-lg"
+                        className="pl-10 font-mono tracking-wider text-center text-lg input-premium"
                         maxLength={6}
                         autoComplete="one-time-code"
                       />
@@ -749,7 +751,7 @@ const Auth = () => {
                   </div>
                 )}
 
-                <Button type="submit" variant="hero" className="w-full" disabled={isSubmitting}>
+                <Button type="submit" variant="glow" className="w-full" disabled={isSubmitting}>
                   {isSubmitting ? 'Verifying...' : 'Verify'}
                 </Button>
 
@@ -801,7 +803,7 @@ const Auth = () => {
                         setNewPassword(e.target.value);
                         setErrors({});
                       }}
-                      className={`pl-10 pr-10 ${errors.password ? 'border-destructive' : ''}`}
+                      className={`pl-10 pr-10 input-premium ${errors.password ? 'border-destructive' : ''}`}
                     />
                     <button
                       type="button"
@@ -812,10 +814,10 @@ const Auth = () => {
                     </button>
                   </div>
                   {errors.password && (
-                    <p className="text-sm text-destructive">{errors.password}</p>
+                    <p className="text-sm text-destructive animate-shake">{errors.password}</p>
                   )}
                 </div>
-                <Button type="submit" variant="hero" className="w-full" disabled={isSubmitting}>
+                <Button type="submit" variant="glow" className="w-full" disabled={isSubmitting}>
                   {isSubmitting ? 'Updating...' : 'Update Password'}
                 </Button>
               </form>
@@ -828,23 +830,23 @@ const Auth = () => {
                   <Label htmlFor="email">Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        setErrors((prev) => ({ ...prev, email: undefined }));
-                      }}
-                      className={`pl-10 ${errors.email ? 'border-destructive' : ''}`}
-                    />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          setErrors((prev) => ({ ...prev, email: undefined }));
+                        }}
+                        className={`pl-10 input-premium ${errors.email ? 'border-destructive' : ''}`}
+                      />
                   </div>
                   {errors.email && (
-                    <p className="text-sm text-destructive">{errors.email}</p>
+                    <p className="text-sm text-destructive animate-shake">{errors.email}</p>
                   )}
                 </div>
-                <Button type="submit" variant="hero" className="w-full" disabled={isSubmitting}>
+                <Button type="submit" variant="glow" className="w-full" disabled={isSubmitting}>
                   {isSubmitting ? 'Sending...' : 'Send Reset Link'}
                 </Button>
                 <div className="text-center">
@@ -866,7 +868,7 @@ const Auth = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full mb-4 gap-2"
+                  className="w-full mb-4 gap-2 glass hover-lift"
                   onClick={handleGoogleSignIn}
                   disabled={isSubmitting}
                 >
@@ -957,7 +959,7 @@ const Auth = () => {
                           placeholder="John Doe"
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
-                          className="pl-10"
+                          className="pl-10 input-premium"
                         />
                       </div>
                     </div>
@@ -987,11 +989,11 @@ const Auth = () => {
                             checkAccountLockout(email);
                           }
                         }}
-                        className={`pl-10 ${errors.email ? 'border-destructive' : ''}`}
+                        className={`pl-10 input-premium ${errors.email ? 'border-destructive' : ''}`}
                       />
                     </div>
                     {errors.email && (
-                      <p className="text-sm text-destructive">{errors.email}</p>
+                      <p className="text-sm text-destructive animate-shake">{errors.email}</p>
                     )}
                   </div>
 
@@ -1020,7 +1022,7 @@ const Auth = () => {
                           setPassword(e.target.value);
                           setErrors((prev) => ({ ...prev, password: undefined }));
                         }}
-                        className={`pl-10 pr-10 ${errors.password ? 'border-destructive' : ''}`}
+                        className={`pl-10 pr-10 input-premium ${errors.password ? 'border-destructive' : ''}`}
                       />
                       <button
                         type="button"
@@ -1031,7 +1033,7 @@ const Auth = () => {
                       </button>
                     </div>
                     {errors.password && (
-                      <p className="text-sm text-destructive">{errors.password}</p>
+                      <p className="text-sm text-destructive animate-shake">{errors.password}</p>
                     )}
                   </div>
 
@@ -1055,7 +1057,7 @@ const Auth = () => {
                   {/* Submit Button */}
                   <Button
                     type="submit"
-                    variant="hero"
+                    variant="glow"
                     className="w-full"
                     disabled={isSubmitting || (view === 'login' && isAccountLocked)}
                   >

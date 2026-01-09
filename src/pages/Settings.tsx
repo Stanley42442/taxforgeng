@@ -300,20 +300,20 @@ const Settings = () => {
   return (
     <PageLayout title="Settings" description="Manage your account and preferences" icon={SettingsIcon} maxWidth="4xl">
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-6">
-          <TabsTrigger value="profile">
+        <TabsList className="grid w-full grid-cols-4 mb-6 glass-frosted">
+          <TabsTrigger value="profile" className="data-[state=active]:glow-sm">
             <User className="h-4 w-4 mr-2" />
             <span className="hidden sm:inline">Profile</span>
           </TabsTrigger>
-          <TabsTrigger value="security">
+          <TabsTrigger value="security" className="data-[state=active]:glow-sm">
             <Shield className="h-4 w-4 mr-2" />
             <span className="hidden sm:inline">Security</span>
           </TabsTrigger>
-          <TabsTrigger value="notifications">
+          <TabsTrigger value="notifications" className="data-[state=active]:glow-sm">
             <MessageCircle className="h-4 w-4 mr-2" />
             <span className="hidden sm:inline">Alerts</span>
           </TabsTrigger>
-          <TabsTrigger value="activity">
+          <TabsTrigger value="activity" className="data-[state=active]:glow-sm">
             <History className="h-4 w-4 mr-2" />
             <span className="hidden sm:inline">Activity</span>
           </TabsTrigger>
@@ -321,10 +321,12 @@ const Settings = () => {
 
         {/* Profile Tab */}
         <TabsContent value="profile" className="space-y-6">
-          <Card>
+          <Card className="glass-frosted hover-lift">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
+                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center glow-sm">
+                  <User className="h-4 w-4 text-primary" />
+                </div>
                 Profile Information
               </CardTitle>
               <CardDescription>Update your personal details</CardDescription>
@@ -337,8 +339,9 @@ const Settings = () => {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Enter your full name"
+                    className="input-premium"
                   />
-                  {errors.name && <p className="text-sm text-destructive mt-1">{errors.name}</p>}
+                  {errors.name && <p className="text-sm text-destructive mt-1 animate-shake">{errors.name}</p>}
                 </div>
                 <div>
                   <Label>Email Address</Label>
@@ -362,10 +365,12 @@ const Settings = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-frosted hover-lift">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Mail className="h-5 w-5" />
+                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center glow-sm">
+                  <Mail className="h-4 w-4 text-primary" />
+                </div>
                 Change Email
               </CardTitle>
               <CardDescription>Update your email address</CardDescription>
@@ -379,8 +384,9 @@ const Settings = () => {
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
                     placeholder="Enter new email"
+                    className="input-premium"
                   />
-                  {errors.email && <p className="text-sm text-destructive mt-1">{errors.email}</p>}
+                  {errors.email && <p className="text-sm text-destructive mt-1 animate-shake">{errors.email}</p>}
                 </div>
                 <Button type="submit" disabled={savingEmail || !newEmail}>
                   {savingEmail && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
@@ -393,10 +399,12 @@ const Settings = () => {
 
         {/* Security Tab */}
         <TabsContent value="security" className="space-y-6">
-          <Card>
+          <Card className="glass-frosted hover-lift">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Lock className="h-5 w-5" />
+                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center glow-sm">
+                  <Lock className="h-4 w-4 text-primary" />
+                </div>
                 Change Password
               </CardTitle>
               <CardDescription>Update your password for better security</CardDescription>
@@ -411,6 +419,7 @@ const Settings = () => {
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="Enter new password"
+                      className="input-premium"
                     />
                     <Button
                       type="button"
@@ -442,10 +451,12 @@ const Settings = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-frosted hover-lift">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Smartphone className="h-5 w-5" />
+                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center glow-sm">
+                  <Smartphone className="h-4 w-4 text-primary" />
+                </div>
                 Two-Factor Authentication
               </CardTitle>
               <CardDescription>Add an extra layer of security</CardDescription>
@@ -485,10 +496,12 @@ const Settings = () => {
 
         {/* Activity Tab */}
         <TabsContent value="activity" className="space-y-6">
-          <Card>
+          <Card className="glass-frosted hover-lift">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <History className="h-5 w-5" />
+                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center glow-sm">
+                  <History className="h-4 w-4 text-primary" />
+                </div>
                 Recent Activity
               </CardTitle>
               <CardDescription>Your recent account activity</CardDescription>
