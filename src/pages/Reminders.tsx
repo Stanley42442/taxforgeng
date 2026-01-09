@@ -19,6 +19,8 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { requestNotificationPermission } from "@/hooks/useReminderNotifications";
 import { Textarea } from "@/components/ui/textarea";
+import { useFormFeedback } from "@/hooks/useFormFeedback";
+import { SuccessCelebration } from "@/components/ui/form-feedback";
 
 interface Reminder {
   id: string;
@@ -225,8 +227,22 @@ const Reminders = () => {
     return reminders.some(r => r.businessId === businessId && r.type === type && r.enabled);
   };
 
+  // Form feedback for custom reminders
+  const reminderFormFeedback = useFormFeedback({
+    successDuration: 3000,
+    onSuccess: () => {
+      setCustomReminderOpen(false);
+      setCustomName('');
+      setCustomDate(undefined);
+      setCustomTime('09:00');
+      setCustomNote('');
+    }
+  });
+
   const addCustomReminder = async () => {
     if (!user || !selectedBusiness || !customName || !customDate) return;
+    
+    reminderFormFeedback.setLoading();
     
     const [hours, minutes] = customTime.split(':').map(Number);
     const year = customDate.getFullYear();
@@ -250,7 +266,7 @@ const Reminders = () => {
 
     if (error) {
       console.error('Error creating custom reminder:', error);
-      toast.error('Failed to create reminder');
+      reminderFormFeedback.setError('Failed to create reminder');
       return;
     }
 
@@ -265,12 +281,10 @@ const Reminders = () => {
     };
 
     setReminders(prev => [...prev, newReminder]);
-    setCustomReminderOpen(false);
-    setCustomName('');
-    setCustomDate(undefined);
-    setCustomTime('09:00');
-    setCustomNote('');
-    toast.success('Custom reminder added');
+    reminderFormFeedback.setSuccess(
+      'Reminder Created! 🔔',
+      `"${customName}" scheduled for ${format(dueDate, 'PPP')}`
+    );
   };
 
   const deleteReminder = async (id: string) => {
@@ -388,6 +402,14 @@ const Reminders = () => {
 
   return (
     <PageLayout title="Tax Reminders" description="Stay on top of your tax filing deadlines" icon={Bell} maxWidth="4xl">
+      {/* Success Celebration with Confetti */}
+      <SuccessCelebration 
+        isVisible={reminderFormFeedback.isSuccess} 
+        message={reminderFormFeedback.message}
+        description={reminderFormFeedback.description}
+        onComplete={reminderFormFeedback.reset}
+      />
+      
       {/* Notification Permission Card */}
       {notificationPermission !== 'granted' && notificationPermission !== 'unsupported' && (
         <Card className="mb-6 glass-frosted border-primary/20 glow-sm">

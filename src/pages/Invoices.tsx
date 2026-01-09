@@ -15,6 +15,8 @@ import { toast } from "sonner";
 import { PageLayout } from "@/components/PageLayout";
 import { Plus, FileText, Send, Check, Clock, X, Trash2, Eye } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
+import { useFormFeedback } from "@/hooks/useFormFeedback";
+import { SuccessCelebration } from "@/components/ui/form-feedback";
 
 interface InvoiceItem {
   id?: string;
@@ -141,11 +143,22 @@ const Invoices = () => {
     }
   };
 
+  // Form feedback hook for success celebrations
+  const invoiceFormFeedback = useFormFeedback({
+    successDuration: 3000,
+    onSuccess: () => {
+      setIsCreating(false);
+      resetForm();
+    }
+  });
+
   const handleCreateInvoice = async () => {
     if (!user || !clientName || !dueDate) {
       toast.error('Please fill in required fields');
       return;
     }
+
+    invoiceFormFeedback.setLoading();
 
     const { subtotal, vatAmount, total } = calculateTotals();
     const invoiceNumber = generateInvoiceNumber();
@@ -190,13 +203,15 @@ const Invoices = () => {
         if (itemsError) throw itemsError;
       }
 
-      toast.success(`Invoice ${invoiceNumber} created!`);
-      setIsCreating(false);
-      resetForm();
+      // Show success celebration with confetti
+      invoiceFormFeedback.setSuccess(
+        "Invoice Created! 📄",
+        `${invoiceNumber} for ${formatCurrency(total)}`
+      );
       fetchInvoices();
     } catch (error) {
       console.error('Error creating invoice:', error);
-      toast.error('Failed to create invoice');
+      invoiceFormFeedback.setError('Failed to create invoice');
     }
   };
 
@@ -275,6 +290,14 @@ const Invoices = () => {
       icon={FileText} 
       maxWidth="6xl"
     >
+      {/* Success Celebration with Confetti */}
+      <SuccessCelebration 
+        isVisible={invoiceFormFeedback.isSuccess} 
+        message={invoiceFormFeedback.message}
+        description={invoiceFormFeedback.description}
+        onComplete={invoiceFormFeedback.reset}
+      />
+
       <Dialog open={isCreating} onOpenChange={setIsCreating}>
         <DialogTrigger asChild>
           <Button variant="glow" className="mb-6">

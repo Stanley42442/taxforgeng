@@ -70,6 +70,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useFormFeedback } from "@/hooks/useFormFeedback";
+import { SuccessCelebration } from "@/components/ui/form-feedback";
 
 interface Expense {
   id: string;
@@ -418,6 +420,21 @@ const Expenses = () => {
 
   const EXPENSE_CATEGORIES = getExpenseCategories();
 
+  // Form feedback hook for success celebrations
+  const expenseFormFeedback = useFormFeedback({
+    successDuration: 3000,
+    onSuccess: () => {
+      setShowAddDialog(false);
+      setNewExpense({
+        date: new Date().toISOString().split('T')[0],
+        description: '',
+        amount: '',
+        category: 'other',
+        businessId: '',
+      });
+    }
+  });
+
   const handleAddExpense = async () => {
     if (!user) {
       toast.error("Please sign in to add expenses");
@@ -428,6 +445,8 @@ const Expenses = () => {
       toast.error("Please fill all required fields");
       return;
     }
+
+    expenseFormFeedback.setLoading();
 
     const categoryInfo = EXPENSE_CATEGORIES.find(c => c.value === newExpense.category);
     const expenseType = categoryInfo?.type || 'expense';
@@ -450,7 +469,7 @@ const Expenses = () => {
 
     if (error) {
       console.error('Error adding expense:', error);
-      toast.error("Failed to add expense");
+      expenseFormFeedback.setError("Failed to add expense");
       return;
     }
 
@@ -466,15 +485,13 @@ const Expenses = () => {
     };
 
     setExpenses(prev => [expense, ...prev]);
-    setShowAddDialog(false);
-    setNewExpense({
-      date: new Date().toISOString().split('T')[0],
-      description: '',
-      amount: '',
-      category: 'other',
-      businessId: '',
-    });
-    toast.success("Expense added successfully");
+    
+    // Show success celebration with confetti
+    expenseFormFeedback.setSuccess(
+      expenseType === 'income' ? "Income Recorded! 💰" : "Expense Added! ✅",
+      `${formatCurrency(expense.amount)} ${expenseType === 'income' ? 'added to income' : 'tracked'}`
+    );
+    
     notifyExpenseAdded(expense.description, expense.amount, expense.type === 'income');
   };
 
@@ -973,6 +990,14 @@ const Expenses = () => {
 
   return (
     <PageLayout title="Expense Tracker" description="Track and manage your business income and expenses" icon={Receipt} maxWidth="6xl">
+      {/* Success Celebration with Confetti */}
+      <SuccessCelebration 
+        isVisible={expenseFormFeedback.isSuccess} 
+        message={expenseFormFeedback.message}
+        description={expenseFormFeedback.description}
+        onComplete={expenseFormFeedback.reset}
+      />
+      
       {/* Summary Cards */}
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-6">
             <div className="neumorphic-sm p-4 rounded-xl overflow-hidden">
