@@ -335,10 +335,49 @@ const Reminders = () => {
   if (loading) {
     return (
       <PageLayout title="Tax Reminders" description="Stay on top of your tax filing deadlines" icon={Bell} maxWidth="4xl">
-        <div className="flex items-center justify-center py-20">
-          <div className="glass-frosted rounded-2xl p-8 shadow-futuristic">
-            <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-            <p className="text-sm text-muted-foreground mt-3">Loading reminders...</p>
+        <div className="space-y-6 animate-fade-in">
+          {/* Notification card skeleton */}
+          <div className="glass-frosted rounded-xl p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="skeleton-shimmer h-10 w-10 rounded-full" />
+                <div className="space-y-2">
+                  <div className="skeleton-shimmer h-4 w-40 rounded" />
+                  <div className="skeleton-shimmer h-3 w-56 rounded" />
+                </div>
+              </div>
+              <div className="skeleton-shimmer h-9 w-36 rounded-lg" />
+            </div>
+          </div>
+          
+          {/* Reminder cards skeleton */}
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="glass-frosted rounded-xl p-6" style={{ animationDelay: `${i * 100}ms` }}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="skeleton-shimmer h-10 w-10 rounded-lg" />
+                  <div className="space-y-2">
+                    <div className="skeleton-shimmer h-5 w-32 rounded" />
+                    <div className="skeleton-shimmer h-3 w-24 rounded" />
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  {Array.from({ length: 4 }).map((_, j) => (
+                    <div key={j} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                      <div className="flex items-center gap-3">
+                        <div className="skeleton-shimmer h-8 w-8 rounded-lg" />
+                        <div className="space-y-1">
+                          <div className="skeleton-shimmer h-4 w-28 rounded" />
+                          <div className="skeleton-shimmer h-3 w-20 rounded" />
+                        </div>
+                      </div>
+                      <div className="skeleton-shimmer h-6 w-10 rounded-full" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </PageLayout>

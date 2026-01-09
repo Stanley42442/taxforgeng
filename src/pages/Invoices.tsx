@@ -469,9 +469,29 @@ const Invoices = () => {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <div className="text-center py-8">
-                <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto glow-primary" />
-                <p className="text-muted-foreground mt-4">Loading invoices...</p>
+              <div className="space-y-3 animate-fade-in">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div 
+                    key={i} 
+                    className="flex items-center justify-between p-4 rounded-lg glass"
+                    style={{ animationDelay: `${i * 50}ms` }}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="space-y-2">
+                        <div className="skeleton-shimmer h-4 w-24 rounded" />
+                        <div className="skeleton-shimmer h-3 w-32 rounded" />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right space-y-2">
+                        <div className="skeleton-shimmer h-4 w-20 rounded" />
+                        <div className="skeleton-shimmer h-3 w-16 rounded" />
+                      </div>
+                      <div className="skeleton-shimmer h-6 w-16 rounded-full" />
+                      <div className="skeleton-shimmer h-8 w-8 rounded-lg" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : invoices.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
