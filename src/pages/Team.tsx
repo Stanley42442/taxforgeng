@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Users, UserPlus, Crown, Shield, Eye, Mail, Trash2, CheckCircle2, Clock, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { useDeleteWithUndo } from "@/hooks/useDeleteWithUndo";
+import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
 
 interface TeamMember {
   id: string;
@@ -34,9 +36,21 @@ const Team = () => {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<'editor' | 'viewer'>('viewer');
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [memberToDelete, setMemberToDelete] = useState<{ id: string; email: string } | null>(null);
-  const [pendingDeleteTimeout, setPendingDeleteTimeout] = useState<NodeJS.Timeout | null>(null);
+  const deletedMemberRef = useRef<TeamMember | null>(null);
+
+  // Use centralized delete with undo hook
+  const deleteWithUndo = useDeleteWithUndo<TeamMember>({
+    onDelete: (member) => {
+      // Persist to localStorage after undo timeout
+      const currentMembers = members.filter(m => m.id !== member.id);
+      localStorage.setItem('taxforge_ng_team', JSON.stringify(currentMembers));
+    },
+    onRestore: (member) => {
+      setMembers(prev => [...prev, member]);
+    },
+    getSuccessMessage: (member) => `Team member "${member.email}" removed`,
+    getItemName: (member) => member.email,
+  });
 
   const saveMembers = (newMembers: TeamMember[]) => {
     setMembers(newMembers);
@@ -73,54 +87,25 @@ const Team = () => {
     });
   };
 
-  const handleDeleteClick = (id: string, email: string) => {
-    setMemberToDelete({ id, email });
-    setShowDeleteDialog(true);
+  const removeMember = (member: TeamMember) => {
+    // Remove optimistically from UI first
+    setMembers(prev => prev.filter(m => m.id !== member.id));
+    deleteWithUndo.requestDelete(member);
   };
 
-  const confirmDelete = () => {
-    if (!memberToDelete) return;
-    
-    const { id, email } = memberToDelete;
-    const deletedMember = members.find(m => m.id === id);
-    
-    // Optimistically remove from UI
-    const newMembers = members.filter(m => m.id !== id);
-    setMembers(newMembers);
-    setShowDeleteDialog(false);
-    setMemberToDelete(null);
-    
-    // Show undo toast
-    const timeoutId = setTimeout(() => {
-      // Persist to localStorage after timeout
-      localStorage.setItem('taxforge_ng_team', JSON.stringify(newMembers));
-      setPendingDeleteTimeout(null);
-    }, 5000);
-    
-    setPendingDeleteTimeout(timeoutId);
-    
-    toast.success(`Team member "${email}" removed`, {
-      action: {
-        label: 'Undo',
-        onClick: () => {
-          clearTimeout(timeoutId);
-          setPendingDeleteTimeout(null);
-          if (deletedMember) {
-            const restoredMembers = [...newMembers, deletedMember];
-            setMembers(restoredMembers);
-          }
-          toast.success('Team member restored');
-        },
-      },
-      duration: 5000,
-    });
-  };
-
-  const removeMember = (id: string) => {
-    const member = members.find(m => m.id === id);
-    if (member) {
-      handleDeleteClick(id, member.email);
+  // Override confirm to handle optimistic update
+  const handleConfirmDelete = () => {
+    if (deleteWithUndo.itemToDelete) {
+      deleteWithUndo.confirmDelete();
     }
+  };
+
+  const handleCancelDelete = () => {
+    // Restore item if cancel
+    if (deleteWithUndo.itemToDelete) {
+      setMembers(prev => [...prev, deleteWithUndo.itemToDelete!]);
+    }
+    deleteWithUndo.cancelDelete();
   };
 
   const updateRole = (id: string, role: TeamMember['role']) => {
@@ -283,7 +268,7 @@ const Team = () => {
                         </SelectContent>
                       </Select>
                     )}
-                    <Button variant="ghost" size="icon" onClick={() => removeMember(member.id)} className="text-destructive hover:text-destructive">
+                    <Button variant="ghost" size="icon" onClick={() => removeMember(member)} className="text-destructive hover:text-destructive">
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
@@ -348,25 +333,13 @@ const Team = () => {
       </Card>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Remove Team Member</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to remove "{memberToDelete?.email}" from your team? You can undo this action for 5 seconds.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={confirmDelete}>
-              <Trash2 className="w-4 h-4 mr-2" />
-              Remove
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteConfirmationDialog
+        open={deleteWithUndo.showDialog}
+        onOpenChange={(open) => !open && handleCancelDelete()}
+        onConfirm={handleConfirmDelete}
+        title="Remove Team Member"
+        itemName={deleteWithUndo.itemToDelete?.email}
+      />
     </PageLayout>
   );
 };
