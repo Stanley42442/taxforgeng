@@ -307,12 +307,12 @@ const CalculatorPage = () => {
           </Popover>
         )}
       </div>
-      <div className="neumorphic-sm p-1">
+      <div className="neumorphic-sm p-1 overflow-hidden">
         <Input
           value={value ? `₦${Number(value).toLocaleString()}` : ''}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="border-0 bg-transparent h-12 text-lg font-medium"
+          className="border-0 bg-transparent h-12 text-lg font-medium truncate"
         />
       </div>
     </div>
