@@ -174,11 +174,12 @@ const Dashboard = () => {
         setExpenseSummary({ totalIncome: income, totalExpenses: expense, deductibleExpenses: deductible });
       }
 
+      // Fetch incomplete reminders (not completed) for dashboard
       const { data: reminders } = await supabase
         .from('reminders')
-        .select('id, title, due_date, business_id')
+        .select('id, title, due_date, business_id, is_completed')
         .eq('user_id', user.id)
-        .eq('notify_email', true)
+        .eq('is_completed', false)
         .order('due_date', { ascending: true })
         .limit(5);
 
@@ -664,7 +665,7 @@ const Dashboard = () => {
                 Upcoming Reminders
               </CardTitle>
               <CardDescription>
-                {upcomingReminders.length === 0 ? 'No upcoming reminders' : `${upcomingReminders.length} reminder${upcomingReminders.length > 1 ? 's' : ''}`}
+                {urgentCount === 0 ? 'No upcoming reminders' : `${urgentCount} reminder${urgentCount > 1 ? 's' : ''}`}
               </CardDescription>
             </div>
             <Link to="/reminders">

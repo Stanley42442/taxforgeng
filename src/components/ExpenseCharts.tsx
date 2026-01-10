@@ -111,8 +111,8 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
       <Card className="glass-frosted shadow-futuristic border-border/40">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-base">
-            <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Receipt className="h-4 w-4 text-primary" />
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Receipt className="h-5 w-5 text-primary" />
             </div>
             Expense Breakdown
           </CardTitle>
@@ -151,8 +151,8 @@ export const ExpenseCharts = ({ expenses }: ExpenseChartsProps) => {
       <Card className="glass-frosted shadow-futuristic border-border/40">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-base">
-            <div className="h-8 w-8 rounded-lg bg-accent/10 flex items-center justify-center">
-              <BarChart3 className="h-4 w-4 text-accent" />
+            <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center">
+              <BarChart3 className="h-5 w-5 text-accent" />
             </div>
             Monthly Overview
           </CardTitle>
