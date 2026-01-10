@@ -16,6 +16,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { InstallPWAPrompt } from "@/components/InstallPWAPrompt";
 import { SharedElementProvider } from "@/components/PageTransition";
+import { NavMenu } from "@/components/NavMenu";
 import { lazy, Suspense } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -174,14 +175,19 @@ const App = () => (
                   <BrowserRouter>
                     <ScrollToTop />
                     <ReminderNotificationProvider />
-                    <TrialBanner />
-                    <TierSelectionWrapper />
-                    <Suspense fallback={<PageLoader />}>
-                      <AnimatedRoutes />
-                      <TaxAssistant />
-                      <OfflineIndicator />
-                      <InstallPWAPrompt />
-                    </Suspense>
+                    <div className="flex flex-col min-h-screen">
+                      <NavMenu />
+                      <TrialBanner />
+                      <TierSelectionWrapper />
+                      <div className="flex-1">
+                        <Suspense fallback={<PageLoader />}>
+                          <AnimatedRoutes />
+                          <TaxAssistant />
+                          <OfflineIndicator />
+                          <InstallPWAPrompt />
+                        </Suspense>
+                      </div>
+                    </div>
                   </BrowserRouter>
                 </>
               </TooltipProvider>

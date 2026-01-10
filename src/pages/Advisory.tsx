@@ -19,7 +19,6 @@ import {
   Wallet,
   ArrowLeft,
   ArrowRight,
-  Lightbulb
 } from "lucide-react";
 import { advisoryQuestions, getRecommendation, type AdvisoryAnswers } from "@/lib/advisoryLogic";
 import { Link } from "react-router-dom";
@@ -101,12 +100,10 @@ const Advisory = () => {
 
           <div className="rounded-2xl border border-border glass-frosted p-8 shadow-card mb-6 animate-slide-up">
             <h2 className="text-2xl font-bold text-foreground mb-3">
-              {recommendation.entityType === 'company' ? 'Limited Liability Company (LLC)' : 'Business Name / Sole Proprietorship'}
+              {recommendation.title}
             </h2>
             <p className="text-muted-foreground mb-6">
-              {recommendation.entityType === 'company' 
-                ? 'A separate legal entity that offers liability protection and is suitable for growth-oriented businesses.'
-                : 'A simple business structure ideal for solo entrepreneurs with lower compliance requirements.'}
+              {recommendation.summary}
             </p>
 
             <div className="grid gap-6 md:grid-cols-2 mb-6">
@@ -116,10 +113,10 @@ const Advisory = () => {
                   Advantages
                 </h3>
                 <ul className="space-y-2">
-                  {recommendation.prosKeys.map((proKey, i) => (
+                  {recommendation.pros.map((pro, i) => (
                     <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
                       <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-success flex-shrink-0" />
-                      {proKey.replace('advisory.pros.', '').replace(/([A-Z])/g, ' $1').trim()}
+                      {pro}
                     </li>
                   ))}
                 </ul>
@@ -130,10 +127,10 @@ const Advisory = () => {
                   Considerations
                 </h3>
                 <ul className="space-y-2">
-                  {recommendation.consKeys.map((conKey, i) => (
+                  {recommendation.cons.map((con, i) => (
                     <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
                       <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-warning flex-shrink-0" />
-                      {conKey.replace('advisory.cons.', '').replace(/([A-Z])/g, ' $1').trim()}
+                      {con}
                     </li>
                   ))}
                 </ul>
@@ -144,19 +141,19 @@ const Advisory = () => {
               <div>
                 <p className="text-xs text-muted-foreground mb-1">Tax Authority</p>
                 <p className="font-medium text-foreground text-sm">
-                  {recommendation.entityType === 'company' ? 'FIRS (Federal)' : 'State IRS'}
+                  {recommendation.taxAuthority}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground mb-1">Registration Cost</p>
                 <p className="font-medium text-foreground text-sm">
-                  {recommendation.entityType === 'company' ? '₦50,000 - ₦150,000' : '₦10,000 - ₦25,000'}
+                  {recommendation.estimatedCosts.registration}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground mb-1">Annual Compliance</p>
                 <p className="font-medium text-foreground text-sm">
-                  {recommendation.entityType === 'company' ? '₦100,000+' : '₦20,000 - ₦50,000'}
+                  {recommendation.estimatedCosts.annual}
                 </p>
               </div>
             </div>
@@ -221,10 +218,10 @@ const Advisory = () => {
       {/* Question Card */}
       <div className="animate-slide-up rounded-2xl border border-border glass-frosted p-8 shadow-card">
         <h2 className="text-2xl font-bold text-foreground mb-2">
-          {currentQuestion.questionKey.replace('advisory.questions.', '').replace(/([A-Z])/g, ' $1').trim()}?
+          {currentQuestion.question}
         </h2>
         <p className="text-muted-foreground mb-8">
-          This helps us understand your business needs
+          {currentQuestion.description}
         </p>
 
         <div className="space-y-3">
@@ -246,7 +243,7 @@ const Advisory = () => {
                   {iconMap[option.icon]}
                 </div>
                 <span className="font-medium text-foreground">
-                  {option.labelKey.replace('advisory.options.', '').replace(/([A-Z])/g, ' $1').trim()}
+                  {option.label}
                 </span>
               </button>
             );

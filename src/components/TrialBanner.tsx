@@ -1,14 +1,12 @@
 import { useSubscription } from '@/contexts/SubscriptionContext';
-import { X, Sparkles, Clock } from 'lucide-react';
-import { useState } from 'react';
+import { Sparkles, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 export const TrialBanner = () => {
   const { isOnTrial, trialEndsAt, effectiveTier } = useSubscription();
-  const [dismissed, setDismissed] = useState(false);
 
-  if (!isOnTrial || dismissed || !trialEndsAt) {
+  if (!isOnTrial || !trialEndsAt) {
     return null;
   }
 
@@ -41,23 +39,14 @@ export const TrialBanner = () => {
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
-          <Button
-            asChild
-            size="sm"
-            variant="secondary"
-            className="h-7 text-xs font-medium"
-          >
-            <Link to="/pricing">Upgrade Now</Link>
-          </Button>
-          <button
-            onClick={() => setDismissed(true)}
-            className="p-1 hover:bg-primary-foreground/10 rounded transition-colors"
-            aria-label="Dismiss banner"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
+        <Button
+          asChild
+          size="sm"
+          variant="secondary"
+          className="h-7 text-xs font-medium"
+        >
+          <Link to="/pricing">Upgrade Now</Link>
+        </Button>
       </div>
     </div>
   );

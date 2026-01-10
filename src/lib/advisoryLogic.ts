@@ -12,14 +12,14 @@ export interface AdvisoryAnswers {
 
 export interface Recommendation {
   entityType: 'business_name' | 'company';
-  titleKey: string;
-  summaryKey: string;
-  prosKeys: string[];
-  consKeys: string[];
-  taxAuthorityKey: string;
+  title: string;
+  summary: string;
+  pros: string[];
+  cons: string[];
+  taxAuthority: string;
   estimatedCosts: {
-    registrationKey: string;
-    annualKey: string;
+    registration: string;
+    annual: string;
   };
   suitabilityScore: number;
 }
@@ -78,50 +78,50 @@ export function getRecommendation(answers: AdvisoryAnswers): Recommendation {
   if (recommendCompany) {
     return {
       entityType: 'company',
-      titleKey: 'advisory.result.company.title',
-      summaryKey: 'advisory.result.company.summary',
-      prosKeys: [
-        'advisory.result.company.pros.liability',
-        'advisory.result.company.pros.credibility',
-        'advisory.result.company.pros.capital',
-        'advisory.result.company.pros.citBenefit',
-        'advisory.result.company.pros.perpetual',
+      title: 'Limited Liability Company (LLC)',
+      summary: 'A separate legal entity that offers liability protection and is suitable for growth-oriented businesses.',
+      pros: [
+        'Limited personal liability - your personal assets are protected',
+        'Enhanced business credibility with clients and partners',
+        'Easier to raise capital and attract investors',
+        'Lower corporate income tax rate (30% vs up to 24% PIT)',
+        'Perpetual existence - business continues regardless of ownership changes',
       ],
-      consKeys: [
-        'advisory.result.company.cons.registration',
-        'advisory.result.company.cons.compliance',
-        'advisory.result.company.cons.annualReturns',
-        'advisory.result.company.cons.audit',
+      cons: [
+        'Higher registration costs (₦50,000 - ₦150,000)',
+        'More complex compliance requirements',
+        'Annual returns filing with CAC required',
+        'May require audited financial statements',
       ],
-      taxAuthorityKey: 'advisory.result.company.taxAuthority',
+      taxAuthority: 'FIRS (Federal)',
       estimatedCosts: {
-        registrationKey: 'advisory.result.company.costs.registration',
-        annualKey: 'advisory.result.company.costs.annual',
+        registration: '₦50,000 - ₦150,000',
+        annual: '₦100,000+',
       },
       suitabilityScore,
     };
   } else {
     return {
       entityType: 'business_name',
-      titleKey: 'advisory.result.businessName.title',
-      summaryKey: 'advisory.result.businessName.summary',
-      prosKeys: [
-        'advisory.result.businessName.pros.lowCost',
-        'advisory.result.businessName.pros.simpler',
-        'advisory.result.businessName.pros.control',
-        'advisory.result.businessName.pros.setup',
-        'advisory.result.businessName.pros.taxRates',
+      title: 'Business Name / Sole Proprietorship',
+      summary: 'A simple business structure ideal for solo entrepreneurs with lower compliance requirements.',
+      pros: [
+        'Low registration costs (₦10,000 - ₦25,000)',
+        'Simpler tax filing and compliance',
+        'Full control over business decisions',
+        'Quick and easy setup process',
+        'Lower tax rates for income under ₦25M',
       ],
-      consKeys: [
-        'advisory.result.businessName.cons.liability',
-        'advisory.result.businessName.cons.funding',
-        'advisory.result.businessName.cons.credibility',
-        'advisory.result.businessName.cons.lifespan',
+      cons: [
+        'Unlimited personal liability - your personal assets are at risk',
+        'Harder to raise external funding',
+        'May have less business credibility',
+        'Business tied to owner\'s lifespan',
       ],
-      taxAuthorityKey: 'advisory.result.businessName.taxAuthority',
+      taxAuthority: 'State IRS',
       estimatedCosts: {
-        registrationKey: 'advisory.result.businessName.costs.registration',
-        annualKey: 'advisory.result.businessName.costs.annual',
+        registration: '₦10,000 - ₦25,000',
+        annual: '₦20,000 - ₦50,000',
       },
       suitabilityScore,
     };
@@ -130,11 +130,11 @@ export function getRecommendation(answers: AdvisoryAnswers): Recommendation {
 
 export interface AdvisoryQuestion {
   id: string;
-  questionKey: string;
-  descriptionKey: string;
+  question: string;
+  description: string;
   options: {
     value: boolean | string;
-    labelKey: string;
+    label: string;
     icon: string;
   }[];
 }
@@ -142,66 +142,66 @@ export interface AdvisoryQuestion {
 export const advisoryQuestions: AdvisoryQuestion[] = [
   {
     id: 'hasPartners',
-    questionKey: 'advisory.questions.hasPartners.question',
-    descriptionKey: 'advisory.questions.hasPartners.description',
+    question: 'Do you have business partners?',
+    description: 'This helps determine the best ownership structure for your situation.',
     options: [
-      { value: true, labelKey: 'advisory.questions.hasPartners.yesPartners', icon: 'users' },
-      { value: false, labelKey: 'advisory.questions.hasPartners.noSolo', icon: 'user' },
+      { value: true, label: 'Yes, I have partners', icon: 'users' },
+      { value: false, label: 'No, I\'m a solo founder', icon: 'user' },
     ],
   },
   {
     id: 'expectedTurnover',
-    questionKey: 'advisory.questions.expectedTurnover.question',
-    descriptionKey: 'advisory.questions.expectedTurnover.description',
+    question: 'What is your expected annual turnover?',
+    description: 'Your revenue level affects tax obligations and recommended structure.',
     options: [
-      { value: 'under_25m', labelKey: 'advisory.questions.expectedTurnover.under25m', icon: 'trending-down' },
-      { value: '25m_to_50m', labelKey: 'advisory.questions.expectedTurnover.25mTo50m', icon: 'minus' },
-      { value: 'over_50m', labelKey: 'advisory.questions.expectedTurnover.over50m', icon: 'trending-up' },
+      { value: 'under_25m', label: 'Under ₦25 million', icon: 'trending-down' },
+      { value: '25m_to_50m', label: '₦25 million to ₦50 million', icon: 'minus' },
+      { value: 'over_50m', label: 'Over ₦50 million', icon: 'trending-up' },
     ],
   },
   {
     id: 'needsAssetProtection',
-    questionKey: 'advisory.questions.needsAssetProtection.question',
-    descriptionKey: 'advisory.questions.needsAssetProtection.description',
+    question: 'Is protecting your personal assets important?',
+    description: 'Some business structures separate personal and business liabilities.',
     options: [
-      { value: true, labelKey: 'advisory.questions.needsAssetProtection.yesImportant', icon: 'shield' },
-      { value: false, labelKey: 'advisory.questions.needsAssetProtection.notPriority', icon: 'shield-off' },
+      { value: true, label: 'Yes, this is very important', icon: 'shield' },
+      { value: false, label: 'Not a priority right now', icon: 'shield-off' },
     ],
   },
   {
     id: 'ownsHome',
-    questionKey: 'advisory.questions.ownsHome.question',
-    descriptionKey: 'advisory.questions.ownsHome.description',
+    question: 'Do you own a home or have significant personal assets?',
+    description: 'This affects your risk exposure with different business structures.',
     options: [
-      { value: true, labelKey: 'advisory.questions.ownsHome.yesAssets', icon: 'home' },
-      { value: false, labelKey: 'advisory.questions.ownsHome.noSignificant', icon: 'briefcase' },
+      { value: true, label: 'Yes, I have significant personal assets', icon: 'home' },
+      { value: false, label: 'No significant personal assets', icon: 'briefcase' },
     ],
   },
   {
     id: 'isProfessionalService',
-    questionKey: 'advisory.questions.isProfessionalService.question',
-    descriptionKey: 'advisory.questions.isProfessionalService.description',
+    question: 'Is your business a professional service?',
+    description: 'Examples: consulting, legal, medical, accounting services.',
     options: [
-      { value: true, labelKey: 'advisory.questions.isProfessionalService.yesProfessional', icon: 'briefcase' },
-      { value: false, labelKey: 'advisory.questions.isProfessionalService.noProduct', icon: 'package' },
+      { value: true, label: 'Yes, it\'s a professional service', icon: 'briefcase' },
+      { value: false, label: 'No, it\'s product or other business', icon: 'package' },
     ],
   },
   {
     id: 'hasSignificantAssets',
-    questionKey: 'advisory.questions.hasSignificantAssets.question',
-    descriptionKey: 'advisory.questions.hasSignificantAssets.description',
+    question: 'Will your business have significant fixed assets?',
+    description: 'Equipment, property, vehicles, or other valuable business assets.',
     options: [
-      { value: true, labelKey: 'advisory.questions.hasSignificantAssets.yesSignificant', icon: 'building' },
-      { value: false, labelKey: 'advisory.questions.hasSignificantAssets.minimal', icon: 'laptop' },
+      { value: true, label: 'Yes, significant business assets', icon: 'building' },
+      { value: false, label: 'Minimal assets needed', icon: 'laptop' },
     ],
   },
   {
     id: 'planToSeekInvestment',
-    questionKey: 'advisory.questions.planToSeekInvestment.question',
-    descriptionKey: 'advisory.questions.planToSeekInvestment.description',
+    question: 'Do you plan to seek external investment?',
+    description: 'Investors and VCs typically require specific business structures.',
     options: [
-      { value: true, labelKey: 'advisory.questions.planToSeekInvestment.yesFunding', icon: 'trending-up' },
-      { value: false, labelKey: 'advisory.questions.planToSeekInvestment.selfFunded', icon: 'wallet' },
+      { value: true, label: 'Yes, I plan to raise funding', icon: 'trending-up' },
+      { value: false, label: 'No, I\'ll be self-funded', icon: 'wallet' },
     ],
   },
 ];
