@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { NavMenu } from "@/components/NavMenu";
 import { LucideIcon } from "lucide-react";
 
 interface PageLayoutProps {
@@ -45,8 +44,6 @@ export const PageLayout = ({
           <div className="fixed inset-0 bg-dots opacity-15 pointer-events-none" />
         </>
       )}
-
-      <NavMenu />
 
       <main className={`flex-1 relative z-10 py-4 sm:py-6 pb-8 px-4 sm:px-6 lg:px-8 w-full ${className}`}>
         <div className={`w-full ${maxWidthClasses[maxWidth]} mx-auto`}>
