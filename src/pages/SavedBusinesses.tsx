@@ -69,13 +69,24 @@ const SavedBusinesses = () => {
   const [showBulkDialog, setShowBulkDialog] = useState(false);
   const [bulkInput, setBulkInput] = useState("");
   const [bulkResults, setBulkResults] = useState<Array<{ rcBnNumber: string; isValid: boolean; details?: any }>>([]);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [businessToDelete, setBusinessToDelete] = useState<{ id: string; name: string } | null>(null);
 
   const limit = getBusinessLimit();
   const limitText = limit === 'unlimited' ? 'Unlimited' : `${businessCount}/${limit}`;
 
-  const handleDelete = (id: string, name: string) => {
-    removeBusiness(id);
-    toast.success(`Removed "${name}" from saved businesses`);
+  const handleDeleteClick = (id: string, name: string) => {
+    setBusinessToDelete({ id, name });
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDelete = () => {
+    if (businessToDelete) {
+      removeBusiness(businessToDelete.id);
+      toast.success(`Removed "${businessToDelete.name}" from saved businesses`);
+      setShowDeleteDialog(false);
+      setBusinessToDelete(null);
+    }
   };
 
   const handleVerify = (business: SavedBusiness) => {
@@ -296,7 +307,7 @@ const SavedBusinesses = () => {
                               </p>
                             </div>
                           </div>
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(business.id, business.name)}>
+                          <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(business.id, business.name)}>
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
                         </div>
@@ -367,6 +378,27 @@ const SavedBusinesses = () => {
             )}
             <DialogFooter>
               <Button onClick={handleBulkVerify}>Verify All</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Business</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete "{businessToDelete?.name}"? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={confirmDelete}>
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
