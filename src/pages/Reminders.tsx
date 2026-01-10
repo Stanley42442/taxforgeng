@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { useSubscription, SavedBusiness } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,6 +21,8 @@ import { requestNotificationPermission } from "@/hooks/useReminderNotifications"
 import { Textarea } from "@/components/ui/textarea";
 import { useFormFeedback } from "@/hooks/useFormFeedback";
 import { SuccessCelebration } from "@/components/ui/form-feedback";
+import { useDeleteWithUndo } from "@/hooks/useDeleteWithUndo";
+import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
 
 interface Reminder {
   id: string;
@@ -91,9 +93,28 @@ const Reminders = () => {
   const [customTime, setCustomTime] = useState('09:00');
   const [customNote, setCustomNote] = useState('');
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | 'unsupported'>('default');
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [reminderToDelete, setReminderToDelete] = useState<{ id: string; name: string } | null>(null);
-  const [pendingDeleteTimeout, setPendingDeleteTimeout] = useState<NodeJS.Timeout | null>(null);
+  const pendingDeleteRef = useRef<{ timeout: NodeJS.Timeout; reminder: Reminder } | null>(null);
+
+  // Use centralized delete with undo hook
+  const deleteWithUndo = useDeleteWithUndo<Reminder>({
+    onDelete: async (reminder) => {
+      const { error } = await supabase
+        .from('reminders')
+        .delete()
+        .eq('id', reminder.id);
+
+      if (error) {
+        console.error('Error deleting reminder:', error);
+        setReminders(prev => [...prev, reminder]);
+        toast.error('Failed to delete reminder');
+      }
+    },
+    onRestore: (reminder) => {
+      setReminders(prev => [...prev, reminder]);
+    },
+    getSuccessMessage: (reminder) => `Reminder "${reminder.name}" deleted`,
+    getItemName: (reminder) => reminder.name,
+  });
 
   useEffect(() => {
     if ('Notification' in window) {
@@ -290,64 +311,29 @@ const Reminders = () => {
     );
   };
 
-  const handleDeleteClick = (id: string, name: string) => {
-    setReminderToDelete({ id, name });
-    setShowDeleteDialog(true);
-  };
-
-  const confirmDelete = () => {
-    if (!reminderToDelete) return;
-    
-    const { id, name } = reminderToDelete;
-    const deletedReminder = reminders.find(r => r.id === id);
-    
-    // Optimistically remove from UI
-    setReminders(prev => prev.filter(r => r.id !== id));
-    setShowDeleteDialog(false);
-    setReminderToDelete(null);
-    
-    // Show undo toast
-    const timeoutId = setTimeout(async () => {
-      // Actually delete from database after timeout
-      const { error } = await supabase
-        .from('reminders')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error('Error deleting reminder:', error);
-        // Restore if delete failed
-        if (deletedReminder) {
-          setReminders(prev => [...prev, deletedReminder]);
-        }
-        toast.error('Failed to delete reminder');
-      }
-      setPendingDeleteTimeout(null);
-    }, 5000);
-    
-    setPendingDeleteTimeout(timeoutId);
-    
-    toast.success(`Reminder "${name}" deleted`, {
-      action: {
-        label: 'Undo',
-        onClick: () => {
-          clearTimeout(timeoutId);
-          setPendingDeleteTimeout(null);
-          if (deletedReminder) {
-            setReminders(prev => [...prev, deletedReminder]);
-          }
-          toast.success('Reminder restored');
-        },
-      },
-      duration: 5000,
-    });
-  };
-
-  const deleteReminder = async (id: string) => {
+  const deleteReminder = (id: string) => {
     const reminder = reminders.find(r => r.id === id);
     if (reminder) {
-      handleDeleteClick(id, reminder.name);
+      // Remove optimistically from UI first
+      setReminders(prev => prev.filter(r => r.id !== id));
+      deleteWithUndo.requestDelete(reminder);
     }
+  };
+
+  // Override confirm to handle optimistic update
+  const handleConfirmDelete = () => {
+    if (deleteWithUndo.itemToDelete) {
+      // Item already removed optimistically in deleteReminder
+      deleteWithUndo.confirmDelete();
+    }
+  };
+
+  const handleCancelDelete = () => {
+    // Restore item if cancel
+    if (deleteWithUndo.itemToDelete) {
+      setReminders(prev => [...prev, deleteWithUndo.itemToDelete!]);
+    }
+    deleteWithUndo.cancelDelete();
   };
 
   const tierOrder = ['free', 'starter', 'basic', 'freelancer', 'business', 'corporate'];
@@ -631,24 +617,13 @@ const Reminders = () => {
       )}
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Reminder</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete "{reminderToDelete?.name}"? You can undo this action for 5 seconds after deletion.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={confirmDelete}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteConfirmationDialog
+        open={deleteWithUndo.showDialog}
+        onOpenChange={(open) => !open && handleCancelDelete()}
+        onConfirm={handleConfirmDelete}
+        title="Delete Reminder"
+        itemName={deleteWithUndo.itemToDelete?.name}
+      />
     </PageLayout>
   );
 };

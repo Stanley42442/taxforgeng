@@ -46,6 +46,8 @@ import {
 } from "@/components/ui/dialog";
 import { SharedElement } from "@/components/PageTransition";
 import { motion } from "framer-motion";
+import { useDeleteWithUndo } from "@/hooks/useDeleteWithUndo";
+import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
 
 const SavedBusinesses = () => {
   const navigate = useNavigate();
@@ -69,25 +71,18 @@ const SavedBusinesses = () => {
   const [showBulkDialog, setShowBulkDialog] = useState(false);
   const [bulkInput, setBulkInput] = useState("");
   const [bulkResults, setBulkResults] = useState<Array<{ rcBnNumber: string; isValid: boolean; details?: any }>>([]);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [businessToDelete, setBusinessToDelete] = useState<{ id: string; name: string } | null>(null);
+
+  // Use centralized delete with undo hook
+  const deleteWithUndo = useDeleteWithUndo<SavedBusiness>({
+    onDelete: (business) => {
+      removeBusiness(business.id);
+    },
+    getSuccessMessage: (business) => `Removed "${business.name}" from saved businesses`,
+    getItemName: (business) => business.name,
+  });
 
   const limit = getBusinessLimit();
   const limitText = limit === 'unlimited' ? 'Unlimited' : `${businessCount}/${limit}`;
-
-  const handleDeleteClick = (id: string, name: string) => {
-    setBusinessToDelete({ id, name });
-    setShowDeleteDialog(true);
-  };
-
-  const confirmDelete = () => {
-    if (businessToDelete) {
-      removeBusiness(businessToDelete.id);
-      toast.success(`Removed "${businessToDelete.name}" from saved businesses`);
-      setShowDeleteDialog(false);
-      setBusinessToDelete(null);
-    }
-  };
 
   const handleVerify = (business: SavedBusiness) => {
     setSelectedBusiness(business);
@@ -307,7 +302,7 @@ const SavedBusinesses = () => {
                               </p>
                             </div>
                           </div>
-                          <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(business.id, business.name)}>
+                          <Button variant="ghost" size="icon" onClick={() => deleteWithUndo.requestDelete(business)}>
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
                         </div>
@@ -383,25 +378,13 @@ const SavedBusinesses = () => {
         </Dialog>
 
         {/* Delete Confirmation Dialog */}
-        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Delete Business</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to delete "{businessToDelete?.name}"? This action cannot be undone.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
-                Cancel
-              </Button>
-              <Button variant="destructive" onClick={confirmDelete}>
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <DeleteConfirmationDialog
+          open={deleteWithUndo.showDialog}
+          onOpenChange={(open) => !open && deleteWithUndo.cancelDelete()}
+          onConfirm={deleteWithUndo.confirmDelete}
+          title="Delete Business"
+          itemName={deleteWithUndo.itemToDelete?.name}
+        />
       </PageLayout>
     </TooltipProvider>
   );

@@ -577,7 +577,9 @@ const Dashboard = () => {
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-primary" />
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Building2 className="h-5 w-5 text-primary" />
+                </div>
                 My Businesses
               </CardTitle>
               <CardDescription>
@@ -661,11 +663,13 @@ const Dashboard = () => {
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-warning" />
+                <div className="h-10 w-10 rounded-lg bg-warning/10 flex items-center justify-center">
+                  <Calendar className="h-5 w-5 text-warning" />
+                </div>
                 Upcoming Reminders
               </CardTitle>
               <CardDescription>
-                {urgentCount === 0 ? 'No upcoming reminders' : `${urgentCount} reminder${urgentCount > 1 ? 's' : ''}`}
+                {upcomingReminders.length === 0 ? 'No upcoming reminders' : `${upcomingReminders.length} reminder${upcomingReminders.length > 1 ? 's' : ''}`}
               </CardDescription>
             </div>
             <Link to="/reminders">
