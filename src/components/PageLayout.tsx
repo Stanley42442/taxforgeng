@@ -48,7 +48,7 @@ export const PageLayout = ({
 
       <NavMenu />
 
-      <main className={`flex-1 relative z-10 py-6 pb-8 px-4 sm:px-6 lg:px-8 w-full ${className}`}>
+      <main className={`flex-1 relative z-10 py-4 sm:py-6 pb-8 px-4 sm:px-6 lg:px-8 w-full ${className}`}>
         <div className={`w-full ${maxWidthClasses[maxWidth]} mx-auto`}>
           {/* Header */}
           {(title || Icon) && (

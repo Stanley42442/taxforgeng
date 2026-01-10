@@ -404,29 +404,29 @@ const Dashboard = () => {
                 {!summaryExpanded && (
                   <div className="hidden sm:flex items-center gap-3 mr-4">
                     <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-primary/10">
-                      <Building2 className="h-3.5 w-3.5 text-primary" />
+                      <Building2 className="h-4 w-4 text-primary" />
                       <span className="text-xs font-medium text-primary">{savedBusinesses.length}</span>
                     </div>
                     <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10">
-                      <TrendingUp className="h-3.5 w-3.5 text-success" />
+                      <TrendingUp className="h-4 w-4 text-success" />
                       <span className="text-xs font-medium text-success">{formatCurrency(filteredSummary.totalIncome)}</span>
                     </div>
                     <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-destructive/10">
-                      <TrendingDown className="h-3.5 w-3.5 text-destructive" />
+                      <TrendingDown className="h-4 w-4 text-destructive" />
                       <span className="text-xs font-medium text-destructive">{formatCurrency(filteredSummary.totalExpenses)}</span>
                     </div>
                     {urgentCount > 0 && (
-                      <Badge variant="destructive" className="text-xs">
+                      <Badge variant="destructive" size="sm" className="h-5 min-w-5 px-1.5 flex items-center justify-center">
                         {urgentCount} urgent
                       </Badge>
                     )}
                   </div>
                 )}
-                <div className="h-8 w-8 rounded-lg bg-secondary/50 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-lg bg-secondary/50 flex items-center justify-center">
                   {summaryExpanded ? (
-                    <Minimize2 className="h-4 w-4 text-muted-foreground" />
+                    <Minimize2 className="h-5 w-5 text-muted-foreground" />
                   ) : (
-                    <Maximize2 className="h-4 w-4 text-muted-foreground" />
+                    <Maximize2 className="h-5 w-5 text-muted-foreground" />
                   )}
                 </div>
               </div>
@@ -549,7 +549,7 @@ const Dashboard = () => {
               <h3 className="font-medium text-sm">Reminders</h3>
               <p className="text-xs text-muted-foreground">Tax deadlines</p>
               {urgentCount > 0 && (
-                <Badge variant="destructive" className="absolute -top-1 -right-1 text-xs animate-pulse">
+                <Badge variant="destructive" size="sm" className="absolute -top-1 -right-1 h-5 min-w-5 px-1.5 flex items-center justify-center animate-pulse">
                   {urgentCount}
                 </Badge>
               )}
@@ -619,10 +619,10 @@ const Dashboard = () => {
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <SharedElement id={`business-icon-${business.id}`}>
-                                  <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${
+                                  <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
                                     business.entityType === 'company' ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'
                                   }`}>
-                                    <Building2 className="h-4 w-4" />
+                                    <Building2 className="h-5 w-5" />
                                   </div>
                                 </SharedElement>
                                 <div className="text-left">

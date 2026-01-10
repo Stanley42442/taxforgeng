@@ -37,7 +37,7 @@ const SAMPLE_BUSINESS = {
 
 export const seedSampleData = async (userId: string): Promise<{ businessId: string | null; success: boolean }> => {
   try {
-    // Check if user already has data
+    // Check if user already has expenses
     const { data: existingExpenses } = await supabase
       .from('expenses')
       .select('id')
@@ -45,8 +45,20 @@ export const seedSampleData = async (userId: string): Promise<{ businessId: stri
       .limit(1);
 
     if (existingExpenses && existingExpenses.length > 0) {
-      // User already has data, don't seed
+      // User already has expenses, don't seed
       return { businessId: null, success: true };
+    }
+
+    // Also check if user already has businesses
+    const { data: existingBusinesses } = await supabase
+      .from('businesses')
+      .select('id')
+      .eq('user_id', userId)
+      .limit(1);
+
+    if (existingBusinesses && existingBusinesses.length > 0) {
+      // User has businesses but no expenses - return existing business ID
+      return { businessId: existingBusinesses[0].id, success: true };
     }
 
     // Create sample business
