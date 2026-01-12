@@ -1,4 +1,5 @@
-// Notification utility for adding app-wide notifications
+// Notification utility for adding app-wide notifications with cross-device sync
+import { supabase } from "@/integrations/supabase/client";
 
 export type NotificationType = 'reminder' | 'warning' | 'info' | 'success';
 
@@ -9,6 +10,7 @@ export interface AppNotification {
   type: NotificationType;
   timestamp: string;
   read: boolean;
+  user_id?: string;
 }
 
 // Play notification sound using Web Audio API
@@ -70,8 +72,75 @@ export const showBrowserNotification = (title: string, body: string, redirectUrl
   }
 };
 
-// Add a notification to localStorage
-export const addNotification = (
+// Add a notification to the database (syncs across devices)
+export const addNotification = async (
+  title: string, 
+  message: string, 
+  type: NotificationType,
+  options?: {
+    playSound?: boolean;
+    showBrowserNotification?: boolean;
+    browserRedirectUrl?: string;
+  }
+): Promise<AppNotification | null> => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      console.warn('No user logged in, cannot save notification to database');
+      // Fall back to localStorage for non-authenticated users
+      return addNotificationToLocalStorage(title, message, type, options);
+    }
+
+    const { data, error } = await supabase
+      .from('user_notifications')
+      .insert({
+        user_id: user.id,
+        title,
+        message,
+        type,
+        read: false
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving notification to database:', error);
+      return addNotificationToLocalStorage(title, message, type, options);
+    }
+
+    const notification: AppNotification = {
+      id: data.id,
+      title: data.title,
+      message: data.message,
+      type: data.type as NotificationType,
+      timestamp: data.created_at,
+      read: data.read,
+      user_id: data.user_id
+    };
+
+    // Dispatch event for real-time updates within the same tab
+    window.dispatchEvent(new CustomEvent('notification-added', { detail: notification }));
+
+    // Optional sound
+    if (options?.playSound) {
+      playNotificationSound();
+    }
+
+    // Optional browser notification
+    if (options?.showBrowserNotification) {
+      showBrowserNotification(title, message, options.browserRedirectUrl);
+    }
+
+    return notification;
+  } catch (error) {
+    console.error('Error adding notification:', error);
+    return addNotificationToLocalStorage(title, message, type, options);
+  }
+};
+
+// Fallback for non-authenticated users
+const addNotificationToLocalStorage = (
   title: string, 
   message: string, 
   type: NotificationType,
@@ -93,23 +162,17 @@ export const addNotification = (
   try {
     const existing = localStorage.getItem('app-notifications');
     const notifications: AppNotification[] = existing ? JSON.parse(existing) : [];
-    
-    // Keep only last 50 notifications
     const updated = [notification, ...notifications].slice(0, 50);
     localStorage.setItem('app-notifications', JSON.stringify(updated));
-    
-    // Dispatch custom event for real-time updates within the same tab
     window.dispatchEvent(new CustomEvent('notification-added', { detail: notification }));
   } catch (error) {
-    console.error('Error saving notification:', error);
+    console.error('Error saving notification to localStorage:', error);
   }
 
-  // Optional sound
   if (options?.playSound) {
     playNotificationSound();
   }
 
-  // Optional browser notification
   if (options?.showBrowserNotification) {
     showBrowserNotification(title, message, options.browserRedirectUrl);
   }
@@ -117,34 +180,158 @@ export const addNotification = (
   return notification;
 };
 
-// Get all notifications
-export const getNotifications = (): AppNotification[] => {
+// Get all notifications from database
+export const getNotifications = async (): Promise<AppNotification[]> => {
   try {
-    const saved = localStorage.getItem('app-notifications');
-    return saved ? JSON.parse(saved) : [];
-  } catch {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      // Fall back to localStorage for non-authenticated users
+      const saved = localStorage.getItem('app-notifications');
+      return saved ? JSON.parse(saved) : [];
+    }
+
+    const { data, error } = await supabase
+      .from('user_notifications')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (error) {
+      console.error('Error fetching notifications:', error);
+      return [];
+    }
+
+    return data.map(n => ({
+      id: n.id,
+      title: n.title,
+      message: n.message,
+      type: n.type as NotificationType,
+      timestamp: n.created_at,
+      read: n.read,
+      user_id: n.user_id
+    }));
+  } catch (error) {
+    console.error('Error getting notifications:', error);
     return [];
   }
 };
 
-// Mark notification as read
-export const markNotificationRead = (id: string): void => {
+// Mark notification as read in database
+export const markNotificationRead = async (id: string): Promise<void> => {
   try {
-    const notifications = getNotifications();
-    const updated = notifications.map(n => 
-      n.id === id ? { ...n, read: true } : n
-    );
-    localStorage.setItem('app-notifications', JSON.stringify(updated));
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      // Fall back to localStorage
+      const notifications = JSON.parse(localStorage.getItem('app-notifications') || '[]');
+      const updated = notifications.map((n: AppNotification) => 
+        n.id === id ? { ...n, read: true } : n
+      );
+      localStorage.setItem('app-notifications', JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('notification-added'));
+      return;
+    }
+
+    const { error } = await supabase
+      .from('user_notifications')
+      .update({ read: true })
+      .eq('id', id)
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('Error marking notification read:', error);
+    }
+
     window.dispatchEvent(new CustomEvent('notification-added'));
   } catch (error) {
     console.error('Error marking notification read:', error);
   }
 };
 
-// Clear all notifications
-export const clearAllNotifications = (): void => {
-  localStorage.removeItem('app-notifications');
-  window.dispatchEvent(new CustomEvent('notification-added'));
+// Mark all notifications as read
+export const markAllNotificationsRead = async (): Promise<void> => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      const notifications = JSON.parse(localStorage.getItem('app-notifications') || '[]');
+      const updated = notifications.map((n: AppNotification) => ({ ...n, read: true }));
+      localStorage.setItem('app-notifications', JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('notification-added'));
+      return;
+    }
+
+    const { error } = await supabase
+      .from('user_notifications')
+      .update({ read: true })
+      .eq('user_id', user.id)
+      .eq('read', false);
+
+    if (error) {
+      console.error('Error marking all notifications read:', error);
+    }
+
+    window.dispatchEvent(new CustomEvent('notification-added'));
+  } catch (error) {
+    console.error('Error marking all notifications read:', error);
+  }
+};
+
+// Delete a notification
+export const deleteNotification = async (id: string): Promise<void> => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      const notifications = JSON.parse(localStorage.getItem('app-notifications') || '[]');
+      const updated = notifications.filter((n: AppNotification) => n.id !== id);
+      localStorage.setItem('app-notifications', JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('notification-added'));
+      return;
+    }
+
+    const { error } = await supabase
+      .from('user_notifications')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('Error deleting notification:', error);
+    }
+
+    window.dispatchEvent(new CustomEvent('notification-added'));
+  } catch (error) {
+    console.error('Error deleting notification:', error);
+  }
+};
+
+// Clear all notifications from database
+export const clearAllNotifications = async (): Promise<void> => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      localStorage.removeItem('app-notifications');
+      window.dispatchEvent(new CustomEvent('notification-added'));
+      return;
+    }
+
+    const { error } = await supabase
+      .from('user_notifications')
+      .delete()
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('Error clearing notifications:', error);
+    }
+
+    window.dispatchEvent(new CustomEvent('notification-added'));
+  } catch (error) {
+    console.error('Error clearing notifications:', error);
+  }
 };
 
 // Convenience methods for different notification types

@@ -21,14 +21,19 @@ import {
   AlertTriangle,
   Settings,
   Inbox,
-  RefreshCw
+  RefreshCw,
+  Wifi,
+  WifiOff
 } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { format } from "date-fns";
 import { 
-  getNotifications, 
   addNotification, 
+  markNotificationRead,
+  markAllNotificationsRead,
+  deleteNotification as deleteNotificationFromDb,
+  clearAllNotifications as clearAllNotificationsFromDb,
   type AppNotification 
 } from "@/lib/notifications";
 import {
@@ -40,31 +45,27 @@ import {
   playMobileNotificationSound,
   vibrateDevice
 } from "@/lib/pwaNotifications";
+import { useSyncedNotifications } from "@/hooks/useSyncedNotifications";
 
 const Notifications = () => {
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | 'unsupported'>('default');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [browserNotificationsEnabled, setBrowserNotificationsEnabled] = useState(true);
-  const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isPwaMode] = useState(() => isPWA());
   const [isMobile] = useState(() => isMobileDevice());
 
-  const loadNotifications = useCallback(() => {
-    const stored = getNotifications();
-    console.log('[Notifications] Loaded notifications:', stored.length);
-    setNotifications(stored);
-  }, []);
+  const { notifications, loading, isConnected, unreadCount, refresh } = useSyncedNotifications();
 
-  const handleRefresh = useCallback(() => {
+  const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
-    loadNotifications();
+    await refresh();
     vibrateDevice([50]);
     setTimeout(() => {
       setIsRefreshing(false);
       toast.success('Notifications refreshed');
     }, 300);
-  }, [loadNotifications]);
+  }, [refresh]);
 
   useEffect(() => {
     // Initialize PWA features
@@ -80,36 +81,7 @@ const Notifications = () => {
     const savedBrowser = localStorage.getItem('notification-browser-enabled');
     if (savedSound !== null) setSoundEnabled(savedSound === 'true');
     if (savedBrowser !== null) setBrowserNotificationsEnabled(savedBrowser === 'true');
-
-    loadNotifications();
-
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'app-notifications') {
-        loadNotifications();
-      }
-    };
-
-    const handleNotificationAdded = () => {
-      loadNotifications();
-    };
-
-    // Refresh on visibility change (when app comes back to foreground)
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        loadNotifications();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('notification-added', handleNotificationAdded);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('notification-added', handleNotificationAdded);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [loadNotifications]);
+  }, []);
 
   const handleEnableNotifications = async () => {
     const granted = await requestPWANotificationPermission();
@@ -158,49 +130,36 @@ const Notifications = () => {
       );
     }
 
-    // Add to local notifications list
-    addNotification(
+    // Add to notifications (now synced across devices)
+    await addNotification(
       "Test Notification",
       "This is a test notification to verify your settings are working.",
       'info'
     );
     
-    loadNotifications();
     toast.success("Test notification sent!");
   };
 
-  const markAsRead = (id: string) => {
-    const stored = getNotifications();
-    const updated = stored.map(n => 
-      n.id === id ? { ...n, read: true } : n
-    );
-    localStorage.setItem('app-notifications', JSON.stringify(updated));
-    setNotifications(updated);
-    window.dispatchEvent(new CustomEvent('notification-added'));
+  const markAsRead = async (id: string) => {
+    await markNotificationRead(id);
+    await refresh();
   };
 
-  const markAllAsRead = () => {
-    const stored = getNotifications();
-    const updated = stored.map(n => ({ ...n, read: true }));
-    localStorage.setItem('app-notifications', JSON.stringify(updated));
-    setNotifications(updated);
-    window.dispatchEvent(new CustomEvent('notification-added'));
+  const handleMarkAllAsRead = async () => {
+    await markAllNotificationsRead();
+    await refresh();
     toast.success('All notifications marked as read');
   };
 
-  const deleteNotification = (id: string) => {
-    const stored = getNotifications();
-    const updated = stored.filter(n => n.id !== id);
-    localStorage.setItem('app-notifications', JSON.stringify(updated));
-    setNotifications(updated);
-    window.dispatchEvent(new CustomEvent('notification-added'));
+  const handleDeleteNotification = async (id: string) => {
+    await deleteNotificationFromDb(id);
+    await refresh();
     toast.success('Notification deleted');
   };
 
-  const clearAllNotifications = () => {
-    setNotifications([]);
-    localStorage.removeItem('app-notifications');
-    window.dispatchEvent(new CustomEvent('notification-added'));
+  const handleClearAllNotifications = async () => {
+    await clearAllNotificationsFromDb();
+    await refresh();
     toast.success('All notifications cleared');
   };
 
@@ -250,8 +209,6 @@ const Notifications = () => {
     }
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
-
   return (
     <PageLayout 
       title="Notifications" 
@@ -260,14 +217,25 @@ const Notifications = () => {
       maxWidth="2xl"
       headerActions={
         <div className="flex items-center gap-2">
+          {isConnected ? (
+            <Badge variant="outline" className="gap-1 text-success border-success/30">
+              <Wifi className="w-3 h-3" />
+              <span className="hidden sm:inline">Synced</span>
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="gap-1 text-muted-foreground">
+              <WifiOff className="w-3 h-3" />
+              <span className="hidden sm:inline">Offline</span>
+            </Badge>
+          )}
           <Button 
             variant="outline" 
             size="sm" 
             onClick={handleRefresh}
-            disabled={isRefreshing}
+            disabled={isRefreshing || loading}
             className="gap-1.5"
           >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${isRefreshing || loading ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Refresh</span>
           </Button>
           {unreadCount > 0 && (
@@ -304,12 +272,12 @@ const Notifications = () => {
               </p>
               <div className="flex gap-2">
                 {unreadCount > 0 && (
-                  <Button variant="outline" size="sm" onClick={markAllAsRead}>
+                  <Button variant="outline" size="sm" onClick={handleMarkAllAsRead}>
                     <CheckCircle2 className="w-4 h-4 mr-1" />
                     Mark all read
                   </Button>
                 )}
-                <Button variant="outline" size="sm" onClick={clearAllNotifications}>
+                <Button variant="outline" size="sm" onClick={handleClearAllNotifications}>
                   <Trash2 className="w-4 h-4 mr-1" />
                   Clear all
                 </Button>
@@ -317,7 +285,14 @@ const Notifications = () => {
             </div>
           )}
 
-          {notifications.length === 0 ? (
+          {loading ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <RefreshCw className="w-8 h-8 mx-auto text-muted-foreground mb-4 animate-spin" />
+                <p className="text-muted-foreground">Loading notifications...</p>
+              </CardContent>
+            </Card>
+          ) : notifications.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
                 <Inbox className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
@@ -378,7 +353,7 @@ const Notifications = () => {
                                 variant="ghost" 
                                 size="sm" 
                                 className="h-7 text-xs text-destructive hover:text-destructive"
-                                onClick={() => deleteNotification(notification.id)}
+                                onClick={() => handleDeleteNotification(notification.id)}
                               >
                                 <Trash2 className="w-3 h-3" />
                               </Button>
@@ -396,6 +371,34 @@ const Notifications = () => {
 
         {/* Settings Tab */}
         <TabsContent value="settings" className="space-y-6">
+          {/* Sync Status Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                {isConnected ? <Wifi className="w-5 h-5 text-success" /> : <WifiOff className="w-5 h-5" />}
+                Cross-Device Sync
+              </CardTitle>
+              <CardDescription>
+                Notifications are synced across all your devices in real-time
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className={`flex items-center gap-3 p-4 rounded-lg ${isConnected ? 'bg-success/10' : 'bg-muted/50'}`}>
+                {isConnected ? (
+                  <>
+                    <CheckCircle2 className="w-5 h-5 text-success" />
+                    <p className="text-sm">Real-time sync is active. Notifications will appear on all your devices.</p>
+                  </>
+                ) : (
+                  <>
+                    <AlertCircle className="w-5 h-5 text-muted-foreground" />
+                    <p className="text-sm">Connecting to sync service...</p>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Permission Status Card */}
           <Card>
             <CardHeader>
@@ -469,65 +472,74 @@ const Notifications = () => {
               <CardDescription>Customize how you receive notifications</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
-                <div className="flex items-center gap-3">
-                  <Volume2 className="w-5 h-5 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium text-sm">Sound Notifications</p>
-                    <p className="text-xs text-muted-foreground">Play a sound when notifications arrive</p>
-                  </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <p className="font-medium">Sound Notifications</p>
+                  <p className="text-sm text-muted-foreground">Play a sound when you receive notifications</p>
                 </div>
-                <Switch checked={soundEnabled} onCheckedChange={handleSoundToggle} />
+                <Switch
+                  checked={soundEnabled}
+                  onCheckedChange={handleSoundToggle}
+                />
               </div>
-
-              <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
-                <div className="flex items-center gap-3">
-                  <BellRing className="w-5 h-5 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium text-sm">Browser Notifications</p>
-                    <p className="text-xs text-muted-foreground">Show desktop notifications</p>
-                  </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <p className="font-medium">Browser Notifications</p>
+                  <p className="text-sm text-muted-foreground">Show browser popup notifications</p>
                 </div>
-                <Switch 
-                  checked={browserNotificationsEnabled} 
+                <Switch
+                  checked={browserNotificationsEnabled}
                   onCheckedChange={handleBrowserToggle}
                   disabled={notificationPermission !== 'granted'}
                 />
               </div>
+            </CardContent>
+          </Card>
 
-              {/* PWA Status Indicator */}
-              {(isPwaMode || isMobile) && (
-                <div className="flex items-center justify-between p-3 rounded-lg bg-primary/10 border border-primary/20">
-                  <div className="flex items-center gap-3">
-                    <Smartphone className="w-5 h-5 text-primary" />
-                    <div>
-                      <p className="font-medium text-sm">
-                        {isPwaMode ? 'Running as App' : 'Mobile Mode'}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {isPwaMode 
-                          ? 'Using enhanced PWA notifications' 
-                          : 'Mobile-optimized notifications enabled'}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
-                    {isPwaMode ? 'PWA' : 'Mobile'}
+          {/* Device Info */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                {isMobile ? <Smartphone className="w-5 h-5" /> : <Monitor className="w-5 h-5" />}
+                Device Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {isPwaMode && (
+                  <Badge variant="secondary">
+                    <Smartphone className="w-3 h-3 mr-1" />
+                    PWA Mode
                   </Badge>
-                </div>
-              )}
-
-              <div className="pt-4 space-y-2">
-                <Button variant="outline" onClick={testNotification} className="w-full">
-                  <Bell className="w-4 h-4 mr-2" />
-                  Test Notifications
-                </Button>
-                <p className="text-xs text-muted-foreground text-center">
-                  {isMobile 
-                    ? 'Tap to test sound, vibration, and notification' 
-                    : 'Click to test sound and notification'}
-                </p>
+                )}
+                {isMobile && (
+                  <Badge variant="secondary">
+                    <Smartphone className="w-3 h-3 mr-1" />
+                    Mobile Device
+                  </Badge>
+                )}
+                {!isPwaMode && !isMobile && (
+                  <Badge variant="secondary">
+                    <Monitor className="w-3 h-3 mr-1" />
+                    Desktop Browser
+                  </Badge>
+                )}
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Test Notifications */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Test Notifications</CardTitle>
+              <CardDescription>Send a test notification to verify your settings</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={testNotification} className="w-full sm:w-auto">
+                <Bell className="w-4 h-4 mr-2" />
+                Send Test Notification
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>

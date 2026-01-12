@@ -50,7 +50,7 @@ export const useRealtimeNotifications = (config: RealtimeConfig = {}) => {
           table: 'notification_deliveries',
           filter: `user_id=eq.${user.id}`
         },
-        (payload) => {
+        async (payload) => {
           console.log('New notification delivery for user:', payload);
           const delivery = payload.new as any;
           
@@ -69,7 +69,7 @@ export const useRealtimeNotifications = (config: RealtimeConfig = {}) => {
           const title = `Security Alert: ${alertLabels[delivery.alert_type] || delivery.alert_type}`;
           const message = delivery.message_preview || `Delivered via ${delivery.delivery_method}`;
 
-          addNotification(title, message, 'warning');
+          await addNotification(title, message, 'warning');
 
           if (enableSound && getSoundEnabled()) {
             playNotificationSound();
@@ -149,7 +149,7 @@ export const useRealtimeNotifications = (config: RealtimeConfig = {}) => {
           table: 'auth_events',
           filter: `user_id=eq.${user.id}`
         },
-        (payload) => {
+        async (payload) => {
           console.log('New auth event:', payload);
           const event = payload.new as any;
           
@@ -164,7 +164,7 @@ export const useRealtimeNotifications = (config: RealtimeConfig = {}) => {
             };
 
             const title = eventLabels[event.event_type] || event.event_type;
-            addNotification('Security Event', title, 'warning');
+            await addNotification('Security Event', title, 'warning');
             
             if (enableToasts) {
               toast.warning('Security Event', { description: title });
