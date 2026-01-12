@@ -540,7 +540,7 @@ const handler = async (req: Request): Promise<Response> => {
                 ${actionMessage}
               </p>
               
-              <a href="https://taxforge-ng.lovable.app/settings" style="display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; margin-right: 12px;">
+              <a href="https://taxforgeng.com/settings" style="display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; margin-right: 12px;">
                 Review Account Security
               </a>
             </div>
