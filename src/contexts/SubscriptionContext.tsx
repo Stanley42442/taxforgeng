@@ -182,10 +182,14 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       // Check if user has an active trial (any tier with trial_expires_at)
       if (profile?.trial_expires_at) {
         trialEndsAt = new Date(profile.trial_expires_at);
-        isOnTrial = new Date() < trialEndsAt;
-        if (!isOnTrial) {
-          // Trial expired - the database function should have downgraded them
-          // but we'll show free tier just in case
+        const now = new Date();
+        // Trial is active if current time is before expiry
+        isOnTrial = now < trialEndsAt;
+        if (isOnTrial) {
+          // During trial, effectiveTier is whatever tier they selected
+          effectiveTier = baseTier;
+        } else {
+          // Trial expired - should have been downgraded by database function
           effectiveTier = 'free';
         }
       }

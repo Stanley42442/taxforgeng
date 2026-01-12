@@ -13,7 +13,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
-import { NavMenu } from "@/components/NavMenu";
+
 import { FreeTrialCTA } from "@/components/FreeTrialCTA";
 import { SuccessStories } from "@/components/SuccessStories";
 import { useState, useEffect, useRef } from "react";
@@ -66,7 +66,7 @@ const Index = () => {
       <div className="fixed bottom-20 left-1/4 w-72 h-72 rounded-full bg-primary/6 blur-3xl animate-float-slow pointer-events-none" />
       <div className="fixed bottom-40 right-1/4 w-48 h-48 rounded-full bg-success/8 blur-3xl animate-float pointer-events-none" />
       
-      <NavMenu />
+      
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 pb-12 pt-8 md:pt-16 md:pb-20 relative z-10">
