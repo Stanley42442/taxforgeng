@@ -66,6 +66,13 @@
     touch-action: pan-y pinch-zoom !important;
     -webkit-overflow-scrolling: touch !important;
   }
+  
+  /* Ensure sticky headers work properly on mobile */
+  header.sticky,
+  .sticky {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+  }
 }
 
 /* Single-column layouts */
