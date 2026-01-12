@@ -1,3 +1,6 @@
+# TaxForge NG - taxforgeng.com
+# https://www.robotstxt.org/robotstxt.html
+
 User-agent: Googlebot
 Allow: /
 
@@ -12,3 +15,5 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Sitemap: https://taxforgeng.com/sitemap.xml
