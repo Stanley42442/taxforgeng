@@ -176,7 +176,7 @@ const App = () => (
                     <ScrollToTop />
                     <ReminderNotificationProvider />
                     <div className="min-h-screen">
-                      <div className="sticky top-0 z-50">
+                      <div className="sticky-header-wrapper">
                         <NavMenu />
                         <TrialBanner />
                       </div>

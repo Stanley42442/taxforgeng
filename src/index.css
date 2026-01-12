@@ -2,6 +2,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @tailwind base;
+
+/* ================================================
+   CRITICAL: Global Sticky Header Fix
+   Works on ALL devices including mobile
+   ================================================ */
+html {
+  overflow-x: clip;
+  /* DO NOT set overflow-y - breaks sticky on mobile */
+}
+
+body {
+  overflow-x: clip;
+  /* DO NOT set overflow-y - breaks sticky on mobile */
+}
+
+#root {
+  min-height: 100vh;
+  /* DO NOT set overflow - breaks sticky on mobile */
+}
+
+.sticky-header-wrapper {
+  position: -webkit-sticky !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 50 !important;
+  will-change: transform;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
 @tailwind components;
 @tailwind utilities;
 
