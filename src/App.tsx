@@ -175,18 +175,18 @@ const App = () => (
                   <BrowserRouter>
                     <ScrollToTop />
                     <ReminderNotificationProvider />
-                    <div className="flex flex-col min-h-screen">
-                      <NavMenu />
-                      <TrialBanner />
-                      <TierSelectionWrapper />
-                      <div className="flex-1">
-                        <Suspense fallback={<PageLoader />}>
-                          <AnimatedRoutes />
-                          <TaxAssistant />
-                          <OfflineIndicator />
-                          <InstallPWAPrompt />
-                        </Suspense>
+                    <div className="min-h-screen">
+                      <div className="sticky top-0 z-50">
+                        <NavMenu />
+                        <TrialBanner />
                       </div>
+                      <TierSelectionWrapper />
+                      <Suspense fallback={<PageLoader />}>
+                        <AnimatedRoutes />
+                        <TaxAssistant />
+                        <OfflineIndicator />
+                        <InstallPWAPrompt />
+                      </Suspense>
                     </div>
                   </BrowserRouter>
                 </>
