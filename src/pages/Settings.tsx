@@ -509,6 +509,34 @@ const Settings = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Security Dashboard Link */}
+          <Card className="glass-frosted hover-lift border-primary/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center glow-sm">
+                  <Shield className="h-4 w-4 text-primary" />
+                </div>
+                Advanced Security
+              </CardTitle>
+              <CardDescription>
+                Manage devices, IP whitelist, time restrictions, and view blocked login attempts
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <p className="text-sm text-muted-foreground">
+                  View and manage your security settings, trusted devices, and access controls.
+                </p>
+                <Button asChild>
+                  <Link to="/security">
+                    <Shield className="h-4 w-4 mr-2" />
+                    Open Security Dashboard
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Notifications Tab */}
