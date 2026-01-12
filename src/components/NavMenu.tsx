@@ -105,6 +105,7 @@ export const NavMenu = () => {
     { to: "/team", label: "Team", icon: Users, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
     { to: "/api-docs", label: "API Docs", icon: Code, minTier: 'corporate', adminOnly: false, showCondition: 'always' as const },
     { to: "/audit-log", label: "Audit Log", icon: History, minTier: 'corporate', adminOnly: false, showCondition: 'always' as const },
+    { to: "/security", label: "Security", icon: Shield, minTier: 'starter', adminOnly: false, showCondition: 'always' as const },
     { to: "/accountant-portal", label: "Accountant Portal", icon: Building2, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
     { to: "/tax-calendar", label: "Tax Calendar", icon: Calendar, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
     { to: "/referrals", label: "Referrals", icon: Gift, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
