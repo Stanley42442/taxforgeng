@@ -179,8 +179,8 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       let trialEndsAt: Date | null = null;
       let effectiveTier = baseTier;
 
-      // Check if user is on business tier with active trial
-      if (profile?.trial_expires_at && baseTier === 'business') {
+      // Check if user has an active trial (any tier with trial_expires_at)
+      if (profile?.trial_expires_at) {
         trialEndsAt = new Date(profile.trial_expires_at);
         isOnTrial = new Date() < trialEndsAt;
         if (!isOnTrial) {
