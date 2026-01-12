@@ -47,12 +47,13 @@ export const TrialBanner = () => {
     return null;
   }
 
-  const { days, hours, minutes } = timeRemaining;
+  const { days, hours, minutes, seconds } = timeRemaining;
+  const isUrgent = days === 0 && hours < 24; // Show seconds when less than 24 hours remain
 
   // Format the countdown display
   const formatTimeUnit = (value: number, unit: string) => (
     <span className="inline-flex items-center gap-0.5">
-      <span className="font-bold tabular-nums">{value}</span>
+      <span className="font-bold tabular-nums">{value.toString().padStart(2, '0')}</span>
       <span className="text-primary-foreground/80 text-xs">{unit}</span>
     </span>
   );
@@ -67,12 +68,13 @@ export const TrialBanner = () => {
           </div>
           
           {/* Countdown Timer */}
-          <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
+          <div className={`flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm ${isUrgent ? 'animate-pulse' : ''}`}>
             <Clock className="h-3.5 w-3.5 shrink-0 hidden sm:block" />
             <div className="flex items-center gap-1 sm:gap-2">
               {days > 0 && formatTimeUnit(days, 'd')}
               {formatTimeUnit(hours, 'h')}
               {formatTimeUnit(minutes, 'm')}
+              {isUrgent && formatTimeUnit(seconds, 's')}
             </div>
             <span className="hidden sm:inline text-primary-foreground/80">
               left of <span className="font-semibold capitalize">{effectiveTier}</span>
