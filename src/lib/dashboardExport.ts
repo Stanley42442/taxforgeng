@@ -243,7 +243,7 @@ export const exportDashboardToPDF = (data: DashboardExportData) => {
     pageWidth / 2, footerY + 2, { align: 'center' }
   );
   doc.text(
-    `© ${new Date().getFullYear()} TaxForge NG | www.taxforge.ng`,
+    `© ${new Date().getFullYear()} TaxForge NG | www.taxforgeng.com`,
     pageWidth / 2, footerY + 8, { align: 'center' }
   );
 

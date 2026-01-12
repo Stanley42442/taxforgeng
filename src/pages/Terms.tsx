@@ -113,7 +113,7 @@ const Terms = () => {
             <p>For questions about these terms or our privacy practices, contact our legal team.</p>
             <div className="mt-3 p-3 rounded-lg bg-muted">
               <p className="font-medium text-foreground">TaxForge NG Legal & Privacy</p>
-              <p>Email: legal@taxforge.ng</p>
+              <p>Email: legal@taxforgeng.com</p>
               <p>Address: Lagos, Nigeria</p>
             </div>
           </CardContent>

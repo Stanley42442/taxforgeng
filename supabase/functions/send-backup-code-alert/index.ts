@@ -64,7 +64,7 @@ const handler = async (req: Request): Promise<Response> => {
                 </p>
               </div>
               
-              <a href="https://taxforge-ng.lovable.app/settings" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
+              <a href="https://taxforgeng.com/settings" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
                 Generate New Backup Codes
               </a>
             </div>

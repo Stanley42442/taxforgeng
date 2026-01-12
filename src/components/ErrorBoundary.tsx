@@ -44,7 +44,7 @@ export class ErrorBoundary extends Component<Props, State> {
     const body = encodeURIComponent(
       `Error: ${this.state.error?.message}\n\nStack: ${this.state.error?.stack}\n\nComponent Stack: ${this.state.errorInfo?.componentStack}`
     );
-    window.open(`mailto:support@taxforge.ng?subject=${subject}&body=${body}`);
+    window.open(`mailto:support@taxforgeng.com?subject=${subject}&body=${body}`);
   };
 
   public render() {

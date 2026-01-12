@@ -281,7 +281,7 @@ const Pricing = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="outline" asChild>
-              <a href="mailto:support@taxforge.ng">
+              <a href="mailto:support@taxforgeng.com">
                 <Mail className="h-4 w-4" />
                 Contact Sales
               </a>

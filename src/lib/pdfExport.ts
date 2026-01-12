@@ -408,7 +408,7 @@ export const generateProfessionalPDF = (
     pageWidth / 2, footerY + 7, { align: 'center' }
   );
   doc.text(
-    `© ${new Date().getFullYear()} TaxForge NG | www.taxforge.ng`,
+    `© ${new Date().getFullYear()} TaxForge NG | www.taxforgeng.com`,
     pageWidth / 2, footerY + 12, { align: 'center' }
   );
 

@@ -389,7 +389,7 @@ export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate }: Embe
       {theme.showPoweredBy && (
         <div style={styles.poweredBy}>
           Powered by{' '}
-          <a href="https://taxforge.ng" target="_blank" rel="noopener noreferrer" style={styles.poweredByLink}>
+          <a href="https://taxforgeng.com" target="_blank" rel="noopener noreferrer" style={styles.poweredByLink}>
             TaxForge NG
           </a>
         </div>
