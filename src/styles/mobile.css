@@ -14,18 +14,7 @@
 
 /* Fix container centering */
 @media (max-width: 767px) {
-  /* CRITICAL FIX: Override overflow-x-hidden everywhere on mobile Chrome Android
-     overflow-x: hidden causes scroll bouncing/locking issues on Chrome Android */
-  html,
-  body,
-  #root,
-  [class*="overflow-x-hidden"],
-  [class*="overflow-hidden"] {
-    overflow-x: visible !important;
-    overflow-y: visible !important;
-  }
-  
-  /* Set proper scrolling on root elements only */
+  /* Set proper scrolling on root elements - use clip for horizontal, auto for vertical */
   html {
     overflow-x: clip !important;
     overflow-y: auto !important;
@@ -47,7 +36,7 @@
   
   #root {
     overflow-x: clip !important;
-    overflow-y: visible !important;
+    overflow-y: auto !important;
     max-width: 100vw;
     width: 100%;
     min-height: 100vh;
@@ -72,6 +61,8 @@
   .sticky {
     position: -webkit-sticky !important;
     position: sticky !important;
+    top: 0 !important;
+    z-index: 50 !important;
   }
 }
 
