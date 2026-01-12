@@ -35,22 +35,16 @@ import {
   type AppNotification 
 } from "@/lib/notifications";
 
-interface NotificationItem extends Omit<AppNotification, 'timestamp'> {
-  timestamp: Date;
-}
-
 const Notifications = () => {
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | 'unsupported'>('default');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [browserNotificationsEnabled, setBrowserNotificationsEnabled] = useState(true);
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
 
   const loadNotifications = () => {
     const stored = getNotifications();
-    setNotifications(stored.map(n => ({
-      ...n,
-      timestamp: new Date(n.timestamp)
-    })));
+    console.log('[Notifications] Loaded notifications:', stored.length);
+    setNotifications(stored);
   };
 
   useEffect(() => {
@@ -132,26 +126,29 @@ const Notifications = () => {
   };
 
   const markAsRead = (id: string) => {
-    const updated = notifications.map(n => 
+    const stored = getNotifications();
+    const updated = stored.map(n => 
       n.id === id ? { ...n, read: true } : n
     );
-    setNotifications(updated);
     localStorage.setItem('app-notifications', JSON.stringify(updated));
+    setNotifications(updated);
     window.dispatchEvent(new CustomEvent('notification-added'));
   };
 
   const markAllAsRead = () => {
-    const updated = notifications.map(n => ({ ...n, read: true }));
-    setNotifications(updated);
+    const stored = getNotifications();
+    const updated = stored.map(n => ({ ...n, read: true }));
     localStorage.setItem('app-notifications', JSON.stringify(updated));
+    setNotifications(updated);
     window.dispatchEvent(new CustomEvent('notification-added'));
     toast.success('All notifications marked as read');
   };
 
   const deleteNotification = (id: string) => {
-    const updated = notifications.filter(n => n.id !== id);
-    setNotifications(updated);
+    const stored = getNotifications();
+    const updated = stored.filter(n => n.id !== id);
     localStorage.setItem('app-notifications', JSON.stringify(updated));
+    setNotifications(updated);
     window.dispatchEvent(new CustomEvent('notification-added'));
     toast.success('Notification deleted');
   };
@@ -196,7 +193,7 @@ const Notifications = () => {
     }
   };
 
-  const getNotificationIcon = (type: NotificationItem['type']) => {
+  const getNotificationIcon = (type: AppNotification['type']) => {
     switch (type) {
       case 'reminder':
         return <Bell className="w-5 h-5 text-primary" />;
@@ -308,7 +305,7 @@ const Notifications = () => {
                           <div className="flex items-center justify-between mt-2">
                             <p className="text-xs text-muted-foreground flex items-center gap-1">
                               <Clock className="w-3 h-3" />
-                              {format(notification.timestamp, "PPp")}
+                              {format(new Date(notification.timestamp), "PPp")}
                             </p>
                             <div className="flex gap-1">
                               {!notification.read && (
