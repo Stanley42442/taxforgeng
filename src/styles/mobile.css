@@ -14,29 +14,25 @@
 
 /* Fix container centering */
 @media (max-width: 767px) {
-  /* Set proper scrolling on root elements - use clip for horizontal, auto for vertical */
+  /* CRITICAL: Do NOT set overflow on html/body/root - it breaks sticky positioning */
+  /* Only clip horizontal overflow, let vertical scroll naturally */
   html {
     overflow-x: clip !important;
-    overflow-y: auto !important;
     max-width: 100vw;
     touch-action: pan-y pinch-zoom !important;
     -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior: none;
   }
   
   body {
     overflow-x: clip !important;
-    overflow-y: auto !important;
     max-width: 100vw;
     width: 100%;
     touch-action: pan-y pinch-zoom !important;
     -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior-y: none;
   }
   
   #root {
     overflow-x: clip !important;
-    overflow-y: auto !important;
     max-width: 100vw;
     width: 100%;
     min-height: 100vh;
@@ -57,7 +53,6 @@
   }
   
   /* Ensure sticky headers work properly on mobile */
-  header.sticky,
   .sticky {
     position: -webkit-sticky !important;
     position: sticky !important;
