@@ -286,12 +286,8 @@
   padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
 }
 
-/* Prevent ALL Horizontal Overflow - use clip to avoid Chrome Android scroll issues */
-html, body, #root {
-  overflow-x: clip;
-  max-width: 100vw;
-  width: 100%;
-}
+/* Removed: Global html/body/root overflow rules - now in index.css */
+/* This prevents conflicts with sticky positioning */
 
 .mobile-overflow-fix {
   max-width: 100vw;
