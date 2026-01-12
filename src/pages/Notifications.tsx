@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -21,33 +20,56 @@ import {
   Trash2,
   AlertTriangle,
   Settings,
-  Inbox
+  Inbox,
+  RefreshCw
 } from "lucide-react";
 import { toast } from "sonner";
-import { requestNotificationPermission } from "@/hooks/useReminderNotifications";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { format } from "date-fns";
 import { 
   getNotifications, 
   addNotification, 
-  playNotificationSound,
-  showBrowserNotification,
   type AppNotification 
 } from "@/lib/notifications";
+import {
+  initializePWA,
+  isPWA,
+  isMobileDevice,
+  requestPWANotificationPermission,
+  showPWANotification,
+  playMobileNotificationSound,
+  vibrateDevice
+} from "@/lib/pwaNotifications";
 
 const Notifications = () => {
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | 'unsupported'>('default');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [browserNotificationsEnabled, setBrowserNotificationsEnabled] = useState(true);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isPwaMode] = useState(() => isPWA());
+  const [isMobile] = useState(() => isMobileDevice());
 
-  const loadNotifications = () => {
+  const loadNotifications = useCallback(() => {
     const stored = getNotifications();
     console.log('[Notifications] Loaded notifications:', stored.length);
     setNotifications(stored);
-  };
+  }, []);
+
+  const handleRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    loadNotifications();
+    vibrateDevice([50]);
+    setTimeout(() => {
+      setIsRefreshing(false);
+      toast.success('Notifications refreshed');
+    }, 300);
+  }, [loadNotifications]);
 
   useEffect(() => {
+    // Initialize PWA features
+    initializePWA();
+
     if ('Notification' in window) {
       setNotificationPermission(Notification.permission);
     } else {
@@ -71,24 +93,36 @@ const Notifications = () => {
       loadNotifications();
     };
 
+    // Refresh on visibility change (when app comes back to foreground)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        loadNotifications();
+      }
+    };
+
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('notification-added', handleNotificationAdded);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('notification-added', handleNotificationAdded);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, []);
+  }, [loadNotifications]);
 
   const handleEnableNotifications = async () => {
-    const granted = await requestNotificationPermission();
+    const granted = await requestPWANotificationPermission();
     if (granted) {
       setNotificationPermission('granted');
+      vibrateDevice([100, 50, 100]);
       toast.success('Push notifications enabled!');
     } else {
-      setNotificationPermission(Notification.permission);
-      if (Notification.permission === 'denied') {
-        toast.error('Notifications blocked by browser. Please enable in browser settings.');
+      if ('Notification' in window) {
+        setNotificationPermission(Notification.permission);
+        if (Notification.permission === 'denied') {
+          toast.error('Notifications blocked by browser. Please enable in browser settings.');
+        }
       }
     }
   };
@@ -96,6 +130,7 @@ const Notifications = () => {
   const handleSoundToggle = (enabled: boolean) => {
     setSoundEnabled(enabled);
     localStorage.setItem('notification-sound-enabled', String(enabled));
+    if (enabled) vibrateDevice([50]);
     toast.success(enabled ? 'Sound notifications enabled' : 'Sound notifications disabled');
   };
 
@@ -105,16 +140,25 @@ const Notifications = () => {
     toast.success(enabled ? 'Browser notifications enabled' : 'Browser notifications disabled');
   };
 
-  const testNotification = () => {
-    playNotificationSound();
+  const testNotification = async () => {
+    console.log('[Notifications] Testing notification...', { isPwaMode, isMobile });
+    
+    // Play sound (with mobile-compatible audio context)
+    await playMobileNotificationSound();
+    
+    // Vibrate on mobile
+    vibrateDevice([200, 100, 200]);
 
+    // Show browser/PWA notification
     if (notificationPermission === 'granted') {
-      showBrowserNotification(
+      await showPWANotification(
         "TaxForge NG - Test",
-        "This is a test notification. Your notifications are working!"
+        "This is a test notification. Your notifications are working!",
+        { url: '/notifications', vibrate: true }
       );
     }
 
+    // Add to local notifications list
     addNotification(
       "Test Notification",
       "This is a test notification to verify your settings are working.",
@@ -215,11 +259,23 @@ const Notifications = () => {
       icon={Bell} 
       maxWidth="2xl"
       headerActions={
-        unreadCount > 0 ? (
-          <Badge variant="destructive" className="text-sm">
-            {unreadCount} unread
-          </Badge>
-        ) : undefined
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="gap-1.5"
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Refresh</span>
+          </Button>
+          {unreadCount > 0 && (
+            <Badge variant="destructive" className="text-sm">
+              {unreadCount} unread
+            </Badge>
+          )}
+        </div>
       }
     >
       <Tabs defaultValue="notifications" className="w-full">
@@ -439,11 +495,38 @@ const Notifications = () => {
                 />
               </div>
 
-              <div className="pt-4">
+              {/* PWA Status Indicator */}
+              {(isPwaMode || isMobile) && (
+                <div className="flex items-center justify-between p-3 rounded-lg bg-primary/10 border border-primary/20">
+                  <div className="flex items-center gap-3">
+                    <Smartphone className="w-5 h-5 text-primary" />
+                    <div>
+                      <p className="font-medium text-sm">
+                        {isPwaMode ? 'Running as App' : 'Mobile Mode'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {isPwaMode 
+                          ? 'Using enhanced PWA notifications' 
+                          : 'Mobile-optimized notifications enabled'}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                    {isPwaMode ? 'PWA' : 'Mobile'}
+                  </Badge>
+                </div>
+              )}
+
+              <div className="pt-4 space-y-2">
                 <Button variant="outline" onClick={testNotification} className="w-full">
                   <Bell className="w-4 h-4 mr-2" />
                   Test Notifications
                 </Button>
+                <p className="text-xs text-muted-foreground text-center">
+                  {isMobile 
+                    ? 'Tap to test sound, vibration, and notification' 
+                    : 'Click to test sound and notification'}
+                </p>
               </div>
             </CardContent>
           </Card>
