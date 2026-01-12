@@ -135,7 +135,7 @@ export const NavMenu = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-2 sm:px-4">
         <nav className="flex h-14 sm:h-16 items-center justify-between gap-2">
           {/* Logo */}
