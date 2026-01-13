@@ -389,6 +389,90 @@
   }
 }
 
+/* Standard Mobile (360px - 480px) - Common Android/iPhone widths like Redmi 12c */
+@media (min-width: 360px) and (max-width: 480px) {
+  .mobile-container {
+    padding: 0 0.875rem;
+  }
+  
+  /* Tighter card styling */
+  .neumorphic,
+  .glass-premium {
+    padding: 0.875rem;
+    border-radius: 0.875rem;
+  }
+  
+  /* Adjusted typography */
+  .display-xl { font-size: 1.875rem; line-height: 1.18; }
+  .display-lg { font-size: 1.625rem; line-height: 1.22; }
+  .display-md { font-size: 1.3125rem; line-height: 1.28; }
+  
+  /* Optimized buttons */
+  .btn-premium {
+    min-height: 42px;
+    padding: 0.6875rem 1.125rem;
+    font-size: 0.875rem;
+  }
+  
+  /* Optimized inputs */
+  .input-neumorphic {
+    min-height: 42px;
+    padding: 0.6875rem 0.8125rem;
+    font-size: 1rem;
+  }
+  
+  /* Tighter bento grid gaps */
+  .bento-grid {
+    gap: 0.625rem;
+  }
+  
+  /* Carousel adjustments */
+  .carousel-premium .carousel-item {
+    flex: 0 0 88%;
+  }
+  
+  .carousel-premium .carousel-item-content {
+    padding: 1rem;
+  }
+  
+  /* Chart container */
+  .chart-glass-container {
+    padding: 0.875rem;
+  }
+  
+  /* Timeline adjustments */
+  .timeline-mobile {
+    padding-left: 1.75rem;
+  }
+  
+  .timeline-mobile .timeline-item {
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+  }
+  
+  /* FAB adjustments */
+  .fab {
+    width: 44px;
+    height: 44px;
+  }
+  
+  /* Modal adjustments */
+  .modal-content-premium {
+    border-radius: 0.875rem 0.875rem 0 0;
+    padding: 1rem;
+    padding-bottom: calc(0.875rem + env(safe-area-inset-bottom, 0px));
+  }
+  
+  /* Grid gaps */
+  .mobile-grid-stack {
+    gap: 0.625rem;
+  }
+  
+  .mobile-flex-wrap {
+    gap: 0.375rem;
+  }
+}
+
 /* Extra Small Screens (≤359px) */
 @media (max-width: 359px) {
   .mobile-container {
