@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { useSubscription, SubscriptionTier } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
+import { useUpgradeCelebration } from "@/components/UpgradeCelebrationProvider";
 
 interface TierFeature {
   name: string;
@@ -92,6 +93,7 @@ const featureCategories = [
 const Pricing = () => {
   const navigate = useNavigate();
   const { tier: currentTier, upgradeTier } = useSubscription();
+  const { triggerCelebration } = useUpgradeCelebration();
 
   const handleUpgrade = (tier: SubscriptionTier) => {
     if (tier === 'corporate') {
@@ -106,8 +108,8 @@ const Pricing = () => {
     
     setTimeout(() => {
       upgradeTier(tier);
-      toast.success("Upgrade successful!");
-      navigate('/calculator');
+      triggerCelebration(tier);
+      navigate('/dashboard');
     }, 1500);
   };
 

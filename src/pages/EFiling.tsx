@@ -17,6 +17,7 @@ import {
   Building2,
   FileText
 } from "lucide-react";
+import { UpgradePrompt } from "@/components/UpgradePrompt";
 import {
   Dialog,
   DialogContent,
@@ -45,18 +46,12 @@ const EFiling = () => {
   if (!isBusinessPlus) {
     return (
       <PageLayout title="E-Filing & Payment" icon={FileCheck} maxWidth="md">
-        <div className="text-center py-10">
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-warning/10">
-            <Crown className="h-10 w-10 text-warning" />
-          </div>
-          <h2 className="text-xl font-bold text-foreground mb-3">E-Filing & Payment</h2>
-          <p className="text-muted-foreground mb-6">
-            File returns and pay taxes directly through TaxForge NG. Available on Business+ plans.
-          </p>
-          <Button variant="hero" onClick={() => navigate('/pricing')}>
-            <Crown className="h-4 w-4" />
-            Upgrade to Business
-          </Button>
+        <div className="max-w-lg mx-auto py-12">
+          <UpgradePrompt 
+            feature="E-Filing & Tax Payment" 
+            requiredTier="business"
+            showFeatures={true}
+          />
         </div>
       </PageLayout>
     );
