@@ -119,17 +119,26 @@ const IndividualCalculatorPage = () => {
 
   const [result, setResult] = useState<ReturnType<typeof calculateIndividualTax> | null>(null);
 
-  // Auto-populate from personal expenses when toggled on
+  // Track if we've already populated for the current toggle session
+  const [hasPopulated, setHasPopulated] = useState(false);
+
+  // Auto-populate from personal expenses when toggled on (only once per toggle)
   useEffect(() => {
-    if (loadFromExpenses && annualTotals) {
+    if (loadFromExpenses && annualTotals && !hasPopulated) {
       setPensionContribution(annualTotals.pension_contribution > 0 ? annualTotals.pension_contribution.toLocaleString('en-NG') : '');
       setNhfContribution(annualTotals.nhf_contribution > 0 ? annualTotals.nhf_contribution.toLocaleString('en-NG') : '');
       setLifeInsurance(annualTotals.life_insurance > 0 ? annualTotals.life_insurance.toLocaleString('en-NG') : '');
       setHealthInsurance(annualTotals.health_insurance > 0 ? annualTotals.health_insurance.toLocaleString('en-NG') : '');
       setRentPaid(annualTotals.rent > 0 ? annualTotals.rent.toLocaleString('en-NG') : '');
+      setHasPopulated(true);
       toast.success('Fields populated from personal expenses');
     }
-  }, [loadFromExpenses, annualTotals]);
+  }, [loadFromExpenses, annualTotals, hasPopulated]);
+
+  const handleRefreshExpenses = async () => {
+    setHasPopulated(false); // Allow re-population on refresh
+    await refetch();
+  };
 
   const handleToggleLoadExpenses = (checked: boolean) => {
     if (checked && !user) {
@@ -137,6 +146,7 @@ const IndividualCalculatorPage = () => {
       return;
     }
     setLoadFromExpenses(checked);
+    setHasPopulated(false); // Reset when toggling
     if (!checked) {
       // Clear auto-populated fields
       setPensionContribution('');
@@ -173,7 +183,6 @@ const IndividualCalculatorPage = () => {
 
     const calcResult = calculateIndividualTax(inputs);
     setResult(calcResult);
-    toast.success('Calculation complete');
   };
 
   const canCalculate = () => {
@@ -305,7 +314,7 @@ const IndividualCalculatorPage = () => {
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      onClick={() => refetch()}
+                      onClick={handleRefreshExpenses}
                       disabled={expensesLoading}
                     >
                       <RefreshCw className={`h-4 w-4 ${expensesLoading ? 'animate-spin' : ''}`} />

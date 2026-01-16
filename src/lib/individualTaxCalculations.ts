@@ -182,6 +182,14 @@ export function calculatePersonalIncomeTax(inputs: IndividualTaxInputs): Individ
   const taxableIncome = Math.max(0, grossIncome - totalReliefs);
   const { tax, breakdown } = calculateProgressiveTax(taxableIncome, bands);
 
+  // Always show breakdown items including reliefs applied
+  const fullBreakdown: TaxBreakdownItem[] = [
+    { label: 'Gross Income', amount: grossIncome },
+    { label: 'Total Reliefs', amount: -totalReliefs },
+    { label: 'Taxable Income', amount: taxableIncome },
+    ...breakdown
+  ];
+
   const effectiveRate = grossIncome > 0 ? (tax / grossIncome) * 100 : 0;
 
   // Alerts and recommendations
@@ -208,7 +216,7 @@ export function calculatePersonalIncomeTax(inputs: IndividualTaxInputs): Individ
     reliefs,
     taxPayable: tax,
     effectiveRate,
-    breakdown,
+    breakdown: fullBreakdown,
     alerts,
     recommendations
   };
