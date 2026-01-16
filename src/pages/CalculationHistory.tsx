@@ -574,12 +574,9 @@ export default function CalculationHistory() {
 
       {/* Detail Dialog */}
       <Dialog open={!!showDetailDialog} onOpenChange={() => setShowDetailDialog(null)}>
-        <DialogContent className="w-[92vw] max-w-md max-h-[65vh] rounded-xl p-4 overflow-hidden flex flex-col mx-auto">
+        <DialogContent className="w-[92vw] max-w-md max-h-[65vh] rounded-xl p-4 flex flex-col mx-auto">
           <DialogHeader className="flex-shrink-0">
-            <DialogTitle className={getResponsiveClasses(device, {
-              mobile: 'flex items-center gap-2 text-base',
-              all: 'flex items-center gap-2 text-base'
-            })}>
+            <DialogTitle className="flex items-center gap-2 text-base">
               {showDetailDialog && (
                 <>
                   {(() => {
@@ -596,7 +593,7 @@ export default function CalculationHistory() {
           </DialogHeader>
           
           {showDetailDialog && (
-            <ScrollArea className="flex-1 pr-2">
+            <div className="flex-1 min-h-0 overflow-y-auto pr-2 mt-4">
               <div className="space-y-3 pb-2">
                 {/* Summary */}
                 <div className="p-2.5 rounded-lg bg-primary/5 border border-primary/20">
@@ -640,7 +637,7 @@ export default function CalculationHistory() {
                   </div>
                 )}
               </div>
-            </ScrollArea>
+            </div>
           )}
           
           <DialogFooter className="flex-shrink-0 pt-3 border-t border-border/50">
@@ -657,7 +654,7 @@ export default function CalculationHistory() {
 
       {/* Compare Dialog */}
       <Dialog open={showCompareDialog} onOpenChange={setShowCompareDialog}>
-        <DialogContent className="w-[92vw] max-w-3xl max-h-[70vh] rounded-xl p-4 overflow-hidden flex flex-col mx-auto">
+        <DialogContent className="w-[92vw] max-w-3xl max-h-[70vh] rounded-xl p-4 flex flex-col mx-auto">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="flex items-center gap-2 text-base">
               <ArrowLeftRight className="h-4 w-4" />
@@ -668,7 +665,7 @@ export default function CalculationHistory() {
             </DialogDescription>
           </DialogHeader>
           
-          <ScrollArea className="flex-1 pr-2">
+          <div className="flex-1 min-h-0 overflow-y-auto pr-2 mt-4">
             <div className={`grid gap-3 ${selectedCalculations.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'}`}>
               {selectedCalculations.map((calc, index) => {
                 const Icon = calcTypeIcons[calc.calculation_type] || Briefcase;
@@ -746,7 +743,7 @@ export default function CalculationHistory() {
                 })()}
               </div>
             )}
-          </ScrollArea>
+          </div>
           
           <DialogFooter className="flex-shrink-0 pt-3 border-t border-border/50">
             <Button variant="outline" size="sm" onClick={() => setShowCompareDialog(false)}>Close</Button>
