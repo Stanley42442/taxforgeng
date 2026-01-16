@@ -56,10 +56,10 @@ const ScenarioModeling = () => {
             <Crown className="h-10 w-10 text-warning" />
           </div>
           <h2 className="text-2xl font-bold text-foreground mb-3">Scenario Modeling</h2>
-          <p className="text-muted-foreground mb-6">Available on Freelancer plan and above</p>
+          <p className="text-muted-foreground mb-6">Available on Professional plan and above</p>
           <Button variant="hero" onClick={() => navigate('/pricing')}>
             <Crown className="h-4 w-4" />
-            Upgrade to Freelancer
+            Upgrade to Professional
           </Button>
         </div>
       </PageLayout>

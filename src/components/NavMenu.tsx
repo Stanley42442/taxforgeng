@@ -95,11 +95,11 @@ export const NavMenu = () => {
     // Business Management Features
     { to: "/expenses", label: "Expenses", icon: Receipt, minTier: 'starter', adminOnly: false, showCondition: 'always' as const },
     { to: "/invoices", label: "Invoices", icon: FileText, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
-    { to: "/payroll", label: "Payroll", icon: Users, minTier: 'freelancer', adminOnly: false, showCondition: 'always' as const },
+    { to: "/payroll", label: "Payroll", icon: Users, minTier: 'professional', adminOnly: false, showCondition: 'always' as const },
     { to: "/profit-loss", label: "P&L Statement", icon: PieChart, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
-    { to: "/compliance", label: "Compliance", icon: Building2, minTier: 'freelancer', adminOnly: false, showCondition: 'always' as const },
+    { to: "/compliance", label: "Compliance", icon: Building2, minTier: 'professional', adminOnly: false, showCondition: 'always' as const },
     
-    { to: "/scenarios", label: "Scenarios", icon: GitBranch, minTier: 'freelancer', adminOnly: false, showCondition: 'always' as const },
+    { to: "/scenarios", label: "Scenarios", icon: GitBranch, minTier: 'professional', adminOnly: false, showCondition: 'always' as const },
     { to: "/business-report", label: "Reports", icon: BarChart3, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
     { to: "/insights", label: "Insights", icon: BarChart3, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
     { to: "/transactions", label: "Transactions", icon: Upload, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
@@ -117,7 +117,7 @@ export const NavMenu = () => {
     { to: "/admin-analytics", label: "Admin Analytics", icon: Shield, minTier: 'free', adminOnly: true, showCondition: 'always' as const },
   ];
 
-  const tierOrder = ['free', 'starter', 'basic', 'freelancer', 'business', 'corporate'];
+  const tierOrder = ['free', 'starter', 'basic', 'professional', 'business', 'corporate'];
   const userTierIndex = tierOrder.indexOf(tier);
   
   const filteredLinks = navLinks.filter(link => {

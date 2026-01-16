@@ -25,7 +25,7 @@ const ProfitLoss = () => {
   const [selectedBusiness, setSelectedBusiness] = useState<string>("all");
   const [period, setPeriod] = useState<string>("month");
 
-  const tierOrder = ['free', 'starter', 'basic', 'freelancer', 'business', 'corporate'];
+  const tierOrder = ['free', 'starter', 'basic', 'professional', 'business', 'corporate'];
   const canAccess = tierOrder.indexOf(tier) >= tierOrder.indexOf('basic');
 
   useEffect(() => {

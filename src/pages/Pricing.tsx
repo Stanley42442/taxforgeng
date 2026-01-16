@@ -33,50 +33,50 @@ interface TierFeature {
   free: boolean | string;
   starter: boolean | string;
   basic: boolean | string;
-  freelancer: boolean | string;
+  professional: boolean | string;
   business: boolean | string;
   corporate: boolean | string;
 }
 
 const features: TierFeature[] = [
   // Tax Calculators
-  { name: 'Personal Tax Calculator (PIT)', category: 'Tax Tools', free: true, starter: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Crypto & Investment Taxes', category: 'Tax Tools', free: true, starter: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Foreign Income / DTT Credits', category: 'Tax Tools', free: true, starter: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Business Tax Calculator', category: 'Tax Tools', free: false, starter: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Digital VAT Calculator', category: 'Tax Tools', free: false, starter: false, basic: false, freelancer: true, business: true, corporate: true },
+  { name: 'Personal Tax Calculator (PIT)', category: 'Tax Tools', free: true, starter: true, basic: true, professional: true, business: true, corporate: true },
+  { name: 'Crypto & Investment Taxes', category: 'Tax Tools', free: true, starter: true, basic: true, professional: true, business: true, corporate: true },
+  { name: 'Foreign Income / DTT Credits', category: 'Tax Tools', free: true, starter: true, basic: true, professional: true, business: true, corporate: true },
+  { name: 'Business Tax Calculator', category: 'Tax Tools', free: false, starter: true, basic: true, professional: true, business: true, corporate: true },
+  { name: 'Digital VAT Calculator', category: 'Tax Tools', free: false, starter: false, basic: false, professional: true, business: true, corporate: true },
   
   // Business Management
-  { name: 'Saved Businesses', category: 'Business', free: '0', starter: '1', basic: '2', freelancer: '5', business: '10', corporate: 'Unlimited' },
-  { name: 'Expense Tracking', category: 'Business', free: false, starter: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Invoices', category: 'Business', free: false, starter: false, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Payroll Calculator', category: 'Business', free: false, starter: false, basic: false, freelancer: true, business: true, corporate: true },
-  { name: 'Profit & Loss Statement', category: 'Business', free: false, starter: false, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Compliance Tracker', category: 'Business', free: false, starter: false, basic: false, freelancer: true, business: true, corporate: true },
+  { name: 'Saved Businesses', category: 'Business', free: '0', starter: '1', basic: '2', professional: '5', business: '10', corporate: 'Unlimited' },
+  { name: 'Expense Tracking', category: 'Business', free: false, starter: true, basic: true, professional: true, business: true, corporate: true },
+  { name: 'Invoices', category: 'Business', free: false, starter: false, basic: true, professional: true, business: true, corporate: true },
+  { name: 'Payroll Calculator', category: 'Business', free: false, starter: false, basic: false, professional: true, business: true, corporate: true },
+  { name: 'Profit & Loss Statement', category: 'Business', free: false, starter: false, basic: true, professional: true, business: true, corporate: true },
+  { name: 'Compliance Tracker', category: 'Business', free: false, starter: false, basic: false, professional: true, business: true, corporate: true },
   
   // Features & Tools
-  { name: 'PDF/CSV Export', category: 'Features', free: false, starter: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Tax Reminders', category: 'Features', free: false, starter: true, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'Sector-Specific Presets', category: 'Features', free: false, starter: false, basic: true, freelancer: true, business: true, corporate: true },
-  { name: 'OCR Receipt Scanner', category: 'Features', free: false, starter: false, basic: false, freelancer: true, business: true, corporate: true },
-  { name: 'Scenario Modeling', category: 'Features', free: false, starter: false, basic: false, freelancer: 'Basic', business: 'Advanced', corporate: 'Advanced' },
-  { name: 'Multi-Year Projection', category: 'Features', free: false, starter: false, basic: false, freelancer: false, business: true, corporate: true },
+  { name: 'PDF/CSV Export', category: 'Features', free: false, starter: true, basic: true, professional: true, business: true, corporate: true },
+  { name: 'Tax Reminders', category: 'Features', free: false, starter: true, basic: true, professional: true, business: true, corporate: true },
+  { name: 'Sector-Specific Presets', category: 'Features', free: false, starter: false, basic: true, professional: true, business: true, corporate: true },
+  { name: 'OCR Receipt Scanner', category: 'Features', free: false, starter: false, basic: true, professional: true, business: true, corporate: true },
+  { name: 'Scenario Modeling', category: 'Features', free: false, starter: false, basic: false, professional: 'Basic', business: 'Advanced', corporate: 'Advanced' },
+  { name: 'Multi-Year Projection', category: 'Features', free: false, starter: false, basic: false, professional: false, business: true, corporate: true },
   
   // Verification & Filing
-  { name: 'CAC Verification (Auto)', category: 'Verification', free: false, starter: false, basic: false, freelancer: false, business: true, corporate: true },
-  { name: 'Bulk CAC Verification', category: 'Verification', free: false, starter: false, basic: false, freelancer: false, business: false, corporate: true },
-  { name: 'Tax Filing Preparation', category: 'Verification', free: false, starter: false, basic: false, freelancer: false, business: true, corporate: true },
+  { name: 'CAC Verification (Auto)', category: 'Verification', free: false, starter: false, basic: false, professional: false, business: true, corporate: true },
+  { name: 'Bulk CAC Verification', category: 'Verification', free: false, starter: false, basic: false, professional: false, business: false, corporate: true },
+  { name: 'Tax Filing Preparation', category: 'Verification', free: false, starter: false, basic: false, professional: false, business: true, corporate: true },
   
   // AI & Advisory
-  { name: 'AI Tax Assistant', category: 'AI & Support', free: '5 queries', starter: '20 queries', basic: '50 queries', freelancer: '100 queries', business: 'Unlimited', corporate: 'Priority' },
-  { name: 'Priority Support', category: 'AI & Support', free: false, starter: false, basic: false, freelancer: true, business: true, corporate: true },
+  { name: 'AI Tax Assistant', category: 'AI & Support', free: '5 queries', starter: '20 queries', basic: '75 queries', professional: '100 queries', business: 'Unlimited', corporate: 'Priority' },
+  { name: 'Priority Support', category: 'AI & Support', free: false, starter: false, basic: false, professional: true, business: true, corporate: true },
   
   // Security & Admin
-  { name: 'No Watermarks', category: 'Security', free: false, starter: true, basic: false, freelancer: true, business: true, corporate: true },
-  { name: 'Audit Log', category: 'Security', free: false, starter: false, basic: false, freelancer: false, business: false, corporate: true },
-  { name: 'IP Whitelist', category: 'Security', free: false, starter: false, basic: false, freelancer: false, business: false, corporate: true },
-  { name: 'Multi-User Seats', category: 'Team', free: false, starter: false, basic: false, freelancer: false, business: '2 seats', corporate: 'Unlimited' },
-  { name: 'API Access', category: 'Team', free: false, starter: false, basic: false, freelancer: false, business: false, corporate: true },
+  { name: 'No Watermarks', category: 'Security', free: false, starter: true, basic: true, professional: true, business: true, corporate: true },
+  { name: 'Audit Log', category: 'Security', free: false, starter: false, basic: false, professional: false, business: false, corporate: true },
+  { name: 'IP Whitelist', category: 'Security', free: false, starter: false, basic: false, professional: false, business: false, corporate: true },
+  { name: 'Multi-User Seats', category: 'Team', free: false, starter: false, basic: false, professional: false, business: '2 seats', corporate: 'Unlimited' },
+  { name: 'API Access', category: 'Team', free: false, starter: false, basic: false, professional: false, business: false, corporate: true },
 ];
 
 const featureCategories = [
@@ -145,9 +145,8 @@ const Pricing = () => {
           icon={<Zap className="h-5 w-5 sm:h-6 sm:w-6" />}
           monthlyPrice={500}
           annualPrice={5000}
-          description="For small business owners"
+          description="For side hustlers starting out"
           features={['Everything in Free', '1 saved business', 'PDF/CSV export', 'No watermarks', 'Email reminders']}
-          limitations={['No scenario modeling']}
           currentTier={currentTier}
           onUpgrade={handleUpgrade}
         />
@@ -159,22 +158,21 @@ const Pricing = () => {
           icon={<Star className="h-5 w-5 sm:h-6 sm:w-6" />}
           monthlyPrice={2000}
           annualPrice={20000}
-          description="Perfect for side hustlers"
-          features={['Everything in Starter', 'Up to 2 businesses', 'Invoices & P&L', 'Sector presets', 'Data storage']}
-          limitations={['Watermarked results']}
+          description="For freelancers & solo professionals"
+          features={['Everything in Starter', 'Up to 2 businesses', 'Invoices & P&L', 'OCR receipts', '75 AI queries', 'No watermarks']}
           currentTier={currentTier}
           onUpgrade={handleUpgrade}
         />
 
-        {/* Freelancer Tier */}
+        {/* Professional Tier (was Freelancer) */}
         <PricingCard
-          tier="freelancer"
-          name="Freelancer"
+          tier="professional"
+          name="Professional"
           icon={<Briefcase className="h-5 w-5 sm:h-6 sm:w-6" />}
           monthlyPrice={4999}
           annualPrice={49990}
-          description="For solo professionals & freelancers"
-          features={['Everything in Basic', 'Up to 5 businesses', 'Payroll & Compliance', 'OCR receipts', 'Basic scenarios', 'Priority support']}
+          description="For small businesses"
+          features={['Everything in Basic', 'Up to 5 businesses', 'Payroll & Compliance', 'Digital VAT calc', 'Basic scenarios', 'Priority support']}
           currentTier={currentTier}
           onUpgrade={handleUpgrade}
         />
@@ -187,7 +185,7 @@ const Pricing = () => {
           monthlyPrice={8999}
           annualPrice={89990}
           description="For growing businesses"
-          features={['Everything in Freelancer', 'Up to 10 businesses', 'CAC verification', 'Advanced scenarios', 'Tax filing prep', '2 user seats']}
+          features={['Everything in Professional', 'Up to 10 businesses', 'CAC verification', 'Advanced scenarios', 'Tax filing prep', '2 user seats']}
           isPopular
           currentTier={currentTier}
           onUpgrade={handleUpgrade}
@@ -220,7 +218,7 @@ const Pricing = () => {
                   <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Individual</th>
                   <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Starter</th>
                   <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Basic</th>
-                  <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Freelancer</th>
+                  <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Professional</th>
                   <th className="text-center p-4 font-semibold text-foreground bg-primary/5 min-w-[80px]">Business</th>
                   <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Corporate</th>
                 </tr>
@@ -244,7 +242,7 @@ const Pricing = () => {
                         <td className="p-4 text-center"><FeatureValue value={feature.free} /></td>
                         <td className="p-4 text-center"><FeatureValue value={feature.starter} /></td>
                         <td className="p-4 text-center"><FeatureValue value={feature.basic} /></td>
-                        <td className="p-4 text-center"><FeatureValue value={feature.freelancer} /></td>
+                        <td className="p-4 text-center"><FeatureValue value={feature.professional} /></td>
                         <td className="p-4 text-center bg-primary/5"><FeatureValue value={feature.business} /></td>
                         <td className="p-4 text-center"><FeatureValue value={feature.corporate} /></td>
                       </tr>
