@@ -17,6 +17,7 @@ import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { InstallPWAPrompt } from "@/components/InstallPWAPrompt";
 import { SharedElementProvider } from "@/components/PageTransition";
 import { NavMenu } from "@/components/NavMenu";
+import { UpgradeCelebrationProvider } from "@/components/UpgradeCelebrationProvider";
 import { lazy, Suspense } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -177,21 +178,23 @@ const App = () => (
                   <Toaster />
                   <Sonner />
                   <BrowserRouter>
-                    <ScrollToTop />
-                    <ReminderNotificationProvider />
-                    <div className="min-h-screen">
-                      <div className="sticky-header-wrapper">
-                        <NavMenu />
-                        <TrialBanner />
+                    <UpgradeCelebrationProvider>
+                      <ScrollToTop />
+                      <ReminderNotificationProvider />
+                      <div className="min-h-screen">
+                        <div className="sticky-header-wrapper">
+                          <NavMenu />
+                          <TrialBanner />
+                        </div>
+                        <TierSelectionWrapper />
+                        <Suspense fallback={<PageLoader />}>
+                          <AnimatedRoutes />
+                          <TaxAssistant />
+                          <OfflineIndicator />
+                          <InstallPWAPrompt />
+                        </Suspense>
                       </div>
-                      <TierSelectionWrapper />
-                      <Suspense fallback={<PageLoader />}>
-                        <AnimatedRoutes />
-                        <TaxAssistant />
-                        <OfflineIndicator />
-                        <InstallPWAPrompt />
-                      </Suspense>
-                    </div>
+                    </UpgradeCelebrationProvider>
                   </BrowserRouter>
                 </>
               </TooltipProvider>

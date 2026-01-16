@@ -17,6 +17,7 @@ import { Plus, FileText, Send, Check, Clock, X, Trash2, Eye } from "lucide-react
 import { formatCurrency } from "@/lib/taxCalculations";
 import { useFormFeedback } from "@/hooks/useFormFeedback";
 import { SuccessCelebration } from "@/components/ui/form-feedback";
+import { UpgradePrompt } from "@/components/UpgradePrompt";
 
 interface InvoiceItem {
   id?: string;
@@ -265,17 +266,12 @@ const Invoices = () => {
   if (!canAccess) {
     return (
       <PageLayout title="Invoices" icon={FileText} maxWidth="6xl">
-        <div className="text-center py-12">
-          <Card className="glass-frosted max-w-2xl mx-auto text-center p-8 hover-lift">
-            <div className="h-20 w-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6 glow-sm">
-              <FileText className="h-10 w-10 text-primary" />
-            </div>
-            <h2 className="text-2xl font-bold mb-2">Invoicing System</h2>
-            <p className="text-muted-foreground mb-6">
-              Create professional invoices with automatic VAT calculation. Available on Basic plan and above.
-            </p>
-            <Button variant="glow" onClick={() => navigate('/pricing')}>Upgrade to Access</Button>
-          </Card>
+        <div className="max-w-lg mx-auto py-12">
+          <UpgradePrompt 
+            feature="Professional Invoicing" 
+            requiredTier="basic"
+            showFeatures={true}
+          />
         </div>
       </PageLayout>
     );

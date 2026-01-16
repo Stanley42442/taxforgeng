@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, DollarSign, FileText, Calendar } from "lucide-react";
+import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { format, startOfMonth, endOfMonth, subMonths, startOfYear, endOfYear } from "date-fns";
 
@@ -78,12 +79,13 @@ const ProfitLoss = () => {
   if (!canAccess) {
     return (
       <PageLayout title="Profit & Loss Statement" description="Financial performance overview" icon={FileText}>
-        <Card className="max-w-2xl mx-auto text-center p-8">
-          <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Profit & Loss Statement</h2>
-          <p className="text-muted-foreground mb-6">Available on Basic plan and above.</p>
-          <Button onClick={() => navigate('/pricing')}>Upgrade to Access</Button>
-        </Card>
+        <div className="max-w-lg mx-auto py-12">
+          <UpgradePrompt 
+            feature="Profit & Loss Reports" 
+            requiredTier="basic"
+            showFeatures={true}
+          />
+        </div>
       </PageLayout>
     );
   }

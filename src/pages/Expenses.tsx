@@ -67,6 +67,7 @@ import { ExpenseCharts } from "@/components/ExpenseCharts";
 import { ExpenseAnalytics } from "@/components/ExpenseAnalytics";
 import { OCRReceiptScanner } from "@/components/OCRReceiptScanner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -1049,15 +1050,29 @@ const Expenses = () => {
               </Button>
               {/* OCR Scanner - Available on Basic tier and above */}
               {['basic', 'professional', 'business', 'corporate'].includes(tier) ? (
-                <Button variant="outline" className="glass" onClick={() => setShowOCRScanner(true)}>
-                  <Camera className="h-4 w-4" />
-                  <span className="hidden sm:inline">Scan Receipt</span>
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" className="glass" onClick={() => setShowOCRScanner(true)}>
+                      <Camera className="h-4 w-4" />
+                      <span className="hidden sm:inline">Scan Receipt</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Scan receipts to auto-fill expenses</p>
+                  </TooltipContent>
+                </Tooltip>
               ) : (
-                <Button variant="outline" className="glass border-primary/30 hover:border-primary/50" onClick={() => setShowOCRUpgrade(true)}>
-                  <Crown className="h-4 w-4 text-primary" />
-                  <span className="hidden sm:inline">Scan Receipt</span>
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" className="glass border-primary/30 hover:border-primary/50" onClick={() => setShowOCRUpgrade(true)}>
+                      <Crown className="h-4 w-4 text-primary" />
+                      <span className="hidden sm:inline">Scan Receipt</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Upgrade to Basic to unlock OCR scanning</p>
+                  </TooltipContent>
+                </Tooltip>
               )}
               <Button variant="outline" className="glass" onClick={handleCSVImport}>
                 <Upload className="h-4 w-4" />
