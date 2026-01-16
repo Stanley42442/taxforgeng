@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/PageLayout";
@@ -27,6 +28,7 @@ import {
 import { useSubscription, SubscriptionTier } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
 import { useUpgradeCelebration } from "@/components/UpgradeCelebrationProvider";
+import { DowngradeConfirmationDialog } from "@/components/DowngradeConfirmationDialog";
 
 interface TierFeature {
   name: string;
@@ -90,17 +92,40 @@ const featureCategories = [
   { name: 'Team', icon: Users },
 ];
 
+const TIER_ORDER: SubscriptionTier[] = ['free', 'starter', 'basic', 'professional', 'business', 'corporate'];
+
 const Pricing = () => {
   const navigate = useNavigate();
   const { tier: currentTier, upgradeTier } = useSubscription();
   const { triggerCelebration } = useUpgradeCelebration();
+  
+  const [showDowngradeDialog, setShowDowngradeDialog] = useState(false);
+  const [pendingDowngradeTier, setPendingDowngradeTier] = useState<SubscriptionTier | null>(null);
 
-  const handleUpgrade = (tier: SubscriptionTier) => {
+  const isDowngrade = (targetTier: SubscriptionTier): boolean => {
+    const currentIndex = TIER_ORDER.indexOf(currentTier);
+    const targetIndex = TIER_ORDER.indexOf(targetTier);
+    return targetIndex < currentIndex;
+  };
+
+  const handleTierSelect = (tier: SubscriptionTier) => {
     if (tier === 'corporate') {
       toast.info("Contact us for Corporate pricing");
       return;
     }
-    
+
+    // Check if this is a downgrade
+    if (isDowngrade(tier)) {
+      setPendingDowngradeTier(tier);
+      setShowDowngradeDialog(true);
+      return;
+    }
+
+    // Regular upgrade flow
+    processUpgrade(tier);
+  };
+
+  const processUpgrade = (tier: SubscriptionTier) => {
     // Mock Paystack checkout - in production, this would open Paystack
     toast.success("Processing upgrade...", {
       description: 'This is a test mode transaction'
@@ -113,7 +138,20 @@ const Pricing = () => {
     }, 1500);
   };
 
+  const handleDowngradeConfirm = () => {
+    if (!pendingDowngradeTier) return;
+    
+    toast.success(`Downgraded to ${pendingDowngradeTier.charAt(0).toUpperCase() + pendingDowngradeTier.slice(1)}`, {
+      description: 'Your data has been preserved and will be available if you upgrade again.'
+    });
+    
+    upgradeTier(pendingDowngradeTier);
+    setPendingDowngradeTier(null);
+    navigate('/dashboard');
+  };
+
   return (
+    <>
     <PageLayout maxWidth="7xl" showBackground={true}>
       {/* Header */}
       <div className="text-center mb-12 animate-slide-up">
@@ -137,7 +175,7 @@ const Pricing = () => {
           features={['Personal tax calculator', 'Employment/Salary PIT', 'Crypto & investment taxes', 'Foreign income credits']}
           limitations={['No business saves', 'No exports']}
           currentTier={currentTier}
-          onUpgrade={handleUpgrade}
+          onUpgrade={handleTierSelect}
         />
 
         {/* Starter Tier */}
@@ -150,7 +188,7 @@ const Pricing = () => {
           description="For side hustlers starting out"
           features={['Everything in Free', '1 saved business', 'PDF/CSV export', 'No watermarks', 'Email reminders']}
           currentTier={currentTier}
-          onUpgrade={handleUpgrade}
+          onUpgrade={handleTierSelect}
         />
 
         {/* Basic Tier */}
@@ -163,7 +201,7 @@ const Pricing = () => {
           description="For freelancers & solo professionals"
           features={['Everything in Starter', 'Up to 2 businesses', 'Invoices & P&L', 'OCR receipts', '75 AI queries', 'No watermarks']}
           currentTier={currentTier}
-          onUpgrade={handleUpgrade}
+          onUpgrade={handleTierSelect}
         />
 
         {/* Professional Tier (was Freelancer) */}
@@ -176,7 +214,7 @@ const Pricing = () => {
           description="For small businesses"
           features={['Everything in Basic', 'Up to 5 businesses', 'Payroll & Compliance', 'Digital VAT calc', 'Basic scenarios', 'Priority support']}
           currentTier={currentTier}
-          onUpgrade={handleUpgrade}
+          onUpgrade={handleTierSelect}
         />
 
         {/* Business Tier */}
@@ -190,7 +228,7 @@ const Pricing = () => {
           features={['Everything in Professional', 'Up to 10 businesses', 'CAC verification', 'Advanced scenarios', 'Tax filing prep', '2 user seats']}
           isPopular
           currentTier={currentTier}
-          onUpgrade={handleUpgrade}
+          onUpgrade={handleTierSelect}
         />
 
         {/* Corporate Tier */}
@@ -202,7 +240,7 @@ const Pricing = () => {
           description="Enterprise solution"
           features={['Everything in Business', 'Unlimited businesses', 'Unlimited users', 'API access', 'Audit log & IP whitelist', 'Dedicated support']}
           currentTier={currentTier}
-          onUpgrade={handleUpgrade}
+          onUpgrade={handleTierSelect}
         />
       </div>
 
@@ -301,6 +339,16 @@ const Pricing = () => {
         </p>
       </div>
     </PageLayout>
+
+    {/* Downgrade Confirmation Dialog */}
+    <DowngradeConfirmationDialog
+      open={showDowngradeDialog}
+      onOpenChange={setShowDowngradeDialog}
+      currentTier={currentTier}
+      targetTier={pendingDowngradeTier || 'free'}
+      onConfirm={handleDowngradeConfirm}
+    />
+  </>
   );
 };
 
@@ -331,7 +379,11 @@ const PricingCard = ({
 }) => {
   const isCurrentTier = currentTier === tier;
   const formatPrice = (price: number) => `₦${price.toLocaleString()}`;
-
+  
+  // Determine if selecting this tier is a downgrade
+  const currentIndex = TIER_ORDER.indexOf(currentTier);
+  const tierIndex = TIER_ORDER.indexOf(tier);
+  const isDowngradeTier = tierIndex < currentIndex;
   return (
     <div className={`relative rounded-xl sm:rounded-2xl border p-4 sm:p-6 transition-all duration-300 ${
       isPopular 
@@ -401,12 +453,18 @@ const PricingCard = ({
       </ul>
 
       <Button
-        variant={isPopular ? 'hero' : isCurrentTier ? 'secondary' : 'outline'}
-        className="w-full text-xs sm:text-sm h-9 sm:h-10"
-        disabled={isCurrentTier || (tier === 'free')}
+        variant={isPopular ? 'hero' : isCurrentTier ? 'secondary' : isDowngradeTier ? 'outline' : 'outline'}
+        className={`w-full text-xs sm:text-sm h-9 sm:h-10 ${isDowngradeTier ? 'border-warning/50 text-warning hover:bg-warning/10' : ''}`}
+        disabled={isCurrentTier}
         onClick={() => onUpgrade(tier)}
       >
-        {isCurrentTier ? 'Current Plan' : tier === 'free' ? 'Free Forever' : tier === 'corporate' ? 'Contact Us' : 'Upgrade Now'}
+        {isCurrentTier 
+          ? 'Current Plan' 
+          : tier === 'corporate' 
+            ? 'Contact Us' 
+            : isDowngradeTier 
+              ? 'Downgrade' 
+              : 'Upgrade Now'}
       </Button>
     </div>
   );
