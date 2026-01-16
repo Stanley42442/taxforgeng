@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -119,24 +119,37 @@ const IndividualCalculatorPage = () => {
 
   const [result, setResult] = useState<ReturnType<typeof calculateIndividualTax> | null>(null);
 
-  // Track if we've already populated for the current toggle session
-  const [hasPopulated, setHasPopulated] = useState(false);
+  // Track if we need to populate (using ref to avoid re-triggers)
+  const shouldPopulateRef = useRef(false);
+  const lastPopulatedRef = useRef<string | null>(null);
 
-  // Auto-populate from personal expenses when toggled on (only once per toggle)
-  useEffect(() => {
-    if (loadFromExpenses && annualTotals && !hasPopulated) {
-      setPensionContribution(annualTotals.pension_contribution > 0 ? annualTotals.pension_contribution.toLocaleString('en-NG') : '');
-      setNhfContribution(annualTotals.nhf_contribution > 0 ? annualTotals.nhf_contribution.toLocaleString('en-NG') : '');
-      setLifeInsurance(annualTotals.life_insurance > 0 ? annualTotals.life_insurance.toLocaleString('en-NG') : '');
-      setHealthInsurance(annualTotals.health_insurance > 0 ? annualTotals.health_insurance.toLocaleString('en-NG') : '');
-      setRentPaid(annualTotals.rent > 0 ? annualTotals.rent.toLocaleString('en-NG') : '');
-      setHasPopulated(true);
+  // Populate fields from expenses
+  const populateFromExpenses = (totals: typeof annualTotals, showToast = true) => {
+    setPensionContribution(totals.pension_contribution > 0 ? totals.pension_contribution.toLocaleString('en-NG') : '');
+    setNhfContribution(totals.nhf_contribution > 0 ? totals.nhf_contribution.toLocaleString('en-NG') : '');
+    setLifeInsurance(totals.life_insurance > 0 ? totals.life_insurance.toLocaleString('en-NG') : '');
+    setHealthInsurance(totals.health_insurance > 0 ? totals.health_insurance.toLocaleString('en-NG') : '');
+    setRentPaid(totals.rent > 0 ? totals.rent.toLocaleString('en-NG') : '');
+    if (showToast) {
       toast.success('Fields populated from personal expenses');
     }
-  }, [loadFromExpenses, annualTotals, hasPopulated]);
+  };
+
+  // Handle initial load when toggle is on and data arrives
+  useEffect(() => {
+    if (shouldPopulateRef.current && annualTotals && !expensesLoading) {
+      const totalsKey = JSON.stringify(annualTotals);
+      if (lastPopulatedRef.current !== totalsKey) {
+        populateFromExpenses(annualTotals);
+        lastPopulatedRef.current = totalsKey;
+        shouldPopulateRef.current = false;
+      }
+    }
+  }, [annualTotals, expensesLoading]);
 
   const handleRefreshExpenses = async () => {
-    setHasPopulated(false); // Allow re-population on refresh
+    lastPopulatedRef.current = null; // Reset to allow re-population
+    shouldPopulateRef.current = true;
     await refetch();
   };
 
@@ -146,14 +159,24 @@ const IndividualCalculatorPage = () => {
       return;
     }
     setLoadFromExpenses(checked);
-    setHasPopulated(false); // Reset when toggling
-    if (!checked) {
+    if (checked) {
+      shouldPopulateRef.current = true;
+      lastPopulatedRef.current = null;
+      // If data already loaded, populate immediately
+      if (annualTotals && !expensesLoading) {
+        populateFromExpenses(annualTotals);
+        lastPopulatedRef.current = JSON.stringify(annualTotals);
+        shouldPopulateRef.current = false;
+      }
+    } else {
       // Clear auto-populated fields
       setPensionContribution('');
       setNhfContribution('');
       setLifeInsurance('');
       setHealthInsurance('');
       setRentPaid('');
+      shouldPopulateRef.current = false;
+      lastPopulatedRef.current = null;
     }
   };
 
