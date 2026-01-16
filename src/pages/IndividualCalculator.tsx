@@ -30,17 +30,35 @@ import {
   AlertCircle,
   Wallet,
   RefreshCw,
-  Download
+  Download,
+  Save,
+  History,
+  ArrowLeftRight,
+  TrendingDown,
+  Loader2,
+  X
 } from "lucide-react";
 import { ForeignIncomeCalculator } from "@/components/ForeignIncomeCalculator";
-import { calculateIndividualTax, formatCurrency, type IndividualTaxInputs } from "@/lib/individualTaxCalculations";
+import { calculateIndividualTax, formatCurrency, type IndividualTaxInputs, type IndividualTaxResult } from "@/lib/individualTaxCalculations";
 import { PRESUMPTIVE_TAX_RATES } from "@/lib/sectorConfig";
 import { usePersonalExpenses } from "@/hooks/usePersonalExpenses";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { downloadIndividualTaxPDF } from "@/lib/individualPdfExport";
+import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { format } from "date-fns";
 
 type CalculationType = 'pit' | 'crypto' | 'investment' | 'informal' | 'foreign_income';
+
+interface SavedCalculation {
+  id: string;
+  calculation_type: string;
+  inputs: IndividualTaxInputs;
+  result: IndividualTaxResult;
+  created_at: string;
+}
 
 const InputField = ({
   label,
@@ -120,10 +138,17 @@ const IndividualCalculatorPage = () => {
   const [location, setLocation] = useState('other_urban');
 
   const [result, setResult] = useState<ReturnType<typeof calculateIndividualTax> | null>(null);
+  const [comparisonResult, setComparisonResult] = useState<ReturnType<typeof calculateIndividualTax> | null>(null);
+  const [showComparison, setShowComparison] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedCalculations, setSavedCalculations] = useState<SavedCalculation[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
 
   // Track if we need to populate (using ref to avoid re-triggers)
   const shouldPopulateRef = useRef(false);
   const lastPopulatedRef = useRef<string | null>(null);
+
 
   // Populate fields from expenses
   const populateFromExpenses = (totals: typeof annualTotals, showToast = true) => {
@@ -188,26 +213,115 @@ const IndividualCalculatorPage = () => {
     return num ? num.toLocaleString('en-NG') : '';
   };
 
-  const handleCalculate = () => {
-    const inputs: IndividualTaxInputs = {
-      calculationType,
-      use2026Rules,
-      employmentIncome: parseNumber(employmentIncome),
-      pensionContribution: parseNumber(pensionContribution),
-      nhfContribution: parseNumber(nhfContribution),
-      lifeInsurancePremium: parseNumber(lifeInsurance),
-      cryptoIncome: parseNumber(cryptoIncome),
-      cryptoGains: parseNumber(cryptoGains),
-      cryptoLosses: parseNumber(cryptoLosses),
-      dividendIncome: parseNumber(dividendIncome),
-      interestIncome: parseNumber(interestIncome),
-      capitalGains: parseNumber(capitalGains),
-      estimatedTurnover: parseNumber(estimatedTurnover),
-      location,
-    };
+  const getInputs = (rules2026: boolean): IndividualTaxInputs => ({
+    calculationType,
+    use2026Rules: rules2026,
+    employmentIncome: parseNumber(employmentIncome),
+    pensionContribution: parseNumber(pensionContribution),
+    nhfContribution: parseNumber(nhfContribution),
+    lifeInsurancePremium: parseNumber(lifeInsurance),
+    cryptoIncome: parseNumber(cryptoIncome),
+    cryptoGains: parseNumber(cryptoGains),
+    cryptoLosses: parseNumber(cryptoLosses),
+    dividendIncome: parseNumber(dividendIncome),
+    interestIncome: parseNumber(interestIncome),
+    capitalGains: parseNumber(capitalGains),
+    estimatedTurnover: parseNumber(estimatedTurnover),
+    location,
+  });
 
+  const handleCalculate = () => {
+    const inputs = getInputs(use2026Rules);
     const calcResult = calculateIndividualTax(inputs);
     setResult(calcResult);
+
+    // Calculate comparison with opposite rules
+    const comparisonInputs = getInputs(!use2026Rules);
+    const compResult = calculateIndividualTax(comparisonInputs);
+    setComparisonResult(compResult);
+  };
+
+  const handleSaveCalculation = async () => {
+    if (!user) {
+      toast.error('Please log in to save calculations');
+      return;
+    }
+    if (!result) return;
+
+    setIsSaving(true);
+    try {
+      const inputs = getInputs(use2026Rules);
+      const { error } = await supabase
+        .from('individual_calculations')
+        .insert([{
+          user_id: user.id,
+          calculation_type: calculationType,
+          inputs: JSON.parse(JSON.stringify(inputs)),
+          result: JSON.parse(JSON.stringify(result)),
+        }]);
+
+      if (error) throw error;
+      toast.success('Calculation saved successfully');
+    } catch (error) {
+      console.error('Error saving calculation:', error);
+      toast.error('Failed to save calculation');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const loadCalculationHistory = async () => {
+    if (!user) return;
+    
+    setIsLoadingHistory(true);
+    try {
+      const { data, error } = await supabase
+        .from('individual_calculations')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+      setSavedCalculations(data as unknown as SavedCalculation[]);
+    } catch (error) {
+      console.error('Error loading history:', error);
+      toast.error('Failed to load calculation history');
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  const loadSavedCalculation = (calc: SavedCalculation) => {
+    const inputs = calc.inputs;
+    setCalculationType(inputs.calculationType as CalculationType);
+    setUse2026Rules(inputs.use2026Rules);
+    setEmploymentIncome(inputs.employmentIncome ? inputs.employmentIncome.toLocaleString('en-NG') : '');
+    setPensionContribution(inputs.pensionContribution ? inputs.pensionContribution.toLocaleString('en-NG') : '');
+    setNhfContribution(inputs.nhfContribution ? inputs.nhfContribution.toLocaleString('en-NG') : '');
+    setLifeInsurance(inputs.lifeInsurancePremium ? inputs.lifeInsurancePremium.toLocaleString('en-NG') : '');
+    setCryptoIncome(inputs.cryptoIncome ? inputs.cryptoIncome.toLocaleString('en-NG') : '');
+    setCryptoGains(inputs.cryptoGains ? inputs.cryptoGains.toLocaleString('en-NG') : '');
+    setCryptoLosses(inputs.cryptoLosses ? inputs.cryptoLosses.toLocaleString('en-NG') : '');
+    setDividendIncome(inputs.dividendIncome ? inputs.dividendIncome.toLocaleString('en-NG') : '');
+    setInterestIncome(inputs.interestIncome ? inputs.interestIncome.toLocaleString('en-NG') : '');
+    setCapitalGains(inputs.capitalGains ? inputs.capitalGains.toLocaleString('en-NG') : '');
+    setEstimatedTurnover(inputs.estimatedTurnover ? inputs.estimatedTurnover.toLocaleString('en-NG') : '');
+    setLocation(inputs.location || 'other_urban');
+    setResult(calc.result);
+    setShowHistoryDialog(false);
+    toast.success('Calculation loaded');
+  };
+
+  const getCalcTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      pit: 'Employment PIT',
+      crypto: 'Crypto Tax',
+      investment: 'Investment Tax',
+      informal: 'Informal Tax',
+      foreign_income: 'Foreign Income'
+    };
+    return labels[type] || type;
   };
 
   const canCalculate = () => {
@@ -609,9 +723,9 @@ const IndividualCalculatorPage = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Calculate Button */}
+      {/* Calculate Button and History */}
       {calculationType !== 'foreign_income' && (
-        <div className="text-center mb-8 animate-slide-up">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8 animate-slide-up">
           <Button 
             variant="hero" 
             size="lg" 
@@ -622,79 +736,242 @@ const IndividualCalculatorPage = () => {
             <Calculator className="h-5 w-5" />
             Calculate Tax
           </Button>
+          
+          {user && (
+            <Dialog open={showHistoryDialog} onOpenChange={(open) => {
+              setShowHistoryDialog(open);
+              if (open) loadCalculationHistory();
+            }}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="lg" className="gap-2">
+                  <History className="h-5 w-5" />
+                  <span className="hidden sm:inline">View History</span>
+                  <span className="sm:hidden">History</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg max-h-[80vh]">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <History className="h-5 w-5" />
+                    Calculation History
+                  </DialogTitle>
+                </DialogHeader>
+                <ScrollArea className="max-h-[60vh] pr-4">
+                  {isLoadingHistory ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : savedCalculations.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                      <p>No saved calculations yet</p>
+                      <p className="text-sm">Calculate and save to see history</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {savedCalculations.map((calc) => (
+                        <div 
+                          key={calc.id}
+                          className="p-4 rounded-lg border border-border hover:border-primary/50 cursor-pointer transition-all hover:bg-primary/5"
+                          onClick={() => loadSavedCalculation(calc)}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <Badge variant="outline">{getCalcTypeLabel(calc.calculation_type)}</Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {format(new Date(calc.created_at), 'MMM d, yyyy')}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">Tax Payable:</span>
+                            <span className="font-semibold text-primary">
+                              {formatCurrency(calc.result.taxPayable)}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">
+                              {calc.inputs.use2026Rules ? '2026 Rules' : 'Pre-2026 Rules'}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              Rate: {calc.result.effectiveRate.toFixed(1)}%
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       )}
 
       {/* Results Section */}
       {result && (
         <Card className="glass-frosted border-0 shadow-futuristic animate-slide-up">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <CardTitle className="flex items-center gap-2">
               <Calculator className="h-5 w-5 text-primary" />
               Calculation Results
             </CardTitle>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const inputs: IndividualTaxInputs = {
-                  calculationType,
-                  use2026Rules,
-                  employmentIncome: parseNumber(employmentIncome),
-                  pensionContribution: parseNumber(pensionContribution),
-                  nhfContribution: parseNumber(nhfContribution),
-                  lifeInsurancePremium: parseNumber(lifeInsurance),
-                  cryptoIncome: parseNumber(cryptoIncome),
-                  cryptoGains: parseNumber(cryptoGains),
-                  cryptoLosses: parseNumber(cryptoLosses),
-                  dividendIncome: parseNumber(dividendIncome),
-                  interestIncome: parseNumber(interestIncome),
-                  capitalGains: parseNumber(capitalGains),
-                  estimatedTurnover: parseNumber(estimatedTurnover),
-                  location,
-                };
-                downloadIndividualTaxPDF({
-                  inputs,
-                  result,
-                  employmentIncome: parseNumber(employmentIncome),
-                  pensionContribution: parseNumber(pensionContribution),
-                  nhfContribution: parseNumber(nhfContribution),
-                  lifeInsurance: parseNumber(lifeInsurance),
-                  healthInsurance: parseNumber(healthInsurance),
-                  rentPaid: parseNumber(rentPaid),
-                  cryptoIncome: parseNumber(cryptoIncome),
-                  cryptoGains: parseNumber(cryptoGains),
-                  cryptoLosses: parseNumber(cryptoLosses),
-                  dividendIncome: parseNumber(dividendIncome),
-                  interestIncome: parseNumber(interestIncome),
-                  capitalGains: parseNumber(capitalGains),
-                  estimatedTurnover: parseNumber(estimatedTurnover),
-                  location,
-                });
-                toast.success('PDF downloaded successfully');
-              }}
-              className="gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Export PDF
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              {user && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSaveCalculation}
+                  disabled={isSaving}
+                  className="gap-2"
+                >
+                  {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                  <span className="hidden sm:inline">Save</span>
+                </Button>
+              )}
+              <Button
+                variant={showComparison ? "secondary" : "outline"}
+                size="sm"
+                onClick={() => setShowComparison(!showComparison)}
+                className="gap-2"
+              >
+                <ArrowLeftRight className="h-4 w-4" />
+                <span className="hidden sm:inline">Compare Rules</span>
+                <span className="sm:hidden">Compare</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const inputs = getInputs(use2026Rules);
+                  downloadIndividualTaxPDF({
+                    inputs,
+                    result,
+                    employmentIncome: parseNumber(employmentIncome),
+                    pensionContribution: parseNumber(pensionContribution),
+                    nhfContribution: parseNumber(nhfContribution),
+                    lifeInsurance: parseNumber(lifeInsurance),
+                    healthInsurance: parseNumber(healthInsurance),
+                    rentPaid: parseNumber(rentPaid),
+                    cryptoIncome: parseNumber(cryptoIncome),
+                    cryptoGains: parseNumber(cryptoGains),
+                    cryptoLosses: parseNumber(cryptoLosses),
+                    dividendIncome: parseNumber(dividendIncome),
+                    interestIncome: parseNumber(interestIncome),
+                    capitalGains: parseNumber(capitalGains),
+                    estimatedTurnover: parseNumber(estimatedTurnover),
+                    location,
+                  });
+                  toast.success('PDF downloaded successfully');
+                }}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">Export PDF</span>
+                <span className="sm:hidden">PDF</span>
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
+            {/* Comparison View */}
+            {showComparison && comparisonResult && (
+              <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/20">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <ArrowLeftRight className="h-4 w-4" />
+                    Tax Rule Comparison
+                  </h4>
+                  <Button variant="ghost" size="sm" onClick={() => setShowComparison(false)}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Current Rules */}
+                  <div className={`p-4 rounded-xl border-2 ${use2026Rules ? 'border-success bg-success/5' : 'border-muted bg-muted/20'}`}>
+                    <div className="flex items-center gap-2 mb-3">
+                      {use2026Rules && <CheckCircle className="h-4 w-4 text-success" />}
+                      <span className="font-medium text-sm">
+                        {use2026Rules ? 'Nigeria Tax Act 2026' : 'Pre-2026 Rules'}
+                      </span>
+                      {use2026Rules && <Badge variant="outline" className="text-xs bg-success/10 text-success border-success/30">Selected</Badge>}
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Tax Payable:</span>
+                        <span className="font-bold text-lg">{formatCurrency(result.taxPayable)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Effective Rate:</span>
+                        <span className="font-medium">{result.effectiveRate.toFixed(2)}%</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Comparison Rules */}
+                  <div className={`p-4 rounded-xl border-2 ${!use2026Rules ? 'border-success bg-success/5' : 'border-muted bg-muted/20'}`}>
+                    <div className="flex items-center gap-2 mb-3">
+                      {!use2026Rules && <CheckCircle className="h-4 w-4 text-success" />}
+                      <span className="font-medium text-sm">
+                        {!use2026Rules ? 'Nigeria Tax Act 2026' : 'Pre-2026 Rules'}
+                      </span>
+                      {!use2026Rules && <Badge variant="outline" className="text-xs bg-success/10 text-success border-success/30">Selected</Badge>}
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Tax Payable:</span>
+                        <span className="font-bold text-lg">{formatCurrency(comparisonResult.taxPayable)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Effective Rate:</span>
+                        <span className="font-medium">{comparisonResult.effectiveRate.toFixed(2)}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Savings Summary */}
+                {(() => {
+                  const savings = comparisonResult.taxPayable - result.taxPayable;
+                  const savings2026 = use2026Rules ? savings : -savings;
+                  return savings2026 !== 0 && (
+                    <div className={`mt-4 p-3 rounded-lg flex flex-col sm:flex-row items-center justify-center gap-2 text-center ${
+                      savings2026 > 0 ? 'bg-success/10 border border-success/20' : 'bg-warning/10 border border-warning/20'
+                    }`}>
+                      {savings2026 > 0 ? (
+                        <>
+                          <TrendingDown className="h-5 w-5 text-success" />
+                          <span className="text-success font-medium">
+                            You save {formatCurrency(Math.abs(savings2026))} with 2026 Rules
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <TrendingUp className="h-5 w-5 text-warning" />
+                          <span className="text-warning font-medium">
+                            Pre-2026 Rules would save you {formatCurrency(Math.abs(savings2026))}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+
             <div className="grid gap-6 md:grid-cols-2">
               {/* Summary */}
               <div className="space-y-4">
                 <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
                   <p className="text-sm text-muted-foreground">Total Tax Payable</p>
-                  <p className="text-3xl font-bold text-primary">{formatCurrency(result.taxPayable)}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-primary">{formatCurrency(result.taxPayable)}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 rounded-xl bg-secondary">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                  <div className="p-3 sm:p-4 rounded-xl bg-secondary">
                     <p className="text-xs text-muted-foreground">Taxable Income</p>
-                    <p className="text-lg font-semibold">{formatCurrency(result.taxableIncome)}</p>
+                    <p className="text-base sm:text-lg font-semibold">{formatCurrency(result.taxableIncome)}</p>
                   </div>
-                  <div className="p-4 rounded-xl bg-secondary">
+                  <div className="p-3 sm:p-4 rounded-xl bg-secondary">
                     <p className="text-xs text-muted-foreground">Effective Rate</p>
-                    <p className="text-lg font-semibold">{result.effectiveRate.toFixed(2)}%</p>
+                    <p className="text-base sm:text-lg font-semibold">{result.effectiveRate.toFixed(2)}%</p>
                   </div>
                 </div>
               </div>
@@ -704,8 +981,8 @@ const IndividualCalculatorPage = () => {
                 <h4 className="font-medium text-foreground">Tax Breakdown</h4>
                 {result.breakdown.map((item, i) => (
                   <div key={i} className="flex justify-between text-sm py-2 border-b border-border last:border-0">
-                    <span className="text-muted-foreground">{item.label}</span>
-                    <span className="font-medium">{formatCurrency(item.amount)}</span>
+                    <span className="text-muted-foreground text-xs sm:text-sm">{item.label}</span>
+                    <span className="font-medium text-xs sm:text-sm">{formatCurrency(item.amount)}</span>
                   </div>
                 ))}
               </div>
@@ -715,15 +992,15 @@ const IndividualCalculatorPage = () => {
             {result.reliefs && result.reliefs.length > 0 && (
               <div className="mt-6 pt-6 border-t border-border">
                 <h4 className="font-medium text-foreground mb-4">Tax Reliefs Applied</h4>
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
                   {result.reliefs.map((relief, i) => (
                     <div key={i} className="p-3 rounded-lg bg-success/5 border border-success/20">
-                      <div className="flex justify-between items-start">
-                        <div>
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="min-w-0">
                           <p className="text-sm font-medium text-foreground">{relief.name}</p>
-                          <p className="text-xs text-muted-foreground">{relief.description}</p>
+                          <p className="text-xs text-muted-foreground truncate">{relief.description}</p>
                         </div>
-                        <span className="text-sm font-semibold text-success">-{formatCurrency(relief.amount)}</span>
+                        <span className="text-sm font-semibold text-success whitespace-nowrap">-{formatCurrency(relief.amount)}</span>
                       </div>
                     </div>
                   ))}
@@ -739,7 +1016,7 @@ const IndividualCalculatorPage = () => {
                   {result.alerts.map((alert, i) => (
                     <div 
                       key={i} 
-                      className={`p-3 rounded-lg text-sm ${
+                      className={`p-3 rounded-lg text-xs sm:text-sm ${
                         alert.type === 'success' ? 'bg-success/10 text-success border border-success/20' :
                         alert.type === 'warning' ? 'bg-warning/10 text-warning border border-warning/20' :
                         'bg-info/10 text-info border border-info/20'
@@ -761,7 +1038,7 @@ const IndividualCalculatorPage = () => {
                 <h4 className="font-medium text-foreground mb-4">Recommendations</h4>
                 <ul className="space-y-2">
                   {result.recommendations.map((rec, i) => (
-                    <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+                    <li key={i} className="text-xs sm:text-sm text-muted-foreground flex items-start gap-2">
                       <Sparkles className="h-4 w-4 text-accent mt-0.5 flex-shrink-0" />
                       {rec}
                     </li>
