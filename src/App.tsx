@@ -65,6 +65,7 @@ const Payroll = lazy(() => import("./pages/Payroll"));
 const ProfitLoss = lazy(() => import("./pages/ProfitLoss"));
 const Compliance = lazy(() => import("./pages/Compliance"));
 const PersonalExpenses = lazy(() => import("./pages/PersonalExpenses"));
+const CalculationHistory = lazy(() => import("./pages/CalculationHistory"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Lazy load TaxAssistant (heavy component with AI chat)
@@ -153,6 +154,7 @@ const AnimatedRoutes = () => {
           <Route path="/profit-loss" element={<ProfitLoss />} />
           <Route path="/compliance" element={<Compliance />} />
           <Route path="/personal-expenses" element={<PersonalExpenses />} />
+          <Route path="/calculation-history" element={<CalculationHistory />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
