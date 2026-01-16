@@ -72,6 +72,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useFormFeedback } from "@/hooks/useFormFeedback";
 import { SuccessCelebration } from "@/components/ui/form-feedback";
+import { UpgradePrompt } from "@/components/UpgradePrompt";
 
 interface Expense {
   id: string;
@@ -158,6 +159,7 @@ const Expenses = () => {
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showOCRScanner, setShowOCRScanner] = useState(false);
+  const [showOCRUpgrade, setShowOCRUpgrade] = useState(false);
   const [filterBusinessId, setFilterBusinessId] = useState<string>('all');
   const [showCharts, setShowCharts] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -1052,9 +1054,9 @@ const Expenses = () => {
                   <span className="hidden sm:inline">Scan Receipt</span>
                 </Button>
               ) : (
-                <Button variant="outline" className="glass" onClick={() => navigate('/pricing')}>
-                  <Crown className="h-4 w-4" />
-                  <span className="hidden sm:inline">OCR (Basic+)</span>
+                <Button variant="outline" className="glass border-primary/30 hover:border-primary/50" onClick={() => setShowOCRUpgrade(true)}>
+                  <Crown className="h-4 w-4 text-primary" />
+                  <span className="hidden sm:inline">Scan Receipt</span>
                 </Button>
               )}
               <Button variant="outline" className="glass" onClick={handleCSVImport}>
@@ -2115,6 +2117,18 @@ const Expenses = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowRecurringDialog(false)}>Done</Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* OCR Upgrade Dialog */}
+      <Dialog open={showOCRUpgrade} onOpenChange={setShowOCRUpgrade}>
+        <DialogContent className="max-w-md p-0 overflow-hidden">
+          <UpgradePrompt 
+            feature="OCR Receipt Scanner" 
+            requiredTier="basic"
+            showFeatures={true}
+            onClose={() => setShowOCRUpgrade(false)}
+          />
         </DialogContent>
       </Dialog>
     </PageLayout>

@@ -77,7 +77,7 @@ export const TrialBanner = () => {
               {isUrgent && formatTimeUnit(seconds, 's')}
             </div>
             <span className="hidden sm:inline text-primary-foreground/80">
-              left of <span className="font-semibold capitalize">{effectiveTier}</span>
+              left of <span className="font-semibold capitalize">{effectiveTier === 'professional' ? 'Professional' : effectiveTier}</span> trial
             </span>
           </div>
         </div>
