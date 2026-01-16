@@ -114,6 +114,7 @@ export const NavMenu = () => {
     { to: "/referrals", label: "Referrals", icon: Gift, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
     { to: "/success-stories", label: "Success Stories", icon: Star, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
     { to: "/roadmap", label: "Roadmap", icon: Map, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
+    { to: "/documentation", label: "Documentation", icon: FileText, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
     { to: "/admin-analytics", label: "Admin Analytics", icon: Shield, minTier: 'free', adminOnly: true, showCondition: 'always' as const },
   ];
 

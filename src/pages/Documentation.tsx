@@ -165,7 +165,7 @@ const Documentation = () => {
 
     setIsExporting(true);
     try {
-      downloadDocumentationPDF(stats);
+      await downloadDocumentationPDF(stats);
       toast.success('Documentation PDF downloaded successfully!');
     } catch (error) {
       console.error('PDF export error:', error);

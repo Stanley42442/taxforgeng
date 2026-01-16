@@ -249,6 +249,7 @@ const Index = () => {
                 { to: "/success-stories", label: "Success Stories" },
                 { to: "/referrals", label: "Referrals" },
                 { to: "/roadmap", label: "Roadmap" },
+                { to: "/documentation", label: "Documentation" },
                 { to: "/terms", label: "Terms of Service" },
                 { to: "/auth", label: "Sign In" },
               ].map((link) => (

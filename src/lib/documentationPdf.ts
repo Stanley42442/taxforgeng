@@ -1,16 +1,36 @@
 import jsPDF from 'jspdf';
+import QRCode from 'qrcode';
 import type { DocumentationStats } from '@/hooks/useDocumentationStats';
 
 const PRIMARY_COLOR = { r: 34, g: 197, b: 94 }; // Green
 const DARK_COLOR = { r: 17, g: 24, b: 39 };
 const GRAY_COLOR = { r: 107, g: 114, b: 128 };
 
+const LIVE_URL = 'https://taxforgeng.lovable.app';
+
 interface PDFSection {
   title: string;
   content: string[];
 }
 
-export const generateDocumentationPDF = (stats: DocumentationStats): jsPDF => {
+// Generate QR code as base64 data URL
+const generateQRCodeDataUrl = async (url: string): Promise<string> => {
+  try {
+    return await QRCode.toDataURL(url, {
+      width: 150,
+      margin: 1,
+      color: {
+        dark: '#22c55e', // Primary green color
+        light: '#ffffff',
+      },
+    });
+  } catch (error) {
+    console.error('Failed to generate QR code:', error);
+    return '';
+  }
+};
+
+export const generateDocumentationPDF = async (stats: DocumentationStats): Promise<jsPDF> => {
   const doc = new jsPDF('p', 'mm', 'a4');
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -156,7 +176,20 @@ export const generateDocumentationPDF = (stats: DocumentationStats): jsPDF => {
 
   doc.setFontSize(10);
   doc.setTextColor(GRAY_COLOR.r, GRAY_COLOR.g, GRAY_COLOR.b);
-  doc.text('Live URL: https://taxforgeng.lovable.app', pageWidth / 2, yPosition, { align: 'center' });
+  doc.text('Live URL: ' + LIVE_URL, pageWidth / 2, yPosition, { align: 'center' });
+  yPosition += 15;
+
+  // Add QR Code for mobile access
+  const qrCodeDataUrl = await generateQRCodeDataUrl(LIVE_URL);
+  if (qrCodeDataUrl) {
+    const qrSize = 35;
+    const qrX = (pageWidth - qrSize) / 2;
+    doc.addImage(qrCodeDataUrl, 'PNG', qrX, yPosition, qrSize, qrSize);
+    yPosition += qrSize + 5;
+    doc.setFontSize(8);
+    doc.setTextColor(GRAY_COLOR.r, GRAY_COLOR.g, GRAY_COLOR.b);
+    doc.text('Scan to visit live website', pageWidth / 2, yPosition, { align: 'center' });
+  }
 
   // Executive Summary Page
   doc.addPage();
@@ -415,7 +448,7 @@ export const generateDocumentationPDF = (stats: DocumentationStats): jsPDF => {
   return doc;
 };
 
-export const downloadDocumentationPDF = (stats: DocumentationStats): void => {
-  const doc = generateDocumentationPDF(stats);
+export const downloadDocumentationPDF = async (stats: DocumentationStats): Promise<void> => {
+  const doc = await generateDocumentationPDF(stats);
   doc.save('TaxForge-NG-Project-Documentation.pdf');
 };
