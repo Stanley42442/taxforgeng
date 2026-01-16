@@ -43,6 +43,7 @@ import {
   Calendar,
   Star,
   Building2,
+  Wallet,
 } from "lucide-react";
 import {
   Sheet,
@@ -81,6 +82,7 @@ export const NavMenu = () => {
     { to: "/advisory", label: "Get Advice", icon: Lightbulb, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
     // Personal Tax: only for guests or free tier
     { to: "/individual-calculator", label: "Personal Tax", icon: User, minTier: 'free', adminOnly: false, showCondition: 'freeOnly' as const },
+    { to: "/personal-expenses", label: "Personal Expenses", icon: Wallet, minTier: 'free', adminOnly: false, showCondition: 'freeOnly' as const },
     // Business Tax: only for basic tier and above
     { to: "/calculator", label: "Calculator", icon: Calculator, minTier: 'basic', adminOnly: false, showCondition: 'paidOnly' as const },
     { to: "/learn", label: "Learn", icon: GraduationCap, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
