@@ -738,70 +738,87 @@ const IndividualCalculatorPage = () => {
           </Button>
           
           {user && (
-            <Dialog open={showHistoryDialog} onOpenChange={(open) => {
-              setShowHistoryDialog(open);
-              if (open) loadCalculationHistory();
-            }}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="lg" className="gap-2">
-                  <History className="h-5 w-5" />
-                  <span className="hidden sm:inline">View History</span>
-                  <span className="sm:hidden">History</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-lg max-h-[80vh]">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
+            <>
+              <Dialog open={showHistoryDialog} onOpenChange={(open) => {
+                setShowHistoryDialog(open);
+                if (open) loadCalculationHistory();
+              }}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="lg" className="gap-2">
                     <History className="h-5 w-5" />
-                    Calculation History
-                  </DialogTitle>
-                </DialogHeader>
-                <ScrollArea className="max-h-[60vh] pr-4">
-                  {isLoadingHistory ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                    </div>
-                  ) : savedCalculations.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                      <p>No saved calculations yet</p>
-                      <p className="text-sm">Calculate and save to see history</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {savedCalculations.map((calc) => (
-                        <div 
-                          key={calc.id}
-                          className="p-4 rounded-lg border border-border hover:border-primary/50 cursor-pointer transition-all hover:bg-primary/5"
-                          onClick={() => loadSavedCalculation(calc)}
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <Badge variant="outline">{getCalcTypeLabel(calc.calculation_type)}</Badge>
-                            <span className="text-xs text-muted-foreground">
-                              {format(new Date(calc.created_at), 'MMM d, yyyy')}
-                            </span>
+                    <span className="hidden sm:inline">Recent</span>
+                    <span className="sm:hidden">History</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg max-h-[80vh]">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <History className="h-5 w-5" />
+                      Recent Calculations
+                    </DialogTitle>
+                  </DialogHeader>
+                  <ScrollArea className="max-h-[55vh] pr-4">
+                    {isLoadingHistory ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                      </div>
+                    ) : savedCalculations.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                        <p>No saved calculations yet</p>
+                        <p className="text-sm">Calculate and save to see history</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {savedCalculations.slice(0, 5).map((calc) => (
+                          <div 
+                            key={calc.id}
+                            className="p-4 rounded-lg border border-border hover:border-primary/50 cursor-pointer transition-all hover:bg-primary/5"
+                            onClick={() => loadSavedCalculation(calc)}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <Badge variant="outline">{getCalcTypeLabel(calc.calculation_type)}</Badge>
+                              <span className="text-xs text-muted-foreground">
+                                {format(new Date(calc.created_at), 'MMM d, yyyy')}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-muted-foreground">Tax Payable:</span>
+                              <span className="font-semibold text-primary">
+                                {formatCurrency(calc.result.taxPayable)}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-muted-foreground">
+                                {calc.inputs.use2026Rules ? '2026 Rules' : 'Pre-2026 Rules'}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                Rate: {calc.result.effectiveRate.toFixed(1)}%
+                              </span>
+                            </div>
                           </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground">Tax Payable:</span>
-                            <span className="font-semibold text-primary">
-                              {formatCurrency(calc.result.taxPayable)}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-muted-foreground">
-                              {calc.inputs.use2026Rules ? '2026 Rules' : 'Pre-2026 Rules'}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              Rate: {calc.result.effectiveRate.toFixed(1)}%
-                            </span>
-                          </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
+                    )}
+                  </ScrollArea>
+                  {savedCalculations.length > 0 && (
+                    <div className="pt-4 border-t border-border">
+                      <Button 
+                        variant="outline" 
+                        className="w-full gap-2"
+                        onClick={() => {
+                          setShowHistoryDialog(false);
+                          navigate('/calculation-history');
+                        }}
+                      >
+                        View All History
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
                     </div>
                   )}
-                </ScrollArea>
-              </DialogContent>
-            </Dialog>
+                </DialogContent>
+              </Dialog>
+            </>
           )}
         </div>
       )}
