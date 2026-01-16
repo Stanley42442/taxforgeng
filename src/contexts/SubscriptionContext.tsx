@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
-export type SubscriptionTier = 'free' | 'starter' | 'basic' | 'freelancer' | 'business' | 'corporate';
+export type SubscriptionTier = 'free' | 'starter' | 'basic' | 'professional' | 'business' | 'corporate';
 
 export interface CACVerificationDetails {
   companyName: string;
@@ -57,11 +57,18 @@ interface SubscriptionContextType extends SubscriptionState {
   refreshBusinesses: () => Promise<void>;
 }
 
+// Tier limits for saved businesses
+// free: 0 (Individuals with no business)
+// starter: 1 (Side hustlers)
+// basic: 2 (Freelancers & solo professionals)
+// professional: 5 (Small businesses)
+// business: 10 (Growing businesses)
+// corporate: unlimited (Enterprise)
 const TIER_LIMITS: Record<SubscriptionTier, number | 'unlimited'> = {
   free: 0,
   starter: 1,
   basic: 2,
-  freelancer: 5,
+  professional: 5,
   business: 10,
   corporate: 'unlimited',
 };
@@ -319,9 +326,10 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
   const canExport = () => state.effectiveTier !== 'free';
   const canAccessFiling = () => state.effectiveTier === 'business' || state.effectiveTier === 'corporate';
-  const canAccessScenarioModeling = () => state.effectiveTier === 'freelancer' || state.effectiveTier === 'business' || state.effectiveTier === 'corporate';
+  const canAccessScenarioModeling = () => state.effectiveTier === 'professional' || state.effectiveTier === 'business' || state.effectiveTier === 'corporate';
   const canVerifyCAC = () => state.effectiveTier === 'business' || state.effectiveTier === 'corporate';
-  const showWatermark = () => state.effectiveTier === 'free' || state.effectiveTier === 'basic';
+  // Only free tier shows watermark (Starter, Basic+ all have no watermarks)
+  const showWatermark = () => state.effectiveTier === 'free';
 
   const upgradeTier = async (newTier: SubscriptionTier) => {
     if (!user) return;

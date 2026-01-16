@@ -1045,10 +1045,18 @@ const Expenses = () => {
                 <Plus className="h-4 w-4" />
                 Add Entry
               </Button>
-              <Button variant="outline" className="glass" onClick={() => setShowOCRScanner(true)}>
-                <Camera className="h-4 w-4" />
-                <span className="hidden sm:inline">Scan Receipt</span>
-              </Button>
+              {/* OCR Scanner - Available on Basic tier and above */}
+              {['basic', 'professional', 'business', 'corporate'].includes(tier) ? (
+                <Button variant="outline" className="glass" onClick={() => setShowOCRScanner(true)}>
+                  <Camera className="h-4 w-4" />
+                  <span className="hidden sm:inline">Scan Receipt</span>
+                </Button>
+              ) : (
+                <Button variant="outline" className="glass" onClick={() => navigate('/pricing')}>
+                  <Crown className="h-4 w-4" />
+                  <span className="hidden sm:inline">OCR (Basic+)</span>
+                </Button>
+              )}
               <Button variant="outline" className="glass" onClick={handleCSVImport}>
                 <Upload className="h-4 w-4" />
                 <span className="hidden sm:inline">Import CSV</span>

@@ -77,7 +77,7 @@ const Invoices = () => {
     { description: "", quantity: 1, unit_price: 0, amount: 0, is_vatable: true }
   ]);
 
-  const tierOrder = ['free', 'starter', 'basic', 'freelancer', 'business', 'corporate'];
+  const tierOrder = ['free', 'starter', 'basic', 'professional', 'business', 'corporate'];
   const canAccess = tierOrder.indexOf(tier) >= tierOrder.indexOf('basic');
 
   useEffect(() => {
