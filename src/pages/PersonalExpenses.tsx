@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
+import { format, addMonths, addDays, isBefore, startOfDay } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, 
@@ -13,7 +13,11 @@ import {
   ChevronUp,
   Info,
   CheckCircle2,
-  Filter
+  Filter,
+  Sparkles,
+  Bell,
+  BellRing,
+  Clock
 } from 'lucide-react';
 import PageLayout from '@/components/PageLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,8 +30,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Switch } from '@/components/ui/switch';
 import { usePersonalExpenses, PersonalExpenseInput } from '@/hooks/usePersonalExpenses';
 import { PERSONAL_EXPENSE_CATEGORIES, PAYMENT_INTERVALS, getCategoryById, calculateAnnualAmount } from '@/lib/personalExpenseCategories';
+import { EXPENSE_TEMPLATES } from '@/lib/expenseTemplates';
 import { useAuth } from '@/hooks/useAuth';
 import { DeleteConfirmationDialog } from '@/components/DeleteConfirmationDialog';
 
@@ -43,6 +49,8 @@ export default function PersonalExpenses() {
   const [editingExpense, setEditingExpense] = useState<string | null>(null);
   const [deleteExpenseId, setDeleteExpenseId] = useState<string | null>(null);
   const [summaryExpanded, setSummaryExpanded] = useState(true);
+  const [templatesExpanded, setTemplatesExpanded] = useState(false);
+  const [showReminders, setShowReminders] = useState(true);
 
   const {
     expenses,
@@ -56,6 +64,53 @@ export default function PersonalExpenses() {
     updateExpense,
     deleteExpense
   } = usePersonalExpenses(selectedYear);
+
+  // Calculate upcoming payment reminders
+  const getUpcomingReminders = () => {
+    const today = startOfDay(new Date());
+    const reminderDays = 7; // Remind 7 days before
+    
+    return expenses.filter(expense => {
+      if (expense.payment_interval === 'one_time') return false;
+      
+      const startDate = new Date(expense.start_date);
+      let nextPaymentDate: Date;
+      
+      switch (expense.payment_interval) {
+        case 'weekly':
+          nextPaymentDate = addDays(startDate, 7 * Math.ceil((today.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000)));
+          break;
+        case 'monthly':
+          const monthsDiff = (today.getFullYear() - startDate.getFullYear()) * 12 + today.getMonth() - startDate.getMonth();
+          nextPaymentDate = addMonths(startDate, monthsDiff + (today.getDate() >= startDate.getDate() ? 1 : 0));
+          break;
+        case 'quarterly':
+          const quartersDiff = Math.floor(((today.getFullYear() - startDate.getFullYear()) * 12 + today.getMonth() - startDate.getMonth()) / 3);
+          nextPaymentDate = addMonths(startDate, (quartersDiff + 1) * 3);
+          break;
+        case 'annually':
+          const yearsDiff = today.getFullYear() - startDate.getFullYear();
+          nextPaymentDate = new Date(startDate);
+          nextPaymentDate.setFullYear(startDate.getFullYear() + yearsDiff + (today >= new Date(startDate.getFullYear() + yearsDiff, startDate.getMonth(), startDate.getDate()) ? 1 : 0));
+          break;
+        default:
+          return false;
+      }
+      
+      // Check if next payment is within reminder period
+      const reminderDate = addDays(today, reminderDays);
+      return isBefore(nextPaymentDate, reminderDate) && !isBefore(nextPaymentDate, today);
+    }).map(expense => {
+      const category = getCategoryById(expense.category);
+      return {
+        ...expense,
+        categoryName: category?.name || expense.category,
+        categoryIcon: category?.icon || Info
+      };
+    });
+  };
+
+  const upcomingReminders = getUpcomingReminders();
 
   // Form state
   const [formData, setFormData] = useState<PersonalExpenseInput>({
@@ -255,6 +310,124 @@ export default function PersonalExpenses() {
                       <Calculator className="h-4 w-4" />
                       Use in Tax Calculator
                     </Button>
+                  </div>
+                </CardContent>
+              </CollapsibleContent>
+            </Collapsible>
+          </Card>
+        </motion.div>
+
+        {/* Payment Reminders */}
+        {showReminders && upcomingReminders.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            <Card className="glass-premium mb-6 border-warning/30">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-xl p-2.5 bg-warning/20">
+                      <BellRing className="h-5 w-5 text-warning" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Upcoming Payments</CardTitle>
+                      <CardDescription>{upcomingReminders.length} payment{upcomingReminders.length !== 1 ? 's' : ''} due soon</CardDescription>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setShowReminders(false)}>
+                    Dismiss
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {upcomingReminders.slice(0, 3).map(reminder => {
+                    const Icon = reminder.categoryIcon;
+                    return (
+                      <div 
+                        key={reminder.id} 
+                        className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-warning/20"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Icon className="h-4 w-4 text-warning" />
+                          <div>
+                            <p className="font-medium text-sm">{reminder.categoryName}</p>
+                            <p className="text-xs text-muted-foreground">{reminder.description || 'Recurring payment'}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold text-sm">{formatCurrency(Number(reminder.amount))}</p>
+                          <div className="flex items-center gap-1 text-xs text-warning">
+                            <Clock className="h-3 w-3" />
+                            <span>Due soon</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Quick Add Templates */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Card className="glass mb-6">
+            <Collapsible open={templatesExpanded} onOpenChange={setTemplatesExpanded}>
+              <CardHeader className="pb-2">
+                <CollapsibleTrigger className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="h-5 w-5 text-accent" />
+                    <div className="text-left">
+                      <CardTitle className="text-lg">Quick Add Templates</CardTitle>
+                      <CardDescription>Add common expenses with one click</CardDescription>
+                    </div>
+                  </div>
+                  {templatesExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                </CollapsibleTrigger>
+              </CardHeader>
+              <CollapsibleContent>
+                <CardContent>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {EXPENSE_TEMPLATES.map(template => {
+                      const Icon = template.icon;
+                      return (
+                        <Button
+                          key={template.id}
+                          variant="outline"
+                          className="h-auto py-3 px-4 flex flex-col items-start gap-1 text-left hover:border-primary/50 hover:bg-primary/5"
+                          onClick={() => {
+                            setFormData({
+                              category: template.category,
+                              description: template.description,
+                              amount: template.suggestedAmount || 0,
+                              payment_interval: template.payment_interval,
+                              start_date: format(new Date(), 'yyyy-MM-dd'),
+                              end_date: null,
+                              tax_year: selectedYear,
+                              notes: ''
+                            });
+                            setIsAddDialogOpen(true);
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <Icon className="h-4 w-4 text-primary" />
+                            <span className="font-medium text-sm">{template.name}</span>
+                          </div>
+                          <span className="text-xs text-muted-foreground line-clamp-1">
+                            {PAYMENT_INTERVALS.find(p => p.value === template.payment_interval)?.label}
+                            {template.suggestedAmount && ` • ₦${template.suggestedAmount.toLocaleString()}`}
+                          </span>
+                        </Button>
+                      );
+                    })}
                   </div>
                 </CardContent>
               </CollapsibleContent>
