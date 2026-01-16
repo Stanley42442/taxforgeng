@@ -574,10 +574,7 @@ export default function CalculationHistory() {
 
       {/* Detail Dialog */}
       <Dialog open={!!showDetailDialog} onOpenChange={() => setShowDetailDialog(null)}>
-        <DialogContent className={getResponsiveClasses(device, {
-          mobile: 'max-w-[95vw] max-h-[65vh] rounded-xl modal-content-premium p-4 overflow-hidden flex flex-col',
-          all: 'max-w-md max-h-[65vh] overflow-hidden flex flex-col'
-        })}>
+        <DialogContent className="w-[92vw] max-w-md max-h-[65vh] rounded-xl p-4 overflow-hidden flex flex-col mx-auto">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className={getResponsiveClasses(device, {
               mobile: 'flex items-center gap-2 text-base',
@@ -660,10 +657,7 @@ export default function CalculationHistory() {
 
       {/* Compare Dialog */}
       <Dialog open={showCompareDialog} onOpenChange={setShowCompareDialog}>
-        <DialogContent className={getResponsiveClasses(device, {
-          mobile: 'max-w-[95vw] max-h-[70vh] rounded-xl modal-content-premium p-4 overflow-hidden flex flex-col',
-          all: 'max-w-3xl max-h-[70vh] overflow-hidden flex flex-col'
-        })}>
+        <DialogContent className="w-[92vw] max-w-3xl max-h-[70vh] rounded-xl p-4 overflow-hidden flex flex-col mx-auto">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="flex items-center gap-2 text-base">
               <ArrowLeftRight className="h-4 w-4" />
