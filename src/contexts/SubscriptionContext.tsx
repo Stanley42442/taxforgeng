@@ -334,13 +334,59 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const upgradeTier = async (newTier: SubscriptionTier) => {
     if (!user) return;
     
+    const previousTier = state.tier;
+    const isDowngrade = ['free', 'starter', 'basic', 'professional', 'business', 'corporate'].indexOf(newTier) < 
+                        ['free', 'starter', 'basic', 'professional', 'business', 'corporate'].indexOf(previousTier);
+    
     const endDate = new Date();
     endDate.setMonth(endDate.getMonth() + 1);
     
+    // Update profile
     await supabase
       .from('profiles')
       .update({ subscription_tier: newTier })
       .eq('id', user.id);
+
+    // Log subscription history
+    await supabase
+      .from('subscription_history')
+      .insert({
+        user_id: user.id,
+        previous_tier: previousTier,
+        new_tier: newTier,
+        change_type: isDowngrade ? 'downgrade' : 'upgrade',
+        metadata: {
+          timestamp: new Date().toISOString(),
+          previous_trial_status: state.isOnTrial,
+        }
+      });
+
+    // If downgrading, create data snapshot for future reference
+    if (isDowngrade) {
+      const dataCounts = await Promise.all([
+        supabase.from('businesses').select('id', { count: 'exact', head: true }),
+        supabase.from('invoices').select('id', { count: 'exact', head: true }),
+        supabase.from('expenses').select('id', { count: 'exact', head: true }),
+        supabase.from('tax_calculations').select('id', { count: 'exact', head: true }),
+      ]);
+
+      const snapshots = [
+        { data_type: 'businesses', data_count: dataCounts[0].count || 0 },
+        { data_type: 'invoices', data_count: dataCounts[1].count || 0 },
+        { data_type: 'expenses', data_count: dataCounts[2].count || 0 },
+        { data_type: 'calculations', data_count: dataCounts[3].count || 0 },
+      ].filter(s => s.data_count > 0);
+
+      for (const snapshot of snapshots) {
+        await supabase.from('tier_data_snapshots').insert({
+          user_id: user.id,
+          snapshot_tier: previousTier,
+          data_type: snapshot.data_type,
+          data_count: snapshot.data_count,
+          notes: `Data preserved from ${previousTier} tier`,
+        });
+      }
+    }
 
     setState(prev => ({
       ...prev,
