@@ -1257,6 +1257,39 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_history: {
+        Row: {
+          change_type: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          new_tier: string
+          previous_tier: string | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          change_type?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          new_tier: string
+          previous_tier?: string | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          change_type?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          new_tier?: string
+          previous_tier?: string | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       tax_calculations: {
         Row: {
           business_id: string | null
@@ -1322,6 +1355,39 @@ export type Database = {
           owner_id?: string
           role?: string
           status?: string
+        }
+        Relationships: []
+      }
+      tier_data_snapshots: {
+        Row: {
+          data_count: number
+          data_type: string
+          id: string
+          is_active: boolean
+          notes: string | null
+          snapshot_date: string
+          snapshot_tier: string
+          user_id: string
+        }
+        Insert: {
+          data_count?: number
+          data_type: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          snapshot_date?: string
+          snapshot_tier: string
+          user_id: string
+        }
+        Update: {
+          data_count?: number
+          data_type?: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          snapshot_date?: string
+          snapshot_tier?: string
+          user_id?: string
         }
         Relationships: []
       }
