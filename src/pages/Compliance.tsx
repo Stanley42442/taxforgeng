@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { Plus, CheckCircle, Clock, AlertTriangle, Calendar, FileCheck, Trash2 } from "lucide-react";
+import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { format, differenceInDays, isPast } from "date-fns";
 
 interface ComplianceItem {
@@ -59,8 +60,8 @@ const Compliance = () => {
   const [dueDate, setDueDate] = useState("");
   const [selectedBusiness, setSelectedBusiness] = useState<string>("");
 
-  const tierOrder = ['free', 'starter', 'basic', 'freelancer', 'business', 'corporate'];
-  const canAccess = tierOrder.indexOf(tier) >= tierOrder.indexOf('freelancer');
+  const tierOrder = ['free', 'starter', 'basic', 'professional', 'business', 'corporate'];
+  const canAccess = tierOrder.indexOf(tier) >= tierOrder.indexOf('professional');
 
   useEffect(() => {
     if (user && canAccess) fetchItems();
@@ -126,12 +127,13 @@ const Compliance = () => {
   if (!canAccess) {
     return (
       <PageLayout title="Compliance Tracker" description="Track tax and regulatory deadlines" icon={FileCheck}>
-        <Card className="max-w-2xl mx-auto text-center p-8 glass-frosted shadow-futuristic">
-          <FileCheck className="h-16 w-16 mx-auto text-muted-foreground mb-4 animate-float" />
-          <h2 className="text-2xl font-bold mb-2">Compliance Tracker</h2>
-          <p className="text-muted-foreground mb-6">Available on Freelancer plan and above.</p>
-          <Button onClick={() => navigate('/pricing')} className="glow-sm">Upgrade to Access</Button>
-        </Card>
+        <div className="max-w-lg mx-auto py-12">
+          <UpgradePrompt 
+            feature="Compliance Tracker" 
+            requiredTier="professional"
+            showFeatures={true}
+          />
+        </div>
       </PageLayout>
     );
   }

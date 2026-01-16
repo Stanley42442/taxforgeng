@@ -62,6 +62,17 @@ const TIER_FEATURES: Record<string, TierInfo> = {
       { name: '300 AI assistant queries' },
     ],
   },
+  corporate: {
+    name: 'Corporate',
+    color: 'from-slate-700 to-slate-900',
+    features: [
+      { name: 'Unlimited business profiles' },
+      { name: 'Dedicated account manager' },
+      { name: 'Custom integrations' },
+      { name: 'SLA guarantees' },
+      { name: 'Unlimited AI queries' },
+    ],
+  },
 };
 
 interface UpgradePromptProps {
