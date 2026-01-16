@@ -666,10 +666,7 @@ export default function PersonalExpenses() {
             }
           }}
         >
-          <DialogContent className={getResponsiveClasses(device, {
-            mobile: 'max-w-[95vw] max-h-[70vh] rounded-xl modal-content-premium p-4 overflow-hidden flex flex-col',
-            all: 'max-w-md max-h-[70vh] overflow-hidden flex flex-col'
-          })}>
+          <DialogContent className="w-[92vw] max-w-md max-h-[70vh] rounded-xl p-4 overflow-hidden flex flex-col mx-auto">
             <DialogHeader className="flex-shrink-0">
               <DialogTitle className={isMobile ? 'text-lg' : ''}>{editingExpense ? 'Edit Expense' : 'Add Personal Expense'}</DialogTitle>
               <DialogDescription className={isMobile ? 'text-sm' : ''}>
