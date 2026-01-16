@@ -24,6 +24,7 @@ import {
   AlertTriangle,
   Globe
 } from "lucide-react";
+import { UpgradePrompt } from "@/components/UpgradePrompt";
 
 const ScenarioModeling = () => {
   const { canAccessScenarioModeling } = useSubscription();
@@ -51,16 +52,12 @@ const ScenarioModeling = () => {
   if (!hasAccess) {
     return (
       <PageLayout title="Scenario Modeling" description="Model different scenarios and see tax impact" icon={BarChart3} maxWidth="lg">
-        <div className="text-center py-12">
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-warning/10">
-            <Crown className="h-10 w-10 text-warning" />
-          </div>
-          <h2 className="text-2xl font-bold text-foreground mb-3">Scenario Modeling</h2>
-          <p className="text-muted-foreground mb-6">Available on Professional plan and above</p>
-          <Button variant="hero" onClick={() => navigate('/pricing')}>
-            <Crown className="h-4 w-4" />
-            Upgrade to Professional
-          </Button>
+        <div className="max-w-lg mx-auto py-12">
+          <UpgradePrompt 
+            feature="Scenario Modeling" 
+            requiredTier="professional"
+            showFeatures={true}
+          />
         </div>
       </PageLayout>
     );
