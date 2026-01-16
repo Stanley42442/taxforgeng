@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,11 +27,15 @@ import {
   Globe,
   Calculator,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Wallet,
+  RefreshCw
 } from "lucide-react";
 import { ForeignIncomeCalculator } from "@/components/ForeignIncomeCalculator";
 import { calculateIndividualTax, formatCurrency, type IndividualTaxInputs } from "@/lib/individualTaxCalculations";
 import { PRESUMPTIVE_TAX_RATES } from "@/lib/sectorConfig";
+import { usePersonalExpenses } from "@/hooks/usePersonalExpenses";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 type CalculationType = 'pit' | 'crypto' | 'investment' | 'informal' | 'foreign_income';
@@ -81,15 +85,23 @@ const InputField = ({
 
 const IndividualCalculatorPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const currentYear = new Date().getFullYear();
   
   const [use2026Rules, setUse2026Rules] = useState(true);
   const [calculationType, setCalculationType] = useState<CalculationType>('pit');
+  const [loadFromExpenses, setLoadFromExpenses] = useState(false);
+  
+  // Personal expenses data
+  const { annualTotals, loading: expensesLoading, refetch } = usePersonalExpenses(currentYear);
   
   // PIT inputs
   const [employmentIncome, setEmploymentIncome] = useState('');
   const [pensionContribution, setPensionContribution] = useState('');
   const [nhfContribution, setNhfContribution] = useState('');
   const [lifeInsurance, setLifeInsurance] = useState('');
+  const [healthInsurance, setHealthInsurance] = useState('');
+  const [rentPaid, setRentPaid] = useState('');
   
   // Crypto inputs
   const [cryptoIncome, setCryptoIncome] = useState('');
@@ -106,6 +118,34 @@ const IndividualCalculatorPage = () => {
   const [location, setLocation] = useState('other_urban');
 
   const [result, setResult] = useState<ReturnType<typeof calculateIndividualTax> | null>(null);
+
+  // Auto-populate from personal expenses when toggled on
+  useEffect(() => {
+    if (loadFromExpenses && annualTotals) {
+      setPensionContribution(annualTotals.pension_contribution > 0 ? annualTotals.pension_contribution.toLocaleString('en-NG') : '');
+      setNhfContribution(annualTotals.nhf_contribution > 0 ? annualTotals.nhf_contribution.toLocaleString('en-NG') : '');
+      setLifeInsurance(annualTotals.life_insurance > 0 ? annualTotals.life_insurance.toLocaleString('en-NG') : '');
+      setHealthInsurance(annualTotals.health_insurance > 0 ? annualTotals.health_insurance.toLocaleString('en-NG') : '');
+      setRentPaid(annualTotals.rent > 0 ? annualTotals.rent.toLocaleString('en-NG') : '');
+      toast.success('Fields populated from personal expenses');
+    }
+  }, [loadFromExpenses, annualTotals]);
+
+  const handleToggleLoadExpenses = (checked: boolean) => {
+    if (checked && !user) {
+      toast.error('Please log in to load personal expenses');
+      return;
+    }
+    setLoadFromExpenses(checked);
+    if (!checked) {
+      // Clear auto-populated fields
+      setPensionContribution('');
+      setNhfContribution('');
+      setLifeInsurance('');
+      setHealthInsurance('');
+      setRentPaid('');
+    }
+  };
 
   const parseNumber = (value: string) => Number(value.replace(/[^0-9]/g, '')) || 0;
   const formatInput = (value: string) => {
@@ -240,7 +280,76 @@ const IndividualCalculatorPage = () => {
         </TabsList>
 
         {/* PIT Calculator */}
-        <TabsContent value="pit" className="mt-6">
+        <TabsContent value="pit" className="mt-6 space-y-4">
+          {/* Load from Personal Expenses Toggle */}
+          <Card className="glass-frosted border-0 shadow-sm">
+            <CardContent className="py-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className={`rounded-xl p-2.5 transition-all duration-300 ${
+                    loadFromExpenses 
+                      ? 'bg-accent/20 text-accent' 
+                      : 'bg-secondary text-secondary-foreground'
+                  }`}>
+                    <Wallet className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm">Load from Personal Expenses</p>
+                    <p className="text-xs text-muted-foreground">
+                      Auto-populate relief fields from tracked expenses
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {loadFromExpenses && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => refetch()}
+                      disabled={expensesLoading}
+                    >
+                      <RefreshCw className={`h-4 w-4 ${expensesLoading ? 'animate-spin' : ''}`} />
+                    </Button>
+                  )}
+                  <Switch 
+                    checked={loadFromExpenses} 
+                    onCheckedChange={handleToggleLoadExpenses}
+                    disabled={expensesLoading}
+                  />
+                </div>
+              </div>
+              {loadFromExpenses && annualTotals && (
+                <div className="mt-3 pt-3 border-t border-border/50">
+                  <div className="flex flex-wrap gap-2">
+                    {annualTotals.rent > 0 && (
+                      <Badge variant="outline" className="text-xs">Rent: ₦{annualTotals.rent.toLocaleString()}</Badge>
+                    )}
+                    {annualTotals.pension_contribution > 0 && (
+                      <Badge variant="outline" className="text-xs">Pension: ₦{annualTotals.pension_contribution.toLocaleString()}</Badge>
+                    )}
+                    {annualTotals.nhf_contribution > 0 && (
+                      <Badge variant="outline" className="text-xs">NHF: ₦{annualTotals.nhf_contribution.toLocaleString()}</Badge>
+                    )}
+                    {annualTotals.health_insurance > 0 && (
+                      <Badge variant="outline" className="text-xs">Health Ins: ₦{annualTotals.health_insurance.toLocaleString()}</Badge>
+                    )}
+                    {annualTotals.life_insurance > 0 && (
+                      <Badge variant="outline" className="text-xs">Life Ins: ₦{annualTotals.life_insurance.toLocaleString()}</Badge>
+                    )}
+                  </div>
+                  <Button 
+                    variant="link" 
+                    size="sm" 
+                    className="mt-2 h-auto p-0 text-xs"
+                    onClick={() => navigate('/personal-expenses')}
+                  >
+                    Manage Personal Expenses →
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           <Card className="glass-frosted border-0 shadow-futuristic">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -261,21 +370,33 @@ const IndividualCalculatorPage = () => {
                   required
                 />
                 <InputField
+                  label="Rent Paid"
+                  value={formatInput(rentPaid)}
+                  onChange={(v) => !loadFromExpenses && setRentPaid(v)}
+                  tooltip="Annual rent paid on accommodation"
+                />
+                <InputField
                   label="Pension Contribution"
                   value={formatInput(pensionContribution)}
-                  onChange={(v) => setPensionContribution(v)}
+                  onChange={(v) => !loadFromExpenses && setPensionContribution(v)}
                   tooltip="Employee pension contribution (typically 8% of basic)"
                 />
                 <InputField
                   label="NHF Contribution"
                   value={formatInput(nhfContribution)}
-                  onChange={(v) => setNhfContribution(v)}
+                  onChange={(v) => !loadFromExpenses && setNhfContribution(v)}
                   tooltip="National Housing Fund contribution (2.5% of basic)"
+                />
+                <InputField
+                  label="Health Insurance"
+                  value={formatInput(healthInsurance)}
+                  onChange={(v) => !loadFromExpenses && setHealthInsurance(v)}
+                  tooltip="Annual health insurance premium"
                 />
                 <InputField
                   label="Life Insurance Premium"
                   value={formatInput(lifeInsurance)}
-                  onChange={(v) => setLifeInsurance(v)}
+                  onChange={(v) => !loadFromExpenses && setLifeInsurance(v)}
                   tooltip="Annual life insurance premium payments"
                 />
               </div>
