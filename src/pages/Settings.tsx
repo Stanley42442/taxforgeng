@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Dialog,
@@ -37,8 +38,21 @@ import {
   Settings as SettingsIcon,
   AlertTriangle,
   MessageCircle,
-  Send
+  Send,
+  Crown,
+  CreditCard,
+  Calendar,
+  Database,
+  CheckCircle,
+  Clock,
+  Building2,
+  FileText,
+  Receipt,
+  BarChart3,
+  ArrowUpRight,
+  ArrowDownRight
 } from "lucide-react";
+import { format } from "date-fns";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -69,6 +83,33 @@ interface MFAFactor {
   status: string;
   created_at: string;
 }
+
+interface SubscriptionHistoryItem {
+  id: string;
+  previous_tier: string | null;
+  new_tier: string;
+  change_type: string;
+  reason: string | null;
+  created_at: string;
+}
+
+const TIER_DISPLAY_NAMES: Record<string, string> = {
+  free: 'Individual',
+  starter: 'Starter',
+  basic: 'Basic',
+  professional: 'Professional',
+  business: 'Business',
+  corporate: 'Corporate',
+};
+
+const TIER_COLORS: Record<string, string> = {
+  free: 'bg-muted text-muted-foreground',
+  starter: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+  basic: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200',
+  professional: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+  business: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
+  corporate: 'bg-gradient-to-r from-primary to-accent text-primary-foreground',
+};
 
 const getEventIcon = (eventType: string) => {
   switch (eventType) {
@@ -105,8 +146,9 @@ const getEventLabel = (eventType: string) => {
 
 const Settings = () => {
   const { user, loading } = useAuth();
-  const { tier } = useSubscription();
+  const { tier, trialEndsAt, isOnTrial } = useSubscription();
   const navigate = useNavigate();
+  const trialDaysLeft = trialEndsAt ? Math.max(0, Math.ceil((trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : null;
 
   const [fullName, setFullName] = useState("");
   const [profileLoading, setProfileLoading] = useState(true);
@@ -124,6 +166,14 @@ const Settings = () => {
   const [eventsLoading, setEventsLoading] = useState(true);
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [subscriptionHistory, setSubscriptionHistory] = useState<SubscriptionHistoryItem[]>([]);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(true);
+  const [dataCounts, setDataCounts] = useState({
+    businesses: 0,
+    invoices: 0,
+    expenses: 0,
+    calculations: 0,
+  });
 
   useEffect(() => {
     if (!loading && !user) {
@@ -196,6 +246,69 @@ const Settings = () => {
 
     loadAuthEvents();
   }, [user]);
+
+  useEffect(() => {
+    const loadSubscriptionData = async () => {
+      if (!user) return;
+
+      try {
+        const [historyRes, businessesRes, invoicesRes, expensesRes, calculationsRes] = await Promise.all([
+          supabase.from('subscription_history').select('*').order('created_at', { ascending: false }).limit(20),
+          supabase.from('businesses').select('id', { count: 'exact', head: true }),
+          supabase.from('invoices').select('id', { count: 'exact', head: true }),
+          supabase.from('expenses').select('id', { count: 'exact', head: true }),
+          supabase.from('tax_calculations').select('id', { count: 'exact', head: true }),
+        ]);
+
+        if (historyRes.data) {
+          setSubscriptionHistory(historyRes.data);
+        }
+
+        setDataCounts({
+          businesses: businessesRes.count || 0,
+          invoices: invoicesRes.count || 0,
+          expenses: expensesRes.count || 0,
+          calculations: calculationsRes.count || 0,
+        });
+      } catch (error) {
+        console.error("Error loading subscription data:", error);
+      } finally {
+        setSubscriptionLoading(false);
+      }
+    };
+
+    loadSubscriptionData();
+  }, [user]);
+
+  const getChangeTypeIcon = (changeType: string) => {
+    switch (changeType) {
+      case 'upgrade':
+        return <ArrowUpRight className="h-4 w-4 text-success" />;
+      case 'downgrade':
+        return <ArrowDownRight className="h-4 w-4 text-warning" />;
+      case 'trial_start':
+        return <Clock className="h-4 w-4 text-primary" />;
+      case 'trial_end':
+        return <CheckCircle className="h-4 w-4 text-muted-foreground" />;
+      default:
+        return <History className="h-4 w-4 text-muted-foreground" />;
+    }
+  };
+
+  const getChangeTypeLabel = (changeType: string) => {
+    switch (changeType) {
+      case 'upgrade':
+        return 'Upgraded';
+      case 'downgrade':
+        return 'Downgraded';
+      case 'trial_start':
+        return 'Trial Started';
+      case 'trial_end':
+        return 'Trial Ended';
+      default:
+        return 'Changed';
+    }
+  };
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -323,10 +436,14 @@ const Settings = () => {
   return (
     <PageLayout title="Settings" description="Manage your account and preferences" icon={SettingsIcon} maxWidth="4xl">
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-6 glass-frosted">
+        <TabsList className="grid w-full grid-cols-5 mb-6 glass-frosted">
           <TabsTrigger value="profile" className="data-[state=active]:glow-sm">
             <User className="h-4 w-4 mr-2" />
             <span className="hidden sm:inline">Profile</span>
+          </TabsTrigger>
+          <TabsTrigger value="subscription" className="data-[state=active]:glow-sm">
+            <Crown className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Plan</span>
           </TabsTrigger>
           <TabsTrigger value="security" className="data-[state=active]:glow-sm">
             <Shield className="h-4 w-4 mr-2" />
@@ -416,6 +533,205 @@ const Settings = () => {
                   Update Email
                 </Button>
               </form>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Subscription Tab */}
+        <TabsContent value="subscription" className="space-y-6">
+          {/* Current Plan Card */}
+          <Card className="glass-frosted border-primary/20">
+            <CardHeader>
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-xl bg-gradient-primary flex items-center justify-center">
+                    <Crown className="h-6 w-6 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <CardTitle>Current Plan</CardTitle>
+                    <CardDescription>Your active subscription details</CardDescription>
+                  </div>
+                </div>
+                <Badge className={TIER_COLORS[tier]}>
+                  {TIER_DISPLAY_NAMES[tier]}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Trial Status */}
+              {isOnTrial && trialDaysLeft !== null && (
+                <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
+                  <div className="flex items-center gap-3">
+                    <Clock className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="font-medium text-foreground">Trial Active</p>
+                      <p className="text-sm text-muted-foreground">
+                        {trialDaysLeft} days remaining in your {TIER_DISPLAY_NAMES[tier]} trial
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Account Info */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="flex items-center gap-3 rounded-lg border border-border p-4">
+                  <User className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Account</p>
+                    <p className="font-medium text-foreground truncate">{user.email}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 rounded-lg border border-border p-4">
+                  <Calendar className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Member Since</p>
+                    <p className="font-medium text-foreground">
+                      {user?.created_at ? format(new Date(user.created_at), 'MMM d, yyyy') : 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-wrap gap-3">
+                <Button variant="hero" onClick={() => navigate('/pricing')}>
+                  <CreditCard className="h-4 w-4" />
+                  {tier === 'free' ? 'Upgrade Plan' : 'Change Plan'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Data Summary Card */}
+          <Card className="glass-frosted">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-secondary flex items-center justify-center">
+                  <Database className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Your Data</CardTitle>
+                  <CardDescription>Preserved across tier changes</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="flex items-center gap-3 rounded-lg border border-border p-4">
+                  <Building2 className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Businesses</p>
+                    <p className="font-medium text-foreground text-lg">{dataCounts.businesses}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 rounded-lg border border-border p-4">
+                  <FileText className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Invoices</p>
+                    <p className="font-medium text-foreground text-lg">{dataCounts.invoices}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 rounded-lg border border-border p-4">
+                  <Receipt className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Expenses</p>
+                    <p className="font-medium text-foreground text-lg">{dataCounts.expenses}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 rounded-lg border border-border p-4">
+                  <BarChart3 className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Calculations</p>
+                    <p className="font-medium text-foreground text-lg">{dataCounts.calculations}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-lg bg-success/10 border border-success/30 p-4 mt-4">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-success" />
+                  <span className="text-sm text-success font-medium">All data is preserved</span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Your data remains safe even if you change plans. Downgrading won't delete anything.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Subscription History Card */}
+          <Card className="glass-frosted">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-secondary flex items-center justify-center">
+                  <History className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Subscription History</CardTitle>
+                  <CardDescription>Track your plan changes over time</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {subscriptionLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : subscriptionHistory.length === 0 ? (
+                <div className="text-center py-8">
+                  <History className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
+                  <p className="text-muted-foreground">No subscription changes yet</p>
+                  <p className="text-sm text-muted-foreground/70 mt-1">
+                    Your plan history will appear here when you upgrade or change plans
+                  </p>
+                </div>
+              ) : (
+                <ScrollArea className="h-[300px]">
+                  <div className="space-y-3">
+                    {subscriptionHistory.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-4 rounded-lg border border-border p-4 hover:bg-muted/30 transition-colors"
+                      >
+                        <div className="h-10 w-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                          {getChangeTypeIcon(item.change_type)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-medium text-foreground">
+                              {getChangeTypeLabel(item.change_type)}
+                            </span>
+                            {item.previous_tier && (
+                              <>
+                                <span className="text-muted-foreground text-sm">from</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {TIER_DISPLAY_NAMES[item.previous_tier] || item.previous_tier}
+                                </Badge>
+                              </>
+                            )}
+                            <span className="text-muted-foreground text-sm">to</span>
+                            <Badge className={TIER_COLORS[item.new_tier] || 'bg-muted'}>
+                              {TIER_DISPLAY_NAMES[item.new_tier] || item.new_tier}
+                            </Badge>
+                          </div>
+                          {item.reason && (
+                            <p className="text-sm text-muted-foreground mt-1">{item.reason}</p>
+                          )}
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-sm text-muted-foreground">
+                            {format(new Date(item.created_at), 'MMM d, yyyy')}
+                          </p>
+                          <p className="text-xs text-muted-foreground/70">
+                            {format(new Date(item.created_at), 'h:mm a')}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
