@@ -530,59 +530,121 @@ export default function PersonalExpenses() {
                     exit={{ opacity: 0, x: -100 }}
                     transition={{ delay: index * 0.05 }}
                   >
-                    <Card className="glass hover:shadow-lg transition-shadow">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="flex items-center gap-3 min-w-0 flex-1">
-                            <div className="p-2 rounded-lg bg-primary/10">
-                              <Icon className="h-5 w-5 text-primary" />
-                            </div>
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-2">
-                                <h3 className="font-medium truncate">{category?.name || expense.category}</h3>
-                                <Badge variant="outline" className="text-xs hidden sm:flex">
-                                  {PAYMENT_INTERVALS.find(p => p.value === expense.payment_interval)?.label}
-                                </Badge>
+                    <Card className={getResponsiveClasses(device, {
+                      mobile: 'mobile-card neumorphic-inset touch-feedback',
+                      all: 'glass hover:shadow-lg transition-shadow'
+                    })}>
+                      <CardContent className={isMobile ? 'p-3' : 'p-4'}>
+                        {isMobile ? (
+                          // Mobile layout - stacked for better visibility
+                          <div className="space-y-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex items-center gap-2 min-w-0 flex-1">
+                                <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+                                  <Icon className="h-4 w-4 text-primary" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <h3 className="font-semibold text-sm leading-tight">
+                                    {category?.name || expense.category}
+                                  </h3>
+                                  <Badge variant="outline" className="text-[10px] mt-1 px-1.5 py-0">
+                                    {PAYMENT_INTERVALS.find(p => p.value === expense.payment_interval)?.label}
+                                  </Badge>
+                                </div>
                               </div>
-                              <p className="text-sm text-muted-foreground truncate">
-                                {expense.description || 'No description'}
-                              </p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-4">
-                            <div className="text-right">
-                              <p className="font-semibold">{formatCurrency(Number(expense.amount))}</p>
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <p className="text-xs text-muted-foreground">
-                                      {formatCurrency(annualAmount)}/yr
-                                    </p>
-                                  </TooltipTrigger>
-                                  <TooltipContent>Annual equivalent</TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
+                              <div className="text-right shrink-0">
+                                <p className="font-bold text-sm">{formatCurrency(Number(expense.amount))}</p>
+                                <p className="text-[10px] text-muted-foreground">
+                                  {formatCurrency(annualAmount)}/yr
+                                </p>
+                              </div>
                             </div>
                             
-                            <div className="flex items-center gap-1">
-                              <Button 
-                                variant="ghost" 
-                                size="icon"
-                                onClick={() => openEditDialog(expense)}
-                              >
-                                <Edit2 className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="icon"
-                                onClick={() => setDeleteExpenseId(expense.id)}
-                              >
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
+                            {expense.description && (
+                              <p className="text-xs text-muted-foreground bg-muted/30 px-2 py-1.5 rounded-md">
+                                {expense.description}
+                              </p>
+                            )}
+                            
+                            <div className="flex items-center justify-between pt-1 border-t border-border/30">
+                              <span className="text-[10px] text-muted-foreground">
+                                From {format(new Date(expense.start_date), 'MMM yyyy')}
+                              </span>
+                              <div className="flex items-center gap-1">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  className="h-7 px-2 touch-feedback"
+                                  onClick={() => openEditDialog(expense)}
+                                >
+                                  <Edit2 className="h-3.5 w-3.5 mr-1" />
+                                  Edit
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  className="h-7 px-2 text-destructive touch-feedback"
+                                  onClick={() => setDeleteExpenseId(expense.id)}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        ) : (
+                          // Desktop/Tablet layout
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3 min-w-0 flex-1">
+                              <div className="p-2 rounded-lg bg-primary/10">
+                                <Icon className="h-5 w-5 text-primary" />
+                              </div>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <h3 className="font-medium truncate">{category?.name || expense.category}</h3>
+                                  <Badge variant="outline" className="text-xs">
+                                    {PAYMENT_INTERVALS.find(p => p.value === expense.payment_interval)?.label}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground truncate">
+                                  {expense.description || 'No description'}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center gap-4">
+                              <div className="text-right">
+                                <p className="font-semibold">{formatCurrency(Number(expense.amount))}</p>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger>
+                                      <p className="text-xs text-muted-foreground">
+                                        {formatCurrency(annualAmount)}/yr
+                                      </p>
+                                    </TooltipTrigger>
+                                    <TooltipContent>Annual equivalent</TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              </div>
+                              
+                              <div className="flex items-center gap-1">
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon"
+                                  onClick={() => openEditDialog(expense)}
+                                >
+                                  <Edit2 className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon"
+                                  onClick={() => setDeleteExpenseId(expense.id)}
+                                >
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   </motion.div>
