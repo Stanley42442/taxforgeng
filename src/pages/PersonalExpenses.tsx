@@ -30,6 +30,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
 import { usePersonalExpenses, PersonalExpenseInput } from '@/hooks/usePersonalExpenses';
 import { PERSONAL_EXPENSE_CATEGORIES, PAYMENT_INTERVALS, getCategoryById, calculateAnnualAmount } from '@/lib/personalExpenseCategories';
@@ -666,138 +667,144 @@ export default function PersonalExpenses() {
           }}
         >
           <DialogContent className={getResponsiveClasses(device, {
-            mobile: 'max-w-[95vw] rounded-xl modal-content-premium p-4',
-            all: 'max-w-md'
+            mobile: 'max-w-[95vw] max-h-[70vh] rounded-xl modal-content-premium p-4 overflow-hidden flex flex-col',
+            all: 'max-w-md max-h-[70vh] overflow-hidden flex flex-col'
           })}>
-            <DialogHeader>
+            <DialogHeader className="flex-shrink-0">
               <DialogTitle className={isMobile ? 'text-lg' : ''}>{editingExpense ? 'Edit Expense' : 'Add Personal Expense'}</DialogTitle>
               <DialogDescription className={isMobile ? 'text-sm' : ''}>
                 Track tax-deductible personal expenses for {selectedYear}
               </DialogDescription>
             </DialogHeader>
             
-            <div className={getResponsiveClasses(device, {
-              mobile: 'space-y-3',
-              all: 'space-y-4'
-            })}>
-              <div className="space-y-2">
-                <Label>Category *</Label>
-                <Select 
-                  value={formData.category} 
-                  onValueChange={(v) => setFormData({ ...formData, category: v })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PERSONAL_EXPENSE_CATEGORIES.map(cat => {
-                      const Icon = cat.icon;
-                      return (
-                        <SelectItem key={cat.id} value={cat.id}>
-                          <div className="flex items-center gap-2">
-                            <Icon className="h-4 w-4" />
-                            {cat.name}
-                          </div>
+            <ScrollArea className="flex-1 pr-2">
+              <div className={getResponsiveClasses(device, {
+                mobile: 'space-y-3 pb-2',
+                all: 'space-y-4 pb-2'
+              })}>
+                <div className="space-y-2">
+                  <Label>Category *</Label>
+                  <Select 
+                    value={formData.category} 
+                    onValueChange={(v) => setFormData({ ...formData, category: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PERSONAL_EXPENSE_CATEGORIES.map(cat => {
+                        const Icon = cat.icon;
+                        return (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            <div className="flex items-center gap-2">
+                              <Icon className="h-4 w-4" />
+                              {cat.name}
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                  {formData.category && (
+                    <p className="text-xs text-muted-foreground">
+                      {getCategoryById(formData.category)?.tooltip}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label className={isMobile ? 'text-sm' : ''}>Amount (₦) *</Label>
+                  <Input
+                    type="number"
+                    value={formData.amount || ''}
+                    onChange={(e) => setFormData({ ...formData, amount: Number(e.target.value) })}
+                    placeholder="Enter amount"
+                    className={isMobile ? 'input-neumorphic h-10' : 'h-9'}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Payment Frequency *</Label>
+                  <Select 
+                    value={formData.payment_interval} 
+                    onValueChange={(v) => setFormData({ ...formData, payment_interval: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PAYMENT_INTERVALS.map(interval => (
+                        <SelectItem key={interval.value} value={interval.value}>
+                          {interval.label}
                         </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-                {formData.category && (
-                  <p className="text-xs text-muted-foreground">
-                    {getCategoryById(formData.category)?.tooltip}
-                  </p>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label className="text-sm">Start Date</Label>
+                    <Input
+                      type="date"
+                      value={formData.start_date}
+                      onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                      className="h-9"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">End Date</Label>
+                    <Input
+                      type="date"
+                      value={formData.end_date || ''}
+                      onChange={(e) => setFormData({ ...formData, end_date: e.target.value || null })}
+                      className="h-9"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Description</Label>
+                  <Input
+                    value={formData.description || ''}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="e.g., Monthly rent at Victoria Island"
+                    className="h-9"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Notes (optional)</Label>
+                  <Textarea
+                    value={formData.notes || ''}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    placeholder="Additional notes..."
+                    rows={2}
+                    className="min-h-[60px]"
+                  />
+                </div>
+
+                {formData.amount > 0 && formData.payment_interval && (
+                  <div className="p-2.5 rounded-lg bg-primary/5 border border-primary/20">
+                    <p className="text-sm">
+                      <span className="text-muted-foreground">Annual Total: </span>
+                      <span className="font-semibold text-primary">
+                        {formatCurrency(calculateAnnualAmount(
+                          formData.amount,
+                          formData.payment_interval,
+                          new Date(formData.start_date),
+                          formData.end_date ? new Date(formData.end_date) : undefined,
+                          selectedYear
+                        ))}
+                      </span>
+                    </p>
+                  </div>
                 )}
               </div>
+            </ScrollArea>
 
-              <div className="space-y-2">
-                <Label className={isMobile ? 'text-sm' : ''}>Amount (₦) *</Label>
-                <Input
-                  type="number"
-                  value={formData.amount || ''}
-                  onChange={(e) => setFormData({ ...formData, amount: Number(e.target.value) })}
-                  placeholder="Enter amount"
-                  className={isMobile ? 'input-neumorphic h-11' : ''}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Payment Frequency *</Label>
-                <Select 
-                  value={formData.payment_interval} 
-                  onValueChange={(v) => setFormData({ ...formData, payment_interval: v })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PAYMENT_INTERVALS.map(interval => (
-                      <SelectItem key={interval.value} value={interval.value}>
-                        {interval.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label>Start Date</Label>
-                  <Input
-                    type="date"
-                    value={formData.start_date}
-                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>End Date (optional)</Label>
-                  <Input
-                    type="date"
-                    value={formData.end_date || ''}
-                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value || null })}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Description</Label>
-                <Input
-                  value={formData.description || ''}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="e.g., Monthly rent at Victoria Island"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Notes (optional)</Label>
-                <Textarea
-                  value={formData.notes || ''}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  placeholder="Additional notes..."
-                  rows={2}
-                />
-              </div>
-
-              {formData.amount > 0 && formData.payment_interval && (
-                <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
-                  <p className="text-sm">
-                    <span className="text-muted-foreground">Annual Total: </span>
-                    <span className="font-semibold text-primary">
-                      {formatCurrency(calculateAnnualAmount(
-                        formData.amount,
-                        formData.payment_interval,
-                        new Date(formData.start_date),
-                        formData.end_date ? new Date(formData.end_date) : undefined,
-                        selectedYear
-                      ))}
-                    </span>
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <DialogFooter>
-              <Button variant="outline" onClick={() => {
+            <DialogFooter className="flex-shrink-0 pt-3 border-t border-border/50">
+              <Button variant="outline" size="sm" onClick={() => {
                 setIsAddDialogOpen(false);
                 setEditingExpense(null);
                 resetForm();
@@ -805,6 +812,7 @@ export default function PersonalExpenses() {
                 Cancel
               </Button>
               <Button 
+                size="sm"
                 onClick={editingExpense ? handleUpdateExpense : handleAddExpense}
                 disabled={!formData.category || formData.amount <= 0}
               >

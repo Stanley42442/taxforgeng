@@ -575,45 +575,39 @@ export default function CalculationHistory() {
       {/* Detail Dialog */}
       <Dialog open={!!showDetailDialog} onOpenChange={() => setShowDetailDialog(null)}>
         <DialogContent className={getResponsiveClasses(device, {
-          mobile: 'max-w-[95vw] max-h-[90vh] rounded-xl modal-content-premium p-4 overflow-hidden flex flex-col',
-          all: 'max-w-lg max-h-[85vh] overflow-hidden flex flex-col'
+          mobile: 'max-w-[95vw] max-h-[65vh] rounded-xl modal-content-premium p-4 overflow-hidden flex flex-col',
+          all: 'max-w-md max-h-[65vh] overflow-hidden flex flex-col'
         })}>
-          <DialogHeader>
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle className={getResponsiveClasses(device, {
               mobile: 'flex items-center gap-2 text-base',
-              all: 'flex items-center gap-2'
+              all: 'flex items-center gap-2 text-base'
             })}>
               {showDetailDialog && (
                 <>
                   {(() => {
                     const Icon = calcTypeIcons[showDetailDialog.calculation_type] || Briefcase;
-                    return <Icon className={isMobile ? 'h-4 w-4 text-primary' : 'h-5 w-5 text-primary'} />;
+                    return <Icon className="h-4 w-4 text-primary" />;
                   })()}
                   {calcTypeLabels[showDetailDialog?.calculation_type || 'pit']}
                 </>
               )}
             </DialogTitle>
-            <DialogDescription className={isMobile ? 'text-xs' : ''}>
+            <DialogDescription className="text-xs">
               {showDetailDialog && format(parseISO(showDetailDialog.created_at), 'MMMM d, yyyy \'at\' h:mm a')}
             </DialogDescription>
           </DialogHeader>
           
           {showDetailDialog && (
-            <ScrollArea className="flex-1 pr-4">
-              <div className={isMobile ? 'space-y-3' : 'space-y-4'}>
+            <ScrollArea className="flex-1 pr-2">
+              <div className="space-y-3 pb-2">
                 {/* Summary */}
-                <div className={getResponsiveClasses(device, {
-                  mobile: 'p-3 rounded-lg bg-primary/5 border border-primary/20',
-                  all: 'p-4 rounded-xl bg-primary/5 border border-primary/20'
-                })}>
-                  <p className={isMobile ? 'text-xs text-muted-foreground' : 'text-sm text-muted-foreground'}>Total Tax Payable</p>
-                  <p className={isMobile ? 'text-xl font-bold text-primary' : 'text-2xl font-bold text-primary'}>{formatCurrency(showDetailDialog.result.taxPayable)}</p>
-                  <div className={getResponsiveClasses(device, {
-                    mobile: 'flex gap-3 mt-2 text-xs',
-                    all: 'flex gap-4 mt-2 text-sm'
-                  })}>
+                <div className="p-2.5 rounded-lg bg-primary/5 border border-primary/20">
+                  <p className="text-xs text-muted-foreground">Total Tax Payable</p>
+                  <p className="text-lg font-bold text-primary">{formatCurrency(showDetailDialog.result.taxPayable)}</p>
+                  <div className="flex gap-3 mt-1.5 text-xs">
                     <span>Rate: {showDetailDialog.result.effectiveRate.toFixed(2)}%</span>
-                    <Badge variant="outline" className={isMobile ? 'text-xs' : ''}>
+                    <Badge variant="outline" className="text-xs h-5">
                       {showDetailDialog.inputs.use2026Rules ? '2026 Rules' : 'Pre-2026'}
                     </Badge>
                   </div>
@@ -621,10 +615,10 @@ export default function CalculationHistory() {
                 
                 {/* Breakdown */}
                 <div>
-                  <h4 className="font-medium mb-2">Tax Breakdown</h4>
-                  <div className="space-y-1">
+                  <h4 className="font-medium text-sm mb-1.5">Tax Breakdown</h4>
+                  <div className="space-y-0.5">
                     {showDetailDialog.result.breakdown.map((item, i) => (
-                      <div key={i} className="flex justify-between text-sm py-1.5 border-b border-border/50 last:border-0">
+                      <div key={i} className="flex justify-between text-xs py-1 border-b border-border/50 last:border-0">
                         <span className="text-muted-foreground">{item.label}</span>
                         <span className="font-medium">{formatCurrency(item.amount)}</span>
                       </div>
@@ -635,10 +629,10 @@ export default function CalculationHistory() {
                 {/* Reliefs */}
                 {showDetailDialog.result.reliefs?.length > 0 && (
                   <div>
-                    <h4 className="font-medium mb-2">Reliefs Applied</h4>
-                    <div className="space-y-2">
+                    <h4 className="font-medium text-sm mb-1.5">Reliefs Applied</h4>
+                    <div className="space-y-1.5">
                       {showDetailDialog.result.reliefs.map((relief, i) => (
-                        <div key={i} className="p-2 rounded-lg bg-success/5 border border-success/20 text-sm">
+                        <div key={i} className="p-2 rounded-lg bg-success/5 border border-success/20 text-xs">
                           <div className="flex justify-between">
                             <span>{relief.name}</span>
                             <span className="text-success font-medium">-{formatCurrency(relief.amount)}</span>
@@ -652,10 +646,10 @@ export default function CalculationHistory() {
             </ScrollArea>
           )}
           
-          <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setShowDetailDialog(null)}>Close</Button>
+          <DialogFooter className="flex-shrink-0 pt-3 border-t border-border/50">
+            <Button variant="outline" size="sm" onClick={() => setShowDetailDialog(null)}>Close</Button>
             {showDetailDialog && (
-              <Button onClick={() => handleExportPDF(showDetailDialog)} className="gap-2">
+              <Button size="sm" onClick={() => handleExportPDF(showDetailDialog)} className="gap-2">
                 <Download className="h-4 w-4" />
                 Export PDF
               </Button>
@@ -666,19 +660,22 @@ export default function CalculationHistory() {
 
       {/* Compare Dialog */}
       <Dialog open={showCompareDialog} onOpenChange={setShowCompareDialog}>
-        <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <ArrowLeftRight className="h-5 w-5" />
+        <DialogContent className={getResponsiveClasses(device, {
+          mobile: 'max-w-[95vw] max-h-[70vh] rounded-xl modal-content-premium p-4 overflow-hidden flex flex-col',
+          all: 'max-w-3xl max-h-[70vh] overflow-hidden flex flex-col'
+        })}>
+          <DialogHeader className="flex-shrink-0">
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <ArrowLeftRight className="h-4 w-4" />
               Compare Calculations
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-xs">
               Comparing {selectedCalculations.length} calculations side by side
             </DialogDescription>
           </DialogHeader>
           
-          <ScrollArea className="flex-1">
-            <div className={`grid gap-4 ${selectedCalculations.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'}`}>
+          <ScrollArea className="flex-1 pr-2">
+            <div className={`grid gap-3 ${selectedCalculations.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'}`}>
               {selectedCalculations.map((calc, index) => {
                 const Icon = calcTypeIcons[calc.calculation_type] || Briefcase;
                 const minTax = Math.min(...selectedCalculations.map(c => c.result.taxPayable));
@@ -687,14 +684,14 @@ export default function CalculationHistory() {
                 return (
                   <Card key={calc.id} className={`relative ${isLowest ? 'border-success ring-1 ring-success/30' : ''}`}>
                     {isLowest && (
-                      <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 bg-success text-success-foreground">
+                      <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 bg-success text-success-foreground text-xs">
                         Lowest Tax
                       </Badge>
                     )}
-                    <CardHeader className="pb-2">
+                    <CardHeader className="pb-2 p-3">
                       <div className="flex items-center gap-2">
-                        <Icon className="h-4 w-4 text-primary" />
-                        <CardTitle className="text-sm">
+                        <Icon className="h-3.5 w-3.5 text-primary" />
+                        <CardTitle className="text-xs">
                           {calcTypeLabels[calc.calculation_type]}
                         </CardTitle>
                       </div>
@@ -702,14 +699,14 @@ export default function CalculationHistory() {
                         {format(parseISO(calc.created_at), 'MMM d, yyyy')}
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="text-center p-3 rounded-lg bg-primary/5">
+                    <CardContent className="space-y-2 p-3 pt-0">
+                      <div className="text-center p-2 rounded-lg bg-primary/5">
                         <p className="text-xs text-muted-foreground">Tax Payable</p>
-                        <p className="text-xl font-bold text-primary">
+                        <p className="text-base font-bold text-primary">
                           {formatCurrency(calc.result.taxPayable)}
                         </p>
                       </div>
-                      <div className="space-y-1.5 text-xs">
+                      <div className="space-y-1 text-xs">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Taxable Income</span>
                           <span>{formatCurrency(calc.result.taxableIncome)}</span>
@@ -720,7 +717,7 @@ export default function CalculationHistory() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Tax Rules</span>
-                          <Badge variant="outline" className="text-xs h-5">
+                          <Badge variant="outline" className="text-xs h-4">
                             {calc.inputs.use2026Rules ? '2026' : 'Pre-2026'}
                           </Badge>
                         </div>
@@ -733,8 +730,8 @@ export default function CalculationHistory() {
             
             {/* Savings Summary */}
             {selectedCalculations.length >= 2 && (
-              <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-success/5 to-accent/5 border border-success/20">
-                <h4 className="font-medium mb-3 flex items-center gap-2">
+              <div className="mt-4 p-3 rounded-lg bg-gradient-to-r from-success/5 to-accent/5 border border-success/20">
+                <h4 className="font-medium text-sm mb-2 flex items-center gap-2">
                   <TrendingDown className="h-4 w-4 text-success" />
                   Potential Savings
                 </h4>
@@ -746,8 +743,8 @@ export default function CalculationHistory() {
                   
                   return (
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-success">{formatCurrency(savings)}</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xl font-bold text-success">{formatCurrency(savings)}</p>
+                      <p className="text-xs text-muted-foreground">
                         Difference between highest and lowest tax
                       </p>
                     </div>
@@ -757,8 +754,8 @@ export default function CalculationHistory() {
             )}
           </ScrollArea>
           
-          <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setShowCompareDialog(false)}>Close</Button>
+          <DialogFooter className="flex-shrink-0 pt-3 border-t border-border/50">
+            <Button variant="outline" size="sm" onClick={() => setShowCompareDialog(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
