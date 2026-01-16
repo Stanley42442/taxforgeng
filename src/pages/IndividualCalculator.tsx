@@ -49,6 +49,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
+import { useDeviceCSS, getResponsiveClasses } from "@/hooks/useDeviceCSS";
 
 type CalculationType = 'pit' | 'crypto' | 'investment' | 'informal' | 'foreign_income';
 
@@ -104,6 +105,7 @@ const InputField = ({
 );
 
 const IndividualCalculatorPage = () => {
+  const { device, isMobile, isTablet, containerClass } = useDeviceCSS();
   const navigate = useNavigate();
   const { user } = useAuth();
   const currentYear = new Date().getFullYear();
@@ -349,21 +351,38 @@ const IndividualCalculatorPage = () => {
       maxWidth="4xl"
     >
       {/* Tax Rule Toggle */}
-      <div className="mb-6 glass-frosted rounded-2xl p-5 shadow-futuristic animate-slide-up">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4 min-w-0 flex-1">
-            <div className={`rounded-xl p-3 flex-shrink-0 transition-all duration-300 ${
+      <div className={getResponsiveClasses(device, {
+        mobile: 'mb-4 glass-premium rounded-xl p-4 mobile-card',
+        all: 'mb-6 glass-frosted rounded-2xl p-5 shadow-futuristic animate-slide-up'
+      })}>
+        <div className={getResponsiveClasses(device, {
+          mobile: 'flex items-center justify-between gap-3',
+          all: 'flex items-center justify-between gap-4'
+        })}>
+          <div className={getResponsiveClasses(device, {
+            mobile: 'flex items-center gap-3 min-w-0 flex-1',
+            all: 'flex items-center gap-4 min-w-0 flex-1'
+          })}>
+            <div className={`rounded-xl flex-shrink-0 transition-all duration-300 ${
+              isMobile ? 'p-2.5' : 'p-3'
+            } ${
               use2026Rules 
                 ? 'bg-success/20 text-success glow-success' 
                 : 'bg-secondary text-secondary-foreground neumorphic-sm'
             }`}>
-              <Info className="h-6 w-6" />
+              <Info className={isMobile ? 'h-5 w-5' : 'h-6 w-6'} />
             </div>
             <div className="min-w-0 mr-3">
-              <p className="font-semibold text-foreground">
+              <p className={getResponsiveClasses(device, {
+                mobile: 'font-semibold text-foreground text-sm',
+                all: 'font-semibold text-foreground'
+              })}>
                 {use2026Rules ? 'Nigeria Tax Act 2026' : 'Current Tax Rules'}
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className={getResponsiveClasses(device, {
+                mobile: 'text-xs text-muted-foreground',
+                all: 'text-sm text-muted-foreground'
+              })}>
                 {use2026Rules 
                   ? '₦800k exemption, 0-25% progressive rates' 
                   : '₦300k start, 7-24% progressive rates'}
@@ -385,45 +404,70 @@ const IndividualCalculatorPage = () => {
           setCalculationType(v as CalculationType);
           setResult(null);
         }}
-        className="mb-6 animate-slide-up"
+        className={getResponsiveClasses(device, {
+          mobile: 'mb-4',
+          all: 'mb-6 animate-slide-up'
+        })}
       >
-        <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 h-auto p-1.5 glass-frosted rounded-2xl">
+        <TabsList className={getResponsiveClasses(device, {
+          mobile: 'grid w-full grid-cols-3 h-auto p-1 glass-premium rounded-xl gap-1',
+          all: 'grid w-full grid-cols-3 md:grid-cols-5 h-auto p-1.5 glass-frosted rounded-2xl'
+        })}>
           <TabsTrigger 
             value="pit"
-            className="flex items-center gap-2 py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all duration-300"
+            className={getResponsiveClasses(device, {
+              mobile: 'flex items-center justify-center gap-1 py-2.5 rounded-lg data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all touch-feedback',
+              all: 'flex items-center gap-2 py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all duration-300'
+            })}
           >
-            <Briefcase className="h-4 w-4" />
-            <span className="text-sm font-medium hidden sm:inline">Employment</span>
-            <span className="text-sm font-medium sm:hidden">PIT</span>
+            <Briefcase className={isMobile ? 'h-4 w-4' : 'h-4 w-4'} />
+            <span className={isMobile ? 'text-xs font-medium' : 'text-sm font-medium hidden sm:inline'}>
+              {isMobile ? 'PIT' : 'Employment'}
+            </span>
+            {!isMobile && <span className="text-sm font-medium sm:hidden">PIT</span>}
           </TabsTrigger>
           <TabsTrigger 
             value="foreign_income"
-            className="flex items-center gap-2 py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all duration-300"
+            className={getResponsiveClasses(device, {
+              mobile: 'flex items-center justify-center gap-1 py-2.5 rounded-lg data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all touch-feedback',
+              all: 'flex items-center gap-2 py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all duration-300'
+            })}
           >
             <Globe className="h-4 w-4" />
-            <span className="text-sm font-medium">Foreign</span>
+            <span className={isMobile ? 'text-xs font-medium' : 'text-sm font-medium'}>Foreign</span>
           </TabsTrigger>
           <TabsTrigger 
             value="crypto"
-            className="flex items-center gap-2 py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all duration-300"
+            className={getResponsiveClasses(device, {
+              mobile: 'flex items-center justify-center gap-1 py-2.5 rounded-lg data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all touch-feedback',
+              all: 'flex items-center gap-2 py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all duration-300'
+            })}
           >
             <Bitcoin className="h-4 w-4" />
-            <span className="text-sm font-medium">Crypto</span>
+            <span className={isMobile ? 'text-xs font-medium' : 'text-sm font-medium'}>Crypto</span>
           </TabsTrigger>
           <TabsTrigger 
             value="investment"
-            className="flex items-center gap-2 py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all duration-300"
+            className={getResponsiveClasses(device, {
+              mobile: 'flex items-center justify-center gap-1 py-2.5 rounded-lg data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all touch-feedback',
+              all: 'flex items-center gap-2 py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all duration-300'
+            })}
           >
             <TrendingUp className="h-4 w-4" />
-            <span className="text-sm font-medium hidden sm:inline">Investment</span>
-            <span className="text-sm font-medium sm:hidden">Invest</span>
+            <span className={isMobile ? 'text-xs font-medium' : 'text-sm font-medium hidden sm:inline'}>
+              {isMobile ? 'Invest' : 'Investment'}
+            </span>
+            {!isMobile && <span className="text-sm font-medium sm:hidden">Invest</span>}
           </TabsTrigger>
           <TabsTrigger 
             value="informal"
-            className="flex items-center gap-2 py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all duration-300"
+            className={getResponsiveClasses(device, {
+              mobile: 'flex items-center justify-center gap-1 py-2.5 rounded-lg data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all touch-feedback',
+              all: 'flex items-center gap-2 py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all duration-300'
+            })}
           >
             <Store className="h-4 w-4" />
-            <span className="text-sm font-medium">Informal</span>
+            <span className={isMobile ? 'text-xs font-medium' : 'text-sm font-medium'}>Informal</span>
           </TabsTrigger>
         </TabsList>
 

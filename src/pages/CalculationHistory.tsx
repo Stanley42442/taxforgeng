@@ -40,6 +40,7 @@ import { toast } from 'sonner';
 import { formatCurrency, type IndividualTaxInputs, type IndividualTaxResult } from '@/lib/individualTaxCalculations';
 import { downloadIndividualTaxPDF } from '@/lib/individualPdfExport';
 import { DeleteConfirmationDialog } from '@/components/DeleteConfirmationDialog';
+import { useDeviceCSS, getResponsiveClasses } from '@/hooks/useDeviceCSS';
 
 interface SavedCalculation {
   id: string;
@@ -74,6 +75,7 @@ const dateFilters = [
 ];
 
 export default function CalculationHistory() {
+  const { device, isMobile, isTablet, containerClass } = useDeviceCSS();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [calculations, setCalculations] = useState<SavedCalculation[]>([]);
@@ -260,18 +262,27 @@ export default function CalculationHistory() {
       maxWidth="6xl"
     >
       {/* Search & Filter Bar */}
-      <Card className="glass-frosted mb-6">
-        <CardContent className="py-4">
+      <Card className={getResponsiveClasses(device, {
+        mobile: 'glass-premium mb-4 mobile-card',
+        all: 'glass-frosted mb-6'
+      })}>
+        <CardContent className={isMobile ? 'py-3 px-3' : 'py-4'}>
           <div className="flex flex-col gap-4">
             {/* Search Row */}
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className={getResponsiveClasses(device, {
+              mobile: 'flex flex-col gap-2',
+              all: 'flex flex-col sm:flex-row gap-3'
+            })}>
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search calculations..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 input-neumorphic"
+                  className={getResponsiveClasses(device, {
+                    mobile: 'pl-10 input-neumorphic h-11',
+                    all: 'pl-10 input-neumorphic'
+                  })}
                 />
               </div>
               <div className="flex gap-2">
@@ -457,13 +468,21 @@ export default function CalculationHistory() {
                   layout
                 >
                   <Card 
-                    className={`glass-frosted transition-all cursor-pointer hover:border-primary/30 ${
-                      isSelected ? 'border-primary ring-1 ring-primary/30' : ''
-                    }`}
+                    className={getResponsiveClasses(device, {
+                      mobile: `glass-premium mobile-card transition-all cursor-pointer touch-feedback ${
+                        isSelected ? 'border-primary ring-1 ring-primary/30' : ''
+                      }`,
+                      all: `glass-frosted transition-all cursor-pointer hover:border-primary/30 ${
+                        isSelected ? 'border-primary ring-1 ring-primary/30' : ''
+                      }`
+                    })}
                     onClick={() => toggleSelection(calc.id)}
                   >
-                    <CardContent className="py-4">
-                      <div className="flex items-start gap-3 sm:gap-4">
+                    <CardContent className={isMobile ? 'py-3 px-3' : 'py-4'}>
+                      <div className={getResponsiveClasses(device, {
+                        mobile: 'flex items-start gap-2',
+                        all: 'flex items-start gap-3 sm:gap-4'
+                      })}>
                         {/* Checkbox */}
                         <div className="pt-1">
                           <Checkbox
@@ -474,10 +493,12 @@ export default function CalculationHistory() {
                         </div>
                         
                         {/* Icon */}
-                        <div className={`rounded-xl p-2.5 sm:p-3 flex-shrink-0 ${
+                        <div className={`rounded-xl flex-shrink-0 ${
+                          isMobile ? 'p-2' : 'p-2.5 sm:p-3'
+                        } ${
                           calc.inputs.use2026Rules ? 'bg-success/10 text-success' : 'bg-secondary text-secondary-foreground'
                         }`}>
-                          <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                          <Icon className={isMobile ? 'h-4 w-4' : 'h-5 w-5 sm:h-6 sm:w-6'} />
                         </div>
                         
                         {/* Content */}
@@ -553,34 +574,46 @@ export default function CalculationHistory() {
 
       {/* Detail Dialog */}
       <Dialog open={!!showDetailDialog} onOpenChange={() => setShowDetailDialog(null)}>
-        <DialogContent className="max-w-lg max-h-[85vh] overflow-hidden flex flex-col">
+        <DialogContent className={getResponsiveClasses(device, {
+          mobile: 'max-w-[95vw] max-h-[90vh] rounded-xl modal-content-premium p-4 overflow-hidden flex flex-col',
+          all: 'max-w-lg max-h-[85vh] overflow-hidden flex flex-col'
+        })}>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className={getResponsiveClasses(device, {
+              mobile: 'flex items-center gap-2 text-base',
+              all: 'flex items-center gap-2'
+            })}>
               {showDetailDialog && (
                 <>
                   {(() => {
                     const Icon = calcTypeIcons[showDetailDialog.calculation_type] || Briefcase;
-                    return <Icon className="h-5 w-5 text-primary" />;
+                    return <Icon className={isMobile ? 'h-4 w-4 text-primary' : 'h-5 w-5 text-primary'} />;
                   })()}
                   {calcTypeLabels[showDetailDialog?.calculation_type || 'pit']}
                 </>
               )}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className={isMobile ? 'text-xs' : ''}>
               {showDetailDialog && format(parseISO(showDetailDialog.created_at), 'MMMM d, yyyy \'at\' h:mm a')}
             </DialogDescription>
           </DialogHeader>
           
           {showDetailDialog && (
             <ScrollArea className="flex-1 pr-4">
-              <div className="space-y-4">
+              <div className={isMobile ? 'space-y-3' : 'space-y-4'}>
                 {/* Summary */}
-                <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
-                  <p className="text-sm text-muted-foreground">Total Tax Payable</p>
-                  <p className="text-2xl font-bold text-primary">{formatCurrency(showDetailDialog.result.taxPayable)}</p>
-                  <div className="flex gap-4 mt-2 text-sm">
+                <div className={getResponsiveClasses(device, {
+                  mobile: 'p-3 rounded-lg bg-primary/5 border border-primary/20',
+                  all: 'p-4 rounded-xl bg-primary/5 border border-primary/20'
+                })}>
+                  <p className={isMobile ? 'text-xs text-muted-foreground' : 'text-sm text-muted-foreground'}>Total Tax Payable</p>
+                  <p className={isMobile ? 'text-xl font-bold text-primary' : 'text-2xl font-bold text-primary'}>{formatCurrency(showDetailDialog.result.taxPayable)}</p>
+                  <div className={getResponsiveClasses(device, {
+                    mobile: 'flex gap-3 mt-2 text-xs',
+                    all: 'flex gap-4 mt-2 text-sm'
+                  })}>
                     <span>Rate: {showDetailDialog.result.effectiveRate.toFixed(2)}%</span>
-                    <Badge variant="outline">
+                    <Badge variant="outline" className={isMobile ? 'text-xs' : ''}>
                       {showDetailDialog.inputs.use2026Rules ? '2026 Rules' : 'Pre-2026'}
                     </Badge>
                   </div>

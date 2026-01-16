@@ -36,11 +36,13 @@ import { PERSONAL_EXPENSE_CATEGORIES, PAYMENT_INTERVALS, getCategoryById, calcul
 import { EXPENSE_TEMPLATES } from '@/lib/expenseTemplates';
 import { useAuth } from '@/hooks/useAuth';
 import { DeleteConfirmationDialog } from '@/components/DeleteConfirmationDialog';
+import { useDeviceCSS, getResponsiveClasses } from '@/hooks/useDeviceCSS';
 
 const currentYear = new Date().getFullYear();
 const TAX_YEARS = [currentYear, currentYear - 1, currentYear - 2];
 
 export default function PersonalExpenses() {
+  const { device, isMobile, isTablet, containerClass} = useDeviceCSS();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [selectedYear, setSelectedYear] = useState(currentYear);
@@ -207,25 +209,39 @@ export default function PersonalExpenses() {
 
   return (
     <PageLayout>
-      <div className="container mx-auto px-4 py-6 max-w-6xl">
+      <div className={getResponsiveClasses(device, {
+        mobile: 'mobile-container px-3 py-4',
+        tablet: 'container mx-auto px-4 py-6 max-w-6xl',
+        desktop: 'container mx-auto px-6 py-8 max-w-6xl'
+      })}>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-6"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className={getResponsiveClasses(device, {
+            mobile: 'flex flex-col gap-4',
+            tablet: 'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4',
+            desktop: 'flex items-center justify-between gap-4'
+          })}>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <h1 className={getResponsiveClasses(device, {
+                mobile: 'display-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent',
+                all: 'text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent'
+              })}>
                 Personal Expenses
               </h1>
-              <p className="text-muted-foreground mt-1">
+              <p className="text-muted-foreground mt-1 text-sm sm:text-base">
                 Track tax-deductible personal expenses for accurate relief calculations
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className={getResponsiveClasses(device, {
+              mobile: 'flex items-center gap-2 w-full',
+              all: 'flex items-center gap-3'
+            })}>
               <Select value={String(selectedYear)} onValueChange={(v) => setSelectedYear(Number(v))}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger className={isMobile ? 'flex-1 input-neumorphic' : 'w-32'}>
                   <Calendar className="h-4 w-4 mr-2" />
                   <SelectValue />
                 </SelectTrigger>
@@ -235,9 +251,15 @@ export default function PersonalExpenses() {
                   ))}
                 </SelectContent>
               </Select>
-              <Button onClick={() => setIsAddDialogOpen(true)} className="gap-2">
+              <Button 
+                onClick={() => setIsAddDialogOpen(true)} 
+                className={getResponsiveClasses(device, {
+                  mobile: 'flex-1 gap-2 btn-premium touch-feedback',
+                  all: 'gap-2'
+                })}
+              >
                 <Plus className="h-4 w-4" />
-                Add Expense
+                {isMobile ? 'Add' : 'Add Expense'}
               </Button>
             </div>
           </div>
@@ -249,33 +271,43 @@ export default function PersonalExpenses() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="glass-premium mb-6">
+          <Card className={getResponsiveClasses(device, {
+            mobile: 'glass-premium mb-4 mobile-card',
+            all: 'glass-premium mb-6'
+          })}>
             <Collapsible open={summaryExpanded} onOpenChange={setSummaryExpanded}>
-              <CardHeader className="pb-2">
-                <CollapsibleTrigger className="flex items-center justify-between w-full">
+              <CardHeader className={isMobile ? 'pb-2 px-4' : 'pb-2'}>
+                <CollapsibleTrigger className="flex items-center justify-between w-full touch-feedback">
                   <div className="flex items-center gap-3">
-                    <TrendingUp className="h-5 w-5 text-primary" />
+                    <TrendingUp className={isMobile ? 'h-4 w-4 text-primary' : 'h-5 w-5 text-primary'} />
                     <div className="text-left">
-                      <CardTitle className="text-lg">Annual Summary - {selectedYear}</CardTitle>
-                      <CardDescription>Total deductible: {formatCurrency(totalDeductible)}</CardDescription>
+                      <CardTitle className={isMobile ? 'text-base' : 'text-lg'}>Annual Summary - {selectedYear}</CardTitle>
+                      <CardDescription className={isMobile ? 'text-xs' : ''}>Total deductible: {formatCurrency(totalDeductible)}</CardDescription>
                     </div>
                   </div>
                   {summaryExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
                 </CollapsibleTrigger>
               </CardHeader>
               <CollapsibleContent>
-                <CardContent>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                <CardContent className={isMobile ? 'px-4' : ''}>
+                  <div className={getResponsiveClasses(device, {
+                    mobile: 'grid grid-cols-2 gap-2',
+                    tablet: 'grid grid-cols-3 gap-3',
+                    desktop: 'grid grid-cols-5 gap-4'
+                  })}>
                     {PERSONAL_EXPENSE_CATEGORIES.slice(0, 5).map(cat => {
                       const amount = annualTotals[cat.id as keyof typeof annualTotals] || 0;
                       const Icon = cat.icon;
                       return (
-                        <div key={cat.id} className="p-3 rounded-lg bg-background/50 border border-border/50">
+                        <div key={cat.id} className={getResponsiveClasses(device, {
+                          mobile: 'p-2.5 rounded-lg bg-background/50 border border-border/50 neumorphic-inset',
+                          all: 'p-3 rounded-lg bg-background/50 border border-border/50'
+                        })}>
                           <div className="flex items-center gap-2 mb-1">
-                            <Icon className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-xs text-muted-foreground truncate">{cat.name}</span>
+                            <Icon className={isMobile ? 'h-3 w-3 text-muted-foreground' : 'h-4 w-4 text-muted-foreground'} />
+                            <span className={isMobile ? 'text-[10px] text-muted-foreground truncate' : 'text-xs text-muted-foreground truncate'}>{cat.name}</span>
                           </div>
-                          <p className="font-semibold text-sm">{formatCurrency(amount)}</p>
+                          <p className={isMobile ? 'font-semibold text-xs' : 'font-semibold text-sm'}>{formatCurrency(amount)}</p>
                         </div>
                       );
                     })}
@@ -571,15 +603,21 @@ export default function PersonalExpenses() {
             }
           }}
         >
-          <DialogContent className="max-w-md">
+          <DialogContent className={getResponsiveClasses(device, {
+            mobile: 'max-w-[95vw] rounded-xl modal-content-premium p-4',
+            all: 'max-w-md'
+          })}>
             <DialogHeader>
-              <DialogTitle>{editingExpense ? 'Edit Expense' : 'Add Personal Expense'}</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className={isMobile ? 'text-lg' : ''}>{editingExpense ? 'Edit Expense' : 'Add Personal Expense'}</DialogTitle>
+              <DialogDescription className={isMobile ? 'text-sm' : ''}>
                 Track tax-deductible personal expenses for {selectedYear}
               </DialogDescription>
             </DialogHeader>
             
-            <div className="space-y-4">
+            <div className={getResponsiveClasses(device, {
+              mobile: 'space-y-3',
+              all: 'space-y-4'
+            })}>
               <div className="space-y-2">
                 <Label>Category *</Label>
                 <Select 
@@ -611,12 +649,13 @@ export default function PersonalExpenses() {
               </div>
 
               <div className="space-y-2">
-                <Label>Amount (₦) *</Label>
+                <Label className={isMobile ? 'text-sm' : ''}>Amount (₦) *</Label>
                 <Input
                   type="number"
                   value={formData.amount || ''}
                   onChange={(e) => setFormData({ ...formData, amount: Number(e.target.value) })}
                   placeholder="Enter amount"
+                  className={isMobile ? 'input-neumorphic h-11' : ''}
                 />
               </div>
 
