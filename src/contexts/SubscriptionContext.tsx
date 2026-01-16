@@ -388,6 +388,19 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       }
     }
 
+    // Send tier change email notification (fire and forget)
+    supabase.functions.invoke('send-tier-change-email', {
+      body: {
+        email: user.email,
+        userName: user.user_metadata?.full_name || user.user_metadata?.name,
+        previousTier,
+        newTier,
+        changeType: isDowngrade ? 'downgrade' : 'upgrade',
+      }
+    }).catch(err => {
+      console.error('Failed to send tier change email:', err);
+    });
+
     setState(prev => ({
       ...prev,
       tier: newTier,
