@@ -29,7 +29,8 @@ import {
   CheckCircle,
   AlertCircle,
   Wallet,
-  RefreshCw
+  RefreshCw,
+  Download
 } from "lucide-react";
 import { ForeignIncomeCalculator } from "@/components/ForeignIncomeCalculator";
 import { calculateIndividualTax, formatCurrency, type IndividualTaxInputs } from "@/lib/individualTaxCalculations";
@@ -37,6 +38,7 @@ import { PRESUMPTIVE_TAX_RATES } from "@/lib/sectorConfig";
 import { usePersonalExpenses } from "@/hooks/usePersonalExpenses";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { downloadIndividualTaxPDF } from "@/lib/individualPdfExport";
 
 type CalculationType = 'pit' | 'crypto' | 'investment' | 'informal' | 'foreign_income';
 
@@ -626,11 +628,56 @@ const IndividualCalculatorPage = () => {
       {/* Results Section */}
       {result && (
         <Card className="glass-frosted border-0 shadow-futuristic animate-slide-up">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Calculator className="h-5 w-5 text-primary" />
               Calculation Results
             </CardTitle>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const inputs: IndividualTaxInputs = {
+                  calculationType,
+                  use2026Rules,
+                  employmentIncome: parseNumber(employmentIncome),
+                  pensionContribution: parseNumber(pensionContribution),
+                  nhfContribution: parseNumber(nhfContribution),
+                  lifeInsurancePremium: parseNumber(lifeInsurance),
+                  cryptoIncome: parseNumber(cryptoIncome),
+                  cryptoGains: parseNumber(cryptoGains),
+                  cryptoLosses: parseNumber(cryptoLosses),
+                  dividendIncome: parseNumber(dividendIncome),
+                  interestIncome: parseNumber(interestIncome),
+                  capitalGains: parseNumber(capitalGains),
+                  estimatedTurnover: parseNumber(estimatedTurnover),
+                  location,
+                };
+                downloadIndividualTaxPDF({
+                  inputs,
+                  result,
+                  employmentIncome: parseNumber(employmentIncome),
+                  pensionContribution: parseNumber(pensionContribution),
+                  nhfContribution: parseNumber(nhfContribution),
+                  lifeInsurance: parseNumber(lifeInsurance),
+                  healthInsurance: parseNumber(healthInsurance),
+                  rentPaid: parseNumber(rentPaid),
+                  cryptoIncome: parseNumber(cryptoIncome),
+                  cryptoGains: parseNumber(cryptoGains),
+                  cryptoLosses: parseNumber(cryptoLosses),
+                  dividendIncome: parseNumber(dividendIncome),
+                  interestIncome: parseNumber(interestIncome),
+                  capitalGains: parseNumber(capitalGains),
+                  estimatedTurnover: parseNumber(estimatedTurnover),
+                  location,
+                });
+                toast.success('PDF downloaded successfully');
+              }}
+              className="gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Export PDF
+            </Button>
           </CardHeader>
           <CardContent>
             <div className="grid gap-6 md:grid-cols-2">
@@ -663,6 +710,65 @@ const IndividualCalculatorPage = () => {
                 ))}
               </div>
             </div>
+
+            {/* Reliefs Section */}
+            {result.reliefs && result.reliefs.length > 0 && (
+              <div className="mt-6 pt-6 border-t border-border">
+                <h4 className="font-medium text-foreground mb-4">Tax Reliefs Applied</h4>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {result.reliefs.map((relief, i) => (
+                    <div key={i} className="p-3 rounded-lg bg-success/5 border border-success/20">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="text-sm font-medium text-foreground">{relief.name}</p>
+                          <p className="text-xs text-muted-foreground">{relief.description}</p>
+                        </div>
+                        <span className="text-sm font-semibold text-success">-{formatCurrency(relief.amount)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Alerts Section */}
+            {result.alerts && result.alerts.length > 0 && (
+              <div className="mt-6 pt-6 border-t border-border">
+                <h4 className="font-medium text-foreground mb-4">Alerts & Insights</h4>
+                <div className="space-y-2">
+                  {result.alerts.map((alert, i) => (
+                    <div 
+                      key={i} 
+                      className={`p-3 rounded-lg text-sm ${
+                        alert.type === 'success' ? 'bg-success/10 text-success border border-success/20' :
+                        alert.type === 'warning' ? 'bg-warning/10 text-warning border border-warning/20' :
+                        'bg-info/10 text-info border border-info/20'
+                      }`}
+                    >
+                      {alert.type === 'success' && <CheckCircle className="h-4 w-4 inline mr-2" />}
+                      {alert.type === 'warning' && <AlertCircle className="h-4 w-4 inline mr-2" />}
+                      {alert.type === 'info' && <Info className="h-4 w-4 inline mr-2" />}
+                      {alert.message}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Recommendations Section */}
+            {result.recommendations && result.recommendations.length > 0 && (
+              <div className="mt-6 pt-6 border-t border-border">
+                <h4 className="font-medium text-foreground mb-4">Recommendations</h4>
+                <ul className="space-y-2">
+                  {result.recommendations.map((rec, i) => (
+                    <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+                      <Sparkles className="h-4 w-4 text-accent mt-0.5 flex-shrink-0" />
+                      {rec}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
