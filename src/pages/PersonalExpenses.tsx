@@ -666,7 +666,7 @@ export default function PersonalExpenses() {
             }
           }}
         >
-          <DialogContent className="w-[92vw] max-w-md max-h-[70vh] rounded-xl p-4 overflow-hidden flex flex-col mx-auto">
+          <DialogContent className="w-[92vw] max-w-md max-h-[70vh] rounded-xl p-4 flex flex-col mx-auto">
             <DialogHeader className="flex-shrink-0">
               <DialogTitle className={isMobile ? 'text-lg' : ''}>{editingExpense ? 'Edit Expense' : 'Add Personal Expense'}</DialogTitle>
               <DialogDescription className={isMobile ? 'text-sm' : ''}>
@@ -674,7 +674,7 @@ export default function PersonalExpenses() {
               </DialogDescription>
             </DialogHeader>
             
-            <ScrollArea className="flex-1 pr-2">
+            <div className="flex-1 min-h-0 overflow-y-auto pr-2 mt-4">
               <div className={getResponsiveClasses(device, {
                 mobile: 'space-y-3 pb-2',
                 all: 'space-y-4 pb-2'
@@ -798,7 +798,7 @@ export default function PersonalExpenses() {
                   </div>
                 )}
               </div>
-            </ScrollArea>
+            </div>
 
             <DialogFooter className="flex-shrink-0 pt-3 border-t border-border/50">
               <Button variant="outline" size="sm" onClick={() => {
