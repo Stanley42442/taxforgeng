@@ -227,16 +227,14 @@ const Pricing = () => {
           className="mb-6"
         />
 
-        {/* Promo Code Input */}
+        {/* Promo Code Input - validated against the selected tier at payment time */}
         <div className="max-w-md mx-auto">
           <PromoCodeInput
-            tier="business"
+            tier="starter"
             billingCycle={billingCycle}
-            onDiscountApplied={(result) => {
+            onDiscountApplied={(result, code) => {
               setPromoValidation(result);
-              if (result?.valid) {
-                setPromoCode(result.description || '');
-              }
+              setPromoCode(code || '');
             }}
           />
         </div>

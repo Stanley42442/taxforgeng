@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 interface PromoCodeInputProps {
   tier: string;
   billingCycle: 'monthly' | 'annually';
-  onDiscountApplied: (discount: DiscountValidationResult | null) => void;
+  onDiscountApplied: (discount: DiscountValidationResult | null, code: string | null) => void;
   className?: string;
 }
 
@@ -36,17 +36,17 @@ export function PromoCodeInput({
 
       if (result.valid) {
         setAppliedDiscount(result);
-        onDiscountApplied(result);
+        onDiscountApplied(result, code.trim().toUpperCase());
         setError(null);
       } else {
         setError(result.message || result.error || 'Invalid code');
         setAppliedDiscount(null);
-        onDiscountApplied(null);
+        onDiscountApplied(null, null);
       }
     } catch (err: any) {
       setError(err.message || 'Failed to validate code');
       setAppliedDiscount(null);
-      onDiscountApplied(null);
+      onDiscountApplied(null, null);
     } finally {
       setIsValidating(false);
     }
@@ -56,7 +56,7 @@ export function PromoCodeInput({
     setCode('');
     setAppliedDiscount(null);
     setError(null);
-    onDiscountApplied(null);
+    onDiscountApplied(null, null);
   }, [onDiscountApplied]);
 
   const formatCurrency = (kobo: number) => {
