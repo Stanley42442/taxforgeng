@@ -1,9 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { usePaystack, DiscountValidationResult } from '@/hooks/usePaystack';
-import { Loader2, Check, X, Tag, Percent } from 'lucide-react';
+import { Loader2, Check, X, Tag, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PromoCodeInputProps {
@@ -23,7 +23,48 @@ export function PromoCodeInput({
   const [code, setCode] = useState('');
   const [isValidating, setIsValidating] = useState(false);
   const [appliedDiscount, setAppliedDiscount] = useState<DiscountValidationResult | null>(null);
+  const [appliedCode, setAppliedCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [lastValidatedTier, setLastValidatedTier] = useState<string>(tier);
+  const [lastValidatedCycle, setLastValidatedCycle] = useState<'monthly' | 'annually'>(billingCycle);
+  
+  // Re-validate when tier or billing cycle changes and we have an applied code
+  useEffect(() => {
+    if (appliedCode && (tier !== lastValidatedTier || billingCycle !== lastValidatedCycle)) {
+      revalidateDiscount();
+    }
+  }, [tier, billingCycle]);
+
+  const revalidateDiscount = useCallback(async () => {
+    if (!appliedCode) return;
+
+    setIsValidating(true);
+    setError(null);
+
+    try {
+      const result = await validateDiscountCode(appliedCode, tier, billingCycle);
+
+      if (result.valid) {
+        setAppliedDiscount(result);
+        onDiscountApplied(result, appliedCode);
+        setError(null);
+      } else {
+        // Code is no longer valid for this tier/cycle
+        setError(result.message || 'Code not valid for selected plan');
+        setAppliedDiscount(null);
+        onDiscountApplied(null, null);
+      }
+      
+      setLastValidatedTier(tier);
+      setLastValidatedCycle(billingCycle);
+    } catch (err: any) {
+      setError(err.message || 'Failed to validate code');
+      setAppliedDiscount(null);
+      onDiscountApplied(null, null);
+    } finally {
+      setIsValidating(false);
+    }
+  }, [appliedCode, tier, billingCycle, validateDiscountCode, onDiscountApplied]);
 
   const handleApply = useCallback(async () => {
     if (!code.trim()) return;
@@ -32,20 +73,26 @@ export function PromoCodeInput({
     setError(null);
 
     try {
-      const result = await validateDiscountCode(code.trim(), tier, billingCycle);
+      const upperCode = code.trim().toUpperCase();
+      const result = await validateDiscountCode(upperCode, tier, billingCycle);
 
       if (result.valid) {
         setAppliedDiscount(result);
-        onDiscountApplied(result, code.trim().toUpperCase());
+        setAppliedCode(upperCode);
+        setLastValidatedTier(tier);
+        setLastValidatedCycle(billingCycle);
+        onDiscountApplied(result, upperCode);
         setError(null);
       } else {
         setError(result.message || result.error || 'Invalid code');
         setAppliedDiscount(null);
+        setAppliedCode(null);
         onDiscountApplied(null, null);
       }
     } catch (err: any) {
       setError(err.message || 'Failed to validate code');
       setAppliedDiscount(null);
+      setAppliedCode(null);
       onDiscountApplied(null, null);
     } finally {
       setIsValidating(false);
@@ -55,6 +102,7 @@ export function PromoCodeInput({
   const handleRemove = useCallback(() => {
     setCode('');
     setAppliedDiscount(null);
+    setAppliedCode(null);
     setError(null);
     onDiscountApplied(null, null);
   }, [onDiscountApplied]);
@@ -78,6 +126,9 @@ export function PromoCodeInput({
             </span>
           </div>
           <div className="flex items-center gap-2">
+            {isValidating && (
+              <RefreshCw className="h-3 w-3 text-muted-foreground animate-spin" />
+            )}
             <Badge variant="outline" className="bg-success/10 text-success border-success/20">
               {appliedDiscount.discountType}
             </Badge>
