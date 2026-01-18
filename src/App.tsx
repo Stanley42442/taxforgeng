@@ -72,6 +72,8 @@ const PaymentCallback = lazy(() => import("./pages/PaymentCallback"));
 const BillingHistory = lazy(() => import("./pages/BillingHistory"));
 const CancelSubscription = lazy(() => import("./pages/CancelSubscription"));
 const LoyaltyRewards = lazy(() => import("./pages/LoyaltyRewards"));
+const WebhookTesting = lazy(() => import("./pages/WebhookTesting"));
+const PromoCodeAdmin = lazy(() => import("./pages/PromoCodeAdmin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Lazy load TaxAssistant (heavy component with AI chat)
@@ -166,6 +168,8 @@ const AnimatedRoutes = () => {
           <Route path="/billing" element={<BillingHistory />} />
           <Route path="/cancel-subscription" element={<CancelSubscription />} />
           <Route path="/rewards" element={<LoyaltyRewards />} />
+          <Route path="/admin/webhooks" element={<WebhookTesting />} />
+          <Route path="/admin/promo-codes" element={<PromoCodeAdmin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
