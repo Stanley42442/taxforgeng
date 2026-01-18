@@ -107,13 +107,13 @@ const Auth = () => {
     }
   };
 
-  // Record login attempt
+  // Record login attempt via security definer function
   const recordLoginAttempt = async (attemptEmail: string, success: boolean) => {
     try {
-      await supabase.from('login_attempts').insert({
-        email: attemptEmail,
-        success,
-        ip_address: null // Could be fetched if needed
+      await supabase.rpc('record_login_attempt', {
+        attempt_email: attemptEmail,
+        attempt_success: success,
+        attempt_ip: null
       });
     } catch (err) {
       console.error('Failed to record login attempt:', err);
