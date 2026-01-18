@@ -25,7 +25,13 @@ import {
   Target,
   Zap,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  CreditCard,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Gift,
+  Percent
 } from "lucide-react";
 import { format, subDays, startOfDay, endOfDay, subMonths, startOfMonth, endOfMonth, eachMonthOfInterval, eachDayOfInterval } from "date-fns";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
@@ -61,6 +67,26 @@ import {
 } from "recharts";
 import { ReusableAreaChart } from "@/components/ui/reusable-area-chart";
 
+interface PaymentAnalytics {
+  totalRevenue: number;
+  successfulPayments: number;
+  failedPayments: number;
+  pendingPayments: number;
+  activeSubscriptions: number;
+  cancelledSubscriptions: number;
+  promoCodeUsage: { code: string; uses: number; revenue: number }[];
+  recentTransactions: { 
+    id: string; 
+    amount: number; 
+    status: string; 
+    tier: string; 
+    created_at: string;
+    discount_code?: string;
+  }[];
+  monthlyRevenue: { month: string; revenue: number; transactions: number }[];
+  tierRevenue: { tier: string; revenue: number; count: number }[];
+}
+
 interface AnalyticsData {
   totalUsers: number;
   totalBusinesses: number;
@@ -79,6 +105,7 @@ interface AnalyticsData {
   conversionRate: number;
   churnRate: number;
   ltv: number;
+  payments: PaymentAnalytics;
 }
 
 type DatePreset = 'today' | '7days' | '30days' | '90days' | 'all' | 'custom';
@@ -86,9 +113,10 @@ type DatePreset = 'today' | '7days' | '30days' | '90days' | 'all' | 'custom';
 // Pricing tiers for ARR calculation (monthly prices in Naira)
 const TIER_PRICING: Record<string, number> = {
   free: 0,
-  basic: 4999,
+  starter: 2999,
+  professional: 7999,
   business: 14999,
-  corporate: 49999
+  enterprise: 49999
 };
 
 const TIER_COLORS: Record<string, string> = {
@@ -275,6 +303,71 @@ const AdminAnalytics = () => {
       const avgRevenuePerUser = profiles.length > 0 ? realMrr / profiles.length : 0;
       const ltv = churnRate > 0 ? (avgRevenuePerUser / (churnRate / 100)) : 0;
 
+      // Fetch payment analytics
+      const [transactionsResult, subscriptionsResult, promoRedemptionsResult] = await Promise.all([
+        supabase.from('payment_transactions').select('*').order('created_at', { ascending: false }).limit(50),
+        supabase.from('paystack_subscriptions').select('*'),
+        supabase.from('promo_code_redemptions').select('*, promo_codes(code)')
+      ]);
+
+      const transactions = transactionsResult.data || [];
+      const subscriptions = subscriptionsResult.data || [];
+      const promoRedemptions = promoRedemptionsResult.data || [];
+
+      // Calculate payment metrics
+      const successfulPayments = transactions.filter((t: any) => t.status === 'success');
+      const failedPayments = transactions.filter((t: any) => t.status === 'failed');
+      const pendingPayments = transactions.filter((t: any) => t.status === 'pending');
+      const totalRevenue = successfulPayments.reduce((sum: number, t: any) => sum + (t.amount || 0), 0) / 100;
+
+      const activeSubscriptions = subscriptions.filter((s: any) => s.status === 'active').length;
+      const cancelledSubscriptions = subscriptions.filter((s: any) => s.status === 'cancelled').length;
+
+      // Promo code usage
+      const promoCodeUsage = promoRedemptions.reduce((acc: any, r: any) => {
+        const code = (r.promo_codes as any)?.code || r.promo_code_id || 'Unknown';
+        if (!acc[code]) acc[code] = { uses: 0, revenue: 0 };
+        acc[code].uses += 1;
+        acc[code].revenue += r.discount_amount || 0;
+        return acc;
+      }, {});
+
+      const promoCodeUsageArr = Object.entries(promoCodeUsage).map(([code, data]: [string, any]) => ({
+        code,
+        uses: data.uses,
+        revenue: data.revenue / 100
+      }));
+
+      // Monthly revenue from transactions
+      const monthlyRevenueMap = successfulPayments.reduce((acc: any, t: any) => {
+        const month = format(new Date(t.created_at), 'MMM');
+        if (!acc[month]) acc[month] = { revenue: 0, transactions: 0 };
+        acc[month].revenue += (t.amount || 0) / 100;
+        acc[month].transactions += 1;
+        return acc;
+      }, {});
+
+      const monthlyRevenue = Object.entries(monthlyRevenueMap).map(([month, data]: [string, any]) => ({
+        month,
+        revenue: data.revenue,
+        transactions: data.transactions
+      }));
+
+      // Tier revenue breakdown
+      const tierRevenueMap = successfulPayments.reduce((acc: any, t: any) => {
+        const tier = t.tier || 'unknown';
+        if (!acc[tier]) acc[tier] = { revenue: 0, count: 0 };
+        acc[tier].revenue += (t.amount || 0) / 100;
+        acc[tier].count += 1;
+        return acc;
+      }, {});
+
+      const tierRevenue = Object.entries(tierRevenueMap).map(([tier, data]: [string, any]) => ({
+        tier,
+        revenue: data.revenue,
+        count: data.count
+      }));
+
       setAnalytics({
         totalUsers: profilesResult.count || 0,
         totalBusinesses: businessesResult.count || 0,
@@ -292,7 +385,26 @@ const AdminAnalytics = () => {
         arrData,
         conversionRate,
         churnRate,
-        ltv
+        ltv,
+        payments: {
+          totalRevenue,
+          successfulPayments: successfulPayments.length,
+          failedPayments: failedPayments.length,
+          pendingPayments: pendingPayments.length,
+          activeSubscriptions,
+          cancelledSubscriptions,
+          promoCodeUsage: promoCodeUsageArr,
+          recentTransactions: transactions.slice(0, 10).map((t: any) => ({
+            id: t.id,
+            amount: t.amount / 100,
+            status: t.status,
+            tier: t.tier,
+            created_at: t.created_at,
+            discount_code: t.discount_code
+          })),
+          monthlyRevenue,
+          tierRevenue
+        }
       });
       
       setLastUpdated(new Date());
@@ -310,9 +422,9 @@ const AdminAnalytics = () => {
         totalApiRequests: 12450,
         tierBreakdown: [
           { tier: 'free', count: 98 },
-          { tier: 'basic', count: 35 },
-          { tier: 'business', count: 18 },
-          { tier: 'corporate', count: 5 }
+          { tier: 'starter', count: 35 },
+          { tier: 'professional', count: 18 },
+          { tier: 'business', count: 5 }
         ],
         recentSignups: 23,
         averageRating: 4.2,
@@ -343,7 +455,28 @@ const AdminAnalytics = () => {
         ],
         conversionRate: 37.2,
         churnRate: 3.2,
-        ltv: 45000
+        ltv: 45000,
+        payments: {
+          totalRevenue: 2450000,
+          successfulPayments: 156,
+          failedPayments: 8,
+          pendingPayments: 3,
+          activeSubscriptions: 58,
+          cancelledSubscriptions: 12,
+          promoCodeUsage: [
+            { code: 'LAUNCH20', uses: 23, revenue: 125000 },
+            { code: 'WELCOME10', uses: 45, revenue: 89000 }
+          ],
+          recentTransactions: [],
+          monthlyRevenue: [
+            { month: 'Jan', revenue: 489965, transactions: 34 }
+          ],
+          tierRevenue: [
+            { tier: 'starter', revenue: 150000, count: 45 },
+            { tier: 'professional', revenue: 400000, count: 23 },
+            { tier: 'business', revenue: 890000, count: 12 }
+          ]
+        }
       });
     } finally {
       setLoading(false);
@@ -855,6 +988,194 @@ const AdminAnalytics = () => {
               <CardContent>
                 <div className="text-2xl font-bold">{analytics?.totalExpenses.toLocaleString()}</div>
                 <p className="text-xs text-muted-foreground">Expenses tracked</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Payment Analytics Section */}
+          <div className="mt-8 mb-6">
+            <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+              <CreditCard className="h-6 w-6 text-primary" />
+              Payment Analytics
+            </h2>
+            
+            {/* Payment Stats */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+              <Card className="animate-slide-up">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
+                  <DollarSign className="h-5 w-5 text-success" />
+                </CardHeader>
+                <CardContent className="overflow-hidden">
+                  <div className="text-lg sm:text-2xl font-bold text-success break-all">{formatCurrency(analytics?.payments.totalRevenue || 0)}</div>
+                  <p className="text-xs text-muted-foreground">Lifetime revenue</p>
+                </CardContent>
+              </Card>
+
+              <Card className="animate-slide-up" style={{ animationDelay: '50ms' }}>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Successful Payments</CardTitle>
+                  <CheckCircle className="h-5 w-5 text-success" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-foreground">{analytics?.payments.successfulPayments || 0}</div>
+                  <p className="text-xs text-muted-foreground">Completed transactions</p>
+                </CardContent>
+              </Card>
+
+              <Card className="animate-slide-up" style={{ animationDelay: '100ms' }}>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Active Subscriptions</CardTitle>
+                  <Crown className="h-5 w-5 text-primary" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-foreground">{analytics?.payments.activeSubscriptions || 0}</div>
+                  <p className="text-xs text-success">+{analytics?.payments.cancelledSubscriptions || 0} cancelled</p>
+                </CardContent>
+              </Card>
+
+              <Card className="animate-slide-up" style={{ animationDelay: '150ms' }}>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Failed/Pending</CardTitle>
+                  <XCircle className="h-5 w-5 text-destructive" />
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-4">
+                    <div>
+                      <div className="text-xl font-bold text-destructive">{analytics?.payments.failedPayments || 0}</div>
+                      <p className="text-xs text-muted-foreground">Failed</p>
+                    </div>
+                    <div>
+                      <div className="text-xl font-bold text-warning">{analytics?.payments.pendingPayments || 0}</div>
+                      <p className="text-xs text-muted-foreground">Pending</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Promo Code Performance & Recent Transactions */}
+            <div className="grid gap-6 lg:grid-cols-2 mb-6">
+              {/* Promo Code Usage */}
+              <Card className="animate-slide-up">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Gift className="h-5 w-5 text-accent" />
+                    Promo Code Performance
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {analytics?.payments.promoCodeUsage && analytics.payments.promoCodeUsage.length > 0 ? (
+                    <div className="space-y-3">
+                      {analytics.payments.promoCodeUsage.map((promo, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
+                          <div className="flex items-center gap-3">
+                            <Badge variant="outline" className="font-mono">{promo.code}</Badge>
+                            <span className="text-sm text-muted-foreground">{promo.uses} uses</span>
+                          </div>
+                          <span className="font-bold text-primary">{formatCurrency(promo.revenue)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Percent className="h-10 w-10 mx-auto mb-2 opacity-50" />
+                      <p>No promo codes used yet</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Revenue by Tier */}
+              <Card className="animate-slide-up">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Crown className="h-5 w-5 text-warning" />
+                    Revenue by Tier
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {analytics?.payments.tierRevenue && analytics.payments.tierRevenue.length > 0 ? (
+                    <div className="space-y-3">
+                      {analytics.payments.tierRevenue.map((tier, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
+                          <div className="flex items-center gap-3">
+                            <Badge variant="secondary" className="capitalize">{tier.tier}</Badge>
+                            <span className="text-sm text-muted-foreground">{tier.count} payments</span>
+                          </div>
+                          <span className="font-bold text-success">{formatCurrency(tier.revenue)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <CreditCard className="h-10 w-10 mx-auto mb-2 opacity-50" />
+                      <p>No tier revenue data yet</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Recent Transactions Table */}
+            <Card className="animate-slide-up">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Receipt className="h-5 w-5 text-info" />
+                  Recent Transactions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {analytics?.payments.recentTransactions && analytics.payments.recentTransactions.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="text-left py-3 px-2 text-muted-foreground font-medium">Date</th>
+                          <th className="text-left py-3 px-2 text-muted-foreground font-medium">Tier</th>
+                          <th className="text-left py-3 px-2 text-muted-foreground font-medium">Amount</th>
+                          <th className="text-left py-3 px-2 text-muted-foreground font-medium">Status</th>
+                          <th className="text-left py-3 px-2 text-muted-foreground font-medium">Discount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {analytics.payments.recentTransactions.map((tx, index) => (
+                          <tr key={index} className="border-b border-border/50 hover:bg-secondary/30">
+                            <td className="py-3 px-2 text-foreground">
+                              {format(new Date(tx.created_at), 'MMM d, yyyy')}
+                            </td>
+                            <td className="py-3 px-2">
+                              <Badge variant="outline" className="capitalize">{tx.tier}</Badge>
+                            </td>
+                            <td className="py-3 px-2 font-medium text-foreground">
+                              {formatCurrency(tx.amount)}
+                            </td>
+                            <td className="py-3 px-2">
+                              <Badge 
+                                variant={tx.status === 'success' ? 'default' : tx.status === 'pending' ? 'secondary' : 'destructive'}
+                                className={tx.status === 'success' ? 'bg-success text-success-foreground' : ''}
+                              >
+                                {tx.status}
+                              </Badge>
+                            </td>
+                            <td className="py-3 px-2">
+                              {tx.discount_code ? (
+                                <Badge variant="outline" className="font-mono text-xs">{tx.discount_code}</Badge>
+                              ) : (
+                                <span className="text-muted-foreground">-</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Clock className="h-10 w-10 mx-auto mb-2 opacity-50" />
+                    <p>No transactions yet</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

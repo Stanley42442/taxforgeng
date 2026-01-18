@@ -6,6 +6,28 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Rate limiting - prevent payment spam
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const RATE_LIMIT_MAX = 5; // 5 payment attempts per minute per user
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitStore.get(userId);
+  
+  if (!entry || now > entry.resetTime) {
+    rateLimitStore.set(userId, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  
+  if (entry.count >= RATE_LIMIT_MAX) {
+    return false;
+  }
+  
+  entry.count++;
+  return true;
+}
+
 interface InitializeRequest {
   tier: string;
   billingCycle: 'monthly' | 'annually';
@@ -56,6 +78,15 @@ serve(async (req) => {
     
     if (authError || !user) {
       throw new Error("Unauthorized");
+    }
+
+    // Rate limiting check
+    if (!checkRateLimit(user.id)) {
+      console.log(`Rate limit exceeded for user: ${user.id}`);
+      return new Response(
+        JSON.stringify({ success: false, error: 'Too many payment attempts. Please wait a minute and try again.' }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": "60" } }
+      );
     }
 
     const body: InitializeRequest = await req.json();

@@ -6,7 +6,29 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-paystack-signature',
 };
 
-// Simple HMAC-SHA512 verification using Web Crypto API
+// Rate limiting store (in-memory, resets on cold start)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const RATE_LIMIT_MAX = 100; // 100 requests per minute
+
+function checkRateLimit(identifier: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitStore.get(identifier);
+  
+  if (!entry || now > entry.resetTime) {
+    rateLimitStore.set(identifier, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  
+  if (entry.count >= RATE_LIMIT_MAX) {
+    return false;
+  }
+  
+  entry.count++;
+  return true;
+}
+
+// HMAC-SHA512 verification using Web Crypto API
 async function verifySignature(body: string, signature: string, secret: string): Promise<boolean> {
   try {
     const encoder = new TextEncoder();
@@ -21,16 +43,51 @@ async function verifySignature(body: string, signature: string, secret: string):
     const computedSignature = Array.from(new Uint8Array(signatureBuffer))
       .map(b => b.toString(16).padStart(2, '0'))
       .join('');
-    return computedSignature === signature;
+    
+    // Constant-time comparison to prevent timing attacks
+    if (computedSignature.length !== signature.length) {
+      return false;
+    }
+    
+    let result = 0;
+    for (let i = 0; i < computedSignature.length; i++) {
+      result |= computedSignature.charCodeAt(i) ^ signature.charCodeAt(i);
+    }
+    return result === 0;
   } catch (err) {
     console.error('Signature verification error:', err);
     return false;
   }
 }
 
+// Log webhook event for auditing
+async function logWebhookEvent(supabase: any, event: string, success: boolean, details: any) {
+  try {
+    await supabase.from('payment_audit_log').insert({
+      action: `webhook_${event}`,
+      entity_type: 'webhook',
+      entity_id: details.reference || details.subscription_code || null,
+      new_values: { event, success, ...details }
+    });
+  } catch (error) {
+    console.error('Failed to log webhook event:', error);
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  const clientIP = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+
+  // Rate limiting
+  if (!checkRateLimit(clientIP)) {
+    console.error(`Rate limit exceeded for IP: ${clientIP}`);
+    return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
+      status: 429,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Retry-After': '60' },
+    });
   }
 
   try {
@@ -47,16 +104,22 @@ serve(async (req) => {
     const body = await req.text();
     const signature = req.headers.get('x-paystack-signature');
 
-    // Verify webhook signature
-    if (signature) {
-      const isValid = await verifySignature(body, signature, paystackSecretKey);
-      if (!isValid) {
-        console.error('Invalid webhook signature');
-        return new Response(JSON.stringify({ error: 'Invalid signature' }), {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
+    // Verify webhook signature (REQUIRED in production)
+    if (!signature) {
+      console.error('Missing webhook signature');
+      return new Response(JSON.stringify({ error: 'Missing signature' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const isValid = await verifySignature(body, signature, paystackSecretKey);
+    if (!isValid) {
+      console.error('Invalid webhook signature from IP:', clientIP);
+      return new Response(JSON.stringify({ error: 'Invalid signature' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const payload = JSON.parse(body);
@@ -69,6 +132,9 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Log webhook start
+    await logWebhookEvent(supabase, event, true, { reference: data.reference, ip: clientIP });
+
     switch (event) {
       case 'charge.success': {
         // Handle successful charge
@@ -78,7 +144,7 @@ serve(async (req) => {
         console.log(`Charge success for reference: ${reference}`);
 
         // Update transaction status
-        await supabase
+        const { error: updateError } = await supabase
           .from('payment_transactions')
           .update({ 
             status: 'success',
@@ -86,6 +152,19 @@ serve(async (req) => {
             updated_at: new Date().toISOString()
           })
           .eq('reference', reference);
+
+        if (updateError) {
+          console.error('Failed to update transaction:', updateError);
+        }
+
+        // Send payment confirmation email via edge function
+        try {
+          await supabase.functions.invoke('send-payment-confirmation', {
+            body: { reference }
+          });
+        } catch (emailError) {
+          console.error('Failed to send confirmation email:', emailError);
+        }
 
         break;
       }
@@ -218,6 +297,8 @@ serve(async (req) => {
         console.log(`Unhandled webhook event: ${event}`);
     }
 
+    await logWebhookEvent(supabase, event, true, { processed: true });
+
     return new Response(JSON.stringify({ received: true }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -231,4 +312,3 @@ serve(async (req) => {
     });
   }
 });
-
