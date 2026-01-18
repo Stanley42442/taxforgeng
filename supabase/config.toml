@@ -50,3 +50,21 @@ verify_jwt = false
 
 [functions.send-tier-change-email]
 verify_jwt = false
+
+[functions.paystack-initialize]
+verify_jwt = false
+
+[functions.paystack-verify]
+verify_jwt = false
+
+[functions.validate-discount-code]
+verify_jwt = false
+
+[functions.paystack-webhook]
+verify_jwt = false
+
+[functions.paystack-cancel-subscription]
+verify_jwt = false
+
+[functions.paystack-get-subscription]
+verify_jwt = false
