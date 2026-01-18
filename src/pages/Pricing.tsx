@@ -128,28 +128,6 @@ const Pricing = () => {
     return targetIndex < currentIndex;
   };
 
-  const handlePromoApply = async (code: string, tier: SubscriptionTier) => {
-    if (!code.trim()) {
-      setPromoValidation(null);
-      return;
-    }
-
-    setValidatingPromo(true);
-    try {
-      const result = await validateDiscountCode(code, tier, billingCycle);
-      setPromoValidation(result);
-      if (result.valid) {
-        toast.success(`Promo code applied! ${result.description}`);
-      } else {
-        toast.error(result.error || 'Invalid promo code');
-      }
-    } catch {
-      toast.error('Failed to validate promo code');
-    } finally {
-      setValidatingPromo(false);
-    }
-  };
-
   const handleTierSelect = async (tier: SubscriptionTier) => {
     if (tier === 'free') {
       toast.info("You're already on the free tier or this is the free tier");
@@ -252,12 +230,14 @@ const Pricing = () => {
         {/* Promo Code Input */}
         <div className="max-w-md mx-auto">
           <PromoCodeInput
-            value={promoCode}
-            onChange={setPromoCode}
-            onApply={(code) => handlePromoApply(code, 'business')}
-            isValid={promoValidation?.valid}
-            discountInfo={promoValidation?.valid ? promoValidation.description : undefined}
-            isLoading={validatingPromo}
+            tier="business"
+            billingCycle={billingCycle}
+            onDiscountApplied={(result) => {
+              setPromoValidation(result);
+              if (result?.valid) {
+                setPromoCode(result.description || '');
+              }
+            }}
           />
         </div>
       </div>
