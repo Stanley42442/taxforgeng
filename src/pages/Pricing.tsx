@@ -119,7 +119,7 @@ const Pricing = () => {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annually'>('monthly');
   const [promoCode, setPromoCode] = useState('');
   const [promoValidation, setPromoValidation] = useState<DiscountValidationResult | null>(null);
-  const [validatingPromo, setValidatingPromo] = useState(false);
+  const [selectedTierForPromo, setSelectedTierForPromo] = useState<SubscriptionTier>('starter');
   const [processingTier, setProcessingTier] = useState<SubscriptionTier | null>(null);
 
   const isDowngrade = (targetTier: SubscriptionTier): boolean => {
@@ -227,10 +227,23 @@ const Pricing = () => {
           className="mb-6"
         />
 
-        {/* Promo Code Input - validated against the selected tier at payment time */}
-        <div className="max-w-md mx-auto">
+        {/* Promo Code Input with tier selector */}
+        <div className="max-w-lg mx-auto space-y-3">
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <span>Validate code for:</span>
+            <select
+              value={selectedTierForPromo}
+              onChange={(e) => setSelectedTierForPromo(e.target.value as SubscriptionTier)}
+              className="bg-secondary border border-border rounded-md px-2 py-1 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="starter">Starter</option>
+              <option value="basic">Basic</option>
+              <option value="professional">Professional</option>
+              <option value="business">Business</option>
+            </select>
+          </div>
           <PromoCodeInput
-            tier="starter"
+            tier={selectedTierForPromo}
             billingCycle={billingCycle}
             onDiscountApplied={(result, code) => {
               setPromoValidation(result);

@@ -115,13 +115,13 @@ export const NavMenu = () => {
     { to: "/success-stories", label: "Success Stories", icon: Star, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
     { to: "/roadmap", label: "Roadmap", icon: Map, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
     { to: "/documentation", label: "Documentation", icon: FileText, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/loyalty-rewards", label: "Loyalty Rewards", icon: Gift, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/billing/history", label: "Billing History", icon: Receipt, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
+    { to: "/rewards", label: "Loyalty Rewards", icon: Gift, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
+    { to: "/billing", label: "Billing History", icon: Receipt, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
     // Admin-only links
     { to: "/admin-analytics", label: "Admin Analytics", icon: Shield, minTier: 'free', adminOnly: true, showCondition: 'always' as const },
     { to: "/admin/promo-codes", label: "Promo Codes", icon: Gift, minTier: 'free', adminOnly: true, showCondition: 'always' as const },
     { to: "/admin/webhooks", label: "Webhook Testing", icon: Code, minTier: 'free', adminOnly: true, showCondition: 'always' as const },
-    { to: "/admin/ai-analytics", label: "AI Analytics", icon: BarChart3, minTier: 'free', adminOnly: true, showCondition: 'always' as const },
+    { to: "/ai-analytics", label: "AI Analytics", icon: BarChart3, minTier: 'free', adminOnly: true, showCondition: 'always' as const },
   ];
 
   const tierOrder = ['free', 'starter', 'basic', 'professional', 'business', 'corporate'];
