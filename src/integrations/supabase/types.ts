@@ -229,6 +229,56 @@ export type Database = {
         }
         Relationships: []
       }
+      cancellation_feedback: {
+        Row: {
+          created_at: string | null
+          id: string
+          other_reason: string | null
+          previous_tier: string | null
+          reason: string
+          reason_category: string | null
+          subscription_id: string | null
+          suggestions: string | null
+          tenure_months: number | null
+          user_id: string
+          would_return: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          other_reason?: string | null
+          previous_tier?: string | null
+          reason: string
+          reason_category?: string | null
+          subscription_id?: string | null
+          suggestions?: string | null
+          tenure_months?: number | null
+          user_id: string
+          would_return?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          other_reason?: string | null
+          previous_tier?: string | null
+          reason?: string
+          reason_category?: string | null
+          subscription_id?: string | null
+          suggestions?: string | null
+          tenure_months?: number | null
+          user_id?: string
+          would_return?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cancellation_feedback_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "paystack_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           address: string | null
@@ -711,6 +761,78 @@ export type Database = {
         }
         Relationships: []
       }
+      loyalty_points_transactions: {
+        Row: {
+          action_reference: string | null
+          action_type: string
+          created_at: string | null
+          description: string | null
+          id: string
+          metadata: Json | null
+          points: number
+          user_id: string
+        }
+        Insert: {
+          action_reference?: string | null
+          action_type: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          points: number
+          user_id: string
+        }
+        Update: {
+          action_reference?: string | null
+          action_type?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          points?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      loyalty_redemptions: {
+        Row: {
+          created_at: string | null
+          discount_code: string
+          discount_percentage: number
+          expires_at: string
+          id: string
+          is_used: boolean | null
+          points_spent: number
+          transaction_reference: string | null
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          discount_code: string
+          discount_percentage: number
+          expires_at: string
+          id?: string
+          is_used?: boolean | null
+          points_spent: number
+          transaction_reference?: string | null
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          discount_code?: string
+          discount_percentage?: number
+          expires_at?: string
+          id?: string
+          is_used?: boolean | null
+          points_spent?: number
+          transaction_reference?: string | null
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       notification_deliveries: {
         Row: {
           alert_type: string
@@ -899,6 +1021,210 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_audit_log: {
+        Row: {
+          action: string
+          created_at: string | null
+          entity_id: string | null
+          entity_type: string
+          id: string
+          ip_address: string | null
+          new_values: Json | null
+          old_values: Json | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      payment_transactions: {
+        Row: {
+          amount: number
+          billing_cycle: string | null
+          created_at: string | null
+          discount_amount: number | null
+          discount_code: string | null
+          discount_type: string | null
+          id: string
+          ip_address: string | null
+          original_amount: number | null
+          paystack_response: Json | null
+          receipt_number: string | null
+          reference: string
+          status: string | null
+          tier: string
+          updated_at: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          billing_cycle?: string | null
+          created_at?: string | null
+          discount_amount?: number | null
+          discount_code?: string | null
+          discount_type?: string | null
+          id?: string
+          ip_address?: string | null
+          original_amount?: number | null
+          paystack_response?: Json | null
+          receipt_number?: string | null
+          reference: string
+          status?: string | null
+          tier: string
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          billing_cycle?: string | null
+          created_at?: string | null
+          discount_amount?: number | null
+          discount_code?: string | null
+          discount_type?: string | null
+          id?: string
+          ip_address?: string | null
+          original_amount?: number | null
+          paystack_response?: Json | null
+          receipt_number?: string | null
+          reference?: string
+          status?: string | null
+          tier?: string
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      paystack_plans: {
+        Row: {
+          amount: number
+          billing_cycle: string
+          created_at: string | null
+          currency: string | null
+          id: string
+          interval: string
+          is_active: boolean | null
+          plan_code: string
+          tier: string
+        }
+        Insert: {
+          amount: number
+          billing_cycle: string
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          interval: string
+          is_active?: boolean | null
+          plan_code?: string
+          tier: string
+        }
+        Update: {
+          amount?: number
+          billing_cycle?: string
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          interval?: string
+          is_active?: boolean | null
+          plan_code?: string
+          tier?: string
+        }
+        Relationships: []
+      }
+      paystack_subscriptions: {
+        Row: {
+          amount: number
+          authorization_code: string | null
+          billing_cycle: string
+          cancel_at_period_end: boolean | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          created_at: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          customer_code: string
+          email_token: string | null
+          failed_payments_count: number | null
+          id: string
+          next_payment_date: string | null
+          plan_code: string
+          status: string | null
+          subscription_code: string
+          tier: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          authorization_code?: string | null
+          billing_cycle: string
+          cancel_at_period_end?: boolean | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          customer_code: string
+          email_token?: string | null
+          failed_payments_count?: number | null
+          id?: string
+          next_payment_date?: string | null
+          plan_code: string
+          status?: string | null
+          subscription_code: string
+          tier: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          authorization_code?: string | null
+          billing_cycle?: string
+          cancel_at_period_end?: boolean | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          customer_code?: string
+          email_token?: string | null
+          failed_payments_count?: number | null
+          id?: string
+          next_payment_date?: string | null
+          plan_code?: string
+          status?: string | null
+          subscription_code?: string
+          tier?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       personal_expenses: {
         Row: {
           amount: number
@@ -1013,6 +1339,169 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_code_redemptions: {
+        Row: {
+          discount_amount: number
+          final_amount: number
+          id: string
+          original_amount: number
+          promo_code_id: string | null
+          redeemed_at: string | null
+          tier: string
+          transaction_reference: string | null
+          user_id: string
+        }
+        Insert: {
+          discount_amount: number
+          final_amount: number
+          id?: string
+          original_amount: number
+          promo_code_id?: string | null
+          redeemed_at?: string | null
+          tier: string
+          transaction_reference?: string | null
+          user_id: string
+        }
+        Update: {
+          discount_amount?: number
+          final_amount?: number
+          id?: string
+          original_amount?: number
+          promo_code_id?: string | null
+          redeemed_at?: string | null
+          tier?: string
+          transaction_reference?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promo_code_redemptions_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      promo_codes: {
+        Row: {
+          applicable_billing_cycles: string[] | null
+          applicable_tiers: string[] | null
+          code: string
+          created_at: string | null
+          created_by: string | null
+          current_uses: number | null
+          description: string | null
+          discount_type: string
+          discount_value: number
+          first_purchase_only: boolean | null
+          id: string
+          is_active: boolean | null
+          max_discount_amount: number | null
+          max_uses: number | null
+          max_uses_per_user: number | null
+          min_purchase_amount: number | null
+          new_users_only: boolean | null
+          updated_at: string | null
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          applicable_billing_cycles?: string[] | null
+          applicable_tiers?: string[] | null
+          code: string
+          created_at?: string | null
+          created_by?: string | null
+          current_uses?: number | null
+          description?: string | null
+          discount_type: string
+          discount_value: number
+          first_purchase_only?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          max_discount_amount?: number | null
+          max_uses?: number | null
+          max_uses_per_user?: number | null
+          min_purchase_amount?: number | null
+          new_users_only?: boolean | null
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          applicable_billing_cycles?: string[] | null
+          applicable_tiers?: string[] | null
+          code?: string
+          created_at?: string | null
+          created_by?: string | null
+          current_uses?: number | null
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          first_purchase_only?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          max_discount_amount?: number | null
+          max_uses?: number | null
+          max_uses_per_user?: number | null
+          min_purchase_amount?: number | null
+          new_users_only?: boolean | null
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: []
+      }
+      referral_discount_codes: {
+        Row: {
+          code: string
+          created_at: string | null
+          discount_percentage: number | null
+          expires_at: string
+          id: string
+          is_used: boolean | null
+          owner_type: string
+          owner_user_id: string
+          referral_id: string | null
+          used_at: string | null
+          used_for_transaction: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          discount_percentage?: number | null
+          expires_at: string
+          id?: string
+          is_used?: boolean | null
+          owner_type: string
+          owner_user_id: string
+          referral_id?: string | null
+          used_at?: string | null
+          used_for_transaction?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          discount_percentage?: number | null
+          expires_at?: string
+          id?: string
+          is_used?: boolean | null
+          owner_type?: string
+          owner_user_id?: string
+          referral_id?: string | null
+          used_at?: string | null
+          used_for_transaction?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_discount_codes_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "referrals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       referral_rewards: {
         Row: {
           applied_at: string | null
@@ -1059,9 +1548,11 @@ export type Database = {
           completed_at: string | null
           created_at: string
           id: string
+          invitee_discount_code_id: string | null
           referral_code: string
           referred_email: string
           referred_user_id: string | null
+          referrer_discount_code_id: string | null
           referrer_id: string
           reward_claimed: boolean
           reward_months: number | null
@@ -1071,9 +1562,11 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
+          invitee_discount_code_id?: string | null
           referral_code: string
           referred_email: string
           referred_user_id?: string | null
+          referrer_discount_code_id?: string | null
           referrer_id: string
           reward_claimed?: boolean
           reward_months?: number | null
@@ -1083,15 +1576,32 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
+          invitee_discount_code_id?: string | null
           referral_code?: string
           referred_email?: string
           referred_user_id?: string | null
+          referrer_discount_code_id?: string | null
           referrer_id?: string
           reward_claimed?: boolean
           reward_months?: number | null
           status?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "referrals_invitee_discount_code_id_fkey"
+            columns: ["invitee_discount_code_id"]
+            isOneToOne: false
+            referencedRelation: "referral_discount_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_discount_code_id_fkey"
+            columns: ["referrer_discount_code_id"]
+            isOneToOne: false
+            referencedRelation: "referral_discount_codes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reminders: {
         Row: {
