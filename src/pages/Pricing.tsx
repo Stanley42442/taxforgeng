@@ -24,11 +24,16 @@ import {
   Bot,
   Key,
   ClipboardCheck,
+  Loader2,
 } from "lucide-react";
 import { useSubscription, SubscriptionTier } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
 import { useUpgradeCelebration } from "@/components/UpgradeCelebrationProvider";
 import { DowngradeConfirmationDialog } from "@/components/DowngradeConfirmationDialog";
+import { BillingCycleToggle } from "@/components/BillingCycleToggle";
+import { PromoCodeInput } from "@/components/PromoCodeInput";
+import { usePaystack, DiscountValidationResult } from "@/hooks/usePaystack";
+import { useAuth } from "@/hooks/useAuth";
 
 interface TierFeature {
   name: string;
@@ -94,13 +99,28 @@ const featureCategories = [
 
 const TIER_ORDER: SubscriptionTier[] = ['free', 'starter', 'basic', 'professional', 'business', 'corporate'];
 
+// Pricing in Naira (kobo will be calculated in backend)
+const TIER_PRICES: Record<string, { monthly: number; annually: number }> = {
+  starter: { monthly: 500, annually: 5000 },
+  basic: { monthly: 2000, annually: 20000 },
+  professional: { monthly: 4999, annually: 49990 },
+  business: { monthly: 8999, annually: 89990 },
+};
+
 const Pricing = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { tier: currentTier, upgradeTier } = useSubscription();
   const { triggerCelebration } = useUpgradeCelebration();
+  const { initializePayment, validateDiscountCode, loading: paymentLoading } = usePaystack();
   
   const [showDowngradeDialog, setShowDowngradeDialog] = useState(false);
   const [pendingDowngradeTier, setPendingDowngradeTier] = useState<SubscriptionTier | null>(null);
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annually'>('monthly');
+  const [promoCode, setPromoCode] = useState('');
+  const [promoValidation, setPromoValidation] = useState<DiscountValidationResult | null>(null);
+  const [validatingPromo, setValidatingPromo] = useState(false);
+  const [processingTier, setProcessingTier] = useState<SubscriptionTier | null>(null);
 
   const isDowngrade = (targetTier: SubscriptionTier): boolean => {
     const currentIndex = TIER_ORDER.indexOf(currentTier);
@@ -108,9 +128,43 @@ const Pricing = () => {
     return targetIndex < currentIndex;
   };
 
-  const handleTierSelect = (tier: SubscriptionTier) => {
+  const handlePromoApply = async (code: string, tier: SubscriptionTier) => {
+    if (!code.trim()) {
+      setPromoValidation(null);
+      return;
+    }
+
+    setValidatingPromo(true);
+    try {
+      const result = await validateDiscountCode(code, tier, billingCycle);
+      setPromoValidation(result);
+      if (result.valid) {
+        toast.success(`Promo code applied! ${result.description}`);
+      } else {
+        toast.error(result.error || 'Invalid promo code');
+      }
+    } catch {
+      toast.error('Failed to validate promo code');
+    } finally {
+      setValidatingPromo(false);
+    }
+  };
+
+  const handleTierSelect = async (tier: SubscriptionTier) => {
+    if (tier === 'free') {
+      toast.info("You're already on the free tier or this is the free tier");
+      return;
+    }
+
     if (tier === 'corporate') {
       toast.info("Contact us for Corporate pricing");
+      return;
+    }
+
+    // Require authentication
+    if (!user) {
+      toast.info("Please sign in to upgrade");
+      navigate('/auth?redirect=/pricing');
       return;
     }
 
@@ -121,21 +175,41 @@ const Pricing = () => {
       return;
     }
 
-    // Regular upgrade flow
-    processUpgrade(tier);
+    // Process payment with Paystack
+    await processPayment(tier);
   };
 
-  const processUpgrade = (tier: SubscriptionTier) => {
-    // Mock Paystack checkout - in production, this would open Paystack
-    toast.success("Processing upgrade...", {
-      description: 'This is a test mode transaction'
-    });
+  const processPayment = async (tier: SubscriptionTier) => {
+    setProcessingTier(tier);
     
-    setTimeout(() => {
-      upgradeTier(tier);
-      triggerCelebration(tier);
-      navigate('/dashboard');
-    }, 1500);
+    try {
+      const result = await initializePayment(
+        tier,
+        billingCycle,
+        promoValidation?.valid ? promoCode : undefined,
+        promoValidation?.discountType
+      );
+
+      if (!result.success) {
+        toast.error(result.error || 'Failed to initialize payment');
+        return;
+      }
+
+      // Show discount info if applied
+      if (result.discountApplied && result.discountAmount) {
+        toast.success(`Discount applied! You save ₦${result.discountAmount.toLocaleString()}`);
+      }
+
+      // Redirect to Paystack checkout
+      if (result.authorizationUrl) {
+        window.location.href = result.authorizationUrl;
+      }
+    } catch (err) {
+      toast.error('Payment initialization failed');
+      console.error('Payment error:', err);
+    } finally {
+      setProcessingTier(null);
+    }
   };
 
   const handleDowngradeConfirm = () => {
@@ -150,17 +224,42 @@ const Pricing = () => {
     navigate('/dashboard');
   };
 
+  const getPrice = (tier: SubscriptionTier) => {
+    if (tier === 'free' || tier === 'corporate') return null;
+    const prices = TIER_PRICES[tier];
+    return billingCycle === 'annually' ? prices.annually : prices.monthly;
+  };
+
   return (
     <>
     <PageLayout maxWidth="7xl" showBackground={true}>
       {/* Header */}
-      <div className="text-center mb-12 animate-slide-up">
+      <div className="text-center mb-8 animate-slide-up">
         <h1 className="text-4xl font-extrabold text-foreground mb-4">
           Simple, Transparent Pricing
         </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
           Choose the plan that fits your needs. Save ~17% with annual billing.
         </p>
+        
+        {/* Billing Cycle Toggle */}
+        <BillingCycleToggle 
+          value={billingCycle} 
+          onChange={setBillingCycle}
+          className="mb-6"
+        />
+
+        {/* Promo Code Input */}
+        <div className="max-w-md mx-auto">
+          <PromoCodeInput
+            value={promoCode}
+            onChange={setPromoCode}
+            onApply={(code) => handlePromoApply(code, 'business')}
+            isValid={promoValidation?.valid}
+            discountInfo={promoValidation?.valid ? promoValidation.description : undefined}
+            isLoading={validatingPromo}
+          />
+        </div>
       </div>
 
       {/* Pricing Cards */}
@@ -176,6 +275,8 @@ const Pricing = () => {
           limitations={['No business saves', 'No exports']}
           currentTier={currentTier}
           onUpgrade={handleTierSelect}
+          isProcessing={processingTier === 'free'}
+          billingCycle={billingCycle}
         />
 
         {/* Starter Tier */}
@@ -183,12 +284,15 @@ const Pricing = () => {
           tier="starter"
           name="Starter"
           icon={<Zap className="h-5 w-5 sm:h-6 sm:w-6" />}
-          monthlyPrice={500}
-          annualPrice={5000}
+          monthlyPrice={getPrice('starter') || 500}
+          annualPrice={billingCycle === 'annually' ? undefined : TIER_PRICES.starter.annually}
           description="For side hustlers starting out"
           features={['Everything in Free', '1 saved business', 'PDF/CSV export', 'No watermarks', 'Email reminders']}
           currentTier={currentTier}
           onUpgrade={handleTierSelect}
+          isProcessing={processingTier === 'starter'}
+          billingCycle={billingCycle}
+          promoDiscount={promoValidation?.valid ? promoValidation.discountPercentage : undefined}
         />
 
         {/* Basic Tier */}
@@ -196,25 +300,31 @@ const Pricing = () => {
           tier="basic"
           name="Basic"
           icon={<Star className="h-5 w-5 sm:h-6 sm:w-6" />}
-          monthlyPrice={2000}
-          annualPrice={20000}
+          monthlyPrice={getPrice('basic') || 2000}
+          annualPrice={billingCycle === 'annually' ? undefined : TIER_PRICES.basic.annually}
           description="For freelancers & solo professionals"
           features={['Everything in Starter', 'Up to 2 businesses', 'Invoices & P&L', 'OCR receipts', '75 AI queries', 'No watermarks']}
           currentTier={currentTier}
           onUpgrade={handleTierSelect}
+          isProcessing={processingTier === 'basic'}
+          billingCycle={billingCycle}
+          promoDiscount={promoValidation?.valid ? promoValidation.discountPercentage : undefined}
         />
 
-        {/* Professional Tier (was Freelancer) */}
+        {/* Professional Tier */}
         <PricingCard
           tier="professional"
           name="Professional"
           icon={<Briefcase className="h-5 w-5 sm:h-6 sm:w-6" />}
-          monthlyPrice={4999}
-          annualPrice={49990}
+          monthlyPrice={getPrice('professional') || 4999}
+          annualPrice={billingCycle === 'annually' ? undefined : TIER_PRICES.professional.annually}
           description="For small businesses"
           features={['Everything in Basic', 'Up to 5 businesses', 'Payroll & Compliance', 'Digital VAT calc', 'Basic scenarios', 'Priority support']}
           currentTier={currentTier}
           onUpgrade={handleTierSelect}
+          isProcessing={processingTier === 'professional'}
+          billingCycle={billingCycle}
+          promoDiscount={promoValidation?.valid ? promoValidation.discountPercentage : undefined}
         />
 
         {/* Business Tier */}
@@ -222,13 +332,16 @@ const Pricing = () => {
           tier="business"
           name="Business"
           icon={<Building2 className="h-5 w-5 sm:h-6 sm:w-6" />}
-          monthlyPrice={8999}
-          annualPrice={89990}
+          monthlyPrice={getPrice('business') || 8999}
+          annualPrice={billingCycle === 'annually' ? undefined : TIER_PRICES.business.annually}
           description="For growing businesses"
           features={['Everything in Professional', 'Up to 10 businesses', 'CAC verification', 'Advanced scenarios', 'Tax filing prep', '2 user seats']}
           isPopular
           currentTier={currentTier}
           onUpgrade={handleTierSelect}
+          isProcessing={processingTier === 'business'}
+          billingCycle={billingCycle}
+          promoDiscount={promoValidation?.valid ? promoValidation.discountPercentage : undefined}
         />
 
         {/* Corporate Tier */}
@@ -241,6 +354,8 @@ const Pricing = () => {
           features={['Everything in Business', 'Unlimited businesses', 'Unlimited users', 'API access', 'Audit log & IP whitelist', 'Dedicated support']}
           currentTier={currentTier}
           onUpgrade={handleTierSelect}
+          isProcessing={processingTier === 'corporate'}
+          billingCycle={billingCycle}
         />
       </div>
 
@@ -364,6 +479,9 @@ const PricingCard = ({
   isPopular = false,
   currentTier,
   onUpgrade,
+  isProcessing = false,
+  billingCycle,
+  promoDiscount,
 }: {
   tier: SubscriptionTier;
   name: string;
@@ -376,6 +494,9 @@ const PricingCard = ({
   isPopular?: boolean;
   currentTier: SubscriptionTier;
   onUpgrade: (tier: SubscriptionTier) => void;
+  isProcessing?: boolean;
+  billingCycle: 'monthly' | 'annually';
+  promoDiscount?: number;
 }) => {
   const isCurrentTier = currentTier === tier;
   const formatPrice = (price: number) => `₦${price.toLocaleString()}`;
@@ -384,6 +505,12 @@ const PricingCard = ({
   const currentIndex = TIER_ORDER.indexOf(currentTier);
   const tierIndex = TIER_ORDER.indexOf(tier);
   const isDowngradeTier = tierIndex < currentIndex;
+
+  // Calculate discounted price if promo applied
+  const displayPrice = typeof monthlyPrice === 'number' && promoDiscount
+    ? monthlyPrice * (1 - promoDiscount / 100)
+    : monthlyPrice;
+
   return (
     <div className={`relative rounded-xl sm:rounded-2xl border p-4 sm:p-6 transition-all duration-300 ${
       isPopular 
@@ -416,13 +543,18 @@ const PricingCard = ({
       </div>
 
       <div className="mb-3 sm:mb-4">
-        {typeof monthlyPrice === 'number' ? (
+        {typeof displayPrice === 'number' ? (
           <>
             <div className="flex items-baseline gap-1">
-              <span className="text-2xl sm:text-3xl font-extrabold text-foreground">{formatPrice(monthlyPrice)}</span>
-              <span className="text-muted-foreground text-sm">/mo</span>
+              {promoDiscount && typeof monthlyPrice === 'number' && (
+                <span className="text-sm line-through text-muted-foreground mr-1">
+                  {formatPrice(monthlyPrice)}
+                </span>
+              )}
+              <span className="text-2xl sm:text-3xl font-extrabold text-foreground">{formatPrice(displayPrice)}</span>
+              <span className="text-muted-foreground text-sm">/{billingCycle === 'annually' ? 'yr' : 'mo'}</span>
             </div>
-            {annualPrice && (
+            {annualPrice && billingCycle === 'monthly' && (
               <p className="text-xs sm:text-sm text-success mt-1">
                 {formatPrice(annualPrice)}/year (save ~17%)
               </p>
@@ -430,7 +562,7 @@ const PricingCard = ({
           </>
         ) : (
           <div className="flex items-baseline gap-1">
-            <span className="text-2xl sm:text-3xl font-extrabold text-foreground">{monthlyPrice}</span>
+            <span className="text-2xl sm:text-3xl font-extrabold text-foreground">{displayPrice}</span>
           </div>
         )}
       </div>
@@ -455,10 +587,15 @@ const PricingCard = ({
       <Button
         variant={isPopular ? 'hero' : isCurrentTier ? 'secondary' : isDowngradeTier ? 'outline' : 'outline'}
         className={`w-full text-xs sm:text-sm h-9 sm:h-10 ${isDowngradeTier ? 'border-warning/50 text-warning hover:bg-warning/10' : ''}`}
-        disabled={isCurrentTier}
+        disabled={isCurrentTier || isProcessing}
         onClick={() => onUpgrade(tier)}
       >
-        {isCurrentTier 
+        {isProcessing ? (
+          <>
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            Processing...
+          </>
+        ) : isCurrentTier 
           ? 'Current Plan' 
           : tier === 'corporate' 
             ? 'Contact Us' 
