@@ -19,7 +19,7 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { PageLayout } from "@/components/PageLayout";
 import { toast } from "sonner";
 import { useState } from "react";
-import { jsPDF } from "jspdf";
+import { generateTaxFormPDF } from "@/lib/taxFormsPdf";
 
 const TaxFiling = () => {
   const navigate = useNavigate();
@@ -34,31 +34,7 @@ const TaxFiling = () => {
     }
 
     const business = savedBusinesses.find((b) => b.id === selectedBusiness);
-
-    const doc = new jsPDF();
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
-    doc.text(`TaxForge NG — ${formType}`, 20, 22);
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    doc.text(`Business: ${business?.name ?? ""}`, 20, 38);
-    doc.text(
-      `Entity: ${business?.entityType === "company" ? "Limited Company" : "Business Name"}`,
-      20,
-      48
-    );
-
-    doc.setFontSize(10);
-    doc.text(
-      "NOTE: This is a prototype mock form for testing. Live TaxProMax/FIRS submission is not enabled.",
-      20,
-      70,
-      { maxWidth: 170 }
-    );
-
-    const filename = `taxforge-ng-${formType.replace(/\s+/g, "-").toLowerCase()}.pdf`;
-    doc.save(filename);
+    generateTaxFormPDF(formType, business ? { name: business.name, entityType: business.entityType } : null);
 
     toast.success(`${formType} downloaded`, {
       description: "Prototype mock file generated for testing",

@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { History, Crown, Building2, Download, Filter, FileText, Edit, Plus, Trash2, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import jsPDF from "jspdf";
+import { exportAuditLogPDF, exportAuditLogCSV } from "@/lib/auditLogExport";
 
 interface AuditEntry {
   id: string;
@@ -68,58 +68,13 @@ const AuditLog = () => {
     }
   };
 
-  const exportPDF = () => {
-    const doc = new jsPDF();
-    
-    doc.setFontSize(18);
-    doc.text('Audit Log Export', 20, 20);
-    doc.setFontSize(10);
-    doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 30);
-    
-    let y = 45;
-    doc.setFontSize(9);
-    
-    filteredLogs.forEach((entry, index) => {
-      if (y > 270) {
-        doc.addPage();
-        y = 20;
-      }
-      
-      const timestamp = new Date(entry.timestamp).toLocaleString();
-      doc.text(`${index + 1}. [${timestamp}] ${entry.user}`, 20, y);
-      y += 5;
-      doc.text(`   ${getActionLabel(entry)}`, 20, y);
-      if (entry.oldValue && entry.newValue) {
-        y += 5;
-        doc.text(`   Changed: "${entry.oldValue}" → "${entry.newValue}"`, 20, y);
-      }
-      y += 10;
-    });
-    
-    doc.save('audit-log.pdf');
+  const handleExportPDF = () => {
+    exportAuditLogPDF(filteredLogs);
     toast.success('Audit log exported');
   };
 
-  const exportCSV = () => {
-    const headers = ['Timestamp', 'User', 'Action', 'Business', 'Field', 'Old Value', 'New Value'];
-    const rows = filteredLogs.map(entry => [
-      new Date(entry.timestamp).toISOString(),
-      entry.user,
-      entry.action,
-      entry.businessName,
-      entry.field || '',
-      entry.oldValue || '',
-      entry.newValue || ''
-    ]);
-    
-    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'audit-log.csv';
-    a.click();
-    URL.revokeObjectURL(url);
+  const handleExportCSV = () => {
+    exportAuditLogCSV(filteredLogs);
     toast.success('Audit log exported as CSV');
   };
 
@@ -175,11 +130,11 @@ const AuditLog = () => {
       maxWidth="6xl"
       headerActions={
         <div className="flex gap-2">
-          <Button variant="outline" onClick={exportCSV}>
+          <Button variant="outline" onClick={handleExportCSV}>
             <Download className="w-4 h-4 mr-2" />
             CSV
           </Button>
-          <Button variant="outline" onClick={exportPDF}>
+          <Button variant="outline" onClick={handleExportPDF}>
             <FileText className="w-4 h-4 mr-2" />
             PDF
           </Button>
