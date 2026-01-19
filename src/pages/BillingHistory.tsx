@@ -10,7 +10,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { 
   CreditCard, 
-  Download, 
   Receipt, 
   Calendar,
   TrendingUp,
@@ -20,6 +19,7 @@ import {
   XCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { DownloadInvoiceButton } from '@/components/DownloadInvoiceButton';
 
 interface BillingTransaction {
   id: string;
@@ -94,7 +94,8 @@ export default function BillingHistory() {
     fetchBillingData();
   }, [user]);
 
-  const formatCurrency = (amount: number) => `₦${amount.toLocaleString()}`;
+  // Amounts from database are in kobo, convert to Naira
+  const formatCurrency = (amountInKobo: number) => `₦${(amountInKobo / 100).toLocaleString()}`;
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -289,11 +290,7 @@ export default function BillingHistory() {
                       </TableCell>
                       <TableCell>{getStatusBadge(transaction.status)}</TableCell>
                       <TableCell className="text-right">
-                        {transaction.receiptNumber && (
-                          <Button variant="ghost" size="sm">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        )}
+                        <DownloadInvoiceButton transactionReference={transaction.reference} />
                       </TableCell>
                     </TableRow>
                   ))}
