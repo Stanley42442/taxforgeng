@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { toast } from "sonner";
 import { PageLayout } from "@/components/PageLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -121,22 +122,10 @@ const TaxCalendar = () => {
   }, [allDeadlines]);
 
   const exportToICS = () => {
-    let icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//TaxForge NG//Tax Calendar//EN\n`;
-
-    allDeadlines.forEach((deadline) => {
-      const dateStr = format(deadline.date, "yyyyMMdd");
-      icsContent += `BEGIN:VEVENT\nDTSTART;VALUE=DATE:${dateStr}\nSUMMARY:${deadline.title}\nDESCRIPTION:${deadline.description || "Tax deadline"}\nEND:VEVENT\n`;
+    import("@/lib/taxCalendarExport").then(({ exportTaxCalendarICS }) => {
+      exportTaxCalendarICS(allDeadlines);
+      toast.success("Calendar exported successfully");
     });
-
-    icsContent += "END:VCALENDAR";
-
-    const blob = new Blob([icsContent], { type: "text/calendar" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "taxforge-calendar.ics";
-    a.click();
-    URL.revokeObjectURL(url);
   };
 
   return (

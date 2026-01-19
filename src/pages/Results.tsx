@@ -158,32 +158,12 @@ const Results = () => {
       });
       return;
     }
-    const rows = [
-      ['TaxForge NG Tax Calculation Report'],
-      [''],
-      ['Entity Type', result.entityType],
-      ['Tax Rules', inputs.use2026Rules ? '2026 (New Rules)' : 'Pre-2026 (Current)'],
-      [''],
-      ['Income Summary'],
-      ['Gross Income', result.grossIncome],
-      ['Taxable Income', result.taxableIncome],
-      [''],
-      ['Tax Breakdown'],
-      ...result.breakdown.map(item => [item.label, item.amount]),
-      [''],
-      ['Summary'],
-      ['Total Tax Payable', result.totalTaxPayable],
-      ['Effective Rate', `${result.effectiveRate.toFixed(2)}%`],
-    ];
-
-    const csvContent = rows.map(row => row.join(',')).join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'taxforge-ng-calculation.csv';
-    a.click();
-    window.URL.revokeObjectURL(url);
+    
+    // Import and use the shared export function
+    import("@/lib/resultsExport").then(({ exportResultsToCSV }) => {
+      exportResultsToCSV(result, inputs);
+      toast.success("CSV exported successfully");
+    });
   };
 
   const exportToPDF = () => {

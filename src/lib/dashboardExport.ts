@@ -1,13 +1,10 @@
 import { jsPDF } from "jspdf";
-import { format } from "date-fns";
 import { formatCurrency } from "./taxCalculations";
 import {
   BRAND_COLORS,
-  COMPANY_INFO,
   PDF_SETTINGS,
   formatNaira,
   formatNigerianDate,
-  formatDateForFilename,
   addPDFHeader,
   addPDFFooter,
   addPageNumbers,
@@ -45,7 +42,6 @@ export interface DashboardExportData {
 export const exportDashboardToPDF = (data: DashboardExportData) => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
   const margin = PDF_SETTINGS.margin;
   const contentWidth = pageWidth - margin * 2;
 
@@ -53,14 +49,14 @@ export const exportDashboardToPDF = (data: DashboardExportData) => {
   let y = addPDFHeader(doc, { badgeText: 'DASHBOARD REPORT' });
 
   // Report title
-  doc.setTextColor(...BRAND_COLORS.text);
+  doc.setTextColor(BRAND_COLORS.text[0], BRAND_COLORS.text[1], BRAND_COLORS.text[2]);
   doc.setFontSize(22);
   doc.setFont('helvetica', 'bold');
   doc.text('Financial Summary Report', margin, y);
   y += 10;
 
   // Date info
-  doc.setTextColor(...BRAND_COLORS.muted);
+  doc.setTextColor(BRAND_COLORS.muted[0], BRAND_COLORS.muted[1], BRAND_COLORS.muted[2]);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.text(`Period: ${data.dateRange}`, margin, y);
@@ -82,15 +78,15 @@ export const exportDashboardToPDF = (data: DashboardExportData) => {
   const col2X = margin + colWidth + 10;
 
   // Income details
-  doc.setFillColor(...BRAND_COLORS.lightBg);
+  doc.setFillColor(BRAND_COLORS.lightBg[0], BRAND_COLORS.lightBg[1], BRAND_COLORS.lightBg[2]);
   doc.roundedRect(col1X, y, colWidth, 45, 3, 3, 'F');
   
-  doc.setTextColor(...BRAND_COLORS.nigerianGreen);
+  doc.setTextColor(BRAND_COLORS.nigerianGreen[0], BRAND_COLORS.nigerianGreen[1], BRAND_COLORS.nigerianGreen[2]);
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
   doc.text('Income & Expenses', col1X + 8, y + 12);
   
-  doc.setTextColor(...BRAND_COLORS.text);
+  doc.setTextColor(BRAND_COLORS.text[0], BRAND_COLORS.text[1], BRAND_COLORS.text[2]);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
   
@@ -108,15 +104,15 @@ export const exportDashboardToPDF = (data: DashboardExportData) => {
   });
 
   // Business summary
-  doc.setFillColor(...BRAND_COLORS.lightBg);
+  doc.setFillColor(BRAND_COLORS.lightBg[0], BRAND_COLORS.lightBg[1], BRAND_COLORS.lightBg[2]);
   doc.roundedRect(col2X, y, colWidth, 45, 3, 3, 'F');
   
-  doc.setTextColor(...BRAND_COLORS.nigerianGreen);
+  doc.setTextColor(BRAND_COLORS.nigerianGreen[0], BRAND_COLORS.nigerianGreen[1], BRAND_COLORS.nigerianGreen[2]);
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
   doc.text('Business Overview', col2X + 8, y + 12);
   
-  doc.setTextColor(...BRAND_COLORS.text);
+  doc.setTextColor(BRAND_COLORS.text[0], BRAND_COLORS.text[1], BRAND_COLORS.text[2]);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
   
@@ -140,17 +136,17 @@ export const exportDashboardToPDF = (data: DashboardExportData) => {
     if (data.urgentCount > 0) {
       doc.setFillColor(254, 242, 242);
     } else {
-      doc.setFillColor(...BRAND_COLORS.lightBg);
+      doc.setFillColor(BRAND_COLORS.lightBg[0], BRAND_COLORS.lightBg[1], BRAND_COLORS.lightBg[2]);
     }
     doc.roundedRect(margin, y, contentWidth, 20, 3, 3, 'F');
     
     const textColor = data.urgentCount > 0 ? BRAND_COLORS.danger : BRAND_COLORS.nigerianGreen;
-    doc.setTextColor(...textColor);
+    doc.setTextColor(textColor[0], textColor[1], textColor[2]);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.text('Reminders', margin + 8, y + 13);
     
-    doc.setTextColor(...BRAND_COLORS.text);
+    doc.setTextColor(BRAND_COLORS.text[0], BRAND_COLORS.text[1], BRAND_COLORS.text[2]);
     doc.setFont('helvetica', 'normal');
     doc.text(`${data.reminderCount} total reminders${data.urgentCount > 0 ? ` \u2022 ${data.urgentCount} urgent` : ''}`, pageWidth - margin - 8, y + 13, { align: 'right' });
     
@@ -166,7 +162,7 @@ export const exportDashboardToPDF = (data: DashboardExportData) => {
       { text: 'Business Name', x: margin + 5 },
       { text: 'Type', x: margin + 90 },
       { text: 'Sector', x: margin + 120 },
-      { text: 'Turnover', x: pageWidth - margin - 5, align: 'right' },
+      { text: 'Turnover', x: pageWidth - margin - 5, align: 'right' as const },
     ], y);
 
     data.businesses.forEach((biz, index) => {
@@ -174,7 +170,7 @@ export const exportDashboardToPDF = (data: DashboardExportData) => {
         { text: biz.name.substring(0, 30), x: margin + 5 },
         { text: biz.entityType === 'company' ? 'LLC' : 'Business', x: margin + 90 },
         { text: biz.sector || 'N/A', x: margin + 120 },
-        { text: formatCurrency(biz.turnover), x: pageWidth - margin - 5, align: 'right' },
+        { text: formatCurrency(biz.turnover), x: pageWidth - margin - 5, align: 'right' as const },
       ], y, index % 2 === 0);
     });
   }

@@ -54,7 +54,7 @@ import {
   Sparkles as SparklesIcon
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
-import { jsPDF } from "jspdf";
+import { exportMonthlySummaryPDF } from "@/lib/expensesSummaryPdf";
 import {
   Dialog,
   DialogContent,
@@ -846,79 +846,8 @@ const Expenses = () => {
     };
   };
 
-  const exportMonthlySummaryPDF = () => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 20;
-    let y = margin;
-
-    // Header
-    doc.setFillColor(26, 79, 62);
-    doc.rect(0, 0, pageWidth, 8, 'F');
-    doc.setFillColor(212, 175, 55);
-    doc.rect(0, 8, pageWidth, 2, 'F');
-
-    y = 25;
-    doc.setTextColor(26, 79, 62);
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Monthly Expense Summary', margin, y);
-    y += 12;
-
-    doc.setTextColor(128, 128, 128);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Generated: ${new Date().toLocaleDateString('en-NG', { year: 'numeric', month: 'long', day: 'numeric' })}`, margin, y);
-    y += 15;
-
-    // Table header
-    doc.setFillColor(26, 79, 62);
-    doc.rect(margin, y, pageWidth - margin * 2, 10, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Month', margin + 5, y + 7);
-    doc.text('Income', margin + 60, y + 7);
-    doc.text('Expenses', margin + 100, y + 7);
-    doc.text('Net', margin + 140, y + 7);
-    y += 14;
-
-    // Table rows
-    doc.setFont('helvetica', 'normal');
-    sortedMonths.forEach(([, data], index) => {
-      if (index % 2 === 0) {
-        doc.setFillColor(248, 250, 248);
-        doc.rect(margin, y - 4, pageWidth - margin * 2, 10, 'F');
-      }
-      doc.setTextColor(51, 51, 51);
-      doc.text(data.monthName, margin + 5, y + 2);
-      doc.setTextColor(34, 197, 94);
-      doc.text(formatCurrency(data.income), margin + 60, y + 2);
-      doc.setTextColor(239, 68, 68);
-      doc.text(formatCurrency(data.expenses), margin + 100, y + 2);
-      doc.setTextColor(data.net >= 0 ? 34 : 239, data.net >= 0 ? 197 : 68, data.net >= 0 ? 94 : 68);
-      doc.text(formatCurrency(data.net), margin + 140, y + 2);
-      y += 10;
-    });
-
-    // Totals
-    y += 5;
-    const totals = sortedMonths.reduce((acc, [, data]) => ({
-      income: acc.income + data.income,
-      expenses: acc.expenses + data.expenses,
-      net: acc.net + data.net
-    }), { income: 0, expenses: 0, net: 0 });
-
-    doc.setFillColor(26, 79, 62);
-    doc.rect(margin, y, pageWidth - margin * 2, 12, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.text('TOTAL', margin + 5, y + 8);
-    doc.text(formatCurrency(totals.income), margin + 60, y + 8);
-    doc.text(formatCurrency(totals.expenses), margin + 100, y + 8);
-    doc.text(formatCurrency(totals.net), margin + 140, y + 8);
-
-    doc.save('monthly-expense-summary.pdf');
+  const handleExportMonthlySummaryPDF = () => {
+    exportMonthlySummaryPDF(sortedMonths);
     toast.success('Monthly summary exported to PDF');
   };
 
@@ -1579,7 +1508,7 @@ const Expenses = () => {
                   </div>
                   Monthly Summary
                 </h2>
-                <Button variant="outline" size="sm" onClick={exportMonthlySummaryPDF}>
+                <Button variant="outline" size="sm" onClick={handleExportMonthlySummaryPDF}>
                   <Download className="h-4 w-4" />
                   <span className="hidden sm:inline">Export PDF</span>
                 </Button>

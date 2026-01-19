@@ -84,26 +84,10 @@ const AccountantPortal = () => {
 
   const bulkExport = () => {
     const selectedData = filteredClients.filter(c => selectedClients.includes(c.id));
-    const csv = [
-      ["Business Name", "Entity Type", "Turnover", "CAC Verified", "Sector", "Created"].join(","),
-      ...selectedData.map(c => [
-        c.name,
-        c.entity_type,
-        c.turnover,
-        c.cac_verified ? "Yes" : "No",
-        c.sector || "N/A",
-        new Date(c.created_at).toLocaleDateString(),
-      ].join(","))
-    ].join("\n");
-
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "client-businesses.csv";
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success(`Exported ${selectedData.length} businesses`);
+    import("@/lib/accountantExport").then(({ exportClientBusinessesCSV }) => {
+      exportClientBusinessesCSV(selectedData);
+      toast.success(`Exported ${selectedData.length} businesses`);
+    });
   };
 
   const bulkVerifyCAC = async () => {

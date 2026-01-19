@@ -31,7 +31,7 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = PDF_SETTINGS.margin;
   const contentWidth = pageWidth - margin * 2;
-  let yPosition = margin;
+  let yPosition: number = margin;
 
   const addNewPageIfNeeded = (requiredSpace: number = 30) => {
     if (yPosition + requiredSpace > pageHeight - 30) {
@@ -116,7 +116,7 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
 
   // Cover Page
   addHeader();
-  yPosition = 60 as number;
+  yPosition = 60;
   
   doc.setFontSize(32);
   doc.setFont('helvetica', 'bold');
