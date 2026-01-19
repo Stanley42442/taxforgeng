@@ -31,14 +31,13 @@ export function DownloadInvoiceButton({
       onClick={handleDownload}
       disabled={isLoading}
       className={className}
-      title="Download Invoice"
     >
       {isLoading ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
+        <Loader2 className="h-4 w-4 animate-spin mr-2" />
       ) : (
-        <Download className="h-4 w-4" />
+        <Download className="h-4 w-4 mr-2" />
       )}
-      <span className="sr-only">Download Invoice</span>
+      {isLoading ? 'Generating...' : 'Download'}
     </Button>
   );
 }
