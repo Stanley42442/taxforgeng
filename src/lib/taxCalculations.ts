@@ -67,13 +67,14 @@ export interface TaxAlert {
   message: string;
 }
 
-// Personal Income Tax bands (2026 rules)
+// Personal Income Tax bands (2026 rules) - Nigeria Tax Act 2025
 const PIT_BANDS = [
-  { threshold: 800000, rate: 0 },      // First ₦800k exempt
-  { threshold: 3000000, rate: 0.15 },  // Next ₦2.2m at 15%
-  { threshold: 10000000, rate: 0.19 }, // Next ₦7m at 19%
-  { threshold: 50000000, rate: 0.21 }, // Next ₦40m at 21%
-  { threshold: Infinity, rate: 0.25 }, // Above ₦50m at 25%
+  { threshold: 800000, rate: 0 },       // First ₦800k exempt
+  { threshold: 3000000, rate: 0.15 },   // Next ₦2.2m at 15%
+  { threshold: 12000000, rate: 0.18 },  // Next ₦9m at 18%
+  { threshold: 25000000, rate: 0.21 },  // Next ₦13m at 21%
+  { threshold: 50000000, rate: 0.23 },  // Next ₦25m at 23%
+  { threshold: Infinity, rate: 0.25 },  // Above ₦50m at 25%
 ];
 
 // Pre-2026 PIT bands
@@ -130,9 +131,9 @@ export function calculateCompanyTax(
   const hasSectorCIT = sectorRules?.citRate !== undefined;
   
   if (use2026Rules) {
-    // 2026 Rules: Small companies (turnover ≤ ₦50m AND fixed assets ≤ ₦250m)
-    // Note: Some sources cite ₦100m, but we follow the dual threshold approach
-    const isSmall = turnover <= 50000000 && fixedAssets <= 250000000;
+    // 2026 Rules: Small companies (turnover ≤ ₦100m AND fixed assets ≤ ₦250m)
+    // Per Nigeria Tax Act 2025 Section 19
+    const isSmall = turnover <= 100000000 && fixedAssets <= 250000000;
     
     // Sector override for CIT (e.g., agriculture 0%, oil & gas 30%)
     if (hasSectorCIT) {
@@ -148,10 +149,10 @@ export function calculateCompanyTax(
       return { cit: 0, devLevy: 0, isSmall: true, appliedRate: 0 };
     }
     
-    // Regular company: 25% CIT + 4% Development Levy
-    const cit = Math.max(0, profit * 0.25);
+    // Large company: 30% CIT + 4% Development Levy (per Nigeria Tax Act 2025)
+    const cit = Math.max(0, profit * 0.30);
     const devLevy = Math.max(0, profit * 0.04);
-    return { cit, devLevy, isSmall: false, appliedRate: 25 };
+    return { cit, devLevy, isSmall: false, appliedRate: 30 };
   } else {
     // Pre-2026 Rules: 30% CIT (or sector override)
     const rate = hasSectorCIT ? sectorRules!.citRate! / 100 : 0.30;

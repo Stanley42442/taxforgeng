@@ -68,7 +68,8 @@ export const MultiYearProjection = () => {
 
       if (entityType === 'company') {
         if (use2026Rules) {
-          if (turnover < 50000000) {
+          // 2026 rules: Small company threshold is ₦100M
+          if (turnover < 100000000) {
             companySize = 'small';
             isExempt = true; // 0% CIT for small companies
           } else if (turnover < 200000000) {
@@ -113,8 +114,8 @@ export const MultiYearProjection = () => {
   const exemptYearsSavings = projections
     .filter(p => p.isExempt)
     .reduce((sum, p) => {
-      // Estimate what tax would have been without exemption
-      const estimatedTax = p.taxableIncome * (use2026Rules ? 0.25 : 0.30);
+      // Estimate what tax would have been without exemption (30% CIT under 2026 rules)
+      const estimatedTax = p.taxableIncome * (use2026Rules ? 0.30 : 0.30);
       return sum + estimatedTax;
     }, 0);
 
@@ -219,7 +220,7 @@ export const MultiYearProjection = () => {
             <div>
               <p className="font-semibold text-warning">Tax Transition in {transitionYear.year}</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Your business will cross the ₦50M threshold and start paying CIT at 25%.
+                Your business will cross the ₦100M threshold and start paying CIT at 30%.
               </p>
               <p className="text-sm text-success mt-2">
                 Estimated Exemption Savings: {formatCurrency(exemptYearsSavings)}

@@ -120,7 +120,7 @@ export const SECTOR_PRESETS: SectorPreset[] = [
     },
     benefits: ['10% fixed asset credit', 'Wage deductions', 'Accelerated depreciation'],
     taxRules: {
-      citRate: 25,
+      citRate: 30, // 30% for large companies under 2026 rules
       vatStatus: 'standard',
       vatRate: 7.5,
       specialIncentives: ['Investment Tax Credit 10%', 'Local raw material bonus 10%', 'Job creation 10% deduction']
@@ -195,7 +195,7 @@ export const SECTOR_PRESETS: SectorPreset[] = [
     },
     benefits: ['VAT zero-rating', 'EEG eligibility', 'Forex retention'],
     taxRules: {
-      citRate: 25,
+      citRate: 30, // 30% for large companies under 2026 rules
       vatStatus: 'zero',
       vatRate: 0,
       specialIncentives: ['EEG up to 30%', 'Duty drawback', 'Export Development Fund']
@@ -220,7 +220,7 @@ export const SECTOR_PRESETS: SectorPreset[] = [
     },
     benefits: ['NSA labeling eligible', 'R&D deductions', 'EDTI credits'],
     taxRules: {
-      citRate: 25,
+      citRate: 30, // 30% for large companies under 2026 rules (small companies 0%)
       vatStatus: 'standard',
       vatRate: 7.5,
       edtiRate: 5,
@@ -248,7 +248,7 @@ export const SECTOR_PRESETS: SectorPreset[] = [
     },
     benefits: ['VAT-exempt services', 'Equipment duty waiver', 'Pioneer Status'],
     taxRules: {
-      citRate: 25,
+      citRate: 30, // 30% for large companies under 2026 rules (small companies 0%)
       vatStatus: 'exempt',
       vatRate: 0,
       pioneerStatus: true,
@@ -275,7 +275,7 @@ export const SECTOR_PRESETS: SectorPreset[] = [
     },
     benefits: ['Capital allowances', 'Interest deductions', 'CGT deferral'],
     taxRules: {
-      citRate: 25,
+      citRate: 30, // 30% for large companies under 2026 rules
       vatStatus: 'standard',
       vatRate: 7.5,
       whtRate: 10,
@@ -301,7 +301,7 @@ export const SECTOR_PRESETS: SectorPreset[] = [
     },
     benefits: ['Vehicle depreciation', 'Fuel deductions', 'Export logistics incentives'],
     taxRules: {
-      citRate: 25,
+      citRate: 30, // 30% for large companies under 2026 rules
       vatStatus: 'standard',
       vatRate: 7.5,
       specialIncentives: ['Accelerated vehicle depreciation', 'Export logistics zero-rated']
@@ -328,7 +328,7 @@ export const SECTOR_PRESETS: SectorPreset[] = [
     },
     benefits: ['5% EDTI on eco-investments', 'Zero VAT on EVs/solar', '50% green tech hire deduction'],
     taxRules: {
-      citRate: 25,
+      citRate: 30, // 30% for large companies under 2026 rules
       vatStatus: 'zero',
       vatRate: 0,
       edtiRate: 5,
@@ -385,7 +385,7 @@ export const SECTOR_PRESETS: SectorPreset[] = [
     },
     benefits: ['Presumptive tax for small operators', 'VAT-exempt transport services', 'Seasonal wage deductions'],
     taxRules: {
-      citRate: 25,
+      citRate: 30, // 30% for large companies under 2026 rules (small companies 0%)
       vatStatus: 'standard',
       vatRate: 7.5,
       specialIncentives: ['Tourism levy credits', 'Hotel equipment duty waivers', 'Local sourcing incentives']
@@ -438,7 +438,7 @@ export const SECTOR_PRESETS: SectorPreset[] = [
     },
     benefits: ['WHT 5-10% on contracts', 'Rent relief up to ₦500k', 'CGT home sale exemptions'],
     taxRules: {
-      citRate: 25,
+      citRate: 30, // 30% for large companies under 2026 rules
       vatStatus: 'standard',
       vatRate: 7.5,
       whtRate: 5,

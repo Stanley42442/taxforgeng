@@ -9,12 +9,13 @@ import { Separator } from "@/components/ui/separator";
 import { Calculator, Download, Users } from "lucide-react";
 import { formatCurrency, formatNumber } from "@/lib/taxCalculations";
 
-// 2026 PIT Bands
+// 2026 PIT Bands - Nigeria Tax Act 2025
 const PIT_BANDS_2026 = [
   { threshold: 800000, rate: 0 },
   { threshold: 3000000, rate: 0.15 },
-  { threshold: 10000000, rate: 0.19 },
-  { threshold: 50000000, rate: 0.21 },
+  { threshold: 12000000, rate: 0.18 },
+  { threshold: 25000000, rate: 0.21 },
+  { threshold: 50000000, rate: 0.23 },
   { threshold: Infinity, rate: 0.25 },
 ];
 
@@ -264,8 +265,9 @@ export const PayrollCalculator = () => {
               <ul className="space-y-1 text-muted-foreground">
                 <li>• ₦0 - ₦800k: 0%</li>
                 <li>• ₦800k - ₦3m: 15%</li>
-                <li>• ₦3m - ₦10m: 19%</li>
-                <li>• ₦10m - ₦50m: 21%</li>
+                <li>• ₦3m - ₦12m: 18%</li>
+                <li>• ₦12m - ₦25m: 21%</li>
+                <li>• ₦25m - ₦50m: 23%</li>
                 <li>• Above ₦50m: 25%</li>
               </ul>
             </div>
