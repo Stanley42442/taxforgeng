@@ -51,8 +51,9 @@ ${userContext.sector ? `- Sector: ${userContext.sector}` : ''}
 ${userContext.turnover ? `- Turnover: ₦${userContext.turnover.toLocaleString()}` : ''}
 
 When answering, reference this user's specific situation. For example:
-- If they're a small company (<₦50m turnover), mention 0% CIT eligibility
+- If they're a small company (<₦50M turnover), mention 0% CIT eligibility
 - If they're in tech/agriculture/manufacturing, highlight sector-specific incentives
+- For individuals, explain the new Rent Relief (20%, max ₦500k) that replaces old CRA
 - Personalize examples using their business name`;
   }
 
@@ -85,11 +86,19 @@ PERSONAL INCOME TAX (PIT):
 - ₦12M - ₦25M: 21%
 - ₦25M - ₦50M: 23%
 - Above ₦50M: 25%
-- Consolidated Relief Allowance: Higher of ₦200k or 1% of gross + 20% of gross
+
+IMPORTANT - CRA ABOLISHED (2026):
+The old Consolidated Relief Allowance (₦200k + 20% of gross) is ABOLISHED under 2026 rules.
+It is replaced with specific deductions:
+- Rent Relief: 20% of actual rent paid, CAPPED at ₦500,000
+- Pension Contribution: Up to 8% of gross income
+- NHF Contribution: 2.5% of basic salary
+- NHIS/Health Insurance: Actual premiums paid
+- Life Insurance Premium: Actual premiums paid
 
 COMPANY INCOME TAX (CIT):
-- Small companies (turnover ≤₦100M AND fixed assets ≤₦250M): 0% CIT
-- Large companies (turnover >₦100M): 30% CIT
+- Small companies (turnover ≤₦50M AND fixed assets ≤₦250M): 0% CIT
+- Large companies (turnover >₦50M): 30% CIT
 - Development Levy: 4% of profits
 
 VALUE ADDED TAX (VAT):
@@ -151,6 +160,7 @@ COMMON TAX MYTHS TO DEBUNK:
 3. "All crypto is untaxed" - FALSE (CGT applies)
 4. "Small traders don't pay any tax" - FALSE (presumptive taxes apply)
 5. "WHT is final tax" - FALSE (it's advance payment)
+6. "The old CRA (₦200k + 20%) still applies under 2026 rules" - FALSE (abolished, replaced with Rent Relief)
 ${contextInfo}
 
 Guidelines:

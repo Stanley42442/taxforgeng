@@ -11,7 +11,9 @@ export interface IndividualTaxInputs {
   employmentIncome?: number;
   pensionContribution?: number;
   nhfContribution?: number;
+  nhisContribution?: number; // Health insurance (NHIS)
   lifeInsurancePremium?: number;
+  annualRentPaid?: number; // For 2026 Rent Relief (replaces CRA)
   
   // Foreign income inputs
   foreignIncome?: number;
@@ -118,6 +120,7 @@ function calculateProgressiveTax(
 }
 
 // Calculate Personal Income Tax
+// 2026 Rules: CRA abolished, replaced with specific deductions (Rent Relief, Pension, NHF, NHIS, Life Insurance)
 export function calculatePersonalIncomeTax(inputs: IndividualTaxInputs): IndividualTaxResult {
   const bands = inputs.use2026Rules ? PIT_BANDS_2026 : PIT_BANDS_PRE2026;
   const grossIncome = inputs.employmentIncome || 0;
@@ -128,8 +131,23 @@ export function calculatePersonalIncomeTax(inputs: IndividualTaxInputs): Individ
   // Calculate reliefs
   let totalReliefs = 0;
 
-  // Consolidated Relief Allowance (CRA) - 2026 rules
   if (inputs.use2026Rules) {
+    // 2026 Rules: CRA is ABOLISHED - replaced with specific deductions
+    // Per Nigeria Tax Act 2025: Rent Relief, Pension, NHF, NHIS, Life Insurance
+    
+    // Rent Relief: 20% of actual rent paid, capped at ₦500,000
+    const annualRent = inputs.annualRentPaid || 0;
+    if (annualRent > 0) {
+      const rentRelief = Math.min(annualRent * 0.20, 500000);
+      reliefs.push({
+        name: 'Rent Relief',
+        amount: rentRelief,
+        description: '20% of annual rent paid (max ₦500,000)'
+      });
+      totalReliefs += rentRelief;
+    }
+  } else {
+    // Pre-2026: Old CRA still applies
     const cra = Math.max(200000, grossIncome * 0.01) + (grossIncome * 0.20);
     reliefs.push({
       name: 'Consolidated Relief Allowance',
@@ -137,18 +155,9 @@ export function calculatePersonalIncomeTax(inputs: IndividualTaxInputs): Individ
       description: 'Higher of ₦200k or 1% of gross + 20% of gross'
     });
     totalReliefs += cra;
-  } else {
-    // Pre-2026 reliefs
-    const basicRelief = 200000;
-    reliefs.push({
-      name: 'Basic Relief',
-      amount: basicRelief,
-      description: 'Standard personal relief'
-    });
-    totalReliefs += basicRelief;
   }
 
-  // Pension contribution (8% max)
+  // Pension contribution (8% max) - applies to both rule sets
   if (inputs.pensionContribution && inputs.pensionContribution > 0) {
     const maxPension = grossIncome * 0.08;
     const allowedPension = Math.min(inputs.pensionContribution, maxPension);
@@ -160,7 +169,7 @@ export function calculatePersonalIncomeTax(inputs: IndividualTaxInputs): Individ
     totalReliefs += allowedPension;
   }
 
-  // NHF contribution
+  // NHF contribution - applies to both rule sets
   if (inputs.nhfContribution && inputs.nhfContribution > 0) {
     reliefs.push({
       name: 'NHF Contribution',
@@ -170,7 +179,17 @@ export function calculatePersonalIncomeTax(inputs: IndividualTaxInputs): Individ
     totalReliefs += inputs.nhfContribution;
   }
 
-  // Life insurance premium
+  // NHIS/Health Insurance contribution (2026 rules allow this deduction)
+  if (inputs.nhisContribution && inputs.nhisContribution > 0) {
+    reliefs.push({
+      name: 'NHIS/Health Insurance',
+      amount: inputs.nhisContribution,
+      description: 'Health insurance premium'
+    });
+    totalReliefs += inputs.nhisContribution;
+  }
+
+  // Life insurance premium - applies to both rule sets
   if (inputs.lifeInsurancePremium && inputs.lifeInsurancePremium > 0) {
     reliefs.push({
       name: 'Life Insurance Premium',
@@ -201,8 +220,20 @@ export function calculatePersonalIncomeTax(inputs: IndividualTaxInputs): Individ
     });
   }
 
+  // 2026 Rules: Alert about CRA abolition
+  if (inputs.use2026Rules && (!inputs.annualRentPaid || inputs.annualRentPaid === 0)) {
+    alerts.push({
+      type: 'info',
+      message: '2026 Rules: The old CRA is abolished. Enter your annual rent to claim Rent Relief (20%, max ₦500k).'
+    });
+  }
+
   if (!inputs.pensionContribution || inputs.pensionContribution === 0) {
     recommendations.push('Consider contributing to a pension fund to reduce taxable income');
+  }
+
+  if (inputs.use2026Rules && (!inputs.nhisContribution || inputs.nhisContribution === 0)) {
+    recommendations.push('NHIS/Health insurance premiums are deductible under 2026 rules');
   }
 
   if (grossIncome > 50000000) {

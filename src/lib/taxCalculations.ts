@@ -131,9 +131,9 @@ export function calculateCompanyTax(
   const hasSectorCIT = sectorRules?.citRate !== undefined;
   
   if (use2026Rules) {
-    // 2026 Rules: Small companies (turnover ≤ ₦100m AND fixed assets ≤ ₦250m)
-    // Per Nigeria Tax Act 2025 Section 19
-    const isSmall = turnover <= 100000000 && fixedAssets <= 250000000;
+    // 2026 Rules: Small companies (turnover ≤ ₦50m AND fixed assets ≤ ₦250m)
+    // Per Nigeria Tax Act 2025 Section 56 (EY Tax Alert, June 2025)
+    const isSmall = turnover <= 50000000 && fixedAssets <= 250000000;
     
     // Sector override for CIT (e.g., agriculture 0%, oil & gas 30%)
     if (hasSectorCIT) {
