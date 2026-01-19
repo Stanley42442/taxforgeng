@@ -4,9 +4,8 @@ import {
   getQuarantinedRecords, 
   getIntegrityLogs,
   QuarantinedRecord,
-  IntegrityReport,
-  IntegrityLog,
 } from '@/lib/offlineStorage';
+import { IntegrityReport, IntegrityLog } from '@/lib/dataIntegrity';
 import { createEmptyReport } from '@/lib/dataIntegrity';
 
 export type IntegrityStatus = 'healthy' | 'issues' | 'critical' | 'unknown';
