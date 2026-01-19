@@ -173,9 +173,9 @@ const Pricing = () => {
         return;
       }
 
-      // Show discount info if applied
+      // Show discount info if applied (discountAmount is in kobo, convert to Naira)
       if (result.discountApplied && result.discountAmount) {
-        toast.success(`Discount applied! You save ₦${result.discountAmount.toLocaleString()}`);
+        toast.success(`Discount applied! You save ₦${(result.discountAmount / 100).toLocaleString()}`);
       }
 
       // Redirect to Paystack checkout
