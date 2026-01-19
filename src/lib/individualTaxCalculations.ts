@@ -64,13 +64,14 @@ interface TaxAlert {
   message: string;
 }
 
-// 2026 PIT bands
+// 2026 PIT bands - Nigeria Tax Act 2025
 const PIT_BANDS_2026 = [
-  { threshold: 800000, rate: 0 },      // First ₦800k exempt
-  { threshold: 3000000, rate: 0.15 },  // Next ₦2.2m at 15%
-  { threshold: 10000000, rate: 0.19 }, // Next ₦7m at 19%
-  { threshold: 50000000, rate: 0.21 }, // Next ₦40m at 21%
-  { threshold: Infinity, rate: 0.25 }, // Above ₦50m at 25%
+  { threshold: 800000, rate: 0 },       // First ₦800k exempt
+  { threshold: 3000000, rate: 0.15 },   // Next ₦2.2m at 15%
+  { threshold: 12000000, rate: 0.18 },  // Next ₦9m at 18%
+  { threshold: 25000000, rate: 0.21 },  // Next ₦13m at 21%
+  { threshold: 50000000, rate: 0.23 },  // Next ₦25m at 23%
+  { threshold: Infinity, rate: 0.25 },  // Above ₦50m at 25%
 ];
 
 // Pre-2026 PIT bands

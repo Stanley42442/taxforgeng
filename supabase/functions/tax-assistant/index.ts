@@ -76,20 +76,20 @@ Your expertise includes:
 - Nigerian Startup Act (NSA) incentives
 - Sector-specific incentives
 
-KEY TAX RULES (2026):
+KEY TAX RULES (2026) - Nigeria Tax Act 2025:
 
 PERSONAL INCOME TAX (PIT):
 - First ₦800,000 is tax-exempt
 - ₦800k - ₦3M: 15%
-- ₦3M - ₦10M: 19%
-- ₦10M - ₦50M: 21%
+- ₦3M - ₦12M: 18%
+- ₦12M - ₦25M: 21%
+- ₦25M - ₦50M: 23%
 - Above ₦50M: 25%
 - Consolidated Relief Allowance: Higher of ₦200k or 1% of gross + 20% of gross
 
 COMPANY INCOME TAX (CIT):
-- Small companies (turnover ≤₦50M AND fixed assets ≤₦250M): 0% CIT
-- Medium companies (turnover ₦50M-₦500M): 20% CIT
-- Large companies (turnover >₦500M): 25% CIT
+- Small companies (turnover ≤₦100M AND fixed assets ≤₦250M): 0% CIT
+- Large companies (turnover >₦100M): 30% CIT
 - Development Levy: 4% of profits
 
 VALUE ADDED TAX (VAT):
