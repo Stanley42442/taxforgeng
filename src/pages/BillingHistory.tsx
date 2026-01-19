@@ -94,17 +94,15 @@ export default function BillingHistory() {
     fetchBillingData();
   }, [user]);
 
-  // IMPORTANT: All amounts from database are stored in kobo (100 kobo = 1 Naira)
-  // We MUST divide by 100 to convert to Naira for display
-  const formatCurrency = (amountInKobo: number) => {
-    // Convert kobo to Naira: 629930 kobo = 6299.30 Naira
-    const amountInNaira = amountInKobo / 100;
-    return new Intl.NumberFormat('en-NG', {
-      style: 'currency',
-      currency: 'NGN',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amountInNaira);
+  // KOBO TO NAIRA CONVERSION - Database stores kobo (100 kobo = 1 Naira)
+  // 629930 kobo ÷ 100 = ₦6,299.30
+  const formatCurrency = (amountInKobo: number): string => {
+    if (!amountInKobo || isNaN(amountInKobo)) return '₦0.00';
+    const amountInNaira = Number(amountInKobo) / 100;
+    return `₦${amountInNaira.toLocaleString('en-NG', { 
+      minimumFractionDigits: 2, 
+      maximumFractionDigits: 2 
+    })}`;
   };
 
   const getStatusBadge = (status: string) => {
