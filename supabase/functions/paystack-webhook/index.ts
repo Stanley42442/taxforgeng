@@ -74,6 +74,20 @@ async function logWebhookEvent(supabase: any, event: string, success: boolean, d
   }
 }
 
+// Log analytics event
+async function logAnalyticsEvent(supabase: any, userId: string | null, eventType: string, eventData: any, tier?: string) {
+  try {
+    await supabase.from('analytics_events').insert({
+      user_id: userId,
+      event_type: eventType,
+      event_data: eventData,
+      tier: tier,
+    });
+  } catch (error) {
+    console.error('Failed to log analytics event:', error);
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -140,8 +154,16 @@ serve(async (req) => {
         // Handle successful charge
         const reference = data.reference;
         const customerEmail = data.customer?.email;
+        const amount = data.amount / 100; // Convert from kobo
         
         console.log(`Charge success for reference: ${reference}`);
+
+        // Get transaction for user info
+        const { data: transaction } = await supabase
+          .from('payment_transactions')
+          .select('user_id, tier, billing_cycle, discount_amount, original_amount')
+          .eq('reference', reference)
+          .single();
 
         // Update transaction status
         const { error: updateError } = await supabase
@@ -149,6 +171,7 @@ serve(async (req) => {
           .update({ 
             status: 'success',
             paystack_response: data,
+            receipt_number: data.receipt_number,
             updated_at: new Date().toISOString()
           })
           .eq('reference', reference);
@@ -157,13 +180,93 @@ serve(async (req) => {
           console.error('Failed to update transaction:', updateError);
         }
 
+        // Store payment method from authorization if available
+        if (transaction?.user_id && data.authorization?.authorization_code) {
+          const auth = data.authorization;
+          
+          // Check if payment method exists
+          const { data: existingMethod } = await supabase
+            .from('user_payment_methods')
+            .select('id')
+            .eq('user_id', transaction.user_id)
+            .eq('authorization_code', auth.authorization_code)
+            .single();
+
+          if (!existingMethod) {
+            const { data: hasDefault } = await supabase
+              .from('user_payment_methods')
+              .select('id')
+              .eq('user_id', transaction.user_id)
+              .eq('is_default', true)
+              .single();
+
+            await supabase
+              .from('user_payment_methods')
+              .insert({
+                user_id: transaction.user_id,
+                authorization_code: auth.authorization_code,
+                card_type: auth.card_type || 'unknown',
+                last_four: auth.last4 || '****',
+                exp_month: parseInt(auth.exp_month) || 0,
+                exp_year: parseInt(auth.exp_year) || 0,
+                bank: auth.bank || null,
+                country_code: auth.country_code || 'NG',
+                is_default: !hasDefault,
+                is_active: true,
+              });
+          }
+        }
+
+        // Log analytics
+        if (transaction?.user_id) {
+          await logAnalyticsEvent(supabase, transaction.user_id, 'webhook_charge_success', {
+            reference,
+            amount,
+            tier: transaction.tier,
+          }, transaction.tier);
+        }
+
+        // Get user profile for email
+        let userProfile = null;
+        if (transaction?.user_id) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, email')
+            .eq('id', transaction.user_id)
+            .single();
+          userProfile = profile;
+        }
+
         // Send payment confirmation email via edge function
         try {
           await supabase.functions.invoke('send-payment-confirmation', {
-            body: { reference }
+            body: { 
+              email: customerEmail || userProfile?.email,
+              userName: userProfile?.full_name,
+              amount,
+              tier: transaction?.tier || 'unknown',
+              billingCycle: transaction?.billing_cycle || 'monthly',
+              receiptNumber: data.receipt_number || reference,
+              transactionDate: new Date().toISOString(),
+              discountApplied: !!transaction?.discount_amount,
+              discountAmount: transaction?.discount_amount ? transaction.discount_amount / 100 : 0,
+              reference,
+            }
           });
         } catch (emailError) {
           console.error('Failed to send confirmation email:', emailError);
+        }
+
+        // Create user notification
+        if (transaction?.user_id) {
+          await supabase
+            .from('user_notifications')
+            .insert({
+              user_id: transaction.user_id,
+              title: 'Payment Received',
+              message: `Payment of ₦${amount.toLocaleString()} received successfully. Receipt: ${data.receipt_number || reference}`,
+              type: 'payment',
+            });
         }
 
         break;
@@ -182,7 +285,7 @@ serve(async (req) => {
         // Get user by email
         const { data: profile } = await supabase
           .from('profiles')
-          .select('id')
+          .select('id, full_name')
           .eq('email', customerEmail)
           .single();
 
@@ -202,13 +305,16 @@ serve(async (req) => {
               .eq('plan_code', planCode)
               .single();
 
+            const tier = plan?.tier || 'starter';
+            const billingCycle = plan?.billing_cycle || 'monthly';
+
             await supabase.from('paystack_subscriptions').insert({
               user_id: profile.id,
               subscription_code: subscriptionCode,
               customer_code: customerCode,
               plan_code: planCode,
-              tier: plan?.tier || 'starter',
-              billing_cycle: plan?.billing_cycle || 'monthly',
+              tier,
+              billing_cycle: billingCycle,
               amount: amount,
               status: 'active',
               next_payment_date: nextPaymentDate,
@@ -220,11 +326,40 @@ serve(async (req) => {
             await supabase
               .from('profiles')
               .update({ 
-                subscription_tier: plan?.tier || 'starter',
+                subscription_tier: tier,
                 trial_expires_at: null,
                 trial_started_at: null
               })
               .eq('id', profile.id);
+
+            // Log subscription history
+            await supabase
+              .from('subscription_history')
+              .insert({
+                user_id: profile.id,
+                previous_tier: 'free',
+                new_tier: tier,
+                change_type: 'new_subscription',
+                reason: 'webhook_subscription_create',
+                metadata: { subscription_code: subscriptionCode, plan_code: planCode },
+              });
+
+            // Log analytics
+            await logAnalyticsEvent(supabase, profile.id, 'subscription_created', {
+              subscription_code: subscriptionCode,
+              plan_code: planCode,
+              amount,
+            }, tier);
+
+            // Create notification
+            await supabase
+              .from('user_notifications')
+              .insert({
+                user_id: profile.id,
+                title: 'Subscription Active',
+                message: `Your ${tier.charAt(0).toUpperCase() + tier.slice(1)} subscription is now active.`,
+                type: 'subscription',
+              });
           }
         }
         break;
@@ -247,6 +382,27 @@ serve(async (req) => {
           .select('user_id, tier')
           .single();
 
+        if (subscription?.user_id) {
+          // Log analytics
+          await logAnalyticsEvent(supabase, subscription.user_id, 
+            event === 'subscription.disable' ? 'subscription_cancelled' : 'subscription_not_renewing',
+            { subscription_code: subscriptionCode },
+            subscription.tier
+          );
+
+          // Create notification
+          await supabase
+            .from('user_notifications')
+            .insert({
+              user_id: subscription.user_id,
+              title: event === 'subscription.disable' ? 'Subscription Cancelled' : 'Subscription Not Renewing',
+              message: event === 'subscription.disable' 
+                ? 'Your subscription has been cancelled. You will retain access until the end of your billing period.'
+                : 'Your subscription will not renew. You will retain access until the end of your billing period.',
+              type: 'subscription',
+            });
+        }
+
         // Don't immediately downgrade - let them keep access until period ends
         break;
       }
@@ -259,7 +415,7 @@ serve(async (req) => {
           // Increment failed payments count
           const { data: subscription } = await supabase
             .from('paystack_subscriptions')
-            .select('failed_payments_count, user_id')
+            .select('failed_payments_count, user_id, tier')
             .eq('subscription_code', subscriptionCode)
             .single();
 
@@ -274,12 +430,42 @@ serve(async (req) => {
               })
               .eq('subscription_code', subscriptionCode);
 
+            // Log analytics
+            await logAnalyticsEvent(supabase, subscription.user_id, 'payment_failed', {
+              subscription_code: subscriptionCode,
+              failed_count: newCount,
+            }, subscription.tier);
+
+            // Create notification
+            await supabase
+              .from('user_notifications')
+              .insert({
+                user_id: subscription.user_id,
+                title: 'Payment Failed',
+                message: newCount >= 3 
+                  ? 'Multiple payment attempts have failed. Please update your payment method to avoid service interruption.'
+                  : 'Your recent payment attempt failed. Please check your payment method.',
+                type: 'payment',
+              });
+
             // If 3+ failed payments, consider downgrading
             if (newCount >= 3) {
               await supabase
                 .from('profiles')
                 .update({ subscription_tier: 'free' })
                 .eq('id', subscription.user_id);
+
+              // Log subscription history
+              await supabase
+                .from('subscription_history')
+                .insert({
+                  user_id: subscription.user_id,
+                  previous_tier: subscription.tier,
+                  new_tier: 'free',
+                  change_type: 'downgrade',
+                  reason: 'payment_failure',
+                  metadata: { failed_count: newCount, subscription_code: subscriptionCode },
+                });
             }
           }
         }

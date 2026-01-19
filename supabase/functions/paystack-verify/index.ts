@@ -109,7 +109,7 @@ serve(async (req) => {
     // Get current user profile for subscription history
     const { data: currentProfile } = await supabase
       .from('profiles')
-      .select('subscription_tier')
+      .select('subscription_tier, full_name, email')
       .eq('id', user.id)
       .single();
 
@@ -144,6 +144,43 @@ serve(async (req) => {
           billing_cycle: billingCycle,
         },
       });
+
+    // Store/update payment method from authorization
+    const authorization = paymentData.authorization;
+    if (authorization?.authorization_code) {
+      // Check if payment method already exists
+      const { data: existingMethod } = await supabase
+        .from('user_payment_methods')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('authorization_code', authorization.authorization_code)
+        .single();
+
+      if (!existingMethod) {
+        // If this is a new payment method, check for existing default
+        const { data: existingDefault } = await supabase
+          .from('user_payment_methods')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('is_default', true)
+          .single();
+
+        await supabase
+          .from('user_payment_methods')
+          .insert({
+            user_id: user.id,
+            authorization_code: authorization.authorization_code,
+            card_type: authorization.card_type || 'unknown',
+            last_four: authorization.last4 || '****',
+            exp_month: parseInt(authorization.exp_month) || 0,
+            exp_year: parseInt(authorization.exp_year) || 0,
+            bank: authorization.bank || null,
+            country_code: authorization.country_code || 'NG',
+            is_default: !existingDefault, // Make default if no existing default
+            is_active: true,
+          });
+      }
+    }
 
     // Create or update subscription record
     const customerCode = paymentData.customer?.customer_code || '';
@@ -194,6 +231,60 @@ serve(async (req) => {
           amount: paymentData.amount,
           billing_cycle: billingCycle,
         },
+        ip_address: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip'),
+        user_agent: req.headers.get('user-agent'),
+      });
+
+    // Log analytics event
+    await supabase
+      .from('analytics_events')
+      .insert({
+        user_id: user.id,
+        event_type: 'payment_completed',
+        event_data: {
+          reference,
+          amount: paymentData.amount / 100,
+          previous_tier: previousTier,
+          new_tier: tier,
+          change_type: changeType,
+          discount_applied: !!existingTx.discount_code,
+          discount_amount: existingTx.discount_amount || 0,
+        },
+        tier,
+        billing_cycle: billingCycle,
+        ip_address: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip'),
+      });
+
+    // Send payment confirmation email with receipt
+    try {
+      await supabase.functions.invoke('send-payment-confirmation', {
+        body: {
+          email: user.email,
+          userName: currentProfile?.full_name || user.user_metadata?.full_name,
+          amount: paymentData.amount / 100, // Convert from kobo to Naira
+          tier,
+          billingCycle,
+          receiptNumber: paymentData.receipt_number || reference,
+          transactionDate: new Date().toISOString(),
+          discountApplied: !!existingTx.discount_code,
+          discountAmount: existingTx.discount_amount ? existingTx.discount_amount / 100 : 0,
+          reference,
+        }
+      });
+      console.log('Payment confirmation email sent');
+    } catch (emailError) {
+      console.error('Failed to send confirmation email:', emailError);
+      // Don't fail the payment verification if email fails
+    }
+
+    // Create a user notification
+    await supabase
+      .from('user_notifications')
+      .insert({
+        user_id: user.id,
+        title: 'Payment Successful',
+        message: `Your ${tier.charAt(0).toUpperCase() + tier.slice(1)} plan subscription is now active. Receipt: ${paymentData.receipt_number || reference}`,
+        type: 'payment',
       });
 
     return new Response(
