@@ -1,17 +1,12 @@
 import jsPDF from 'jspdf';
 import QRCode from 'qrcode';
 import type { DocumentationStats } from '@/hooks/useDocumentationStats';
-
-const PRIMARY_COLOR = { r: 34, g: 197, b: 94 }; // Green
-const DARK_COLOR = { r: 17, g: 24, b: 39 };
-const GRAY_COLOR = { r: 107, g: 114, b: 128 };
-
-const LIVE_URL = 'https://taxforgeng.lovable.app';
-
-interface PDFSection {
-  title: string;
-  content: string[];
-}
+import {
+  BRAND_COLORS,
+  COMPANY_INFO,
+  PDF_SETTINGS,
+  formatNigerianDate,
+} from './exportShared';
 
 // Generate QR code as base64 data URL
 const generateQRCodeDataUrl = async (url: string): Promise<string> => {
@@ -20,7 +15,7 @@ const generateQRCodeDataUrl = async (url: string): Promise<string> => {
       width: 150,
       margin: 1,
       color: {
-        dark: '#22c55e', // Primary green color
+        dark: '#008751', // Nigerian green
         light: '#ffffff',
       },
     });
@@ -34,7 +29,7 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
   const doc = new jsPDF('p', 'mm', 'a4');
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 20;
+  const margin = PDF_SETTINGS.margin;
   const contentWidth = pageWidth - margin * 2;
   let yPosition = margin;
 
@@ -47,25 +42,23 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
   };
 
   const addHeader = () => {
-    doc.setFillColor(PRIMARY_COLOR.r, PRIMARY_COLOR.g, PRIMARY_COLOR.b);
+    doc.setFillColor(...BRAND_COLORS.nigerianGreen);
     doc.rect(0, 0, pageWidth, 8, 'F');
+    doc.setFillColor(...BRAND_COLORS.gold);
+    doc.rect(0, 8, pageWidth, 2, 'F');
   };
 
   const addFooter = (pageNum: number, totalPages: number) => {
     doc.setFontSize(8);
-    doc.setTextColor(GRAY_COLOR.r, GRAY_COLOR.g, GRAY_COLOR.b);
+    doc.setTextColor(...BRAND_COLORS.muted);
     doc.text(
-      `TaxForge NG - Project Documentation | Page ${pageNum} of ${totalPages}`,
+      `${COMPANY_INFO.shortName} - Project Documentation | Page ${pageNum} of ${totalPages}`,
       pageWidth / 2,
       pageHeight - 10,
       { align: 'center' }
     );
     doc.text(
-      `Generated: ${new Date().toLocaleDateString('en-NG', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      })}`,
+      `Generated: ${formatNigerianDate(new Date().toISOString())}`,
       pageWidth / 2,
       pageHeight - 5,
       { align: 'center' }
@@ -76,10 +69,10 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
     addNewPageIfNeeded(20);
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(PRIMARY_COLOR.r, PRIMARY_COLOR.g, PRIMARY_COLOR.b);
+    doc.setTextColor(...BRAND_COLORS.nigerianGreen);
     doc.text(title, margin, yPosition);
     yPosition += 3;
-    doc.setDrawColor(PRIMARY_COLOR.r, PRIMARY_COLOR.g, PRIMARY_COLOR.b);
+    doc.setDrawColor(...BRAND_COLORS.nigerianGreen);
     doc.setLineWidth(0.5);
     doc.line(margin, yPosition, margin + 60, yPosition);
     yPosition += 10;
@@ -89,7 +82,7 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
     addNewPageIfNeeded(15);
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(DARK_COLOR.r, DARK_COLOR.g, DARK_COLOR.b);
+    doc.setTextColor(...BRAND_COLORS.text);
     doc.text(title, margin, yPosition);
     yPosition += 7;
   };
@@ -97,7 +90,7 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
   const addParagraph = (text: string) => {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(GRAY_COLOR.r, GRAY_COLOR.g, GRAY_COLOR.b);
+    doc.setTextColor(...BRAND_COLORS.muted);
     const lines = doc.splitTextToSize(text, contentWidth);
     lines.forEach((line: string) => {
       addNewPageIfNeeded(6);
@@ -110,9 +103,9 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
   const addBulletPoint = (text: string) => {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(GRAY_COLOR.r, GRAY_COLOR.g, GRAY_COLOR.b);
+    doc.setTextColor(...BRAND_COLORS.muted);
     addNewPageIfNeeded(6);
-    doc.text('•', margin + 2, yPosition);
+    doc.text('\u2022', margin + 2, yPosition);
     const lines = doc.splitTextToSize(text, contentWidth - 10);
     lines.forEach((line: string, index: number) => {
       if (index > 0) addNewPageIfNeeded(6);
@@ -123,33 +116,36 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
 
   // Cover Page
   addHeader();
-  yPosition = 60;
+  yPosition = 60 as number;
   
   doc.setFontSize(32);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(PRIMARY_COLOR.r, PRIMARY_COLOR.g, PRIMARY_COLOR.b);
-  doc.text('TaxForge NG', pageWidth / 2, yPosition, { align: 'center' });
+  doc.setTextColor(...BRAND_COLORS.nigerianGreen);
+  doc.text(COMPANY_INFO.shortName, pageWidth / 2, yPosition, { align: 'center' });
   yPosition += 15;
 
   doc.setFontSize(14);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(DARK_COLOR.r, DARK_COLOR.g, DARK_COLOR.b);
+  doc.setTextColor(...BRAND_COLORS.text);
   doc.text('Nigerian Tax Calculator For Smart Businesses', pageWidth / 2, yPosition, { align: 'center' });
   yPosition += 10;
 
   doc.setFontSize(10);
-  doc.setTextColor(GRAY_COLOR.r, GRAY_COLOR.g, GRAY_COLOR.b);
+  doc.setTextColor(...BRAND_COLORS.muted);
   doc.text('Project Documentation & Investment Overview', pageWidth / 2, yPosition, { align: 'center' });
   yPosition += 25;
 
   // Live Statistics Box
-  doc.setFillColor(248, 250, 252);
+  doc.setFillColor(...BRAND_COLORS.lightBg);
   doc.roundedRect(margin, yPosition, contentWidth, 50, 3, 3, 'F');
+  doc.setDrawColor(...BRAND_COLORS.gold);
+  doc.setLineWidth(1);
+  doc.roundedRect(margin, yPosition, contentWidth, 50, 3, 3, 'S');
   yPosition += 10;
 
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(DARK_COLOR.r, DARK_COLOR.g, DARK_COLOR.b);
+  doc.setTextColor(...BRAND_COLORS.text);
   doc.text('Live Platform Statistics', pageWidth / 2, yPosition, { align: 'center' });
   yPosition += 10;
 
@@ -165,29 +161,29 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
     const xPos = margin + statWidth * index + statWidth / 2;
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(PRIMARY_COLOR.r, PRIMARY_COLOR.g, PRIMARY_COLOR.b);
+    doc.setTextColor(...BRAND_COLORS.nigerianGreen);
     doc.text(stat.value, xPos, yPosition, { align: 'center' });
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(GRAY_COLOR.r, GRAY_COLOR.g, GRAY_COLOR.b);
+    doc.setTextColor(...BRAND_COLORS.muted);
     doc.text(stat.label, xPos, yPosition + 6, { align: 'center' });
   });
   yPosition += 35;
 
   doc.setFontSize(10);
-  doc.setTextColor(GRAY_COLOR.r, GRAY_COLOR.g, GRAY_COLOR.b);
-  doc.text('Live URL: ' + LIVE_URL, pageWidth / 2, yPosition, { align: 'center' });
+  doc.setTextColor(...BRAND_COLORS.muted);
+  doc.text('Live URL: ' + COMPANY_INFO.liveUrl, pageWidth / 2, yPosition, { align: 'center' });
   yPosition += 15;
 
   // Add QR Code for mobile access
-  const qrCodeDataUrl = await generateQRCodeDataUrl(LIVE_URL);
+  const qrCodeDataUrl = await generateQRCodeDataUrl(COMPANY_INFO.liveUrl);
   if (qrCodeDataUrl) {
     const qrSize = 35;
     const qrX = (pageWidth - qrSize) / 2;
     doc.addImage(qrCodeDataUrl, 'PNG', qrX, yPosition, qrSize, qrSize);
     yPosition += qrSize + 5;
     doc.setFontSize(8);
-    doc.setTextColor(GRAY_COLOR.r, GRAY_COLOR.g, GRAY_COLOR.b);
+    doc.setTextColor(...BRAND_COLORS.muted);
     doc.text('Scan to visit live website', pageWidth / 2, yPosition, { align: 'center' });
   }
 
@@ -198,7 +194,7 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
 
   addSectionTitle('Executive Summary');
   addParagraph(
-    'TaxForge NG is a comprehensive Nigerian tax calculation and compliance platform designed to simplify tax management ' +
+    `${COMPANY_INFO.shortName} is a comprehensive Nigerian tax calculation and compliance platform designed to simplify tax management ` +
     'for individuals and businesses. The platform addresses the complexity of Nigerian tax law, including the 2026 tax reform ' +
     'changes, providing accessible tools for accurate calculations, compliance tracking, and business financial management.'
   );
@@ -213,7 +209,7 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
 
   addSubsectionTitle('Solution');
   addParagraph(
-    'TaxForge NG provides an all-in-one platform combining tax calculations, business management, compliance tracking, ' +
+    `${COMPANY_INFO.shortName} provides an all-in-one platform combining tax calculations, business management, compliance tracking, ` +
     'and AI-powered advisory services. With a progressive subscription model from free to enterprise tiers, the platform ' +
     'serves everyone from individual employees to large corporations.'
   );
@@ -223,7 +219,7 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
 
   addSubsectionTitle('Tax Calculators');
   addBulletPoint('Personal Income Tax (PIT) with 2025 FIRS rules and 2026 preview mode');
-  addBulletPoint('Company Income Tax (CIT) with small company exemptions (0% for turnover < ₦50M)');
+  addBulletPoint('Company Income Tax (CIT) with small company exemptions (0% for turnover < \u20A650M)');
   addBulletPoint('VAT calculations with sector-specific rules (exempt, zero-rated, standard)');
   addBulletPoint('Withholding Tax (WHT) credit tracking and reconciliation');
   addBulletPoint('Capital Gains Tax (CGT) with investor exemptions');
@@ -262,18 +258,18 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
 
   addSectionTitle('Subscription & Monetization Model');
   addParagraph(
-    'TaxForge NG operates on a 6-tier subscription model designed to serve users from individual employees ' +
+    `${COMPANY_INFO.shortName} operates on a 6-tier subscription model designed to serve users from individual employees ` +
     'to large enterprises. Annual billing offers approximately 17% savings.'
   );
   yPosition += 5;
 
   // Pricing Table
   const tiers = [
-    { name: 'Free (Individual)', price: '₦0', target: 'Employees', features: 'Personal tax calc, crypto taxes, foreign income' },
-    { name: 'Starter', price: '₦500/mo', target: 'Side hustlers', features: '1 business, exports, email reminders' },
-    { name: 'Basic', price: '₦2,000/mo', target: 'Freelancers', features: '2 businesses, invoices, OCR, 75 AI queries' },
-    { name: 'Professional', price: '₦4,999/mo', target: 'Small business', features: '5 businesses, payroll, digital VAT' },
-    { name: 'Business', price: '₦8,999/mo', target: 'Growing business', features: '10 businesses, CAC verification, 2 seats' },
+    { name: 'Free (Individual)', price: '\u20A60', target: 'Employees', features: 'Personal tax calc, crypto taxes, foreign income' },
+    { name: 'Starter', price: '\u20A6500/mo', target: 'Side hustlers', features: '1 business, exports, email reminders' },
+    { name: 'Basic', price: '\u20A62,000/mo', target: 'Freelancers', features: '2 businesses, invoices, OCR, 75 AI queries' },
+    { name: 'Professional', price: '\u20A64,999/mo', target: 'Small business', features: '5 businesses, payroll, digital VAT' },
+    { name: 'Business', price: '\u20A68,999/mo', target: 'Growing business', features: '10 businesses, CAC verification, 2 seats' },
     { name: 'Corporate', price: 'Custom', target: 'Enterprises', features: 'Unlimited, API, audit log, white-label' },
   ];
 
@@ -281,11 +277,11 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
   const tableStartY = yPosition;
 
   // Table Header
-  doc.setFillColor(PRIMARY_COLOR.r, PRIMARY_COLOR.g, PRIMARY_COLOR.b);
+  doc.setFillColor(...BRAND_COLORS.nigerianGreen);
   doc.rect(margin, yPosition, contentWidth, 8, 'F');
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(255, 255, 255);
+  doc.setTextColor(...BRAND_COLORS.white);
   doc.text('Tier', margin + 2, yPosition + 5.5);
   doc.text('Price', margin + colWidths[0] + 2, yPosition + 5.5);
   doc.text('Target', margin + colWidths[0] + colWidths[1] + 2, yPosition + 5.5);
@@ -294,24 +290,27 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
 
   // Table Rows
   tiers.forEach((tier, index) => {
-    const rowColor = index % 2 === 0 ? { r: 249, g: 250, b: 251 } : { r: 255, g: 255, b: 255 };
-    doc.setFillColor(rowColor.r, rowColor.g, rowColor.b);
+    if (index % 2 === 0) {
+      doc.setFillColor(...BRAND_COLORS.lightBg);
+    } else {
+      doc.setFillColor(...BRAND_COLORS.white);
+    }
     doc.rect(margin, yPosition, contentWidth, 8, 'F');
     
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(DARK_COLOR.r, DARK_COLOR.g, DARK_COLOR.b);
+    doc.setTextColor(...BRAND_COLORS.text);
     doc.text(tier.name, margin + 2, yPosition + 5.5);
-    doc.setTextColor(PRIMARY_COLOR.r, PRIMARY_COLOR.g, PRIMARY_COLOR.b);
+    doc.setTextColor(...BRAND_COLORS.nigerianGreen);
     doc.text(tier.price, margin + colWidths[0] + 2, yPosition + 5.5);
-    doc.setTextColor(GRAY_COLOR.r, GRAY_COLOR.g, GRAY_COLOR.b);
+    doc.setTextColor(...BRAND_COLORS.muted);
     doc.text(tier.target, margin + colWidths[0] + colWidths[1] + 2, yPosition + 5.5);
     doc.text(tier.features, margin + colWidths[0] + colWidths[1] + colWidths[2] + 2, yPosition + 5.5);
     yPosition += 8;
   });
 
   // Table Border
-  doc.setDrawColor(GRAY_COLOR.r, GRAY_COLOR.g, GRAY_COLOR.b);
+  doc.setDrawColor(...BRAND_COLORS.muted);
   doc.setLineWidth(0.3);
   doc.rect(margin, tableStartY, contentWidth, yPosition - tableStartY);
   yPosition += 10;
@@ -423,20 +422,21 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
   // Contact
   yPosition += 10;
   addNewPageIfNeeded(40);
-  doc.setFillColor(248, 250, 252);
+  doc.setFillColor(...BRAND_COLORS.lightBg);
   doc.roundedRect(margin, yPosition, contentWidth, 30, 3, 3, 'F');
+  doc.setDrawColor(...BRAND_COLORS.gold);
+  doc.setLineWidth(1);
+  doc.roundedRect(margin, yPosition, contentWidth, 30, 3, 3, 'S');
   yPosition += 12;
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(DARK_COLOR.r, DARK_COLOR.g, DARK_COLOR.b);
+  doc.setTextColor(...BRAND_COLORS.text);
   doc.text('Contact & More Information', pageWidth / 2, yPosition, { align: 'center' });
   yPosition += 8;
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(GRAY_COLOR.r, GRAY_COLOR.g, GRAY_COLOR.b);
-  doc.text('Website: https://taxforgeng.lovable.app', pageWidth / 2, yPosition, { align: 'center' });
-  yPosition += 5;
-  doc.text('Email: hello@taxforgeng.com', pageWidth / 2, yPosition, { align: 'center' });
+  doc.setTextColor(...BRAND_COLORS.muted);
+  doc.text(`${COMPANY_INFO.website} | ${COMPANY_INFO.email}`, pageWidth / 2, yPosition, { align: 'center' });
 
   // Add footers to all pages
   const totalPages = doc.getNumberOfPages();
@@ -450,5 +450,5 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
 
 export const downloadDocumentationPDF = async (stats: DocumentationStats): Promise<void> => {
   const doc = await generateDocumentationPDF(stats);
-  doc.save('TaxForge-NG-Project-Documentation.pdf');
+  doc.save('taxforge-ng-documentation.pdf');
 };

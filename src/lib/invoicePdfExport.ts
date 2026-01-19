@@ -1,4 +1,15 @@
 import { jsPDF } from 'jspdf';
+import {
+  BRAND_COLORS,
+  COMPANY_INFO,
+  PDF_SETTINGS,
+  formatNaira,
+  formatNigerianDate,
+  formatDateForFilename,
+  addPDFHeader,
+  addPDFFooter,
+  generateFilename,
+} from './exportShared';
 
 export interface PaymentInvoiceData {
   // Transaction details
@@ -22,7 +33,7 @@ export interface PaymentInvoiceData {
   // Business details (TaxForge)
   businessName: string;
   businessAddress: string;
-  businessTIN?: string; // Tax Identification Number
+  businessTIN?: string;
   businessEmail: string;
   
   // Dates
@@ -33,80 +44,24 @@ export interface PaymentInvoiceData {
   vatRate: number; // 7.5%
   vatAmount: number;
   subtotal: number;
-}
-
-// Helper: Format date in Nigerian style (DD Month YYYY)
-function formatNigerianDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('en-NG', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric'
-  });
-}
-
-// Helper: Format currency in Nigerian Naira
-function formatNigerianCurrency(amount: number): string {
-  return `₦${amount.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  
+  // Payment method (optional)
+  paymentMethod?: string;
+  cardLastFour?: string;
 }
 
 export const generatePaymentInvoicePDF = (data: PaymentInvoiceData): jsPDF => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 20;
+  const margin = PDF_SETTINGS.margin;
   const contentWidth = pageWidth - margin * 2;
-  let y = margin;
 
-  // Colors (Nigerian flag inspired with professional tones)
-  const primaryColor: [number, number, number] = [0, 135, 81]; // Nigerian green
-  const accentColor: [number, number, number] = [212, 175, 55]; // Gold
-  const textColor: [number, number, number] = [51, 51, 51];
-  const mutedColor: [number, number, number] = [128, 128, 128];
-  const lightBg: [number, number, number] = [248, 250, 248];
-  const successColor: [number, number, number] = [34, 197, 94];
-
-  // === HEADER ===
-  // Nigerian-themed header bar
-  doc.setFillColor(...primaryColor);
-  doc.rect(0, 0, pageWidth, 12, 'F');
-  
-  // White stripe
-  doc.setFillColor(255, 255, 255);
-  doc.rect(0, 12, pageWidth, 4, 'F');
-  
-  // Green stripe
-  doc.setFillColor(...primaryColor);
-  doc.rect(0, 16, pageWidth, 2, 'F');
-
-  y = 30;
-
-  // Logo area
-  doc.setFillColor(...primaryColor);
-  doc.roundedRect(margin, y, 15, 15, 2, 2, 'F');
-  doc.setFontSize(10);
-  doc.setTextColor(255, 255, 255);
-  doc.setFont('helvetica', 'bold');
-  doc.text('TF', margin + 7.5, y + 10, { align: 'center' });
-
-  // Company name
-  doc.setTextColor(...primaryColor);
-  doc.setFontSize(22);
-  doc.setFont('helvetica', 'bold');
-  doc.text('TaxForge NG', margin + 20, y + 10);
-
-  // Invoice badge
-  doc.setFillColor(...accentColor);
-  doc.roundedRect(pageWidth - margin - 50, y, 50, 15, 2, 2, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'bold');
-  doc.text('PAYMENT INVOICE', pageWidth - margin - 25, y + 10, { align: 'center' });
-
-  y += 25;
+  // === HEADER with Nigerian stripes ===
+  let y = addPDFHeader(doc, { badgeText: 'PAYMENT INVOICE', useNigerianStripes: true });
 
   // Invoice number and date
-  doc.setTextColor(...textColor);
+  doc.setTextColor(...BRAND_COLORS.text);
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
   doc.text(`Invoice #: ${data.receiptNumber || data.reference}`, margin, y);
@@ -119,51 +74,57 @@ export const generatePaymentInvoicePDF = (data: PaymentInvoiceData): jsPDF => {
   const colWidth = (contentWidth - 20) / 2;
 
   // From section
-  doc.setFillColor(...lightBg);
-  doc.roundedRect(margin, y, colWidth, 45, 3, 3, 'F');
+  doc.setFillColor(...BRAND_COLORS.lightBg);
+  doc.roundedRect(margin, y, colWidth, 50, 3, 3, 'F');
+  doc.setDrawColor(...BRAND_COLORS.nigerianGreen);
+  doc.setLineWidth(0.5);
+  doc.roundedRect(margin, y, colWidth, 50, 3, 3, 'S');
   
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(...BRAND_COLORS.nigerianGreen);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   doc.text('FROM:', margin + 8, y + 12);
   
-  doc.setTextColor(...textColor);
+  doc.setTextColor(...BRAND_COLORS.text);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
-  doc.text(data.businessName, margin + 8, y + 22);
-  doc.text(data.businessAddress, margin + 8, y + 30);
+  doc.text(data.businessName || COMPANY_INFO.name, margin + 8, y + 22);
+  doc.text(data.businessAddress || COMPANY_INFO.address, margin + 8, y + 30);
   if (data.businessTIN) {
     doc.text(`TIN: ${data.businessTIN}`, margin + 8, y + 38);
   }
+  doc.text(data.businessEmail || COMPANY_INFO.email, margin + 8, y + 46);
 
   // To section
-  doc.setFillColor(...lightBg);
-  doc.roundedRect(margin + colWidth + 20, y, colWidth, 45, 3, 3, 'F');
+  doc.setFillColor(...BRAND_COLORS.lightBg);
+  doc.roundedRect(margin + colWidth + 20, y, colWidth, 50, 3, 3, 'F');
+  doc.setDrawColor(...BRAND_COLORS.nigerianGreen);
+  doc.roundedRect(margin + colWidth + 20, y, colWidth, 50, 3, 3, 'S');
   
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(...BRAND_COLORS.nigerianGreen);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   doc.text('BILL TO:', margin + colWidth + 28, y + 12);
   
-  doc.setTextColor(...textColor);
+  doc.setTextColor(...BRAND_COLORS.text);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.text(data.customerName, margin + colWidth + 28, y + 22);
   doc.text(data.customerEmail, margin + colWidth + 28, y + 30);
 
-  y += 55;
+  y += 60;
 
   // === PAYMENT DETAILS TABLE ===
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(...BRAND_COLORS.nigerianGreen);
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.text('Payment Details', margin, y);
   y += 8;
 
   // Table header
-  doc.setFillColor(...primaryColor);
+  doc.setFillColor(...BRAND_COLORS.nigerianGreen);
   doc.roundedRect(margin, y, contentWidth, 12, 2, 2, 'F');
-  doc.setTextColor(255, 255, 255);
+  doc.setTextColor(...BRAND_COLORS.white);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
   doc.text('Description', margin + 8, y + 8);
@@ -172,7 +133,7 @@ export const generatePaymentInvoicePDF = (data: PaymentInvoiceData): jsPDF => {
   y += 14;
 
   // Subscription row
-  doc.setTextColor(...textColor);
+  doc.setTextColor(...BRAND_COLORS.text);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   
@@ -181,89 +142,104 @@ export const generatePaymentInvoicePDF = (data: PaymentInvoiceData): jsPDF => {
   
   doc.text(`${tierName} Plan - ${cycleLabel} Subscription`, margin + 8, y + 6);
   doc.text(`${formatNigerianDate(data.periodStart)} - ${formatNigerianDate(data.periodEnd)}`, margin + 100, y + 6);
-  doc.text(formatNigerianCurrency(data.subtotal), pageWidth - margin - 8, y + 6, { align: 'right' });
+  doc.text(formatNaira(data.subtotal, { showDecimals: true }), pageWidth - margin - 8, y + 6, { align: 'right' });
   y += 12;
 
   // Discount row (if applicable)
   if (data.discountAmount && data.discountAmount > 0) {
-    doc.setFillColor(...lightBg);
+    doc.setFillColor(...BRAND_COLORS.lightBg);
     doc.rect(margin, y - 4, contentWidth, 12, 'F');
-    doc.setTextColor(46, 125, 50); // Green for discount
+    doc.setTextColor(...BRAND_COLORS.success);
     doc.text(`Discount Applied${data.discountCode ? ` (${data.discountCode})` : ''}`, margin + 8, y + 4);
-    doc.text(`-${formatNigerianCurrency(data.discountAmount)}`, pageWidth - margin - 8, y + 4, { align: 'right' });
+    doc.text(`(${formatNaira(data.discountAmount, { showDecimals: true })})`, pageWidth - margin - 8, y + 4, { align: 'right' });
     y += 12;
   }
 
-  // VAT row (Nigerian 7.5% VAT)
-  doc.setTextColor(...mutedColor);
+  // VAT row
+  doc.setTextColor(...BRAND_COLORS.muted);
   doc.text(`VAT (${data.vatRate}%)`, margin + 8, y + 6);
-  doc.text(formatNigerianCurrency(data.vatAmount), pageWidth - margin - 8, y + 6, { align: 'right' });
+  doc.text(formatNaira(data.vatAmount, { showDecimals: true }), pageWidth - margin - 8, y + 6, { align: 'right' });
   y += 15;
 
   // Total box
-  doc.setFillColor(...primaryColor);
-  doc.roundedRect(pageWidth - margin - 80, y, 80, 20, 3, 3, 'F');
-  doc.setTextColor(255, 255, 255);
+  doc.setFillColor(...BRAND_COLORS.nigerianGreen);
+  doc.roundedRect(pageWidth - margin - 90, y, 90, 24, 3, 3, 'F');
+  doc.setTextColor(...BRAND_COLORS.white);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
-  doc.text('TOTAL PAID:', pageWidth - margin - 75, y + 8);
+  doc.text('TOTAL PAID:', pageWidth - margin - 85, y + 9);
   doc.setFontSize(14);
-  doc.text(formatNigerianCurrency(data.amount), pageWidth - margin - 8, y + 15, { align: 'right' });
+  doc.text(formatNaira(data.amount, { showDecimals: true }), pageWidth - margin - 8, y + 19, { align: 'right' });
 
   y += 35;
 
-  // === PAYMENT STATUS BADGE ===
-  doc.setFillColor(...successColor);
-  doc.roundedRect(margin, y, 70, 12, 2, 2, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.text('✓ PAYMENT CONFIRMED', margin + 35, y + 8, { align: 'center' });
+  // === AMOUNT DUE SECTION (NEW) ===
+  doc.setFillColor(...BRAND_COLORS.lightGreen);
+  doc.roundedRect(margin, y, contentWidth, 30, 3, 3, 'F');
+  doc.setDrawColor(...BRAND_COLORS.success);
+  doc.setLineWidth(1);
+  doc.roundedRect(margin, y, contentWidth, 30, 3, 3, 'S');
   
-  doc.setTextColor(...mutedColor);
+  doc.setTextColor(...BRAND_COLORS.text);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Amount Due:', margin + 10, y + 12);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.setTextColor(...BRAND_COLORS.success);
+  doc.text(`${formatNaira(0, { showDecimals: true })} (PAID)`, margin + 70, y + 12);
+  
+  // Payment method
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...BRAND_COLORS.muted);
+  const paymentMethodText = data.cardLastFour 
+    ? `Payment Method: Card ending in ${data.cardLastFour}`
+    : data.paymentMethod 
+      ? `Payment Method: ${data.paymentMethod}`
+      : 'Payment Method: Paystack';
+  doc.text(paymentMethodText, margin + 10, y + 24);
+
+  y += 40;
+
+  // === PAYMENT STATUS BADGE ===
+  doc.setFillColor(...BRAND_COLORS.success);
+  doc.roundedRect(margin, y, 85, 14, 2, 2, 'F');
+  doc.setTextColor(...BRAND_COLORS.white);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('\u2713 PAYMENT CONFIRMED', margin + 42.5, y + 9, { align: 'center' });
+  
+  doc.setTextColor(...BRAND_COLORS.muted);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.text(`Payment Date: ${formatNigerianDate(data.paymentDate)}`, margin + 80, y + 5);
-  doc.text(`Reference: ${data.reference}`, margin + 80, y + 12);
+  doc.text(`Payment Date: ${formatNigerianDate(data.paymentDate)}`, margin + 95, y + 5);
+  doc.text(`Reference: ${data.reference}`, margin + 95, y + 12);
 
   y += 25;
 
   // === NOTES SECTION ===
-  doc.setFillColor(...lightBg);
-  doc.roundedRect(margin, y, contentWidth, 35, 3, 3, 'F');
+  doc.setFillColor(...BRAND_COLORS.lightBg);
+  doc.roundedRect(margin, y, contentWidth, 40, 3, 3, 'F');
   
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(...BRAND_COLORS.nigerianGreen);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
   doc.text('Important Information:', margin + 8, y + 10);
   
-  doc.setTextColor(...textColor);
+  doc.setTextColor(...BRAND_COLORS.text);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.text('• This invoice serves as confirmation of payment for your TaxForge NG subscription.', margin + 8, y + 18);
-  doc.text('• Your subscription will automatically renew unless cancelled before the end of the billing period.', margin + 8, y + 25);
-  doc.text('• For support, contact: support@taxforgeng.com', margin + 8, y + 32);
+  doc.text(`\u2022 This invoice serves as confirmation of payment for your ${COMPANY_INFO.shortName} subscription.`, margin + 8, y + 18);
+  doc.text('\u2022 Your subscription will automatically renew unless cancelled before the end of the billing period.', margin + 8, y + 26);
+  doc.text(`\u2022 For support, contact: ${COMPANY_INFO.email}`, margin + 8, y + 34);
 
   // === FOOTER ===
-  const footerY = pageHeight - 25;
-  
-  doc.setFillColor(...primaryColor);
-  doc.rect(margin, footerY - 10, contentWidth, 0.5, 'F');
-  
-  doc.setTextColor(...mutedColor);
-  doc.setFontSize(7);
-  doc.text(
-    'This is an electronically generated invoice and is valid without signature.',
-    pageWidth / 2, footerY - 2, { align: 'center' }
-  );
-  doc.text(
-    `© ${new Date().getFullYear()} TaxForge NG | RC: [Company RC Number] | TIN: ${data.businessTIN || 'N/A'}`,
-    pageWidth / 2, footerY + 4, { align: 'center' }
-  );
-  doc.text(
-    'www.taxforgeng.com | support@taxforgeng.com',
-    pageWidth / 2, footerY + 10, { align: 'center' }
-  );
+  addPDFFooter(doc, {
+    disclaimer: 'This is an electronically generated invoice and is valid without signature.',
+    pageNumber: 1,
+    totalPages: 1,
+  });
 
   return doc;
 };
@@ -271,7 +247,7 @@ export const generatePaymentInvoicePDF = (data: PaymentInvoiceData): jsPDF => {
 // Download function
 export const downloadPaymentInvoice = (data: PaymentInvoiceData): void => {
   const doc = generatePaymentInvoicePDF(data);
-  const fileName = `TaxForge-Invoice-${data.receiptNumber || data.reference}.pdf`;
+  const fileName = generateFilename('invoice', 'pdf', data.receiptNumber || data.reference);
   doc.save(fileName);
 };
 
