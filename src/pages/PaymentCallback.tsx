@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { usePaystack } from '@/hooks/usePaystack';
 import { useUpgradeCelebration } from '@/components/UpgradeCelebrationProvider';
+import { useSubscription, SubscriptionTier } from '@/contexts/SubscriptionContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SubscriptionTier } from '@/contexts/SubscriptionContext';
 
 type VerificationStatus = 'verifying' | 'success' | 'failed' | 'error';
 
@@ -15,6 +15,7 @@ export default function PaymentCallback() {
   const navigate = useNavigate();
   const { verifyPayment } = usePaystack();
   const { triggerCelebration } = useUpgradeCelebration();
+  const { refreshSubscription } = useSubscription();
   
   const [status, setStatus] = useState<VerificationStatus>('verifying');
   const [message, setMessage] = useState('');
@@ -39,6 +40,9 @@ export default function PaymentCallback() {
           setTier(result.tier || '');
           setReceiptNumber(result.receiptNumber || '');
           
+          // Refresh subscription context to update tier across the app
+          await refreshSubscription();
+          
           if (!result.alreadyProcessed) {
             setMessage('Your subscription has been activated!');
             // Trigger celebration after a short delay
@@ -59,7 +63,7 @@ export default function PaymentCallback() {
     };
 
     verify();
-  }, [reference, verifyPayment, triggerCelebration]);
+  }, [reference, verifyPayment, triggerCelebration, refreshSubscription]);
 
   const renderContent = () => {
     switch (status) {

@@ -55,6 +55,7 @@ interface SubscriptionContextType extends SubscriptionState {
   bulkVerifyRCBN: (numbers: string[]) => Array<{ rcBnNumber: string; isValid: boolean; details?: CACVerificationDetails }>;
   addSampleBusinesses: () => Promise<void>;
   refreshBusinesses: () => Promise<void>;
+  refreshSubscription: () => Promise<void>;
 }
 
 // Tier limits for saved businesses
@@ -221,6 +222,45 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     fetchUserData();
   }, [fetchUserData]);
+
+  // Set up realtime subscription for profile changes (tier updates)
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel(`profile-changes-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${user.id}`,
+        },
+        (payload) => {
+          console.log('Profile updated in real-time:', payload);
+          const newTier = (payload.new as any).subscription_tier as SubscriptionTier;
+          const trialExpiresAt = (payload.new as any).trial_expires_at;
+          
+          setState(prev => ({
+            ...prev,
+            tier: newTier,
+            effectiveTier: newTier,
+            trialEndsAt: trialExpiresAt ? new Date(trialExpiresAt) : null,
+            isOnTrial: trialExpiresAt ? new Date(trialExpiresAt) > new Date() : false,
+          }));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
+  const refreshSubscription = async () => {
+    await fetchUserData();
+  };
 
   const refreshBusinesses = async () => {
     await fetchUserData();
@@ -506,6 +546,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         bulkVerifyRCBN,
         addSampleBusinesses,
         refreshBusinesses,
+        refreshSubscription,
       }}
     >
       {children}
