@@ -484,6 +484,105 @@ export type Database = {
         }
         Relationships: []
       }
+      document_verifications: {
+        Row: {
+          business_name: string | null
+          created_at: string | null
+          document_hash: string
+          document_id: string
+          document_type: string
+          generated_at: string | null
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          business_name?: string | null
+          created_at?: string | null
+          document_hash: string
+          document_id: string
+          document_type: string
+          generated_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          business_name?: string | null
+          created_at?: string | null
+          document_hash?: string
+          document_id?: string
+          document_type?: string
+          generated_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      email_logs: {
+        Row: {
+          error_message: string | null
+          id: string
+          recipient_email: string
+          report_title: string | null
+          report_type: string
+          sent_at: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          error_message?: string | null
+          id?: string
+          recipient_email: string
+          report_title?: string | null
+          report_type: string
+          sent_at?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          error_message?: string | null
+          id?: string
+          recipient_email?: string
+          report_title?: string | null
+          report_type?: string
+          sent_at?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      email_recipients: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          is_default: boolean | null
+          name: string | null
+          type: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          is_default?: boolean | null
+          name?: string | null
+          type?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          is_default?: boolean | null
+          name?: string | null
+          type?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       expenses: {
         Row: {
           amount: number

@@ -877,3 +877,475 @@ export function getStatusColor(status: string): RGB {
       return BRAND_COLORS.info;
   }
 }
+
+// ============================================
+// CATEGORY COLORS FOR CHARTS
+// ============================================
+
+export const CATEGORY_COLORS: Record<string, RGB> = {
+  income: [34, 197, 94],      // Green
+  rent: [245, 158, 11],       // Orange
+  transport: [59, 130, 246],  // Blue
+  marketing: [168, 85, 247],  // Purple
+  salary: [236, 72, 153],     // Pink
+  utilities: [20, 184, 166],  // Teal
+  supplies: [139, 92, 246],   // Violet
+  equipment: [249, 115, 22],  // Orange
+  professional: [6, 182, 212], // Cyan
+  insurance: [244, 63, 94],   // Rose
+  taxes: [234, 179, 8],       // Yellow
+  other: [107, 114, 128],     // Gray
+  cit: [0, 135, 81],          // Nigerian Green
+  vat: [212, 175, 55],        // Gold
+  levy: [59, 130, 246],       // Blue
+};
+
+export function getCategoryColor(category: string): RGB {
+  const key = category.toLowerCase().replace(/[^a-z]/g, '');
+  return CATEGORY_COLORS[key] || BRAND_COLORS.muted;
+}
+
+// ============================================
+// VISUAL CHART UTILITIES
+// ============================================
+
+/**
+ * Add a pie chart to PDF
+ */
+export function addPieChart(
+  doc: jsPDF,
+  data: Array<{ label: string; value: number; color?: RGB }>,
+  centerX: number,
+  centerY: number,
+  radius: number,
+  options?: { showLegend?: boolean; legendX?: number; legendY?: number }
+): number {
+  const { showLegend = true, legendX, legendY } = options || {};
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+  if (total === 0) return centerY + radius + 10;
+
+  let startAngle = -Math.PI / 2; // Start from top
+
+  // Draw pie slices using polygon approximation
+  data.forEach((item, index) => {
+    const sliceAngle = (item.value / total) * 2 * Math.PI;
+    const endAngle = startAngle + sliceAngle;
+    const color = item.color || getCategoryColor(item.label);
+
+    // Create pie slice path
+    const points: Array<[number, number]> = [[centerX, centerY]];
+    const steps = Math.max(20, Math.ceil(sliceAngle * 20));
+    
+    for (let i = 0; i <= steps; i++) {
+      const angle = startAngle + (sliceAngle * i) / steps;
+      points.push([
+        centerX + radius * Math.cos(angle),
+        centerY + radius * Math.sin(angle),
+      ]);
+    }
+
+    doc.setFillColor(...color);
+    doc.setDrawColor(255, 255, 255);
+    doc.setLineWidth(0.5);
+
+    // Draw polygon
+    const firstPoint = points[0];
+    doc.moveTo(firstPoint[0], firstPoint[1]);
+    points.slice(1).forEach(([x, y]) => doc.lineTo(x, y));
+    doc.lineTo(firstPoint[0], firstPoint[1]);
+    doc.fillStroke();
+
+    startAngle = endAngle;
+  });
+
+  // Draw legend
+  if (showLegend) {
+    const legX = legendX ?? centerX + radius + 15;
+    let legY = legendY ?? centerY - (data.length * 7) / 2;
+    
+    doc.setFontSize(8);
+    data.forEach((item) => {
+      const color = item.color || getCategoryColor(item.label);
+      doc.setFillColor(...color);
+      doc.rect(legX, legY - 3, 6, 6, 'F');
+      
+      doc.setTextColor(...BRAND_COLORS.text);
+      const percentage = ((item.value / total) * 100).toFixed(1);
+      doc.text(`${item.label} (${percentage}%)`, legX + 9, legY + 1);
+      legY += 9;
+    });
+  }
+
+  return centerY + radius + 15;
+}
+
+/**
+ * Add a bar chart to PDF
+ */
+export function addBarChart(
+  doc: jsPDF,
+  data: Array<{ label: string; value: number; color?: RGB }>,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  options?: { showValues?: boolean; horizontal?: boolean; maxValue?: number }
+): number {
+  const { showValues = true, horizontal = false, maxValue } = options || {};
+  const max = maxValue ?? Math.max(...data.map(d => d.value));
+  if (max === 0) return y + height + 10;
+
+  const barCount = data.length;
+  const gap = 4;
+
+  if (horizontal) {
+    const barHeight = (height - gap * (barCount - 1)) / barCount;
+    
+    data.forEach((item, index) => {
+      const barY = y + index * (barHeight + gap);
+      const barWidth = (item.value / max) * width;
+      const color = item.color || getCategoryColor(item.label);
+
+      doc.setFillColor(...color);
+      doc.roundedRect(x, barY, barWidth, barHeight, 2, 2, 'F');
+
+      // Label
+      doc.setFontSize(7);
+      doc.setTextColor(...BRAND_COLORS.text);
+      doc.text(truncateText(item.label, 15), x - 2, barY + barHeight / 2 + 1, { align: 'right' });
+
+      // Value
+      if (showValues && barWidth > 20) {
+        doc.setTextColor(...BRAND_COLORS.white);
+        doc.text(formatNaira(item.value), x + barWidth - 3, barY + barHeight / 2 + 1, { align: 'right' });
+      }
+    });
+  } else {
+    const barWidth = (width - gap * (barCount - 1)) / barCount;
+    
+    data.forEach((item, index) => {
+      const barX = x + index * (barWidth + gap);
+      const barHeight = (item.value / max) * height;
+      const barY = y + height - barHeight;
+      const color = item.color || getCategoryColor(item.label);
+
+      doc.setFillColor(...color);
+      doc.roundedRect(barX, barY, barWidth, barHeight, 2, 2, 'F');
+
+      // Label (rotated or truncated)
+      doc.setFontSize(6);
+      doc.setTextColor(...BRAND_COLORS.muted);
+      const label = truncateText(item.label, 8);
+      doc.text(label, barX + barWidth / 2, y + height + 6, { align: 'center' });
+
+      // Value on top
+      if (showValues && barHeight > 10) {
+        doc.setTextColor(...BRAND_COLORS.white);
+        doc.setFontSize(6);
+        doc.text(formatNaira(item.value), barX + barWidth / 2, barY + 6, { align: 'center' });
+      }
+    });
+  }
+
+  return y + height + 15;
+}
+
+/**
+ * Add a progress bar to PDF
+ */
+export function addProgressBar(
+  doc: jsPDF,
+  percentage: number,
+  x: number,
+  y: number,
+  width: number,
+  height: number = 8,
+  color?: RGB
+): void {
+  const fillColor = color || BRAND_COLORS.nigerianGreen;
+  const clampedPercentage = Math.max(0, Math.min(100, percentage));
+  const fillWidth = (clampedPercentage / 100) * width;
+
+  // Background
+  doc.setFillColor(229, 231, 235); // Gray-200
+  doc.roundedRect(x, y, width, height, height / 2, height / 2, 'F');
+
+  // Fill
+  if (fillWidth > 0) {
+    doc.setFillColor(...fillColor);
+    doc.roundedRect(x, y, fillWidth, height, height / 2, height / 2, 'F');
+  }
+
+  // Percentage text
+  doc.setFontSize(7);
+  doc.setTextColor(...BRAND_COLORS.text);
+  doc.text(`${clampedPercentage.toFixed(1)}%`, x + width + 5, y + height / 2 + 2);
+}
+
+// ============================================
+// WATERMARK AND SIGNATURE UTILITIES
+// ============================================
+
+/**
+ * Add tier-aware watermark to PDF
+ * Only adds watermark for free tier users
+ */
+export function addTieredWatermark(
+  doc: jsPDF,
+  showWatermark: boolean,
+  documentType?: 'draft' | 'sample' | 'confidential' | 'official'
+): void {
+  if (!showWatermark) return;
+
+  const pages = doc.getNumberOfPages();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+
+  for (let i = 1; i <= pages; i++) {
+    doc.setPage(i);
+    
+    // Save graphics state
+    doc.saveGraphicsState();
+    
+    // Set watermark style
+    doc.setTextColor(200, 200, 200);
+    doc.setFontSize(50);
+    doc.setFont('helvetica', 'bold');
+
+    const text = documentType === 'draft' ? 'DRAFT' :
+                 documentType === 'confidential' ? 'CONFIDENTIAL' :
+                 documentType === 'official' ? 'OFFICIAL' :
+                 'SAMPLE - UPGRADE';
+
+    // Center and rotate watermark
+    doc.text(text, pageWidth / 2, pageHeight / 2, {
+      align: 'center',
+      angle: 45,
+    });
+
+    // Restore graphics state
+    doc.restoreGraphicsState();
+  }
+}
+
+/**
+ * Digital signature options
+ */
+export interface DigitalSignatureOptions {
+  documentId: string;
+  generatedAt: Date;
+  userId?: string;
+  businessName?: string;
+  verificationUrl?: string;
+}
+
+/**
+ * Generate a simple document hash for verification
+ */
+export function generateDocumentHash(options: DigitalSignatureOptions): string {
+  const content = JSON.stringify({
+    id: options.documentId,
+    ts: options.generatedAt.getTime(),
+    user: options.userId || 'anonymous',
+    biz: options.businessName || '',
+  });
+  
+  let hash = 0;
+  for (let i = 0; i < content.length; i++) {
+    const char = content.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash).toString(16).toUpperCase().padStart(16, '0');
+}
+
+/**
+ * Add digital signature block to PDF (Professional+ tiers)
+ */
+export function addDigitalSignatureBlock(
+  doc: jsPDF,
+  options: DigitalSignatureOptions,
+  y: number
+): number {
+  const margin = PDF_SETTINGS.margin;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const contentWidth = pageWidth - margin * 2;
+  const hash = generateDocumentHash(options);
+
+  // Signature box
+  doc.setFillColor(...BRAND_COLORS.lightBg);
+  doc.roundedRect(margin, y, contentWidth, 35, 3, 3, 'F');
+  doc.setDrawColor(...BRAND_COLORS.nigerianGreen);
+  doc.setLineWidth(1);
+  doc.roundedRect(margin, y, contentWidth, 35, 3, 3, 'S');
+
+  // Green badge
+  doc.setFillColor(...BRAND_COLORS.nigerianGreen);
+  doc.roundedRect(margin + 5, y + 5, 8, 25, 2, 2, 'F');
+
+  // Signature icon (checkmark)
+  doc.setTextColor(...BRAND_COLORS.white);
+  doc.setFontSize(12);
+  doc.text('\u2713', margin + 9, y + 20, { align: 'center' });
+
+  // Signature text
+  doc.setTextColor(...BRAND_COLORS.nigerianGreen);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('DIGITALLY SIGNED DOCUMENT', margin + 18, y + 10);
+
+  doc.setTextColor(...BRAND_COLORS.text);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Document ID: ${options.documentId}`, margin + 18, y + 18);
+  doc.text(`Generated: ${formatNigerianDate(options.generatedAt.toISOString())}`, margin + 18, y + 25);
+  doc.text(`Hash: ${hash.substring(0, 16)}...`, margin + 18, y + 32);
+
+  // Verification URL if provided
+  if (options.verificationUrl) {
+    doc.setTextColor(...BRAND_COLORS.info);
+    doc.setFontSize(7);
+    doc.text(`Verify: ${options.verificationUrl}`, pageWidth - margin - 5, y + 32, { align: 'right' });
+  }
+
+  return y + 42;
+}
+
+/**
+ * Generate unique document ID for verification
+ */
+export function generateDocumentId(): string {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 9);
+  return `TF-${timestamp}-${random}`.toUpperCase();
+}
+
+// ============================================
+// PRINT OPTIMIZATION UTILITIES
+// ============================================
+
+export const PRINT_SETTINGS = {
+  a4: { width: 210, height: 297 },
+  letter: { width: 216, height: 279 },
+  margins: { top: 20, bottom: 25, left: 20, right: 20 },
+  safeZone: { top: 15, bottom: 20 },
+};
+
+/**
+ * Get safe page height for content (accounting for footer)
+ */
+export function getPageSafeHeight(doc: jsPDF): number {
+  return doc.internal.pageSize.getHeight() - PDF_SETTINGS.footerHeight - 15;
+}
+
+/**
+ * Add smart page break with continuation header
+ */
+export function addSectionWithPageBreak(
+  doc: jsPDF,
+  sectionHeight: number,
+  currentY: number,
+  renderSection: (y: number) => number,
+  onNewPage: () => number
+): number {
+  if (currentY + sectionHeight > getPageSafeHeight(doc)) {
+    doc.addPage();
+    currentY = onNewPage();
+  }
+  return renderSection(currentY);
+}
+
+/**
+ * Add table continuation header on new pages
+ */
+export function addTableContinuationHeader(
+  doc: jsPDF,
+  tableName: string,
+  y: number
+): number {
+  const margin = PDF_SETTINGS.margin;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const contentWidth = pageWidth - margin * 2;
+
+  doc.setFillColor(...BRAND_COLORS.lightBg);
+  doc.rect(margin, y, contentWidth, 8, 'F');
+  
+  doc.setFontSize(8);
+  doc.setTextColor(...BRAND_COLORS.muted);
+  doc.setFont('helvetica', 'italic');
+  doc.text(`${tableName} (continued from previous page)`, margin + 5, y + 5);
+  doc.setFont('helvetica', 'normal');
+  
+  return y + 12;
+}
+
+/**
+ * Truncate text to fit within a maximum width
+ */
+export function truncateToWidth(doc: jsPDF, text: string, maxWidth: number): string {
+  if (!text) return '';
+  const ellipsis = '...';
+  
+  if (doc.getTextWidth(text) <= maxWidth) return text;
+  
+  let truncated = text;
+  while (doc.getTextWidth(truncated + ellipsis) > maxWidth && truncated.length > 3) {
+    truncated = truncated.slice(0, -1);
+  }
+  
+  return truncated + ellipsis;
+}
+
+/**
+ * Calculate dynamic row height based on content
+ */
+export function calculateRowHeight(
+  doc: jsPDF,
+  texts: string[],
+  maxWidths: number[],
+  baseHeight: number = 10
+): number {
+  let maxLines = 1;
+  
+  texts.forEach((text, i) => {
+    if (maxWidths[i] && text) {
+      const lines = doc.splitTextToSize(String(text), maxWidths[i]);
+      maxLines = Math.max(maxLines, Array.isArray(lines) ? lines.length : 1);
+    }
+  });
+  
+  return baseHeight + (maxLines - 1) * 5;
+}
+
+/**
+ * Format timestamp for PDF without problematic characters
+ */
+export function formatPDFTimestamp(date: Date = new Date()): string {
+  return date.toLocaleDateString('en-NG', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }) + ' ' + date.toLocaleTimeString('en-NG', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  }).replace(':', '.');
+}
+
+// ============================================
+// PDF TO BASE64 CONVERSION
+// ============================================
+
+/**
+ * Convert jsPDF document to base64 string
+ */
+export function pdfToBase64(doc: jsPDF): string {
+  return doc.output('datauristring').split(',')[1];
+}
+
+/**
+ * Convert jsPDF document to Blob
+ */
+export function pdfToBlob(doc: jsPDF): Blob {
+  return doc.output('blob');
+}
