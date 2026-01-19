@@ -94,8 +94,11 @@ export default function BillingHistory() {
     fetchBillingData();
   }, [user]);
 
-  // Amounts from database are in kobo, convert to Naira
-  const formatCurrency = (amountInKobo: number) => `₦${(amountInKobo / 100).toLocaleString()}`;
+  // Amounts from database are in kobo (100 kobo = 1 Naira), convert to Naira for display
+  const formatCurrency = (amountInKobo: number) => {
+    const amountInNaira = amountInKobo / 100;
+    return `₦${amountInNaira.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
