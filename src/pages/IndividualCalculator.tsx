@@ -221,7 +221,9 @@ const IndividualCalculatorPage = () => {
     employmentIncome: parseNumber(employmentIncome),
     pensionContribution: parseNumber(pensionContribution),
     nhfContribution: parseNumber(nhfContribution),
+    nhisContribution: parseNumber(healthInsurance), // NHIS/Health Insurance
     lifeInsurancePremium: parseNumber(lifeInsurance),
+    annualRentPaid: parseNumber(rentPaid), // For 2026 Rent Relief
     cryptoIncome: parseNumber(cryptoIncome),
     cryptoGains: parseNumber(cryptoGains),
     cryptoLosses: parseNumber(cryptoLosses),
@@ -600,7 +602,7 @@ const IndividualCalculatorPage = () => {
                     <span className="font-medium text-sm">2026 Benefits Active</span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">
-                    First ₦800,000 exempt, lower progressive rates apply
+                    First ₦800k exempt. Old CRA abolished - enter Rent Paid for Rent Relief (20%, max ₦500k).
                   </p>
                 </div>
               )}

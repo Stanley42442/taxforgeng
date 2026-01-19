@@ -34,16 +34,17 @@ interface PayrollResult {
   pensionEmployee: number;
   pensionEmployer: number;
   nhf: number;
-  consolidatedRelief: number;
+  rentRelief: number; // 2026: Replaces CRA
   taxableIncome: number;
   paye: number;
   netSalary: number;
   totalCostToCompany: number;
-  breakdown: { label: string; amount: number; type: 'deduction' | 'contribution' | 'tax' }[];
+  breakdown: { label: string; amount: number; type: 'deduction' | 'contribution' | 'tax' | 'relief' }[];
 }
 
 export const PayrollCalculator = () => {
   const [grossSalary, setGrossSalary] = useState<number>(0);
+  const [annualRent, setAnnualRent] = useState<number>(0);
   const [use2026Rules, setUse2026Rules] = useState(true);
   const [includeNHF, setIncludeNHF] = useState(true);
   const [result, setResult] = useState<PayrollResult | null>(null);
@@ -78,21 +79,32 @@ export const PayrollCalculator = () => {
     const pensionEmployer = grossSalary * 0.10; // 10% employer contribution
     const nhf = includeNHF ? grossSalary * 0.025 : 0; // 2.5% NHF
 
-    // Annual gross for CRA calculation
+    // Annual gross for relief calculation
     const annualGross = grossSalary * 12;
     
-    // Consolidated Relief Allowance (CRA)
-    const cra = use2026Rules 
-      ? Math.max(200000, annualGross * 0.01) + (annualGross * 0.20)
-      : 200000 + (annualGross * 0.20);
-    const monthlyCRA = cra / 12;
+    // 2026 Rules: CRA is ABOLISHED - use Rent Relief instead
+    // Pre-2026: Old CRA applies
+    let totalAnnualReliefs = 0;
+    let rentReliefAmount = 0;
+    
+    if (use2026Rules) {
+      // Rent Relief: 20% of annual rent, max ₦500,000
+      rentReliefAmount = Math.min(annualRent * 0.20, 500000);
+      totalAnnualReliefs = rentReliefAmount;
+    } else {
+      // Pre-2026: Old CRA
+      const cra = Math.max(200000, annualGross * 0.01) + (annualGross * 0.20);
+      totalAnnualReliefs = cra;
+    }
+    
+    const monthlyRelief = totalAnnualReliefs / 12;
 
-    // Annual reliefs
+    // Annual reliefs (pension + NHF)
     const annualPension = pensionEmployee * 12;
     const annualNHF = nhf * 12;
 
     // Taxable income
-    const annualTaxableIncome = Math.max(0, annualGross - cra - annualPension - annualNHF);
+    const annualTaxableIncome = Math.max(0, annualGross - totalAnnualReliefs - annualPension - annualNHF);
     const monthlyTaxableIncome = annualTaxableIncome / 12;
 
     // Calculate PAYE
@@ -114,7 +126,7 @@ export const PayrollCalculator = () => {
     }
 
     breakdown.push(
-      { label: 'CRA (Monthly)', amount: monthlyCRA, type: 'deduction' },
+      { label: use2026Rules ? 'Rent Relief (Monthly)' : 'CRA (Monthly)', amount: monthlyRelief, type: 'relief' },
       { label: 'PAYE', amount: paye, type: 'tax' }
     );
 
@@ -123,7 +135,7 @@ export const PayrollCalculator = () => {
       pensionEmployee,
       pensionEmployer,
       nhf,
-      consolidatedRelief: monthlyCRA,
+      rentRelief: monthlyRelief,
       taxableIncome: monthlyTaxableIncome,
       paye,
       netSalary,
@@ -159,10 +171,27 @@ export const PayrollCalculator = () => {
                 />
               </div>
 
+              {use2026Rules && (
+                <div>
+                  <Label htmlFor="annualRent">Annual Rent Paid (₦)</Label>
+                  <Input
+                    id="annualRent"
+                    type="number"
+                    value={annualRent || ''}
+                    onChange={(e) => setAnnualRent(Number(e.target.value))}
+                    placeholder="Enter annual rent for Rent Relief"
+                    className="mt-1"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    2026 Rule: 20% of rent (max ₦500k) replaces old CRA
+                  </p>
+                </div>
+              )}
+
               <div className="flex items-center justify-between">
                 <div>
                   <Label>Use 2026 Tax Rules</Label>
-                  <p className="text-sm text-muted-foreground">Apply new ₦800k exemption</p>
+                  <p className="text-sm text-muted-foreground">Rent Relief replaces old CRA</p>
                 </div>
                 <Switch checked={use2026Rules} onCheckedChange={setUse2026Rules} />
               </div>
@@ -191,6 +220,16 @@ export const PayrollCalculator = () => {
                   
                   <Separator />
                   
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm">Reliefs</h4>
+                    {result.breakdown.filter(b => b.type === 'relief').map((item, i) => (
+                      <div key={i} className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">{item.label}</span>
+                        <span className="text-green-600">{formatCurrency(item.amount)}</span>
+                      </div>
+                    ))}
+                  </div>
+
                   <div className="space-y-2">
                     <h4 className="font-medium text-sm">Deductions</h4>
                     {result.breakdown.filter(b => b.type === 'deduction').map((item, i) => (
@@ -272,11 +311,14 @@ export const PayrollCalculator = () => {
               </ul>
             </div>
             <div>
-              <h4 className="font-medium mb-2">Other Deductions</h4>
+              <h4 className="font-medium mb-2">2026 Allowable Deductions</h4>
               <ul className="space-y-1 text-muted-foreground">
-                <li>• NHF: 2.5% of basic</li>
-                <li>• CRA: Higher of ₦200k or 1% + 20% of gross</li>
-                <li>• Life Insurance: Actual premium</li>
+                <li>• <strong>Rent Relief:</strong> 20% of rent (max ₦500k)</li>
+                <li>• Pension: Up to 8% of gross</li>
+                <li>• NHF: 2.5% of basic salary</li>
+                <li>• NHIS: Actual premiums paid</li>
+                <li>• Life Insurance: Actual premiums</li>
+                <li className="text-warning">• Old CRA: <strong>ABOLISHED</strong></li>
               </ul>
             </div>
           </div>

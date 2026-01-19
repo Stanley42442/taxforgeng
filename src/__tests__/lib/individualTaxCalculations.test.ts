@@ -106,33 +106,59 @@ describe('Individual Personal Income Tax (PIT)', () => {
     });
   });
 
-  describe('Consolidated Relief Allowance (CRA)', () => {
-    it('should calculate CRA as higher of ₦200k or 1% + 20% of gross', () => {
+  describe('2026 Rent Relief (Replaces CRA)', () => {
+    it('should calculate Rent Relief as 20% of rent, max ₦500k', () => {
       const inputs: IndividualTaxInputs = {
         calculationType: 'pit',
         use2026Rules: true,
         employmentIncome: 10000000,
+        annualRentPaid: 2000000, // 20% = ₦400k
       };
       
       const result = calculatePersonalIncomeTax(inputs);
-      // CRA = max(200000, 10M * 0.01) + (10M * 0.20) = 100000 + 2000000 = 2,100,000
-      // But max(200000, 100000) = 200000, so CRA = 200000 + 2000000 = 2,200,000
-      const craRelief = result.reliefs.find(r => r.name === 'Consolidated Relief Allowance');
-      expect(craRelief).toBeDefined();
-      expect(craRelief!.amount).toBe(2200000);
+      const rentRelief = result.reliefs.find(r => r.name === 'Rent Relief');
+      expect(rentRelief).toBeDefined();
+      expect(rentRelief!.amount).toBe(400000); // 2M * 20%
     });
 
-    it('should use ₦200k minimum when 1% is less', () => {
+    it('should cap Rent Relief at ₦500,000', () => {
       const inputs: IndividualTaxInputs = {
         calculationType: 'pit',
         use2026Rules: true,
-        employmentIncome: 5000000, // 1% = ₦50k < ₦200k
+        employmentIncome: 10000000,
+        annualRentPaid: 5000000, // 20% = ₦1M but capped at ₦500k
+      };
+      
+      const result = calculatePersonalIncomeTax(inputs);
+      const rentRelief = result.reliefs.find(r => r.name === 'Rent Relief');
+      expect(rentRelief!.amount).toBe(500000); // Capped
+    });
+
+    it('should show zero Rent Relief when no rent is paid', () => {
+      const inputs: IndividualTaxInputs = {
+        calculationType: 'pit',
+        use2026Rules: true,
+        employmentIncome: 10000000,
+        annualRentPaid: 0,
+      };
+      
+      const result = calculatePersonalIncomeTax(inputs);
+      const rentRelief = result.reliefs.find(r => r.name === 'Rent Relief');
+      expect(rentRelief).toBeUndefined(); // No rent = no relief
+    });
+
+    it('should use old CRA for pre-2026 rules', () => {
+      const inputs: IndividualTaxInputs = {
+        calculationType: 'pit',
+        use2026Rules: false,
+        employmentIncome: 10000000,
       };
       
       const result = calculatePersonalIncomeTax(inputs);
       const craRelief = result.reliefs.find(r => r.name === 'Consolidated Relief Allowance');
-      // CRA = 200000 + (5M * 0.20) = 200000 + 1000000 = 1,200,000
-      expect(craRelief!.amount).toBe(1200000);
+      expect(craRelief).toBeDefined();
+      // CRA = max(200000, 10M * 0.01) + (10M * 0.20) = 200000 + 2000000 = 2,200,000
+      expect(craRelief!.amount).toBe(2200000);
     });
   });
 

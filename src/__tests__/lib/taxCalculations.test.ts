@@ -108,10 +108,10 @@ describe('Personal Income Tax (PIT) - 2026 Rules', () => {
 
 describe('Company Income Tax (CIT) - 2026 Rules', () => {
   describe('Small Company Exemption', () => {
-    it('should apply 0% CIT for companies with turnover ≤ ₦100M and assets ≤ ₦250M', () => {
+    it('should apply 0% CIT for companies with turnover ≤ ₦50M and assets ≤ ₦250M', () => {
       const result = calculateCompanyTax(
         10000000,  // profit
-        80000000,  // turnover (below ₦100M)
+        40000000,  // turnover (below ₦50M)
         200000000, // fixed assets (below ₦250M)
         true       // use2026Rules
       );
@@ -121,10 +121,10 @@ describe('Company Income Tax (CIT) - 2026 Rules', () => {
       expect(result.appliedRate).toBe(0);
     });
 
-    it('should apply 0% CIT at exactly ₦100M turnover threshold', () => {
+    it('should apply 0% CIT at exactly ₦50M turnover threshold', () => {
       const result = calculateCompanyTax(
         15000000,   // profit
-        100000000,  // turnover (exactly ₦100M)
+        50000000,   // turnover (exactly ₦50M)
         250000000,  // fixed assets (exactly ₦250M)
         true
       );
@@ -132,10 +132,10 @@ describe('Company Income Tax (CIT) - 2026 Rules', () => {
       expect(result.isSmall).toBe(true);
     });
 
-    it('should NOT qualify as small if turnover exceeds ₦100M', () => {
+    it('should NOT qualify as small if turnover exceeds ₦50M', () => {
       const result = calculateCompanyTax(
         20000000,   // profit
-        120000000,  // turnover (above ₦100M)
+        60000000,   // turnover (above ₦50M)
         200000000,  // fixed assets (below ₦250M)
         true
       );
@@ -146,7 +146,7 @@ describe('Company Income Tax (CIT) - 2026 Rules', () => {
     it('should NOT qualify as small if fixed assets exceed ₦250M', () => {
       const result = calculateCompanyTax(
         15000000,   // profit
-        80000000,   // turnover (below ₦100M)
+        40000000,   // turnover (below ₦50M)
         300000000,  // fixed assets (above ₦250M)
         true
       );
@@ -159,7 +159,7 @@ describe('Company Income Tax (CIT) - 2026 Rules', () => {
     it('should apply 30% CIT for large companies under 2026 rules', () => {
       const result = calculateCompanyTax(
         50000000,   // profit
-        200000000,  // turnover (above ₦100M)
+        100000000,  // turnover (above ₦50M)
         300000000,  // fixed assets
         true
       );
@@ -316,11 +316,11 @@ describe('Full Tax Calculation Integration', () => {
     it('should apply small company exemption correctly', () => {
       const inputs: TaxInputs = {
         entityType: 'company',
-        turnover: 80000000, // Below ₦100M
-        expenses: 30000000,
+        turnover: 40000000, // Below ₦50M
+        expenses: 15000000,
         rentPaid: 0,
-        vatableSales: 80000000,
-        vatablePurchases: 20000000,
+        vatableSales: 40000000,
+        vatablePurchases: 10000000,
         rentalIncome: 0,
         consultancyIncome: 0,
         dividendIncome: 0,
@@ -340,11 +340,11 @@ describe('Full Tax Calculation Integration', () => {
     it('should apply 30% CIT for large companies', () => {
       const inputs: TaxInputs = {
         entityType: 'company',
-        turnover: 200000000, // Above ₦100M
-        expenses: 100000000,
+        turnover: 100000000, // Above ₦50M
+        expenses: 50000000,
         rentPaid: 0,
-        vatableSales: 200000000,
-        vatablePurchases: 80000000,
+        vatableSales: 100000000,
+        vatablePurchases: 40000000,
         rentalIncome: 0,
         consultancyIncome: 0,
         dividendIncome: 0,
@@ -357,9 +357,9 @@ describe('Full Tax Calculation Integration', () => {
       const result = calculateTax(inputs);
       
       expect(result.isSmallCompany).toBe(false);
-      // Taxable income: 200M - 100M = 100M
-      // CIT: 100M * 30% = 30M
-      expect(result.incomeTax).toBeGreaterThanOrEqual(30000000);
+      // Taxable income: 100M - 50M = 50M
+      // CIT: 50M * 30% = 15M
+      expect(result.incomeTax).toBeGreaterThanOrEqual(15000000);
     });
   });
 
@@ -407,15 +407,15 @@ describe('Full Tax Calculation Integration', () => {
       expect(result.incomeTax).toBe(0);
     });
 
-    it('should correctly handle ₦100M threshold boundary', () => {
+    it('should correctly handle ₦50M threshold boundary', () => {
       // Just below threshold - should be small
       const inputsSmall: TaxInputs = {
         entityType: 'company',
-        turnover: 99999999,
-        expenses: 40000000,
+        turnover: 49999999,
+        expenses: 20000000,
         rentPaid: 0,
-        vatableSales: 99999999,
-        vatablePurchases: 30000000,
+        vatableSales: 49999999,
+        vatablePurchases: 15000000,
         rentalIncome: 0,
         consultancyIncome: 0,
         dividendIncome: 0,
@@ -428,8 +428,8 @@ describe('Full Tax Calculation Integration', () => {
       // Just above threshold - should be large
       const inputsLarge: TaxInputs = {
         ...inputsSmall,
-        turnover: 100000001,
-        vatableSales: 100000001,
+        turnover: 50000001,
+        vatableSales: 50000001,
       };
 
       const resultSmall = calculateTax(inputsSmall);
@@ -469,11 +469,11 @@ describe('Effective Tax Rate Calculations', () => {
   it('should show 0% effective rate for exempt small companies', () => {
     const inputs: TaxInputs = {
       entityType: 'company',
-      turnover: 50000000,
-      expenses: 20000000,
+      turnover: 40000000, // Below ₦50M threshold
+      expenses: 16000000,
       rentPaid: 0,
-      vatableSales: 50000000,
-      vatablePurchases: 15000000,
+      vatableSales: 40000000,
+      vatablePurchases: 12000000,
       rentalIncome: 0,
       consultancyIncome: 0,
       dividendIncome: 0,
