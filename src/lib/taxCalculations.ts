@@ -528,12 +528,12 @@ export function calculateTax(inputs: TaxInputs): TaxResult {
 }
 
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-NG', {
-    style: 'currency',
-    currency: 'NGN',
+  const formatted = new Intl.NumberFormat('en-NG', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(amount);
+  }).format(Math.abs(amount));
+  // Use Unicode \u20A6 for reliable Naira symbol rendering in PDFs
+  return `${amount < 0 ? '-' : ''}\u20A6${formatted}`;
 }
 
 export function formatNumber(num: number): string {

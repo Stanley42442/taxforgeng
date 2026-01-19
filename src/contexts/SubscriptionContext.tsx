@@ -56,6 +56,12 @@ interface SubscriptionContextType extends SubscriptionState {
   addSampleBusinesses: () => Promise<void>;
   refreshBusinesses: () => Promise<void>;
   refreshSubscription: () => Promise<void>;
+  // Export feature tier checks
+  canExportExcel: () => boolean;
+  canEmailReports: () => boolean;
+  canBulkExport: () => boolean;
+  canAddDigitalSignature: () => boolean;
+  canAddQRVerification: () => boolean;
 }
 
 // Tier limits for saved businesses
@@ -370,6 +376,17 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const canVerifyCAC = () => state.effectiveTier === 'business' || state.effectiveTier === 'corporate';
   // Only free tier shows watermark (Starter, Basic+ all have no watermarks)
   const showWatermark = () => state.effectiveTier === 'free';
+  
+  // Export feature tier checks
+  // Excel export: Basic+ tiers
+  const canExportExcel = () => ['basic', 'professional', 'business', 'corporate'].includes(state.effectiveTier);
+  // Email reports: Basic+ tiers
+  const canEmailReports = () => ['basic', 'professional', 'business', 'corporate'].includes(state.effectiveTier);
+  // Bulk export (ZIP): Business+ tiers only
+  const canBulkExport = () => ['business', 'corporate'].includes(state.effectiveTier);
+  // Digital signature and QR verification: Professional+ tiers
+  const canAddDigitalSignature = () => ['professional', 'business', 'corporate'].includes(state.effectiveTier);
+  const canAddQRVerification = () => ['professional', 'business', 'corporate'].includes(state.effectiveTier);
 
   const upgradeTier = async (newTier: SubscriptionTier) => {
     if (!user) return;
@@ -547,6 +564,11 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         addSampleBusinesses,
         refreshBusinesses,
         refreshSubscription,
+        canExportExcel,
+        canEmailReports,
+        canBulkExport,
+        canAddDigitalSignature,
+        canAddQRVerification,
       }}
     >
       {children}
