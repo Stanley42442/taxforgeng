@@ -73,15 +73,22 @@ export const useOfflineSync = (): UseOfflineSyncReturn => {
         try {
           // Process each action based on table and action type
           const { table, action: actionType, data } = action;
+          const record = data as Record<string, unknown>;
+          const recordId = record.id as string;
+          
+          // Use type assertion to bypass strict table typing
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const tableRef = supabase.from(table as any);
           
           if (actionType === 'create') {
-            await supabase.from(table as 'businesses').insert(data as Record<string, unknown>);
+            const { error } = await tableRef.insert([record] as any);
+            if (error) throw error;
           } else if (actionType === 'update') {
-            const record = data as Record<string, unknown>;
-            await supabase.from(table as 'businesses').update(record).eq('id', record.id);
+            const { error } = await tableRef.update(record as any).eq('id', recordId);
+            if (error) throw error;
           } else if (actionType === 'delete') {
-            const record = data as Record<string, unknown>;
-            await supabase.from(table as 'businesses').delete().eq('id', record.id);
+            const { error } = await tableRef.delete().eq('id', recordId);
+            if (error) throw error;
           }
           
           await removeFromSyncQueue(action.id);

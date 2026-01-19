@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+import { registerSW } from 'virtual:pwa-register';
 import App from "./App.tsx";
 import "./index.css";
 
@@ -7,17 +8,22 @@ import "./styles/mobile.css";
 import "./styles/tablet.css";
 import "./styles/desktop.css";
 
-// Register service worker for PWA features
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then((registration) => {
-        console.log('[Main] SW registered:', registration.scope);
-      })
-      .catch((error) => {
-        console.log('[Main] SW registration failed:', error);
-      });
-  });
-}
+// Register VitePWA service worker
+const updateSW = registerSW({
+  onNeedRefresh() {
+    if (confirm('New version available. Update now?')) {
+      updateSW(true);
+    }
+  },
+  onOfflineReady() {
+    console.log('[PWA] Ready for offline use');
+  },
+  onRegistered(registration) {
+    console.log('[PWA] Service worker registered:', registration?.scope);
+  },
+  onRegisterError(error) {
+    console.error('[PWA] Service worker registration failed:', error);
+  },
+});
 
 createRoot(document.getElementById("root")!).render(<App />);

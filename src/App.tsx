@@ -18,6 +18,9 @@ import { InstallPWAPrompt } from "@/components/InstallPWAPrompt";
 import { SharedElementProvider } from "@/components/PageTransition";
 import { NavMenu } from "@/components/NavMenu";
 import { UpgradeCelebrationProvider } from "@/components/UpgradeCelebrationProvider";
+import { OfflineDataProvider } from "@/contexts/OfflineDataContext";
+import { StorageWarningBanner } from "@/components/StorageWarningBanner";
+import { OfflineBanner } from "@/components/OfflineBanner";
 import { lazy, Suspense } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -75,6 +78,7 @@ const LoyaltyRewards = lazy(() => import("./pages/LoyaltyRewards"));
 const WebhookTesting = lazy(() => import("./pages/WebhookTesting"));
 const PromoCodeAdmin = lazy(() => import("./pages/PromoCodeAdmin"));
 const SecurityTestResults = lazy(() => import("./pages/SecurityTestResults"));
+const OfflineDashboard = lazy(() => import("./pages/OfflineDashboard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Lazy load TaxAssistant (heavy component with AI chat)
@@ -172,6 +176,7 @@ const AnimatedRoutes = () => {
           <Route path="/admin/webhooks" element={<WebhookTesting />} />
           <Route path="/admin/promo-codes" element={<PromoCodeAdmin />} />
           <Route path="/admin/security-tests" element={<SecurityTestResults />} />
+          <Route path="/offline" element={<OfflineDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
@@ -190,29 +195,33 @@ const App = () => (
             <SubscriptionProvider>
               <LanguageProvider>
               <TooltipProvider>
-                <>
-                  <Toaster />
-                  <Sonner />
-                  <BrowserRouter>
-                    <UpgradeCelebrationProvider>
-                      <ScrollToTop />
-                      <ReminderNotificationProvider />
-                      <div className="min-h-screen">
-                        <div className="sticky-header-wrapper">
-                          <NavMenu />
-                          <TrialBanner />
+                <OfflineDataProvider>
+                  <>
+                    <Toaster />
+                    <Sonner />
+                    <BrowserRouter>
+                      <UpgradeCelebrationProvider>
+                        <ScrollToTop />
+                        <ReminderNotificationProvider />
+                        <StorageWarningBanner />
+                        <OfflineBanner />
+                        <div className="min-h-screen">
+                          <div className="sticky-header-wrapper">
+                            <NavMenu />
+                            <TrialBanner />
+                          </div>
+                          <TierSelectionWrapper />
+                          <Suspense fallback={<PageLoader />}>
+                            <AnimatedRoutes />
+                            <TaxAssistant />
+                            <OfflineIndicator />
+                            <InstallPWAPrompt />
+                          </Suspense>
                         </div>
-                        <TierSelectionWrapper />
-                        <Suspense fallback={<PageLoader />}>
-                          <AnimatedRoutes />
-                          <TaxAssistant />
-                          <OfflineIndicator />
-                          <InstallPWAPrompt />
-                        </Suspense>
-                      </div>
-                    </UpgradeCelebrationProvider>
-                  </BrowserRouter>
-                </>
+                      </UpgradeCelebrationProvider>
+                    </BrowserRouter>
+                  </>
+                </OfflineDataProvider>
               </TooltipProvider>
             </LanguageProvider>
           </SubscriptionProvider>
