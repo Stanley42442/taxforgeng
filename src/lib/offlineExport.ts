@@ -4,7 +4,14 @@
  */
 
 import { getBusinesses, getExpenses, getPersonalExpenses, getCalculations } from './offlineStorage';
-import { formatBytes } from './compression';
+import {
+  COMPANY_INFO,
+  toCSV,
+  addCSVHeader,
+  downloadFile,
+  generateFilename,
+  formatTimestamp,
+} from './exportShared';
 
 export interface ExportOptions {
   format: 'csv' | 'json';
@@ -16,51 +23,24 @@ export interface ExportOptions {
 }
 
 /**
- * Convert data to CSV format
- */
-const toCSV = (data: Record<string, unknown>[], columns?: string[]): string => {
-  if (data.length === 0) return '';
-  
-  const headers = columns || Object.keys(data[0]);
-  const rows = data.map(item => 
-    headers.map(header => {
-      const value = item[header];
-      if (value === null || value === undefined) return '';
-      if (typeof value === 'object') return JSON.stringify(value);
-      const stringValue = String(value);
-      // Escape quotes and wrap in quotes if contains comma or newline
-      if (stringValue.includes(',') || stringValue.includes('\n') || stringValue.includes('"')) {
-        return `"${stringValue.replace(/"/g, '""')}"`;
-      }
-      return stringValue;
-    }).join(',')
-  );
-  
-  return [headers.join(','), ...rows].join('\n');
-};
-
-/**
- * Download a file in the browser
- */
-const downloadFile = (content: string, filename: string, mimeType: string): void => {
-  const blob = new Blob([content], { type: mimeType });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-};
-
-/**
  * Export businesses to CSV
  */
 export const exportBusinessesToCSV = async (): Promise<void> => {
   const businesses = await getBusinesses<Record<string, unknown>>();
-  const csv = toCSV(businesses, ['id', 'name', 'entity_type', 'turnover', 'sector', 'created_at']);
-  downloadFile(csv, `businesses_${new Date().toISOString().split('T')[0]}.csv`, 'text/csv');
+  
+  const headerLines = addCSVHeader('Businesses Export');
+  const dataCSV = toCSV(businesses, [
+    { key: 'id', header: 'ID' },
+    { key: 'name', header: 'Business Name' },
+    { key: 'entity_type', header: 'Entity Type' },
+    { key: 'turnover', header: 'Turnover' },
+    { key: 'sector', header: 'Sector' },
+    { key: 'created_at', header: 'Created At' },
+  ]);
+  
+  const csvContent = [...headerLines, dataCSV].join('\n');
+  const filename = generateFilename('businesses', 'csv');
+  downloadFile(csvContent, filename, 'text/csv;charset=utf-8;');
 };
 
 /**
@@ -68,8 +48,20 @@ export const exportBusinessesToCSV = async (): Promise<void> => {
  */
 export const exportExpensesToCSV = async (): Promise<void> => {
   const expenses = await getExpenses<Record<string, unknown>>();
-  const csv = toCSV(expenses, ['id', 'category', 'amount', 'description', 'date', 'is_deductible']);
-  downloadFile(csv, `expenses_${new Date().toISOString().split('T')[0]}.csv`, 'text/csv');
+  
+  const headerLines = addCSVHeader('Expenses Export');
+  const dataCSV = toCSV(expenses, [
+    { key: 'id', header: 'ID' },
+    { key: 'category', header: 'Category' },
+    { key: 'amount', header: 'Amount' },
+    { key: 'description', header: 'Description' },
+    { key: 'date', header: 'Date' },
+    { key: 'is_deductible', header: 'Tax Deductible' },
+  ]);
+  
+  const csvContent = [...headerLines, dataCSV].join('\n');
+  const filename = generateFilename('expenses', 'csv');
+  downloadFile(csvContent, filename, 'text/csv;charset=utf-8;');
 };
 
 /**
@@ -77,8 +69,20 @@ export const exportExpensesToCSV = async (): Promise<void> => {
  */
 export const exportPersonalExpensesToCSV = async (): Promise<void> => {
   const expenses = await getPersonalExpenses<Record<string, unknown>>();
-  const csv = toCSV(expenses, ['id', 'category', 'amount', 'description', 'payment_interval', 'start_date']);
-  downloadFile(csv, `personal_expenses_${new Date().toISOString().split('T')[0]}.csv`, 'text/csv');
+  
+  const headerLines = addCSVHeader('Personal Expenses Export');
+  const dataCSV = toCSV(expenses, [
+    { key: 'id', header: 'ID' },
+    { key: 'category', header: 'Category' },
+    { key: 'amount', header: 'Amount' },
+    { key: 'description', header: 'Description' },
+    { key: 'payment_interval', header: 'Payment Interval' },
+    { key: 'start_date', header: 'Start Date' },
+  ]);
+  
+  const csvContent = [...headerLines, dataCSV].join('\n');
+  const filename = generateFilename('personal-expenses', 'csv');
+  downloadFile(csvContent, filename, 'text/csv;charset=utf-8;');
 };
 
 /**
@@ -86,8 +90,20 @@ export const exportPersonalExpensesToCSV = async (): Promise<void> => {
  */
 export const exportCalculationsToJSON = async (): Promise<void> => {
   const calculations = await getCalculations<Record<string, unknown>>();
-  const json = JSON.stringify(calculations, null, 2);
-  downloadFile(json, `calculations_${new Date().toISOString().split('T')[0]}.json`, 'application/json');
+  
+  const exportData = {
+    metadata: {
+      source: COMPANY_INFO.shortName,
+      exportedAt: formatTimestamp(),
+      type: 'Tax Calculations',
+      recordCount: calculations.length,
+    },
+    data: calculations,
+  };
+  
+  const json = JSON.stringify(exportData, null, 2);
+  const filename = generateFilename('calculations', 'json');
+  downloadFile(json, filename, 'application/json');
 };
 
 /**
@@ -102,23 +118,30 @@ export const exportAllCachedData = async (): Promise<void> => {
   ]);
 
   const exportData = {
-    exportedAt: new Date().toISOString(),
-    data: {
-      businesses,
-      expenses,
-      personalExpenses,
-      calculations,
+    metadata: {
+      source: COMPANY_INFO.shortName,
+      version: '1.0',
+      exportedAt: formatTimestamp(),
+      website: COMPANY_INFO.website,
     },
     summary: {
       businessCount: businesses.length,
       expenseCount: expenses.length,
       personalExpenseCount: personalExpenses.length,
       calculationCount: calculations.length,
+      totalRecords: businesses.length + expenses.length + personalExpenses.length + calculations.length,
+    },
+    data: {
+      businesses,
+      expenses,
+      personalExpenses,
+      calculations,
     },
   };
 
   const json = JSON.stringify(exportData, null, 2);
-  downloadFile(json, `taxforge_export_${new Date().toISOString().split('T')[0]}.json`, 'application/json');
+  const filename = generateFilename('full-export', 'json');
+  downloadFile(json, filename, 'application/json');
 };
 
 /**

@@ -1,5 +1,20 @@
 import { jsPDF } from "jspdf";
 import { IndividualTaxResult, IndividualTaxInputs, formatCurrency } from "./individualTaxCalculations";
+import {
+  BRAND_COLORS,
+  PDF_SETTINGS,
+  formatNaira,
+  formatNigerianDate,
+  addPDFHeader,
+  addPDFFooter,
+  addPageNumbers,
+  addSummaryBox,
+  addTableHeader,
+  addTableRow,
+  addAlertBox,
+  addSectionTitle,
+  checkPageBreak,
+} from "./exportShared";
 
 interface ExportData {
   inputs: IndividualTaxInputs;
@@ -31,52 +46,10 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 20;
+  const margin = PDF_SETTINGS.margin;
   const contentWidth = pageWidth - margin * 2;
-  let y = margin;
 
-  // Colors
-  const primaryColor: [number, number, number] = [26, 79, 62];
-  const accentColor: [number, number, number] = [212, 175, 55];
-  const textColor: [number, number, number] = [51, 51, 51];
-  const mutedColor: [number, number, number] = [128, 128, 128];
-  const lightBg: [number, number, number] = [248, 250, 248];
-  const successColor: [number, number, number] = [34, 197, 94];
-
-  const setColor = (color: [number, number, number]) => doc.setTextColor(...color);
-  const setFillColor = (color: [number, number, number]) => doc.setFillColor(...color);
-
-  // === HEADER ===
-  setFillColor(primaryColor);
-  doc.rect(0, 0, pageWidth, 8, 'F');
-  setFillColor(accentColor);
-  doc.rect(0, 8, pageWidth, 2, 'F');
-
-  y = 25;
-
-  // Logo
-  setFillColor(primaryColor);
-  doc.roundedRect(margin, y, 12, 12, 2, 2, 'F');
-  doc.setFontSize(8);
-  doc.setTextColor(255, 255, 255);
-  doc.text('NT', margin + 6, y + 7.5, { align: 'center' });
-
-  setColor(primaryColor);
-  doc.setFontSize(20);
-  doc.setFont('helvetica', 'bold');
-  doc.text('TaxForge NG', margin + 16, y + 8);
-
-  // Badge
-  setFillColor(lightBg);
-  doc.roundedRect(pageWidth - margin - 50, y, 50, 10, 2, 2, 'F');
-  setColor(primaryColor);
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  doc.text('INDIVIDUAL TAX', pageWidth - margin - 25, y + 6.5, { align: 'center' });
-
-  y += 20;
-
-  // Title
+  // Calculation type labels
   const calcTypeLabels: Record<string, string> = {
     pit: 'Personal Income Tax Report',
     crypto: 'Crypto/Digital Asset Tax Report',
@@ -85,76 +58,56 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
     foreign_income: 'Foreign Income Tax Report'
   };
 
-  setColor(textColor);
+  // === HEADER ===
+  let y = addPDFHeader(doc, { badgeText: 'INDIVIDUAL TAX' });
+
+  // Title
+  doc.setTextColor(...BRAND_COLORS.text);
   doc.setFontSize(22);
   doc.setFont('helvetica', 'bold');
   doc.text(calcTypeLabels[inputs.calculationType] || 'Individual Tax Report', margin, y);
   y += 10;
 
   // Meta info
-  setColor(mutedColor);
+  doc.setTextColor(...BRAND_COLORS.muted);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  const dateStr = new Date().toLocaleDateString('en-NG', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  });
+  const dateStr = formatNigerianDate(new Date().toISOString());
   doc.text(`Generated: ${dateStr}`, margin, y);
   doc.text(`Tax Rules: ${inputs.use2026Rules ? 'Nigeria Tax Act 2026' : 'Pre-2026 Rules'}`, pageWidth - margin, y, { align: 'right' });
   y += 12;
 
   // === SUMMARY BOX ===
-  setFillColor(primaryColor);
-  doc.roundedRect(margin, y, contentWidth, 50, 4, 4, 'F');
-  setFillColor(accentColor);
-  doc.roundedRect(margin + 3, y + 3, contentWidth - 6, 44, 3, 3, 'F');
-  setFillColor(primaryColor);
-  doc.roundedRect(margin + 4, y + 4, contentWidth - 8, 42, 2, 2, 'F');
-
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(11);
-  doc.setFont('helvetica', 'normal');
-  doc.text('TOTAL TAX PAYABLE', pageWidth / 2, y + 14, { align: 'center' });
-
-  doc.setFontSize(28);
-  doc.setFont('helvetica', 'bold');
-  doc.text(formatCurrency(result.taxPayable), pageWidth / 2, y + 32, { align: 'center' });
-
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(200, 200, 200);
-  doc.text(`Effective Tax Rate: ${result.effectiveRate.toFixed(2)}%`, pageWidth / 2, y + 44, { align: 'center' });
-
-  y += 60;
+  y = addSummaryBox(doc, {
+    title: 'TOTAL TAX PAYABLE',
+    mainValue: formatCurrency(result.taxPayable),
+    subtitle: `Effective Tax Rate: ${result.effectiveRate.toFixed(2)}%`,
+    y,
+  });
 
   // === INPUT VALUES SECTION ===
-  setColor(primaryColor);
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Input Values', margin, y);
-  y += 8;
+  y = addSectionTitle(doc, 'Input Values', y);
 
-  setFillColor(lightBg);
+  doc.setFillColor(...BRAND_COLORS.lightBg);
   const inputItems: [string, string][] = [];
 
   if (inputs.calculationType === 'pit') {
-    if (data.employmentIncome) inputItems.push(['Annual Gross Income', `₦${formatNumber(data.employmentIncome)}`]);
-    if (data.rentPaid) inputItems.push(['Rent Paid', `₦${formatNumber(data.rentPaid)}`]);
-    if (data.pensionContribution) inputItems.push(['Pension Contribution', `₦${formatNumber(data.pensionContribution)}`]);
-    if (data.nhfContribution) inputItems.push(['NHF Contribution', `₦${formatNumber(data.nhfContribution)}`]);
-    if (data.healthInsurance) inputItems.push(['Health Insurance', `₦${formatNumber(data.healthInsurance)}`]);
-    if (data.lifeInsurance) inputItems.push(['Life Insurance Premium', `₦${formatNumber(data.lifeInsurance)}`]);
+    if (data.employmentIncome) inputItems.push(['Annual Gross Income', formatNaira(data.employmentIncome)]);
+    if (data.rentPaid) inputItems.push(['Rent Paid', formatNaira(data.rentPaid)]);
+    if (data.pensionContribution) inputItems.push(['Pension Contribution', formatNaira(data.pensionContribution)]);
+    if (data.nhfContribution) inputItems.push(['NHF Contribution', formatNaira(data.nhfContribution)]);
+    if (data.healthInsurance) inputItems.push(['Health Insurance', formatNaira(data.healthInsurance)]);
+    if (data.lifeInsurance) inputItems.push(['Life Insurance Premium', formatNaira(data.lifeInsurance)]);
   } else if (inputs.calculationType === 'crypto') {
-    if (data.cryptoIncome) inputItems.push(['Crypto Income', `₦${formatNumber(data.cryptoIncome)}`]);
-    if (data.cryptoGains) inputItems.push(['Crypto Gains', `₦${formatNumber(data.cryptoGains)}`]);
-    if (data.cryptoLosses) inputItems.push(['Crypto Losses', `₦${formatNumber(data.cryptoLosses)}`]);
+    if (data.cryptoIncome) inputItems.push(['Crypto Income', formatNaira(data.cryptoIncome)]);
+    if (data.cryptoGains) inputItems.push(['Crypto Gains', formatNaira(data.cryptoGains)]);
+    if (data.cryptoLosses) inputItems.push(['Crypto Losses', formatNaira(data.cryptoLosses)]);
   } else if (inputs.calculationType === 'investment') {
-    if (data.dividendIncome) inputItems.push(['Dividend Income', `₦${formatNumber(data.dividendIncome)}`]);
-    if (data.interestIncome) inputItems.push(['Interest Income', `₦${formatNumber(data.interestIncome)}`]);
-    if (data.capitalGains) inputItems.push(['Capital Gains', `₦${formatNumber(data.capitalGains)}`]);
+    if (data.dividendIncome) inputItems.push(['Dividend Income', formatNaira(data.dividendIncome)]);
+    if (data.interestIncome) inputItems.push(['Interest Income', formatNaira(data.interestIncome)]);
+    if (data.capitalGains) inputItems.push(['Capital Gains', formatNaira(data.capitalGains)]);
   } else if (inputs.calculationType === 'informal') {
-    if (data.estimatedTurnover) inputItems.push(['Estimated Turnover', `₦${formatNumber(data.estimatedTurnover)}`]);
+    if (data.estimatedTurnover) inputItems.push(['Estimated Turnover', formatNaira(data.estimatedTurnover)]);
     if (data.location) inputItems.push(['Location', data.location.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())]);
   }
 
@@ -163,7 +116,7 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
     doc.roundedRect(margin, y, contentWidth, inputBoxHeight, 3, 3, 'F');
 
     let itemY = y + 10;
-    setColor(textColor);
+    doc.setTextColor(...BRAND_COLORS.text);
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
 
@@ -180,137 +133,115 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
     y += 5;
   }
 
-  // === RELIEFS SECTION (if applicable) ===
-  if (result.reliefs && result.reliefs.length > 0) {
-    if (y > pageHeight - 100) {
-      doc.addPage();
-      y = 20;
-    }
+  // === PROGRESSIVE TAX BANDS TABLE (for PIT) ===
+  if (inputs.calculationType === 'pit' && result.breakdown.some(b => b.label.includes('Band'))) {
+    y = checkPageBreak(doc, y, 80, () => margin + 20);
+    y = addSectionTitle(doc, 'Progressive Tax Bands Applied', y);
+    
+    const taxBands = [
+      { band: 'First \u20A6300,000', rate: '7%' },
+      { band: 'Next \u20A6300,000', rate: '11%' },
+      { band: 'Next \u20A6500,000', rate: '15%' },
+      { band: 'Next \u20A6500,000', rate: '19%' },
+      { band: 'Next \u20A61,600,000', rate: '21%' },
+      { band: 'Above \u20A63,200,000', rate: '24%' },
+    ];
 
-    setColor(primaryColor);
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Tax Reliefs & Allowances', margin, y);
-    y += 8;
+    y = addTableHeader(doc, [
+      { text: 'Income Band', x: margin + 5 },
+      { text: 'Rate', x: margin + 100 },
+      { text: 'Tax Amount', x: pageWidth - margin - 5, align: 'right' },
+    ], y);
+
+    taxBands.forEach((band, index) => {
+      const bandItem = result.breakdown.find(b => b.label.includes(band.rate.replace('%', '')));
+      const taxAmount = bandItem ? formatCurrency(bandItem.amount) : formatNaira(0);
+      
+      y = addTableRow(doc, [
+        { text: band.band, x: margin + 5 },
+        { text: band.rate, x: margin + 100 },
+        { text: taxAmount, x: pageWidth - margin - 5, align: 'right' },
+      ], y, index % 2 === 0);
+    });
+
+    y += 10;
+  }
+
+  // === RELIEFS SECTION ===
+  if (result.reliefs && result.reliefs.length > 0) {
+    y = checkPageBreak(doc, y, 100, () => margin + 20);
+    y = addSectionTitle(doc, 'Tax Reliefs & Allowances', y);
 
     // Header row
-    setFillColor(primaryColor);
-    doc.roundedRect(margin, y, contentWidth, 10, 2, 2, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Relief Type', margin + 5, y + 7);
-    doc.text('Description', margin + 80, y + 7);
-    doc.text('Amount', pageWidth - margin - 5, y + 7, { align: 'right' });
-    y += 12;
+    y = addTableHeader(doc, [
+      { text: 'Relief Type', x: margin + 5 },
+      { text: 'Description', x: margin + 70 },
+      { text: 'Amount', x: pageWidth - margin - 5, align: 'right' },
+    ], y);
 
     let totalReliefs = 0;
     result.reliefs.forEach((relief, index) => {
-      if (y > pageHeight - 40) {
-        doc.addPage();
-        y = 20;
-      }
+      y = checkPageBreak(doc, y, 15, () => margin + 20);
 
-      if (index % 2 === 0) {
-        setFillColor(lightBg);
-        doc.rect(margin, y - 4, contentWidth, 12, 'F');
-      }
-
-      setColor(textColor);
-      doc.setFontSize(9);
-      doc.setFont('helvetica', 'bold');
-      doc.text(relief.name, margin + 5, y + 3);
+      // Truncate description if needed
+      const descText = relief.description.length > 50 ? relief.description.substring(0, 47) + '...' : relief.description;
       
-      doc.setFont('helvetica', 'normal');
-      setColor(mutedColor);
-      const descText = relief.description.length > 40 ? relief.description.substring(0, 40) + '...' : relief.description;
-      doc.text(descText, margin + 80, y + 3);
-      
-      setColor(successColor);
-      doc.setFont('helvetica', 'bold');
-      doc.text(`-₦${formatNumber(relief.amount)}`, pageWidth - margin - 5, y + 3, { align: 'right' });
+      y = addTableRow(doc, [
+        { text: relief.name, x: margin + 5 },
+        { text: descText, x: margin + 70, color: BRAND_COLORS.muted },
+        { text: `(${formatNaira(relief.amount)})`, x: pageWidth - margin - 5, align: 'right', color: BRAND_COLORS.success },
+      ], y, index % 2 === 0);
       
       totalReliefs += relief.amount;
-      y += 12;
     });
 
     // Total reliefs row
-    setFillColor([240, 253, 244]);
+    doc.setFillColor(...BRAND_COLORS.lightGreen);
     doc.roundedRect(margin, y, contentWidth, 12, 2, 2, 'F');
-    setColor(successColor);
+    doc.setTextColor(...BRAND_COLORS.success);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.text('Total Reliefs', margin + 5, y + 8);
-    doc.text(`-₦${formatNumber(totalReliefs)}`, pageWidth - margin - 5, y + 8, { align: 'right' });
+    doc.text(`(${formatNaira(totalReliefs)})`, pageWidth - margin - 5, y + 8, { align: 'right' });
     y += 20;
   }
 
   // === TAX BREAKDOWN SECTION ===
-  if (y > pageHeight - 80) {
-    doc.addPage();
-    y = 20;
-  }
-
-  setColor(primaryColor);
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Detailed Tax Calculation', margin, y);
-  y += 8;
+  y = checkPageBreak(doc, y, 80, () => margin + 20);
+  y = addSectionTitle(doc, 'Detailed Tax Calculation', y);
 
   // Header
-  setFillColor(primaryColor);
-  doc.roundedRect(margin, y, contentWidth, 10, 2, 2, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Component', margin + 5, y + 7);
-  doc.text('Amount', pageWidth - margin - 5, y + 7, { align: 'right' });
-  y += 12;
+  y = addTableHeader(doc, [
+    { text: 'Component', x: margin + 5 },
+    { text: 'Amount', x: pageWidth - margin - 5, align: 'right' },
+  ], y);
 
   result.breakdown.forEach((item, index) => {
-    if (y > pageHeight - 40) {
-      doc.addPage();
-      y = 20;
-    }
-
-    if (index % 2 === 0) {
-      setFillColor(lightBg);
-      doc.rect(margin, y - 4, contentWidth, 14, 'F');
-    }
-
-    setColor(textColor);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.text(item.label, margin + 5, y + 2);
+    y = checkPageBreak(doc, y, 20, () => margin + 20);
 
     const isNegative = item.amount < 0;
     const amountStr = isNegative 
-      ? `(₦${formatNumber(Math.abs(item.amount))})` 
-      : `₦${formatNumber(item.amount)}`;
+      ? `(${formatNaira(Math.abs(item.amount))})` 
+      : formatNaira(item.amount);
 
-    if (isNegative) {
-      setColor(successColor);
-    } else {
-      setColor(textColor);
-    }
-    doc.setFont('helvetica', 'bold');
-    doc.text(amountStr, pageWidth - margin - 5, y + 2, { align: 'right' });
+    y = addTableRow(doc, [
+      { text: item.label, x: margin + 5 },
+      { text: amountStr, x: pageWidth - margin - 5, align: 'right', color: isNegative ? BRAND_COLORS.success : BRAND_COLORS.text },
+    ], y, index % 2 === 0, item.description ? 16 : 10);
 
     if (item.description) {
-      setColor(mutedColor);
+      doc.setTextColor(...BRAND_COLORS.muted);
       doc.setFontSize(8);
       doc.setFont('helvetica', 'normal');
-      doc.text(item.description, margin + 10, y + 9);
+      doc.text(item.description, margin + 10, y - 2);
     }
-
-    y += item.description ? 16 : 12;
   });
 
   // Final total row
   y += 4;
-  setFillColor(primaryColor);
+  doc.setFillColor(...BRAND_COLORS.nigerianGreen);
   doc.roundedRect(margin, y, contentWidth, 14, 2, 2, 'F');
-  doc.setTextColor(255, 255, 255);
+  doc.setTextColor(...BRAND_COLORS.white);
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
   doc.text('Total Tax Payable', margin + 5, y + 10);
@@ -319,106 +250,54 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
 
   // === ALERTS & RECOMMENDATIONS ===
   if ((result.alerts && result.alerts.length > 0) || (result.recommendations && result.recommendations.length > 0)) {
-    if (y > pageHeight - 60) {
-      doc.addPage();
-      y = 20;
-    }
-
-    setColor(primaryColor);
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Alerts & Recommendations', margin, y);
-    y += 10;
+    y = checkPageBreak(doc, y, 60, () => margin + 20);
+    y = addSectionTitle(doc, 'Alerts & Recommendations', y);
 
     // Alerts
     if (result.alerts && result.alerts.length > 0) {
       result.alerts.forEach(alert => {
-        if (y > pageHeight - 30) {
-          doc.addPage();
-          y = 20;
-        }
-
-        const alertColors: Record<string, [number, number, number]> = {
-          info: [59, 130, 246],
-          warning: [245, 158, 11],
-          success: [34, 197, 94],
-        };
-        const bgColors: Record<string, [number, number, number]> = {
-          info: [239, 246, 255],
-          warning: [255, 251, 235],
-          success: [240, 253, 244],
-        };
-
-        setFillColor(bgColors[alert.type] || bgColors.info);
-        doc.roundedRect(margin, y, contentWidth, 12, 2, 2, 'F');
-        setColor(alertColors[alert.type] || alertColors.info);
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'normal');
-        const icon = alert.type === 'warning' ? '⚠' : alert.type === 'success' ? '✓' : 'ℹ';
-        doc.text(`${icon} ${alert.message}`, margin + 5, y + 8);
-        y += 16;
+        y = checkPageBreak(doc, y, 20, () => margin + 20);
+        y = addAlertBox(doc, alert.message, alert.type as 'info' | 'warning' | 'success', y);
       });
     }
 
     // Recommendations
     if (result.recommendations && result.recommendations.length > 0) {
       result.recommendations.forEach(rec => {
-        if (y > pageHeight - 20) {
-          doc.addPage();
-          y = 20;
-        }
-
-        setColor(mutedColor);
+        y = checkPageBreak(doc, y, 10, () => margin + 20);
+        doc.setTextColor(...BRAND_COLORS.muted);
         doc.setFontSize(8);
         doc.setFont('helvetica', 'normal');
-        doc.text(`• ${rec}`, margin + 5, y);
+        doc.text(`\u2022 ${rec}`, margin + 5, y);
         y += 8;
       });
     }
   }
 
   // === FOOTER ===
-  const footerY = pageHeight - 25;
-  setFillColor(primaryColor);
-  doc.rect(margin, footerY - 5, contentWidth, 0.5, 'F');
-
-  setColor(mutedColor);
-  doc.setFontSize(7);
-  doc.setFont('helvetica', 'normal');
-  doc.text(
-    'DISCLAIMER: This report is for educational and planning purposes only. Tax calculations are estimates based on provided inputs.',
-    pageWidth / 2, footerY + 2, { align: 'center' }
-  );
-  doc.text(
-    'Please consult a certified tax professional for official advice. References: Nigeria Tax Act 2025, PITA.',
-    pageWidth / 2, footerY + 7, { align: 'center' }
-  );
-  doc.text(
-    `© ${new Date().getFullYear()} TaxForge NG | www.taxforgeng.com`,
-    pageWidth / 2, footerY + 12, { align: 'center' }
-  );
+  addPDFFooter(doc, {
+    disclaimer: 'DISCLAIMER: This report is for educational and planning purposes only. Please consult a certified tax professional.',
+  });
 
   // Watermark
   if (showWatermark) {
-    doc.saveGraphicsState();
-    doc.setTextColor(150, 150, 150);
-    doc.setFontSize(40);
-    doc.setFont('helvetica', 'bold');
-    doc.text('SAMPLE - UPGRADE', pageWidth / 2, pageHeight / 2, {
-      align: 'center',
-      angle: 45
-    });
-    doc.restoreGraphicsState();
+    const totalPages = doc.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.saveGraphicsState();
+      doc.setTextColor(150, 150, 150);
+      doc.setFontSize(40);
+      doc.setFont('helvetica', 'bold');
+      doc.text('SAMPLE - UPGRADE', pageWidth / 2, pageHeight / 2, {
+        align: 'center',
+        angle: 45
+      });
+      doc.restoreGraphicsState();
+    }
   }
 
   // Page numbers
-  const totalPages = doc.getNumberOfPages();
-  for (let i = 1; i <= totalPages; i++) {
-    doc.setPage(i);
-    setColor(mutedColor);
-    doc.setFontSize(8);
-    doc.text(`Page ${i} of ${totalPages}`, pageWidth - margin, pageHeight - 10, { align: 'right' });
-  }
+  addPageNumbers(doc);
 
   return doc;
 };
