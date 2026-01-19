@@ -80,6 +80,7 @@ const PromoCodeAdmin = lazy(() => import("./pages/PromoCodeAdmin"));
 const SecurityTestResults = lazy(() => import("./pages/SecurityTestResults"));
 const OfflineDashboard = lazy(() => import("./pages/OfflineDashboard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const VerifyDocument = lazy(() => import("./pages/VerifyDocument"));
 
 // Lazy load TaxAssistant (heavy component with AI chat)
 const TaxAssistant = lazy(() => import("./components/TaxAssistant").then(m => ({ default: m.TaxAssistant })));
@@ -177,6 +178,7 @@ const AnimatedRoutes = () => {
           <Route path="/admin/promo-codes" element={<PromoCodeAdmin />} />
           <Route path="/admin/security-tests" element={<SecurityTestResults />} />
           <Route path="/offline" element={<OfflineDashboard />} />
+          <Route path="/verify/:documentId" element={<VerifyDocument />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
