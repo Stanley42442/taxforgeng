@@ -77,6 +77,42 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_events: {
+        Row: {
+          billing_cycle: string | null
+          created_at: string | null
+          event_data: Json | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          session_id: string | null
+          tier: string | null
+          user_id: string | null
+        }
+        Insert: {
+          billing_cycle?: string | null
+          created_at?: string | null
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          session_id?: string | null
+          tier?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          billing_cycle?: string | null
+          created_at?: string | null
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          session_id?: string | null
+          tier?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       api_rate_limits: {
         Row: {
           created_at: string
@@ -1087,6 +1123,57 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_reconciliation_logs: {
+        Row: {
+          created_at: string | null
+          discrepancies: Json | null
+          discrepancy_count: number
+          end_date: string
+          fixed_count: number | null
+          fixes_applied: Json | null
+          id: string
+          matched_count: number
+          run_at: string | null
+          run_by: string | null
+          start_date: string
+          status: string | null
+          total_db_transactions: number
+          total_paystack_transactions: number
+        }
+        Insert: {
+          created_at?: string | null
+          discrepancies?: Json | null
+          discrepancy_count: number
+          end_date: string
+          fixed_count?: number | null
+          fixes_applied?: Json | null
+          id?: string
+          matched_count: number
+          run_at?: string | null
+          run_by?: string | null
+          start_date: string
+          status?: string | null
+          total_db_transactions: number
+          total_paystack_transactions: number
+        }
+        Update: {
+          created_at?: string | null
+          discrepancies?: Json | null
+          discrepancy_count?: number
+          end_date?: string
+          fixed_count?: number | null
+          fixes_applied?: Json | null
+          id?: string
+          matched_count?: number
+          run_at?: string | null
+          run_by?: string | null
+          start_date?: string
+          status?: string | null
+          total_db_transactions?: number
+          total_paystack_transactions?: number
+        }
+        Relationships: []
+      }
       payment_transactions: {
         Row: {
           amount: number
@@ -1144,6 +1231,57 @@ export type Database = {
           updated_at?: string | null
           user_agent?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      payment_verification_tokens: {
+        Row: {
+          attempts: number | null
+          created_at: string | null
+          delivery_method: string
+          delivery_target: string
+          expires_at: string
+          id: string
+          ip_address: string | null
+          max_attempts: number | null
+          operation_data: Json | null
+          token_hash: string
+          token_type: string
+          user_agent: string | null
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          attempts?: number | null
+          created_at?: string | null
+          delivery_method?: string
+          delivery_target: string
+          expires_at: string
+          id?: string
+          ip_address?: string | null
+          max_attempts?: number | null
+          operation_data?: Json | null
+          token_hash: string
+          token_type: string
+          user_agent?: string | null
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          attempts?: number | null
+          created_at?: string | null
+          delivery_method?: string
+          delivery_target?: string
+          expires_at?: string
+          id?: string
+          ip_address?: string | null
+          max_attempts?: number | null
+          operation_data?: Json | null
+          token_hash?: string
+          token_type?: string
+          user_agent?: string | null
+          user_id?: string
+          verified_at?: string | null
         }
         Relationships: []
       }
@@ -1312,6 +1450,8 @@ export type Database = {
           id: string
           ip_whitelist_enabled: boolean
           language_preference: string | null
+          last_password_change: string | null
+          session_invalidated_at: string | null
           subscription_tier: string
           time_restriction_timezone: string | null
           time_restrictions_enabled: boolean
@@ -1333,6 +1473,8 @@ export type Database = {
           id: string
           ip_whitelist_enabled?: boolean
           language_preference?: string | null
+          last_password_change?: string | null
+          session_invalidated_at?: string | null
           subscription_tier?: string
           time_restriction_timezone?: string | null
           time_restrictions_enabled?: boolean
@@ -1354,6 +1496,8 @@ export type Database = {
           id?: string
           ip_whitelist_enabled?: boolean
           language_preference?: string | null
+          last_password_change?: string | null
+          session_invalidated_at?: string | null
           subscription_tier?: string
           time_restriction_timezone?: string | null
           time_restrictions_enabled?: boolean
@@ -1988,6 +2132,54 @@ export type Database = {
         }
         Relationships: []
       }
+      user_payment_methods: {
+        Row: {
+          authorization_code: string
+          bank: string | null
+          card_type: string
+          country_code: string | null
+          created_at: string | null
+          exp_month: number
+          exp_year: number
+          id: string
+          is_active: boolean | null
+          is_default: boolean | null
+          last_four: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          authorization_code: string
+          bank?: string | null
+          card_type: string
+          country_code?: string | null
+          created_at?: string | null
+          exp_month: number
+          exp_year: number
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          last_four: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          authorization_code?: string
+          bank?: string | null
+          card_type?: string
+          country_code?: string | null
+          created_at?: string | null
+          exp_month?: number
+          exp_year?: number
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          last_four?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -2002,6 +2194,57 @@ export type Database = {
         Update: {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_sessions: {
+        Row: {
+          created_at: string | null
+          device_fingerprint: string | null
+          device_name: string | null
+          expires_at: string | null
+          id: string
+          ip_address: string | null
+          is_current: boolean | null
+          last_active_at: string | null
+          location: Json | null
+          revoked_at: string | null
+          revoked_reason: string | null
+          session_token_hash: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          device_fingerprint?: string | null
+          device_name?: string | null
+          expires_at?: string | null
+          id?: string
+          ip_address?: string | null
+          is_current?: boolean | null
+          last_active_at?: string | null
+          location?: Json | null
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          session_token_hash: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          device_fingerprint?: string | null
+          device_name?: string | null
+          expires_at?: string | null
+          id?: string
+          ip_address?: string | null
+          is_current?: boolean | null
+          last_active_at?: string | null
+          location?: Json | null
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          session_token_hash?: string
+          user_agent?: string | null
           user_id?: string
         }
         Relationships: []
@@ -2055,6 +2298,8 @@ export type Database = {
         Args: { check_user_id: string }
         Returns: boolean
       }
+      cleanup_expired_payment_tokens: { Args: never; Returns: undefined }
+      cleanup_expired_sessions: { Args: never; Returns: undefined }
       cleanup_old_backup_attempts: { Args: never; Returns: undefined }
       cleanup_old_login_attempts: { Args: never; Returns: undefined }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
@@ -2067,6 +2312,10 @@ export type Database = {
         Returns: boolean
       }
       increment_promo_usage: { Args: { promo_id: string }; Returns: undefined }
+      invalidate_user_sessions: {
+        Args: { reason?: string; target_user_id: string }
+        Returns: number
+      }
       record_login_attempt: {
         Args: {
           attempt_email: string
