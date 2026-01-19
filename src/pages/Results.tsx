@@ -22,8 +22,11 @@ import {
   Percent,
   Receipt,
   Fuel,
-  Leaf
+  Leaf,
+  Mail,
+  Printer
 } from "lucide-react";
+import { ExportActionsMenu } from "@/components/ExportActionsMenu";
 import { formatCurrency, calculateTax, type TaxResult, type TaxInputs } from "@/lib/taxCalculations";
 import { downloadPDF } from "@/lib/pdfExport";
 import { useState, useEffect, useRef } from "react";
@@ -238,14 +241,12 @@ const Results = () => {
           Save Business
           {tier === 'free' && <Lock className="h-3 w-3 ml-1" />}
         </Button>
-        <Button variant="outline" onClick={exportToPDF}>
-          <FileDown className="h-4 w-4" />
-          PDF
-        </Button>
-        <Button variant="outline" onClick={exportToCSV}>
-          <Download className="h-4 w-4" />
-          CSV
-        </Button>
+        <ExportActionsMenu
+          onExportPDF={exportToPDF}
+          onExportCSV={exportToCSV}
+          reportTitle={`Tax Calculation - ${result.entityType}`}
+          reportType="tax-calculation"
+        />
       </div>
 
       {/* Comparison Dashboard */}

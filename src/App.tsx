@@ -21,6 +21,7 @@ import { UpgradeCelebrationProvider } from "@/components/UpgradeCelebrationProvi
 import { OfflineDataProvider } from "@/contexts/OfflineDataContext";
 import { StorageWarningBanner } from "@/components/StorageWarningBanner";
 import { OfflineBanner } from "@/components/OfflineBanner";
+import "@/styles/print.css";
 import { lazy, Suspense } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
