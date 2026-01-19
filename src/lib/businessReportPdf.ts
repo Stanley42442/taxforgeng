@@ -1,5 +1,24 @@
 import { jsPDF } from "jspdf";
 import { formatCurrency } from "./taxCalculations";
+import {
+  BRAND_COLORS,
+  COMPANY_INFO,
+  PDF_SETTINGS,
+  formatNaira,
+  formatNigerianDate,
+  addAccentHeader,
+  addLogo,
+  addSummaryGrid,
+  addSectionTitle,
+  addTableHeader,
+  addTableRow,
+  addPDFFooter,
+  checkPageBreak,
+  truncateText,
+  type RGB,
+  type TableColumn,
+  type TableRowData,
+} from "./exportShared";
 
 interface Expense {
   id: string;
@@ -41,19 +60,20 @@ export const generateBusinessReportPDF = (data: BusinessReportData) => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 20;
+  const margin = PDF_SETTINGS.margin;
   const contentWidth = pageWidth - margin * 2;
-  let y = margin;
+  let y: number = margin;
 
-  // Colors
-  const primaryColor: [number, number, number] = [26, 79, 62];
-  const accentColor: [number, number, number] = [212, 175, 55];
-  const textColor: [number, number, number] = [51, 51, 51];
-  const mutedColor: [number, number, number] = [128, 128, 128];
-  const lightBg: [number, number, number] = [248, 250, 248];
-  const successColor: [number, number, number] = [34, 197, 94];
-  const dangerColor: [number, number, number] = [239, 68, 68];
+  // Colors using shared brand colors
+  const primaryColor: [number, number, number] = [BRAND_COLORS.darkGreen[0], BRAND_COLORS.darkGreen[1], BRAND_COLORS.darkGreen[2]];
+  const accentColor: [number, number, number] = [BRAND_COLORS.gold[0], BRAND_COLORS.gold[1], BRAND_COLORS.gold[2]];
+  const textColor: [number, number, number] = [BRAND_COLORS.text[0], BRAND_COLORS.text[1], BRAND_COLORS.text[2]];
+  const mutedColor: [number, number, number] = [BRAND_COLORS.muted[0], BRAND_COLORS.muted[1], BRAND_COLORS.muted[2]];
+  const lightBg: [number, number, number] = [BRAND_COLORS.lightBg[0], BRAND_COLORS.lightBg[1], BRAND_COLORS.lightBg[2]];
+  const successColor: [number, number, number] = [BRAND_COLORS.success[0], BRAND_COLORS.success[1], BRAND_COLORS.success[2]];
+  const dangerColor: [number, number, number] = [BRAND_COLORS.danger[0], BRAND_COLORS.danger[1], BRAND_COLORS.danger[2]];
 
+  // Helper functions
   const setColor = (color: [number, number, number]) => doc.setTextColor(...color);
   const setFillColor = (color: [number, number, number]) => doc.setFillColor(...color);
 
@@ -256,7 +276,7 @@ export const generateBusinessReportPDF = (data: BusinessReportData) => {
   doc.text('Amount', pageWidth - margin - 5, y + 7, { align: 'right' });
   y += 12;
 
-  setFont('helvetica', 'normal');
+  doc.setFont('helvetica', 'normal');
   const recentExpenses = data.expenses.slice(0, 10);
   
   recentExpenses.forEach((expense, index) => {
@@ -275,7 +295,7 @@ export const generateBusinessReportPDF = (data: BusinessReportData) => {
     const date = new Date(expense.date).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' });
     doc.text(date, margin + 5, y + 2);
     
-    const desc = expense.description.length > 35 ? expense.description.substring(0, 35) + '...' : expense.description;
+    const desc = truncateText(expense.description, 40);
     doc.text(desc, margin + 30, y + 2);
     
     if (expense.type === 'income') {
@@ -315,10 +335,6 @@ export const generateBusinessReportPDF = (data: BusinessReportData) => {
   }
 
   return doc;
-
-  function setFont(family: string, style: string) {
-    doc.setFont(family, style);
-  }
 };
 
 export const downloadBusinessReportPDF = (data: BusinessReportData) => {
