@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, Download, Users } from "lucide-react";
-import { formatCurrency, formatNumber } from "@/lib/taxCalculations";
+import { Calculator } from "lucide-react";
+import { formatCurrency } from "@/lib/taxCalculations";
+import { CurrencyInput } from "@/components/ui/currency-input";
 
 // 2026 PIT Bands - Nigeria Tax Act 2025
 const PIT_BANDS_2026 = [
@@ -161,11 +161,10 @@ export const PayrollCalculator = () => {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="grossSalary">Monthly Gross Salary (₦)</Label>
-                <Input
+                <CurrencyInput
                   id="grossSalary"
-                  type="number"
-                  value={grossSalary || ''}
-                  onChange={(e) => setGrossSalary(Number(e.target.value))}
+                  value={grossSalary}
+                  onChange={setGrossSalary}
                   placeholder="Enter gross salary"
                   className="mt-1"
                 />
@@ -174,11 +173,10 @@ export const PayrollCalculator = () => {
               {use2026Rules && (
                 <div>
                   <Label htmlFor="annualRent">Annual Rent Paid (₦)</Label>
-                  <Input
+                  <CurrencyInput
                     id="annualRent"
-                    type="number"
-                    value={annualRent || ''}
-                    onChange={(e) => setAnnualRent(Number(e.target.value))}
+                    value={annualRent}
+                    onChange={setAnnualRent}
                     placeholder="Enter annual rent for Rent Relief"
                     className="mt-1"
                   />
@@ -313,12 +311,12 @@ export const PayrollCalculator = () => {
             <div>
               <h4 className="font-medium mb-2">2026 Allowable Deductions</h4>
               <ul className="space-y-1 text-muted-foreground">
-                <li>• <strong>Rent Relief:</strong> 20% of rent (max ₦500k)</li>
+                <li>• <strong>Rent Relief:</strong> 20% of rent (max ₦500k) - requires proof</li>
                 <li>• Pension: Up to 8% of gross</li>
                 <li>• NHF: 2.5% of basic salary</li>
                 <li>• NHIS: Actual premiums paid</li>
                 <li>• Life Insurance: Actual premiums</li>
-                <li className="text-warning">• Old CRA: <strong>ABOLISHED</strong></li>
+                <li className="text-amber-600">• Old CRA: <strong>ABOLISHED</strong></li>
               </ul>
             </div>
           </div>

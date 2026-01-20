@@ -26,6 +26,7 @@ export interface Employee {
   pfa_name?: string;
   nhf_number?: string;
   include_nhf: boolean;
+  annual_rent?: number;
   status: 'active' | 'inactive' | 'terminated';
   notes?: string;
   self_service_enabled: boolean;
@@ -61,6 +62,7 @@ export interface CreateEmployeeInput {
   pfa_name?: string;
   nhf_number?: string;
   include_nhf?: boolean;
+  annual_rent?: number;
   hire_date?: string;
   business_id?: string;
 }

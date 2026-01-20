@@ -14,6 +14,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { calculatePayroll, type PayrollInput, type PayrollResult } from "@/lib/payrollCalculations";
 import { formatCurrency } from "@/lib/taxCalculations";
+import { CurrencyInput } from "@/components/ui/currency-input";
 
 interface OvertimeEntry {
   id: string;
@@ -207,14 +208,13 @@ export const OvertimeBonusCalculator = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label>Monthly Gross Salary (₦)</Label>
-              <Input
-                type="number"
-                value={baseSalary || ""}
-                onChange={(e) => {
-                  setBaseSalary(Number(e.target.value));
+              <CurrencyInput
+                value={baseSalary}
+                onChange={(v) => {
+                  setBaseSalary(v);
                   setResult(null);
                 }}
-                placeholder="500000"
+                placeholder="Enter monthly gross salary"
               />
               {hourlyRate > 0 && (
                 <p className="text-sm text-muted-foreground mt-1">
@@ -225,11 +225,10 @@ export const OvertimeBonusCalculator = () => {
             {use2026Rules && (
               <div>
                 <Label>Annual Rent Paid (₦)</Label>
-                <Input
-                  type="number"
-                  value={annualRent || ""}
-                  onChange={(e) => {
-                    setAnnualRent(Number(e.target.value));
+                <CurrencyInput
+                  value={annualRent}
+                  onChange={(v) => {
+                    setAnnualRent(v);
                     setResult(null);
                   }}
                   placeholder="For Rent Relief calculation"
@@ -385,11 +384,10 @@ export const OvertimeBonusCalculator = () => {
               </div>
               <div className="flex-1">
                 <Label>Amount (₦)</Label>
-                <Input
-                  type="number"
-                  value={entry.amount || ""}
-                  onChange={(e) => updateBonusEntry(entry.id, "amount", Number(e.target.value))}
-                  placeholder="100000"
+                <CurrencyInput
+                  value={entry.amount}
+                  onChange={(v) => updateBonusEntry(entry.id, "amount", v)}
+                  placeholder="Enter bonus amount"
                 />
               </div>
               <div className="flex items-center gap-2 pb-2">
@@ -487,7 +485,7 @@ export const OvertimeBonusCalculator = () => {
                 <Separator />
                 <div className="flex justify-between font-medium">
                   <span>Total Earnings</span>
-                  <span>{formatCurrency(result.grossSalary + totalOvertime + totalBonuses)}</span>
+                  <span>{formatCurrency(baseSalary + totalOvertime + totalBonuses)}</span>
                 </div>
               </div>
 
@@ -509,23 +507,20 @@ export const OvertimeBonusCalculator = () => {
                 </div>
                 <Separator />
                 <div className="flex justify-between font-medium">
-                  <span>Net Salary</span>
-                  <span className="text-green-600">{formatCurrency(result.netSalary)}</span>
+                  <span>Total Deductions</span>
+                  <span className="text-red-600">
+                    -{formatCurrency(result.pensionEmployee + result.nhf + result.paye)}
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Tax Impact Note */}
-            {taxableBonuses > 0 && (
-              <div className="flex items-start gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-sm">
-                <AlertCircle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-                <p className="text-yellow-800 dark:text-yellow-200">
-                  <strong>Tax Note:</strong> Taxable bonuses of {formatCurrency(taxableBonuses)} are added to 
-                  your annual income, which may push you into a higher tax bracket. The additional PAYE is 
-                  calculated at your marginal rate.
-                </p>
-              </div>
-            )}
+            <Separator />
+
+            <div className="flex justify-between items-center text-lg">
+              <span className="font-bold">Net Pay</span>
+              <span className="font-bold text-2xl text-green-600">{formatCurrency(result.netSalary)}</span>
+            </div>
           </CardContent>
         </Card>
       )}
