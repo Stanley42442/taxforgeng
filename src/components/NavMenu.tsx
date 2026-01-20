@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { TierSwitcher } from "@/components/TierSwitcher";
 import { FeedbackForm } from "@/components/FeedbackForm";
@@ -12,6 +13,12 @@ import { useNotificationCount } from "@/hooks/useNotificationCount";
 import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
 import { Badge } from "@/components/ui/badge";
 import { LiveIndicator } from "@/components/ui/live-indicator";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { 
   Calculator, 
   Crown, 
@@ -44,6 +51,9 @@ import {
   Star,
   Building2,
   Wallet,
+  Search,
+  X,
+  type LucideIcon,
 } from "lucide-react";
 import {
   Sheet,
@@ -53,9 +63,133 @@ import {
 } from "@/components/ui/sheet";
 import { toast } from "sonner";
 
+interface NavLink {
+  to: string;
+  label: string;
+  icon: LucideIcon;
+  minTier?: string;
+}
+
+interface NavGroup {
+  id: string;
+  label: string;
+  icon: LucideIcon;
+  links: NavLink[];
+  adminOnly?: boolean;
+  showCondition?: 'always' | 'freeOnly' | 'paidOnly';
+  badgeKey?: 'reminders' | 'notifications';
+}
+
+const navGroups: NavGroup[] = [
+  {
+    id: 'overview',
+    label: 'Overview',
+    icon: LayoutDashboard,
+    links: [
+      { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { to: "/advisory", label: "Get Advice", icon: Lightbulb },
+    ]
+  },
+  {
+    id: 'personal',
+    label: 'Personal Tax',
+    icon: User,
+    showCondition: 'freeOnly',
+    links: [
+      { to: "/individual-calculator", label: "Personal Tax Calculator", icon: Calculator },
+      { to: "/personal-expenses", label: "Personal Expenses", icon: Wallet },
+      { to: "/calculation-history", label: "Tax History", icon: History },
+    ]
+  },
+  {
+    id: 'business',
+    label: 'Business Tax',
+    icon: Building2,
+    showCondition: 'paidOnly',
+    links: [
+      { to: "/calculator", label: "Business Calculator", icon: Calculator, minTier: 'basic' },
+      { to: "/businesses", label: "My Businesses", icon: FolderOpen, minTier: 'starter' },
+      { to: "/expenses", label: "Expenses", icon: Receipt, minTier: 'starter' },
+      { to: "/invoices", label: "Invoices", icon: FileText, minTier: 'basic' },
+      { to: "/payroll", label: "Payroll", icon: Users, minTier: 'professional' },
+      { to: "/profit-loss", label: "P&L Statement", icon: PieChart, minTier: 'basic' },
+    ]
+  },
+  {
+    id: 'filing',
+    label: 'Filing & Compliance',
+    icon: Send,
+    badgeKey: 'reminders',
+    links: [
+      { to: "/compliance", label: "Compliance", icon: Building2, minTier: 'professional' },
+      { to: "/e-filing", label: "E-Filing", icon: Send, minTier: 'business' },
+      { to: "/tax-filing", label: "Tax Filing", icon: FileText, minTier: 'business' },
+      { to: "/tax-calendar", label: "Tax Calendar", icon: Calendar },
+      { to: "/reminders", label: "Reminders", icon: Bell, minTier: 'starter' },
+    ]
+  },
+  {
+    id: 'reports',
+    label: 'Reports & Insights',
+    icon: BarChart3,
+    links: [
+      { to: "/business-report", label: "Reports", icon: BarChart3, minTier: 'basic' },
+      { to: "/insights", label: "Insights", icon: BarChart3, minTier: 'business' },
+      { to: "/scenarios", label: "Scenarios", icon: GitBranch, minTier: 'professional' },
+      { to: "/transactions", label: "Transactions", icon: Upload, minTier: 'business' },
+    ]
+  },
+  {
+    id: 'team',
+    label: 'Team & Tools',
+    icon: Users,
+    links: [
+      { to: "/team", label: "Team", icon: Users, minTier: 'business' },
+      { to: "/accountant-portal", label: "Accountant Portal", icon: Building2, minTier: 'business' },
+      { to: "/audit-log", label: "Audit Log", icon: History, minTier: 'corporate' },
+      { to: "/api-docs", label: "API Docs", icon: Code, minTier: 'corporate' },
+    ]
+  },
+  {
+    id: 'resources',
+    label: 'Resources',
+    icon: GraduationCap,
+    links: [
+      { to: "/learn", label: "Learn", icon: GraduationCap },
+      { to: "/pricing", label: "Pricing", icon: DollarSign },
+      { to: "/documentation", label: "Documentation", icon: FileText },
+      { to: "/roadmap", label: "Roadmap", icon: Map },
+      { to: "/success-stories", label: "Success Stories", icon: Star },
+    ]
+  },
+  {
+    id: 'account',
+    label: 'Account',
+    icon: Trophy,
+    links: [
+      { to: "/achievements", label: "Achievements", icon: Trophy, minTier: 'basic' },
+      { to: "/referrals", label: "Referrals", icon: Gift },
+      { to: "/rewards", label: "Loyalty Rewards", icon: Gift },
+      { to: "/billing", label: "Billing History", icon: Receipt },
+    ]
+  },
+  {
+    id: 'admin',
+    label: 'Admin',
+    icon: Shield,
+    adminOnly: true,
+    links: [
+      { to: "/admin-analytics", label: "Admin Analytics", icon: Shield },
+      { to: "/admin/promo-codes", label: "Promo Codes", icon: Gift },
+      { to: "/admin/webhooks", label: "Webhook Testing", icon: Code },
+      { to: "/ai-analytics", label: "AI Analytics", icon: BarChart3 },
+    ]
+  },
+];
+
 export const NavMenu = () => {
   const { tier } = useSubscription();
-  const { user, signOut, loading } = useAuth();
+  const { user, signOut } = useAuth();
   const { isAdmin } = useAdminCheck();
   const { urgentCount } = useUpcomingReminders();
   const { unreadCount: notificationCount } = useNotificationCount();
@@ -63,8 +197,8 @@ export const NavMenu = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Combined notification count
   const totalNotificationCount = notificationCount + newNotificationCount;
 
   const handleSignOut = async () => {
@@ -73,77 +207,71 @@ export const NavMenu = () => {
     navigate("/");
   };
 
-  // Determine if user should see personal vs business calculator
   const isFreeTierOrGuest = !user || tier === 'free' || tier === 'starter';
   const isPaidTier = user && tier !== 'free' && tier !== 'starter';
 
-  const navLinks = [
-    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/advisory", label: "Get Advice", icon: Lightbulb, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    // Personal Tax: only for guests or free tier
-    { to: "/individual-calculator", label: "Personal Tax", icon: User, minTier: 'free', adminOnly: false, showCondition: 'freeOnly' as const },
-    { to: "/personal-expenses", label: "Personal Expenses", icon: Wallet, minTier: 'free', adminOnly: false, showCondition: 'freeOnly' as const },
-    { to: "/calculation-history", label: "Tax History", icon: History, minTier: 'free', adminOnly: false, showCondition: 'freeOnly' as const },
-    // Business Tax: only for basic tier and above
-    { to: "/calculator", label: "Calculator", icon: Calculator, minTier: 'basic', adminOnly: false, showCondition: 'paidOnly' as const },
-    { to: "/learn", label: "Learn", icon: GraduationCap, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/pricing", label: "Pricing", icon: DollarSign, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/businesses", label: "My Businesses", icon: FolderOpen, minTier: 'starter', adminOnly: false, showCondition: 'always' as const },
-    { to: "/achievements", label: "Achievements", icon: Trophy, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
-    { to: "/reminders", label: "Reminders", icon: Bell, minTier: 'starter', adminOnly: false, showCondition: 'always' as const },
-    
-    // Business Management Features
-    { to: "/expenses", label: "Expenses", icon: Receipt, minTier: 'starter', adminOnly: false, showCondition: 'always' as const },
-    { to: "/invoices", label: "Invoices", icon: FileText, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
-    { to: "/payroll", label: "Payroll", icon: Users, minTier: 'professional', adminOnly: false, showCondition: 'always' as const },
-    { to: "/profit-loss", label: "P&L Statement", icon: PieChart, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
-    { to: "/compliance", label: "Compliance", icon: Building2, minTier: 'professional', adminOnly: false, showCondition: 'always' as const },
-    
-    { to: "/scenarios", label: "Scenarios", icon: GitBranch, minTier: 'professional', adminOnly: false, showCondition: 'always' as const },
-    { to: "/business-report", label: "Reports", icon: BarChart3, minTier: 'basic', adminOnly: false, showCondition: 'always' as const },
-    { to: "/insights", label: "Insights", icon: BarChart3, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
-    { to: "/transactions", label: "Transactions", icon: Upload, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
-    { to: "/e-filing", label: "E-Filing", icon: Send, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
-    { to: "/tax-filing", label: "Tax Filing", icon: FileText, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
-    { to: "/team", label: "Team", icon: Users, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
-    { to: "/api-docs", label: "API Docs", icon: Code, minTier: 'corporate', adminOnly: false, showCondition: 'always' as const },
-    { to: "/audit-log", label: "Audit Log", icon: History, minTier: 'corporate', adminOnly: false, showCondition: 'always' as const },
-    
-    { to: "/accountant-portal", label: "Accountant Portal", icon: Building2, minTier: 'business', adminOnly: false, showCondition: 'always' as const },
-    { to: "/tax-calendar", label: "Tax Calendar", icon: Calendar, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/referrals", label: "Referrals", icon: Gift, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/success-stories", label: "Success Stories", icon: Star, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/roadmap", label: "Roadmap", icon: Map, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/documentation", label: "Documentation", icon: FileText, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/rewards", label: "Loyalty Rewards", icon: Gift, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    { to: "/billing", label: "Billing History", icon: Receipt, minTier: 'free', adminOnly: false, showCondition: 'always' as const },
-    // Admin-only links
-    { to: "/admin-analytics", label: "Admin Analytics", icon: Shield, minTier: 'free', adminOnly: true, showCondition: 'always' as const },
-    { to: "/admin/promo-codes", label: "Promo Codes", icon: Gift, minTier: 'free', adminOnly: true, showCondition: 'always' as const },
-    { to: "/admin/webhooks", label: "Webhook Testing", icon: Code, minTier: 'free', adminOnly: true, showCondition: 'always' as const },
-    { to: "/ai-analytics", label: "AI Analytics", icon: BarChart3, minTier: 'free', adminOnly: true, showCondition: 'always' as const },
-  ];
-
   const tierOrder = ['free', 'starter', 'basic', 'professional', 'business', 'corporate'];
   const userTierIndex = tierOrder.indexOf(tier);
-  
-  const filteredLinks = navLinks.filter(link => {
-    const linkTierIndex = tierOrder.indexOf(link.minTier);
-    const tierMatch = linkTierIndex <= userTierIndex;
-    const adminMatch = link.adminOnly ? isAdmin : true;
-    
-    // Check show condition for calculator visibility
-    let showConditionMatch = true;
-    if (link.showCondition === 'freeOnly') {
-      showConditionMatch = isFreeTierOrGuest;
-    } else if (link.showCondition === 'paidOnly') {
-      showConditionMatch = isPaidTier;
-    }
-    
-    return tierMatch && adminMatch && showConditionMatch;
-  });
 
   const isActive = (path: string) => location.pathname === path;
+
+  // Filter and process groups
+  const visibleGroups = useMemo(() => {
+    return navGroups
+      .filter(group => {
+        // Admin check
+        if (group.adminOnly && !isAdmin) return false;
+        
+        // Show condition check
+        if (group.showCondition === 'freeOnly' && !isFreeTierOrGuest) return false;
+        if (group.showCondition === 'paidOnly' && !isPaidTier) return false;
+        
+        return true;
+      })
+      .map(group => ({
+        ...group,
+        links: group.links.filter(link => {
+          // Filter by tier
+          const linkTierIndex = tierOrder.indexOf(link.minTier || 'free');
+          if (linkTierIndex > userTierIndex) return false;
+          
+          // Filter by search
+          if (searchQuery) {
+            return link.label.toLowerCase().includes(searchQuery.toLowerCase());
+          }
+          return true;
+        })
+      }))
+      .filter(group => group.links.length > 0);
+  }, [isAdmin, isFreeTierOrGuest, isPaidTier, userTierIndex, searchQuery]);
+
+  // Find active group for default expansion
+  const activeGroupId = useMemo(() => {
+    for (const group of navGroups) {
+      if (group.links.some(link => isActive(link.to))) {
+        return group.id;
+      }
+    }
+    return 'overview';
+  }, [location.pathname]);
+
+  // Get badge count for a group
+  const getBadgeCount = (badgeKey?: string) => {
+    if (badgeKey === 'reminders') return urgentCount;
+    if (badgeKey === 'notifications') return totalNotificationCount;
+    return 0;
+  };
+
+  // Desktop quick links (first 5 from visible groups)
+  const quickLinks = useMemo(() => {
+    const links: NavLink[] = [];
+    for (const group of visibleGroups) {
+      for (const link of group.links) {
+        if (links.length < 5) links.push(link);
+      }
+    }
+    return links;
+  }, [visibleGroups]);
 
   return (
     <header className="w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -157,9 +285,9 @@ export const NavMenu = () => {
             <span className="text-base sm:text-xl font-bold text-foreground truncate">TaxForge NG</span>
           </Link>
 
-          {/* Desktop Quick Links - shows on xl screens only */}
+          {/* Desktop Quick Links */}
           <div className="hidden xl:flex items-center gap-4 2xl:gap-6">
-            {filteredLinks.slice(0, 5).map((link) => (
+            {quickLinks.map((link) => (
               <Link 
                 key={link.to}
                 to={link.to} 
@@ -174,7 +302,7 @@ export const NavMenu = () => {
             ))}
           </div>
 
-          {/* Actions - always visible */}
+          {/* Actions */}
           <div className="flex items-center gap-1 sm:gap-2">
             <div className="hidden sm:block">
               <FeedbackForm />
@@ -189,12 +317,10 @@ export const NavMenu = () => {
             )}
             <ThemeToggle />
 
-            {/* Realtime Indicator */}
             {user && isRealtimeConnected && (
               <LiveIndicator isLive={true} label="" className="hidden sm:flex" />
             )}
 
-            {/* Notification Badge - links to notifications page */}
             <Link 
               to="/notifications" 
               className="relative flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -214,7 +340,7 @@ export const NavMenu = () => {
               )}
             </Link>
             
-            {/* Hamburger Menu - always visible */}
+            {/* Hamburger Menu */}
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10 shrink-0">
@@ -222,53 +348,114 @@ export const NavMenu = () => {
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[280px] sm:w-[320px] h-full flex flex-col">
+              <SheetContent side="right" className="w-[300px] sm:w-[340px] h-full flex flex-col p-0">
                 <div className="flex flex-col h-full min-h-0">
-                  <div className="flex items-center justify-between mb-4 shrink-0">
-                    <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary shrink-0">
-                        <Calculator className="h-4 w-4 text-primary-foreground" />
-                      </div>
-                      <span className="font-bold text-foreground truncate">TaxForge NG</span>
-                    </Link>
-                  </div>
-
-                  {/* Tier Badge */}
-                  {tier !== 'free' && (
-                    <div className="mb-3 p-2.5 rounded-lg bg-success/10 border border-success/20 shrink-0">
-                      <p className="text-sm font-medium text-success flex items-center gap-2">
-                        <Crown className="h-4 w-4 shrink-0" />
-                        <span className="truncate">{tier.charAt(0).toUpperCase() + tier.slice(1)} Plan</span>
-                      </p>
+                  {/* Header */}
+                  <div className="px-4 pt-4 pb-2 shrink-0 border-b border-border">
+                    <div className="flex items-center justify-between mb-3">
+                      <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary shrink-0">
+                          <Calculator className="h-4 w-4 text-primary-foreground" />
+                        </div>
+                        <span className="font-bold text-foreground truncate">TaxForge NG</span>
+                      </Link>
                     </div>
-                  )}
 
-                  {/* Tier Switcher for testing */}
-                  <div className="mb-3 shrink-0">
-                    <TierSwitcher />
+                    {/* Tier Badge */}
+                    {tier !== 'free' && (
+                      <div className="mb-3 p-2 rounded-lg bg-success/10 border border-success/20">
+                        <p className="text-sm font-medium text-success flex items-center gap-2">
+                          <Crown className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{tier.charAt(0).toUpperCase() + tier.slice(1)} Plan</span>
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Tier Switcher */}
+                    <div className="mb-3">
+                      <TierSwitcher />
+                    </div>
+
+                    {/* Search */}
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search pages..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-9 h-9 text-sm"
+                      />
+                      {searchQuery && (
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                          onClick={() => setSearchQuery("")}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Nav Links - Vertical scrollable list */}
-                  <nav className="flex flex-col gap-1 overflow-y-auto flex-1 min-h-0 pr-1">
-                    {filteredLinks.map((link) => (
-                      <SheetClose asChild key={link.to}>
-                        <Link
-                          to={link.to}
-                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors shrink-0 ${
-                            isActive(link.to)
-                              ? 'bg-primary/10 text-primary'
-                              : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
-                          }`}
-                        >
-                          <link.icon className="h-4 w-4 shrink-0" />
-                          <span className="truncate">{link.label}</span>
-                        </Link>
-                      </SheetClose>
-                    ))}
-                  </nav>
+                  {/* Navigation Accordion */}
+                  <div className="flex-1 overflow-y-auto px-2 py-2">
+                    <Accordion 
+                      type="multiple" 
+                      defaultValue={[activeGroupId]}
+                      className="w-full"
+                    >
+                      {visibleGroups.map((group) => {
+                        const badgeCount = getBadgeCount(group.badgeKey);
+                        const GroupIcon = group.icon;
+                        
+                        return (
+                          <AccordionItem 
+                            key={group.id} 
+                            value={group.id}
+                            className="border-b-0"
+                          >
+                            <AccordionTrigger className="py-2 px-2 hover:no-underline hover:bg-secondary/50 rounded-lg [&[data-state=open]]:bg-secondary/30">
+                              <div className="flex items-center gap-2">
+                                <GroupIcon className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium">{group.label}</span>
+                                {badgeCount > 0 && (
+                                  <Badge variant="destructive" className="h-5 px-1.5 text-xs ml-auto mr-2">
+                                    {badgeCount}
+                                  </Badge>
+                                )}
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="pb-1 pt-0">
+                              <div className="flex flex-col gap-0.5 pl-4">
+                                {group.links.map((link) => {
+                                  const LinkIcon = link.icon;
+                                  return (
+                                    <SheetClose asChild key={link.to}>
+                                      <Link
+                                        to={link.to}
+                                        className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
+                                          isActive(link.to)
+                                            ? 'bg-primary/10 text-primary font-medium'
+                                            : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+                                        }`}
+                                      >
+                                        <LinkIcon className="h-3.5 w-3.5 shrink-0" />
+                                        <span className="truncate">{link.label}</span>
+                                      </Link>
+                                    </SheetClose>
+                                  );
+                                })}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        );
+                      })}
+                    </Accordion>
+                  </div>
 
-                  {/* Mobile CTA */}
-                  <div className="mt-auto pt-4 border-t border-border space-y-2 shrink-0">
+                  {/* Footer */}
+                  <div className="px-4 py-3 border-t border-border space-y-2 shrink-0 bg-background">
                     {user ? (
                       <>
                         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50">
