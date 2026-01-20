@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 import { calculateTax, formatCurrency, type TaxInputs } from "@/lib/taxCalculations";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart } from "recharts";
 import {
@@ -13,6 +13,7 @@ import {
   Info,
   Lightbulb
 } from "lucide-react";
+import { CurrencyInput } from "@/components/ui/currency-input";
 
 interface YearProjection {
   year: number;
@@ -133,18 +134,16 @@ export const MultiYearProjection = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div>
           <Label className="text-sm mb-2 block">Starting Turnover</Label>
-          <Input
-            type="number"
+          <CurrencyInput
             value={startingTurnover}
-            onChange={(e) => setStartingTurnover(Number(e.target.value))}
+            onChange={setStartingTurnover}
           />
         </div>
         <div>
           <Label className="text-sm mb-2 block">Starting Expenses</Label>
-          <Input
-            type="number"
+          <CurrencyInput
             value={startingExpenses}
-            onChange={(e) => setStartingExpenses(Number(e.target.value))}
+            onChange={setStartingExpenses}
           />
         </div>
         <div>

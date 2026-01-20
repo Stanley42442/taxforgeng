@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Camera, Upload, Loader2, Sparkles, CheckCircle2, AlertCircle, Brain, FileText } from "lucide-react";
 import { createWorker, type Worker } from "tesseract.js";
 import { supabase } from "@/integrations/supabase/client";
+import { CurrencyInput } from "@/components/ui/currency-input";
 
 interface ParsedReceipt {
   amount: number | null;
@@ -55,7 +56,7 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
   const [progressText, setProgressText] = useState('');
   const [parsedData, setParsedData] = useState<ParsedReceipt | null>(null);
   const [editableData, setEditableData] = useState({
-    amount: '',
+    amount: 0,
     description: '',
     date: new Date().toISOString().split('T')[0],
     category: 'other',
@@ -197,7 +198,7 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
       setParsedData(parsed);
 
       setEditableData({
-        amount: parsed.amount?.toString() || '',
+        amount: parsed.amount || 0,
         description: parsed.description,
         date: parsed.date,
         category: parsed.category,
@@ -240,8 +241,8 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
   };
 
   const handleConfirm = () => {
-    const amount = parseFloat(editableData.amount);
-    if (isNaN(amount) || amount <= 0) {
+    const amount = editableData.amount;
+    if (amount <= 0) {
       toast.error('Please enter a valid amount');
       return;
     }
@@ -257,7 +258,7 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
     // Reset state
     setParsedData(null);
     setEditableData({
-      amount: '',
+      amount: 0,
       description: '',
       date: new Date().toISOString().split('T')[0],
       category: 'other',
@@ -365,11 +366,10 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
               {/* Editable fields */}
               <div className="space-y-3">
                 <div>
-                  <Label className="text-sm">Amount (₦)</Label>
-                  <Input
-                    type="number"
+                  <Label className="text-sm">Amount</Label>
+                  <CurrencyInput
                     value={editableData.amount}
-                    onChange={(e) => setEditableData(prev => ({ ...prev, amount: e.target.value }))}
+                    onChange={(val) => setEditableData(prev => ({ ...prev, amount: val }))}
                     placeholder="0"
                   />
                 </div>

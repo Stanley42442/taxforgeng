@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { calculateTax, formatCurrency, type TaxInputs } from "@/lib/taxCalculations";
 import { MultiYearProjection } from "@/components/MultiYearProjection";
 import { PenaltyEstimator } from "@/components/PenaltyEstimator";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { ForeignIncomeCalculator } from "@/components/ForeignIncomeCalculator";
 import {
   ArrowRight,
@@ -127,10 +127,9 @@ const ScenarioModeling = () => {
               <div className="space-y-6">
                 <div>
                   <Label className="text-sm mb-2 block">Base Turnover: {formatCurrency(baseValues.turnover)}</Label>
-                  <Input
-                    type="number"
+                  <CurrencyInput
                     value={baseValues.turnover}
-                    onChange={(e) => setBaseValues(prev => ({ ...prev, turnover: Number(e.target.value) }))}
+                    onChange={(val) => setBaseValues(prev => ({ ...prev, turnover: val }))}
                     className="mb-2"
                   />
                 </div>
@@ -170,20 +169,18 @@ const ScenarioModeling = () => {
 
                 <div>
                   <Label className="text-sm mb-2 block">Bonus/Additional Income</Label>
-                  <Input
-                    type="number"
-                    value={adjustments.bonusIncome || ''}
-                    onChange={(e) => setAdjustments(prev => ({ ...prev, bonusIncome: Number(e.target.value) || 0 }))}
+                  <CurrencyInput
+                    value={adjustments.bonusIncome}
+                    onChange={(val) => setAdjustments(prev => ({ ...prev, bonusIncome: val }))}
                     placeholder="0"
                   />
                 </div>
 
                 <div>
                   <Label className="text-sm mb-2 block">Crypto/Capital Gains</Label>
-                  <Input
-                    type="number"
-                    value={adjustments.cryptoGains || ''}
-                    onChange={(e) => setAdjustments(prev => ({ ...prev, cryptoGains: Number(e.target.value) || 0 }))}
+                  <CurrencyInput
+                    value={adjustments.cryptoGains}
+                    onChange={(val) => setAdjustments(prev => ({ ...prev, cryptoGains: val }))}
                     placeholder="0"
                   />
                   <p className="text-xs text-muted-foreground mt-1">10% CGT applies</p>

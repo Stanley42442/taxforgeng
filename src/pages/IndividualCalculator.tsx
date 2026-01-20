@@ -84,7 +84,7 @@ interface ValidationErrors {
 const STORAGE_KEY = 'taxforge_individual_calculator';
 const STORAGE_EXPIRY_MS = 86400000; // 24 hours
 
-// Enhanced InputField with validation error display
+// Enhanced InputField with validation error display and always-visible commas
 const InputField = ({
   label,
   value,
@@ -106,8 +106,56 @@ const InputField = ({
   onReset?: () => void;
   disabled?: boolean;
 }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [cursorPosition, setCursorPosition] = useState<number | null>(null);
+  
   const isModified = importedValue !== undefined && value !== importedValue;
   const isImported = importedValue !== undefined && value === importedValue && value !== '';
+  
+  const formatWithCommas = (num: number): string => {
+    if (!num) return '';
+    return num.toLocaleString('en-NG');
+  };
+  
+  const numericValue = value ? Number(value.replace(/[^0-9]/g, '')) : 0;
+  // Always show formatted value with commas and prefix
+  const displayValue = numericValue ? `₦${formatWithCommas(numericValue)}` : '';
+  
+  // Restore cursor position after formatting
+  useEffect(() => {
+    if (cursorPosition !== null && inputRef.current) {
+      inputRef.current.setSelectionRange(cursorPosition, cursorPosition);
+      setCursorPosition(null);
+    }
+  }, [displayValue, cursorPosition]);
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value;
+    const cursorPos = e.target.selectionStart || 0;
+    
+    // Strip all non-numeric characters
+    const numValue = input.replace(/[^0-9]/g, '');
+    
+    // Calculate cursor position based on digit count before cursor
+    const beforeCursor = input.slice(0, cursorPos);
+    const digitsBeforeCursor = beforeCursor.replace(/[^0-9]/g, '').length;
+    
+    // Find new cursor position in formatted string
+    const newNumValue = numValue ? Number(numValue) : 0;
+    const formatted = newNumValue ? `₦${formatWithCommas(newNumValue)}` : '';
+    let newCursorPos = 0;
+    let digitCount = 0;
+    
+    for (let i = 0; i < formatted.length && digitCount < digitsBeforeCursor; i++) {
+      newCursorPos = i + 1;
+      if (/[0-9]/.test(formatted[i])) {
+        digitCount++;
+      }
+    }
+    
+    setCursorPosition(newCursorPos);
+    onChange(numValue);
+  };
   
   return (
     <div className="space-y-2">
@@ -151,18 +199,15 @@ const InputField = ({
           </Button>
         )}
       </div>
-      <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₦</span>
-        <Input
-          type="text"
-          inputMode="numeric"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={`pl-8 bg-background ${error ? 'border-destructive focus:ring-destructive' : ''}`}
-          placeholder="0"
-          disabled={disabled}
-        />
-      </div>
+      <Input
+        ref={inputRef}
+        inputMode="numeric"
+        value={displayValue}
+        onChange={handleChange}
+        className={`bg-background ${error ? 'border-destructive focus:ring-destructive' : ''}`}
+        placeholder="0"
+        disabled={disabled}
+      />
       {error && (
         <p className="text-xs text-destructive flex items-center gap-1">
           <AlertCircle className="h-3 w-3 flex-shrink-0" />
