@@ -535,6 +535,52 @@ const Settings = () => {
               </form>
             </CardContent>
           </Card>
+
+          <Card className="glass-frosted hover-lift border-destructive/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-lg bg-destructive/10 flex items-center justify-center">
+                  <RefreshCw className="h-4 w-4 text-destructive" />
+                </div>
+                App Cache
+              </CardTitle>
+              <CardDescription>
+                If the app shows outdated content or isn't working correctly, clear the cache to get the latest version.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                variant="destructive" 
+                onClick={async () => {
+                  const toastId = toast.loading("Clearing cache...");
+                  try {
+                    // Unregister all service workers
+                    if ('serviceWorker' in navigator) {
+                      const registrations = await navigator.serviceWorker.getRegistrations();
+                      await Promise.all(registrations.map(r => r.unregister()));
+                    }
+                    // Clear all caches
+                    if ('caches' in window) {
+                      const cacheNames = await caches.keys();
+                      await Promise.all(cacheNames.map(name => caches.delete(name)));
+                    }
+                    // Clear localStorage cache version
+                    localStorage.removeItem('cache-version');
+                    toast.dismiss(toastId);
+                    toast.success("Cache cleared! Reloading...");
+                    setTimeout(() => window.location.reload(), 500);
+                  } catch (error) {
+                    toast.dismiss(toastId);
+                    toast.error("Failed to clear cache. Please try again.");
+                  }
+                }}
+                className="w-full sm:w-auto"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Clear Cache & Reload
+              </Button>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Subscription Tab */}
