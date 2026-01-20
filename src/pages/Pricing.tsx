@@ -355,19 +355,20 @@ const Pricing = () => {
         <h2 className="text-2xl font-bold text-foreground text-center mb-8">
           Full Feature Comparison
         </h2>
-        <div className="rounded-2xl border border-border bg-card shadow-card">
-          <table className="w-full" style={{ borderCollapse: 'collapse', borderSpacing: 0 }}>
-            <thead>
-              <tr className="border-b border-border bg-secondary/50">
-                <th className="text-left p-4 font-semibold text-foreground">Feature</th>
-                <th className="text-center p-4 font-semibold text-foreground">Individual</th>
-                <th className="text-center p-4 font-semibold text-foreground">Starter</th>
-                <th className="text-center p-4 font-semibold text-foreground">Basic</th>
-                <th className="text-center p-4 font-semibold text-foreground">Professional</th>
-                <th className="text-center p-4 font-semibold text-primary">Business ✦</th>
-                <th className="text-center p-4 font-semibold text-foreground">Corporate</th>
-              </tr>
-            </thead>
+        <div className="rounded-2xl border border-border bg-card shadow-card overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-full" style={{ borderCollapse: 'collapse', borderSpacing: 0 }}>
+              <thead>
+                <tr className="border-b border-border bg-secondary/50">
+                  <th className="text-left p-4 font-semibold text-foreground w-[28%]">Feature</th>
+                  <th className="text-center p-4 font-semibold text-foreground w-[12%]">Individual</th>
+                  <th className="text-center p-4 font-semibold text-foreground w-[12%]">Starter</th>
+                  <th className="text-center p-4 font-semibold text-foreground w-[12%]">Basic</th>
+                  <th className="text-center p-4 font-semibold text-foreground w-[12%]">Professional</th>
+                  <th className="text-center p-4 font-semibold text-primary w-[12%]">Business ✦</th>
+                  <th className="text-center p-4 font-semibold text-foreground w-[12%]">Corporate</th>
+                </tr>
+              </thead>
             <tbody>
               {featureCategories.map((category, catIndex) => (
                 <>
@@ -395,7 +396,8 @@ const Pricing = () => {
                 </>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         </div>
       </div>
 
