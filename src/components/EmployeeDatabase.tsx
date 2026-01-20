@@ -16,7 +16,7 @@ import {
   UserPlus, Building, DollarSign, Calendar, Mail, Phone,
   TrendingUp, MoreHorizontal, History, FileText, AlertCircle
 } from "lucide-react";
-import { useEmployees, type Employee, type NewEmployee } from "@/hooks/useEmployees";
+import { useEmployees, type Employee, type CreateEmployeeInput } from "@/hooks/useEmployees";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -88,7 +88,7 @@ const initialFormData: EmployeeFormData = {
 };
 
 export const EmployeeDatabase = () => {
-  const { employees, isLoading, createEmployee, updateEmployee, deleteEmployee, updateSalary } = useEmployees();
+  const { employees, isLoading, addEmployee, updateEmployee, deleteEmployee } = useEmployees();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterDepartment, setFilterDepartment] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("active");
@@ -131,7 +131,7 @@ export const EmployeeDatabase = () => {
       return;
     }
 
-    const newEmployee: NewEmployee = {
+    const newEmployee: CreateEmployeeInput = {
       first_name: formData.firstName,
       last_name: formData.lastName,
       email: formData.email || undefined,
@@ -150,7 +150,7 @@ export const EmployeeDatabase = () => {
       nhf_number: formData.nhfNumber || undefined,
     };
 
-    await createEmployee(newEmployee);
+    addEmployee.mutate(newEmployee);
     setFormData(initialFormData);
     setIsAddDialogOpen(false);
   };
@@ -158,21 +158,24 @@ export const EmployeeDatabase = () => {
   const handleEditEmployee = async () => {
     if (!selectedEmployee) return;
 
-    await updateEmployee(selectedEmployee.id, {
-      first_name: formData.firstName,
-      last_name: formData.lastName,
-      email: formData.email || undefined,
-      phone: formData.phone || undefined,
-      position: formData.position || undefined,
-      department: formData.department || undefined,
-      employment_type: formData.employmentType,
-      include_nhf: formData.includeNhf,
-      bank_name: formData.bankName || undefined,
-      bank_account_number: formData.bankAccountNumber || undefined,
-      pfa_name: formData.pfaName || undefined,
-      pension_pin: formData.pensionPin || undefined,
-      tax_id: formData.taxId || undefined,
-      nhf_number: formData.nhfNumber || undefined,
+    updateEmployee.mutate({
+      id: selectedEmployee.id,
+      updates: {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email || undefined,
+        phone: formData.phone || undefined,
+        position: formData.position || undefined,
+        department: formData.department || undefined,
+        employment_type: formData.employmentType,
+        include_nhf: formData.includeNhf,
+        bank_name: formData.bankName || undefined,
+        bank_account_number: formData.bankAccountNumber || undefined,
+        pfa_name: formData.pfaName || undefined,
+        pension_pin: formData.pensionPin || undefined,
+        tax_id: formData.taxId || undefined,
+        nhf_number: formData.nhfNumber || undefined,
+      }
     });
     setIsEditDialogOpen(false);
     setSelectedEmployee(null);
@@ -181,7 +184,11 @@ export const EmployeeDatabase = () => {
   const handleSalaryUpdate = async () => {
     if (!selectedEmployee || newSalary <= 0) return;
 
-    await updateSalary(selectedEmployee.id, newSalary, salaryChangeReason);
+    updateEmployee.mutate({
+      id: selectedEmployee.id,
+      updates: { current_gross_salary: newSalary },
+      salaryChangeReason,
+    });
     setIsSalaryDialogOpen(false);
     setSelectedEmployee(null);
     setNewSalary(0);
@@ -605,7 +612,7 @@ export const EmployeeDatabase = () => {
                             <DropdownMenuSeparator />
                             <DropdownMenuItem 
                               className="text-destructive"
-                              onClick={() => deleteEmployee(employee.id)}
+                              onClick={() => deleteEmployee.mutate(employee.id)}
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
                               Delete

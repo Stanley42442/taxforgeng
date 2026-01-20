@@ -240,6 +240,9 @@ export function calculatePayroll(input: PayrollInput): PayrollResult {
   };
 }
 
+// Alias for backwards compatibility
+export const calculatePayrollWithExtras = calculatePayroll;
+
 /**
  * Calculate bulk payroll for multiple employees
  */

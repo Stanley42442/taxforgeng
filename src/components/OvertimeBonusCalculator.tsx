@@ -12,7 +12,7 @@ import {
   TrendingUp, AlertCircle, CheckCircle, HelpCircle
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { calculatePayrollWithExtras, type PayrollInput, type PayrollResult } from "@/lib/payrollCalculations";
+import { calculatePayroll, type PayrollInput, type PayrollResult } from "@/lib/payrollCalculations";
 import { formatCurrency } from "@/lib/taxCalculations";
 
 interface OvertimeEntry {
@@ -150,17 +150,17 @@ export const OvertimeBonusCalculator = () => {
     // Calculate base payroll (without OT/bonus)
     const baseInput: PayrollInput = {
       grossSalary: baseSalary,
-      includeNhf,
+      includeNHF: includeNhf,
       use2026Rules,
       annualRent,
       overtimeHours: 0,
       overtimeMultiplier: 1,
       bonusAmount: 0,
       bonusIsTaxable: false,
-      leaveDeductionDays: 0,
-      dailyRate: 0,
+      unpaidLeaveDays: 0,
+      workingDaysInMonth: 22,
     };
-    const baseCalc = calculatePayrollWithExtras(baseInput);
+    const baseCalc = calculatePayroll(baseInput);
     setBaseResult(baseCalc);
 
     // Calculate with OT and bonus
@@ -171,18 +171,18 @@ export const OvertimeBonusCalculator = () => {
 
     const input: PayrollInput = {
       grossSalary: baseSalary,
-      includeNhf,
+      includeNHF: includeNhf,
       use2026Rules,
       annualRent,
       overtimeHours: totalOTHours,
       overtimeMultiplier: avgMultiplier,
       bonusAmount: taxableBonuses,
       bonusIsTaxable: true,
-      leaveDeductionDays: 0,
-      dailyRate: 0,
+      unpaidLeaveDays: 0,
+      workingDaysInMonth: 22,
     };
 
-    const calcResult = calculatePayrollWithExtras(input);
+    const calcResult = calculatePayroll(input);
     
     // Add non-taxable bonuses to net
     const nonTaxableBonuses = totalBonuses - taxableBonuses;
