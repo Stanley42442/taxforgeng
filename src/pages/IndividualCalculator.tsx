@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +36,8 @@ import {
   ArrowLeftRight,
   TrendingDown,
   Loader2,
-  X
+  X,
+  RotateCcw
 } from "lucide-react";
 import { ForeignIncomeCalculator } from "@/components/ForeignIncomeCalculator";
 import { calculateIndividualTax, formatCurrency, type IndividualTaxInputs, type IndividualTaxResult } from "@/lib/individualTaxCalculations";
@@ -50,6 +51,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { useDeviceCSS, getResponsiveClasses } from "@/hooks/useDeviceCSS";
+import { TaxOptimizationTips } from "@/components/TaxOptimizationTips";
 
 type CalculationType = 'pit' | 'crypto' | 'investment' | 'informal' | 'foreign_income';
 
@@ -61,48 +63,115 @@ interface SavedCalculation {
   created_at: string;
 }
 
+interface ImportedValues {
+  rentPaid: string;
+  pensionContribution: string;
+  nhfContribution: string;
+  healthInsurance: string;
+  lifeInsurance: string;
+}
+
+interface ValidationErrors {
+  employmentIncome?: string;
+  pensionContribution?: string;
+  nhfContribution?: string;
+  cryptoGains?: string;
+  cryptoLosses?: string;
+  estimatedTurnover?: string;
+}
+
+// Storage key for auto-save
+const STORAGE_KEY = 'taxforge_individual_calculator';
+const STORAGE_EXPIRY_MS = 86400000; // 24 hours
+
+// Enhanced InputField with validation error display
 const InputField = ({
   label,
   value,
   onChange,
   tooltip,
   required,
+  error,
+  importedValue,
+  onReset,
+  disabled,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   tooltip?: string;
   required?: boolean;
-}) => (
-  <div className="space-y-2">
-    <div className="flex items-center gap-2">
-      <Label className="text-sm font-medium">
-        {label}
-        {required && <span className="text-destructive ml-1">*</span>}
-      </Label>
-      {tooltip && (
-        <Popover>
-          <PopoverTrigger>
-            <HelpCircle className="h-4 w-4 text-muted-foreground" />
-          </PopoverTrigger>
-          <PopoverContent side="top" className="text-sm max-w-xs">
-            {tooltip}
-          </PopoverContent>
-        </Popover>
+  error?: string;
+  importedValue?: string;
+  onReset?: () => void;
+  disabled?: boolean;
+}) => {
+  const isModified = importedValue !== undefined && value !== importedValue;
+  const isImported = importedValue !== undefined && value === importedValue && value !== '';
+  
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <Label className="text-sm font-medium truncate">
+            {label}
+            {required && <span className="text-destructive ml-1">*</span>}
+          </Label>
+          {isImported && (
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-success/10 text-success border-success/20 flex-shrink-0">
+              <Download className="h-2.5 w-2.5 mr-0.5" />
+              Imported
+            </Badge>
+          )}
+          {isModified && (
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 text-amber-600 border-amber-300 flex-shrink-0">
+              Modified
+            </Badge>
+          )}
+          {tooltip && (
+            <Popover>
+              <PopoverTrigger>
+                <HelpCircle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              </PopoverTrigger>
+              <PopoverContent side="top" className="text-sm max-w-xs">
+                {tooltip}
+              </PopoverContent>
+            </Popover>
+          )}
+        </div>
+        {isModified && onReset && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onReset}
+            className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+          >
+            <RotateCcw className="h-3 w-3 mr-1" />
+            Reset
+          </Button>
+        )}
+      </div>
+      <div className="relative">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₦</span>
+        <Input
+          type="text"
+          inputMode="numeric"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={`pl-8 bg-background ${error ? 'border-destructive focus:ring-destructive' : ''}`}
+          placeholder="0"
+          disabled={disabled}
+        />
+      </div>
+      {error && (
+        <p className="text-xs text-destructive flex items-center gap-1">
+          <AlertCircle className="h-3 w-3 flex-shrink-0" />
+          {error}
+        </p>
       )}
     </div>
-    <div className="relative">
-      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₦</span>
-      <Input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="pl-8 bg-background"
-        placeholder="0"
-      />
-    </div>
-  </div>
-);
+  );
+};
 
 const IndividualCalculatorPage = () => {
   const { device, isMobile, isTablet, containerClass } = useDeviceCSS();
@@ -110,34 +179,60 @@ const IndividualCalculatorPage = () => {
   const { user } = useAuth();
   const currentYear = new Date().getFullYear();
   
-  const [use2026Rules, setUse2026Rules] = useState(true);
-  const [calculationType, setCalculationType] = useState<CalculationType>('pit');
+  // Load saved state from localStorage
+  const loadSavedState = useCallback(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.timestamp && Date.now() - parsed.timestamp < STORAGE_EXPIRY_MS) {
+          return parsed.data;
+        }
+      }
+    } catch {
+      // Ignore
+    }
+    return null;
+  }, []);
+
+  const savedState = loadSavedState();
+  const [wasRestored, setWasRestored] = useState(!!savedState);
+  const hasShownRestoreToast = useRef(false);
+  
+  const [use2026Rules, setUse2026Rules] = useState(savedState?.use2026Rules ?? true);
+  const [calculationType, setCalculationType] = useState<CalculationType>(savedState?.calculationType ?? 'pit');
   const [loadFromExpenses, setLoadFromExpenses] = useState(false);
   
   // Personal expenses data
   const { annualTotals, loading: expensesLoading, refetch } = usePersonalExpenses(currentYear);
   
+  // Track imported values for visual indicators
+  const [importedValues, setImportedValues] = useState<ImportedValues | null>(null);
+  
+  // Validation errors
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  
   // PIT inputs
-  const [employmentIncome, setEmploymentIncome] = useState('');
-  const [pensionContribution, setPensionContribution] = useState('');
-  const [nhfContribution, setNhfContribution] = useState('');
-  const [lifeInsurance, setLifeInsurance] = useState('');
-  const [healthInsurance, setHealthInsurance] = useState('');
-  const [rentPaid, setRentPaid] = useState('');
+  const [employmentIncome, setEmploymentIncome] = useState(savedState?.employmentIncome ?? '');
+  const [pensionContribution, setPensionContribution] = useState(savedState?.pensionContribution ?? '');
+  const [nhfContribution, setNhfContribution] = useState(savedState?.nhfContribution ?? '');
+  const [lifeInsurance, setLifeInsurance] = useState(savedState?.lifeInsurance ?? '');
+  const [healthInsurance, setHealthInsurance] = useState(savedState?.healthInsurance ?? '');
+  const [rentPaid, setRentPaid] = useState(savedState?.rentPaid ?? '');
   
   // Crypto inputs
-  const [cryptoIncome, setCryptoIncome] = useState('');
-  const [cryptoGains, setCryptoGains] = useState('');
-  const [cryptoLosses, setCryptoLosses] = useState('');
+  const [cryptoIncome, setCryptoIncome] = useState(savedState?.cryptoIncome ?? '');
+  const [cryptoGains, setCryptoGains] = useState(savedState?.cryptoGains ?? '');
+  const [cryptoLosses, setCryptoLosses] = useState(savedState?.cryptoLosses ?? '');
   
   // Investment inputs
-  const [dividendIncome, setDividendIncome] = useState('');
-  const [interestIncome, setInterestIncome] = useState('');
-  const [capitalGains, setCapitalGains] = useState('');
+  const [dividendIncome, setDividendIncome] = useState(savedState?.dividendIncome ?? '');
+  const [interestIncome, setInterestIncome] = useState(savedState?.interestIncome ?? '');
+  const [capitalGains, setCapitalGains] = useState(savedState?.capitalGains ?? '');
   
   // Informal inputs
-  const [estimatedTurnover, setEstimatedTurnover] = useState('');
-  const [location, setLocation] = useState('other_urban');
+  const [estimatedTurnover, setEstimatedTurnover] = useState(savedState?.estimatedTurnover ?? '');
+  const [location, setLocation] = useState(savedState?.location ?? 'other_urban');
 
   const [result, setResult] = useState<ReturnType<typeof calculateIndividualTax> | null>(null);
   const [comparisonResult, setComparisonResult] = useState<ReturnType<typeof calculateIndividualTax> | null>(null);
@@ -151,14 +246,98 @@ const IndividualCalculatorPage = () => {
   const shouldPopulateRef = useRef(false);
   const lastPopulatedRef = useRef<string | null>(null);
 
+  // Show restore toast once
+  useEffect(() => {
+    if (wasRestored && !hasShownRestoreToast.current) {
+      hasShownRestoreToast.current = true;
+      toast.info('Previous session restored', {
+        description: 'Your inputs from earlier have been loaded',
+        action: {
+          label: 'Clear',
+          onClick: () => {
+            localStorage.removeItem(STORAGE_KEY);
+            // Reset all fields
+            setEmploymentIncome('');
+            setPensionContribution('');
+            setNhfContribution('');
+            setLifeInsurance('');
+            setHealthInsurance('');
+            setRentPaid('');
+            setCryptoIncome('');
+            setCryptoGains('');
+            setCryptoLosses('');
+            setDividendIncome('');
+            setInterestIncome('');
+            setCapitalGains('');
+            setEstimatedTurnover('');
+            setLocation('other_urban');
+            setUse2026Rules(true);
+            setCalculationType('pit');
+            toast.success('Session cleared');
+          },
+        },
+        duration: 5000,
+      });
+    }
+  }, [wasRestored]);
+
+  // Auto-save form state (debounced)
+  useEffect(() => {
+    const saveTimeout = setTimeout(() => {
+      const formState = {
+        use2026Rules,
+        calculationType,
+        employmentIncome,
+        pensionContribution,
+        nhfContribution,
+        lifeInsurance,
+        healthInsurance,
+        rentPaid,
+        cryptoIncome,
+        cryptoGains,
+        cryptoLosses,
+        dividendIncome,
+        interestIncome,
+        capitalGains,
+        estimatedTurnover,
+        location,
+      };
+      
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          data: formState,
+          timestamp: Date.now(),
+        }));
+      } catch {
+        // Ignore storage errors
+      }
+    }, 500);
+
+    return () => clearTimeout(saveTimeout);
+  }, [
+    use2026Rules, calculationType, employmentIncome, pensionContribution,
+    nhfContribution, lifeInsurance, healthInsurance, rentPaid,
+    cryptoIncome, cryptoGains, cryptoLosses, dividendIncome,
+    interestIncome, capitalGains, estimatedTurnover, location
+  ]);
 
   // Populate fields from expenses
   const populateFromExpenses = (totals: typeof annualTotals, showToast = true) => {
-    setPensionContribution(totals.pension_contribution > 0 ? totals.pension_contribution.toLocaleString('en-NG') : '');
-    setNhfContribution(totals.nhf_contribution > 0 ? totals.nhf_contribution.toLocaleString('en-NG') : '');
-    setLifeInsurance(totals.life_insurance > 0 ? totals.life_insurance.toLocaleString('en-NG') : '');
-    setHealthInsurance(totals.health_insurance > 0 ? totals.health_insurance.toLocaleString('en-NG') : '');
-    setRentPaid(totals.rent > 0 ? totals.rent.toLocaleString('en-NG') : '');
+    const values: ImportedValues = {
+      rentPaid: totals.rent > 0 ? totals.rent.toLocaleString('en-NG') : '',
+      pensionContribution: totals.pension_contribution > 0 ? totals.pension_contribution.toLocaleString('en-NG') : '',
+      nhfContribution: totals.nhf_contribution > 0 ? totals.nhf_contribution.toLocaleString('en-NG') : '',
+      healthInsurance: totals.health_insurance > 0 ? totals.health_insurance.toLocaleString('en-NG') : '',
+      lifeInsurance: totals.life_insurance > 0 ? totals.life_insurance.toLocaleString('en-NG') : '',
+    };
+    
+    setImportedValues(values);
+    setPensionContribution(values.pensionContribution);
+    setNhfContribution(values.nhfContribution);
+    setLifeInsurance(values.lifeInsurance);
+    setHealthInsurance(values.healthInsurance);
+    setRentPaid(values.rentPaid);
+    
     if (showToast) {
       toast.success('Fields populated from personal expenses');
     }
@@ -198,12 +377,13 @@ const IndividualCalculatorPage = () => {
         shouldPopulateRef.current = false;
       }
     } else {
-      // Clear auto-populated fields
+      // Clear auto-populated fields and imported values tracking
       setPensionContribution('');
       setNhfContribution('');
       setLifeInsurance('');
       setHealthInsurance('');
       setRentPaid('');
+      setImportedValues(null);
       shouldPopulateRef.current = false;
       lastPopulatedRef.current = null;
     }
@@ -213,6 +393,57 @@ const IndividualCalculatorPage = () => {
   const formatInput = (value: string) => {
     const num = parseNumber(value);
     return num ? num.toLocaleString('en-NG') : '';
+  };
+
+  // Validation function
+  const validateFields = useCallback((): boolean => {
+    const errors: ValidationErrors = {};
+    const income = parseNumber(employmentIncome);
+    const pension = parseNumber(pensionContribution);
+    const nhf = parseNumber(nhfContribution);
+
+    if (calculationType === 'pit') {
+      if (income <= 0) {
+        errors.employmentIncome = 'Please enter your annual gross income';
+      }
+      // Pension can't exceed 20% of income (reasonable max)
+      if (pension > income * 0.20 && income > 0) {
+        errors.pensionContribution = 'Pension contribution seems high (>20% of income)';
+      }
+      // NHF can't exceed 2.5% of income significantly
+      if (nhf > income * 0.05 && income > 0) {
+        errors.nhfContribution = 'NHF contribution seems high (typically 2.5% of basic)';
+      }
+    }
+
+    if (calculationType === 'crypto') {
+      const gains = parseNumber(cryptoGains);
+      const losses = parseNumber(cryptoLosses);
+      const cryptoInc = parseNumber(cryptoIncome);
+      
+      if (gains <= 0 && cryptoInc <= 0) {
+        errors.cryptoGains = 'Please enter crypto gains or income';
+      }
+      if (losses > gains && gains > 0) {
+        errors.cryptoLosses = 'Losses exceed gains - excess can be carried forward';
+      }
+    }
+
+    if (calculationType === 'informal') {
+      if (parseNumber(estimatedTurnover) <= 0) {
+        errors.estimatedTurnover = 'Please enter your estimated annual turnover';
+      }
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  }, [calculationType, employmentIncome, pensionContribution, nhfContribution, cryptoGains, cryptoLosses, cryptoIncome, estimatedTurnover]);
+
+  // Clear specific validation error when field changes
+  const clearValidationError = (field: keyof ValidationErrors) => {
+    if (validationErrors[field]) {
+      setValidationErrors(prev => ({ ...prev, [field]: undefined }));
+    }
   };
 
   const getInputs = (rules2026: boolean): IndividualTaxInputs => ({
@@ -235,6 +466,11 @@ const IndividualCalculatorPage = () => {
   });
 
   const handleCalculate = () => {
+    if (!validateFields()) {
+      toast.error('Please fix the errors before calculating');
+      return;
+    }
+    
     const inputs = getInputs(use2026Rules);
     const calcResult = calculateIndividualTax(inputs);
     setResult(calcResult);
@@ -314,6 +550,8 @@ const IndividualCalculatorPage = () => {
     setLocation(inputs.location || 'other_urban');
     setResult(calc.result);
     setShowHistoryDialog(false);
+    setImportedValues(null); // Clear import tracking when loading saved
+    setValidationErrors({}); // Clear errors
     toast.success('Calculation loaded');
   };
 
@@ -405,6 +643,7 @@ const IndividualCalculatorPage = () => {
         onValueChange={(v) => {
           setCalculationType(v as CalculationType);
           setResult(null);
+          setValidationErrors({});
         }}
         className={getResponsiveClasses(device, {
           mobile: 'mb-4',
@@ -559,39 +798,61 @@ const IndividualCalculatorPage = () => {
                 <InputField
                   label="Annual Gross Income"
                   value={formatInput(employmentIncome)}
-                  onChange={(v) => setEmploymentIncome(v)}
+                  onChange={(v) => {
+                    setEmploymentIncome(v);
+                    clearValidationError('employmentIncome');
+                  }}
                   tooltip="Your total annual salary before any deductions"
                   required
+                  error={validationErrors.employmentIncome}
                 />
                 <InputField
                   label="Rent Paid"
                   value={formatInput(rentPaid)}
-                  onChange={(v) => !loadFromExpenses && setRentPaid(v)}
+                  onChange={(v) => setRentPaid(v)}
                   tooltip="Annual rent paid on accommodation"
+                  importedValue={loadFromExpenses ? importedValues?.rentPaid : undefined}
+                  onReset={() => setRentPaid(importedValues?.rentPaid || '')}
                 />
                 <InputField
                   label="Pension Contribution"
                   value={formatInput(pensionContribution)}
-                  onChange={(v) => !loadFromExpenses && setPensionContribution(v)}
+                  onChange={(v) => {
+                    setPensionContribution(v);
+                    clearValidationError('pensionContribution');
+                  }}
                   tooltip="Employee pension contribution (typically 8% of basic)"
+                  error={validationErrors.pensionContribution}
+                  importedValue={loadFromExpenses ? importedValues?.pensionContribution : undefined}
+                  onReset={() => setPensionContribution(importedValues?.pensionContribution || '')}
                 />
                 <InputField
                   label="NHF Contribution"
                   value={formatInput(nhfContribution)}
-                  onChange={(v) => !loadFromExpenses && setNhfContribution(v)}
+                  onChange={(v) => {
+                    setNhfContribution(v);
+                    clearValidationError('nhfContribution');
+                  }}
                   tooltip="National Housing Fund contribution (2.5% of basic)"
+                  error={validationErrors.nhfContribution}
+                  importedValue={loadFromExpenses ? importedValues?.nhfContribution : undefined}
+                  onReset={() => setNhfContribution(importedValues?.nhfContribution || '')}
                 />
                 <InputField
                   label="Health Insurance"
                   value={formatInput(healthInsurance)}
-                  onChange={(v) => !loadFromExpenses && setHealthInsurance(v)}
+                  onChange={(v) => setHealthInsurance(v)}
                   tooltip="Annual health insurance premium"
+                  importedValue={loadFromExpenses ? importedValues?.healthInsurance : undefined}
+                  onReset={() => setHealthInsurance(importedValues?.healthInsurance || '')}
                 />
                 <InputField
                   label="Life Insurance Premium"
                   value={formatInput(lifeInsurance)}
-                  onChange={(v) => !loadFromExpenses && setLifeInsurance(v)}
+                  onChange={(v) => setLifeInsurance(v)}
                   tooltip="Annual life insurance premium payments"
+                  importedValue={loadFromExpenses ? importedValues?.lifeInsurance : undefined}
+                  onReset={() => setLifeInsurance(importedValues?.lifeInsurance || '')}
                 />
               </div>
               
@@ -608,6 +869,24 @@ const IndividualCalculatorPage = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Tax Optimization Tips */}
+          {parseNumber(employmentIncome) > 0 && (
+            <div className="animate-slide-up">
+              <TaxOptimizationTips
+                inputs={{
+                  employmentIncome: parseNumber(employmentIncome),
+                  pensionContribution: parseNumber(pensionContribution),
+                  nhfContribution: parseNumber(nhfContribution),
+                  healthInsurance: parseNumber(healthInsurance),
+                  lifeInsurance: parseNumber(lifeInsurance),
+                  rentPaid: parseNumber(rentPaid),
+                }}
+                use2026Rules={use2026Rules}
+                calculationType={calculationType}
+              />
+            </div>
+          )}
         </TabsContent>
 
         {/* Foreign Income Calculator */}
@@ -638,14 +917,22 @@ const IndividualCalculatorPage = () => {
                 <InputField
                   label="Capital Gains (Trading)"
                   value={formatInput(cryptoGains)}
-                  onChange={(v) => setCryptoGains(v)}
+                  onChange={(v) => {
+                    setCryptoGains(v);
+                    clearValidationError('cryptoGains');
+                  }}
                   tooltip="Profit from selling cryptocurrency"
+                  error={validationErrors.cryptoGains}
                 />
                 <InputField
                   label="Capital Losses"
                   value={formatInput(cryptoLosses)}
-                  onChange={(v) => setCryptoLosses(v)}
+                  onChange={(v) => {
+                    setCryptoLosses(v);
+                    clearValidationError('cryptoLosses');
+                  }}
                   tooltip="Losses from cryptocurrency trading"
+                  error={validationErrors.cryptoLosses}
                 />
               </div>
               
@@ -734,9 +1021,13 @@ const IndividualCalculatorPage = () => {
                 <InputField
                   label="Estimated Annual Turnover"
                   value={formatInput(estimatedTurnover)}
-                  onChange={(v) => setEstimatedTurnover(v)}
+                  onChange={(v) => {
+                    setEstimatedTurnover(v);
+                    clearValidationError('estimatedTurnover');
+                  }}
                   tooltip="Your estimated annual sales"
                   required
+                  error={validationErrors.estimatedTurnover}
                 />
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Location</Label>

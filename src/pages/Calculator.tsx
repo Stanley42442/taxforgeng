@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
@@ -292,31 +292,49 @@ const CalculatorPage = () => {
     placeholder: string;
     required?: boolean;
     tooltip?: string;
-  }) => (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <Label className="text-sm font-medium text-foreground">
-          {label} {required && <span className="text-destructive">*</span>}
-        </Label>
-        {tooltip && (
-          <Popover>
-            <PopoverTrigger>
-              <HelpCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-            </PopoverTrigger>
-            <PopoverContent className="text-sm max-w-xs">{tooltip}</PopoverContent>
-          </Popover>
-        )}
+  }) => {
+    const [isFocused, setIsFocused] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+    
+    // Show raw value while typing, formatted value when blurred
+    const displayValue = isFocused 
+      ? value 
+      : value ? `₦${Number(value).toLocaleString()}` : '';
+    
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <Label className="text-sm font-medium text-foreground">
+            {label} {required && <span className="text-destructive">*</span>}
+          </Label>
+          {tooltip && (
+            <Popover>
+              <PopoverTrigger>
+                <HelpCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+              </PopoverTrigger>
+              <PopoverContent className="text-sm max-w-xs">{tooltip}</PopoverContent>
+            </Popover>
+          )}
+        </div>
+        <div className="neumorphic-sm p-1 overflow-hidden">
+          <Input
+            ref={inputRef}
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={displayValue}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            onChange={(e) => {
+              const numValue = e.target.value.replace(/[^0-9]/g, '');
+              onChange(numValue);
+            }}
+            placeholder={placeholder}
+            className="border-0 bg-transparent h-12 text-lg font-medium truncate"
+          />
+        </div>
       </div>
-      <div className="neumorphic-sm p-1 overflow-hidden">
-        <Input
-          value={value ? `₦${Number(value).toLocaleString()}` : ''}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          className="border-0 bg-transparent h-12 text-lg font-medium truncate"
-        />
-      </div>
-    </div>
-  );
+    );
+  };
 
   const InputSection = ({ title, tooltip, children }: { title: string; tooltip?: string; children: React.ReactNode }) => (
     <div className="space-y-4">
