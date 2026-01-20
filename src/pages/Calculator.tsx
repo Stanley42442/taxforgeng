@@ -49,6 +49,104 @@ import { useSubscription, type SavedBusiness } from "@/contexts/SubscriptionCont
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
+// Move components OUTSIDE main function to prevent re-creation on every render
+const NeumorphicInput = ({ 
+  label, 
+  value, 
+  onChange, 
+  placeholder, 
+  required = false, 
+  tooltip 
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+  required?: boolean;
+  tooltip?: string;
+}) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Show raw value while typing, formatted value when blurred
+  const displayValue = isFocused 
+    ? value 
+    : value ? `₦${Number(value).toLocaleString('en-NG')}` : '';
+  
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <Label className="text-sm font-medium text-foreground">
+          {label} {required && <span className="text-destructive">*</span>}
+        </Label>
+        {tooltip && (
+          <Popover>
+            <PopoverTrigger>
+              <HelpCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+            </PopoverTrigger>
+            <PopoverContent className="text-sm max-w-xs">{tooltip}</PopoverContent>
+          </Popover>
+        )}
+      </div>
+      <div className="neumorphic-sm p-1 overflow-hidden">
+        <Input
+          ref={inputRef}
+          inputMode="numeric"
+          pattern="[0-9]*"
+          value={displayValue}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          onChange={(e) => {
+            const numValue = e.target.value.replace(/[^0-9]/g, '');
+            onChange(numValue);
+          }}
+          placeholder={placeholder}
+          className="border-0 bg-transparent h-12 text-lg font-medium truncate"
+        />
+      </div>
+    </div>
+  );
+};
+
+const InputSection = ({ title, tooltip, children }: { title: string; tooltip?: string; children: React.ReactNode }) => (
+  <div className="space-y-4">
+    <div className="flex items-center gap-2">
+      <h3 className="font-semibold text-foreground">{title}</h3>
+      {tooltip && (
+        <Popover>
+          <PopoverTrigger>
+            <HelpCircle className="h-4 w-4 text-muted-foreground" />
+          </PopoverTrigger>
+          <PopoverContent className="text-sm max-w-xs">{tooltip}</PopoverContent>
+        </Popover>
+      )}
+    </div>
+    {children}
+  </div>
+);
+
+type ExpenseCategory = 'office_supplies' | 'travel' | 'utilities' | 'meals' | 'rent' | 'equipment' | 'other';
+
+const categoryIcons: Record<ExpenseCategory, React.ReactNode> = {
+  office_supplies: <Package className="h-4 w-4" />,
+  travel: <Car className="h-4 w-4" />,
+  utilities: <Plug className="h-4 w-4" />,
+  meals: <Utensils className="h-4 w-4" />,
+  rent: <Home className="h-4 w-4" />,
+  equipment: <Package className="h-4 w-4" />,
+  other: <Receipt className="h-4 w-4" />,
+};
+
+const categoryLabels: Record<ExpenseCategory, string> = {
+  office_supplies: 'Office Supplies',
+  travel: 'Travel',
+  utilities: 'Utilities',
+  meals: 'Meals',
+  rent: 'Rent',
+  equipment: 'Equipment',
+  other: 'Other',
+};
+
 const CalculatorPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -123,28 +221,6 @@ const CalculatorPage = () => {
   if (isFreeTierOrGuest) {
     return null;
   }
-
-  type ExpenseCategory = 'office_supplies' | 'travel' | 'utilities' | 'meals' | 'rent' | 'equipment' | 'other';
-
-  const categoryIcons: Record<ExpenseCategory, React.ReactNode> = {
-    office_supplies: <Package className="h-4 w-4" />,
-    travel: <Car className="h-4 w-4" />,
-    utilities: <Plug className="h-4 w-4" />,
-    meals: <Utensils className="h-4 w-4" />,
-    rent: <Home className="h-4 w-4" />,
-    equipment: <Package className="h-4 w-4" />,
-    other: <Receipt className="h-4 w-4" />,
-  };
-
-  const categoryLabels: Record<ExpenseCategory, string> = {
-    office_supplies: 'Office Supplies',
-    travel: 'Travel',
-    utilities: 'Utilities',
-    meals: 'Meals',
-    rent: 'Rent',
-    equipment: 'Equipment',
-    other: 'Other',
-  };
 
   const fetchBusinessExpenses = async (businessId: string) => {
     if (!user || businessId === '__new__') {
@@ -284,74 +360,6 @@ const CalculatorPage = () => {
   };
 
   const canCalculate = Number(inputs.turnover) > 0;
-
-  const NeumorphicInput = ({ label, value, onChange, placeholder, required = false, tooltip }: {
-    label: string;
-    value: string;
-    onChange: (v: string) => void;
-    placeholder: string;
-    required?: boolean;
-    tooltip?: string;
-  }) => {
-    const [isFocused, setIsFocused] = useState(false);
-    const inputRef = useRef<HTMLInputElement>(null);
-    
-    // Show raw value while typing, formatted value when blurred
-    const displayValue = isFocused 
-      ? value 
-      : value ? `₦${Number(value).toLocaleString()}` : '';
-    
-    return (
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <Label className="text-sm font-medium text-foreground">
-            {label} {required && <span className="text-destructive">*</span>}
-          </Label>
-          {tooltip && (
-            <Popover>
-              <PopoverTrigger>
-                <HelpCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-              </PopoverTrigger>
-              <PopoverContent className="text-sm max-w-xs">{tooltip}</PopoverContent>
-            </Popover>
-          )}
-        </div>
-        <div className="neumorphic-sm p-1 overflow-hidden">
-          <Input
-            ref={inputRef}
-            inputMode="numeric"
-            pattern="[0-9]*"
-            value={displayValue}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            onChange={(e) => {
-              const numValue = e.target.value.replace(/[^0-9]/g, '');
-              onChange(numValue);
-            }}
-            placeholder={placeholder}
-            className="border-0 bg-transparent h-12 text-lg font-medium truncate"
-          />
-        </div>
-      </div>
-    );
-  };
-
-  const InputSection = ({ title, tooltip, children }: { title: string; tooltip?: string; children: React.ReactNode }) => (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <h3 className="font-semibold text-foreground">{title}</h3>
-        {tooltip && (
-          <Popover>
-            <PopoverTrigger>
-              <HelpCircle className="h-4 w-4 text-muted-foreground" />
-            </PopoverTrigger>
-            <PopoverContent className="text-sm max-w-xs">{tooltip}</PopoverContent>
-          </Popover>
-        )}
-      </div>
-      {children}
-    </div>
-  );
 
   return (
     <PageLayout maxWidth="2xl" showBackground={true}>

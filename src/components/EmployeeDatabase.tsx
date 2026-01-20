@@ -20,6 +20,7 @@ import { useEmployees, type Employee, type CreateEmployeeInput } from "@/hooks/u
 import { formatCurrency } from "@/lib/taxCalculations";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,6 +67,7 @@ interface EmployeeFormData {
   pensionPin: string;
   taxId: string;
   nhfNumber: string;
+  annualRent: number;
 }
 
 const initialFormData: EmployeeFormData = {
@@ -85,7 +87,208 @@ const initialFormData: EmployeeFormData = {
   pensionPin: "",
   taxId: "",
   nhfNumber: "",
+  annualRent: 0,
 };
+
+// Move EmployeeForm OUTSIDE the main component to prevent re-creation
+interface EmployeeFormProps {
+  formData: EmployeeFormData;
+  setFormData: React.Dispatch<React.SetStateAction<EmployeeFormData>>;
+  isEdit?: boolean;
+}
+
+const EmployeeForm = ({ formData, setFormData, isEdit = false }: EmployeeFormProps) => (
+  <Tabs defaultValue="basic" className="w-full">
+    <TabsList className="grid w-full grid-cols-3">
+      <TabsTrigger value="basic">Basic Info</TabsTrigger>
+      <TabsTrigger value="employment">Employment</TabsTrigger>
+      <TabsTrigger value="banking">Banking & Tax</TabsTrigger>
+    </TabsList>
+
+    <TabsContent value="basic" className="space-y-4 mt-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>First Name *</Label>
+          <Input
+            value={formData.firstName}
+            onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+            placeholder="John"
+          />
+        </div>
+        <div>
+          <Label>Last Name *</Label>
+          <Input
+            value={formData.lastName}
+            onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+            placeholder="Doe"
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Email</Label>
+          <Input
+            type="email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            placeholder="john.doe@company.com"
+          />
+        </div>
+        <div>
+          <Label>Phone</Label>
+          <Input
+            value={formData.phone}
+            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            placeholder="+234 XXX XXX XXXX"
+          />
+        </div>
+      </div>
+    </TabsContent>
+
+    <TabsContent value="employment" className="space-y-4 mt-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Position</Label>
+          <Input
+            value={formData.position}
+            onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+            placeholder="Software Engineer"
+          />
+        </div>
+        <div>
+          <Label>Department</Label>
+          <Select value={formData.department} onValueChange={(v) => setFormData({ ...formData, department: v })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select department" />
+            </SelectTrigger>
+            <SelectContent>
+              {DEPARTMENTS.map(dept => (
+                <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Employment Type</Label>
+          <Select value={formData.employmentType} onValueChange={(v) => setFormData({ ...formData, employmentType: v })}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {EMPLOYMENT_TYPES.map(type => (
+                <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label>Hire Date</Label>
+          <Input
+            type="date"
+            value={formData.hireDate}
+            onChange={(e) => setFormData({ ...formData, hireDate: e.target.value })}
+          />
+        </div>
+      </div>
+      {!isEdit && (
+        <div>
+          <Label>Monthly Gross Salary (₦) *</Label>
+          <CurrencyInput
+            value={formData.currentGrossSalary}
+            onChange={(v) => setFormData({ ...formData, currentGrossSalary: v })}
+            placeholder="Enter monthly gross salary"
+          />
+        </div>
+      )}
+      <div className="flex items-center justify-between">
+        <div>
+          <Label>Include NHF</Label>
+          <p className="text-xs text-muted-foreground">2.5% National Housing Fund</p>
+        </div>
+        <Switch 
+          checked={formData.includeNhf} 
+          onCheckedChange={(v) => setFormData({ ...formData, includeNhf: v })} 
+        />
+      </div>
+    </TabsContent>
+
+    <TabsContent value="banking" className="space-y-4 mt-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Bank Name</Label>
+          <Select value={formData.bankName} onValueChange={(v) => setFormData({ ...formData, bankName: v })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select bank" />
+            </SelectTrigger>
+            <SelectContent>
+              {BANKS.map(bank => (
+                <SelectItem key={bank} value={bank}>{bank}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label>Account Number</Label>
+          <Input
+            value={formData.bankAccountNumber}
+            onChange={(e) => setFormData({ ...formData, bankAccountNumber: e.target.value })}
+            placeholder="0123456789"
+            maxLength={10}
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>PFA Name</Label>
+          <Input
+            value={formData.pfaName}
+            onChange={(e) => setFormData({ ...formData, pfaName: e.target.value })}
+            placeholder="ARM Pension Managers"
+          />
+        </div>
+        <div>
+          <Label>Pension PIN</Label>
+          <Input
+            value={formData.pensionPin}
+            onChange={(e) => setFormData({ ...formData, pensionPin: e.target.value })}
+            placeholder="PEN123456789"
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Tax ID (TIN)</Label>
+          <Input
+            value={formData.taxId}
+            onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
+            placeholder="12345678-0001"
+          />
+        </div>
+        <div>
+          <Label>NHF Number</Label>
+          <Input
+            value={formData.nhfNumber}
+            onChange={(e) => setFormData({ ...formData, nhfNumber: e.target.value })}
+            placeholder="NHF123456"
+          />
+        </div>
+      </div>
+      <div>
+        <Label>Annual Rent (Optional)</Label>
+        <CurrencyInput
+          value={formData.annualRent}
+          onChange={(v) => setFormData({ ...formData, annualRent: v })}
+          placeholder="For Rent Relief - requires proof"
+        />
+        <p className="text-xs text-muted-foreground mt-1">
+          Employee must provide rent payment proof for Rent Relief deduction
+        </p>
+      </div>
+    </TabsContent>
+  </Tabs>
+);
 
 export const EmployeeDatabase = () => {
   const { employees, isLoading, addEmployee, updateEmployee, deleteEmployee } = useEmployees();
@@ -148,6 +351,7 @@ export const EmployeeDatabase = () => {
       pension_pin: formData.pensionPin || undefined,
       tax_id: formData.taxId || undefined,
       nhf_number: formData.nhfNumber || undefined,
+      annual_rent: formData.annualRent || undefined,
     };
 
     addEmployee.mutate(newEmployee);
@@ -175,6 +379,7 @@ export const EmployeeDatabase = () => {
         pension_pin: formData.pensionPin || undefined,
         tax_id: formData.taxId || undefined,
         nhf_number: formData.nhfNumber || undefined,
+        annual_rent: formData.annualRent || undefined,
       }
     });
     setIsEditDialogOpen(false);
@@ -214,6 +419,7 @@ export const EmployeeDatabase = () => {
       pensionPin: employee.pension_pin || "",
       taxId: employee.tax_id || "",
       nhfNumber: employee.nhf_number || "",
+      annualRent: employee.annual_rent || 0,
     });
     setIsEditDialogOpen(true);
   };
@@ -223,189 +429,6 @@ export const EmployeeDatabase = () => {
     setNewSalary(employee.current_gross_salary);
     setIsSalaryDialogOpen(true);
   };
-
-  const EmployeeForm = ({ isEdit = false }: { isEdit?: boolean }) => (
-    <Tabs defaultValue="basic" className="w-full">
-      <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger value="basic">Basic Info</TabsTrigger>
-        <TabsTrigger value="employment">Employment</TabsTrigger>
-        <TabsTrigger value="banking">Banking & Tax</TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="basic" className="space-y-4 mt-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>First Name *</Label>
-            <Input
-              value={formData.firstName}
-              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-              placeholder="John"
-            />
-          </div>
-          <div>
-            <Label>Last Name *</Label>
-            <Input
-              value={formData.lastName}
-              onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-              placeholder="Doe"
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>Email</Label>
-            <Input
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              placeholder="john.doe@company.com"
-            />
-          </div>
-          <div>
-            <Label>Phone</Label>
-            <Input
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              placeholder="+234 XXX XXX XXXX"
-            />
-          </div>
-        </div>
-      </TabsContent>
-
-      <TabsContent value="employment" className="space-y-4 mt-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>Position</Label>
-            <Input
-              value={formData.position}
-              onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-              placeholder="Software Engineer"
-            />
-          </div>
-          <div>
-            <Label>Department</Label>
-            <Select value={formData.department} onValueChange={(v) => setFormData({ ...formData, department: v })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select department" />
-              </SelectTrigger>
-              <SelectContent>
-                {DEPARTMENTS.map(dept => (
-                  <SelectItem key={dept} value={dept}>{dept}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>Employment Type</Label>
-            <Select value={formData.employmentType} onValueChange={(v) => setFormData({ ...formData, employmentType: v })}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {EMPLOYMENT_TYPES.map(type => (
-                  <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>Hire Date</Label>
-            <Input
-              type="date"
-              value={formData.hireDate}
-              onChange={(e) => setFormData({ ...formData, hireDate: e.target.value })}
-            />
-          </div>
-        </div>
-        {!isEdit && (
-          <div>
-            <Label>Monthly Gross Salary (₦) *</Label>
-            <Input
-              type="number"
-              value={formData.currentGrossSalary || ""}
-              onChange={(e) => setFormData({ ...formData, currentGrossSalary: Number(e.target.value) })}
-              placeholder="500000"
-            />
-          </div>
-        )}
-        <div className="flex items-center justify-between">
-          <div>
-            <Label>Include NHF</Label>
-            <p className="text-xs text-muted-foreground">2.5% National Housing Fund</p>
-          </div>
-          <Switch 
-            checked={formData.includeNhf} 
-            onCheckedChange={(v) => setFormData({ ...formData, includeNhf: v })} 
-          />
-        </div>
-      </TabsContent>
-
-      <TabsContent value="banking" className="space-y-4 mt-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>Bank Name</Label>
-            <Select value={formData.bankName} onValueChange={(v) => setFormData({ ...formData, bankName: v })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select bank" />
-              </SelectTrigger>
-              <SelectContent>
-                {BANKS.map(bank => (
-                  <SelectItem key={bank} value={bank}>{bank}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>Account Number</Label>
-            <Input
-              value={formData.bankAccountNumber}
-              onChange={(e) => setFormData({ ...formData, bankAccountNumber: e.target.value })}
-              placeholder="0123456789"
-              maxLength={10}
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>PFA Name</Label>
-            <Input
-              value={formData.pfaName}
-              onChange={(e) => setFormData({ ...formData, pfaName: e.target.value })}
-              placeholder="ARM Pension Managers"
-            />
-          </div>
-          <div>
-            <Label>Pension PIN</Label>
-            <Input
-              value={formData.pensionPin}
-              onChange={(e) => setFormData({ ...formData, pensionPin: e.target.value })}
-              placeholder="PEN123456789"
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>Tax ID (TIN)</Label>
-            <Input
-              value={formData.taxId}
-              onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
-              placeholder="12345678-0001"
-            />
-          </div>
-          <div>
-            <Label>NHF Number</Label>
-            <Input
-              value={formData.nhfNumber}
-              onChange={(e) => setFormData({ ...formData, nhfNumber: e.target.value })}
-              placeholder="NHF123456"
-            />
-          </div>
-        </div>
-      </TabsContent>
-    </Tabs>
-  );
 
   return (
     <div className="space-y-6">
@@ -487,7 +510,7 @@ export const EmployeeDatabase = () => {
                 <DialogHeader>
                   <DialogTitle>Add New Employee</DialogTitle>
                 </DialogHeader>
-                <EmployeeForm />
+                <EmployeeForm formData={formData} setFormData={setFormData} />
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
                   <Button onClick={handleAddEmployee}>Add Employee</Button>
@@ -635,7 +658,7 @@ export const EmployeeDatabase = () => {
           <DialogHeader>
             <DialogTitle>Edit Employee</DialogTitle>
           </DialogHeader>
-          <EmployeeForm isEdit />
+          <EmployeeForm formData={formData} setFormData={setFormData} isEdit />
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
             <Button onClick={handleEditEmployee}>Save Changes</Button>
@@ -657,10 +680,10 @@ export const EmployeeDatabase = () => {
               </div>
               <div>
                 <Label>New Monthly Gross Salary (₦)</Label>
-                <Input
-                  type="number"
-                  value={newSalary || ""}
-                  onChange={(e) => setNewSalary(Number(e.target.value))}
+                <CurrencyInput
+                  value={newSalary}
+                  onChange={setNewSalary}
+                  placeholder="Enter new salary"
                 />
                 {newSalary !== selectedEmployee.current_gross_salary && newSalary > 0 && (
                   <p className="text-sm mt-1">

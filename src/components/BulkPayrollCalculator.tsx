@@ -10,7 +10,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { 
   Calculator, Users, Download, Save, Plus, Trash2, 
@@ -25,6 +24,7 @@ import { formatCurrency } from "@/lib/taxCalculations";
 import { generatePayslipPDF } from "@/lib/payslipPdfExport";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { CurrencyInput } from "@/components/ui/currency-input";
 
 interface EmployeePayrollEntry {
   id: string;
@@ -39,6 +39,7 @@ interface EmployeePayrollEntry {
   bonusType: string;
   leaveDeduction: number;
   selected: boolean;
+  annualRent: number;
   result?: PayrollResult;
 }
 
@@ -90,6 +91,7 @@ export const BulkPayrollCalculator = () => {
       bonusType: "none",
       leaveDeduction: 0,
       selected: true,
+      annualRent: emp.annual_rent || 0,
     })));
     setIsCalculated(false);
     toast.success(`Loaded ${activeEmployees.length} employees`);
@@ -108,6 +110,7 @@ export const BulkPayrollCalculator = () => {
       bonusType: "none",
       leaveDeduction: 0,
       selected: true,
+      annualRent: 0,
     }]);
     setIsCalculated(false);
   };
@@ -150,7 +153,7 @@ export const BulkPayrollCalculator = () => {
         grossSalary: entry.grossSalary,
         includeNHF: entry.includeNhf,
         use2026Rules,
-        annualRent: 0,
+        annualRent: entry.annualRent,
         overtimeHours: entry.overtimeHours,
         overtimeMultiplier: entry.overtimeMultiplier,
         bonusAmount: entry.bonusType !== "none" ? entry.bonusAmount : 0,
@@ -386,10 +389,9 @@ export const BulkPayrollCalculator = () => {
                         )}
                       </TableCell>
                       <TableCell>
-                        <Input
-                          type="number"
-                          value={entry.grossSalary || ""}
-                          onChange={(e) => updateEntry(entry.id, "grossSalary", Number(e.target.value))}
+                        <CurrencyInput
+                          value={entry.grossSalary}
+                          onChange={(v) => updateEntry(entry.id, "grossSalary", v)}
                           className="h-8 w-28"
                         />
                       </TableCell>
@@ -433,10 +435,9 @@ export const BulkPayrollCalculator = () => {
                             </SelectContent>
                           </Select>
                           {entry.bonusType !== "none" && (
-                            <Input
-                              type="number"
-                              value={entry.bonusAmount || ""}
-                              onChange={(e) => updateEntry(entry.id, "bonusAmount", Number(e.target.value))}
+                            <CurrencyInput
+                              value={entry.bonusAmount}
+                              onChange={(v) => updateEntry(entry.id, "bonusAmount", v)}
                               className="h-8 w-24"
                               placeholder="Amount"
                             />
@@ -460,8 +461,8 @@ export const BulkPayrollCalculator = () => {
                         ) : "-"}
                       </TableCell>
                       <TableCell>
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           size="icon"
                           onClick={() => removeEntry(entry.id)}
                         >
@@ -477,18 +478,17 @@ export const BulkPayrollCalculator = () => {
         </Card>
       )}
 
-      {/* Totals & Actions */}
-      {isCalculated && (
+      {/* Totals Summary */}
+      {isCalculated && totals.count > 0 && (
         <Card className="bg-primary/5">
           <CardHeader>
-            <CardTitle className="text-lg">Payroll Summary</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-500" />
+              Payroll Summary - {totals.count} Employees
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-              <div>
-                <p className="text-sm text-muted-foreground">Employees</p>
-                <p className="text-2xl font-bold">{totals.count}</p>
-              </div>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div>
                 <p className="text-sm text-muted-foreground">Total Gross</p>
                 <p className="text-xl font-bold">{formatCurrency(totals.totalGross)}</p>
@@ -498,52 +498,33 @@ export const BulkPayrollCalculator = () => {
                 <p className="text-xl font-bold text-red-600">{formatCurrency(totals.totalPaye)}</p>
               </div>
               <div>
+                <p className="text-sm text-muted-foreground">Total Pension</p>
+                <p className="text-xl font-bold">{formatCurrency(totals.totalPension + totals.totalPensionEmployer)}</p>
+              </div>
+              <div>
                 <p className="text-sm text-muted-foreground">Total Net</p>
                 <p className="text-xl font-bold text-green-600">{formatCurrency(totals.totalNet)}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Cost to Company</p>
+                <p className="text-sm text-muted-foreground">Total Cost</p>
                 <p className="text-xl font-bold">{formatCurrency(totals.totalCost)}</p>
               </div>
             </div>
 
             <Separator className="my-4" />
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-6">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Overtime:</span>
-                <span>{formatCurrency(totals.totalOvertime)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Bonuses:</span>
-                <span>{formatCurrency(totals.totalBonus)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Pension (Employee):</span>
-                <span>{formatCurrency(totals.totalPension)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Pension (Employer):</span>
-                <span>{formatCurrency(totals.totalPensionEmployer)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">NHF:</span>
-                <span>{formatCurrency(totals.totalNhf)}</span>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              <Button onClick={handleSavePayrollRun} disabled={createPayrollRun.isPending}>
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={handleSavePayrollRun}>
                 <Save className="h-4 w-4 mr-2" />
                 Save Payroll Run
-              </Button>
-              <Button variant="outline" onClick={downloadAllPayslips}>
-                <Download className="h-4 w-4 mr-2" />
-                Download All Payslips
               </Button>
               <Button variant="outline" onClick={() => setShowSaveTemplateDialog(true)}>
                 <FileSpreadsheet className="h-4 w-4 mr-2" />
                 Save as Template
+              </Button>
+              <Button variant="outline" onClick={downloadAllPayslips}>
+                <Download className="h-4 w-4 mr-2" />
+                Download All Payslips
               </Button>
             </div>
           </CardContent>
@@ -558,19 +539,19 @@ export const BulkPayrollCalculator = () => {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Template Name</Label>
+              <Label>Template Name *</Label>
               <Input
                 value={templateName}
                 onChange={(e) => setTemplateName(e.target.value)}
-                placeholder="e.g., Monthly Staff Payroll"
+                placeholder="e.g., Monthly Payroll - Engineering"
               />
             </div>
             <div>
-              <Label>Description (Optional)</Label>
+              <Label>Description</Label>
               <Input
                 value={templateDescription}
                 onChange={(e) => setTemplateDescription(e.target.value)}
-                placeholder="Brief description"
+                placeholder="Optional description"
               />
             </div>
           </div>
