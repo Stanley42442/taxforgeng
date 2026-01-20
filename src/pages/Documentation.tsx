@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDocumentationStats } from '@/hooks/useDocumentationStats';
 import { downloadDocumentationPDF } from '@/lib/documentationPdf';
+import { downloadTaxLogicDocumentPDF } from '@/lib/taxLogicDocumentPdf';
 import { toast } from 'sonner';
 import PageLayout from '@/components/PageLayout';
 
@@ -156,6 +157,7 @@ const PricingTier = ({
 const Documentation = () => {
   const { data: stats, isLoading } = useDocumentationStats();
   const [isExporting, setIsExporting] = useState(false);
+  const [isExportingTaxLogic, setIsExportingTaxLogic] = useState(false);
 
   const handleExportPDF = async () => {
     if (!stats) {
@@ -172,6 +174,19 @@ const Documentation = () => {
       toast.error('Failed to generate PDF. Please try again.');
     } finally {
       setIsExporting(false);
+    }
+  };
+
+  const handleExportTaxLogicPDF = async () => {
+    setIsExportingTaxLogic(true);
+    try {
+      await downloadTaxLogicDocumentPDF();
+      toast.success('Tax Logic Reference PDF downloaded successfully!');
+    } catch (error) {
+      console.error('Tax Logic PDF export error:', error);
+      toast.error('Failed to generate Tax Logic PDF. Please try again.');
+    } finally {
+      setIsExportingTaxLogic(false);
     }
   };
 
@@ -214,6 +229,10 @@ const Documentation = () => {
             <Button onClick={handleExportPDF} disabled={isExporting || isLoading} size="lg">
               <Download className="h-4 w-4 mr-2" />
               {isExporting ? 'Generating PDF...' : 'Download PDF'}
+            </Button>
+            <Button onClick={handleExportTaxLogicPDF} disabled={isExportingTaxLogic} size="lg" variant="secondary">
+              <FileText className="h-4 w-4 mr-2" />
+              {isExportingTaxLogic ? 'Generating...' : 'Tax Logic Reference'}
             </Button>
             <Button variant="outline" size="lg" asChild>
               <a href="https://taxforgeng.lovable.app" target="_blank" rel="noopener noreferrer">
