@@ -7,4 +7,35 @@ import "./styles/mobile.css";
 import "./styles/tablet.css";
 import "./styles/desktop.css";
 
+// One-time cache clear to fix stale service worker - increment to force new clear
+const CACHE_VERSION = 'v2';
+
+(async () => {
+  const lastVersion = localStorage.getItem('cache-version');
+  
+  if (lastVersion !== CACHE_VERSION && 'serviceWorker' in navigator) {
+    console.log('[PWA] Clearing old service worker and caches...');
+    
+    try {
+      // Unregister all service workers
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map(r => r.unregister()));
+      console.log('[PWA] Unregistered', registrations.length, 'service workers');
+      
+      // Clear all caches
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map(name => caches.delete(name)));
+      console.log('[PWA] Cleared', cacheNames.length, 'caches');
+      
+      // Set version and reload
+      localStorage.setItem('cache-version', CACHE_VERSION);
+      window.location.reload();
+      return;
+    } catch (error) {
+      console.error('[PWA] Cache clear failed:', error);
+      localStorage.setItem('cache-version', CACHE_VERSION);
+    }
+  }
+})();
+
 createRoot(document.getElementById("root")!).render(<App />);
