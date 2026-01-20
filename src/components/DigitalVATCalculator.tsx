@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Globe, Calculator, AlertCircle, CheckCircle, Info, ArrowRight } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { DIGITAL_VAT_CONFIG } from "@/lib/sectorConfig";
+import { CurrencyInput } from "@/components/ui/currency-input";
 
 interface DigitalVATResult {
   annualRevenue: number;
@@ -43,20 +43,13 @@ const BUSINESS_TYPES = [
 export const DigitalVATCalculator = () => {
   const [country, setCountry] = useState('US');
   const [businessType, setBusinessType] = useState('saas');
-  const [nigerianRevenue, setNigerianRevenue] = useState('');
+  const [nigerianRevenue, setNigerianRevenue] = useState<number>(0);
   const [hasLocalEntity, setHasLocalEntity] = useState(false);
   const [isB2B, setIsB2B] = useState(false);
   const [result, setResult] = useState<DigitalVATResult | null>(null);
 
-  const parseAmount = (value: string) => Number(value.replace(/[^0-9]/g, '')) || 0;
-  
-  const formatInputValue = (value: string) => {
-    const num = parseAmount(value);
-    return num ? num.toLocaleString('en-NG') : '';
-  };
-
   const calculateVAT = () => {
-    const revenue = parseAmount(nigerianRevenue);
+    const revenue = nigerianRevenue;
     const sepThresholdMet = revenue >= DIGITAL_VAT_CONFIG.sepThreshold;
     const exemptions: string[] = [];
     const recommendations: string[] = [];
@@ -152,18 +145,12 @@ export const DigitalVATCalculator = () => {
 
         {/* Nigerian Revenue */}
         <div className="space-y-2">
-          <Label>Annual Revenue from Nigerian Customers (₦)</Label>
-          <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary font-semibold">₦</span>
-            <Input
-              type="text"
-              inputMode="numeric"
-              value={formatInputValue(nigerianRevenue)}
-              onChange={(e) => setNigerianRevenue(e.target.value)}
-              className="pl-10"
-              placeholder="0"
-            />
-          </div>
+          <Label>Annual Revenue from Nigerian Customers</Label>
+          <CurrencyInput
+            value={nigerianRevenue}
+            onChange={setNigerianRevenue}
+            placeholder="0"
+          />
           <p className="text-xs text-muted-foreground">
             SEP threshold: {formatCurrency(DIGITAL_VAT_CONFIG.sepThreshold)}/year
           </p>

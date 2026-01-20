@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Globe, Calculator, Info, AlertCircle } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
+import { CurrencyInput } from "@/components/ui/currency-input";
 
 interface TreatyCountry {
   name: string;
@@ -145,10 +145,11 @@ export const ForeignIncomeCalculator = () => {
           </div>
           <div className="space-y-2">
             <Label>Amount</Label>
-            <Input
-              type="number"
+            <CurrencyInput
               value={foreignAmount}
-              onChange={(e) => setForeignAmount(Number(e.target.value) || 0)}
+              onChange={setForeignAmount}
+              showPrefix={false}
+              showCommasOnly={true}
             />
           </div>
         </div>
@@ -159,10 +160,11 @@ export const ForeignIncomeCalculator = () => {
             Exchange Rate (₦/{foreignCurrency})
             <Info className="h-3 w-3 text-muted-foreground" />
           </Label>
-          <Input
-            type="number"
+          <CurrencyInput
             value={exchangeRate}
-            onChange={(e) => setExchangeRate(Number(e.target.value) || 0)}
+            onChange={setExchangeRate}
+            showPrefix={false}
+            showCommasOnly={true}
           />
           <p className="text-xs text-muted-foreground">Use CBN rate on date of receipt</p>
         </div>
@@ -170,10 +172,11 @@ export const ForeignIncomeCalculator = () => {
         {/* Foreign Tax Paid */}
         <div className="space-y-2">
           <Label>Foreign Tax Paid ({foreignCurrency})</Label>
-          <Input
-            type="number"
+          <CurrencyInput
             value={foreignTaxPaid}
-            onChange={(e) => setForeignTaxPaid(Number(e.target.value) || 0)}
+            onChange={setForeignTaxPaid}
+            showPrefix={false}
+            showCommasOnly={true}
             placeholder="0"
           />
           <p className="text-xs text-muted-foreground">Eligible for foreign tax credit</p>

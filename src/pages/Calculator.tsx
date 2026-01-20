@@ -65,13 +65,53 @@ const NeumorphicInput = ({
   required?: boolean;
   tooltip?: string;
 }) => {
-  const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [cursorPosition, setCursorPosition] = useState<number | null>(null);
   
-  // Show raw value while typing, formatted value when blurred
-  const displayValue = isFocused 
-    ? value 
-    : value ? `₦${Number(value).toLocaleString('en-NG')}` : '';
+  const formatWithCommas = (num: number): string => {
+    if (!num) return '';
+    return num.toLocaleString('en-NG');
+  };
+  
+  const numericValue = value ? Number(value) : 0;
+  // Always show formatted value with commas and prefix
+  const displayValue = numericValue ? `₦${formatWithCommas(numericValue)}` : '';
+  
+  // Restore cursor position after formatting
+  useEffect(() => {
+    if (cursorPosition !== null && inputRef.current) {
+      inputRef.current.setSelectionRange(cursorPosition, cursorPosition);
+      setCursorPosition(null);
+    }
+  }, [displayValue, cursorPosition]);
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value;
+    const cursorPos = e.target.selectionStart || 0;
+    
+    // Strip all non-numeric characters
+    const numValue = input.replace(/[^0-9]/g, '');
+    
+    // Calculate cursor position based on digit count before cursor
+    const beforeCursor = input.slice(0, cursorPos);
+    const digitsBeforeCursor = beforeCursor.replace(/[^0-9]/g, '').length;
+    
+    // Find new cursor position in formatted string
+    const newNumValue = numValue ? Number(numValue) : 0;
+    const formatted = newNumValue ? `₦${formatWithCommas(newNumValue)}` : '';
+    let newCursorPos = 0;
+    let digitCount = 0;
+    
+    for (let i = 0; i < formatted.length && digitCount < digitsBeforeCursor; i++) {
+      newCursorPos = i + 1;
+      if (/[0-9]/.test(formatted[i])) {
+        digitCount++;
+      }
+    }
+    
+    setCursorPosition(newCursorPos);
+    onChange(numValue);
+  };
   
   return (
     <div className="space-y-2">
@@ -92,14 +132,8 @@ const NeumorphicInput = ({
         <Input
           ref={inputRef}
           inputMode="numeric"
-          pattern="[0-9]*"
           value={displayValue}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          onChange={(e) => {
-            const numValue = e.target.value.replace(/[^0-9]/g, '');
-            onChange(numValue);
-          }}
+          onChange={handleChange}
           placeholder={placeholder}
           className="border-0 bg-transparent h-12 text-lg font-medium truncate"
         />

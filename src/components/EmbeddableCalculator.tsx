@@ -35,11 +35,26 @@ const defaultTheme: PartnerTheme = {
 
 export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate }: EmbeddableCalculatorProps) => {
   const [entityType, setEntityType] = useState<'business_name' | 'company'>('business_name');
-  const [turnover, setTurnover] = useState('');
-  const [expenses, setExpenses] = useState('');
-  const [fixedAssets, setFixedAssets] = useState('');
+  const [turnover, setTurnover] = useState<number>(0);
+  const [expenses, setExpenses] = useState<number>(0);
+  const [fixedAssets, setFixedAssets] = useState<number>(0);
   const [result, setResult] = useState<any>(null);
   const [isCalculating, setIsCalculating] = useState(false);
+
+  // Format number with commas for display
+  const formatWithCommas = (num: number): string => {
+    if (!num) return '';
+    return num.toLocaleString('en-NG');
+  };
+
+  // Handle input change - strip non-numeric and update state
+  const handleCurrencyChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setter: React.Dispatch<React.SetStateAction<number>>
+  ) => {
+    const numericValue = e.target.value.replace(/[^0-9]/g, '');
+    setter(numericValue ? Number(numericValue) : 0);
+  };
 
   const styles = {
     container: {
@@ -199,9 +214,9 @@ export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate }: Embe
     setIsCalculating(true);
     
     setTimeout(() => {
-      const turnoverNum = Number(turnover) || 0;
-      const expensesNum = Number(expenses) || 0;
-      const assetsNum = Number(fixedAssets) || 0;
+      const turnoverNum = turnover || 0;
+      const expensesNum = expenses || 0;
+      const assetsNum = fixedAssets || 0;
       const taxableIncome = Math.max(0, turnoverNum - expensesNum);
 
       let pit = 0;
@@ -295,26 +310,28 @@ export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate }: Embe
 
       {/* Input Fields */}
       <div style={styles.inputGroup}>
-        <label style={styles.label}>Annual Turnover (₦)</label>
+        <label style={styles.label}>Annual Turnover</label>
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           style={styles.input}
           placeholder="e.g., 15,000,000"
-          value={turnover}
-          onChange={(e) => setTurnover(e.target.value)}
+          value={turnover ? `₦${formatWithCommas(turnover)}` : ''}
+          onChange={(e) => handleCurrencyChange(e, setTurnover)}
           onFocus={(e) => e.target.style.borderColor = theme.primaryColor}
           onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
         />
       </div>
 
       <div style={styles.inputGroup}>
-        <label style={styles.label}>Deductible Expenses (₦)</label>
+        <label style={styles.label}>Deductible Expenses</label>
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           style={styles.input}
           placeholder="e.g., 3,000,000"
-          value={expenses}
-          onChange={(e) => setExpenses(e.target.value)}
+          value={expenses ? `₦${formatWithCommas(expenses)}` : ''}
+          onChange={(e) => handleCurrencyChange(e, setExpenses)}
           onFocus={(e) => e.target.style.borderColor = theme.primaryColor}
           onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
         />
@@ -322,13 +339,14 @@ export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate }: Embe
 
       {entityType === 'company' && (
         <div style={styles.inputGroup}>
-          <label style={styles.label}>Fixed Assets (₦) - For small company check</label>
+          <label style={styles.label}>Fixed Assets - For small company check</label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
             style={styles.input}
             placeholder="e.g., 100,000,000"
-            value={fixedAssets}
-            onChange={(e) => setFixedAssets(e.target.value)}
+            value={fixedAssets ? `₦${formatWithCommas(fixedAssets)}` : ''}
+            onChange={(e) => handleCurrencyChange(e, setFixedAssets)}
             onFocus={(e) => e.target.style.borderColor = theme.primaryColor}
             onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
           />
