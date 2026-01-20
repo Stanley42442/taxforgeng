@@ -15,6 +15,7 @@ import { TierSelectionWrapper } from "@/components/TierSelectionWrapper";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { InstallPWAPrompt } from "@/components/InstallPWAPrompt";
+import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
 import { SharedElementProvider } from "@/components/PageTransition";
 import { NavMenu } from "@/components/NavMenu";
 import { UpgradeCelebrationProvider } from "@/components/UpgradeCelebrationProvider";
@@ -219,6 +220,7 @@ const App = () => (
                             <TaxAssistant />
                             <OfflineIndicator />
                             <InstallPWAPrompt />
+                            <PWAUpdatePrompt />
                           </Suspense>
                         </div>
                       </UpgradeCelebrationProvider>
