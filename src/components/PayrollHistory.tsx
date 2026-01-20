@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/collapsible";
 
 export const PayrollHistory = () => {
-  const { payrollRuns, payrollEntries, isLoading } = usePayrollHistory();
+  const { payrollRuns, isLoading, getPayrollEntries } = usePayrollHistory();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterYear, setFilterYear] = useState<string>("all");
   const [selectedRun, setSelectedRun] = useState<string | null>(null);
@@ -38,16 +38,18 @@ export const PayrollHistory = () => {
     return matchesYear;
   }) || [];
 
-  // Get entries for selected run
-  const selectedRunEntries = payrollEntries?.filter(e => e.payroll_run_id === selectedRun) || [];
+  // Note: We'll fetch entries for selected run when needed via getPayrollEntries
+  const [selectedRunEntries, setSelectedRunEntries] = useState<any[]>([]);
   const selectedRunData = payrollRuns?.find(r => r.id === selectedRun);
 
   // Stats
   const totalRuns = payrollRuns?.length || 0;
   const totalPaid = payrollRuns?.reduce((sum, r) => sum + (r.total_net_salaries || 0), 0) || 0;
 
-  const handleViewDetails = (runId: string) => {
+  const handleViewDetails = async (runId: string) => {
     setSelectedRun(runId);
+    const entries = await getPayrollEntries(runId);
+    setSelectedRunEntries(entries);
     setShowDetailsDialog(true);
   };
 
@@ -60,6 +62,7 @@ export const PayrollHistory = () => {
       payDate: selectedRunData?.pay_date || "",
       result: {
         grossSalary: entry.gross_salary,
+        adjustedGross: entry.gross_salary,
         pensionEmployee: entry.pension_employee,
         pensionEmployer: entry.pension_employer,
         nhf: entry.nhf || 0,
@@ -210,7 +213,7 @@ export const PayrollHistory = () => {
                                   {run.total_employees} employees
                                 </p>
                               </div>
-                              <Badge variant={run.status === "completed" ? "default" : "secondary"}>
+                              <Badge variant={run.status === "paid" ? "default" : "secondary"}>
                                 {run.status}
                               </Badge>
                               <ChevronDown className="h-4 w-4 text-muted-foreground" />

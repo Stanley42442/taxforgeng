@@ -94,6 +94,23 @@ export function useLeaveManagement() {
     enabled: !!user,
   });
 
+  // Fetch leave requests
+  const { data: leaveRequests, isLoading: requestsLoading } = useQuery({
+    queryKey: ['leave-requests', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      
+      const { data, error } = await supabase
+        .from('leave_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data as LeaveRequest[];
+    },
+    enabled: !!user,
+  });
+
   // Fetch public holidays
   const { data: holidays, isLoading: holidaysLoading } = useQuery({
     queryKey: ['public-holidays', user?.id],
@@ -163,6 +180,124 @@ export function useLeaveManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['leave-types'] });
       toast.success('Leave types initialized');
+    },
+  });
+
+  // Create leave type
+  const createLeaveType = useMutation({
+    mutationFn: async (leaveType: {
+      name: string;
+      code: string;
+      defaultDaysPerYear: number;
+      color: string;
+      isPaid: boolean;
+      requiresApproval: boolean;
+      canCarryOver: boolean;
+      maxCarryOverDays: number;
+    }) => {
+      if (!user) throw new Error('Not authenticated');
+      
+      const { data, error } = await supabase
+        .from('leave_types')
+        .insert({
+          user_id: user.id,
+          name: leaveType.name,
+          code: leaveType.code,
+          default_days_per_year: leaveType.defaultDaysPerYear,
+          color: leaveType.color,
+          is_paid: leaveType.isPaid,
+          requires_approval: leaveType.requiresApproval,
+          can_carry_over: leaveType.canCarryOver,
+          max_carry_over_days: leaveType.maxCarryOverDays,
+          is_active: true,
+        })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leave-types'] });
+      toast.success('Leave type created');
+    },
+  });
+
+  // Create leave request
+  const createLeaveRequest = useMutation({
+    mutationFn: async (request: {
+      employeeId: string;
+      leaveTypeId: string;
+      startDate: string;
+      endDate: string;
+      totalDays: number;
+      isHalfDay?: boolean;
+      reason?: string;
+    }) => {
+      const leaveType = leaveTypes?.find(t => t.id === request.leaveTypeId);
+      
+      const { data, error } = await supabase
+        .from('leave_requests')
+        .insert({
+          employee_id: request.employeeId,
+          leave_type_id: request.leaveTypeId,
+          start_date: request.startDate,
+          end_date: request.endDate,
+          total_days: request.totalDays,
+          is_half_day: request.isHalfDay || false,
+          reason: request.reason,
+          status: leaveType?.requires_approval ? 'pending' : 'approved',
+        })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leave-requests'] });
+      toast.success('Leave request submitted');
+    },
+    onError: (error) => {
+      toast.error('Failed to submit request: ' + error.message);
+    },
+  });
+
+  // Approve request
+  const approveRequest = useMutation({
+    mutationFn: async (requestId: string) => {
+      const { error } = await supabase
+        .from('leave_requests')
+        .update({
+          status: 'approved',
+          approved_at: new Date().toISOString(),
+        })
+        .eq('id', requestId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leave-requests'] });
+      toast.success('Leave request approved');
+    },
+  });
+
+  // Reject request
+  const rejectRequest = useMutation({
+    mutationFn: async ({ requestId, reason }: { requestId: string; reason?: string }) => {
+      const { error } = await supabase
+        .from('leave_requests')
+        .update({
+          status: 'rejected',
+          rejection_reason: reason,
+        })
+        .eq('id', requestId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leave-requests'] });
+      toast.success('Leave request rejected');
     },
   });
 
@@ -327,10 +462,15 @@ export function useLeaveManagement() {
 
   return {
     leaveTypes: leaveTypes || [],
+    leaveRequests: leaveRequests || [],
     holidays: holidays || [],
-    isLoading: typesLoading || holidaysLoading,
+    isLoading: typesLoading || holidaysLoading || requestsLoading,
     calculateWorkingDays,
     initializeLeaveTypes,
+    createLeaveType,
+    createLeaveRequest,
+    approveRequest,
+    rejectRequest,
     getEmployeeBalances,
     submitLeaveRequest,
     updateLeaveRequestStatus,

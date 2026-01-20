@@ -129,10 +129,11 @@ export const PayrollAnalyticsDashboard = () => {
     }));
 
     const totalPayroll = activeEmployees.reduce((sum, e) => sum + e.current_gross_salary, 0);
-    const departmentDistribution = departmentMetrics.map(d => ({
+    const departmentColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
+    const departmentDistribution = departmentMetrics.map((d, i) => ({
       name: d.department,
       value: d.totalGross,
-      fill: `hsl(${Math.random() * 360}, 70%, 50%)`,
+      color: departmentColors[i % departmentColors.length],
     }));
 
     // YoY comparison
@@ -294,8 +295,6 @@ export const PayrollAnalyticsDashboard = () => {
             <div className="h-[300px]">
               <ReusablePieChart
                 data={analytics.departmentDistribution}
-                dataKey="value"
-                nameKey="name"
               />
             </div>
           </CardContent>

@@ -46,13 +46,12 @@ export const LeaveManagement = () => {
   const { 
     leaveTypes, 
     leaveRequests, 
-    leaveBalances,
     isLoading,
     createLeaveType,
     createLeaveRequest,
     approveRequest,
     rejectRequest,
-    initializeBalances,
+    initializeLeaveTypes,
   } = useLeaveManagement();
   const { employees } = useEmployees();
   
@@ -109,7 +108,7 @@ export const LeaveManagement = () => {
       return;
     }
 
-    await createLeaveRequest({
+    createLeaveRequest.mutate({
       employeeId: selectedEmployee,
       leaveTypeId: selectedLeaveType,
       startDate: format(startDate, "yyyy-MM-dd"),
@@ -133,19 +132,8 @@ export const LeaveManagement = () => {
   };
 
   // Initialize default leave types
-  const handleInitializeDefaults = async () => {
-    for (const type of DEFAULT_LEAVE_TYPES) {
-      await createLeaveType({
-        name: type.name,
-        code: type.code,
-        defaultDaysPerYear: type.defaultDays,
-        color: type.color,
-        isPaid: type.isPaid,
-        requiresApproval: true,
-        canCarryOver: false,
-        maxCarryOverDays: 0,
-      });
-    }
+  const handleInitializeDefaults = () => {
+    initializeLeaveTypes.mutate();
   };
 
   // Stats
@@ -467,14 +455,14 @@ export const LeaveManagement = () => {
                                 <Button 
                                   size="sm" 
                                   variant="outline"
-                                  onClick={() => approveRequest(request.id)}
+                                  onClick={() => approveRequest.mutate(request.id)}
                                 >
                                   <Check className="h-4 w-4" />
                                 </Button>
                                 <Button 
                                   size="sm" 
                                   variant="outline"
-                                  onClick={() => rejectRequest(request.id, "Rejected by manager")}
+                                  onClick={() => rejectRequest.mutate({ requestId: request.id, reason: "Rejected by manager" })}
                                 >
                                   <X className="h-4 w-4" />
                                 </Button>
@@ -490,49 +478,9 @@ export const LeaveManagement = () => {
             </TabsContent>
 
             <TabsContent value="balances">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {employees?.filter(e => e.status === "active").map(emp => {
-                  const empBalances = leaveBalances?.filter(b => b.employee_id === emp.id) || [];
-                  
-                  return (
-                    <Card key={emp.id}>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-base">{emp.first_name} {emp.last_name}</CardTitle>
-                        <CardDescription>{emp.department || "No department"}</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        {empBalances.length === 0 ? (
-                          <p className="text-sm text-muted-foreground">No balances initialized</p>
-                        ) : (
-                          <div className="space-y-2">
-                            {empBalances.map(balance => {
-                              const type = leaveTypes?.find(t => t.id === balance.leave_type_id);
-                              const used = balance.used_days || 0;
-                              const total = balance.entitled_days;
-                              const remaining = total - used;
-                              
-                              return (
-                                <div key={balance.id} className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <div 
-                                      className="w-2 h-2 rounded-full" 
-                                      style={{ backgroundColor: type?.color || "#6b7280" }} 
-                                    />
-                                    <span className="text-sm">{type?.name}</span>
-                                  </div>
-                                  <div className="text-sm">
-                                    <span className="font-medium">{remaining}</span>
-                                    <span className="text-muted-foreground">/{total}</span>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+              <div className="text-center py-8 text-muted-foreground">
+                <p>Leave balances are initialized when employees are assigned leave types.</p>
+                <p>Use the "Leave Types" tab to configure available leave categories.</p>
               </div>
             </TabsContent>
 

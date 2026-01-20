@@ -20,7 +20,7 @@ import {
 import { useEmployees } from "@/hooks/useEmployees";
 import { usePayrollHistory } from "@/hooks/usePayrollHistory";
 import { usePayrollTemplates } from "@/hooks/usePayrollTemplates";
-import { calculatePayrollWithExtras, type PayrollInput, type PayrollResult } from "@/lib/payrollCalculations";
+import { calculatePayroll, type PayrollInput, type PayrollResult } from "@/lib/payrollCalculations";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { generatePayslipPDF } from "@/lib/payslipPdfExport";
 import { toast } from "sonner";
@@ -57,8 +57,8 @@ const BONUS_TYPES = [
 
 export const BulkPayrollCalculator = () => {
   const { employees } = useEmployees();
-  const { savePayrollRun, isSaving } = usePayrollHistory();
-  const { templates, saveTemplate } = usePayrollTemplates();
+  const { createPayrollRun } = usePayrollHistory();
+  const { templates, createTemplate } = usePayrollTemplates();
   
   const [use2026Rules, setUse2026Rules] = useState(true);
   const [payPeriod, setPayPeriod] = useState(format(new Date(), "yyyy-MM"));
@@ -148,18 +148,18 @@ export const BulkPayrollCalculator = () => {
 
       const input: PayrollInput = {
         grossSalary: entry.grossSalary,
-        includeNhf: entry.includeNhf,
+        includeNHF: entry.includeNhf,
         use2026Rules,
-        annualRent: 0, // Could be added per employee
+        annualRent: 0,
         overtimeHours: entry.overtimeHours,
         overtimeMultiplier: entry.overtimeMultiplier,
         bonusAmount: entry.bonusType !== "none" ? entry.bonusAmount : 0,
         bonusIsTaxable: true,
-        leaveDeductionDays: 0,
-        dailyRate: entry.grossSalary / 22,
+        unpaidLeaveDays: 0,
+        workingDaysInMonth: 22,
       };
 
-      const result = calculatePayrollWithExtras(input);
+      const result = calculatePayroll(input);
       return { ...entry, result };
     });
 
@@ -194,20 +194,23 @@ export const BulkPayrollCalculator = () => {
       return;
     }
 
-    await savePayrollRun({
-      payPeriod,
-      payDate,
+    createPayrollRun.mutate({
+      pay_period: payPeriod,
+      pay_date: payDate,
       entries: validEntries.map(e => ({
-        employeeId: e.employeeId,
-        employeeName: e.employeeName,
-        department: e.department,
-        grossSalary: e.grossSalary,
-        includeNhf: e.includeNhf,
-        result: e.result!,
-        overtimeHours: e.overtimeHours,
-        overtimeMultiplier: e.overtimeMultiplier,
-        bonusAmount: e.bonusAmount,
-        bonusType: e.bonusType,
+        employee_id: e.employeeId,
+        employee_name: e.employeeName,
+        gross_salary: e.grossSalary,
+        overtime_amount: e.result!.overtimeAmount,
+        bonus_amount: e.result!.bonusAmount,
+        leave_deduction: e.result!.leaveDeduction,
+        pension_employee: e.result!.pensionEmployee,
+        pension_employer: e.result!.pensionEmployer,
+        nhf: e.result!.nhf,
+        taxable_income: e.result!.taxableIncome,
+        paye: e.result!.paye,
+        net_salary: e.result!.netSalary,
+        include_nhf: e.includeNhf,
       })),
     });
   };
@@ -219,15 +222,15 @@ export const BulkPayrollCalculator = () => {
       return;
     }
 
-    await saveTemplate({
+    createTemplate.mutate({
       name: templateName,
       description: templateDescription,
       entries: entries.map(e => ({
-        employeeId: e.employeeId,
-        employeeName: e.employeeName,
+        employee_id: e.employeeId,
+        employee_name: e.employeeName,
+        gross_salary: e.grossSalary,
+        include_nhf: e.includeNhf,
         department: e.department,
-        grossSalary: e.grossSalary,
-        includeNhf: e.includeNhf,
       })),
     });
 
@@ -530,7 +533,7 @@ export const BulkPayrollCalculator = () => {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <Button onClick={handleSavePayrollRun} disabled={isSaving}>
+              <Button onClick={handleSavePayrollRun} disabled={createPayrollRun.isPending}>
                 <Save className="h-4 w-4 mr-2" />
                 Save Payroll Run
               </Button>
