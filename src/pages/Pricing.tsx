@@ -355,49 +355,47 @@ const Pricing = () => {
         <h2 className="text-2xl font-bold text-foreground text-center mb-8">
           Full Feature Comparison
         </h2>
-        <div className="rounded-2xl border border-border glass-frosted shadow-card">
-          <div className="overflow-x-auto rounded-2xl">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b border-border bg-secondary/50">
-                  <th className="text-left p-4 font-semibold text-foreground min-w-[200px]">Feature</th>
-                  <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Individual</th>
-                  <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Starter</th>
-                  <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Basic</th>
-                  <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Professional</th>
-                  <th className="text-center p-4 font-semibold text-primary min-w-[80px] border-x border-primary/30">Business ✦</th>
-                  <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Corporate</th>
-                </tr>
-              </thead>
-              <tbody>
-                {featureCategories.map((category, catIndex) => (
-                  <>
-                    {/* Category Header */}
-                    <tr key={`cat-${catIndex}`} className="bg-muted/30">
-                      <td colSpan={7} className="p-3">
-                        <div className="flex items-center gap-2 font-semibold text-foreground">
-                          <category.icon className="h-4 w-4 text-primary" />
-                          {category.name}
-                        </div>
-                      </td>
+        <div className="rounded-2xl border border-border bg-card shadow-card">
+          <table className="w-full" style={{ borderCollapse: 'collapse', borderSpacing: 0 }}>
+            <thead>
+              <tr className="border-b border-border bg-secondary/50">
+                <th className="text-left p-4 font-semibold text-foreground">Feature</th>
+                <th className="text-center p-4 font-semibold text-foreground">Individual</th>
+                <th className="text-center p-4 font-semibold text-foreground">Starter</th>
+                <th className="text-center p-4 font-semibold text-foreground">Basic</th>
+                <th className="text-center p-4 font-semibold text-foreground">Professional</th>
+                <th className="text-center p-4 font-semibold text-primary">Business ✦</th>
+                <th className="text-center p-4 font-semibold text-foreground">Corporate</th>
+              </tr>
+            </thead>
+            <tbody>
+              {featureCategories.map((category, catIndex) => (
+                <>
+                  {/* Category Header */}
+                  <tr key={`cat-${catIndex}`} className="bg-muted/30">
+                    <td colSpan={7} className="p-3">
+                      <div className="flex items-center gap-2 font-semibold text-foreground">
+                        <category.icon className="h-4 w-4 text-primary" />
+                        {category.name}
+                      </div>
+                    </td>
+                  </tr>
+                  {/* Features in this category */}
+                  {features.filter(f => f.category === category.name).map((feature, i) => (
+                    <tr key={`${category.name}-${i}`} className={i % 2 === 0 ? 'bg-background' : 'bg-secondary/20'}>
+                      <td className="p-4 text-sm text-foreground">{feature.name}</td>
+                      <td className="p-4 text-center"><FeatureValue value={feature.free} /></td>
+                      <td className="p-4 text-center"><FeatureValue value={feature.starter} /></td>
+                      <td className="p-4 text-center"><FeatureValue value={feature.basic} /></td>
+                      <td className="p-4 text-center"><FeatureValue value={feature.professional} /></td>
+                      <td className="p-4 text-center"><FeatureValue value={feature.business} /></td>
+                      <td className="p-4 text-center"><FeatureValue value={feature.corporate} /></td>
                     </tr>
-                    {/* Features in this category */}
-                    {features.filter(f => f.category === category.name).map((feature, i) => (
-                      <tr key={`${category.name}-${i}`} className={i % 2 === 0 ? 'bg-background' : 'bg-secondary/20'}>
-                        <td className="p-4 text-sm text-foreground">{feature.name}</td>
-                        <td className="p-4 text-center"><FeatureValue value={feature.free} /></td>
-                        <td className="p-4 text-center"><FeatureValue value={feature.starter} /></td>
-                        <td className="p-4 text-center"><FeatureValue value={feature.basic} /></td>
-                        <td className="p-4 text-center"><FeatureValue value={feature.professional} /></td>
-                        <td className="p-4 text-center border-x border-primary/30"><FeatureValue value={feature.business} /></td>
-                        <td className="p-4 text-center"><FeatureValue value={feature.corporate} /></td>
-                      </tr>
-                    ))}
-                  </>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                  ))}
+                </>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
