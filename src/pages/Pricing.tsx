@@ -355,9 +355,9 @@ const Pricing = () => {
         <h2 className="text-2xl font-bold text-foreground text-center mb-8">
           Full Feature Comparison
         </h2>
-        <div className="rounded-2xl border border-border glass-frosted overflow-hidden shadow-card">
-          <div className="overflow-x-auto">
-            <table className="w-full">
+        <div className="rounded-2xl border border-border glass-frosted shadow-card">
+          <div className="overflow-x-auto rounded-2xl">
+            <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-border bg-secondary/50">
                   <th className="text-left p-4 font-semibold text-foreground min-w-[200px]">Feature</th>
@@ -365,7 +365,7 @@ const Pricing = () => {
                   <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Starter</th>
                   <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Basic</th>
                   <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Professional</th>
-                  <th className="text-center p-4 font-semibold text-foreground bg-primary/5 min-w-[80px]">Business</th>
+                  <th className="text-center p-4 font-semibold text-primary min-w-[80px] border-x border-primary/30">Business ✦</th>
                   <th className="text-center p-4 font-semibold text-foreground min-w-[80px]">Corporate</th>
                 </tr>
               </thead>
@@ -389,7 +389,7 @@ const Pricing = () => {
                         <td className="p-4 text-center"><FeatureValue value={feature.starter} /></td>
                         <td className="p-4 text-center"><FeatureValue value={feature.basic} /></td>
                         <td className="p-4 text-center"><FeatureValue value={feature.professional} /></td>
-                        <td className="p-4 text-center bg-primary/5"><FeatureValue value={feature.business} /></td>
+                        <td className="p-4 text-center border-x border-primary/30"><FeatureValue value={feature.business} /></td>
                         <td className="p-4 text-center"><FeatureValue value={feature.corporate} /></td>
                       </tr>
                     ))}
