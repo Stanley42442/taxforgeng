@@ -7,8 +7,8 @@ import "./styles/mobile.css";
 import "./styles/tablet.css";
 import "./styles/desktop.css";
 
-// One-time cache clear to fix stale service worker - increment to force new clear
-const CACHE_VERSION = 'v2';
+// Automatic cache busting - uses build timestamp so every deploy triggers cache clear
+const CACHE_VERSION = import.meta.env.VITE_BUILD_TIME || 'dev';
 
 (async () => {
   const lastVersion = localStorage.getItem('cache-version');
