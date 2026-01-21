@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Calculator } from "lucide-react";
+import { Calculator, Info } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { CurrencyInput } from "@/components/ui/currency-input";
+import { RentReliefTooltip, RentReliefWarnings } from "@/components/RentReliefTooltip";
+import { VerificationBadge } from "@/components/VerificationBadge";
 
 // 2026 PIT Bands - Nigeria Tax Act 2025
 const PIT_BANDS_2026 = [
@@ -171,18 +173,21 @@ export const PayrollCalculator = () => {
               </div>
 
               {use2026Rules && (
-                <div>
-                  <Label htmlFor="annualRent">Annual Rent Paid (₦)</Label>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="annualRent">Annual Rent Paid (Optional)</Label>
+                    <RentReliefTooltip />
+                  </div>
                   <CurrencyInput
                     id="annualRent"
                     value={annualRent}
                     onChange={setAnnualRent}
                     placeholder="Enter annual rent for Rent Relief"
-                    className="mt-1"
                   />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    2026 Rule: 20% of rent (max ₦500k) replaces old CRA
-                  </p>
+                  <RentReliefWarnings 
+                    annualRent={annualRent} 
+                    annualGross={grossSalary * 12} 
+                  />
                 </div>
               )}
 

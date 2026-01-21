@@ -1,6 +1,11 @@
 // Nigerian Payroll Calculations - 2026 Rules
 // Based on Nigeria Tax Act 2025
 
+import {
+  verifyPayrollCalculation,
+  toVerificationData,
+  logVerificationResults,
+} from './taxValidators';
 // Standard working hours per month (44 hours/week × 4 weeks)
 export const STANDARD_MONTHLY_HOURS = 176;
 
@@ -52,6 +57,7 @@ export interface PayrollResult {
   bonusAmount: number;
   leaveDeduction: number;
   breakdown: PayrollBreakdownItem[];
+  verification?: import('@/types/verification').VerificationData;
 }
 
 export interface PayrollBreakdownItem {
@@ -222,7 +228,8 @@ export function calculatePayroll(input: PayrollInput): PayrollResult {
   
   breakdown.push({ label: 'PAYE', amount: paye, type: 'tax' });
 
-  return {
+  // Run verification
+  const preliminaryResult = {
     grossSalary,
     adjustedGross,
     pensionEmployee,
@@ -237,6 +244,14 @@ export function calculatePayroll(input: PayrollInput): PayrollResult {
     bonusAmount: bonusIsTaxable ? bonusAmount : nonTaxableBonus,
     leaveDeduction,
     breakdown,
+  };
+  
+  const verificationReport = verifyPayrollCalculation(input, preliminaryResult as PayrollResult);
+  logVerificationResults(verificationReport, 'Payroll');
+  
+  return {
+    ...preliminaryResult,
+    verification: toVerificationData(verificationReport),
   };
 }
 
