@@ -16,12 +16,114 @@ import {
   addSectionTitle,
   checkPageBreak,
 } from "./exportShared";
+import type { VerificationData, ValidationResult } from "@/types/verification";
+import { VERIFICATION_SOURCES } from "@/types/verification";
 
 export interface BusinessPDFData {
   name?: string;
   rcBnNumber?: string;
   verificationStatus?: 'verified' | 'not_verified' | 'pending' | 'manual';
   cacDetails?: CACVerificationDetails;
+}
+
+/**
+ * Add verification badge to PDF
+ * Shows "Accuracy Verified ✓" with gold border and passed checks count
+ */
+function addVerificationBadge(
+  doc: jsPDF,
+  y: number,
+  verification: VerificationData | undefined,
+  margin: number,
+  contentWidth: number
+): number {
+  if (!verification) return y;
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  
+  // Gold border box with light green fill
+  doc.setDrawColor(212, 175, 55); // Gold
+  doc.setLineWidth(1);
+  doc.setFillColor(240, 255, 240); // Light green
+  doc.roundedRect(margin, y, contentWidth, 28, 3, 3, 'FD');
+
+  // Checkmark icon
+  doc.setTextColor(0, 128, 0); // Green
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text('\u2713', margin + 8, y + 14);
+
+  // Title text
+  doc.setTextColor(0, 100, 0);
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Accuracy Verified', margin + 20, y + 12);
+
+  // Subtitle
+  doc.setTextColor(80, 80, 80);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.text(
+    `Verified against Nigeria Tax Act 2025 (as of ${verification.timestamp}). Sources: PwC, KPMG, EY, NRS.`,
+    margin + 20,
+    y + 20
+  );
+
+  // Checks passed badge (right side)
+  doc.setTextColor(212, 175, 55); // Gold
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text(
+    `${verification.checksPassed}/${verification.checksRun} Checks`,
+    pageWidth - margin - 8,
+    y + 14,
+    { align: 'right' }
+  );
+
+  return y + 35;
+}
+
+/**
+ * Add verification details section to PDF
+ * Shows list of passed/failed checks with explanations
+ */
+function addVerificationDetails(
+  doc: jsPDF,
+  y: number,
+  details: ValidationResult[],
+  margin: number,
+  contentWidth: number
+): number {
+  // Section title
+  doc.setTextColor(0, 100, 0);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Verification Details', margin, y);
+  y += 8;
+
+  // Details list
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+
+  const passedChecks = details.filter(d => d.passed);
+  const maxToShow = Math.min(passedChecks.length, 6); // Show max 6 checks
+  
+  for (let i = 0; i < maxToShow; i++) {
+    const check = passedChecks[i];
+    doc.setTextColor(0, 128, 0); // Green
+    doc.text('\u2713', margin + 4, y);
+    doc.setTextColor(60, 60, 60);
+    doc.text(check.ruleName, margin + 12, y);
+    y += 6;
+  }
+
+  if (passedChecks.length > maxToShow) {
+    doc.setTextColor(100, 100, 100);
+    doc.text(`+ ${passedChecks.length - maxToShow} more checks passed`, margin + 12, y);
+    y += 6;
+  }
+
+  return y + 5;
 }
 
 export const generateProfessionalPDF = (
@@ -91,6 +193,16 @@ export const generateProfessionalPDF = (
     doc.text(`Directors: ${businessData.cacDetails.directors.join(', ')}`, margin + 100, y + 20);
     
     y += 30;
+  }
+
+  // === VERIFICATION BADGE (if verification data available) ===
+  if (result.verification) {
+    y = addVerificationBadge(doc, y, result.verification, margin, contentWidth);
+    
+    // Add verification details if checks were run
+    if (result.verification.details && result.verification.details.length > 0) {
+      y = addVerificationDetails(doc, y, result.verification.details, margin, contentWidth);
+    }
   }
 
   y += 5;
