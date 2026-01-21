@@ -167,12 +167,22 @@ export function calculatePayroll(input: PayrollInput): PayrollResult {
   const annualBonus = bonusIsTaxable ? bonusAmount * 12 : 0;
   
   // Rent Relief (2026 rules) or CRA (pre-2026)
+  // CRITICAL: Under 2026 rules, CRA is ABOLISHED - only Rent Relief applies
+  // Rent Relief = 20% of actual rent paid, capped at ₦500,000 annually
+  // If no rent is claimed, relief is ₦0 (unlike old CRA which was automatic)
   let rentRelief = 0;
+  let craAmount = 0; // Track CRA separately for verification
+  
   if (use2026Rules) {
+    // 2026 Rules: CRA abolished, only Rent Relief applies
+    // Relief = 20% of rent, max ₦500,000/year
     rentRelief = Math.min(annualRent * 0.20, 500000) / 12;
+    craAmount = 0; // CRA is explicitly zero
   } else {
-    const cra = Math.max(200000, annualGross * 0.01) + (annualGross * 0.20);
-    rentRelief = cra / 12;
+    // Pre-2026 Rules: CRA applies (automatic relief)
+    // CRA = higher of ₦200,000 or 1% of gross + 20% of gross
+    craAmount = Math.max(200000, annualGross * 0.01) + (annualGross * 0.20);
+    rentRelief = craAmount / 12;
   }
   
   // Annual reliefs
