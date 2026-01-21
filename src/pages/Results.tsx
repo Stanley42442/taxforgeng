@@ -47,6 +47,7 @@ import {
 import { useFormFeedback } from "@/hooks/useFormFeedback";
 import { SuccessCelebration } from "@/components/ui/form-feedback";
 import { SharedElement } from "@/components/PageTransition";
+import { VerificationBadge } from "@/components/VerificationBadge";
 
 const Results = () => {
   const location = useLocation();
@@ -390,6 +391,17 @@ const Results = () => {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+
+      {/* Verification Badge */}
+      {result.verification && (
+        <div className="mb-6 animate-slide-up">
+          <VerificationBadge 
+            verification={result.verification}
+            onReVerify={() => toast.info('Rules verified as of Jan 21, 2026')}
+          />
         </div>
       )}
 

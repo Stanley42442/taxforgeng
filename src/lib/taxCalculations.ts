@@ -1,5 +1,10 @@
 // Nigerian Tax Calculations - Pre-2026 and 2026+ Rules
 
+import { 
+  verifyBusinessTaxCalculation, 
+  toVerificationData, 
+  logVerificationResults 
+} from './taxValidators';
 export interface SectorTaxRules {
   citRate?: number;
   vatStatus?: 'standard' | 'zero' | 'exempt' | 'reduced';
@@ -54,6 +59,7 @@ export interface TaxResult {
   sectorId?: string;
   sectorRules?: SectorTaxRules;
   appliedIncentives?: string[];
+  verification?: import('@/types/verification').VerificationData;
 }
 
 export interface TaxBreakdownItem {
@@ -509,7 +515,9 @@ export function calculateTax(inputs: TaxInputs): TaxResult {
   const totalTaxPayable = Math.max(0, incomeTax + developmentLevy + netVatPayable - whtCredits);
   const effectiveRate = grossIncome > 0 ? (totalTaxPayable / grossIncome) * 100 : 0;
 
-  return {
+  // Run verification
+  
+  const preliminaryResult = {
     grossIncome,
     taxableIncome,
     incomeTax,
@@ -525,6 +533,14 @@ export function calculateTax(inputs: TaxInputs): TaxResult {
     sectorId: inputs.sectorId,
     sectorRules: inputs.sectorRules,
     appliedIncentives: appliedIncentives.length > 0 ? appliedIncentives : undefined,
+  };
+  
+  const verificationReport = verifyBusinessTaxCalculation(inputs, preliminaryResult as TaxResult);
+  logVerificationResults(verificationReport, 'Business Tax');
+  
+  return {
+    ...preliminaryResult,
+    verification: toVerificationData(verificationReport),
   };
 }
 
