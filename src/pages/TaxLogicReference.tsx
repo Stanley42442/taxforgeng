@@ -206,31 +206,39 @@ const SourceBadge = ({ source }: { source: typeof VERIFICATION_SOURCES_DETAILED[
 
 const TaxLogicReference = () => {
   return (
-    <PageLayout title="Tax Logic Reference">
-      <p className="text-muted-foreground mb-6">Nigeria Tax Act 2025 vs Pre-2026 Rules - Side-by-Side Comparison</p>
+    <PageLayout 
+      title="Tax Logic Reference" 
+      description="Nigeria Tax Act 2025 vs Pre-2026 Rules"
+      icon={FileText}
+    >
       <div className="space-y-6">
         {/* Header with Actions */}
         <Card className="bg-gradient-to-r from-primary/10 to-gold/10 border-gold/30">
-          <CardContent className="py-6">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div>
-                <h2 className="text-xl font-bold flex items-center gap-2">
-                  <Shield className="h-6 w-6 text-success" />
-                  Accuracy Verified
-                </h2>
-                <p className="text-sm text-muted-foreground mt-1">
-                  All rules verified against Big 4 advisories and official NRS guidelines
-                </p>
+          <CardContent className="p-4 sm:py-6">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-start gap-3">
+                <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-success shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                  <h2 className="text-base sm:text-xl font-bold">Accuracy Verified</h2>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                    All rules verified against Big 4 advisories and official NRS guidelines
+                  </p>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => downloadTaxLogicDocumentPDF()}>
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => downloadTaxLogicDocumentPDF()}
+                  className="flex-1 sm:flex-none"
+                >
                   <Download className="h-4 w-4 mr-2" />
-                  Download PDF
+                  <span className="hidden xs:inline">Download</span> PDF
                 </Button>
-                <Button variant="outline" asChild>
+                <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none">
                   <a href="/documentation">
                     <FileText className="h-4 w-4 mr-2" />
-                    Full Documentation
+                    <span className="hidden xs:inline">Full</span> Docs
                   </a>
                 </Button>
               </div>
@@ -240,30 +248,33 @@ const TaxLogicReference = () => {
 
         {/* Main Tabs */}
         <Tabs defaultValue="pit" className="space-y-4">
-          <TabsList className="grid grid-cols-3 md:grid-cols-6 w-full">
-            <TabsTrigger value="pit" className="flex items-center gap-1">
-              <User className="h-4 w-4" />
-              <span className="hidden md:inline">PIT</span>
+          <TabsList className="grid grid-cols-6 w-full h-auto p-1">
+            <TabsTrigger value="pit" className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 px-1 py-1.5 text-xs sm:text-sm">
+              <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span>PIT</span>
             </TabsTrigger>
-            <TabsTrigger value="cit" className="flex items-center gap-1">
-              <Building2 className="h-4 w-4" />
-              <span className="hidden md:inline">CIT</span>
+            <TabsTrigger value="cit" className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 px-1 py-1.5 text-xs sm:text-sm">
+              <Building2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span>CIT</span>
             </TabsTrigger>
-            <TabsTrigger value="vat" className="flex items-center gap-1">
-              <Percent className="h-4 w-4" />
-              <span className="hidden md:inline">VAT/WHT</span>
+            <TabsTrigger value="vat" className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 px-1 py-1.5 text-xs sm:text-sm">
+              <Percent className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">VAT/</span>WHT
             </TabsTrigger>
-            <TabsTrigger value="deductions" className="flex items-center gap-1">
-              <Receipt className="h-4 w-4" />
-              <span className="hidden md:inline">Deductions</span>
+            <TabsTrigger value="deductions" className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 px-1 py-1.5 text-xs sm:text-sm">
+              <Receipt className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Deductions</span>
+              <span className="sm:hidden">Ded.</span>
             </TabsTrigger>
-            <TabsTrigger value="payroll" className="flex items-center gap-1">
-              <Briefcase className="h-4 w-4" />
-              <span className="hidden md:inline">Payroll</span>
+            <TabsTrigger value="payroll" className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 px-1 py-1.5 text-xs sm:text-sm">
+              <Briefcase className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Payroll</span>
+              <span className="sm:hidden">Pay</span>
             </TabsTrigger>
-            <TabsTrigger value="sources" className="flex items-center gap-1">
-              <Shield className="h-4 w-4" />
-              <span className="hidden md:inline">Sources</span>
+            <TabsTrigger value="sources" className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 px-1 py-1.5 text-xs sm:text-sm">
+              <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Sources</span>
+              <span className="sm:hidden">Src</span>
             </TabsTrigger>
           </TabsList>
 
