@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle2, XCircle, ChevronDown, RefreshCw, AlertCircle, ExternalLink } from 'lucide-react';
+import { CheckCircle2, XCircle, ChevronDown, RefreshCw, AlertCircle, ExternalLink, Shield } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -9,7 +9,10 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import type { VerificationData, ValidationResult } from '@/types/verification';
-import { VERIFICATION_SOURCES } from '@/types/verification';
+import { 
+  VERIFICATION_SOURCES_DETAILED, 
+  VERIFICATION_METHODOLOGY 
+} from '@/types/verification';
 import { VERIFICATION_TIMESTAMP } from '@/lib/taxValidators';
 
 interface VerificationBadgeProps {
@@ -18,14 +21,34 @@ interface VerificationBadgeProps {
   compact?: boolean;
 }
 
+// Big 4 badge component
+const Big4Badge = ({ name, type }: { name: string; type: 'big4' | 'government' | 'legal' | 'industry' }) => {
+  const bgColor = type === 'big4' 
+    ? 'bg-primary/10 border-primary/30 text-primary' 
+    : type === 'government'
+    ? 'bg-success/10 border-success/30 text-success'
+    : 'bg-muted border-muted-foreground/30 text-muted-foreground';
+    
+  return (
+    <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-md border ${bgColor}`}>
+      {name}
+    </span>
+  );
+};
+
 export const VerificationBadge = ({ 
   verification, 
   onReVerify,
   compact = false 
 }: VerificationBadgeProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showSources, setShowSources] = useState(false);
   
   const { verified, checksRun, checksPassed, rulesAge, details, warnings } = verification;
+  
+  // Get Big 4 sources only
+  const big4Sources = VERIFICATION_SOURCES_DETAILED.filter(s => s.type === 'big4');
+  const otherSources = VERIFICATION_SOURCES_DETAILED.filter(s => s.type !== 'big4');
   
   if (compact) {
     return (
@@ -45,19 +68,33 @@ export const VerificationBadge = ({
       <div className="flex items-center gap-3 p-4 rounded-xl bg-success/10 border-2 border-gold/30">
         <div className="flex-shrink-0">
           <div className="p-2 rounded-full bg-success/20">
-            <CheckCircle2 className="h-5 w-5 text-success" />
+            <Shield className="h-5 w-5 text-success" />
           </div>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-success">Accuracy Verified ✓</p>
+          <p className="font-semibold text-success flex items-center gap-2">
+            Accuracy Verified ✓
+            <span className="text-xs font-normal text-muted-foreground">
+              Independently verified
+            </span>
+          </p>
           <p className="text-xs text-muted-foreground line-clamp-2">
-            Verified against Nigeria Tax Act 2025 (as of Jan 2026). 
-            Sources: PwC, KPMG, EY, Deloitte, NRS
+            Verified against Nigeria Tax Act 2025 (as of Jan 2026)
           </p>
         </div>
         <Badge variant="outline" className="border-gold text-gold flex-shrink-0">
           {checksPassed}/{checksRun} Checks
         </Badge>
+      </div>
+      
+      {/* Big 4 Source Badges */}
+      <div className="flex flex-wrap gap-2">
+        {big4Sources.map((source, i) => (
+          <Big4Badge key={i} name={source.shortName} type={source.type} />
+        ))}
+        {otherSources.slice(0, 2).map((source, i) => (
+          <Big4Badge key={`other-${i}`} name={source.shortName} type={source.type} />
+        ))}
       </div>
       
       {/* Rules Age Warning */}
@@ -80,6 +117,41 @@ export const VerificationBadge = ({
         </Alert>
       )}
       
+      {/* Expandable Sources */}
+      <Collapsible open={showSources} onOpenChange={setShowSources}>
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" size="sm" className="w-full justify-between">
+            <span className="flex items-center gap-2">
+              <ChevronDown className={`h-4 w-4 transition-transform ${showSources ? 'rotate-180' : ''}`} />
+              Verification Sources
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {VERIFICATION_SOURCES_DETAILED.length} sources
+            </span>
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="space-y-2 mt-2">
+          <div className="rounded-lg border bg-card p-3 space-y-3">
+            {VERIFICATION_SOURCES_DETAILED.map((source, i) => (
+              <div key={i} className="flex items-start gap-2 text-sm">
+                <Big4Badge name={source.shortName} type={source.type} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-foreground font-medium">{source.name}</p>
+                  <p className="text-xs text-muted-foreground">{source.description}</p>
+                </div>
+              </div>
+            ))}
+            
+            {/* Methodology */}
+            <div className="pt-3 border-t">
+              <p className="text-xs text-muted-foreground italic">
+                {VERIFICATION_METHODOLOGY}
+              </p>
+            </div>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+      
       {/* Expandable Details */}
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
@@ -98,19 +170,6 @@ export const VerificationBadge = ({
             {details.map((check, i) => (
               <VerificationCheckItem key={i} check={check} />
             ))}
-          </div>
-          
-          {/* Sources */}
-          <div className="text-xs text-muted-foreground p-2">
-            <p className="font-medium mb-1">Verification Sources:</p>
-            <ul className="space-y-0.5">
-              {VERIFICATION_SOURCES.slice(0, 3).map((source, i) => (
-                <li key={i} className="flex items-center gap-1">
-                  <ExternalLink className="h-3 w-3" />
-                  {source}
-                </li>
-              ))}
-            </ul>
           </div>
         </CollapsibleContent>
       </Collapsible>

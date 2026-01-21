@@ -163,7 +163,7 @@ export function calculateCompanyTax(
     // Pre-2026 Rules: 30% CIT (or sector override)
     const rate = hasSectorCIT ? sectorRules!.citRate! / 100 : 0.30;
     const cit = Math.max(0, profit * rate);
-    const devLevy = Math.max(0, profit * 0.02); // 2% education levy
+    const devLevy = Math.max(0, profit * 0.03); // 3% Tertiary Education Tax (TET) per Finance Act 2021
     return { cit, devLevy, isSmall: false, appliedRate: hasSectorCIT ? sectorRules!.citRate! : 30 };
   }
 }

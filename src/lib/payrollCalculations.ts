@@ -6,6 +6,8 @@ import {
   toVerificationData,
   logVerificationResults,
 } from './taxValidators';
+import { TAX_RULES_2026, TAX_RULES_PRE2026 } from '@/types/verification';
+
 // Standard working hours per month (44 hours/week × 4 weeks)
 export const STANDARD_MONTHLY_HOURS = 176;
 
@@ -40,6 +42,8 @@ export interface PayrollInput {
   bonusIsTaxable?: boolean;
   unpaidLeaveDays?: number;
   workingDaysInMonth?: number;
+  // Loss of Office / Severance compensation
+  lossOfOfficeCompensation?: number;
 }
 
 export interface PayrollResult {
@@ -56,6 +60,10 @@ export interface PayrollResult {
   overtimeAmount: number;
   bonusAmount: number;
   leaveDeduction: number;
+  // Loss of Office
+  lossOfOfficeExemption: number;
+  lossOfOfficeExcess: number;
+  lossOfOfficeCompensation: number;
   breakdown: PayrollBreakdownItem[];
   verification?: import('@/types/verification').VerificationData;
 }
@@ -128,6 +136,25 @@ export function calculateLeaveDeduction(
 }
 
 /**
+ * Calculate Loss of Office exemption
+ * 2026: First ₦50M exempt, excess taxed at progressive rates
+ * Pre-2026: First ₦10M exempt
+ */
+export function calculateLossOfOfficeExemption(
+  compensation: number,
+  use2026Rules: boolean
+): { exemption: number; excess: number } {
+  const limit = use2026Rules 
+    ? TAX_RULES_2026.lossOfOfficeExemption 
+    : (TAX_RULES_PRE2026.lossOfOfficeExemption || 10000000);
+  
+  const exemption = Math.min(compensation, limit);
+  const excess = Math.max(0, compensation - limit);
+  
+  return { exemption, excess };
+}
+
+/**
  * Main payroll calculation function
  */
 export function calculatePayroll(input: PayrollInput): PayrollResult {
@@ -142,6 +169,7 @@ export function calculatePayroll(input: PayrollInput): PayrollResult {
     bonusIsTaxable = true,
     unpaidLeaveDays = 0,
     workingDaysInMonth = 22,
+    lossOfOfficeCompensation = 0,
   } = input;
 
   const breakdown: PayrollBreakdownItem[] = [];
@@ -151,6 +179,11 @@ export function calculatePayroll(input: PayrollInput): PayrollResult {
   
   // Calculate leave deduction
   const leaveDeduction = calculateLeaveDeduction(grossSalary, unpaidLeaveDays, workingDaysInMonth);
+  
+  // Calculate Loss of Office exemption
+  const lossOfOfficeResult = calculateLossOfOfficeExemption(lossOfOfficeCompensation, use2026Rules);
+  const lossOfOfficeExemption = lossOfOfficeResult.exemption;
+  const lossOfOfficeExcess = lossOfOfficeResult.excess;
   
   // Adjusted gross (after leave deduction)
   const adjustedGross = grossSalary - leaveDeduction + overtimeAmount;
@@ -190,8 +223,11 @@ export function calculatePayroll(input: PayrollInput): PayrollResult {
   const annualNHF = nhf * 12;
   const annualRentRelief = rentRelief * 12;
   
-  // Taxable income
-  const annualTaxableIncome = Math.max(0, annualGross + annualBonus - annualRentRelief - annualPension - annualNHF);
+  // Add Loss of Office excess to taxable income (taxed at progressive rates)
+  // The excess is treated as regular income under 2026 rules
+  const annualTaxableIncome = Math.max(0, 
+    annualGross + annualBonus + lossOfOfficeExcess - annualRentRelief - annualPension - annualNHF
+  );
   const monthlyTaxableIncome = annualTaxableIncome / 12;
   
   // PAYE
@@ -200,7 +236,7 @@ export function calculatePayroll(input: PayrollInput): PayrollResult {
   // Non-taxable bonus
   const nonTaxableBonus = bonusIsTaxable ? 0 : bonusAmount;
   
-  // Net salary
+  // Net salary (Loss of Office is a one-time payment, not included in monthly net)
   const netSalary = adjustedGross + nonTaxableBonus + bonusAmount - pensionEmployee - nhf - paye;
   
   // Total cost to company
@@ -221,6 +257,23 @@ export function calculatePayroll(input: PayrollInput): PayrollResult {
       amount: bonusAmount, 
       type: 'earning' 
     });
+  }
+  
+  // Loss of Office breakdown
+  if (lossOfOfficeCompensation > 0) {
+    breakdown.push({
+      label: `Loss of Office Exemption (up to ${use2026Rules ? '₦50M' : '₦10M'})`,
+      amount: lossOfOfficeExemption,
+      type: 'relief'
+    });
+    
+    if (lossOfOfficeExcess > 0) {
+      breakdown.push({
+        label: 'Loss of Office (Taxable Excess)',
+        amount: lossOfOfficeExcess,
+        type: 'earning'
+      });
+    }
   }
   
   breakdown.push({ label: 'Pension (Employee 8%)', amount: pensionEmployee, type: 'deduction' });
@@ -253,6 +306,9 @@ export function calculatePayroll(input: PayrollInput): PayrollResult {
     overtimeAmount,
     bonusAmount: bonusIsTaxable ? bonusAmount : nonTaxableBonus,
     leaveDeduction,
+    lossOfOfficeExemption,
+    lossOfOfficeExcess,
+    lossOfOfficeCompensation,
     breakdown,
   };
   
@@ -287,6 +343,7 @@ export function calculateBulkPayroll(
     totalBonuses: acc.totalBonuses + result.bonusAmount,
     totalLeaveDeductions: acc.totalLeaveDeductions + result.leaveDeduction,
     totalCostToCompany: acc.totalCostToCompany + result.totalCostToCompany,
+    totalLossOfOfficeExemption: acc.totalLossOfOfficeExemption + result.lossOfOfficeExemption,
   }), {
     totalGross: 0,
     totalNet: 0,
@@ -298,6 +355,7 @@ export function calculateBulkPayroll(
     totalBonuses: 0,
     totalLeaveDeductions: 0,
     totalCostToCompany: 0,
+    totalLossOfOfficeExemption: 0,
   });
   
   return { results, totals };
@@ -314,6 +372,7 @@ export interface PayrollTotals {
   totalBonuses: number;
   totalLeaveDeductions: number;
   totalCostToCompany: number;
+  totalLossOfOfficeExemption: number;
 }
 
 /**
