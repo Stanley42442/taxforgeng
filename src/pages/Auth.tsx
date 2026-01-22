@@ -5,17 +5,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, Mail, Lock, User, ArrowLeft, Eye, EyeOff, KeyRound, Shield } from "lucide-react";
+import { Calculator, Mail, Lock, User, ArrowLeft, Eye, EyeOff, KeyRound, Shield, Gift, HelpCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
 import { getDeviceInfo } from "@/lib/deviceFingerprint";
+import { TermsAcceptanceGate } from "@/components/TermsAcceptanceGate";
+import { REFERRAL_SOURCES } from "@/lib/nigerianStates";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const emailSchema = z.string().email("Please enter a valid email address");
 const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
 
 const REMEMBER_ME_KEY = 'taxforge-remember-me';
+const TERMS_ACCEPTED_KEY = 'taxforge-terms-accepted';
 
 type AuthView = 'login' | 'signup' | 'forgot-password' | 'reset-password' | 'mfa-challenge';
 
@@ -41,6 +51,16 @@ const Auth = () => {
   const [isAccountLocked, setIsAccountLocked] = useState(false);
   const [lockoutUnlockTime, setLockoutUnlockTime] = useState<Date | null>(null);
   const [failedAttempts, setFailedAttempts] = useState(0);
+  
+  // New fields for enhanced signup
+  const [referralCode, setReferralCode] = useState("");
+  const [referralSource, setReferralSource] = useState("");
+  const [referralCodeValid, setReferralCodeValid] = useState<boolean | null>(null);
+  const [referralCodeChecking, setReferralCodeChecking] = useState(false);
+  const [showTermsGate, setShowTermsGate] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(() => {
+    return localStorage.getItem(TERMS_ACCEPTED_KEY) === 'true';
+  });
   
   const { signIn, signUp, user, loading } = useAuth();
   const navigate = useNavigate();
@@ -199,7 +219,19 @@ const Auth = () => {
         toast.success("Welcome back!");
         navigate("/");
       } else if (view === 'signup') {
-        const { error } = await signUp(email, password, fullName);
+        // Check if terms were accepted (should be, but double-check)
+        if (!termsAccepted) {
+          setShowTermsGate(true);
+          return;
+        }
+
+        const { error } = await signUp(email, password, fullName, {
+          referral_code: referralCode || undefined,
+          referral_source: referralSource || undefined,
+          terms_accepted: true,
+          privacy_accepted: true,
+          refund_policy_accepted: true,
+        });
         if (error) {
           if (error.message.includes("already registered")) {
             toast.error("This email is already registered. Please sign in instead.");
@@ -220,12 +252,57 @@ const Auth = () => {
           setEmail("");
           setPassword("");
           setFullName("");
+          setReferralCode("");
+          setReferralSource("");
         }
       }
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Validate referral code
+  const validateReferralCode = async (code: string) => {
+    if (!code || code.length < 4) {
+      setReferralCodeValid(null);
+      return;
+    }
+
+    setReferralCodeChecking(true);
+    try {
+      const { data, error } = await supabase
+        .from('referrals')
+        .select('id, referrer_id, status')
+        .eq('referral_code', code.toUpperCase())
+        .eq('status', 'pending')
+        .maybeSingle();
+
+      if (data && !error) {
+        setReferralCodeValid(true);
+        toast.success('Referral code applied! You\'ll both earn bonus points.');
+      } else {
+        setReferralCodeValid(false);
+      }
+    } catch {
+      setReferralCodeValid(false);
+    } finally {
+      setReferralCodeChecking(false);
+    }
+  };
+
+  // Handle terms acceptance
+  const handleTermsAccepted = () => {
+    setTermsAccepted(true);
+    localStorage.setItem(TERMS_ACCEPTED_KEY, 'true');
+    setShowTermsGate(false);
+  };
+
+  // Show terms gate when switching to signup if not accepted
+  useEffect(() => {
+    if (view === 'signup' && !termsAccepted) {
+      setShowTermsGate(true);
+    }
+  }, [view, termsAccepted]);
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1037,6 +1114,67 @@ const Auth = () => {
                     )}
                   </div>
 
+                  {/* Referral Code (Sign Up Only) */}
+                  {view === 'signup' && (
+                    <div className="space-y-2">
+                      <Label htmlFor="referralCode" className="flex items-center gap-2">
+                        <Gift className="h-4 w-4" />
+                        Referral Code (Optional)
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="referralCode"
+                          type="text"
+                          placeholder="Enter referral code"
+                          value={referralCode}
+                          onChange={(e) => {
+                            const code = e.target.value.toUpperCase();
+                            setReferralCode(code);
+                            setReferralCodeValid(null);
+                          }}
+                          onBlur={() => validateReferralCode(referralCode)}
+                          className={`input-premium ${
+                            referralCodeValid === true ? 'border-green-500' :
+                            referralCodeValid === false ? 'border-destructive' : ''
+                          }`}
+                        />
+                        {referralCodeChecking && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                          </div>
+                        )}
+                      </div>
+                      {referralCodeValid === true && (
+                        <p className="text-xs text-green-600">✓ Referral code applied</p>
+                      )}
+                      {referralCodeValid === false && (
+                        <p className="text-xs text-destructive">Invalid or expired code</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* How did you hear about us (Sign Up Only) */}
+                  {view === 'signup' && (
+                    <div className="space-y-2">
+                      <Label htmlFor="referralSource" className="flex items-center gap-2">
+                        <HelpCircle className="h-4 w-4" />
+                        How did you hear about us? (Optional)
+                      </Label>
+                      <Select value={referralSource} onValueChange={setReferralSource}>
+                        <SelectTrigger className="input-premium">
+                          <SelectValue placeholder="Select an option" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {REFERRAL_SOURCES.map((source) => (
+                            <SelectItem key={source.value} value={source.value}>
+                              {source.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
                   {/* Remember Me */}
                   {view === 'login' && (
                     <div className="flex items-center gap-2">
@@ -1107,10 +1245,19 @@ const Auth = () => {
 
           {/* Disclaimer */}
           <p className="text-center text-xs text-muted-foreground mt-6">
-            By continuing, you agree to our Terms of Service and Privacy Policy.
+            By continuing, you agree to our{' '}
+            <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>,{' '}
+            <Link to="/terms#privacy" className="text-primary hover:underline">Privacy Policy</Link>, and{' '}
+            <Link to="/terms#refund" className="text-primary hover:underline">Refund Policy</Link>.
           </p>
         </div>
       </main>
+
+      {/* Terms Acceptance Gate */}
+      <TermsAcceptanceGate 
+        open={showTermsGate} 
+        onAccept={handleTermsAccepted} 
+      />
     </div>
   );
 };
