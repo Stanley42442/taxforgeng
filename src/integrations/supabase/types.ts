@@ -2302,16 +2302,27 @@ export type Database = {
           allowed_start_hour: number | null
           created_at: string
           email: string | null
+          employment_status: string | null
           full_name: string | null
+          has_registered_business: boolean | null
           has_selected_initial_tier: boolean
           id: string
           ip_whitelist_enabled: boolean
+          kyc_level: number | null
           language_preference: string | null
           last_password_change: string | null
+          onboarding_completed: boolean | null
+          privacy_accepted_at: string | null
+          referral_source: string | null
+          referred_by_code: string | null
+          refund_policy_accepted_at: string | null
           session_invalidated_at: string | null
+          state_of_residence: string | null
           subscription_tier: string
+          terms_accepted_at: string | null
           time_restriction_timezone: string | null
           time_restrictions_enabled: boolean
+          tin: string | null
           total_points: number
           trial_expires_at: string | null
           trial_started_at: string | null
@@ -2325,16 +2336,27 @@ export type Database = {
           allowed_start_hour?: number | null
           created_at?: string
           email?: string | null
+          employment_status?: string | null
           full_name?: string | null
+          has_registered_business?: boolean | null
           has_selected_initial_tier?: boolean
           id: string
           ip_whitelist_enabled?: boolean
+          kyc_level?: number | null
           language_preference?: string | null
           last_password_change?: string | null
+          onboarding_completed?: boolean | null
+          privacy_accepted_at?: string | null
+          referral_source?: string | null
+          referred_by_code?: string | null
+          refund_policy_accepted_at?: string | null
           session_invalidated_at?: string | null
+          state_of_residence?: string | null
           subscription_tier?: string
+          terms_accepted_at?: string | null
           time_restriction_timezone?: string | null
           time_restrictions_enabled?: boolean
+          tin?: string | null
           total_points?: number
           trial_expires_at?: string | null
           trial_started_at?: string | null
@@ -2348,16 +2370,27 @@ export type Database = {
           allowed_start_hour?: number | null
           created_at?: string
           email?: string | null
+          employment_status?: string | null
           full_name?: string | null
+          has_registered_business?: boolean | null
           has_selected_initial_tier?: boolean
           id?: string
           ip_whitelist_enabled?: boolean
+          kyc_level?: number | null
           language_preference?: string | null
           last_password_change?: string | null
+          onboarding_completed?: boolean | null
+          privacy_accepted_at?: string | null
+          referral_source?: string | null
+          referred_by_code?: string | null
+          refund_policy_accepted_at?: string | null
           session_invalidated_at?: string | null
+          state_of_residence?: string | null
           subscription_tier?: string
+          terms_accepted_at?: string | null
           time_restriction_timezone?: string | null
           time_restrictions_enabled?: boolean
+          tin?: string | null
           total_points?: number
           trial_expires_at?: string | null
           trial_started_at?: string | null
