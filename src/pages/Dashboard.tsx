@@ -57,6 +57,7 @@ import { useUpcomingReminders } from "@/hooks/useUpcomingReminders";
 import { Badge } from "@/components/ui/badge";
 import { SharedElement } from "@/components/PageTransition";
 import { motion } from "framer-motion";
+import { OnboardingWizard } from "@/components/OnboardingWizard";
 
 interface Expense {
   id: string;
@@ -97,6 +98,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showWelcome, setShowWelcome] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [dataSeeded, setDataSeeded] = useState(false);
   const [expandedBusinessId, setExpandedBusinessId] = useState<string | null>(null);
   const [expandedReminderId, setExpandedReminderId] = useState<string | null>(null);
@@ -118,13 +120,27 @@ const Dashboard = () => {
   }, [summaryExpanded]);
 
   useEffect(() => {
-    if (user) {
-      if (!localStorage.getItem('taxforge_disclaimer_accepted')) {
+    const checkOnboardingStatus = async () => {
+      if (!user) return;
+      
+      // Check if user has completed onboarding
+      const { data } = await supabase
+        .from('profiles')
+        .select('onboarding_completed')
+        .eq('id', user.id)
+        .single();
+
+      // Show onboarding wizard if not completed
+      if (data && data.onboarding_completed === false) {
+        setShowOnboarding(true);
+      } else if (!localStorage.getItem('taxforge_disclaimer_accepted')) {
         setShowDisclaimer(true);
       } else if (!localStorage.getItem('taxforge_welcome_shown')) {
         setShowWelcome(true);
       }
-    }
+    };
+
+    checkOnboardingStatus();
   }, [user]);
 
   useEffect(() => {
@@ -374,6 +390,12 @@ const Dashboard = () => {
 
   return (
     <PageLayout title="Dashboard" description="Your business overview at a glance" icon={LayoutDashboard}>
+      {/* Onboarding Wizard - shown for new users */}
+      <OnboardingWizard 
+        open={showOnboarding} 
+        onComplete={() => setShowOnboarding(false)} 
+      />
+
       {showDisclaimer && (
         <DisclaimerModal onAccept={() => {
           setShowDisclaimer(false);

@@ -9,7 +9,18 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName?: string) => Promise<{ error: Error | null }>;
+  signUp: (
+    email: string, 
+    password: string, 
+    fullName?: string,
+    metadata?: {
+      referral_code?: string;
+      referral_source?: string;
+      terms_accepted?: boolean;
+      privacy_accepted?: boolean;
+      refund_policy_accepted?: boolean;
+    }
+  ) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null; blocked?: boolean }>;
   signOut: () => Promise<void>;
 }
@@ -442,7 +453,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  const signUp = async (email: string, password: string, fullName?: string) => {
+  const signUp = async (
+    email: string, 
+    password: string, 
+    fullName?: string,
+    metadata?: {
+      referral_code?: string;
+      referral_source?: string;
+      terms_accepted?: boolean;
+      privacy_accepted?: boolean;
+      refund_policy_accepted?: boolean;
+    }
+  ) => {
     const redirectUrl = `${window.location.origin}/`;
     
     const { data, error } = await supabase.auth.signUp({
@@ -451,7 +473,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       options: {
         emailRedirectTo: redirectUrl,
         data: {
-          full_name: fullName || ''
+          full_name: fullName || '',
+          referred_by_code: metadata?.referral_code || null,
+          referral_source: metadata?.referral_source || null,
+          terms_accepted: metadata?.terms_accepted || false,
+          privacy_accepted: metadata?.privacy_accepted || false,
+          refund_policy_accepted: metadata?.refund_policy_accepted || false,
         }
       }
     });
