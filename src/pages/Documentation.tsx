@@ -350,7 +350,7 @@ const Documentation = () => {
               <CardContent>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {[
-                    { icon: Calculator, title: 'Accurate Calculations', desc: '2025 FIRS rules with 2026 preview' },
+                    { icon: Calculator, title: 'Accurate Calculations', desc: '2026 Tax Rules (NTA 2025)' },
                     { icon: Bot, title: 'AI-Powered', desc: 'Intelligent tax assistant' },
                     { icon: Shield, title: 'Enterprise Security', desc: 'Bank-grade protection' },
                     { icon: Rocket, title: 'PWA Support', desc: 'Works offline, installs on device' },
@@ -374,7 +374,7 @@ const Documentation = () => {
                 title="Tax Calculators"
                 description="Comprehensive Nigerian tax calculations"
                 features={[
-                  'Personal Income Tax (PIT) with 2025/2026 rules',
+                  'Personal Income Tax (PIT) with 2026 rules (NTA 2025)',
                   'Company Income Tax (CIT) with small company exemptions',
                   'VAT calculations with sector-specific rules',
                   'Withholding Tax (WHT) credit tracking',

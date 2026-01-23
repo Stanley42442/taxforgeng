@@ -1902,12 +1902,12 @@ export const translations: Translations = {
     ha: 'Sami shawarar tsarin kasuwanci da ya dace da ku da ƙididdige haraji daidai. An gina shi don ƙananan kasuwanci da mutane da ke bi ta yanayin harajin Najeriya.', 
     ig: 'Nweta ntụnye usoro azụmaahịa akpọrọ maka gị na ngbako ụtụ ziri ezi. E wuru ya maka obere azụmaahịa na ndị mmadụ na-achọ ụzọ n\'ime ụtụ Naịjirịa.' 
   },
-  'home.updatedFor2025': { 
-    en: 'Updated for Nigeria Tax Act 2025', 
-    pcm: 'We don update am for Nigeria Tax Act 2025', 
-    yo: 'A ti ṣàtúnṣe fún Òfin Owó-orí Nàìjíríà 2025', 
-    ha: 'An sabunta don Dokar Haraji ta Najeriya 2025', 
-    ig: 'Emelitere maka Iwu Ụtụ Naịjirịa 2025' 
+  'home.updatedFor2026': { 
+    en: 'Updated for 2026 Tax Rules', 
+    pcm: 'We don update am for 2026 Tax Rules', 
+    yo: 'A ti ṣàtúnṣe fún Àwọn Òfin Owó-orí 2026', 
+    ha: 'An sabunta don Dokokin Haraji 2026', 
+    ig: 'Emelitere maka Iwu Ụtụ 2026' 
   },
   'home.getAdvice': { 
     en: 'Get Tax Advice', 
@@ -2333,11 +2333,11 @@ export const translations: Translations = {
     ig: 'Ụlọ Ọrụ (LTD)' 
   },
   'calculator.use2026Rules': { 
-    en: 'Nigeria Tax Act 2025 Rules', 
-    pcm: 'Nigeria Tax Act 2025 Rules', 
-    yo: 'Àwọn Òfin Àṣà Owó-orí Nàìjíríà 2025', 
-    ha: 'Dokokin Dokar Haraji ta Najeriya 2025', 
-    ig: 'Iwu Iwu Ụtụ Naịjirịa 2025' 
+    en: '2026 Tax Rules (NTA 2025)', 
+    pcm: '2026 Tax Rules (NTA 2025)', 
+    yo: 'Àwọn Òfin Owó-orí 2026 (NTA 2025)', 
+    ha: 'Dokokin Haraji 2026 (NTA 2025)', 
+    ig: 'Iwu Ụtụ 2026 (NTA 2025)' 
   },
   'calculator.currentRules': { 
     en: 'Current (Pre-2026) Rules', 
@@ -3375,7 +3375,7 @@ export const translations: Translations = {
   'individual.pageTitle': { en: 'Individual Tax Calculator', pcm: 'Personal Tax Calculator', yo: 'Ẹ̀rọ Ìṣirò Owó-orí Ènìyàn', ha: 'Na\'urar Ƙididdigan Harajin Mutum', ig: 'Ngwa Mgbako Ụtụ Onwe' },
   'individual.title': { en: 'Personal Tax Calculator', pcm: 'Personal Tax Calculator', yo: 'Ẹ̀rọ Ìṣirò Owó-orí Ara Ẹni', ha: 'Na\'urar Ƙididdigan Harajin Kai', ig: 'Ngwa Mgbako Ụtụ Nkeonwe' },
   'individual.subtitle': { en: 'Calculate your personal taxes without a registered business', pcm: 'Calculate your personal tax without registered business', yo: 'Ṣe ìṣirò owó-orí ara rẹ láìní iṣẹ́ tí a forúkọsílẹ̀', ha: 'Ƙididdige harajin ku na sirri ba tare da kasuwanci da aka yi rajista ba', ig: 'Gbakọọ ụtụ onwe gị na-enweghị azụmahịa edebanyere aha' },
-  'individual.nigeriaRules': { en: 'Nigeria Tax Act 2025 Rules', pcm: 'Nigeria Tax Act 2025 Rules', yo: 'Àwọn Òfin Ìṣe Owó-orí Nàìjíríà 2025', ha: 'Dokokin Dokar Haraji ta Najeriya 2025', ig: 'Iwu Iwu Ụtụ Naịjirịa 2025' },
+  'individual.nigeriaRules': { en: '2026 Tax Rules (NTA 2025)', pcm: '2026 Tax Rules (NTA 2025)', yo: 'Àwọn Òfin Owó-orí 2026 (NTA 2025)', ha: 'Dokokin Haraji 2026 (NTA 2025)', ig: 'Iwu Ụtụ 2026 (NTA 2025)' },
   'individual.currentRules': { en: 'Current (Pre-2026) Rules', pcm: 'Current (Before 2026) Rules', yo: 'Àwọn Òfin Lọ́wọ́lọ́wọ́ (Ṣáájú 2026)', ha: 'Dokokin Yanzu (Kafin 2026)', ig: 'Iwu Ugbu a (Tupu 2026)' },
   'individual.tabEmployment': { en: 'Employment', pcm: 'Employment', yo: 'Iṣẹ́', ha: 'Aiki', ig: 'Ọrụ' },
   'individual.tabForeign': { en: 'Foreign', pcm: 'Foreign', yo: 'Ilẹ̀ Òkèèrè', ha: 'Ƙasashen Waje', ig: 'Mba Ọzọ' },

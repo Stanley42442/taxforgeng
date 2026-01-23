@@ -144,7 +144,7 @@ const Index = () => {
           <div className="text-center animate-slide-up-delay-1">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full glass px-5 py-2.5 text-sm font-medium text-foreground shadow-futuristic">
               <Sparkles className="h-4 w-4 text-accent animate-pulse-soft" />
-              <span>Updated for 2025 FIRS Rules</span>
+              <span>Updated for 2026 Tax Rules</span>
             </div>
             
             <h1 className="mb-6 text-4xl font-extrabold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl">
