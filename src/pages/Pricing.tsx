@@ -36,6 +36,7 @@ import { BillingCycleToggle } from "@/components/BillingCycleToggle";
 import { PromoCodeInput } from "@/components/PromoCodeInput";
 import { usePaystack, DiscountValidationResult } from "@/hooks/usePaystack";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 interface TierFeature {
   name: string;
@@ -114,7 +115,7 @@ const Pricing = () => {
   const { user } = useAuth();
   const { tier: currentTier, upgradeTier, refreshSubscription } = useSubscription();
   const { triggerCelebration } = useUpgradeCelebration();
-  const { initializePayment, validateDiscountCode, loading: paymentLoading } = usePaystack();
+  const { initializePayment, validateDiscountCode, cancelPayment, loading: paymentLoading, retryCount } = usePaystack();
   
   const [showDowngradeDialog, setShowDowngradeDialog] = useState(false);
   const [pendingDowngradeTier, setPendingDowngradeTier] = useState<SubscriptionTier | null>(null);
@@ -125,10 +126,23 @@ const Pricing = () => {
   const [processingTier, setProcessingTier] = useState<SubscriptionTier | null>(null);
   const [policiesAccepted, setPoliciesAccepted] = useState(false);
 
+  // Pre-warm auth session on page mount for faster payment init
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      console.log('[Pricing] Session pre-warmed:', !!data.session);
+    });
+  }, []);
+
   // Force refresh subscription data on page mount
   useEffect(() => {
     refreshSubscription();
   }, [refreshSubscription]);
+
+  const handleCancelPayment = () => {
+    cancelPayment();
+    setProcessingTier(null);
+    toast.info('Payment cancelled');
+  };
 
   const isDowngrade = (targetTier: SubscriptionTier): boolean => {
     const currentIndex = TIER_ORDER.indexOf(currentTier);
@@ -321,7 +335,9 @@ const Pricing = () => {
           features={['Everything in Free', '1 saved business', 'PDF/CSV export', 'No watermarks', 'Email reminders']}
           currentTier={currentTier}
           onUpgrade={handleTierSelect}
+          onCancel={handleCancelPayment}
           isProcessing={processingTier === 'starter'}
+          retryCount={processingTier === 'starter' ? retryCount : 0}
           billingCycle={billingCycle}
           promoDiscount={promoValidation?.valid ? promoValidation.discountPercentage : undefined}
         />
@@ -337,7 +353,9 @@ const Pricing = () => {
           features={['Everything in Starter', 'Up to 2 businesses', 'Invoices & P&L', 'OCR receipts', '75 AI queries', 'No watermarks']}
           currentTier={currentTier}
           onUpgrade={handleTierSelect}
+          onCancel={handleCancelPayment}
           isProcessing={processingTier === 'basic'}
+          retryCount={processingTier === 'basic' ? retryCount : 0}
           billingCycle={billingCycle}
           promoDiscount={promoValidation?.valid ? promoValidation.discountPercentage : undefined}
         />
@@ -353,7 +371,9 @@ const Pricing = () => {
           features={['Everything in Basic', 'Up to 5 businesses', 'Payroll & Compliance', 'Digital VAT calc', 'Basic scenarios', 'Priority support']}
           currentTier={currentTier}
           onUpgrade={handleTierSelect}
+          onCancel={handleCancelPayment}
           isProcessing={processingTier === 'professional'}
+          retryCount={processingTier === 'professional' ? retryCount : 0}
           billingCycle={billingCycle}
           promoDiscount={promoValidation?.valid ? promoValidation.discountPercentage : undefined}
         />
@@ -370,7 +390,9 @@ const Pricing = () => {
           isPopular
           currentTier={currentTier}
           onUpgrade={handleTierSelect}
+          onCancel={handleCancelPayment}
           isProcessing={processingTier === 'business'}
+          retryCount={processingTier === 'business' ? retryCount : 0}
           billingCycle={billingCycle}
           promoDiscount={promoValidation?.valid ? promoValidation.discountPercentage : undefined}
         />
@@ -510,7 +532,9 @@ const PricingCard = ({
   isPopular = false,
   currentTier,
   onUpgrade,
+  onCancel,
   isProcessing = false,
+  retryCount = 0,
   billingCycle,
   promoDiscount,
 }: {
@@ -525,7 +549,9 @@ const PricingCard = ({
   isPopular?: boolean;
   currentTier: SubscriptionTier;
   onUpgrade: (tier: SubscriptionTier) => void;
+  onCancel?: () => void;
   isProcessing?: boolean;
+  retryCount?: number;
   billingCycle: 'monthly' | 'annually';
   promoDiscount?: number;
 }) => {
@@ -541,6 +567,12 @@ const PricingCard = ({
   const displayPrice = typeof monthlyPrice === 'number' && promoDiscount
     ? monthlyPrice * (1 - promoDiscount / 100)
     : monthlyPrice;
+
+  const getProcessingText = () => {
+    if (retryCount > 0) return `Retrying... (${retryCount}/2)`;
+    return 'Connecting to Paystack...';
+  };
+
 
   return (
     <div className={`relative rounded-xl sm:rounded-2xl border p-4 sm:p-6 transition-all duration-300 ${
@@ -622,10 +654,12 @@ const PricingCard = ({
         onClick={() => onUpgrade(tier)}
       >
         {isProcessing ? (
-          <>
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            Processing...
-          </>
+          <span className="flex flex-col items-center gap-0.5">
+            <span className="flex items-center">
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              {getProcessingText()}
+            </span>
+          </span>
         ) : isCurrentTier 
           ? 'Current Plan' 
           : tier === 'corporate' 
@@ -634,6 +668,14 @@ const PricingCard = ({
               ? 'Downgrade' 
               : 'Upgrade Now'}
       </Button>
+      {isProcessing && onCancel && (
+        <button
+          onClick={onCancel}
+          className="w-full mt-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Cancel
+        </button>
+      )}
     </div>
   );
 };
