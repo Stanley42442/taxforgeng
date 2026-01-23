@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Quote, Star, Building2, Users, TrendingUp } from "lucide-react";
+import { ChevronLeft, ChevronRight, Quote, Star, Building2, TrendingUp } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Testimonial {
   id: string;
@@ -15,66 +16,37 @@ interface Testimonial {
   avatar?: string;
 }
 
-const testimonials: Testimonial[] = [
+// Fallback testimonials when no user reviews exist
+const fallbackTestimonials: Testimonial[] = [
   {
-    id: "1",
-    quote: "TaxForge NG saved us over ₦2M in the first year by identifying we qualified for small company 0% CIT rate. Game changer for our startup.",
-    author: "Chinedu Okafor",
+    id: "fallback-1",
+    quote: "TaxForge NG helped us understand if we qualified for reduced CIT rates. The clarity on tax rules is invaluable.",
+    author: "Business Owner",
     role: "CEO",
-    company: "TechStack Lagos",
+    company: "Lagos Tech Startup",
     sector: "Technology",
-    metric: "₦2M+",
-    metricLabel: "Tax Savings",
+    metric: "Clear",
+    metricLabel: "Tax Guidance",
   },
   {
-    id: "2",
-    quote: "The VAT calculator alone has saved me hours every month. I used to dread tax season, now it takes minutes instead of days.",
-    author: "Aisha Mohammed",
+    id: "fallback-2",
+    quote: "The VAT calculator saves me hours every month. I used to dread tax calculations, now it takes minutes.",
+    author: "Small Business Owner",
     role: "Founder",
-    company: "Fashion Forward NG",
+    company: "Retail Business",
     sector: "Retail",
-    metric: "90%",
+    metric: "Hours",
     metricLabel: "Time Saved",
   },
   {
-    id: "3",
-    quote: "Finally, a tax tool that understands Nigerian tax laws! The 2026 updates were reflected immediately. Our accountant loves it.",
-    author: "Emeka Nwosu",
+    id: "fallback-3",
+    quote: "Finally, a tax tool that understands Nigerian tax laws! The 2026 updates were reflected immediately.",
+    author: "Finance Manager",
     role: "CFO",
-    company: "Agro Solutions Ltd",
+    company: "Agro Business",
     sector: "Agriculture",
-    metric: "5 hrs/week",
-    metricLabel: "Time Saved",
-  },
-  {
-    id: "4",
-    quote: "Switched from manual calculations to TaxForge. The accuracy and automatic updates for new tax laws are invaluable.",
-    author: "Folake Adeyemi",
-    role: "Managing Director",
-    company: "Adeyemi Consulting",
-    sector: "Professional Services",
-    metric: "100%",
-    metricLabel: "Compliance",
-  },
-  {
-    id: "5",
-    quote: "The business structure advisor helped us choose LLC over Business Name. That decision has protected our personal assets.",
-    author: "Uche Obi",
-    role: "Co-founder",
-    company: "BuildRight Construction",
-    sector: "Construction",
-    metric: "Protected",
-    metricLabel: "Personal Assets",
-  },
-  {
-    id: "6",
-    quote: "We manage 50+ client businesses on TaxForge. The bulk processing and reporting features are exactly what we needed.",
-    author: "Ngozi Eze",
-    role: "Partner",
-    company: "Eze & Associates",
-    sector: "Accounting",
-    metric: "50+",
-    metricLabel: "Clients Managed",
+    metric: "Up-to-date",
+    metricLabel: "Tax Rules",
   },
 ];
 
@@ -90,6 +62,49 @@ export const SuccessStories = ({
   autoPlay = true 
 }: SuccessStoriesProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(fallbackTestimonials);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchApprovedReviews();
+  }, []);
+
+  const fetchApprovedReviews = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("user_reviews")
+        .select("*")
+        .eq("is_approved", true)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching reviews:", error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        const userReviews: Testimonial[] = data.map((review) => ({
+          id: review.id,
+          quote: review.quote,
+          author: review.author_name,
+          role: review.role || "",
+          company: review.company || "",
+          sector: review.sector || "",
+          metric: review.metric || "",
+          metricLabel: review.metric_label || "",
+        }));
+        
+        // Use user reviews first, then fallbacks to fill if needed
+        const combined = [...userReviews, ...fallbackTestimonials.slice(0, Math.max(0, 6 - userReviews.length))];
+        setTestimonials(combined);
+      }
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const displayedTestimonials = limit ? testimonials.slice(0, limit) : testimonials;
   const totalSlides = Math.ceil(displayedTestimonials.length / 3);
 
