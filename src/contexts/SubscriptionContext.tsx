@@ -265,9 +265,11 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   }, [user]);
 
   const refreshSubscription = async () => {
-    console.log('[SubscriptionContext] Refreshing subscription data...');
+    console.log('[SubscriptionContext] Force refreshing subscription...');
+    // Clear current state to force fresh fetch
+    setState(prev => ({ ...prev, loading: true }));
     await fetchUserData();
-    console.log('[SubscriptionContext] Subscription data refreshed');
+    console.log('[SubscriptionContext] Refresh complete, current tier:', state.tier);
   };
 
   const refreshBusinesses = async () => {

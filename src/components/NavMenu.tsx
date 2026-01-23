@@ -53,6 +53,7 @@ import {
   Wallet,
   Search,
   X,
+  Scale,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -172,6 +173,16 @@ const navGroups: NavGroup[] = [
       { to: "/referrals", label: "Referrals", icon: Gift },
       { to: "/rewards", label: "Loyalty Rewards", icon: Gift },
       { to: "/billing", label: "Billing History", icon: Receipt },
+    ]
+  },
+  {
+    id: 'legal',
+    label: 'Legal & Policies',
+    icon: Scale,
+    links: [
+      { to: "/terms#terms", label: "Terms & Conditions", icon: FileText },
+      { to: "/terms#privacy", label: "Privacy Policy", icon: Shield },
+      { to: "/terms#refund", label: "Refund Policy", icon: Receipt },
     ]
   },
   {

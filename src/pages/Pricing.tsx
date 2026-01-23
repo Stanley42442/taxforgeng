@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/PageLayout";
@@ -112,7 +112,7 @@ const TIER_PRICES: Record<string, { monthly: number; annually: number }> = {
 const Pricing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { tier: currentTier, upgradeTier } = useSubscription();
+  const { tier: currentTier, upgradeTier, refreshSubscription } = useSubscription();
   const { triggerCelebration } = useUpgradeCelebration();
   const { initializePayment, validateDiscountCode, loading: paymentLoading } = usePaystack();
   
@@ -124,6 +124,11 @@ const Pricing = () => {
   const [selectedTierForPromo, setSelectedTierForPromo] = useState<SubscriptionTier>('starter');
   const [processingTier, setProcessingTier] = useState<SubscriptionTier | null>(null);
   const [policiesAccepted, setPoliciesAccepted] = useState(false);
+
+  // Force refresh subscription data on page mount
+  useEffect(() => {
+    refreshSubscription();
+  }, [refreshSubscription]);
 
   const isDowngrade = (targetTier: SubscriptionTier): boolean => {
     const currentIndex = TIER_ORDER.indexOf(currentTier);

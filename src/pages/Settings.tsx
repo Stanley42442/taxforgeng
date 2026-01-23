@@ -146,7 +146,7 @@ const getEventLabel = (eventType: string) => {
 
 const Settings = () => {
   const { user, loading } = useAuth();
-  const { tier, trialEndsAt, isOnTrial } = useSubscription();
+  const { tier, trialEndsAt, isOnTrial, refreshSubscription } = useSubscription();
   const navigate = useNavigate();
   const trialDaysLeft = trialEndsAt ? Math.max(0, Math.ceil((trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : null;
 
@@ -174,6 +174,11 @@ const Settings = () => {
     expenses: 0,
     calculations: 0,
   });
+
+  // Force refresh subscription data on page mount
+  useEffect(() => {
+    refreshSubscription();
+  }, [refreshSubscription]);
 
   useEffect(() => {
     if (!loading && !user) {
