@@ -56,6 +56,9 @@ function generateReference(): string {
 }
 
 serve(async (req) => {
+  const startTime = Date.now();
+  console.log(`[paystack-init] Request started`);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -66,6 +69,7 @@ serve(async (req) => {
     const paystackSecretKey = Deno.env.get("PAYSTACK_SECRET_KEY")!;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    console.log(`[paystack-init] Supabase client created: ${Date.now() - startTime}ms`);
 
     // Get auth user
     const authHeader = req.headers.get("Authorization");
@@ -75,14 +79,17 @@ serve(async (req) => {
 
     const token = authHeader.replace("Bearer ", "");
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    console.log(`[paystack-init] Auth check completed: ${Date.now() - startTime}ms`);
     
     if (authError || !user) {
       throw new Error("Unauthorized");
     }
 
+    console.log(`[paystack-init] User authenticated: ${user.id}`);
+
     // Rate limiting check
     if (!checkRateLimit(user.id)) {
-      console.log(`Rate limit exceeded for user: ${user.id}`);
+      console.log(`[paystack-init] Rate limit exceeded for user: ${user.id}`);
       return new Response(
         JSON.stringify({ success: false, error: 'Too many payment attempts. Please wait a minute and try again.' }),
         { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": "60" } }
@@ -90,6 +97,7 @@ serve(async (req) => {
     }
 
     const body: InitializeRequest = await req.json();
+    console.log(`[paystack-init] Request body parsed: ${Date.now() - startTime}ms, tier: ${body.tier}, cycle: ${body.billingCycle}`);
     const { tier, billingCycle, email, callbackUrl, discountCode, discountType } = body;
 
     // Validate tier
@@ -146,11 +154,13 @@ serve(async (req) => {
       });
 
     if (txError) {
-      console.error('Transaction insert error:', txError);
+      console.error('[paystack-init] Transaction insert error:', txError);
       throw new Error('Failed to create transaction record');
     }
+    console.log(`[paystack-init] Transaction record created: ${Date.now() - startTime}ms`);
 
     // Initialize payment with Paystack
+    console.log(`[paystack-init] Calling Paystack API...`);
     const paystackResponse = await fetch('https://api.paystack.co/transaction/initialize', {
       method: 'POST',
       headers: {
@@ -173,10 +183,12 @@ serve(async (req) => {
         },
       }),
     });
+    console.log(`[paystack-init] Paystack API responded: ${Date.now() - startTime}ms`);
 
     const paystackData = await paystackResponse.json();
 
     if (!paystackData.status) {
+      console.error(`[paystack-init] Paystack error: ${paystackData.message}`);
       // Update transaction as failed
       await supabase
         .from('payment_transactions')
@@ -205,6 +217,8 @@ serve(async (req) => {
         },
       });
 
+    console.log(`[paystack-init] SUCCESS - Total time: ${Date.now() - startTime}ms, reference: ${reference}`);
+    
     return new Response(
       JSON.stringify({
         success: true,
@@ -219,7 +233,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: unknown) {
-    console.error("Error initializing payment:", error);
+    console.error(`[paystack-init] ERROR after ${Date.now() - startTime}ms:`, error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ success: false, error: errorMessage }),
