@@ -465,7 +465,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       refund_policy_accepted?: boolean;
     }
   ) => {
-    const redirectUrl = `${window.location.origin}/`;
+    const redirectUrl = `${window.location.origin}/auth`;
     
     const { data, error } = await supabase.auth.signUp({
       email,

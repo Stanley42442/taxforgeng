@@ -24,10 +24,13 @@ const ALLOWED_TEST_EMAILS = ['benjamingillespie290@gmail.com'];
 
 export const TierSwitcher = () => {
   const { tier, setTier } = useSubscription();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
-  if (!user) return null;
-  if (!ALLOWED_TEST_EMAILS.includes(user.email || '')) return null;
+  // Don't render while loading or if no user
+  if (loading || !user) return null;
+  
+  // Case-insensitive email check - only allowed test emails can see this
+  if (!ALLOWED_TEST_EMAILS.includes(user.email?.toLowerCase() || '')) return null;
 
   return (
     <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-warning/50 bg-warning/5">

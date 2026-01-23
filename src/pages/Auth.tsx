@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, Mail, Lock, User, ArrowLeft, Eye, EyeOff, KeyRound, Shield, Gift, HelpCircle } from "lucide-react";
+import { Calculator, Mail, Lock, User, ArrowLeft, Eye, EyeOff, KeyRound, Shield, Gift, HelpCircle, CheckCircle, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -27,7 +27,7 @@ const passwordSchema = z.string().min(6, "Password must be at least 6 characters
 const REMEMBER_ME_KEY = 'taxforge-remember-me';
 const TERMS_ACCEPTED_KEY = 'taxforge-terms-accepted';
 
-type AuthView = 'login' | 'signup' | 'forgot-password' | 'reset-password' | 'mfa-challenge';
+type AuthView = 'login' | 'signup' | 'forgot-password' | 'reset-password' | 'mfa-challenge' | 'email-verified' | 'email-expired';
 
 const Auth = () => {
   const [view, setView] = useState<AuthView>('login');
@@ -65,12 +65,30 @@ const Auth = () => {
   const { signIn, signUp, user, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Check for password reset token in URL
+  // Check for password reset or email verification token in URL
   useEffect(() => {
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const type = hashParams.get('type');
+    const errorCode = hashParams.get('error_code');
+    const errorDescription = hashParams.get('error_description');
+    
     if (type === 'recovery') {
       setView('reset-password');
+    } else if (type === 'signup' || type === 'email') {
+      // Handle email verification callback
+      if (errorCode || errorDescription?.includes('expired') || errorDescription?.includes('invalid')) {
+        setView('email-expired');
+        toast.error("Verification link has expired or is invalid");
+      } else {
+        setView('email-verified');
+        // Clear the hash from URL
+        window.history.replaceState(null, '', window.location.pathname);
+        toast.success("Email verified successfully!");
+        // Auto-redirect to login after 3 seconds
+        setTimeout(() => {
+          setView('login');
+        }, 3000);
+      }
     }
   }, []);
 
@@ -377,7 +395,7 @@ const Auth = () => {
         type: 'signup',
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${window.location.origin}/auth`,
         }
       });
       
@@ -732,6 +750,8 @@ const Auth = () => {
       case 'forgot-password': return 'Reset Password';
       case 'reset-password': return 'Set New Password';
       case 'mfa-challenge': return 'Two-Factor Authentication';
+      case 'email-verified': return 'Email Verified!';
+      case 'email-expired': return 'Link Expired';
     }
   };
 
@@ -744,6 +764,8 @@ const Auth = () => {
       case 'mfa-challenge': return useBackupCode 
         ? 'Enter one of your backup codes'
         : 'Enter the 6-digit code from your authenticator app';
+      case 'email-verified': return 'Your email has been successfully verified';
+      case 'email-expired': return 'This verification link has expired or is invalid';
     }
   };
 
@@ -862,6 +884,70 @@ const Auth = () => {
                   </div>
                 </div>
               </form>
+            )}
+
+            {/* Email Verified Success View */}
+            {view === 'email-verified' && (
+              <div className="text-center space-y-6">
+                <div className="w-16 h-16 mx-auto bg-success/20 rounded-full flex items-center justify-center">
+                  <CheckCircle className="h-8 w-8 text-success" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-foreground">Email Verified!</h2>
+                  <p className="text-muted-foreground mt-2">
+                    Your email has been successfully verified. Redirecting to login...
+                  </p>
+                </div>
+                <Button onClick={() => setView('login')} variant="glow" className="w-full">
+                  Continue to Login
+                </Button>
+              </div>
+            )}
+
+            {/* Email Expired View */}
+            {view === 'email-expired' && (
+              <div className="text-center space-y-6">
+                <div className="w-16 h-16 mx-auto bg-destructive/20 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="h-8 w-8 text-destructive" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-foreground">Link Expired</h2>
+                  <p className="text-muted-foreground mt-2">
+                    This verification link has expired or is invalid. Please request a new one.
+                  </p>
+                </div>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="expiredEmail">Email Address</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="expiredEmail"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="pl-10 input-premium"
+                      />
+                    </div>
+                  </div>
+                  <Button 
+                    onClick={handleResendVerification} 
+                    disabled={isResendingVerification}
+                    variant="glow"
+                    className="w-full"
+                  >
+                    {isResendingVerification ? "Sending..." : "Resend Verification Email"}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setView('login')}
+                    className="w-full"
+                  >
+                    Back to Login
+                  </Button>
+                </div>
+              </div>
             )}
 
             {/* Reset Password View */}
