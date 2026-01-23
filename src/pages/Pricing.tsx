@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/PageLayout";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Calculator,
   Check,
@@ -25,6 +26,7 @@ import {
   Key,
   ClipboardCheck,
   Loader2,
+  ExternalLink,
 } from "lucide-react";
 import { useSubscription, SubscriptionTier } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
@@ -121,6 +123,7 @@ const Pricing = () => {
   const [promoValidation, setPromoValidation] = useState<DiscountValidationResult | null>(null);
   const [selectedTierForPromo, setSelectedTierForPromo] = useState<SubscriptionTier>('starter');
   const [processingTier, setProcessingTier] = useState<SubscriptionTier | null>(null);
+  const [policiesAccepted, setPoliciesAccepted] = useState(false);
 
   const isDowngrade = (targetTier: SubscriptionTier): boolean => {
     const currentIndex = TIER_ORDER.indexOf(currentTier);
@@ -150,6 +153,12 @@ const Pricing = () => {
     if (isDowngrade(tier)) {
       setPendingDowngradeTier(tier);
       setShowDowngradeDialog(true);
+      return;
+    }
+
+    // Check if policies are accepted for paid tiers
+    if (!policiesAccepted) {
+      toast.error("Please accept the Terms & Conditions, Privacy Policy, and Refund Policy to continue");
       return;
     }
 
@@ -250,6 +259,32 @@ const Pricing = () => {
               setPromoCode(code || '');
             }}
           />
+        </div>
+
+        {/* Policy Acceptance Checkbox */}
+        <div className="mt-6 max-w-lg mx-auto">
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="checkout-policies"
+                checked={policiesAccepted}
+                onCheckedChange={(checked) => setPoliciesAccepted(checked === true)}
+                className="mt-0.5"
+              />
+              <label htmlFor="checkout-policies" className="text-sm cursor-pointer leading-relaxed">
+                I accept the{' '}
+                <Link to="/terms-and-conditions" target="_blank" className="text-primary hover:underline font-medium inline-flex items-center gap-0.5">
+                  Terms & Conditions <ExternalLink className="h-3 w-3" />
+                </Link>,{' '}
+                <Link to="/privacy-policy" target="_blank" className="text-primary hover:underline font-medium inline-flex items-center gap-0.5">
+                  Privacy Policy <ExternalLink className="h-3 w-3" />
+                </Link>, and{' '}
+                <Link to="/refund-policy" target="_blank" className="text-primary hover:underline font-medium inline-flex items-center gap-0.5">
+                  Refund Policy <ExternalLink className="h-3 w-3" />
+                </Link>
+              </label>
+            </div>
+          </div>
         </div>
       </div>
 

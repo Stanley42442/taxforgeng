@@ -53,6 +53,9 @@ const Achievements = lazy(() => import("./pages/Achievements"));
 const BusinessReport = lazy(() => import("./pages/BusinessReport"));
 const Roadmap = lazy(() => import("./pages/Roadmap"));
 const Terms = lazy(() => import("./pages/Terms"));
+const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
 const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
 const AIQueryAnalytics = lazy(() => import("./pages/AIQueryAnalytics"));
 const Notifications = lazy(() => import("./pages/Notifications"));
@@ -153,6 +156,9 @@ const AnimatedRoutes = () => {
           <Route path="/business-report" element={<BusinessReport />} />
           <Route path="/roadmap" element={<Roadmap />} />
           <Route path="/terms" element={<Terms />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/admin-analytics" element={<AdminAnalytics />} />
           <Route path="/ai-analytics" element={<AIQueryAnalytics />} />
           <Route path="/notifications" element={<Notifications />} />

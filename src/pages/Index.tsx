@@ -250,7 +250,9 @@ const Index = () => {
                 { to: "/referrals", label: "Referrals" },
                 { to: "/roadmap", label: "Roadmap" },
                 { to: "/documentation", label: "Documentation" },
-                { to: "/terms", label: "Terms of Service" },
+                { to: "/terms-and-conditions", label: "Terms & Conditions" },
+                { to: "/privacy-policy", label: "Privacy Policy" },
+                { to: "/refund-policy", label: "Refund Policy" },
                 { to: "/auth", label: "Sign In" },
               ].map((link) => (
                 <Link 

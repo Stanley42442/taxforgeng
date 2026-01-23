@@ -18,14 +18,10 @@ interface TermsAcceptanceGateProps {
 }
 
 export const TermsAcceptanceGate = ({ open, onAccept }: TermsAcceptanceGateProps) => {
-  const [termsChecked, setTermsChecked] = useState(false);
-  const [privacyChecked, setPrivacyChecked] = useState(false);
-  const [refundChecked, setRefundChecked] = useState(false);
-
-  const allChecked = termsChecked && privacyChecked && refundChecked;
+  const [allPoliciesChecked, setAllPoliciesChecked] = useState(false);
 
   const handleContinue = () => {
-    if (allChecked) {
+    if (allPoliciesChecked) {
       onAccept();
     }
   };
@@ -51,7 +47,7 @@ export const TermsAcceptanceGate = ({ open, onAccept }: TermsAcceptanceGateProps
                   <Scale className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex-1 space-y-2">
-                  <h3 className="font-semibold">Terms of Service</h3>
+                  <h3 className="font-semibold">Terms & Conditions</h3>
                   <ul className="text-sm text-muted-foreground space-y-1">
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 mt-0.5 text-primary shrink-0" />
@@ -66,19 +62,13 @@ export const TermsAcceptanceGate = ({ open, onAccept }: TermsAcceptanceGateProps
                       <span>You are responsible for verifying all calculations</span>
                     </li>
                   </ul>
-                  <div className="flex items-center gap-2 pt-2">
-                    <Checkbox
-                      id="terms"
-                      checked={termsChecked}
-                      onCheckedChange={(checked) => setTermsChecked(checked === true)}
-                    />
-                    <label htmlFor="terms" className="text-sm cursor-pointer">
-                      I have read and agree to the{' '}
-                      <Link to="/terms" target="_blank" className="text-primary hover:underline inline-flex items-center gap-1">
-                        Terms of Service <ExternalLink className="h-3 w-3" />
-                      </Link>
-                    </label>
-                  </div>
+                  <Link 
+                    to="/terms-and-conditions" 
+                    target="_blank" 
+                    className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                  >
+                    Read full Terms & Conditions <ExternalLink className="h-3 w-3" />
+                  </Link>
                 </div>
               </div>
             </div>
@@ -86,38 +76,32 @@ export const TermsAcceptanceGate = ({ open, onAccept }: TermsAcceptanceGateProps
             {/* Privacy Policy */}
             <div className="rounded-lg border bg-card p-4">
               <div className="flex items-start gap-3">
-                <div className="rounded-full bg-green-500/10 p-2">
-                  <Shield className="h-5 w-5 text-green-500" />
+                <div className="rounded-full bg-success/10 p-2">
+                  <Shield className="h-5 w-5 text-success" />
                 </div>
                 <div className="flex-1 space-y-2">
                   <h3 className="font-semibold">Privacy Policy</h3>
                   <ul className="text-sm text-muted-foreground space-y-1">
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 mt-0.5 text-green-500 shrink-0" />
-                      <span>NDPR compliant data handling</span>
+                      <CheckCircle2 className="h-4 w-4 mt-0.5 text-success shrink-0" />
+                      <span>NDPA 2023 compliant data handling</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 mt-0.5 text-green-500 shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 mt-0.5 text-success shrink-0" />
                       <span>AES-256 encryption for your data</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 mt-0.5 text-green-500 shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 mt-0.5 text-success shrink-0" />
                       <span>We never sell your data to third parties</span>
                     </li>
                   </ul>
-                  <div className="flex items-center gap-2 pt-2">
-                    <Checkbox
-                      id="privacy"
-                      checked={privacyChecked}
-                      onCheckedChange={(checked) => setPrivacyChecked(checked === true)}
-                    />
-                    <label htmlFor="privacy" className="text-sm cursor-pointer">
-                      I have read and agree to the{' '}
-                      <Link to="/terms#privacy" target="_blank" className="text-primary hover:underline inline-flex items-center gap-1">
-                        Privacy Policy <ExternalLink className="h-3 w-3" />
-                      </Link>
-                    </label>
-                  </div>
+                  <Link 
+                    to="/privacy-policy" 
+                    target="_blank" 
+                    className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                  >
+                    Read full Privacy Policy <ExternalLink className="h-3 w-3" />
+                  </Link>
                 </div>
               </div>
             </div>
@@ -125,39 +109,57 @@ export const TermsAcceptanceGate = ({ open, onAccept }: TermsAcceptanceGateProps
             {/* Refund Policy */}
             <div className="rounded-lg border bg-card p-4">
               <div className="flex items-start gap-3">
-                <div className="rounded-full bg-amber-500/10 p-2">
-                  <CreditCard className="h-5 w-5 text-amber-500" />
+                <div className="rounded-full bg-accent/10 p-2">
+                  <CreditCard className="h-5 w-5 text-accent" />
                 </div>
                 <div className="flex-1 space-y-2">
                   <h3 className="font-semibold">Refund Policy</h3>
                   <ul className="text-sm text-muted-foreground space-y-1">
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 mt-0.5 text-amber-500 shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 mt-0.5 text-accent shrink-0" />
                       <span>7-day free trial, cancel anytime</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 mt-0.5 text-amber-500 shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 mt-0.5 text-accent shrink-0" />
                       <span>Pro-rated refunds available within 30 days</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 mt-0.5 text-amber-500 shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 mt-0.5 text-accent shrink-0" />
                       <span>No refunds after 30 days of subscription</span>
                     </li>
                   </ul>
-                  <div className="flex items-center gap-2 pt-2">
-                    <Checkbox
-                      id="refund"
-                      checked={refundChecked}
-                      onCheckedChange={(checked) => setRefundChecked(checked === true)}
-                    />
-                    <label htmlFor="refund" className="text-sm cursor-pointer">
-                      I have read and agree to the{' '}
-                      <Link to="/terms#refund" target="_blank" className="text-primary hover:underline inline-flex items-center gap-1">
-                        Refund Policy <ExternalLink className="h-3 w-3" />
-                      </Link>
-                    </label>
-                  </div>
+                  <Link 
+                    to="/refund-policy" 
+                    target="_blank" 
+                    className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                  >
+                    Read full Refund Policy <ExternalLink className="h-3 w-3" />
+                  </Link>
                 </div>
+              </div>
+            </div>
+
+            {/* Single Acceptance Checkbox */}
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="all-policies"
+                  checked={allPoliciesChecked}
+                  onCheckedChange={(checked) => setAllPoliciesChecked(checked === true)}
+                  className="mt-0.5"
+                />
+                <label htmlFor="all-policies" className="text-sm cursor-pointer leading-relaxed">
+                  I have read and agree to the{' '}
+                  <Link to="/terms-and-conditions" target="_blank" className="text-primary hover:underline font-medium">
+                    Terms & Conditions
+                  </Link>,{' '}
+                  <Link to="/privacy-policy" target="_blank" className="text-primary hover:underline font-medium">
+                    Privacy Policy
+                  </Link>, and{' '}
+                  <Link to="/refund-policy" target="_blank" className="text-primary hover:underline font-medium">
+                    Refund Policy
+                  </Link>
+                </label>
               </div>
             </div>
           </div>
@@ -166,7 +168,7 @@ export const TermsAcceptanceGate = ({ open, onAccept }: TermsAcceptanceGateProps
         <div className="pt-4 border-t">
           <Button 
             onClick={handleContinue} 
-            disabled={!allChecked}
+            disabled={!allPoliciesChecked}
             className="w-full"
             size="lg"
           >
