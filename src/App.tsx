@@ -25,6 +25,12 @@ import { OfflineBanner } from "@/components/OfflineBanner";
 import "@/styles/print.css";
 import { lazy, Suspense } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Navigate } from "react-router-dom";
+
+// Redirect component for old policy URLs
+const RedirectToTerms = ({ section }: { section: 'terms' | 'privacy' | 'refund' }) => (
+  <Navigate to={`/terms#${section}`} replace />
+);
 
 // Eagerly load Index for fast initial render
 import Index from "./pages/Index";
@@ -53,9 +59,8 @@ const Achievements = lazy(() => import("./pages/Achievements"));
 const BusinessReport = lazy(() => import("./pages/BusinessReport"));
 const Roadmap = lazy(() => import("./pages/Roadmap"));
 const Terms = lazy(() => import("./pages/Terms"));
-const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions"));
-const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
-const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
+// Removed separate policy pages - now consolidated in Terms.tsx with hash navigation
+// Redirects handled inline below
 const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
 const AIQueryAnalytics = lazy(() => import("./pages/AIQueryAnalytics"));
 const Notifications = lazy(() => import("./pages/Notifications"));
@@ -156,9 +161,10 @@ const AnimatedRoutes = () => {
           <Route path="/business-report" element={<BusinessReport />} />
           <Route path="/roadmap" element={<Roadmap />} />
           <Route path="/terms" element={<Terms />} />
-          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/refund-policy" element={<RefundPolicy />} />
+          {/* Redirects from old policy URLs to unified Terms page with hash */}
+          <Route path="/terms-and-conditions" element={<RedirectToTerms section="terms" />} />
+          <Route path="/privacy-policy" element={<RedirectToTerms section="privacy" />} />
+          <Route path="/refund-policy" element={<RedirectToTerms section="refund" />} />
           <Route path="/admin-analytics" element={<AdminAnalytics />} />
           <Route path="/ai-analytics" element={<AIQueryAnalytics />} />
           <Route path="/notifications" element={<Notifications />} />
