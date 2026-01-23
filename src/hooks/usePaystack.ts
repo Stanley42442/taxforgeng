@@ -39,22 +39,19 @@ export interface DiscountValidationResult {
   error?: string;
 }
 
-const PAYMENT_TIMEOUT_MS = 30000; // 30 seconds
-const MAX_RETRIES = 2;
-const RETRY_DELAYS = [2000, 4000]; // 2s, 4s
+const PAYMENT_TIMEOUT_MS = 15000; // 15 seconds for faster feedback
+const MAX_RETRIES = 3;
+const RETRY_DELAYS = [1000, 2000, 4000]; // 1s, 2s, 4s exponential backoff
 
 export function usePaystack() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
-  const abortControllerRef = useRef<AbortController | null>(null);
+  const cancelledRef = useRef(false);
 
   const cancelPayment = useCallback(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-    }
+    cancelledRef.current = true;
     setLoading(false);
     setRetryCount(0);
   }, []);
@@ -77,22 +74,35 @@ export function usePaystack() {
     setLoading(true);
     setError(null);
     setRetryCount(0);
+    cancelledRef.current = false;
+
+    // Refresh session before payment to ensure fresh token
+    const { error: refreshError } = await supabase.auth.refreshSession();
+    if (refreshError) {
+      setLoading(false);
+      return { success: false, error: 'Session expired. Please sign in again.' };
+    }
 
     const attemptPayment = async (attempt: number): Promise<PaymentInitResult> => {
-      // Create new abort controller for this attempt
-      abortControllerRef.current = new AbortController();
-      
-      // Set up timeout
-      const timeoutId = setTimeout(() => {
-        abortControllerRef.current?.abort();
-      }, PAYMENT_TIMEOUT_MS);
+      if (cancelledRef.current) {
+        throw new Error('Payment cancelled');
+      }
 
-      try {
+      // Create timeout promise for reliable timeout handling
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('TIMEOUT')), PAYMENT_TIMEOUT_MS);
+      });
+
+      // Create payment promise
+      const paymentPromise = (async () => {
         const { data: sessionData } = await supabase.auth.getSession();
         
         if (!sessionData.session?.access_token) {
           throw new Error('Session expired. Please sign in again.');
         }
+
+        console.log(`[Payment] Attempt ${attempt + 1}: Starting request...`);
+        const startTime = Date.now();
 
         const response = await supabase.functions.invoke('paystack-initialize', {
           body: {
@@ -104,11 +114,11 @@ export function usePaystack() {
             discountType,
           },
           headers: {
-            Authorization: `Bearer ${sessionData.session?.access_token}`,
+            Authorization: `Bearer ${sessionData.session.access_token}`,
           },
         });
 
-        clearTimeout(timeoutId);
+        console.log(`[Payment] Response received in ${Date.now() - startTime}ms`);
 
         if (response.error) {
           throw new Error(response.error.message);
@@ -121,7 +131,7 @@ export function usePaystack() {
         }
 
         return {
-          success: true,
+          success: true as const,
           authorizationUrl: data.authorizationUrl,
           reference: data.reference,
           amount: data.amount,
@@ -129,23 +139,25 @@ export function usePaystack() {
           discountAmount: data.discountAmount,
           discountApplied: data.discountApplied,
         };
+      })();
 
+      try {
+        // Race between payment and timeout
+        const result = await Promise.race([paymentPromise, timeoutPromise]);
+        return result;
       } catch (err: any) {
-        clearTimeout(timeoutId);
-        
-        // Check if aborted (timeout or manual cancel)
-        if (err.name === 'AbortError' || abortControllerRef.current?.signal.aborted) {
-          // Retry logic
-          if (attempt < MAX_RETRIES) {
+        // Handle timeout or other errors with retry
+        if (err.message === 'TIMEOUT' || err.message?.includes('fetch')) {
+          if (attempt < MAX_RETRIES && !cancelledRef.current) {
             const nextAttempt = attempt + 1;
             setRetryCount(nextAttempt);
+            console.log(`[Payment] Timeout on attempt ${attempt + 1}, retrying...`);
             toast.info(`Connection slow. Retrying... (${nextAttempt}/${MAX_RETRIES})`);
             await new Promise(r => setTimeout(r, RETRY_DELAYS[attempt]));
             return attemptPayment(nextAttempt);
           }
           throw new Error('Payment request timed out. Please check your connection and try again.');
         }
-        
         throw err;
       }
     };
@@ -159,7 +171,6 @@ export function usePaystack() {
     } finally {
       setLoading(false);
       setRetryCount(0);
-      abortControllerRef.current = null;
     }
   }, [user]);
 

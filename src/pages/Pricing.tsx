@@ -126,11 +126,21 @@ const Pricing = () => {
   const [processingTier, setProcessingTier] = useState<SubscriptionTier | null>(null);
   const [policiesAccepted, setPoliciesAccepted] = useState(false);
 
-  // Pre-warm auth session on page mount for faster payment init
+  // Pre-warm auth session AND edge function on page mount for faster payment init
   useEffect(() => {
+    // Pre-warm auth session
     supabase.auth.getSession().then(({ data }) => {
       console.log('[Pricing] Session pre-warmed:', !!data.session);
     });
+    
+    // Pre-warm the edge function with a lightweight OPTIONS request to reduce cold start
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    if (supabaseUrl) {
+      fetch(`${supabaseUrl}/functions/v1/paystack-initialize`, {
+        method: 'OPTIONS',
+      }).catch(() => {}); // Ignore errors, this is just a warm-up
+      console.log('[Pricing] Edge function pre-warmed');
+    }
   }, []);
 
   // Force refresh subscription data on page mount
