@@ -19,11 +19,15 @@ const TIER_INFO: Record<SubscriptionTier, { label: string; color: string }> = {
   corporate: { label: 'Corporate', color: 'bg-warning/20 text-warning' },
 };
 
+// Only these emails can see the tier switcher for testing
+const ALLOWED_TEST_EMAILS = ['benjamingillespie290@gmail.com'];
+
 export const TierSwitcher = () => {
   const { tier, setTier } = useSubscription();
   const { user } = useAuth();
 
   if (!user) return null;
+  if (!ALLOWED_TEST_EMAILS.includes(user.email || '')) return null;
 
   return (
     <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-warning/50 bg-warning/5">
