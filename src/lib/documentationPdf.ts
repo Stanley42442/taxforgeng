@@ -218,7 +218,7 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
   addSectionTitle('Core Product Features');
 
   addSubsectionTitle('Tax Calculators');
-  addBulletPoint('Personal Income Tax (PIT) with 2025 FIRS rules and 2026 preview mode');
+  addBulletPoint('Personal Income Tax (PIT) with 2026 rules (Nigeria Tax Act 2025)');
   addBulletPoint('Company Income Tax (CIT) with small company exemptions (0% for turnover < \u20A650M)');
   addBulletPoint('VAT calculations with sector-specific rules (exempt, zero-rated, standard)');
   addBulletPoint('Withholding Tax (WHT) credit tracking and reconciliation');
