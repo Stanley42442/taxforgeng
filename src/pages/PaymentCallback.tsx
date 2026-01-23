@@ -44,11 +44,13 @@ export default function PaymentCallback() {
           console.log('[PaymentCallback] Refreshing subscription after successful payment...');
           await refreshSubscription();
           
-          // Retry refresh after delay to ensure database has propagated changes
-          setTimeout(async () => {
-            console.log('[PaymentCallback] Retry refreshing subscription after delay...');
-            await refreshSubscription();
-          }, 2000);
+          // Also refresh after delays to ensure sync with proper async handling
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          console.log('[PaymentCallback] Retry refreshing subscription after delay...');
+          await refreshSubscription();
+          
+          // Dispatch event to notify other components
+          window.dispatchEvent(new Event('subscription-updated'));
           
           if (!result.alreadyProcessed) {
             setMessage('Your subscription has been activated!');
