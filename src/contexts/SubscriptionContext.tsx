@@ -163,11 +163,35 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       // Fetch profile for subscription tier and trial info
-      const { data: profile } = await supabase
+      let { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('subscription_tier, email, created_at, trial_started_at, trial_expires_at, has_selected_initial_tier')
         .eq('id', user.id)
         .single();
+
+      // Defensive check: Create profile if it doesn't exist (handles edge case)
+      if (profileError && profileError.code === 'PGRST116') {
+        console.warn('[SubscriptionContext] No profile found, creating one...');
+        const { error: createError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            email: user.email,
+            subscription_tier: 'free',
+          });
+
+        if (createError) {
+          console.error('[SubscriptionContext] Failed to create profile:', createError);
+        } else {
+          // Re-fetch the newly created profile
+          const { data: newProfile } = await supabase
+            .from('profiles')
+            .select('subscription_tier, email, created_at, trial_started_at, trial_expires_at, has_selected_initial_tier')
+            .eq('id', user.id)
+            .single();
+          profile = newProfile;
+        }
+      }
 
       // Fetch businesses
       const { data: businesses } = await supabase

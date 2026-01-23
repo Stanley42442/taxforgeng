@@ -115,16 +115,26 @@ serve(async (req) => {
 
     const previousTier = currentProfile?.subscription_tier || 'free';
 
-    // Update user's subscription tier
-    await supabase
+    // Update user's subscription tier using UPSERT to handle missing profiles
+    console.log(`[paystack-verify] Updating profile for user ${user.id} to tier: ${tier}`);
+    const { error: profileUpsertError } = await supabase
       .from('profiles')
-      .update({
+      .upsert({
+        id: user.id,
+        email: user.email,
         subscription_tier: tier,
         has_selected_initial_tier: true,
         trial_expires_at: null,
         trial_started_at: null,
-      })
-      .eq('id', user.id);
+      }, {
+        onConflict: 'id',
+      });
+
+    if (profileUpsertError) {
+      console.error('[paystack-verify] Failed to update profile:', profileUpsertError);
+      throw new Error('Failed to update subscription tier');
+    }
+    console.log(`[paystack-verify] Profile updated successfully for user ${user.id}`);
 
     // Record subscription history
     const changeType = previousTier === 'free' ? 'new_subscription' : 
