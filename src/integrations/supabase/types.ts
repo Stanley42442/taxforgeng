@@ -3144,6 +3144,54 @@ export type Database = {
         }
         Relationships: []
       }
+      user_reviews: {
+        Row: {
+          author_name: string
+          company: string | null
+          created_at: string | null
+          id: string
+          is_approved: boolean | null
+          metric: string | null
+          metric_label: string | null
+          quote: string
+          rating: number | null
+          role: string | null
+          sector: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          author_name: string
+          company?: string | null
+          created_at?: string | null
+          id?: string
+          is_approved?: boolean | null
+          metric?: string | null
+          metric_label?: string | null
+          quote: string
+          rating?: number | null
+          role?: string | null
+          sector?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          company?: string | null
+          created_at?: string | null
+          id?: string
+          is_approved?: boolean | null
+          metric?: string | null
+          metric_label?: string | null
+          quote?: string
+          rating?: number | null
+          role?: string | null
+          sector?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

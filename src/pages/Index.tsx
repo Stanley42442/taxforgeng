@@ -363,8 +363,6 @@ const FeatureCard = ({
     className={`group relative rounded-2xl glass-frosted p-6 shadow-futuristic transition-all duration-500 hover-lift hover-glow-primary ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
     style={{ transitionDelay: isVisible ? `${delay * 100}ms` : '0ms' }}
   >
-    {/* Gradient Border on Hover */}
-    <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-400 neon-border -z-10" />
     
     {badge && (
       <span className="absolute top-4 right-4 text-xs bg-accent/20 text-accent px-3 py-1 rounded-full font-medium border border-accent/30 shadow-sm">

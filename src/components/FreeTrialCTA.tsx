@@ -84,21 +84,6 @@ export const FreeTrialCTA = () => {
                 </div>
               </div>
               
-              {/* Bottom Stats */}
-              <div className="mt-6 pt-5 border-t border-border/30 relative z-10">
-                <div className="flex flex-wrap justify-center gap-6 md:gap-8">
-                  {[
-                    { value: '10,000+', label: 'Businesses trust us' },
-                    { value: '₦2.5B+', label: 'Tax calculated' },
-                    { value: '4.9/5', label: 'User rating' },
-                  ].map((stat, index) => (
-                    <div key={index} className="text-center">
-                      <div className="text-lg md:text-xl font-bold text-foreground">{stat.value}</div>
-                      <div className="text-xs text-muted-foreground">{stat.label}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         </div>
