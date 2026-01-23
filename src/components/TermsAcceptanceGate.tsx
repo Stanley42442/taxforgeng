@@ -63,7 +63,7 @@ export const TermsAcceptanceGate = ({ open, onAccept }: TermsAcceptanceGateProps
                     </li>
                   </ul>
                   <Link 
-                    to="/terms-and-conditions" 
+                    to="/terms#terms" 
                     target="_blank" 
                     className="text-sm text-primary hover:underline inline-flex items-center gap-1"
                   >
@@ -96,7 +96,7 @@ export const TermsAcceptanceGate = ({ open, onAccept }: TermsAcceptanceGateProps
                     </li>
                   </ul>
                   <Link 
-                    to="/privacy-policy" 
+                    to="/terms#privacy" 
                     target="_blank" 
                     className="text-sm text-primary hover:underline inline-flex items-center gap-1"
                   >
@@ -129,7 +129,7 @@ export const TermsAcceptanceGate = ({ open, onAccept }: TermsAcceptanceGateProps
                     </li>
                   </ul>
                   <Link 
-                    to="/refund-policy" 
+                    to="/terms#refund" 
                     target="_blank" 
                     className="text-sm text-primary hover:underline inline-flex items-center gap-1"
                   >
@@ -150,13 +150,13 @@ export const TermsAcceptanceGate = ({ open, onAccept }: TermsAcceptanceGateProps
                 />
                 <label htmlFor="all-policies" className="text-sm cursor-pointer leading-relaxed">
                   I have read and agree to the{' '}
-                  <Link to="/terms-and-conditions" target="_blank" className="text-primary hover:underline font-medium">
+                  <Link to="/terms#terms" target="_blank" className="text-primary hover:underline font-medium">
                     Terms & Conditions
                   </Link>,{' '}
-                  <Link to="/privacy-policy" target="_blank" className="text-primary hover:underline font-medium">
+                  <Link to="/terms#privacy" target="_blank" className="text-primary hover:underline font-medium">
                     Privacy Policy
                   </Link>, and{' '}
-                  <Link to="/refund-policy" target="_blank" className="text-primary hover:underline font-medium">
+                  <Link to="/terms#refund" target="_blank" className="text-primary hover:underline font-medium">
                     Refund Policy
                   </Link>
                 </label>

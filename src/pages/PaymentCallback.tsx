@@ -41,7 +41,14 @@ export default function PaymentCallback() {
           setReceiptNumber(result.receiptNumber || '');
           
           // Refresh subscription context to update tier across the app
+          console.log('[PaymentCallback] Refreshing subscription after successful payment...');
           await refreshSubscription();
+          
+          // Retry refresh after delay to ensure database has propagated changes
+          setTimeout(async () => {
+            console.log('[PaymentCallback] Retry refreshing subscription after delay...');
+            await refreshSubscription();
+          }, 2000);
           
           if (!result.alreadyProcessed) {
             setMessage('Your subscription has been activated!');

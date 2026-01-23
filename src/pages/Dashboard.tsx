@@ -52,7 +52,7 @@ import { ExpenseCharts } from "@/components/ExpenseCharts";
 import { PremiumOnboarding } from "@/components/PremiumOnboarding";
 import { DisclaimerModal } from "@/components/DisclaimerModal";
 import { FeedbackForm } from "@/components/FeedbackForm";
-import { seedSampleData } from "@/lib/sampleData";
+// seedSampleData import removed - sample data is now opt-in only
 import { useUpcomingReminders } from "@/hooks/useUpcomingReminders";
 import { Badge } from "@/components/ui/badge";
 import { SharedElement } from "@/components/PageTransition";
@@ -99,7 +99,7 @@ const Dashboard = () => {
   const [showWelcome, setShowWelcome] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [dataSeeded, setDataSeeded] = useState(false);
+  // dataSeeded state removed - sample data is now opt-in only
   const [expandedBusinessId, setExpandedBusinessId] = useState<string | null>(null);
   const [expandedReminderId, setExpandedReminderId] = useState<string | null>(null);
   const [summaryExpanded, setSummaryExpanded] = useState(() => {
@@ -143,19 +143,7 @@ const Dashboard = () => {
     checkOnboardingStatus();
   }, [user]);
 
-  useEffect(() => {
-    const seedData = async () => {
-      if (!user || dataSeeded) return;
-      const result = await seedSampleData(user.id);
-      if (result.success && result.businessId) {
-        refreshBusinesses();
-        setDataSeeded(true);
-      }
-    };
-    if (user && !businessLoading) {
-      seedData();
-    }
-  }, [user, businessLoading, dataSeeded, refreshBusinesses]);
+  // Auto-seeding removed - sample data is now opt-in only via SavedBusinesses page
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -218,7 +206,7 @@ const Dashboard = () => {
     if (!businessLoading) {
       fetchDashboardData();
     }
-  }, [user, businessLoading, savedBusinesses, dataSeeded]);
+  }, [user, businessLoading, savedBusinesses]);
 
   const dateRangeStart = useMemo(() => {
     const now = new Date();

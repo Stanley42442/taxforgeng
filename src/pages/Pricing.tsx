@@ -273,13 +273,13 @@ const Pricing = () => {
               />
               <label htmlFor="checkout-policies" className="text-sm cursor-pointer leading-relaxed">
                 I accept the{' '}
-                <Link to="/terms-and-conditions" target="_blank" className="text-primary hover:underline font-medium inline-flex items-center gap-0.5">
+                <Link to="/terms#terms" target="_blank" className="text-primary hover:underline font-medium inline-flex items-center gap-0.5">
                   Terms & Conditions <ExternalLink className="h-3 w-3" />
                 </Link>,{' '}
-                <Link to="/privacy-policy" target="_blank" className="text-primary hover:underline font-medium inline-flex items-center gap-0.5">
+                <Link to="/terms#privacy" target="_blank" className="text-primary hover:underline font-medium inline-flex items-center gap-0.5">
                   Privacy Policy <ExternalLink className="h-3 w-3" />
                 </Link>, and{' '}
-                <Link to="/refund-policy" target="_blank" className="text-primary hover:underline font-medium inline-flex items-center gap-0.5">
+                <Link to="/terms#refund" target="_blank" className="text-primary hover:underline font-medium inline-flex items-center gap-0.5">
                   Refund Policy <ExternalLink className="h-3 w-3" />
                 </Link>
               </label>
