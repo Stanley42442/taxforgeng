@@ -27,7 +27,11 @@ import {
   ClipboardCheck,
   Loader2,
   ExternalLink,
+  Wifi,
+  WifiOff,
+  AlertTriangle,
 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useSubscription, SubscriptionTier } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
 import { useUpgradeCelebration } from "@/components/UpgradeCelebrationProvider";
@@ -115,7 +119,15 @@ const Pricing = () => {
   const { user } = useAuth();
   const { tier: currentTier, upgradeTier, refreshSubscription } = useSubscription();
   const { triggerCelebration } = useUpgradeCelebration();
-  const { initializePayment, validateDiscountCode, cancelPayment, loading: paymentLoading, retryCount } = usePaystack();
+  const { 
+    initializePayment, 
+    validateDiscountCode, 
+    cancelPayment, 
+    checkConnectionQuality,
+    loading: paymentLoading, 
+    retryCount,
+    connectionQuality 
+  } = usePaystack();
   
   const [showDowngradeDialog, setShowDowngradeDialog] = useState(false);
   const [pendingDowngradeTier, setPendingDowngradeTier] = useState<SubscriptionTier | null>(null);
@@ -125,22 +137,52 @@ const Pricing = () => {
   const [selectedTierForPromo, setSelectedTierForPromo] = useState<SubscriptionTier>('starter');
   const [processingTier, setProcessingTier] = useState<SubscriptionTier | null>(null);
   const [policiesAccepted, setPoliciesAccepted] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'checking' | 'good' | 'slow' | 'offline'>('checking');
 
-  // Pre-warm auth session AND edge function on page mount for faster payment init
+  // Smart pre-warming: auth session + authenticated edge function ping
   useEffect(() => {
-    // Pre-warm auth session
-    supabase.auth.getSession().then(({ data }) => {
-      console.log('[Pricing] Session pre-warmed:', !!data.session);
-    });
+    const prewarmAll = async () => {
+      try {
+        // Get session first
+        const { data } = await supabase.auth.getSession();
+        console.log('[Pricing] Session pre-warmed:', !!data.session);
+        
+        // Check connection quality
+        const start = Date.now();
+        await supabase.auth.getSession(); // Quick ping
+        const latency = Date.now() - start;
+        
+        if (!navigator.onLine) {
+          setConnectionStatus('offline');
+        } else if (latency < 1500) {
+          setConnectionStatus('good');
+        } else {
+          setConnectionStatus('slow');
+        }
+        
+        // Pre-warm edge function with authenticated ping (if user is logged in)
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        if (supabaseUrl && data.session?.access_token) {
+          fetch(`${supabaseUrl}/functions/v1/paystack-initialize`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${data.session.access_token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ ping: true }),
+          }).then(() => {
+            console.log('[Pricing] Edge function pre-warmed with auth');
+          }).catch(() => {
+            // Ignore errors, this is just warming
+          });
+        }
+      } catch (err) {
+        console.log('[Pricing] Pre-warm error (non-critical):', err);
+        setConnectionStatus('slow');
+      }
+    };
     
-    // Pre-warm the edge function with a lightweight OPTIONS request to reduce cold start
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    if (supabaseUrl) {
-      fetch(`${supabaseUrl}/functions/v1/paystack-initialize`, {
-        method: 'OPTIONS',
-      }).catch(() => {}); // Ignore errors, this is just a warm-up
-      console.log('[Pricing] Edge function pre-warmed');
-    }
+    prewarmAll();
   }, []);
 
   // Force refresh subscription data on page mount
@@ -249,6 +291,25 @@ const Pricing = () => {
   return (
     <>
     <PageLayout maxWidth="7xl" showBackground={true}>
+      {/* Connection Status Warning */}
+      {connectionStatus === 'slow' && (
+        <Alert variant="default" className="mb-4 border-yellow-500/50 bg-yellow-500/10">
+          <AlertTriangle className="h-4 w-4 text-yellow-500" />
+          <AlertDescription className="text-yellow-700 dark:text-yellow-400">
+            Slow connection detected. Payment processing may take longer than usual.
+          </AlertDescription>
+        </Alert>
+      )}
+      
+      {connectionStatus === 'offline' && (
+        <Alert variant="destructive" className="mb-4">
+          <WifiOff className="h-4 w-4" />
+          <AlertDescription>
+            You're offline. Please check your internet connection to make payments.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Header */}
       <div className="text-center mb-8 animate-slide-up">
         <h1 className="text-4xl font-extrabold text-foreground mb-4">

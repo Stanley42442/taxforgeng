@@ -68,6 +68,18 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const paystackSecretKey = Deno.env.get("PAYSTACK_SECRET_KEY")!;
 
+    // Parse body early to check for ping request
+    const body: InitializeRequest & { ping?: boolean } = await req.json();
+    
+    // Handle ping request for pre-warming (fast path)
+    if (body.ping) {
+      console.log(`[paystack-init] Ping received - function warm: ${Date.now() - startTime}ms`);
+      return new Response(
+        JSON.stringify({ pong: true, warmTime: Date.now() - startTime }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     console.log(`[paystack-init] Supabase client created: ${Date.now() - startTime}ms`);
 
@@ -96,7 +108,6 @@ serve(async (req) => {
       );
     }
 
-    const body: InitializeRequest = await req.json();
     console.log(`[paystack-init] Request body parsed: ${Date.now() - startTime}ms, tier: ${body.tier}, cycle: ${body.billingCycle}`);
     const { tier, billingCycle, email, callbackUrl, discountCode, discountType } = body;
 
@@ -201,21 +212,27 @@ serve(async (req) => {
       throw new Error(paystackData.message || 'Failed to initialize payment');
     }
 
-    // Log to audit trail
-    await supabase
-      .from('payment_audit_log')
-      .insert({
-        user_id: user.id,
-        action: 'payment_initialized',
-        entity_type: 'transaction',
-        entity_id: reference,
-        new_values: {
-          tier,
-          billing_cycle: billingCycle,
-          amount: finalAmount,
-          discount_applied: discountAmount > 0,
-        },
-      });
+    // Log to audit trail (non-blocking for speed)
+    Promise.resolve(
+      supabase
+        .from('payment_audit_log')
+        .insert({
+          user_id: user.id,
+          action: 'payment_initialized',
+          entity_type: 'transaction',
+          entity_id: reference,
+          new_values: {
+            tier,
+            billing_cycle: billingCycle,
+            amount: finalAmount,
+            discount_applied: discountAmount > 0,
+          },
+        })
+    )
+      .then(() => console.log(`[paystack-init] Audit log saved`))
+      .catch((err: unknown) => console.error(`[paystack-init] Audit log error:`, err));
+
+    console.log(`[paystack-init] SUCCESS - Total time: ${Date.now() - startTime}ms, reference: ${reference}`);
 
     console.log(`[paystack-init] SUCCESS - Total time: ${Date.now() - startTime}ms, reference: ${reference}`);
     

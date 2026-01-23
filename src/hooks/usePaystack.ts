@@ -39,7 +39,16 @@ export interface DiscountValidationResult {
   error?: string;
 }
 
-const PAYMENT_TIMEOUT_MS = 15000; // 15 seconds for faster feedback
+export type ConnectionQuality = 'fast' | 'normal' | 'slow' | 'offline';
+
+// Adaptive timeouts based on connection quality
+const TIMEOUT_BY_QUALITY: Record<ConnectionQuality, number> = {
+  fast: 10000,    // 10s for fast connections
+  normal: 15000,  // 15s for normal
+  slow: 25000,    // 25s for slow - give more time
+  offline: 5000,  // 5s - will fail quickly anyway
+};
+
 const MAX_RETRIES = 3;
 const RETRY_DELAYS = [1000, 2000, 4000]; // 1s, 2s, 4s exponential backoff
 
@@ -48,12 +57,39 @@ export function usePaystack() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [connectionQuality, setConnectionQuality] = useState<ConnectionQuality>('normal');
   const cancelledRef = useRef(false);
 
   const cancelPayment = useCallback(() => {
     cancelledRef.current = true;
     setLoading(false);
     setRetryCount(0);
+  }, []);
+
+  // Check connection quality before payment
+  const checkConnectionQuality = useCallback(async (): Promise<ConnectionQuality> => {
+    if (!navigator.onLine) {
+      setConnectionQuality('offline');
+      return 'offline';
+    }
+
+    const start = Date.now();
+    try {
+      await supabase.auth.getSession();
+      const latency = Date.now() - start;
+      console.log(`[Paystack] Connection latency: ${latency}ms`);
+      
+      let quality: ConnectionQuality;
+      if (latency < 500) quality = 'fast';
+      else if (latency < 2000) quality = 'normal';
+      else quality = 'slow';
+      
+      setConnectionQuality(quality);
+      return quality;
+    } catch {
+      setConnectionQuality('slow');
+      return 'slow';
+    }
   }, []);
 
   const initializePayment = useCallback(async (
@@ -76,12 +112,23 @@ export function usePaystack() {
     setRetryCount(0);
     cancelledRef.current = false;
 
-    // Refresh session before payment to ensure fresh token
-    const { error: refreshError } = await supabase.auth.refreshSession();
-    if (refreshError) {
+    // Check connection quality and set adaptive timeout
+    const quality = await checkConnectionQuality();
+    const timeoutMs = TIMEOUT_BY_QUALITY[quality];
+    console.log(`[Paystack] Connection quality: ${quality}, timeout: ${timeoutMs}ms`);
+
+    if (quality === 'slow') {
+      toast.info('Slow connection detected. This may take a moment...');
+    }
+
+    // Refresh session and get token in one call (optimized from 2 calls to 1)
+    const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+    if (refreshError || !refreshData.session?.access_token) {
       setLoading(false);
       return { success: false, error: 'Session expired. Please sign in again.' };
     }
+
+    const accessToken = refreshData.session.access_token;
 
     const attemptPayment = async (attempt: number): Promise<PaymentInitResult> => {
       if (cancelledRef.current) {
@@ -90,17 +137,11 @@ export function usePaystack() {
 
       // Create timeout promise for reliable timeout handling
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('TIMEOUT')), PAYMENT_TIMEOUT_MS);
+        setTimeout(() => reject(new Error('TIMEOUT')), timeoutMs);
       });
 
       // Create payment promise
       const paymentPromise = (async () => {
-        const { data: sessionData } = await supabase.auth.getSession();
-        
-        if (!sessionData.session?.access_token) {
-          throw new Error('Session expired. Please sign in again.');
-        }
-
         console.log(`[Payment] Attempt ${attempt + 1}: Starting request...`);
         const startTime = Date.now();
 
@@ -114,7 +155,7 @@ export function usePaystack() {
             discountType,
           },
           headers: {
-            Authorization: `Bearer ${sessionData.session.access_token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
@@ -146,13 +187,13 @@ export function usePaystack() {
         const result = await Promise.race([paymentPromise, timeoutPromise]);
         return result;
       } catch (err: any) {
-        // Handle timeout or other errors with retry
-        if (err.message === 'TIMEOUT' || err.message?.includes('fetch')) {
-          if (attempt < MAX_RETRIES && !cancelledRef.current) {
+        // Handle timeout or network errors with retry
+        if ((err.message === 'TIMEOUT' || err.message?.includes('fetch') || err.message?.includes('network')) && !cancelledRef.current) {
+          if (attempt < MAX_RETRIES - 1) {
             const nextAttempt = attempt + 1;
             setRetryCount(nextAttempt);
-            console.log(`[Payment] Timeout on attempt ${attempt + 1}, retrying...`);
-            toast.info(`Connection slow. Retrying... (${nextAttempt}/${MAX_RETRIES})`);
+            console.log(`[Payment] Attempt ${attempt + 1} failed, retrying in ${RETRY_DELAYS[attempt]}ms...`);
+            toast.info(`Connection issue. Retrying... (${nextAttempt}/${MAX_RETRIES})`);
             await new Promise(r => setTimeout(r, RETRY_DELAYS[attempt]));
             return attemptPayment(nextAttempt);
           }
@@ -172,7 +213,7 @@ export function usePaystack() {
       setLoading(false);
       setRetryCount(0);
     }
-  }, [user]);
+  }, [user, checkConnectionQuality]);
 
   const verifyPayment = useCallback(async (reference: string): Promise<PaymentVerifyResult> => {
     setLoading(true);
@@ -248,9 +289,11 @@ export function usePaystack() {
     verifyPayment,
     validateDiscountCode,
     cancelPayment,
+    checkConnectionQuality,
     loading,
     error,
     retryCount,
+    connectionQuality,
     clearError: () => setError(null),
   };
 }
