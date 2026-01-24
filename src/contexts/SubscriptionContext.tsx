@@ -288,17 +288,16 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [user]);
 
-  const refreshSubscription = async () => {
+  const refreshSubscription = useCallback(async () => {
     console.log('[SubscriptionContext] Force refreshing subscription...');
-    // Clear current state to force fresh fetch
     setState(prev => ({ ...prev, loading: true }));
     await fetchUserData();
-    console.log('[SubscriptionContext] Refresh complete, current tier:', state.tier);
-  };
+    console.log('[SubscriptionContext] Refresh complete');
+  }, [fetchUserData]);
 
-  const refreshBusinesses = async () => {
+  const refreshBusinesses = useCallback(async () => {
     await fetchUserData();
-  };
+  }, [fetchUserData]);
 
   const setTier = async (tier: SubscriptionTier) => {
     if (!user) return;
