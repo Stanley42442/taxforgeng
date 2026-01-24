@@ -487,23 +487,27 @@ const Dashboard = () => {
 
               {/* Summary Cards */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <div className="glass p-4 rounded-xl hover-lift">
+                <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
                   <div className="flex items-center gap-2 mb-2">
                     <TrendingUp className="h-4 w-4 text-success" />
                     <span className="text-xs text-muted-foreground">Income</span>
                   </div>
                   <p className="text-lg font-bold text-success">{formatCurrency(filteredSummary.totalIncome)}</p>
-                  <SparklineChart data={sparklineData.income} color="var(--success)" height={30} />
+                  <div className="mt-2">
+                    <SparklineChart data={sparklineData.income} color="hsl(var(--success))" height={30} width={80} />
+                  </div>
                 </div>
-                <div className="glass p-4 rounded-xl hover-lift">
+                <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
                   <div className="flex items-center gap-2 mb-2">
                     <TrendingDown className="h-4 w-4 text-destructive" />
                     <span className="text-xs text-muted-foreground">Expenses</span>
                   </div>
                   <p className="text-lg font-bold text-destructive">{formatCurrency(filteredSummary.totalExpenses)}</p>
-                  <SparklineChart data={sparklineData.expenses} color="var(--destructive)" height={30} />
+                  <div className="mt-2">
+                    <SparklineChart data={sparklineData.expenses} color="hsl(var(--destructive))" height={30} width={80} />
+                  </div>
                 </div>
-                <div className="glass p-4 rounded-xl hover-lift">
+                <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
                   <div className="flex items-center gap-2 mb-2">
                     <PieChart className="h-4 w-4 text-primary" />
                     <span className="text-xs text-muted-foreground">Net</span>
@@ -511,9 +515,11 @@ const Dashboard = () => {
                   <p className={`text-lg font-bold ${netIncome >= 0 ? 'text-success' : 'text-destructive'}`}>
                     {formatCurrency(netIncome)}
                   </p>
-                  <SparklineChart data={sparklineData.net} color={netIncome >= 0 ? "var(--success)" : "var(--destructive)"} height={30} />
+                  <div className="mt-2">
+                    <SparklineChart data={sparklineData.net} color={netIncome >= 0 ? "hsl(var(--success))" : "hsl(var(--destructive))"} height={30} width={80} />
+                  </div>
                 </div>
-                <div className="glass p-4 rounded-xl hover-lift">
+                <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
                   <div className="flex items-center gap-2 mb-2">
                     <Receipt className="h-4 w-4 text-accent" />
                     <span className="text-xs text-muted-foreground">Deductible</span>
