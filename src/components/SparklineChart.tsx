@@ -15,6 +15,14 @@ export const SparklineChart = ({
   width = 60,
   showArea = true 
 }: SparklineChartProps) => {
+  // Helper to ensure proper HSL format for SVG colors
+  const resolveColor = (colorValue: string) => {
+    if (colorValue.startsWith('var(--') && !colorValue.startsWith('hsl(')) {
+      return `hsl(${colorValue})`;
+    }
+    return colorValue;
+  };
+
   const path = useMemo(() => {
     if (!data || data.length === 0) return "";
     
@@ -71,7 +79,7 @@ export const SparklineChart = ({
 
   const trend = data.length >= 2 ? data[data.length - 1] - data[0] : 0;
   const trendColor = trend >= 0 ? "hsl(var(--success))" : "hsl(var(--destructive))";
-  const displayColor = color === "auto" ? trendColor : color;
+  const displayColor = resolveColor(color === "auto" ? trendColor : color);
 
   return (
     <svg width={width} height={height} className="overflow-visible">
