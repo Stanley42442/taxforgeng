@@ -98,12 +98,16 @@ export function usePaystack() {
     discountCode?: string,
     discountType?: 'promo' | 'referral' | 'loyalty'
   ): Promise<PaymentInitResult> => {
+    console.log('[usePaystack] initializePayment called', { tier, billingCycle, discountCode, discountType, userEmail: user?.email });
+
     if (!user?.email) {
+      console.error('[usePaystack] No user email - not authenticated');
       return { success: false, error: 'User not authenticated' };
     }
 
     // Check network status first
     if (!navigator.onLine) {
+      console.error('[usePaystack] Navigator offline');
       return { success: false, error: 'No internet connection. Please check your network and try again.' };
     }
 
@@ -113,22 +117,32 @@ export function usePaystack() {
     cancelledRef.current = false;
 
     // Check connection quality and set adaptive timeout
+    console.log('[usePaystack] Checking connection quality...');
     const quality = await checkConnectionQuality();
     const timeoutMs = TIMEOUT_BY_QUALITY[quality];
-    console.log(`[Paystack] Connection quality: ${quality}, timeout: ${timeoutMs}ms`);
+    console.log(`[usePaystack] Connection quality: ${quality}, timeout: ${timeoutMs}ms`);
 
     if (quality === 'slow') {
       toast.info('Slow connection detected. This may take a moment...');
     }
 
     // Refresh session and get token in one call (optimized from 2 calls to 1)
+    console.log('[usePaystack] Refreshing session...');
     const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+    console.log('[usePaystack] Session refresh result:', { 
+      hasSession: !!refreshData?.session, 
+      hasToken: !!refreshData?.session?.access_token,
+      error: refreshError?.message 
+    });
+    
     if (refreshError || !refreshData.session?.access_token) {
+      console.error('[usePaystack] Session refresh failed:', refreshError?.message);
       setLoading(false);
       return { success: false, error: 'Session expired. Please sign in again.' };
     }
 
     const accessToken = refreshData.session.access_token;
+    console.log('[usePaystack] Got access token, proceeding with payment...');
 
     const attemptPayment = async (attempt: number): Promise<PaymentInitResult> => {
       if (cancelledRef.current) {
@@ -142,32 +156,38 @@ export function usePaystack() {
 
       // Create payment promise
       const paymentPromise = (async () => {
-        console.log(`[Payment] Attempt ${attempt + 1}: Starting request...`);
+        console.log(`[usePaystack] Attempt ${attempt + 1}: Starting edge function request...`);
         const startTime = Date.now();
 
+        const requestBody = {
+          tier,
+          billingCycle,
+          email: user.email,
+          callbackUrl: `${window.location.origin}/payment-callback`,
+          discountCode,
+          discountType,
+        };
+        console.log('[usePaystack] Request body:', requestBody);
+
         const response = await supabase.functions.invoke('paystack-initialize', {
-          body: {
-            tier,
-            billingCycle,
-            email: user.email,
-            callbackUrl: `${window.location.origin}/payment-callback`,
-            discountCode,
-            discountType,
-          },
+          body: requestBody,
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
 
-        console.log(`[Payment] Response received in ${Date.now() - startTime}ms`);
+        console.log(`[usePaystack] Response received in ${Date.now() - startTime}ms:`, response);
 
         if (response.error) {
+          console.error('[usePaystack] Edge function error:', response.error);
           throw new Error(response.error.message);
         }
 
         const data = response.data;
+        console.log('[usePaystack] Edge function data:', data);
 
         if (!data.success) {
+          console.error('[usePaystack] Edge function returned success=false:', data.error);
           throw new Error(data.error || 'Failed to initialize payment');
         }
 
