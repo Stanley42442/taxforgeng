@@ -203,18 +203,29 @@ const Pricing = () => {
   };
 
   const handleTierSelect = async (tier: SubscriptionTier) => {
+    console.log('[TierSelect] Called with tier:', tier, {
+      user: user?.email,
+      currentTier,
+      policiesAccepted,
+      billingCycle,
+      connectionStatus
+    });
+
     if (tier === 'free') {
+      console.log('[TierSelect] Free tier selected - no action');
       toast.info("You're already on the free tier or this is the free tier");
       return;
     }
 
     if (tier === 'corporate') {
+      console.log('[TierSelect] Corporate tier - contact required');
       toast.info("Contact us for Corporate pricing");
       return;
     }
 
     // Require authentication
     if (!user) {
+      console.log('[TierSelect] No user - redirecting to auth');
       toast.info("Please sign in to upgrade");
       navigate('/auth?redirect=/pricing');
       return;
@@ -222,6 +233,7 @@ const Pricing = () => {
 
     // Check if this is a downgrade
     if (isDowngrade(tier)) {
+      console.log('[TierSelect] Downgrade detected - showing dialog');
       setPendingDowngradeTier(tier);
       setShowDowngradeDialog(true);
       return;
@@ -229,18 +241,22 @@ const Pricing = () => {
 
     // Check if policies are accepted for paid tiers
     if (!policiesAccepted) {
+      console.log('[TierSelect] Policies not accepted - blocking payment');
       toast.error("Please accept the Terms & Conditions, Privacy Policy, and Refund Policy to continue");
       return;
     }
 
+    console.log('[TierSelect] All checks passed - processing payment');
     // Process payment with Paystack
     await processPayment(tier);
   };
 
   const processPayment = async (tier: SubscriptionTier) => {
+    console.log('[Payment] Starting payment for tier:', tier, { billingCycle, promoCode, promoValidation });
     setProcessingTier(tier);
     
     try {
+      console.log('[Payment] Calling initializePayment...');
       const result = await initializePayment(
         tier,
         billingCycle,
@@ -248,7 +264,10 @@ const Pricing = () => {
         promoValidation?.discountType
       );
 
+      console.log('[Payment] initializePayment result:', result);
+
       if (!result.success) {
+        console.error('[Payment] Failed:', result.error);
         toast.error(result.error || 'Failed to initialize payment');
         return;
       }
@@ -260,11 +279,15 @@ const Pricing = () => {
 
       // Redirect to Paystack checkout
       if (result.authorizationUrl) {
+        console.log('[Payment] Redirecting to Paystack:', result.authorizationUrl);
         window.location.href = result.authorizationUrl;
+      } else {
+        console.error('[Payment] No authorizationUrl in result');
+        toast.error('No payment URL received from server');
       }
     } catch (err) {
+      console.error('[Payment] Exception:', err);
       toast.error('Payment initialization failed');
-      console.error('Payment error:', err);
     } finally {
       setProcessingTier(null);
     }
