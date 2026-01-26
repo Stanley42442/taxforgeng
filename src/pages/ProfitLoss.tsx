@@ -19,6 +19,8 @@ interface InvoiceData { total: number; status: string; issued_date: string; paid
 
 interface PeriodData { income: number; expenses: number; grossProfit: number; netProfit: number; byCategory: Record<string, number>; }
 
+const tierOrder = ['free', 'basic', 'professional', 'business', 'enterprise'] as const;
+
 const ProfitLoss = () => {
   const { user } = useAuth();
   const { savedBusinesses, tier } = useSubscription();
@@ -28,7 +30,7 @@ const ProfitLoss = () => {
   const [loading, setLoading] = useState(true);
   const [selectedBusiness, setSelectedBusiness] = useState<string>("all");
   const [period, setPeriod] = useState<string>("month");
-  const canAccess = tierOrder.indexOf(tier) >= tierOrder.indexOf('basic');
+  const canAccess = tierOrder.indexOf(tier as typeof tierOrder[number]) >= tierOrder.indexOf('basic');
 
   useEffect(() => {
     if (user && canAccess) fetchData();

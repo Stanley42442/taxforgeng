@@ -77,10 +77,14 @@ const Notifications = () => {
       setNotificationPermission('unsupported');
     }
 
-    const savedSound = localStorage.getItem('notification-sound-enabled');
-    const savedBrowser = localStorage.getItem('notification-browser-enabled');
-    if (savedSound !== null) setSoundEnabled(savedSound === 'true');
-    if (savedBrowser !== null) setBrowserNotificationsEnabled(savedBrowser === 'true');
+    try {
+      const savedSound = localStorage.getItem('notification-sound-enabled');
+      const savedBrowser = localStorage.getItem('notification-browser-enabled');
+      if (savedSound !== null) setSoundEnabled(savedSound === 'true');
+      if (savedBrowser !== null) setBrowserNotificationsEnabled(savedBrowser === 'true');
+    } catch {
+      // Use defaults if localStorage unavailable
+    }
   }, []);
 
   const handleEnableNotifications = async () => {
@@ -101,14 +105,22 @@ const Notifications = () => {
 
   const handleSoundToggle = (enabled: boolean) => {
     setSoundEnabled(enabled);
-    localStorage.setItem('notification-sound-enabled', String(enabled));
+    try {
+      localStorage.setItem('notification-sound-enabled', String(enabled));
+    } catch {
+      // Silent fail
+    }
     if (enabled) vibrateDevice([50]);
     toast.success(enabled ? 'Sound notifications enabled' : 'Sound notifications disabled');
   };
 
   const handleBrowserToggle = (enabled: boolean) => {
     setBrowserNotificationsEnabled(enabled);
-    localStorage.setItem('notification-browser-enabled', String(enabled));
+    try {
+      localStorage.setItem('notification-browser-enabled', String(enabled));
+    } catch {
+      // Silent fail
+    }
     toast.success(enabled ? 'Browser notifications enabled' : 'Browser notifications disabled');
   };
 

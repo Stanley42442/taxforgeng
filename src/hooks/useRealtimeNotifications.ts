@@ -26,15 +26,23 @@ export const useRealtimeNotifications = (config: RealtimeConfig = {}) => {
     enableBrowserNotifications = true 
   } = config;
 
-  // Get preferences from localStorage
+  // Get preferences from localStorage (with safe access)
   const getSoundEnabled = useCallback(() => {
-    const saved = localStorage.getItem('notification-sound-enabled');
-    return saved !== null ? saved === 'true' : true;
+    try {
+      const saved = localStorage.getItem('notification-sound-enabled');
+      return saved !== null ? saved === 'true' : true;
+    } catch {
+      return true;
+    }
   }, []);
 
   const getBrowserEnabled = useCallback(() => {
-    const saved = localStorage.getItem('notification-browser-enabled');
-    return saved !== null ? saved === 'true' : true;
+    try {
+      const saved = localStorage.getItem('notification-browser-enabled');
+      return saved !== null ? saved === 'true' : true;
+    } catch {
+      return true;
+    }
   }, []);
 
   // Use ref to generate stable unique channel IDs

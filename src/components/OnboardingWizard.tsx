@@ -88,7 +88,7 @@ export const OnboardingWizard = ({ open, onComplete }: OnboardingWizardProps) =>
         .from('profiles')
         .select('full_name')
         .eq('id', user.id)
-        .single()
+        .maybeSingle()
         .then(({ data }) => {
           if (data?.full_name) {
             setUserName(data.full_name.split(' ')[0]);

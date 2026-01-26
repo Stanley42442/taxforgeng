@@ -3,6 +3,8 @@ import { AlertTriangle, RefreshCw, Home, Bug } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logger from "@/lib/logger";
 import { sanitizeErrorForDisplay } from "@/lib/errorUtils";
+
+interface Props {
   children: ReactNode;
   fallback?: ReactNode;
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
