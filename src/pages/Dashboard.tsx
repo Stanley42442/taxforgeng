@@ -373,7 +373,7 @@ const Dashboard = () => {
       }
     } catch (error) {
       toast.error('Export failed');
-      console.error('Export error:', error);
+      logger.error('Export error:', error);
     }
   };
 

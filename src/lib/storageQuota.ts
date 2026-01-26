@@ -4,6 +4,7 @@
  */
 
 import { formatBytes } from './compression';
+import logger from './logger';
 
 export type WarningLevel = 'none' | 'low' | 'medium' | 'high' | 'critical';
 
@@ -120,7 +121,7 @@ export const requestPersistentStorage = async (): Promise<boolean> => {
     const granted = await navigator.storage.persist();
     return granted;
   } catch (error) {
-    console.error('[StorageQuota] Failed to request persistent storage:', error);
+    logger.error('[StorageQuota] Failed to request persistent storage:', error);
     return false;
   }
 };

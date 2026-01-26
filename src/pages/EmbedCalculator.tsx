@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { EmbeddableCalculator, PartnerTheme } from "@/components/EmbeddableCalculator";
 import { Loader2 } from "lucide-react";
+import logger from "@/lib/logger";
 
 const EmbedCalculator = () => {
   const [searchParams] = useSearchParams();
@@ -52,7 +53,7 @@ const EmbedCalculator = () => {
           showPoweredBy: data.show_powered_by ?? true
         });
       } catch (err) {
-        console.error('Error fetching partner theme:', err);
+        logger.error('Error fetching partner theme:', err);
         setError('Failed to load calculator');
       } finally {
         setLoading(false);

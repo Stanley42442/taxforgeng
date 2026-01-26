@@ -24,6 +24,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Mail, Send, Loader2, UserPlus, FileText } from 'lucide-react';
+import logger from '@/lib/logger';
 
 interface SavedRecipient {
   id: string;
@@ -164,7 +165,7 @@ export const SendReportDialog: React.FC<SendReportDialogProps> = ({
       setMessage('');
       setSaveRecipient(false);
     } catch (error) {
-      console.error('Error sending report:', error);
+      logger.error('Error sending report:', error);
       toast({
         title: 'Failed to Send',
         description: 'There was an error sending the report. Please try again.',

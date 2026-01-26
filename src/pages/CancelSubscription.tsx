@@ -18,6 +18,7 @@ import {
   Gift,
   MessageSquare
 } from 'lucide-react';
+import logger from '@/lib/logger';
 
 const cancellationReasons = [
   { value: 'too_expensive', label: 'Too expensive' },
@@ -66,7 +67,7 @@ export default function CancelSubscription() {
       });
       navigate('/billing');
     } catch (err) {
-      console.error('Cancellation error:', err);
+      logger.error('Cancellation error:', err);
       toast.error('Failed to cancel subscription', {
         description: err instanceof Error ? err.message : 'Please try again or contact support',
       });

@@ -11,6 +11,7 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { supabase } from "@/integrations/supabase/client";
 
 import { toast } from "sonner";
+import logger from "@/lib/logger";
 import { 
   Palette, 
   Code, 
@@ -104,7 +105,7 @@ const PartnerBranding = () => {
         selectPartner(typedData[0]);
       }
     } catch (error) {
-      console.error('Error fetching partners:', error);
+      logger.error('Error fetching partners:', error);
     } finally {
       setLoading(false);
     }
@@ -152,7 +153,7 @@ const PartnerBranding = () => {
       toast.success('Theme saved successfully!');
       fetchPartners();
     } catch (error) {
-      console.error('Error saving theme:', error);
+      logger.error('Error saving theme:', error);
       toast.error('Failed to save theme');
     } finally {
       setSaving(false);

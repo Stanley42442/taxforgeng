@@ -531,10 +531,10 @@ const SecurityDashboard = () => {
               deviceName: device.device_name || 'Unknown Device'
             }
           }
-        }).catch(err => console.error('Failed to send device blocked alert:', err));
+        }).catch(err => logger.error('Failed to send device blocked alert:', err));
       }
     } catch (error) {
-      console.error("Error updating device block status:", error);
+      logger.error("Error updating device block status:", error);
       toast.error("Failed to update device");
     } finally {
       setTogglingBlockId(null);
@@ -1192,7 +1192,7 @@ const SecurityDashboard = () => {
                               alertType: 'sessions_revoked',
                               timestamp: new Date().toLocaleString(),
                             }
-                          }).catch(err => console.error('Failed to send session revocation alert:', err));
+                          }).catch(err => logger.error('Failed to send session revocation alert:', err));
                         }
                         
                         // Log the event

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { addDays, isAfter, isBefore } from "date-fns";
+import logger from "@/lib/logger";
 
 export interface UpcomingReminder {
   id: string;
@@ -35,7 +36,7 @@ export const useUpcomingReminders = () => {
         .order("due_date", { ascending: true });
 
       if (error) {
-        console.error("Error fetching reminders:", error);
+        logger.error("Error fetching reminders:", error);
         setLoading(false);
         return;
       }

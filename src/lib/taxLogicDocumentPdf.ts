@@ -11,6 +11,7 @@ import {
   PDF_SETTINGS,
   formatNigerianDate,
 } from './exportShared';
+import logger from './logger';
 
 // Generate QR code as base64 data URL
 const generateQRCodeDataUrl = async (url: string): Promise<string> => {
@@ -24,7 +25,7 @@ const generateQRCodeDataUrl = async (url: string): Promise<string> => {
       },
     });
   } catch (error) {
-    console.error('Failed to generate QR code:', error);
+    logger.error('Failed to generate QR code:', error);
     return '';
   }
 };

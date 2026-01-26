@@ -40,6 +40,7 @@ import {
 } from "recharts";
 import { ReusableAreaChart } from "@/components/ui/reusable-area-chart";
 import { ReusablePieChart, PieChartDataItem } from "@/components/ui/reusable-pie-chart";
+import logger from "@/lib/logger";
 import {
   Table,
   TableBody,
@@ -234,7 +235,7 @@ const AIQueryAnalytics = () => {
         satisfactionRate
       });
     } catch (error) {
-      console.error('Error fetching AI analytics:', error);
+      logger.error('Error fetching AI analytics:', error);
       // Mock data fallback
       setAnalytics({
         totalQueries: 256,

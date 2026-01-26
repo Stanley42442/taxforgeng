@@ -352,7 +352,7 @@ const Expenses = () => {
         .order('date', { ascending: false });
 
       if (error) {
-        console.error('Error fetching expenses:', error);
+        logger.error('Error fetching expenses:', error);
         toast.error('Failed to load expenses');
       } else {
         const mapped: Expense[] = (data || []).map(e => ({
@@ -519,7 +519,7 @@ const Expenses = () => {
       .select();
 
     if (error) {
-      console.error('Error importing expenses:', error);
+      logger.error('Error importing expenses:', error);
       toast.error("Failed to import expenses");
       return;
     }
@@ -545,7 +545,7 @@ const Expenses = () => {
       .eq('id', id);
 
     if (error) {
-      console.error('Error deleting expense:', error);
+      logger.error('Error deleting expense:', error);
       toast.error("Failed to delete expense");
       return;
     }

@@ -16,6 +16,7 @@ import { downloadDocumentationPDF } from '@/lib/documentationPdf';
 import { downloadTaxLogicDocumentPDF } from '@/lib/taxLogicDocumentPdf';
 import { toast } from 'sonner';
 import PageLayout from '@/components/PageLayout';
+import logger from '@/lib/logger';
 
 const AnimatedCounter = ({ value, duration = 2000 }: { value: number; duration?: number }) => {
   const [displayValue, setDisplayValue] = useState(0);
@@ -170,7 +171,7 @@ const Documentation = () => {
       await downloadDocumentationPDF(stats);
       toast.success('Documentation PDF downloaded successfully!');
     } catch (error) {
-      console.error('PDF export error:', error);
+      logger.error('PDF export error:', error);
       toast.error('Failed to generate PDF. Please try again.');
     } finally {
       setIsExporting(false);
@@ -183,7 +184,7 @@ const Documentation = () => {
       await downloadTaxLogicDocumentPDF();
       toast.success('Tax Logic Reference PDF downloaded successfully!');
     } catch (error) {
-      console.error('Tax Logic PDF export error:', error);
+      logger.error('Tax Logic PDF export error:', error);
       toast.error('Failed to generate Tax Logic PDF. Please try again.');
     } finally {
       setIsExportingTaxLogic(false);
