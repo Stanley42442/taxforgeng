@@ -17,6 +17,7 @@ export interface SavedBusiness {
   entityType: 'company' | 'business_name';
   turnover: number;
   createdAt: Date;
+  deletedAt?: Date;
   sector?: string;
   subSector?: string;
   // CAC Verification fields
@@ -41,6 +42,8 @@ interface SubscriptionContextType extends SubscriptionState {
   setTier: (tier: SubscriptionTier) => void;
   addBusiness: (business: Omit<SavedBusiness, 'id' | 'createdAt'>) => Promise<boolean>;
   removeBusiness: (id: string) => Promise<void>;
+  restoreBusiness: (id: string) => Promise<void>;
+  getDeletedBusinesses: () => Promise<SavedBusiness[]>;
   updateBusiness: (id: string, updates: Partial<SavedBusiness>) => Promise<void>;
   canSaveBusiness: () => boolean;
   canExport: () => boolean;
@@ -361,16 +364,61 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const removeBusiness = async (id: string) => {
     if (!user) return;
 
-    await supabase
-      .from('businesses')
-      .delete()
-      .eq('id', id)
-      .eq('user_id', user.id);
+    // Use soft delete function for cascade delete
+    const { error } = await supabase.rpc('soft_delete_business', {
+      business_uuid: id,
+      deleting_user_id: user.id
+    });
+
+    if (error) {
+      console.error('Error soft-deleting business:', error);
+      throw error;
+    }
 
     setState(prev => ({
       ...prev,
       savedBusinesses: prev.savedBusinesses.filter(b => b.id !== id),
       businessCount: Math.max(0, prev.businessCount - 1),
+    }));
+  };
+
+  const restoreBusiness = async (id: string) => {
+    if (!user) return;
+
+    const { error } = await supabase.rpc('restore_business', {
+      business_uuid: id,
+      restoring_user_id: user.id
+    });
+
+    if (error) {
+      console.error('Error restoring business:', error);
+      throw error;
+    }
+
+    // Refresh businesses to get the restored one
+    await refreshBusinesses();
+  };
+
+  const getDeletedBusinesses = async (): Promise<SavedBusiness[]> => {
+    if (!user) return [];
+
+    const { data: businesses } = await supabase
+      .from('businesses')
+      .select('*')
+      .eq('user_id', user.id)
+      .not('deleted_at', 'is', null)
+      .order('deleted_at', { ascending: false });
+
+    return (businesses || []).map(b => ({
+      id: b.id,
+      name: b.name,
+      entityType: b.entity_type as 'company' | 'business_name',
+      turnover: Number(b.turnover),
+      createdAt: new Date(b.created_at),
+      deletedAt: b.deleted_at ? new Date(b.deleted_at) : undefined,
+      sector: b.sector || undefined,
+      subSector: b.sub_sector || undefined,
+      verificationStatus: b.cac_verified ? 'verified' : 'not_verified',
     }));
   };
 
@@ -576,6 +624,8 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         setTier,
         addBusiness,
         removeBusiness,
+        restoreBusiness,
+        getDeletedBusinesses,
         updateBusiness,
         canSaveBusiness,
         canExport,

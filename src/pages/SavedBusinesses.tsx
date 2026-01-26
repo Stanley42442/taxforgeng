@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,7 +24,9 @@ import {
   ClipboardCheck,
   Receipt,
   Calculator,
-  Bell
+  Bell,
+  ChevronDown,
+  RotateCcw
 } from "lucide-react";
 import { useSubscription, SavedBusiness } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
@@ -48,13 +50,18 @@ import { SharedElement } from "@/components/PageTransition";
 import { motion } from "framer-motion";
 import { useDeleteWithUndo } from "@/hooks/useDeleteWithUndo";
 import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { cn } from "@/lib/utils";
+import { formatDistanceToNow } from "date-fns";
 
 const SavedBusinesses = () => {
   const navigate = useNavigate();
   const { 
     tier, 
     savedBusinesses, 
-    removeBusiness, 
+    removeBusiness,
+    restoreBusiness,
+    getDeletedBusinesses,
     updateBusiness,
     canSaveBusiness, 
     canVerifyCAC,
@@ -71,15 +78,44 @@ const SavedBusinesses = () => {
   const [showBulkDialog, setShowBulkDialog] = useState(false);
   const [bulkInput, setBulkInput] = useState("");
   const [bulkResults, setBulkResults] = useState<Array<{ rcBnNumber: string; isValid: boolean; details?: any }>>([]);
+  const [deletedBusinesses, setDeletedBusinesses] = useState<SavedBusiness[]>([]);
+  const [showDeleted, setShowDeleted] = useState(false);
+  const [restoringId, setRestoringId] = useState<string | null>(null);
+
+  // Fetch deleted businesses
+  useEffect(() => {
+    const fetchDeleted = async () => {
+      const deleted = await getDeletedBusinesses();
+      setDeletedBusinesses(deleted);
+    };
+    fetchDeleted();
+  }, [getDeletedBusinesses, savedBusinesses]);
 
   // Use centralized delete with undo hook
   const deleteWithUndo = useDeleteWithUndo<SavedBusiness>({
-    onDelete: (business) => {
-      removeBusiness(business.id);
+    onDelete: async (business) => {
+      await removeBusiness(business.id);
     },
-    getSuccessMessage: (business) => `Removed "${business.name}" from saved businesses`,
+    onRestore: async (business) => {
+      await restoreBusiness(business.id);
+    },
+    getSuccessMessage: (business) => `"${business.name}" and all related data moved to trash`,
     getItemName: (business) => business.name,
+    undoDuration: 10000, // 10 seconds to undo
   });
+
+  const handleRestore = async (business: SavedBusiness) => {
+    setRestoringId(business.id);
+    try {
+      await restoreBusiness(business.id);
+      toast.success(`"${business.name}" and all related data restored`);
+    } catch (error) {
+      console.error('Error restoring business:', error);
+      toast.error('Failed to restore business');
+    } finally {
+      setRestoringId(null);
+    }
+  };
 
   const limit = getBusinessLimit();
   const limitText = limit === 'unlimited' ? 'Unlimited' : `${businessCount}/${limit}`;
@@ -321,6 +357,60 @@ const SavedBusinesses = () => {
             </div>
           )}
         </div>
+
+        {/* Recently Deleted Section */}
+        {deletedBusinesses.length > 0 && (
+          <div className="mt-8">
+            <Collapsible open={showDeleted} onOpenChange={setShowDeleted}>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" className="w-full justify-between p-4 h-auto border border-dashed border-muted-foreground/30 rounded-lg hover:bg-muted/50">
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <Trash2 className="h-4 w-4" />
+                    Recently Deleted ({deletedBusinesses.length})
+                  </span>
+                  <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", showDeleted && "rotate-180")} />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-4">
+                <div className="space-y-3">
+                  {deletedBusinesses.map((business) => (
+                    <Card key={business.id} className="bg-muted/30 border-dashed opacity-75">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className={`h-8 w-8 rounded-lg flex items-center justify-center opacity-60 ${
+                              business.entityType === 'company' ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'
+                            }`}>
+                              {business.entityType === 'company' ? <Building2 className="h-4 w-4" /> : <Briefcase className="h-4 w-4" />}
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-foreground/70">{business.name}</h4>
+                              <p className="text-xs text-muted-foreground">
+                                Deleted {business.deletedAt ? formatDistanceToNow(business.deletedAt, { addSuffix: true }) : 'recently'}
+                              </p>
+                            </div>
+                          </div>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleRestore(business)}
+                            disabled={restoringId === business.id}
+                          >
+                            <RotateCcw className={cn("h-4 w-4", restoringId === business.id && "animate-spin")} />
+                            {restoringId === business.id ? 'Restoring...' : 'Restore'}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  <p className="text-xs text-muted-foreground text-center pt-2">
+                    Deleted businesses are permanently removed after 30 days
+                  </p>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
+        )}
 
         {/* Verify Dialog */}
         <Dialog open={showVerifyDialog} onOpenChange={setShowVerifyDialog}>
