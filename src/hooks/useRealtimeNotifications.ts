@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -7,6 +7,7 @@ import {
   playNotificationSound,
   showBrowserNotification
 } from "@/lib/notifications";
+import { logger } from "@/lib/logger";
 
 interface RealtimeConfig {
   enableToasts?: boolean;
@@ -36,12 +37,17 @@ export const useRealtimeNotifications = (config: RealtimeConfig = {}) => {
     return saved !== null ? saved === 'true' : true;
   }, []);
 
+  // Use ref to generate stable unique channel IDs
+  const channelIdRef = useRef(`user-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`);
+
   useEffect(() => {
     if (!user) return;
 
+    const channelId = channelIdRef.current;
+
     // Subscribe to notification_deliveries for security alerts
     const deliveriesChannel = supabase
-      .channel('user-notification-deliveries')
+      .channel(`deliveries-${channelId}`)
       .on(
         'postgres_changes',
         {
@@ -51,8 +57,14 @@ export const useRealtimeNotifications = (config: RealtimeConfig = {}) => {
           filter: `user_id=eq.${user.id}`
         },
         async (payload) => {
-          console.log('New notification delivery for user:', payload);
-          const delivery = payload.new as any;
+          logger.debug('New notification delivery for user:', payload);
+          
+          interface NotificationDelivery {
+            alert_type: string;
+            message_preview?: string;
+            delivery_method: string;
+          }
+          const delivery = payload.new as NotificationDelivery;
           
           setNewNotificationCount(prev => prev + 1);
 
@@ -93,7 +105,7 @@ export const useRealtimeNotifications = (config: RealtimeConfig = {}) => {
 
     // Subscribe to reminders changes
     const remindersChannel = supabase
-      .channel('user-reminders-realtime')
+      .channel(`reminders-${channelId}`)
       .on(
         'postgres_changes',
         {
@@ -103,8 +115,13 @@ export const useRealtimeNotifications = (config: RealtimeConfig = {}) => {
           filter: `user_id=eq.${user.id}`
         },
         (payload) => {
-          console.log('New reminder created:', payload);
-          const reminder = payload.new as any;
+          logger.debug('New reminder created:', payload);
+          
+          interface Reminder {
+            title: string;
+            is_completed?: boolean;
+          }
+          const reminder = payload.new as Reminder;
           
           if (enableToasts) {
             toast.success('New reminder created', {
@@ -122,9 +139,14 @@ export const useRealtimeNotifications = (config: RealtimeConfig = {}) => {
           filter: `user_id=eq.${user.id}`
         },
         (payload) => {
-          console.log('Reminder updated:', payload);
-          const reminder = payload.new as any;
-          const oldReminder = payload.old as any;
+          logger.debug('Reminder updated:', payload);
+          
+          interface Reminder {
+            title: string;
+            is_completed?: boolean;
+          }
+          const reminder = payload.new as Reminder;
+          const oldReminder = payload.old as Reminder | null;
           
           // Check if reminder was just completed
           if (reminder.is_completed && !oldReminder?.is_completed) {
@@ -140,7 +162,7 @@ export const useRealtimeNotifications = (config: RealtimeConfig = {}) => {
 
     // Subscribe to auth_events for security monitoring
     const authEventsChannel = supabase
-      .channel('user-auth-events-realtime')
+      .channel(`auth-events-${channelId}`)
       .on(
         'postgres_changes',
         {
@@ -150,8 +172,12 @@ export const useRealtimeNotifications = (config: RealtimeConfig = {}) => {
           filter: `user_id=eq.${user.id}`
         },
         async (payload) => {
-          console.log('New auth event:', payload);
-          const event = payload.new as any;
+          logger.debug('New auth event:', payload);
+          
+          interface AuthEvent {
+            event_type: string;
+          }
+          const event = payload.new as AuthEvent;
           
           // Only notify for important events
           const importantEvents = ['new_device_login', 'password_changed', 'mfa_enabled', 'mfa_disabled'];

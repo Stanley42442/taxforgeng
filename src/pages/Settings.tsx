@@ -186,89 +186,54 @@ const Settings = () => {
     }
   }, [user, loading, navigate]);
 
+  // Parallelized data loading for performance
   useEffect(() => {
-    const loadProfile = async () => {
+    const loadAllData = async () => {
       if (!user) return;
 
       try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('full_name, email, whatsapp_number')
-          .eq('id', user.id)
-          .single();
-
-        if (error) throw error;
-        setFullName(data?.full_name || "");
-        setWhatsappNumber(data?.whatsapp_number || "");
-      } catch (error) {
-        console.error("Error loading profile:", error);
-      } finally {
-        setProfileLoading(false);
-      }
-    };
-
-    loadProfile();
-  }, [user]);
-
-  useEffect(() => {
-    const loadMfaFactors = async () => {
-      if (!user) return;
-
-      try {
-        const { data, error } = await supabase.auth.mfa.listFactors();
-        if (error) throw error;
-        setMfaFactors((data?.totp || []) as MFAFactor[]);
-      } catch (error) {
-        console.error("Error loading MFA factors:", error);
-      } finally {
-        setMfaLoading(false);
-      }
-    };
-
-    loadMfaFactors();
-  }, [user]);
-
-  useEffect(() => {
-    const loadAuthEvents = async () => {
-      if (!user) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('auth_events')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(20);
-
-        if (error) throw error;
-        setAuthEvents((data || []) as AuthEvent[]);
-      } catch (error) {
-        console.error("Error loading auth events:", error);
-      } finally {
-        setEventsLoading(false);
-      }
-    };
-
-    loadAuthEvents();
-  }, [user]);
-
-  useEffect(() => {
-    const loadSubscriptionData = async () => {
-      if (!user) return;
-
-      try {
-        const [historyRes, businessesRes, invoicesRes, expensesRes, calculationsRes] = await Promise.all([
+        const [
+          profileRes,
+          mfaRes,
+          authEventsRes,
+          historyRes,
+          businessesRes,
+          invoicesRes,
+          expensesRes,
+          calculationsRes,
+        ] = await Promise.all([
+          supabase.from('profiles').select('full_name, email, whatsapp_number').eq('id', user.id).single(),
+          supabase.auth.mfa.listFactors(),
+          supabase.from('auth_events').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20),
           supabase.from('subscription_history').select('*').order('created_at', { ascending: false }).limit(20),
-          supabase.from('businesses').select('id', { count: 'exact', head: true }),
-          supabase.from('invoices').select('id', { count: 'exact', head: true }),
-          supabase.from('expenses').select('id', { count: 'exact', head: true }),
-          supabase.from('tax_calculations').select('id', { count: 'exact', head: true }),
+          supabase.from('businesses').select('id', { count: 'exact', head: true }).is('deleted_at', null),
+          supabase.from('invoices').select('id', { count: 'exact', head: true }).is('deleted_at', null),
+          supabase.from('expenses').select('id', { count: 'exact', head: true }).is('deleted_at', null),
+          supabase.from('tax_calculations').select('id', { count: 'exact', head: true }).is('deleted_at', null),
         ]);
 
+        // Set profile data
+        if (!profileRes.error && profileRes.data) {
+          setFullName(profileRes.data.full_name || "");
+          setWhatsappNumber(profileRes.data.whatsapp_number || "");
+        }
+
+        // Set MFA factors
+        if (!mfaRes.error && mfaRes.data) {
+          setMfaFactors((mfaRes.data.totp || []) as MFAFactor[]);
+        }
+
+        // Set auth events
+        if (!authEventsRes.error && authEventsRes.data) {
+          setAuthEvents(authEventsRes.data as AuthEvent[]);
+        }
+
+        // Set subscription history
         if (historyRes.data) {
           setSubscriptionHistory(historyRes.data);
         }
 
+        // Set data counts
         setDataCounts({
           businesses: businessesRes.count || 0,
           invoices: invoicesRes.count || 0,
@@ -276,13 +241,17 @@ const Settings = () => {
           calculations: calculationsRes.count || 0,
         });
       } catch (error) {
-        console.error("Error loading subscription data:", error);
+        const message = error instanceof Error ? error.message : 'Failed to load settings data';
+        console.error("Error loading settings data:", message);
       } finally {
+        setProfileLoading(false);
+        setMfaLoading(false);
+        setEventsLoading(false);
         setSubscriptionLoading(false);
       }
     };
 
-    loadSubscriptionData();
+    loadAllData();
   }, [user]);
 
   const getChangeTypeIcon = (changeType: string) => {
@@ -339,8 +308,9 @@ const Settings = () => {
       });
 
       toast.success("Profile updated successfully");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to update profile");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to update profile";
+      toast.error(message);
     } finally {
       setSavingProfile(false);
     }
@@ -366,8 +336,9 @@ const Settings = () => {
       
       toast.success("Confirmation email sent to your new address");
       setNewEmail("");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to update email");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to update email";
+      toast.error(message);
     } finally {
       setSavingEmail(false);
     }
@@ -400,8 +371,9 @@ const Settings = () => {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to update password");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to update password";
+      toast.error(message);
     } finally {
       setSavingPassword(false);
     }

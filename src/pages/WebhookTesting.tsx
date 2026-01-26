@@ -108,7 +108,7 @@ const WebhookTesting = () => {
       event: selectedEvent,
       data: {
         reference: testReference,
-        amount: parseInt(testAmount),
+        amount: parseInt(testAmount, 10) || 0,
         customer: {
           email: testEmail,
           customer_code: `CUS_test_${Date.now()}`
@@ -207,11 +207,12 @@ const WebhookTesting = () => {
       toast.success('Test logged successfully');
       fetchWebhookLogs();
 
-    } catch (error: any) {
+    } catch (error) {
       const responseTime = Date.now() - startTime;
+      const message = error instanceof Error ? error.message : 'Test failed';
       setTestResult({
         success: false,
-        message: error.message || 'Test failed',
+        message,
         responseTime
       });
       toast.error('Test failed');
