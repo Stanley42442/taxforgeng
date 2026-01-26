@@ -121,76 +121,70 @@ const checkIPWhitelist = async (userId: string, ip: string): Promise<boolean> =>
   }
 };
 
-// Track device on login with location awareness
+// Track device on login with location awareness - parallelized for performance
 const trackDevice = async (userId: string, userEmail: string) => {
   try {
-    const deviceInfo = await getDeviceInfo();
-    const clientIP = await getClientIP();
-    const location = clientIP ? await getLocationFromIP(clientIP) : null;
+    // Run independent operations in parallel for faster login
+    const [deviceInfo, clientIP] = await Promise.all([
+      getDeviceInfo(),
+      getClientIP()
+    ]);
     
-    // Fetch user's WhatsApp number for security alerts
-    let whatsappNumber: string | null = null;
-    try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('whatsapp_number')
-        .eq('id', userId)
-        .single();
-      whatsappNumber = profile?.whatsapp_number || null;
-    } catch {
-      // Ignore error, proceed without WhatsApp
-    }
+    // Run these in parallel - they don't depend on each other
+    const [location, profileResult, blocked] = await Promise.all([
+      clientIP ? getLocationFromIP(clientIP) : Promise.resolve(null),
+      supabase.from('profiles').select('whatsapp_number').eq('id', userId).single(),
+      isDeviceBlocked(userId, deviceInfo.fingerprint)
+    ]);
+    
+    const whatsappNumber = profileResult?.data?.whatsapp_number || null;
     
     // Check if device is blocked
-    const blocked = await isDeviceBlocked(userId, deviceInfo.fingerprint);
     if (blocked) {
       console.warn('Login from blocked device detected');
       return { blocked: true, ipBlocked: false };
     }
     
-    // Check IP whitelist
-    if (clientIP) {
-      const ipAllowed = await checkIPWhitelist(userId, clientIP);
-      if (!ipAllowed) {
-        console.warn('Login from non-whitelisted IP detected');
-        // Send alert for blocked IP
-        supabase.functions.invoke('send-security-alert', {
-          body: {
-            userEmail,
-            userId,
-            alertType: 'ip_blocked',
-            timestamp: new Date().toLocaleString(),
-            deviceInfo: { 
-              browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, 
-              os: `${deviceInfo.os} ${deviceInfo.osVersion}`, 
-              deviceName: deviceInfo.deviceName 
-            },
-            locationInfo: {
-              city: location?.city,
-              region: location?.region,
-              country: location?.country
-            },
-            ipAddress: clientIP,
-            whatsappNumber
-          }
-        }).catch(err => console.error('Failed to send IP blocked alert:', err));
-        
-        // Also trigger in-app notification
-        const locationText = location ? [location.city, location.country].filter(Boolean).join(', ') : undefined;
-        notifyIPBlocked(clientIP, locationText);
-        
-        return { blocked: false, ipBlocked: true, timeBlocked: false };
-      }
-    }
+    // Check IP whitelist and time restrictions in parallel
+    const [ipAllowed, timeAllowed] = await Promise.all([
+      clientIP ? checkIPWhitelist(userId, clientIP) : Promise.resolve(true),
+      supabase.rpc('check_time_restrictions', { check_user_id: userId }).then(({ data }) => data)
+    ]);
     
-    // Check time restrictions
-    const { data: timeAllowed } = await supabase.rpc('check_time_restrictions', {
-      check_user_id: userId
-    });
+    if (!ipAllowed && clientIP) {
+      console.warn('Login from non-whitelisted IP detected');
+      // Send alert for blocked IP (fire-and-forget)
+      supabase.functions.invoke('send-security-alert', {
+        body: {
+          userEmail,
+          userId,
+          alertType: 'ip_blocked',
+          timestamp: new Date().toLocaleString(),
+          deviceInfo: { 
+            browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, 
+            os: `${deviceInfo.os} ${deviceInfo.osVersion}`, 
+            deviceName: deviceInfo.deviceName 
+          },
+          locationInfo: {
+            city: location?.city,
+            region: location?.region,
+            country: location?.country
+          },
+          ipAddress: clientIP,
+          whatsappNumber
+        }
+      }).catch(err => console.error('Failed to send IP blocked alert:', err));
+      
+      // Also trigger in-app notification
+      const locationText = location ? [location.city, location.country].filter(Boolean).join(', ') : undefined;
+      notifyIPBlocked(clientIP, locationText);
+      
+      return { blocked: false, ipBlocked: true, timeBlocked: false };
+    }
     
     if (timeAllowed === false) {
       console.warn('Login outside allowed time window');
-      // Send alert for time-restricted login
+      // Send alert for time-restricted login (fire-and-forget)
       supabase.functions.invoke('send-security-alert', {
         body: {
           userEmail,
@@ -513,9 +507,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    // Log logout event before signing out
+    // Log logout event (fire-and-forget for faster logout)
     if (user) {
-      await logAuthEvent(user.id, 'logout');
+      logAuthEvent(user.id, 'logout').catch(console.error);
     }
     await supabase.auth.signOut();
   };
