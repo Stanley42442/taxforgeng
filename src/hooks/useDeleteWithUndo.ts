@@ -57,11 +57,10 @@ export function useDeleteWithUndo<T extends { id: string }>(
     setItemToDelete(null);
   }, []);
 
-  const confirmDelete = useCallback(() => {
+  const confirmDelete = useCallback(async () => {
     if (!itemToDelete) return;
 
     const item = itemToDelete;
-    setPendingItem(item);
     setShowDialog(false);
     setItemToDelete(null);
 
@@ -70,36 +69,43 @@ export function useDeleteWithUndo<T extends { id: string }>(
       clearTimeout(timeoutRef.current);
     }
 
-    // Show toast with undo button
-    toast(getSuccessMessage(item), {
-      action: {
-        label: "Undo",
-        onClick: () => {
-          // Clear the pending deletion
-          if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-            timeoutRef.current = null;
-          }
-          setPendingItem(null);
-          
-          // Restore the item if handler provided
-          if (onRestore) {
-            onRestore(item);
-          }
-          
-          const itemName = getItemName ? getItemName(item) : "Item";
-          toast.success(`${itemName} restored`);
-        },
-      },
-      duration: undoDuration,
-    });
-
-    // Set timeout for permanent deletion
-    timeoutRef.current = setTimeout(async () => {
+    try {
+      // Delete immediately
       await onDelete(item);
-      setPendingItem(null);
-      timeoutRef.current = null;
-    }, undoDuration);
+      setPendingItem(item);
+
+      // Show toast with undo button
+      toast(getSuccessMessage(item), {
+        action: {
+          label: "Undo",
+          onClick: async () => {
+            setPendingItem(null);
+            
+            // Restore the item if handler provided
+            if (onRestore) {
+              try {
+                await onRestore(item);
+                const itemName = getItemName ? getItemName(item) : "Item";
+                toast.success(`${itemName} restored`);
+              } catch (error) {
+                console.error('Error restoring item:', error);
+                toast.error('Failed to restore item');
+              }
+            }
+          },
+        },
+        duration: undoDuration,
+      });
+
+      // Clear pending state after undo window expires
+      timeoutRef.current = setTimeout(() => {
+        setPendingItem(null);
+        timeoutRef.current = null;
+      }, undoDuration);
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      toast.error('Failed to delete item');
+    }
   }, [itemToDelete, onDelete, onRestore, undoDuration, getSuccessMessage, getItemName]);
 
   const isPending = useCallback(

@@ -82,14 +82,14 @@ const SavedBusinesses = () => {
   const [showDeleted, setShowDeleted] = useState(false);
   const [restoringId, setRestoringId] = useState<string | null>(null);
 
-  // Fetch deleted businesses
+  // Fetch deleted businesses - removed savedBusinesses dependency to prevent infinite loops
   useEffect(() => {
     const fetchDeleted = async () => {
       const deleted = await getDeletedBusinesses();
       setDeletedBusinesses(deleted);
     };
     fetchDeleted();
-  }, [getDeletedBusinesses, savedBusinesses]);
+  }, [getDeletedBusinesses]);
 
   // Use centralized delete with undo hook
   const deleteWithUndo = useDeleteWithUndo<SavedBusiness>({
@@ -98,6 +98,9 @@ const SavedBusinesses = () => {
     },
     onRestore: async (business) => {
       await restoreBusiness(business.id);
+      // Refresh deleted businesses list after restore via undo
+      const updated = await getDeletedBusinesses();
+      setDeletedBusinesses(updated);
     },
     getSuccessMessage: (business) => `"${business.name}" and all related data moved to trash`,
     getItemName: (business) => business.name,
@@ -108,6 +111,9 @@ const SavedBusinesses = () => {
     setRestoringId(business.id);
     try {
       await restoreBusiness(business.id);
+      // Refresh deleted businesses list
+      const updated = await getDeletedBusinesses();
+      setDeletedBusinesses(updated);
       toast.success(`"${business.name}" and all related data restored`);
     } catch (error) {
       console.error('Error restoring business:', error);

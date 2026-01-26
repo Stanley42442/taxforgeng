@@ -130,27 +130,40 @@ export const useSyncedNotifications = () => {
     };
   }, [user]);
 
-  // Listen for local notification events
+  // Listen for local notification events - debounced to prevent duplicate fetches
   useEffect(() => {
+    let debounceTimer: NodeJS.Timeout | null = null;
+    
+    const debouncedLoad = () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        loadNotifications();
+      }, 500);
+    };
+
+    // Only reload from local events if realtime isn't connected (fallback)
     const handleNotificationAdded = () => {
-      loadNotifications();
+      if (!isConnected) {
+        debouncedLoad();
+      }
     };
 
     window.addEventListener('notification-added', handleNotificationAdded);
     
-    // Refresh when app comes back to foreground
+    // Refresh when app comes back to foreground (debounced)
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        loadNotifications();
+        debouncedLoad();
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
       window.removeEventListener('notification-added', handleNotificationAdded);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [loadNotifications]);
+  }, [loadNotifications, isConnected]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 

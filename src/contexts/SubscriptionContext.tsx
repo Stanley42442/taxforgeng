@@ -399,7 +399,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     await refreshBusinesses();
   };
 
-  const getDeletedBusinesses = async (): Promise<SavedBusiness[]> => {
+  const getDeletedBusinesses = useCallback(async (): Promise<SavedBusiness[]> => {
     if (!user) return [];
 
     const { data: businesses } = await supabase
@@ -420,7 +420,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       subSector: b.sub_sector || undefined,
       verificationStatus: b.cac_verified ? 'verified' : 'not_verified',
     }));
-  };
+  }, [user]);
 
   const updateBusiness = async (id: string, updates: Partial<SavedBusiness>) => {
     if (!user) return;
