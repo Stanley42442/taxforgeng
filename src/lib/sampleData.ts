@@ -72,9 +72,9 @@ export const seedSampleData = async (userId: string): Promise<{ businessId: stri
         cac_verified: SAMPLE_BUSINESS.cacVerified,
       })
       .select()
-      .single();
+      .maybeSingle();
 
-    if (businessError) {
+    if (businessError || !business) {
       console.error('Error creating sample business:', businessError);
       return { businessId: null, success: false };
     }

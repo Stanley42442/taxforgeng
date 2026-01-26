@@ -124,9 +124,14 @@ export function EmailRecipientsManager({
         is_default: newRecipient.is_default,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     setSaving(false);
+    
+    if (!data) {
+      toast.error('Failed to add recipient');
+      return;
+    }
 
     if (error) {
       if (error.code === '23505') {

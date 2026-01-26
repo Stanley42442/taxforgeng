@@ -32,7 +32,12 @@ const getAudioContext = (): AudioContext => {
 // Play notification sound using Web Audio API
 export const playNotificationSound = () => {
   try {
-    const soundEnabled = localStorage.getItem('notification-sound-enabled') !== 'false';
+    let soundEnabled = true;
+    try {
+      soundEnabled = localStorage.getItem('notification-sound-enabled') !== 'false';
+    } catch {
+      // Use default if localStorage unavailable
+    }
     if (!soundEnabled) return;
 
     const audioContext = getAudioContext();
@@ -67,7 +72,12 @@ export const playNotificationSound = () => {
 
 // Show browser notification
 export const showBrowserNotification = (title: string, body: string, redirectUrl?: string) => {
-  const browserEnabled = localStorage.getItem('notification-browser-enabled') !== 'false';
+  let browserEnabled = true;
+  try {
+    browserEnabled = localStorage.getItem('notification-browser-enabled') !== 'false';
+  } catch {
+    // Use default if localStorage unavailable
+  }
   
   if (Notification.permission === "granted" && browserEnabled) {
     const notification = new Notification(title, {
@@ -181,8 +191,8 @@ const addNotificationToLocalStorage = (
     const updated = [notification, ...notifications].slice(0, 50);
     localStorage.setItem('app-notifications', JSON.stringify(updated));
     window.dispatchEvent(new CustomEvent('notification-added', { detail: notification }));
-  } catch (error) {
-    console.error('Error saving notification to localStorage:', error);
+  } catch {
+    // Silent fail if localStorage unavailable
   }
 
   if (options?.playSound) {
@@ -203,8 +213,12 @@ export const getNotifications = async (): Promise<AppNotification[]> => {
     
     if (!user) {
       // Fall back to localStorage for non-authenticated users
-      const saved = localStorage.getItem('app-notifications');
-      return saved ? JSON.parse(saved) : [];
+      try {
+        const saved = localStorage.getItem('app-notifications');
+        return saved ? JSON.parse(saved) : [];
+      } catch {
+        return [];
+      }
     }
 
     const { data, error } = await supabase
@@ -241,12 +255,16 @@ export const markNotificationRead = async (id: string): Promise<void> => {
     
     if (!user) {
       // Fall back to localStorage
-      const notifications = JSON.parse(localStorage.getItem('app-notifications') || '[]');
-      const updated = notifications.map((n: AppNotification) => 
-        n.id === id ? { ...n, read: true } : n
-      );
-      localStorage.setItem('app-notifications', JSON.stringify(updated));
-      window.dispatchEvent(new CustomEvent('notification-added'));
+      try {
+        const notifications = JSON.parse(localStorage.getItem('app-notifications') || '[]');
+        const updated = notifications.map((n: AppNotification) => 
+          n.id === id ? { ...n, read: true } : n
+        );
+        localStorage.setItem('app-notifications', JSON.stringify(updated));
+        window.dispatchEvent(new CustomEvent('notification-added'));
+      } catch {
+        // Silent fail
+      }
       return;
     }
 
@@ -272,10 +290,14 @@ export const markAllNotificationsRead = async (): Promise<void> => {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      const notifications = JSON.parse(localStorage.getItem('app-notifications') || '[]');
-      const updated = notifications.map((n: AppNotification) => ({ ...n, read: true }));
-      localStorage.setItem('app-notifications', JSON.stringify(updated));
-      window.dispatchEvent(new CustomEvent('notification-added'));
+      try {
+        const notifications = JSON.parse(localStorage.getItem('app-notifications') || '[]');
+        const updated = notifications.map((n: AppNotification) => ({ ...n, read: true }));
+        localStorage.setItem('app-notifications', JSON.stringify(updated));
+        window.dispatchEvent(new CustomEvent('notification-added'));
+      } catch {
+        // Silent fail
+      }
       return;
     }
 
@@ -301,10 +323,14 @@ export const deleteNotification = async (id: string): Promise<void> => {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      const notifications = JSON.parse(localStorage.getItem('app-notifications') || '[]');
-      const updated = notifications.filter((n: AppNotification) => n.id !== id);
-      localStorage.setItem('app-notifications', JSON.stringify(updated));
-      window.dispatchEvent(new CustomEvent('notification-added'));
+      try {
+        const notifications = JSON.parse(localStorage.getItem('app-notifications') || '[]');
+        const updated = notifications.filter((n: AppNotification) => n.id !== id);
+        localStorage.setItem('app-notifications', JSON.stringify(updated));
+        window.dispatchEvent(new CustomEvent('notification-added'));
+      } catch {
+        // Silent fail
+      }
       return;
     }
 
@@ -330,8 +356,12 @@ export const clearAllNotifications = async (): Promise<void> => {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      localStorage.removeItem('app-notifications');
-      window.dispatchEvent(new CustomEvent('notification-added'));
+      try {
+        localStorage.removeItem('app-notifications');
+        window.dispatchEvent(new CustomEvent('notification-added'));
+      } catch {
+        // Silent fail
+      }
       return;
     }
 

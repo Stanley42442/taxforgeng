@@ -25,7 +25,7 @@ const EmbedCalculator = () => {
           .from('partners')
           .select('brand_name, logo_url, primary_color, secondary_color, accent_color, background_color, text_color, border_radius, font_family, show_powered_by, is_active')
           .eq('api_key', apiKey)
-          .single();
+          .maybeSingle();
 
         if (fetchError || !data) {
           setError('Invalid API key');
