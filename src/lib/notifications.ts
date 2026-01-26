@@ -1,5 +1,6 @@
 // Notification utility for adding app-wide notifications with cross-device sync
 import { supabase } from "@/integrations/supabase/client";
+import logger from "@/lib/logger";
 
 export type NotificationType = 'reminder' | 'warning' | 'info' | 'success';
 
@@ -66,7 +67,7 @@ export const playNotificationSound = () => {
     playTone(1318.51, now + 0.3, 0.25);
     
   } catch (error) {
-    console.error("Error playing notification sound:", error);
+    logger.error("Error playing notification sound:", error);
   }
 };
 
@@ -131,7 +132,7 @@ export const addNotification = async (
       .single();
 
     if (error) {
-      console.error('Error saving notification to database:', error);
+      logger.error('Error saving notification to database:', error);
       return addNotificationToLocalStorage(title, message, type, options);
     }
 
@@ -160,7 +161,7 @@ export const addNotification = async (
 
     return notification;
   } catch (error) {
-    console.error('Error adding notification:', error);
+    logger.error('Error adding notification:', error);
     return addNotificationToLocalStorage(title, message, type, options);
   }
 };
@@ -229,7 +230,7 @@ export const getNotifications = async (): Promise<AppNotification[]> => {
       .limit(50);
 
     if (error) {
-      console.error('Error fetching notifications:', error);
+      logger.error('Error fetching notifications:', error);
       return [];
     }
 
@@ -243,7 +244,7 @@ export const getNotifications = async (): Promise<AppNotification[]> => {
       user_id: n.user_id
     }));
   } catch (error) {
-    console.error('Error getting notifications:', error);
+    logger.error('Error getting notifications:', error);
     return [];
   }
 };
@@ -275,12 +276,12 @@ export const markNotificationRead = async (id: string): Promise<void> => {
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('Error marking notification read:', error);
+      logger.error('Error marking notification read:', error);
     }
 
     window.dispatchEvent(new CustomEvent('notification-added'));
   } catch (error) {
-    console.error('Error marking notification read:', error);
+    logger.error('Error marking notification read:', error);
   }
 };
 
@@ -308,12 +309,12 @@ export const markAllNotificationsRead = async (): Promise<void> => {
       .eq('read', false);
 
     if (error) {
-      console.error('Error marking all notifications read:', error);
+      logger.error('Error marking all notifications read:', error);
     }
 
     window.dispatchEvent(new CustomEvent('notification-added'));
   } catch (error) {
-    console.error('Error marking all notifications read:', error);
+    logger.error('Error marking all notifications read:', error);
   }
 };
 
@@ -341,12 +342,12 @@ export const deleteNotification = async (id: string): Promise<void> => {
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('Error deleting notification:', error);
+      logger.error('Error deleting notification:', error);
     }
 
     window.dispatchEvent(new CustomEvent('notification-added'));
   } catch (error) {
-    console.error('Error deleting notification:', error);
+    logger.error('Error deleting notification:', error);
   }
 };
 
@@ -371,12 +372,12 @@ export const clearAllNotifications = async (): Promise<void> => {
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('Error clearing notifications:', error);
+      logger.error('Error clearing notifications:', error);
     }
 
     window.dispatchEvent(new CustomEvent('notification-added'));
   } catch (error) {
-    console.error('Error clearing notifications:', error);
+    logger.error('Error clearing notifications:', error);
   }
 };
 

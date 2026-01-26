@@ -1,4 +1,5 @@
 import React from 'react';
+import logger from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Download, FileSpreadsheet, FileJson, Package } from 'lucide-react';
@@ -44,7 +45,7 @@ export const OfflineExportButton: React.FC<OfflineExportButtonProps> = ({
       }
     } catch (error) {
       toast.error('Export failed');
-      console.error('Export error:', error);
+      logger.error('Export error:', error);
     }
   };
 

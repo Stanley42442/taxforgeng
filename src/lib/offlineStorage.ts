@@ -4,6 +4,7 @@
 
 import { compressData, decompressData, formatBytes } from './compression';
 import { generateChecksum, verifyChecksum, validateSchema, repairData, SCHEMAS, IntegrityReport, IntegrityLog, generateLogId, createEmptyReport } from './dataIntegrity';
+import logger from './logger';
 
 const DB_NAME = 'taxforge-offline';
 const DB_VERSION = 1;
@@ -217,7 +218,7 @@ const getWithIntegrity = async <T>(
           
           items.push(data);
         } catch (error) {
-          console.error(`[OfflineStorage] Failed to decompress ${record.id}:`, error);
+          logger.error(`[OfflineStorage] Failed to decompress ${record.id}:`, error);
         }
       }
       

@@ -6,6 +6,7 @@
 import JSZip from 'jszip';
 import { jsPDF } from 'jspdf';
 import { formatDateForFilename, COMPANY_INFO } from './exportShared';
+import logger from './logger';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -115,7 +116,7 @@ export async function generateBulkExportZip(
           const pdf = await reportGenerators.generateTaxPDF(business.id);
           taxFolder?.file(`${safeBusinessName}-tax-report.pdf`, pdf);
         } catch (e) {
-          console.error(`Failed to generate tax PDF for ${business.name}:`, e);
+          logger.error(`Failed to generate tax PDF for ${business.name}:`, e);
         }
         processed++;
       }
@@ -131,7 +132,7 @@ export async function generateBulkExportZip(
           const excel = await reportGenerators.generateTaxExcel(business.id);
           taxFolder?.file(`${safeBusinessName}-tax-report.xlsx`, excel);
         } catch (e) {
-          console.error(`Failed to generate tax Excel for ${business.name}:`, e);
+          logger.error(`Failed to generate tax Excel for ${business.name}:`, e);
         }
         processed++;
       }
@@ -150,7 +151,7 @@ export async function generateBulkExportZip(
           const pdf = await reportGenerators.generateExpensesPDF(business.id);
           expenseFolder?.file(`${safeBusinessName}-expenses.pdf`, pdf);
         } catch (e) {
-          console.error(`Failed to generate expenses PDF for ${business.name}:`, e);
+          logger.error(`Failed to generate expenses PDF for ${business.name}:`, e);
         }
         processed++;
       }
@@ -166,7 +167,7 @@ export async function generateBulkExportZip(
           const excel = await reportGenerators.generateExpensesExcel(business.id);
           expenseFolder?.file(`${safeBusinessName}-expenses.xlsx`, excel);
         } catch (e) {
-          console.error(`Failed to generate expenses Excel for ${business.name}:`, e);
+          logger.error(`Failed to generate expenses Excel for ${business.name}:`, e);
         }
         processed++;
       }
@@ -185,7 +186,7 @@ export async function generateBulkExportZip(
           const pdf = await reportGenerators.generateInvoicesPDF(business.id);
           invoiceFolder?.file(`${safeBusinessName}-invoices.pdf`, pdf);
         } catch (e) {
-          console.error(`Failed to generate invoices PDF for ${business.name}:`, e);
+          logger.error(`Failed to generate invoices PDF for ${business.name}:`, e);
         }
         processed++;
       }
@@ -201,7 +202,7 @@ export async function generateBulkExportZip(
           const excel = await reportGenerators.generateInvoicesExcel(business.id);
           invoiceFolder?.file(`${safeBusinessName}-invoices.xlsx`, excel);
         } catch (e) {
-          console.error(`Failed to generate invoices Excel for ${business.name}:`, e);
+          logger.error(`Failed to generate invoices Excel for ${business.name}:`, e);
         }
         processed++;
       }
@@ -220,7 +221,7 @@ export async function generateBulkExportZip(
           const pdf = await reportGenerators.generateBusinessReportPDF(business.id);
           reportsFolder?.file(`${safeBusinessName}-business-report.pdf`, pdf);
         } catch (e) {
-          console.error(`Failed to generate business report PDF for ${business.name}:`, e);
+          logger.error(`Failed to generate business report PDF for ${business.name}:`, e);
         }
         processed++;
       }
@@ -236,7 +237,7 @@ export async function generateBulkExportZip(
           const excel = await reportGenerators.generateBusinessReportExcel(business.id);
           reportsFolder?.file(`${safeBusinessName}-business-report.xlsx`, excel);
         } catch (e) {
-          console.error(`Failed to generate business report Excel for ${business.name}:`, e);
+          logger.error(`Failed to generate business report Excel for ${business.name}:`, e);
         }
         processed++;
       }

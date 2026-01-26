@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import logger from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -70,7 +71,7 @@ export function PaymentMethodsManager() {
       if (error) throw error;
       setMethods(data || []);
     } catch (err) {
-      console.error('Error fetching payment methods:', err);
+      logger.error('Error fetching payment methods:', err);
       toast.error('Failed to load payment methods');
     } finally {
       setLoading(false);
@@ -130,7 +131,7 @@ export function PaymentMethodsManager() {
 
       await fetchPaymentMethods();
     } catch (err) {
-      console.error('Error updating payment method:', err);
+      logger.error('Error updating payment method:', err);
       toast.error('Failed to update payment method');
     } finally {
       setActionLoading(null);

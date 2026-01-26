@@ -19,10 +19,9 @@ export const TierSelectionWrapper = () => {
           .from('profiles')
           .select('has_selected_initial_tier')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
         
         if (error) {
-          console.error('Error checking profile:', error);
           setChecking(false);
           return;
         }
@@ -30,8 +29,8 @@ export const TierSelectionWrapper = () => {
         if (profile && !profile.has_selected_initial_tier) {
           setShowModal(true);
         }
-      } catch (err) {
-        console.error('Error in tier check:', err);
+      } catch {
+        // Silent fail
       } finally {
         setChecking(false);
       }

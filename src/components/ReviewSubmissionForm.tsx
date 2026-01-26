@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import logger from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -71,7 +72,7 @@ export const ReviewSubmissionForm = () => {
       .maybeSingle();
 
     if (error) {
-      console.error("Error fetching review:", error);
+      logger.error("Error fetching review:", error);
       return;
     }
 
@@ -133,7 +134,7 @@ export const ReviewSubmissionForm = () => {
       setIsEditing(false);
       fetchExistingReview();
     } catch (error) {
-      console.error("Error submitting review:", error);
+      logger.error("Error submitting review:", error);
       toast.error("Failed to submit review. Please try again.");
     } finally {
       setIsLoading(false);
@@ -163,7 +164,7 @@ export const ReviewSubmissionForm = () => {
       setMetricLabel("");
       setRating(5);
     } catch (error) {
-      console.error("Error deleting review:", error);
+      logger.error("Error deleting review:", error);
       toast.error("Failed to delete review");
     } finally {
       setIsLoading(false);

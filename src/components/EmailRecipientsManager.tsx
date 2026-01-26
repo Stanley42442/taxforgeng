@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import logger from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -91,7 +92,7 @@ export function EmailRecipientsManager({
       .order('name', { ascending: true });
 
     if (error) {
-      console.error('Error fetching recipients:', error);
+      logger.error('Error fetching recipients:', error);
       toast.error('Failed to load email recipients');
     } else {
       setRecipients(data || []);
@@ -137,7 +138,7 @@ export function EmailRecipientsManager({
       if (error.code === '23505') {
         toast.error('This email is already in your list');
       } else {
-        console.error('Error adding recipient:', error);
+        logger.error('Error adding recipient:', error);
         toast.error('Failed to add recipient');
       }
       return;
@@ -156,7 +157,7 @@ export function EmailRecipientsManager({
       .eq('id', id);
 
     if (error) {
-      console.error('Error deleting recipient:', error);
+      logger.error('Error deleting recipient:', error);
       toast.error('Failed to delete recipient');
       return;
     }
@@ -177,7 +178,7 @@ export function EmailRecipientsManager({
       .eq('id', id);
 
     if (error) {
-      console.error('Error updating recipient:', error);
+      logger.error('Error updating recipient:', error);
       toast.error('Failed to update recipient');
       return;
     }

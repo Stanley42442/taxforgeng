@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import logger from "@/lib/logger";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -108,7 +109,7 @@ export const BlockedLoginAttemptsLog = ({ userId }: BlockedLoginAttemptsLogProps
 
       setAttempts(parsedAttempts);
     } catch (error) {
-      console.error("Error loading blocked attempts:", error);
+      logger.error("Error loading blocked attempts:", error);
     } finally {
       setLoading(false);
       setRefreshing(false);
