@@ -147,7 +147,7 @@ export const ReportScheduleSettings = () => {
       }
 
       toast.success(`${schedule.schedule_type === 'weekly' ? 'Weekly' : 'Monthly'} report schedule saved`);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving schedule:', error);
       toast.error('Failed to save schedule');
     } finally {
@@ -207,7 +207,7 @@ export const ReportScheduleSettings = () => {
                   <Select
                     value={weeklySchedule.day_of_week?.toString()}
                     onValueChange={(v) => {
-                      const updated = { ...weeklySchedule, day_of_week: parseInt(v) };
+                      const updated = { ...weeklySchedule, day_of_week: parseInt(v, 10) };
                       setWeeklySchedule(updated);
                       saveSchedule(updated);
                     }}
@@ -229,7 +229,7 @@ export const ReportScheduleSettings = () => {
                   <Select
                     value={weeklySchedule.preferred_hour.toString()}
                     onValueChange={(v) => {
-                      const updated = { ...weeklySchedule, preferred_hour: parseInt(v) };
+                      const updated = { ...weeklySchedule, preferred_hour: parseInt(v, 10) };
                       setWeeklySchedule(updated);
                       saveSchedule(updated);
                     }}
@@ -278,7 +278,7 @@ export const ReportScheduleSettings = () => {
                   <Select
                     value={monthlySchedule.day_of_month?.toString()}
                     onValueChange={(v) => {
-                      const updated = { ...monthlySchedule, day_of_month: parseInt(v) };
+                      const updated = { ...monthlySchedule, day_of_month: parseInt(v, 10) };
                       setMonthlySchedule(updated);
                       saveSchedule(updated);
                     }}
@@ -300,7 +300,7 @@ export const ReportScheduleSettings = () => {
                   <Select
                     value={monthlySchedule.preferred_hour.toString()}
                     onValueChange={(v) => {
-                      const updated = { ...monthlySchedule, preferred_hour: parseInt(v) };
+                      const updated = { ...monthlySchedule, preferred_hour: parseInt(v, 10) };
                       setMonthlySchedule(updated);
                       saveSchedule(updated);
                     }}

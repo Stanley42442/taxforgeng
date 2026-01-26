@@ -259,9 +259,10 @@ const PromoCodeAdmin = () => {
       setIsDialogOpen(false);
       fetchPromoCodes();
       fetchStats();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving promo code:', error);
-      toast.error(error.message || 'Failed to save promo code');
+      const message = error instanceof Error ? error.message : 'Failed to save promo code';
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -523,7 +524,7 @@ const PromoCodeAdmin = () => {
                   <Input
                     type="number"
                     value={formData.max_uses || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, max_uses: e.target.value ? parseInt(e.target.value) : null }))}
+                    onChange={(e) => setFormData(prev => ({ ...prev, max_uses: e.target.value ? parseInt(e.target.value, 10) : null }))}
                     placeholder="Unlimited"
                     className="mt-1"
                   />
@@ -533,7 +534,7 @@ const PromoCodeAdmin = () => {
                   <Input
                     type="number"
                     value={formData.max_uses_per_user}
-                    onChange={(e) => setFormData(prev => ({ ...prev, max_uses_per_user: parseInt(e.target.value) || 1 }))}
+                    onChange={(e) => setFormData(prev => ({ ...prev, max_uses_per_user: parseInt(e.target.value, 10) || 1 }))}
                     className="mt-1"
                   />
                 </div>

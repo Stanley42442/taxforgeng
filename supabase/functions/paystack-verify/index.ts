@@ -182,8 +182,8 @@ serve(async (req) => {
             authorization_code: authorization.authorization_code,
             card_type: authorization.card_type || 'unknown',
             last_four: authorization.last4 || '****',
-            exp_month: parseInt(authorization.exp_month) || 0,
-            exp_year: parseInt(authorization.exp_year) || 0,
+            exp_month: parseInt(authorization.exp_month, 10) || 0,
+            exp_year: parseInt(authorization.exp_year, 10) || 0,
             bank: authorization.bank || null,
             country_code: authorization.country_code || 'NG',
             is_default: !existingDefault, // Make default if no existing default

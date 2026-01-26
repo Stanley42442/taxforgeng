@@ -245,7 +245,19 @@ serve(async (req) => {
       const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
       
       if (supabaseUrl && supabaseKey && lastUserMessage) {
-        console.log("Query analytics:", {
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        
+        // Insert analytics data to ai_queries table
+        await supabase.from('ai_queries').insert({
+          question: lastUserMessage.content.substring(0, 500),
+          response: 'Streaming response - not captured',
+          categories,
+          response_time_ms: responseTime,
+          sector: userContext?.sector || null,
+          session_id: crypto.randomUUID(),
+        });
+        
+        console.log("Query analytics logged:", {
           question: lastUserMessage.content.substring(0, 100),
           categories,
           responseTime,

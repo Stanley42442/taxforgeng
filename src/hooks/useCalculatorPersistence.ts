@@ -53,7 +53,10 @@ export function useCalculatorPersistence<T extends Record<string, unknown>>(
     return initialState;
   });
 
-  // Debounced save function
+  // Memoize the storage key to prevent stale closures
+  const storageKey = STORAGE_KEYS[calculatorType];
+
+  // Debounced save function - using storageKey to prevent stale closure
   const saveToStorage = useCallback(
     debounce((data: T) => {
       try {
@@ -61,12 +64,12 @@ export function useCalculatorPersistence<T extends Record<string, unknown>>(
           data,
           timestamp: Date.now(),
         };
-        localStorage.setItem(STORAGE_KEYS[calculatorType], JSON.stringify(storageData));
+        localStorage.setItem(storageKey, JSON.stringify(storageData));
       } catch {
         // Ignore storage errors (quota exceeded, etc.)
       }
     }, 500),
-    [calculatorType]
+    [storageKey]
   );
 
   // Auto-save on state change
