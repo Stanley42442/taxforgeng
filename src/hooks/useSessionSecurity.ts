@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import logger from '@/lib/logger';
 
 interface ActiveSession {
   id: string;
@@ -33,7 +34,7 @@ export function useSessionSecurity() {
       if (error) throw error;
       setSessions(data || []);
     } catch (error) {
-      console.error('Failed to fetch sessions:', error);
+      logger.error('Failed to fetch sessions:', error);
     } finally {
       setLoading(false);
     }
@@ -51,7 +52,7 @@ export function useSessionSecurity() {
       await fetchSessions();
     } catch (error) {
       toast.error('Failed to revoke session');
-      console.error(error);
+      logger.error('Failed to revoke session:', error);
     } finally {
       setRevoking(null);
     }
@@ -74,7 +75,7 @@ export function useSessionSecurity() {
       return data?.sessionsRevoked || 0;
     } catch (error) {
       toast.error('Failed to revoke sessions');
-      console.error(error);
+      logger.error('Failed to revoke sessions:', error);
       return 0;
     } finally {
       setRevoking(null);
@@ -98,7 +99,7 @@ export function useSessionSecurity() {
       
       return true;
     } catch (error) {
-      console.error('Session validity check failed:', error);
+      logger.error('Session validity check failed:', error);
       return true; // Fail open on error
     }
   }, [session]);
@@ -115,7 +116,7 @@ export function useSessionSecurity() {
         }
       });
     } catch (error) {
-      console.error('Failed to register session:', error);
+      logger.error('Failed to register session:', error);
     }
   }, [user]);
 

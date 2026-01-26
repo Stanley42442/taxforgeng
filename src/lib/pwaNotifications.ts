@@ -1,11 +1,28 @@
 // PWA-specific notification handling for mobile devices
+import logger from '@/lib/logger';
 
 let swRegistration: ServiceWorkerRegistration | null = null;
+
+// Shared AudioContext for PWA to prevent memory leaks
+let sharedPWAAudioContext: AudioContext | null = null;
+
+const getPWAAudioContext = (): AudioContext => {
+  const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+  if (!sharedPWAAudioContext || sharedPWAAudioContext.state === 'closed') {
+    sharedPWAAudioContext = new AudioContextClass();
+  }
+  if (sharedPWAAudioContext.state === 'suspended') {
+    sharedPWAAudioContext.resume().catch(() => {
+      // Ignore resume errors - user interaction may be required
+    });
+  }
+  return sharedPWAAudioContext;
+};
 
 // Register service worker
 export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration | null> => {
   if (!('serviceWorker' in navigator)) {
-    console.log('[PWA] Service workers not supported');
+    logger.debug('[PWA] Service workers not supported');
     return null;
   }
 
@@ -14,7 +31,7 @@ export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration
       scope: '/'
     });
     
-    console.log('[PWA] Service Worker registered:', registration.scope);
+    logger.debug('[PWA] Service Worker registered:', registration.scope);
     swRegistration = registration;
     
     // Handle updates
@@ -23,7 +40,7 @@ export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration
       if (newWorker) {
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            console.log('[PWA] New service worker available');
+            logger.debug('[PWA] New service worker available');
           }
         });
       }
@@ -31,7 +48,7 @@ export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration
 
     return registration;
   } catch (error) {
-    console.error('[PWA] Service Worker registration failed:', error);
+    logger.error('[PWA] Service Worker registration failed:', error);
     return null;
   }
 };
@@ -56,7 +73,7 @@ export const isMobileDevice = (): boolean => {
 // Request notification permission with mobile-specific handling
 export const requestPWANotificationPermission = async (): Promise<boolean> => {
   if (!('Notification' in window)) {
-    console.log('[PWA] Notifications not supported');
+    logger.debug('[PWA] Notifications not supported');
     return false;
   }
 
@@ -67,16 +84,16 @@ export const requestPWANotificationPermission = async (): Promise<boolean> => {
 
   // Already denied
   if (Notification.permission === 'denied') {
-    console.log('[PWA] Notifications denied by user');
+    logger.debug('[PWA] Notifications denied by user');
     return false;
   }
 
   try {
     const permission = await Notification.requestPermission();
-    console.log('[PWA] Notification permission:', permission);
+    logger.debug('[PWA] Notification permission:', permission);
     return permission === 'granted';
   } catch (error) {
-    console.error('[PWA] Error requesting permission:', error);
+    logger.error('[PWA] Error requesting permission:', error);
     return false;
   }
 };
@@ -91,7 +108,7 @@ export const showPWANotification = async (
     vibrate?: boolean;
   }
 ): Promise<boolean> => {
-  console.log('[PWA] Showing notification:', title);
+  logger.debug('[PWA] Showing notification:', title);
 
   // Get service worker registration
   let registration = swRegistration;
@@ -118,10 +135,10 @@ export const showPWANotification = async (
         vibrateDevice([200, 100, 200]);
       }
       
-      console.log('[PWA] Notification shown via SW');
+      logger.debug('[PWA] Notification shown via SW');
       return true;
     } catch (error) {
-      console.error('[PWA] SW notification failed:', error);
+      logger.error('[PWA] SW notification failed:', error);
     }
   }
 
@@ -144,10 +161,10 @@ export const showPWANotification = async (
         }
       };
 
-      console.log('[PWA] Notification shown via Notification API');
+      logger.debug('[PWA] Notification shown via Notification API');
       return true;
     } catch (error) {
-      console.error('[PWA] Notification API failed:', error);
+      logger.error('[PWA] Notification API failed:', error);
     }
   }
 
@@ -160,32 +177,21 @@ export const vibrateDevice = (pattern: number[] = [200, 100, 200]): boolean => {
     try {
       navigator.vibrate(pattern);
       return true;
-    } catch (error) {
-      console.log('[PWA] Vibration not available');
+    } catch {
+      logger.debug('[PWA] Vibration not available');
     }
   }
   return false;
 };
 
-// Play notification sound that works on mobile
+// Play notification sound that works on mobile (uses shared AudioContext)
 export const playMobileNotificationSound = async (): Promise<void> => {
-  const soundEnabled = localStorage.getItem('notification-sound-enabled') !== 'false';
-  if (!soundEnabled) return;
-
   try {
-    // Create audio context with user gesture requirement handling
-    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioContextClass) {
-      console.log('[PWA] AudioContext not supported');
-      return;
-    }
+    const { safeLocalStorage } = await import('@/lib/safeStorage');
+    const soundEnabled = safeLocalStorage.getItem('notification-sound-enabled') !== 'false';
+    if (!soundEnabled) return;
 
-    const audioContext = new AudioContextClass();
-    
-    // Resume context if suspended (required on mobile)
-    if (audioContext.state === 'suspended') {
-      await audioContext.resume();
-    }
+    const audioContext = getPWAAudioContext();
 
     const playTone = (frequency: number, startTime: number, duration: number) => {
       const oscillator = audioContext.createOscillator();
@@ -209,19 +215,16 @@ export const playMobileNotificationSound = async (): Promise<void> => {
     playTone(880, now, 0.15);
     playTone(1108.73, now + 0.15, 0.2);
     playTone(1318.51, now + 0.3, 0.25);
-
-    // Close context after sound plays
-    setTimeout(() => audioContext.close(), 1000);
   } catch (error) {
-    console.error('[PWA] Error playing sound:', error);
+    logger.error('[PWA] Error playing sound:', error);
   }
 };
 
 // Initialize PWA features
 export const initializePWA = async (): Promise<void> => {
-  console.log('[PWA] Initializing...');
-  console.log('[PWA] Is PWA:', isPWA());
-  console.log('[PWA] Is Mobile:', isMobileDevice());
+  logger.debug('[PWA] Initializing...');
+  logger.debug('[PWA] Is PWA:', isPWA());
+  logger.debug('[PWA] Is Mobile:', isMobileDevice());
 
   await registerServiceWorker();
 };

@@ -59,9 +59,9 @@ export default function PaymentCallback() {
           setStatus('failed');
           setMessage(result.error || 'Payment verification failed');
         }
-      } catch (err: any) {
+      } catch (err) {
         setStatus('error');
-        setMessage(err.message || 'An error occurred during verification');
+        setMessage(err instanceof Error ? err.message : 'An error occurred during verification');
       }
     };
 

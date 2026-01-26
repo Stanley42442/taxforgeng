@@ -1,8 +1,8 @@
 import React, { Component, ErrorInfo, ReactNode } from "react";
 import { AlertTriangle, RefreshCw, Home, Bug } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-interface Props {
+import logger from "@/lib/logger";
+import { sanitizeErrorForDisplay } from "@/lib/errorUtils";
   children: ReactNode;
   fallback?: ReactNode;
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
@@ -26,7 +26,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("ErrorBoundary caught an error:", error, errorInfo);
+    logger.error("ErrorBoundary caught an error:", error, errorInfo);
     this.setState({ errorInfo });
     this.props.onError?.(error, errorInfo);
   }
@@ -41,8 +41,10 @@ export class ErrorBoundary extends Component<Props, State> {
 
   private handleReportIssue = () => {
     const subject = encodeURIComponent("Bug Report: Application Error");
+    // Sanitize error details for production - don't expose full stack traces
+    const sanitizedError = sanitizeErrorForDisplay(this.state.error);
     const body = encodeURIComponent(
-      `Error: ${this.state.error?.message}\n\nStack: ${this.state.error?.stack}\n\nComponent Stack: ${this.state.errorInfo?.componentStack}`
+      `Error: ${sanitizedError}\n\nPlease describe what you were doing when this error occurred:\n\n`
     );
     window.open(`mailto:support@taxforgeng.com?subject=${subject}&body=${body}`);
   };

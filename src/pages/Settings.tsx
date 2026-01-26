@@ -62,6 +62,7 @@ import { formatDistanceToNow } from "date-fns";
 import { SecurityScoreWidget } from "@/components/SecurityScoreWidget";
 import { ReportScheduleSettings } from "@/components/ReportScheduleSettings";
 import { WhatsAppVerification } from "@/components/WhatsAppVerification";
+import logger from "@/lib/logger";
 
 const nameSchema = z.string().min(1, "Name is required").max(100, "Name must be less than 100 characters");
 const emailSchema = z.string().email("Please enter a valid email address");
@@ -242,7 +243,7 @@ const Settings = () => {
         });
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Failed to load settings data';
-        console.error("Error loading settings data:", message);
+        logger.error("Error loading settings data:", message);
       } finally {
         setProfileLoading(false);
         setMfaLoading(false);

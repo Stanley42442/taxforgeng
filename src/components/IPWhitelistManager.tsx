@@ -29,6 +29,8 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { getErrorMessage } from "@/lib/errorUtils";
+import logger from "@/lib/logger";
 
 interface GeoLocation {
   city?: string | null;
@@ -83,7 +85,7 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
         country_code: data.country_code
       };
     } catch (error) {
-      console.error("Error fetching geolocation:", error);
+      logger.error("Error fetching geolocation:", error);
       return null;
     }
   };
@@ -102,7 +104,7 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
           setCurrentIPLocation(location);
         }
       } catch (error) {
-        console.error("Error fetching IP:", error);
+        logger.error("Error fetching IP:", error);
       }
     };
     fetchCurrentIP();
@@ -145,7 +147,7 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
           setGeoLocations(locations);
         }
       } catch (error) {
-        console.error("Error loading IP whitelist:", error);
+        logger.error("Error loading IP whitelist:", error);
         toast.error("Failed to load IP whitelist settings");
       } finally {
         setLoading(false);
@@ -204,8 +206,8 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
       setWhitelistEnabled(newValue);
       setShowConfirmDialog(false);
       toast.success(newValue ? "IP whitelist enabled" : "IP whitelist disabled");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to update settings");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to update settings"));
     } finally {
       setToggling(false);
     }
@@ -264,8 +266,8 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
       setNewDescription("");
       setShowAddDialog(false);
       toast.success("IP range added to whitelist");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to add IP range");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to add IP range"));
     } finally {
       setSaving(false);
     }
@@ -303,8 +305,8 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
       }
       
       toast.success("Current IP added to whitelist");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to add IP");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to add IP"));
     } finally {
       setSaving(false);
     }
@@ -406,7 +408,7 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
             skipped++;
             continue;
           }
-          console.error("Error importing entry:", error);
+          logger.error("Error importing entry:", error);
           skipped++;
           continue;
         }
@@ -427,8 +429,8 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
       } else {
         toast.info(`No new entries imported (${skipped} skipped)`);
       }
-    } catch (error: any) {
-      console.error("Error importing CSV:", error);
+    } catch (error) {
+      logger.error("Error importing CSV:", error);
       toast.error("Failed to import CSV file");
     } finally {
       setImporting(false);
@@ -451,8 +453,8 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
       setEntries(entries.map(e => 
         e.id === entryId ? { ...e, is_active: !isActive } : e
       ));
-    } catch (error: any) {
-      toast.error(error.message || "Failed to update entry");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to update entry"));
     }
   };
 
@@ -467,8 +469,8 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
 
       setEntries(entries.filter(e => e.id !== entryId));
       toast.success("IP range removed from whitelist");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to delete entry");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to delete entry"));
     }
   };
 

@@ -670,7 +670,7 @@ export function toVerificationData(report: VerificationReport): VerificationData
  * Log verification results to console in development mode
  */
 export function logVerificationResults(report: VerificationReport, context: string): void {
-  if (process.env.NODE_ENV !== 'development') return;
+  if (!import.meta.env.DEV) return;
   
   console.group(`📋 Tax Verification Report: ${context}`);
   console.log(`Timestamp: ${report.timestamp}`);

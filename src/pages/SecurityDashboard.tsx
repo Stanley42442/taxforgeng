@@ -58,6 +58,8 @@ import { TimeAccessManager } from "@/components/TimeAccessManager";
 import { SecurityAnalytics } from "@/components/SecurityAnalytics";
 import { NotificationDeliveryLog } from "@/components/NotificationDeliveryLog";
 import { BlockedLoginAttemptsLog } from "@/components/BlockedLoginAttemptsLog";
+import { getErrorMessage } from "@/lib/errorUtils";
+import logger from "@/lib/logger";
 
 interface LocationData {
   city?: string;
@@ -340,7 +342,7 @@ const SecurityDashboard = () => {
                 };
               }
             } catch (err) {
-              console.error('Failed to get location for IP:', event.ip_address, err);
+              logger.error('Failed to get location for IP:', event.ip_address, err);
             }
           }
           return event;
@@ -399,7 +401,7 @@ const SecurityDashboard = () => {
         recentSuspiciousActivity: recentFailedAttempts >= 3
       });
     } catch (error) {
-      console.error("Error loading security data:", error);
+      logger.error("Error loading security data:", error);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -446,10 +448,10 @@ const SecurityDashboard = () => {
               deviceName: device.device_name || 'Unknown Device'
             }
           }
-        }).catch(err => console.error('Failed to send device removal alert:', err));
+        }).catch(err => logger.error('Failed to send device removal alert:', err));
       }
     } catch (error) {
-      console.error("Error removing device:", error);
+      logger.error("Error removing device:", error);
       toast.error("Failed to remove device");
     } finally {
       setRemovingDeviceId(null);
@@ -474,7 +476,7 @@ const SecurityDashboard = () => {
       ));
       toast.success(currentTrusted ? "Device removed from trusted list" : "Device marked as trusted");
     } catch (error) {
-      console.error("Error updating device trust status:", error);
+      logger.error("Error updating device trust status:", error);
       toast.error("Failed to update device");
     } finally {
       setTogglingTrustId(null);
@@ -640,9 +642,9 @@ const SecurityDashboard = () => {
         });
       }
       
-    } catch (error: any) {
-      console.error("Error verifying:", error);
-      toast.error(error.message || "Failed to verify. Please try again.");
+    } catch (error) {
+      logger.error("Error verifying:", error);
+      toast.error(getErrorMessage(error, "Failed to verify. Please try again."));
     } finally {
       setIsVerifyingUnblock(false);
       setUnblockTotpCode("");
