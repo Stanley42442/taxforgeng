@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import logger from "@/lib/logger";
 import { PageLayout } from "@/components/PageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -125,7 +126,7 @@ const Notifications = () => {
   };
 
   const testNotification = async () => {
-    console.log('[Notifications] Testing notification...', { isPwaMode, isMobile });
+    logger.debug('[Notifications] Testing notification...', { isPwaMode, isMobile });
     
     // Play sound (with mobile-compatible audio context)
     await playMobileNotificationSound();

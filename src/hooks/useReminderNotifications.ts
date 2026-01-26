@@ -12,7 +12,7 @@ import logger from "@/lib/logger";
 // Request notification permission
 export const requestNotificationPermission = async (): Promise<boolean> => {
   if (!("Notification" in window)) {
-    console.log("This browser does not support notifications");
+    logger.debug("This browser does not support notifications");
     return false;
   }
   

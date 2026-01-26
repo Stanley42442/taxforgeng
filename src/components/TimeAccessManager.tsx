@@ -75,7 +75,7 @@ export const TimeAccessManager = ({ userId }: TimeAccessManagerProps) => {
           .from('profiles')
           .select('time_restrictions_enabled, allowed_days, allowed_start_hour, allowed_end_hour, time_restriction_timezone')
           .eq('id', userId)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
 

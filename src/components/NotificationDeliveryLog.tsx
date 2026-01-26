@@ -166,7 +166,7 @@ export const NotificationDeliveryLog = () => {
           table: 'notification_deliveries'
         },
         (payload) => {
-          console.log('New notification delivery:', payload);
+          logger.debug('New notification delivery:', payload);
           const newDelivery = payload.new as NotificationDelivery;
           
           // Check if it matches current filters
@@ -198,7 +198,7 @@ export const NotificationDeliveryLog = () => {
           table: 'notification_deliveries'
         },
         (payload) => {
-          console.log('Updated notification delivery:', payload);
+          logger.debug('Updated notification delivery:', payload);
           const updatedDelivery = payload.new as NotificationDelivery;
           setDeliveries(prev => 
             prev.map(d => d.id === updatedDelivery.id ? updatedDelivery : d)
