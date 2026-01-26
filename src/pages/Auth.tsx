@@ -406,7 +406,7 @@ const Auth = () => {
           duration: 5000
         });
       }
-    } catch (error: any) {
+    } catch {
       toast.error("Failed to send verification email. Please try again.");
     } finally {
       setIsResendingVerification(false);

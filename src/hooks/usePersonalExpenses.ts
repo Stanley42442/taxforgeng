@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { calculateAnnualAmount, PERSONAL_EXPENSE_CATEGORIES } from '@/lib/personalExpenseCategories';
 import { toast } from 'sonner';
+import logger from '@/lib/logger';
+import { getErrorMessage } from '@/lib/errorUtils';
 
 export interface PersonalExpense {
   id: string;
@@ -73,9 +75,10 @@ export function usePersonalExpenses(taxYear?: number) {
       if (fetchError) throw fetchError;
       setExpenses(data || []);
       setError(null);
-    } catch (err: any) {
-      console.error('Error fetching personal expenses:', err);
-      setError(err.message);
+    } catch (err) {
+      const message = getErrorMessage(err);
+      logger.error('Error fetching personal expenses:', err);
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -104,8 +107,8 @@ export function usePersonalExpenses(taxYear?: number) {
       toast.success('Expense added successfully');
       await fetchExpenses();
       return true;
-    } catch (err: any) {
-      console.error('Error adding personal expense:', err);
+    } catch (err) {
+      logger.error('Error adding personal expense:', err);
       toast.error('Failed to add expense');
       return false;
     }
@@ -129,8 +132,8 @@ export function usePersonalExpenses(taxYear?: number) {
       toast.success('Expense updated successfully');
       await fetchExpenses();
       return true;
-    } catch (err: any) {
-      console.error('Error updating personal expense:', err);
+    } catch (err) {
+      logger.error('Error updating personal expense:', err);
       toast.error('Failed to update expense');
       return false;
     }
@@ -154,8 +157,8 @@ export function usePersonalExpenses(taxYear?: number) {
       toast.success('Expense deleted successfully');
       await fetchExpenses();
       return true;
-    } catch (err: any) {
-      console.error('Error deleting personal expense:', err);
+    } catch (err) {
+      logger.error('Error deleting personal expense:', err);
       toast.error('Failed to delete expense');
       return false;
     }

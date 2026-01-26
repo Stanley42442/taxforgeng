@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import logger from '@/lib/logger';
 
 export interface PaymentInitResult {
   success: boolean;
@@ -77,7 +78,7 @@ export function usePaystack() {
     try {
       await supabase.auth.getSession();
       const latency = Date.now() - start;
-      console.log(`[Paystack] Connection latency: ${latency}ms`);
+      logger.debug(`[Paystack] Connection latency: ${latency}ms`);
       
       let quality: ConnectionQuality;
       if (latency < 500) quality = 'fast';
@@ -98,16 +99,16 @@ export function usePaystack() {
     discountCode?: string,
     discountType?: 'promo' | 'referral' | 'loyalty'
   ): Promise<PaymentInitResult> => {
-    console.log('[usePaystack] initializePayment called', { tier, billingCycle, discountCode, discountType, userEmail: user?.email });
+    logger.debug('[usePaystack] initializePayment called', { tier, billingCycle, discountCode, discountType, userEmail: user?.email });
 
     if (!user?.email) {
-      console.error('[usePaystack] No user email - not authenticated');
+      logger.error('[usePaystack] No user email - not authenticated');
       return { success: false, error: 'User not authenticated' };
     }
 
     // Check network status first
     if (!navigator.onLine) {
-      console.error('[usePaystack] Navigator offline');
+      logger.error('[usePaystack] Navigator offline');
       return { success: false, error: 'No internet connection. Please check your network and try again.' };
     }
 
@@ -117,32 +118,32 @@ export function usePaystack() {
     cancelledRef.current = false;
 
     // Check connection quality and set adaptive timeout
-    console.log('[usePaystack] Checking connection quality...');
+    logger.debug('[usePaystack] Checking connection quality...');
     const quality = await checkConnectionQuality();
     const timeoutMs = TIMEOUT_BY_QUALITY[quality];
-    console.log(`[usePaystack] Connection quality: ${quality}, timeout: ${timeoutMs}ms`);
+    logger.debug(`[usePaystack] Connection quality: ${quality}, timeout: ${timeoutMs}ms`);
 
     if (quality === 'slow') {
       toast.info('Slow connection detected. This may take a moment...');
     }
 
     // Refresh session and get token in one call (optimized from 2 calls to 1)
-    console.log('[usePaystack] Refreshing session...');
+    logger.debug('[usePaystack] Refreshing session...');
     const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-    console.log('[usePaystack] Session refresh result:', { 
+    logger.debug('[usePaystack] Session refresh result:', { 
       hasSession: !!refreshData?.session, 
       hasToken: !!refreshData?.session?.access_token,
       error: refreshError?.message 
     });
     
     if (refreshError || !refreshData.session?.access_token) {
-      console.error('[usePaystack] Session refresh failed:', refreshError?.message);
+      logger.error('[usePaystack] Session refresh failed:', refreshError?.message);
       setLoading(false);
       return { success: false, error: 'Session expired. Please sign in again.' };
     }
 
     const accessToken = refreshData.session.access_token;
-    console.log('[usePaystack] Got access token, proceeding with payment...');
+    logger.debug('[usePaystack] Got access token, proceeding with payment...');
 
     const attemptPayment = async (attempt: number): Promise<PaymentInitResult> => {
       if (cancelledRef.current) {
@@ -156,7 +157,7 @@ export function usePaystack() {
 
       // Create payment promise
       const paymentPromise = (async () => {
-        console.log(`[usePaystack] Attempt ${attempt + 1}: Starting edge function request...`);
+        logger.debug(`[usePaystack] Attempt ${attempt + 1}: Starting edge function request...`);
         const startTime = Date.now();
 
         const requestBody = {
@@ -167,7 +168,7 @@ export function usePaystack() {
           discountCode,
           discountType,
         };
-        console.log('[usePaystack] Request body:', requestBody);
+        logger.debug('[usePaystack] Request body:', requestBody);
 
         const response = await supabase.functions.invoke('paystack-initialize', {
           body: requestBody,
@@ -176,18 +177,18 @@ export function usePaystack() {
           },
         });
 
-        console.log(`[usePaystack] Response received in ${Date.now() - startTime}ms:`, response);
+        logger.debug(`[usePaystack] Response received in ${Date.now() - startTime}ms:`, response);
 
         if (response.error) {
-          console.error('[usePaystack] Edge function error:', response.error);
+          logger.error('[usePaystack] Edge function error:', response.error);
           throw new Error(response.error.message);
         }
 
         const data = response.data;
-        console.log('[usePaystack] Edge function data:', data);
+        logger.debug('[usePaystack] Edge function data:', data);
 
         if (!data.success) {
-          console.error('[usePaystack] Edge function returned success=false:', data.error);
+          logger.error('[usePaystack] Edge function returned success=false:', data.error);
           throw new Error(data.error || 'Failed to initialize payment');
         }
 
@@ -206,13 +207,14 @@ export function usePaystack() {
         // Race between payment and timeout
         const result = await Promise.race([paymentPromise, timeoutPromise]);
         return result;
-      } catch (err: any) {
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
         // Handle timeout or network errors with retry
-        if ((err.message === 'TIMEOUT' || err.message?.includes('fetch') || err.message?.includes('network')) && !cancelledRef.current) {
+        if ((errorMessage === 'TIMEOUT' || errorMessage.includes('fetch') || errorMessage.includes('network')) && !cancelledRef.current) {
           if (attempt < MAX_RETRIES - 1) {
             const nextAttempt = attempt + 1;
             setRetryCount(nextAttempt);
-            console.log(`[Payment] Attempt ${attempt + 1} failed, retrying in ${RETRY_DELAYS[attempt]}ms...`);
+            logger.debug(`[Payment] Attempt ${attempt + 1} failed, retrying in ${RETRY_DELAYS[attempt]}ms...`);
             toast.info(`Connection issue. Retrying... (${nextAttempt}/${MAX_RETRIES})`);
             await new Promise(r => setTimeout(r, RETRY_DELAYS[attempt]));
             return attemptPayment(nextAttempt);
@@ -225,8 +227,8 @@ export function usePaystack() {
 
     try {
       return await attemptPayment(0);
-    } catch (err: any) {
-      const errorMsg = err.message || 'Failed to initialize payment';
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to initialize payment';
       setError(errorMsg);
       return { success: false, error: errorMsg };
     } finally {
@@ -269,8 +271,8 @@ export function usePaystack() {
         alreadyProcessed: data.alreadyProcessed,
       };
 
-    } catch (err: any) {
-      const errorMsg = err.message || 'Failed to verify payment';
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to verify payment';
       setError(errorMsg);
       return { success: false, error: errorMsg };
     } finally {
@@ -299,8 +301,9 @@ export function usePaystack() {
 
       return response.data;
 
-    } catch (err: any) {
-      return { valid: false, error: err.message || 'Failed to validate code' };
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to validate code';
+      return { valid: false, error: errorMsg };
     }
   }, []);
 

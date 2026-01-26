@@ -1204,8 +1204,8 @@ const SecurityDashboard = () => {
                         });
                         
                         toast.success("Signed out of all other devices successfully");
-                      } catch (error: any) {
-                        toast.error(error.message || "Failed to sign out of other devices");
+                      } catch (error) {
+                        toast.error(getErrorMessage(error, "Failed to sign out of other devices"));
                       } finally {
                         setIsSigningOutOthers(false);
                       }
@@ -1264,8 +1264,8 @@ const SecurityDashboard = () => {
                         ));
                         setStats(prev => ({ ...prev, totalLogins: 0 }));
                         toast.success("Login history cleared successfully");
-                      } catch (error: any) {
-                        toast.error(error.message || "Failed to clear login history");
+                      } catch (error) {
+                        toast.error(getErrorMessage(error, "Failed to clear login history"));
                       } finally {
                         setIsClearingHistory(false);
                       }

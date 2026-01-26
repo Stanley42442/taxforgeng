@@ -1,10 +1,11 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { usePaystack, DiscountValidationResult } from '@/hooks/usePaystack';
 import { Loader2, Check, X, Tag, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getErrorMessage } from '@/lib/errorUtils';
 
 interface PromoCodeInputProps {
   tier: string;
@@ -57,8 +58,8 @@ export function PromoCodeInput({
       
       setLastValidatedTier(tier);
       setLastValidatedCycle(billingCycle);
-    } catch (err: any) {
-      setError(err.message || 'Failed to validate code');
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to validate code'));
       setAppliedDiscount(null);
       onDiscountApplied(null, null);
     } finally {
@@ -89,8 +90,8 @@ export function PromoCodeInput({
         setAppliedCode(null);
         onDiscountApplied(null, null);
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to validate code');
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to validate code'));
       setAppliedDiscount(null);
       setAppliedCode(null);
       onDiscountApplied(null, null);
