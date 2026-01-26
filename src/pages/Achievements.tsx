@@ -38,7 +38,8 @@ const Achievements = () => {
   const { tier } = useSubscription();
   const { stats, earnedBadges, loading } = useAchievements();
   const navigate = useNavigate();
-  const isBasicPlus = tier !== 'free';
+  const tierOrder = ['free', 'starter', 'basic', 'professional', 'business', 'corporate'];
+  const isBasicPlus = tierOrder.indexOf(tier) >= tierOrder.indexOf('basic');
 
   const getLevel = (points: number) => {
     if (points >= 1000) return { level: 5, title: 'Tax Master', nextLevel: null };

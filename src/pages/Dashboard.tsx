@@ -494,7 +494,7 @@ const Dashboard = () => {
                   </div>
                   <p className="text-lg font-bold text-success">{formatCurrency(filteredSummary.totalIncome)}</p>
                   <div className="mt-2">
-                    <SparklineChart data={sparklineData.income} color="hsl(var(--success))" height={30} width={80} />
+                    <SparklineChart data={sparklineData.income} color="hsl(var(--success))" height={30} width={100} />
                   </div>
                 </div>
                 <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
@@ -504,7 +504,7 @@ const Dashboard = () => {
                   </div>
                   <p className="text-lg font-bold text-destructive">{formatCurrency(filteredSummary.totalExpenses)}</p>
                   <div className="mt-2">
-                    <SparklineChart data={sparklineData.expenses} color="hsl(var(--destructive))" height={30} width={80} />
+                    <SparklineChart data={sparklineData.expenses} color="hsl(var(--destructive))" height={30} width={100} />
                   </div>
                 </div>
                 <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
@@ -516,7 +516,7 @@ const Dashboard = () => {
                     {formatCurrency(netIncome)}
                   </p>
                   <div className="mt-2">
-                    <SparklineChart data={sparklineData.net} color={netIncome >= 0 ? "hsl(var(--success))" : "hsl(var(--destructive))"} height={30} width={80} />
+                    <SparklineChart data={sparklineData.net} color={netIncome >= 0 ? "hsl(var(--success))" : "hsl(var(--destructive))"} height={30} width={100} />
                   </div>
                 </div>
                 <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">

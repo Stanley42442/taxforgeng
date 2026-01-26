@@ -87,16 +87,18 @@ export const SparklineChart = ({
         <path 
           d={areaPath} 
           fill={displayColor}
-          fillOpacity={0.15}
+          fillOpacity={0.25}
+          className="dark:opacity-40"
         />
       )}
       <path 
         d={path} 
         fill="none" 
         stroke={displayColor}
-        strokeWidth={1.5}
+        strokeWidth={2}
         strokeLinecap="round"
         strokeLinejoin="round"
+        className="dark:drop-shadow-[0_0_3px_currentColor]"
       />
       {/* End dot */}
       {data.length > 0 && (
@@ -108,8 +110,9 @@ export const SparklineChart = ({
             const range = max - min || 1;
             return height - ((data[data.length - 1] - min) / range) * (height - 4) - 2;
           })()}
-          r={2}
+          r={3}
           fill={displayColor}
+          className="dark:drop-shadow-[0_0_4px_currentColor]"
         />
       )}
     </svg>

@@ -95,7 +95,6 @@ const navGroups: NavGroup[] = [
     id: 'personal',
     label: 'Personal Tax',
     icon: User,
-    showCondition: 'freeOnly',
     links: [
       { to: "/individual-calculator", label: "Personal Tax Calculator", icon: Calculator },
       { to: "/personal-expenses", label: "Personal Expenses", icon: Wallet },
@@ -108,11 +107,11 @@ const navGroups: NavGroup[] = [
     icon: Building2,
     showCondition: 'paidOnly',
     links: [
-      { to: "/calculator", label: "Business Calculator", icon: Calculator, minTier: 'basic' },
+      { to: "/calculator", label: "Business Calculator", icon: Calculator, minTier: 'starter' },
       { to: "/businesses", label: "My Businesses", icon: FolderOpen, minTier: 'starter' },
       { to: "/expenses", label: "Expenses", icon: Receipt, minTier: 'starter' },
       { to: "/invoices", label: "Invoices", icon: FileText, minTier: 'basic' },
-      { to: "/payroll", label: "Payroll", icon: Users, minTier: 'professional' },
+      { to: "/payroll", label: "Payroll", icon: Users, minTier: 'basic' },
       { to: "/profit-loss", label: "P&L Statement", icon: PieChart, minTier: 'basic' },
     ]
   },
@@ -219,8 +218,8 @@ export const NavMenu = () => {
     navigate("/");
   };
 
-  const isFreeTierOrGuest = !user || tier === 'free' || tier === 'starter';
-  const isPaidTier = user && tier !== 'free' && tier !== 'starter';
+  const isFreeTierOrGuest = !user || tier === 'free';
+  const isPaidTier = user && tier !== 'free';
 
   const tierOrder = ['free', 'starter', 'basic', 'professional', 'business', 'corporate'];
   const userTierIndex = tierOrder.indexOf(tier);

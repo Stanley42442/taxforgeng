@@ -143,14 +143,14 @@ const SavedBusinesses = () => {
   // Business tools configuration
   const businessTools = [
     { to: "/invoices", label: "Invoices", icon: FileText, description: "Create & manage invoices", minTier: 'basic' },
-    { to: "/payroll", label: "Payroll", icon: Users, description: "Calculate salaries & PAYE", minTier: 'freelancer' },
+    { to: "/payroll", label: "Payroll", icon: Users, description: "Calculate salaries & PAYE", minTier: 'basic' },
     { to: "/profit-loss", label: "P&L Statement", icon: PieChart, description: "View financial performance", minTier: 'basic' },
-    { to: "/compliance", label: "Compliance", icon: ClipboardCheck, description: "Track tax deadlines", minTier: 'freelancer' },
+    { to: "/compliance", label: "Compliance", icon: ClipboardCheck, description: "Track tax deadlines", minTier: 'professional' },
     { to: "/expenses", label: "Expenses", icon: Receipt, description: "Track business expenses", minTier: 'starter' },
     { to: "/reminders", label: "Reminders", icon: Bell, description: "Set tax reminders", minTier: 'starter' },
   ];
 
-  const tierOrder = ['free', 'starter', 'basic', 'freelancer', 'business', 'corporate'];
+  const tierOrder = ['free', 'starter', 'basic', 'professional', 'business', 'corporate'];
   const userTierIndex = tierOrder.indexOf(tier);
 
   const accessibleTools = businessTools.filter(tool => {
