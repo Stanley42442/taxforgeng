@@ -41,6 +41,7 @@ import { formatCurrency, type IndividualTaxInputs, type IndividualTaxResult } fr
 import { downloadIndividualTaxPDF } from '@/lib/individualPdfExport';
 import { DeleteConfirmationDialog } from '@/components/DeleteConfirmationDialog';
 import { useDeviceCSS, getResponsiveClasses } from '@/hooks/useDeviceCSS';
+import logger from '@/lib/logger';
 
 interface SavedCalculation {
   id: string;
@@ -110,7 +111,7 @@ export default function CalculationHistory() {
       if (error) throw error;
       setCalculations(data as unknown as SavedCalculation[]);
     } catch (error) {
-      console.error('Error loading calculations:', error);
+      logger.error('Error loading calculations:', error);
       toast.error('Failed to load calculation history');
     } finally {
       setLoading(false);
@@ -133,7 +134,7 @@ export default function CalculationHistory() {
       });
       toast.success('Calculation deleted');
     } catch (error) {
-      console.error('Error deleting:', error);
+      logger.error('Error deleting:', error);
       toast.error('Failed to delete calculation');
     }
     setDeleteId(null);
@@ -153,7 +154,7 @@ export default function CalculationHistory() {
       setSelectedIds(new Set());
       toast.success(`${selectedIds.size} calculation(s) deleted`);
     } catch (error) {
-      console.error('Error bulk deleting:', error);
+      logger.error('Error bulk deleting:', error);
       toast.error('Failed to delete calculations');
     }
   };

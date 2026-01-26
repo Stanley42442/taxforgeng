@@ -48,6 +48,7 @@ import { format, isAfter, addDays, subDays, subMonths, startOfWeek, startOfMonth
 import { SparklineChart } from "@/components/SparklineChart";
 import { exportDashboardToPDF, exportDashboardToCSV, DashboardExportData } from "@/lib/dashboardExport";
 import { toast } from "sonner";
+import logger from "@/lib/logger";
 import { ExpenseCharts } from "@/components/ExpenseCharts";
 import { PremiumOnboarding } from "@/components/PremiumOnboarding";
 import { DisclaimerModal } from "@/components/DisclaimerModal";
@@ -128,7 +129,7 @@ const Dashboard = () => {
         .from('profiles')
         .select('onboarding_completed')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       // Show onboarding wizard if not completed
       if (data && data.onboarding_completed === false) {

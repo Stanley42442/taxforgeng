@@ -48,6 +48,7 @@ import { toast } from "sonner";
 import { useSubscription, type SavedBusiness } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import logger from "@/lib/logger";
 
 // Move components OUTSIDE main function to prevent re-creation on every render
 const NeumorphicInput = ({ 
@@ -269,7 +270,7 @@ const CalculatorPage = () => {
       .eq('business_id', businessId);
     
     if (error) {
-      console.error('Error fetching expenses:', error);
+      logger.error('Error fetching expenses:', error);
       setExpenseBreakdown({});
       return { totalExpenses: 0, deductibleExpenses: 0 };
     }
@@ -313,7 +314,7 @@ const CalculatorPage = () => {
 
     if (error) {
       toast.error('Failed to add expense');
-      console.error(error);
+      logger.error(error);
       return;
     }
 

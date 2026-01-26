@@ -19,6 +19,7 @@ import {
   Percent,
   Sparkles,
 } from "lucide-react";
+import logger from "@/lib/logger";
 
 interface Referral {
   id: string;
@@ -69,7 +70,7 @@ const Referrals = () => {
       if (error) throw error;
       setReferrals(data || []);
     } catch (error) {
-      console.error("Error fetching referrals:", error);
+      logger.error("Error fetching referrals:", error);
     } finally {
       setLoading(false);
     }
@@ -90,7 +91,7 @@ const Referrals = () => {
       if (error) throw error;
       setDiscountCodes(data || []);
     } catch (error) {
-      console.error("Error fetching discount codes:", error);
+      logger.error("Error fetching discount codes:", error);
     }
   };
 

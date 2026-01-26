@@ -48,6 +48,7 @@ import { useFormFeedback } from "@/hooks/useFormFeedback";
 import { SuccessCelebration } from "@/components/ui/form-feedback";
 import { SharedElement } from "@/components/PageTransition";
 import { VerificationBadge } from "@/components/VerificationBadge";
+import logger from "@/lib/logger";
 
 const Results = () => {
   const location = useLocation();
@@ -76,13 +77,13 @@ const Results = () => {
         }]);
         
         if (error) {
-          console.error('Error saving calculation:', error);
+          logger.error('Error saving calculation:', error);
         } else {
-          console.log('Calculation saved successfully');
+          logger.debug('Calculation saved successfully');
           notifyTaxCalculation(result.entityType, result.totalTaxPayable);
         }
       } catch (error) {
-        console.error('Error saving calculation:', error);
+        logger.error('Error saving calculation:', error);
       }
     };
 
