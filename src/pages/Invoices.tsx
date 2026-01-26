@@ -18,6 +18,7 @@ import { formatCurrency } from "@/lib/taxCalculations";
 import { useFormFeedback } from "@/hooks/useFormFeedback";
 import { SuccessCelebration } from "@/components/ui/form-feedback";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
+import logger from "@/lib/logger";
 
 interface InvoiceItem {
   id?: string;
@@ -100,7 +101,7 @@ const Invoices = () => {
       if (error) throw error;
       setInvoices(data || []);
     } catch (error) {
-      console.error('Error fetching invoices:', error);
+      logger.error('Error fetching invoices:', error);
       toast.error('Failed to load invoices');
     } finally {
       setLoading(false);
@@ -211,7 +212,7 @@ const Invoices = () => {
       );
       fetchInvoices();
     } catch (error) {
-      console.error('Error creating invoice:', error);
+      logger.error('Error creating invoice:', error);
       invoiceFormFeedback.setError('Failed to create invoice');
     }
   };
@@ -241,7 +242,7 @@ const Invoices = () => {
       toast.success(`Invoice marked as ${newStatus}`);
       fetchInvoices();
     } catch (error) {
-      console.error('Error updating invoice:', error);
+      logger.error('Error updating invoice:', error);
       toast.error('Failed to update invoice');
     }
   };
@@ -258,7 +259,7 @@ const Invoices = () => {
       toast.success('Invoice deleted');
       fetchInvoices();
     } catch (error) {
-      console.error('Error deleting invoice:', error);
+      logger.error('Error deleting invoice:', error);
       toast.error('Failed to delete invoice');
     }
   };

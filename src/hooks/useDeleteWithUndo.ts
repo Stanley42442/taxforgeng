@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { toast } from "sonner";
+import logger from "@/lib/logger";
 
 interface DeleteWithUndoOptions<T> {
   /** Function to delete the item (called after undo timeout) */
@@ -88,7 +89,7 @@ export function useDeleteWithUndo<T extends { id: string }>(
                 const itemName = getItemName ? getItemName(item) : "Item";
                 toast.success(`${itemName} restored`);
               } catch (error) {
-                console.error('Error restoring item:', error);
+                logger.error('Error restoring item:', error);
                 toast.error('Failed to restore item');
               }
             }
@@ -103,7 +104,7 @@ export function useDeleteWithUndo<T extends { id: string }>(
         timeoutRef.current = null;
       }, undoDuration);
     } catch (error) {
-      console.error('Error deleting item:', error);
+      logger.error('Error deleting item:', error);
       toast.error('Failed to delete item');
     }
   }, [itemToDelete, onDelete, onRestore, undoDuration, getSuccessMessage, getItemName]);

@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { notifyExpenseAdded } from "@/lib/notifications";
+import logger from "@/lib/logger";
 import {
   Receipt,
   Plus,
@@ -471,7 +472,7 @@ const Expenses = () => {
       .single();
 
     if (error) {
-      console.error('Error adding expense:', error);
+      logger.error('Error adding expense:', error);
       expenseFormFeedback.setError("Failed to add expense");
       return;
     }
@@ -1835,7 +1836,7 @@ const Expenses = () => {
             .single();
 
           if (error) {
-            console.error('Error adding expense:', error);
+            logger.error('Error adding expense:', error);
             toast.error('Failed to add expense from receipt');
             return;
           }

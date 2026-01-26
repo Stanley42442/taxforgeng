@@ -7,6 +7,7 @@ import {
   showBrowserNotification, 
   addNotification 
 } from "@/lib/notifications";
+import logger from "@/lib/logger";
 
 // Request notification permission
 export const requestNotificationPermission = async (): Promise<boolean> => {
@@ -59,7 +60,7 @@ export const useReminderNotifications = () => {
       .gte("due_date", now.toISOString());
 
     if (error) {
-      console.error("Error checking due reminders:", error);
+      logger.error("Error checking due reminders:", error);
       return;
     }
 
@@ -108,7 +109,7 @@ export const useReminderNotifications = () => {
       .gte("due_date", new Date(now.getTime() - 5 * 60 * 1000).toISOString());
 
     if (overdueError) {
-      console.error("Error checking overdue reminders:", overdueError);
+      logger.error("Error checking overdue reminders:", overdueError);
       return;
     }
 

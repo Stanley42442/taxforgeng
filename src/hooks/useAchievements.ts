@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { notifyAchievement } from '@/lib/notifications';
+import logger from '@/lib/logger';
 
 export interface UserStats {
   totalPoints: number;
@@ -68,7 +69,7 @@ export const useAchievements = () => {
         .from('profiles')
         .select('total_points')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       // Fetch earned achievements
       const { data: achievements } = await supabase
@@ -96,7 +97,7 @@ export const useAchievements = () => {
       })));
 
     } catch (error) {
-      console.error('Error fetching achievements:', error);
+      logger.error('Error fetching achievements:', error);
     } finally {
       setLoading(false);
     }
@@ -126,7 +127,7 @@ export const useAchievements = () => {
         .single();
 
       if (error) {
-        console.error('Error awarding badge:', error);
+        logger.error('Error awarding badge:', error);
         return false;
       }
 
@@ -150,7 +151,7 @@ export const useAchievements = () => {
 
       return true;
     } catch (error) {
-      console.error('Error awarding badge:', error);
+      logger.error('Error awarding badge:', error);
       return false;
     }
   };
@@ -170,7 +171,7 @@ export const useAchievements = () => {
 
       setStats(prev => ({ ...prev, totalPoints: prev.totalPoints + points }));
     } catch (error) {
-      console.error('Error adding points:', error);
+      logger.error('Error adding points:', error);
     }
   };
 

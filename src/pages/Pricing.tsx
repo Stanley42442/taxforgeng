@@ -41,6 +41,7 @@ import { PromoCodeInput } from "@/components/PromoCodeInput";
 import { usePaystack, DiscountValidationResult } from "@/hooks/usePaystack";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import logger from "@/lib/logger";
 
 interface TierFeature {
   name: string;
@@ -264,10 +265,10 @@ const Pricing = () => {
         promoValidation?.discountType
       );
 
-      console.log('[Payment] initializePayment result:', result);
+      logger.debug('[Payment] initializePayment result:', result);
 
       if (!result.success) {
-        console.error('[Payment] Failed:', result.error);
+        logger.error('[Payment] Failed:', result.error);
         toast.error(result.error || 'Failed to initialize payment');
         return;
       }
@@ -279,14 +280,14 @@ const Pricing = () => {
 
       // Redirect to Paystack checkout
       if (result.authorizationUrl) {
-        console.log('[Payment] Redirecting to Paystack:', result.authorizationUrl);
+        logger.debug('[Payment] Redirecting to Paystack:', result.authorizationUrl);
         window.location.href = result.authorizationUrl;
       } else {
-        console.error('[Payment] No authorizationUrl in result');
+        logger.error('[Payment] No authorizationUrl in result');
         toast.error('No payment URL received from server');
       }
     } catch (err) {
-      console.error('[Payment] Exception:', err);
+      logger.error('[Payment] Exception:', err);
       toast.error('Payment initialization failed');
     } finally {
       setProcessingTier(null);

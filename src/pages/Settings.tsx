@@ -203,7 +203,7 @@ const Settings = () => {
           expensesRes,
           calculationsRes,
         ] = await Promise.all([
-          supabase.from('profiles').select('full_name, email, whatsapp_number').eq('id', user.id).single(),
+          supabase.from('profiles').select('full_name, email, whatsapp_number').eq('id', user.id).maybeSingle(),
           supabase.auth.mfa.listFactors(),
           supabase.from('auth_events').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20),
           supabase.from('subscription_history').select('*').order('created_at', { ascending: false }).limit(20),

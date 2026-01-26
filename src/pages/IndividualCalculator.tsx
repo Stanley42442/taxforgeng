@@ -48,6 +48,7 @@ import { toast } from "sonner";
 import { downloadIndividualTaxPDF } from "@/lib/individualPdfExport";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import logger from "@/lib/logger";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { useDeviceCSS, getResponsiveClasses } from "@/hooks/useDeviceCSS";
@@ -548,7 +549,7 @@ const IndividualCalculatorPage = () => {
       if (error) throw error;
       toast.success('Calculation saved successfully');
     } catch (error) {
-      console.error('Error saving calculation:', error);
+      logger.error('Error saving calculation:', error);
       toast.error('Failed to save calculation');
     } finally {
       setIsSaving(false);
@@ -570,7 +571,7 @@ const IndividualCalculatorPage = () => {
       if (error) throw error;
       setSavedCalculations(data as unknown as SavedCalculation[]);
     } catch (error) {
-      console.error('Error loading history:', error);
+      logger.error('Error loading history:', error);
       toast.error('Failed to load calculation history');
     } finally {
       setIsLoadingHistory(false);

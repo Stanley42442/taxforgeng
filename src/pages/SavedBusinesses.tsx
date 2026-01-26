@@ -48,6 +48,7 @@ import {
 } from "@/components/ui/dialog";
 import { SharedElement } from "@/components/PageTransition";
 import { motion } from "framer-motion";
+import logger from "@/lib/logger";
 import { useDeleteWithUndo } from "@/hooks/useDeleteWithUndo";
 import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -116,7 +117,7 @@ const SavedBusinesses = () => {
       setDeletedBusinesses(updated);
       toast.success(`"${business.name}" and all related data restored`);
     } catch (error) {
-      console.error('Error restoring business:', error);
+      logger.error('Error restoring business:', error);
       toast.error('Failed to restore business');
     } finally {
       setRestoringId(null);

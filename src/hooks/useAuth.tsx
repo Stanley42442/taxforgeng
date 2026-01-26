@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 import { getDeviceInfo } from '@/lib/deviceFingerprint';
 import { notifyIPBlocked, notifyTimeRestricted } from '@/lib/notifications';
+import logger from '@/lib/logger';
 
 interface AuthContextType {
   user: User | null;
@@ -34,7 +35,7 @@ const getClientIP = async (): Promise<string | null> => {
     const data = await response.json();
     return data.ip || null;
   } catch (error) {
-    console.error('Failed to get client IP:', error);
+    logger.error('Failed to get client IP:', error);
     return null;
   }
 };
@@ -53,7 +54,7 @@ const getLocationFromIP = async (ip: string): Promise<{ city?: string; region?: 
       country_code: data.country_code
     };
   } catch (error) {
-    console.error('Failed to get location:', error);
+    logger.error('Failed to get location:', error);
     return null;
   }
 };
@@ -70,7 +71,7 @@ const logAuthEvent = async (userId: string, eventType: string, metadata?: Json, 
       metadata: metadata || {}
     }]);
   } catch (error) {
-    console.error('Failed to log auth event:', error);
+    logger.error('Failed to log auth event:', error);
   }
 };
 
@@ -111,7 +112,7 @@ const checkIPWhitelist = async (userId: string, ip: string): Promise<boolean> =>
     });
     
     if (error) {
-      console.error('Error checking IP whitelist:', error);
+      logger.error('Error checking IP whitelist:', error);
       return true; // Fail open if error
     }
     
@@ -133,7 +134,7 @@ const trackDevice = async (userId: string, userEmail: string) => {
     // Run these in parallel - they don't depend on each other
     const [location, profileResult, blocked] = await Promise.all([
       clientIP ? getLocationFromIP(clientIP) : Promise.resolve(null),
-      supabase.from('profiles').select('whatsapp_number').eq('id', userId).single(),
+      supabase.from('profiles').select('whatsapp_number').eq('id', userId).maybeSingle(),
       isDeviceBlocked(userId, deviceInfo.fingerprint)
     ]);
     
@@ -173,7 +174,7 @@ const trackDevice = async (userId: string, userEmail: string) => {
           ipAddress: clientIP,
           whatsappNumber
         }
-      }).catch(err => console.error('Failed to send IP blocked alert:', err));
+      }).catch(err => logger.error('Failed to send IP blocked alert:', err));
       
       // Also trigger in-app notification
       const locationText = location ? [location.city, location.country].filter(Boolean).join(', ') : undefined;
@@ -202,7 +203,7 @@ const trackDevice = async (userId: string, userEmail: string) => {
           },
           whatsappNumber
         }
-      }).catch(err => console.error('Failed to send time restricted alert:', err));
+      }).catch(err => logger.error('Failed to send time restricted alert:', err));
       
       // Also trigger in-app notification
       const hour = new Date().getHours();
@@ -277,7 +278,7 @@ const trackDevice = async (userId: string, userEmail: string) => {
               deviceName: deviceInfo.deviceName 
             }
           }
-        }).catch(err => console.error('Failed to send new location alert:', err));
+        }).catch(err => logger.error('Failed to send new location alert:', err));
       }
     } else {
       // Insert new device
@@ -314,7 +315,7 @@ const trackDevice = async (userId: string, userEmail: string) => {
             deviceName: deviceInfo.deviceName 
           }
         }
-      }).catch(err => console.error('Failed to send new device alert:', err));
+      }).catch(err => logger.error('Failed to send new device alert:', err));
       
       // If this is a login from a completely new country (and we have previous data)
       if (isNewCountry) {
@@ -336,7 +337,7 @@ const trackDevice = async (userId: string, userEmail: string) => {
               deviceName: deviceInfo.deviceName 
             }
           }
-        }).catch(err => console.error('Failed to send new location alert:', err));
+        }).catch(err => logger.error('Failed to send new location alert:', err));
       }
     }
     
@@ -355,12 +356,12 @@ const trackDevice = async (userId: string, userEmail: string) => {
             deviceName: deviceInfo.deviceName 
           }
         }
-      }).catch(err => console.error('Failed to send unusual time alert:', err));
+      }).catch(err => logger.error('Failed to send unusual time alert:', err));
     }
     
     return { blocked: false, ipBlocked: false, timeBlocked: false };
   } catch (error) {
-    console.error('Failed to track device:', error);
+    logger.error('Failed to track device:', error);
     return { blocked: false, ipBlocked: false, timeBlocked: false };
   }
 };
@@ -487,7 +488,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       supabase.functions.invoke('send-welcome-email', {
         body: { email, name: fullName }
       }).catch(err => {
-        console.error('Failed to send welcome email:', err);
+        logger.error('Failed to send welcome email:', err);
       });
     }
     
@@ -503,7 +504,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Log failed login attempt
     if (error) {
       // We can't log to user's auth_events if login failed, but we could log to a separate table
-      console.error('Login failed:', error.message);
+      logger.error('Login failed:', error.message);
     }
     
     return { error: error as Error | null };
@@ -512,7 +513,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     // Log logout event (fire-and-forget for faster logout)
     if (user) {
-      logAuthEvent(user.id, 'logout').catch(console.error);
+      logAuthEvent(user.id, 'logout').catch(err => logger.error('Failed to log logout:', err));
     }
     await supabase.auth.signOut();
   };

@@ -23,6 +23,7 @@ import { useFormFeedback } from "@/hooks/useFormFeedback";
 import { SuccessCelebration } from "@/components/ui/form-feedback";
 import { useDeleteWithUndo } from "@/hooks/useDeleteWithUndo";
 import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
+import logger from "@/lib/logger";
 
 interface Reminder {
   id: string;
@@ -235,7 +236,7 @@ const Reminders = () => {
         .single();
 
       if (error) {
-        console.error('Error creating reminder:', error);
+        logger.error('Error creating reminder:', error);
         setReminders(prev => prev.filter(r => r.id !== tempId));
         toast.error('Failed to create reminder');
         return;
@@ -289,7 +290,7 @@ const Reminders = () => {
       .single();
 
     if (error) {
-      console.error('Error creating custom reminder:', error);
+      logger.error('Error creating custom reminder:', error);
       reminderFormFeedback.setError('Failed to create reminder');
       return;
     }

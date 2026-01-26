@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { downloadPaymentInvoice, PaymentInvoiceData, calculatePeriodEnd } from '@/lib/invoicePdfExport';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import logger from '@/lib/logger';
 
 export function usePaymentInvoice() {
   const { user } = useAuth();
@@ -37,7 +38,7 @@ export function usePaymentInvoice() {
         .from('profiles')
         .select('full_name, email')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       // Calculate VAT (7.5% Nigerian VAT)
       const amountNaira = transaction.amount / 100;
@@ -74,7 +75,7 @@ export function usePaymentInvoice() {
       downloadPaymentInvoice(invoiceData);
       toast.success('Invoice downloaded successfully');
     } catch (error) {
-      console.error('Invoice generation error:', error);
+      logger.error('Invoice generation error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to generate invoice');
       throw error;
     } finally {
