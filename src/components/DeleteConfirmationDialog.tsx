@@ -31,8 +31,8 @@ export function DeleteConfirmationDialog({
   cancelLabel = "Cancel",
 }: DeleteConfirmationDialogProps) {
   const defaultDescription = itemName
-    ? `Are you sure you want to delete "${itemName}"? This action can be undone within a few seconds.`
-    : "Are you sure you want to delete this item? This action can be undone within a few seconds.";
+    ? `Are you sure you want to delete "${itemName}"? This will also delete all related expenses, invoices, employees, reminders, and other data. You can restore this within 30 days.`
+    : "Are you sure you want to delete this item? This will also delete all related data. You can restore this within 30 days.";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

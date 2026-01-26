@@ -145,6 +145,7 @@ export type Database = {
           action: string
           business_id: string | null
           created_at: string
+          deleted_at: string | null
           details: Json | null
           id: string
           user_id: string
@@ -153,6 +154,7 @@ export type Database = {
           action: string
           business_id?: string | null
           created_at?: string
+          deleted_at?: string | null
           details?: Json | null
           id?: string
           user_id: string
@@ -161,6 +163,7 @@ export type Database = {
           action?: string
           business_id?: string | null
           created_at?: string
+          deleted_at?: string | null
           details?: Json | null
           id?: string
           user_id?: string
@@ -311,6 +314,7 @@ export type Database = {
         Row: {
           cac_verified: boolean
           created_at: string
+          deleted_at: string | null
           entity_type: string
           id: string
           name: string
@@ -323,6 +327,7 @@ export type Database = {
         Insert: {
           cac_verified?: boolean
           created_at?: string
+          deleted_at?: string | null
           entity_type: string
           id?: string
           name: string
@@ -335,6 +340,7 @@ export type Database = {
         Update: {
           cac_verified?: boolean
           created_at?: string
+          deleted_at?: string | null
           entity_type?: string
           id?: string
           name?: string
@@ -402,6 +408,7 @@ export type Database = {
           business_id: string | null
           client_type: string
           created_at: string
+          deleted_at: string | null
           email: string | null
           id: string
           name: string
@@ -415,6 +422,7 @@ export type Database = {
           business_id?: string | null
           client_type?: string
           created_at?: string
+          deleted_at?: string | null
           email?: string | null
           id?: string
           name: string
@@ -428,6 +436,7 @@ export type Database = {
           business_id?: string | null
           client_type?: string
           created_at?: string
+          deleted_at?: string | null
           email?: string | null
           id?: string
           name?: string
@@ -451,6 +460,7 @@ export type Database = {
           business_id: string | null
           completed_date: string | null
           created_at: string
+          deleted_at: string | null
           description: string | null
           due_date: string
           id: string
@@ -466,6 +476,7 @@ export type Database = {
           business_id?: string | null
           completed_date?: string | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           due_date: string
           id?: string
@@ -481,6 +492,7 @@ export type Database = {
           business_id?: string | null
           completed_date?: string | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           due_date?: string
           id?: string
@@ -779,6 +791,7 @@ export type Database = {
           created_at: string | null
           current_gross_salary: number
           date_of_birth: string | null
+          deleted_at: string | null
           department: string | null
           email: string | null
           employee_id_number: string | null
@@ -812,6 +825,7 @@ export type Database = {
           created_at?: string | null
           current_gross_salary: number
           date_of_birth?: string | null
+          deleted_at?: string | null
           department?: string | null
           email?: string | null
           employee_id_number?: string | null
@@ -845,6 +859,7 @@ export type Database = {
           created_at?: string | null
           current_gross_salary?: number
           date_of_birth?: string | null
+          deleted_at?: string | null
           department?: string | null
           email?: string | null
           employee_id_number?: string | null
@@ -887,6 +902,7 @@ export type Database = {
           category: string
           created_at: string
           date: string
+          deleted_at: string | null
           description: string | null
           id: string
           is_deductible: boolean
@@ -899,6 +915,7 @@ export type Database = {
           category: string
           created_at?: string
           date?: string
+          deleted_at?: string | null
           description?: string | null
           id?: string
           is_deductible?: boolean
@@ -911,6 +928,7 @@ export type Database = {
           category?: string
           created_at?: string
           date?: string
+          deleted_at?: string | null
           description?: string | null
           id?: string
           is_deductible?: boolean
@@ -1030,6 +1048,7 @@ export type Database = {
           client_id: string | null
           client_name: string
           created_at: string
+          deleted_at: string | null
           due_date: string
           id: string
           invoice_number: string
@@ -1050,6 +1069,7 @@ export type Database = {
           client_id?: string | null
           client_name: string
           created_at?: string
+          deleted_at?: string | null
           due_date: string
           id?: string
           invoice_number: string
@@ -1070,6 +1090,7 @@ export type Database = {
           client_id?: string | null
           client_name?: string
           created_at?: string
+          deleted_at?: string | null
           due_date?: string
           id?: string
           invoice_number?: string
@@ -1977,6 +1998,7 @@ export type Database = {
         Row: {
           business_id: string | null
           created_at: string | null
+          deleted_at: string | null
           id: string
           notes: string | null
           pay_date: string
@@ -1998,6 +2020,7 @@ export type Database = {
         Insert: {
           business_id?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           id?: string
           notes?: string | null
           pay_date: string
@@ -2019,6 +2042,7 @@ export type Database = {
         Update: {
           business_id?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           id?: string
           notes?: string | null
           pay_date?: string
@@ -2105,6 +2129,7 @@ export type Database = {
         Row: {
           business_id: string | null
           created_at: string | null
+          deleted_at: string | null
           description: string | null
           id: string
           is_default: boolean | null
@@ -2115,6 +2140,7 @@ export type Database = {
         Insert: {
           business_id?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           description?: string | null
           id?: string
           is_default?: boolean | null
@@ -2125,6 +2151,7 @@ export type Database = {
         Update: {
           business_id?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           description?: string | null
           id?: string
           is_default?: boolean | null
@@ -2698,6 +2725,7 @@ export type Database = {
         Row: {
           business_id: string | null
           created_at: string
+          deleted_at: string | null
           description: string | null
           due_date: string
           id: string
@@ -2712,6 +2740,7 @@ export type Database = {
         Insert: {
           business_id?: string | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           due_date: string
           id?: string
@@ -2726,6 +2755,7 @@ export type Database = {
         Update: {
           business_id?: string | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           due_date?: string
           id?: string
@@ -2751,6 +2781,7 @@ export type Database = {
         Row: {
           business_id: string | null
           created_at: string | null
+          deleted_at: string | null
           id: string
           is_enabled: boolean | null
           last_sent_for_period: string | null
@@ -2762,6 +2793,7 @@ export type Database = {
         Insert: {
           business_id?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           id?: string
           is_enabled?: boolean | null
           last_sent_for_period?: string | null
@@ -2773,6 +2805,7 @@ export type Database = {
         Update: {
           business_id?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           id?: string
           is_enabled?: boolean | null
           last_sent_for_period?: string | null
@@ -2969,6 +3002,7 @@ export type Database = {
         Row: {
           business_id: string | null
           created_at: string
+          deleted_at: string | null
           id: string
           inputs: Json
           result: Json
@@ -2977,6 +3011,7 @@ export type Database = {
         Insert: {
           business_id?: string | null
           created_at?: string
+          deleted_at?: string | null
           id?: string
           inputs: Json
           result: Json
@@ -2985,6 +3020,7 @@ export type Database = {
         Update: {
           business_id?: string | null
           created_at?: string
+          deleted_at?: string | null
           id?: string
           inputs?: Json
           result?: Json
@@ -3310,6 +3346,10 @@ export type Database = {
         Args: { check_user_id: string }
         Returns: boolean
       }
+      cleanup_deleted_businesses: {
+        Args: { retention_days?: number }
+        Returns: number
+      }
       cleanup_expired_payment_tokens: { Args: never; Returns: undefined }
       cleanup_expired_sessions: { Args: never; Returns: undefined }
       cleanup_old_backup_attempts: { Args: never; Returns: undefined }
@@ -3334,6 +3374,14 @@ export type Database = {
           attempt_ip?: string
           attempt_success: boolean
         }
+        Returns: undefined
+      }
+      restore_business: {
+        Args: { business_uuid: string; restoring_user_id: string }
+        Returns: undefined
+      }
+      soft_delete_business: {
+        Args: { business_uuid: string; deleting_user_id: string }
         Returns: undefined
       }
     }
