@@ -9,7 +9,7 @@ import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { useUpcomingReminders } from "@/hooks/useUpcomingReminders";
-import { useNotificationCount } from "@/hooks/useNotificationCount";
+import { useSyncedNotifications } from "@/hooks/useSyncedNotifications";
 import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
 import { Badge } from "@/components/ui/badge";
 import { LiveIndicator } from "@/components/ui/live-indicator";
@@ -203,7 +203,7 @@ export const NavMenu = () => {
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdminCheck();
   const { urgentCount } = useUpcomingReminders();
-  const { unreadCount: notificationCount } = useNotificationCount();
+  const { unreadCount: notificationCount } = useSyncedNotifications();
   const { isConnected: isRealtimeConnected, newNotificationCount } = useRealtimeNotifications();
   const location = useLocation();
   const navigate = useNavigate();
