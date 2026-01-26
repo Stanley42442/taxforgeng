@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { 
@@ -7,12 +7,27 @@ import {
   playNotificationSound,
   showBrowserNotification
 } from "@/lib/notifications";
+import { safeLocalStorage } from "@/lib/safeStorage";
+import logger from "@/lib/logger";
+
+interface UserNotificationPayload {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  type: string;
+  read: boolean;
+  created_at: string;
+}
 
 export const useSyncedNotifications = () => {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(false);
+  
+  // Unique channel ID to prevent conflicts across tabs
+  const channelIdRef = useRef(`notifications-sync-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`);
 
   const loadNotifications = useCallback(async () => {
     setLoading(true);
@@ -20,7 +35,7 @@ export const useSyncedNotifications = () => {
       const data = await getNotifications();
       setNotifications(data);
     } catch (error) {
-      console.error('Error loading notifications:', error);
+      logger.error('Error loading notifications:', error);
     } finally {
       setLoading(false);
     }
@@ -36,7 +51,7 @@ export const useSyncedNotifications = () => {
     if (!user) return;
 
     const channel = supabase
-      .channel('user-notifications-sync')
+      .channel(channelIdRef.current)
       .on(
         'postgres_changes',
         {
@@ -46,8 +61,8 @@ export const useSyncedNotifications = () => {
           filter: `user_id=eq.${user.id}`
         },
         (payload) => {
-          console.log('[Notifications] New notification received:', payload);
-          const newNotification = payload.new as any;
+          logger.debug('[Notifications] New notification received:', payload);
+          const newNotification = payload.new as UserNotificationPayload;
           
           setNotifications(prev => {
             // Check if notification already exists
@@ -59,19 +74,19 @@ export const useSyncedNotifications = () => {
               id: newNotification.id,
               title: newNotification.title,
               message: newNotification.message,
-              type: newNotification.type,
+              type: newNotification.type as AppNotification['type'],
               timestamp: newNotification.created_at,
               read: newNotification.read,
               user_id: newNotification.user_id
             };
             
             // Play sound and show browser notification for new notifications
-            const soundEnabled = localStorage.getItem('notification-sound-enabled') !== 'false';
+            const soundEnabled = safeLocalStorage.getItem('notification-sound-enabled') !== 'false';
             if (soundEnabled) {
               playNotificationSound();
             }
             
-            const browserEnabled = localStorage.getItem('notification-browser-enabled') !== 'false';
+            const browserEnabled = safeLocalStorage.getItem('notification-browser-enabled') !== 'false';
             if (browserEnabled && Notification.permission === 'granted') {
               showBrowserNotification(notification.title, notification.message);
             }
@@ -89,8 +104,8 @@ export const useSyncedNotifications = () => {
           filter: `user_id=eq.${user.id}`
         },
         (payload) => {
-          console.log('[Notifications] Notification updated:', payload);
-          const updatedNotification = payload.new as any;
+          logger.debug('[Notifications] Notification updated:', payload);
+          const updatedNotification = payload.new as UserNotificationPayload;
           
           setNotifications(prev => 
             prev.map(n => 
@@ -115,13 +130,13 @@ export const useSyncedNotifications = () => {
           filter: `user_id=eq.${user.id}`
         },
         (payload) => {
-          console.log('[Notifications] Notification deleted:', payload);
-          const deletedId = (payload.old as any).id;
+          logger.debug('[Notifications] Notification deleted:', payload);
+          const deletedId = (payload.old as { id: string }).id;
           setNotifications(prev => prev.filter(n => n.id !== deletedId));
         }
       )
       .subscribe((status) => {
-        console.log('[Notifications] Realtime subscription status:', status);
+        logger.debug('[Notifications] Realtime subscription status:', status);
         setIsConnected(status === 'SUBSCRIBED');
       });
 

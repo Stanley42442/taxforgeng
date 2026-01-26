@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-
-interface PointsTransaction {
+import logger from '@/lib/logger';
   id: string;
   points: number;
   action_type: string;
@@ -69,7 +68,7 @@ export function useLoyaltyPoints() {
         error: null,
       });
     } catch (err) {
-      console.error('Error fetching loyalty points:', err);
+      logger.error('Error fetching loyalty points:', err);
       setState(prev => ({
         ...prev,
         loading: false,

@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { DownloadInvoiceButton } from '@/components/DownloadInvoiceButton';
+import logger from '@/lib/logger';
 
 interface BillingTransaction {
   id: string;
@@ -84,7 +85,7 @@ export default function BillingHistory() {
 
         setBillingData(response.data);
       } catch (err) {
-        console.error('Error fetching billing data:', err);
+        logger.error('Error fetching billing data:', err);
         setError(err instanceof Error ? err.message : 'Failed to load billing data');
       } finally {
         setLoading(false);

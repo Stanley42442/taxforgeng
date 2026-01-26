@@ -12,8 +12,11 @@ import { TrendingUp, TrendingDown, DollarSign, FileText, Calendar } from "lucide
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { format, startOfMonth, endOfMonth, subMonths, startOfYear, endOfYear } from "date-fns";
+import logger from "@/lib/logger";
 
 interface ExpenseData { category: string; type: string; amount: number; date: string; }
+interface InvoiceData { total: number; status: string; issued_date: string; paid_date: string | null; }
+
 interface PeriodData { income: number; expenses: number; grossProfit: number; netProfit: number; byCategory: Record<string, number>; }
 
 const ProfitLoss = () => {
@@ -21,12 +24,10 @@ const ProfitLoss = () => {
   const { savedBusinesses, tier } = useSubscription();
   const navigate = useNavigate();
   const [expenses, setExpenses] = useState<ExpenseData[]>([]);
-  const [invoices, setInvoices] = useState<any[]>([]);
+  const [invoices, setInvoices] = useState<InvoiceData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedBusiness, setSelectedBusiness] = useState<string>("all");
   const [period, setPeriod] = useState<string>("month");
-
-  const tierOrder = ['free', 'starter', 'basic', 'professional', 'business', 'corporate'];
   const canAccess = tierOrder.indexOf(tier) >= tierOrder.indexOf('basic');
 
   useEffect(() => {
@@ -47,7 +48,7 @@ const ProfitLoss = () => {
       const { data: invoiceData } = await invoiceQuery;
       setInvoices(invoiceData || []);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      logger.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }

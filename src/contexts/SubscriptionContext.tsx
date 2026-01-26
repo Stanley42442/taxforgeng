@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import logger from '@/lib/logger';
 
 export type SubscriptionTier = 'free' | 'starter' | 'basic' | 'professional' | 'business' | 'corporate';
 
@@ -174,7 +175,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
       // Defensive check: Create profile if it doesn't exist (handles edge case)
       if (profileError && profileError.code === 'PGRST116') {
-        console.warn('[SubscriptionContext] No profile found, creating one...');
+        logger.warn('[SubscriptionContext] No profile found, creating one...');
         const { error: createError } = await supabase
           .from('profiles')
           .insert({
@@ -184,7 +185,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
           });
 
         if (createError) {
-          console.error('[SubscriptionContext] Failed to create profile:', createError);
+          logger.error('[SubscriptionContext] Failed to create profile:', createError);
         } else {
           // Re-fetch the newly created profile
           const { data: newProfile } = await supabase
@@ -271,9 +272,9 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
           filter: `id=eq.${user.id}`,
         },
         (payload) => {
-          console.log('Profile updated in real-time:', payload);
-          const newTier = (payload.new as any).subscription_tier as SubscriptionTier;
-          const trialExpiresAt = (payload.new as any).trial_expires_at;
+          logger.debug('Profile updated in real-time:', payload);
+          const newTier = (payload.new as { subscription_tier: SubscriptionTier }).subscription_tier;
+          const trialExpiresAt = (payload.new as { trial_expires_at: string | null }).trial_expires_at;
           
           setState(prev => ({
             ...prev,
@@ -292,10 +293,10 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   }, [user]);
 
   const refreshSubscription = useCallback(async () => {
-    console.log('[SubscriptionContext] Force refreshing subscription...');
+    logger.debug('[SubscriptionContext] Force refreshing subscription...');
     setState(prev => ({ ...prev, loading: true }));
     await fetchUserData();
-    console.log('[SubscriptionContext] Refresh complete');
+    logger.debug('[SubscriptionContext] Refresh complete');
   }, [fetchUserData]);
 
   const refreshBusinesses = useCallback(async () => {
@@ -337,7 +338,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       .single();
 
     if (error) {
-      console.error('Error adding business:', error);
+      logger.error('Error adding business:', error);
       return false;
     }
 
@@ -371,7 +372,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     });
 
     if (error) {
-      console.error('Error soft-deleting business:', error);
+      logger.error('Error soft-deleting business:', error);
       throw error;
     }
 
@@ -391,7 +392,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     });
 
     if (error) {
-      console.error('Error restoring business:', error);
+      logger.error('Error restoring business:', error);
       throw error;
     }
 
