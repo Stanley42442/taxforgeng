@@ -8,6 +8,14 @@ import { Label } from "@/components/ui/label";
 import { Bot, Send, User, Loader2, X, MessageCircle, Sparkles, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { safeSessionStorage, safeLocalStorage } from "@/lib/safeStorage";
+import { 
+  CHAT_RATE_LIMIT_MS, 
+  MAX_CHAT_MESSAGE_LENGTH, 
+  MIN_CHAT_MESSAGE_LENGTH,
+  MAX_CHAT_HISTORY_MESSAGES,
+  STORAGE_KEYS 
+} from "@/lib/constants";
 
 interface Message {
   role: "user" | "assistant";
@@ -26,8 +34,31 @@ interface UserContext {
   turnover?: number;
 }
 
-const STORAGE_KEY = "taxbot-position";
 const DEFAULT_POSITION: Position = { x: 24, y: 24 };
+
+const getStoredPosition = (): Position => {
+  const stored = safeLocalStorage.getJSON<Position | null>(STORAGE_KEYS.CHAT_POSITION, null);
+  if (stored && typeof stored.x === "number" && typeof stored.y === "number") {
+    return stored;
+  }
+  return DEFAULT_POSITION;
+};
+
+const savePosition = (pos: Position) => {
+  safeLocalStorage.setJSON(STORAGE_KEYS.CHAT_POSITION, pos);
+};
+
+// Get stored chat history from sessionStorage (persists during session)
+const getStoredMessages = (): Message[] => {
+  return safeSessionStorage.getJSON<Message[]>(STORAGE_KEYS.CHAT_HISTORY, []);
+};
+
+// Save chat history to sessionStorage
+const saveMessages = (messages: Message[]) => {
+  // Keep only the last N messages to prevent storage bloat
+  const toSave = messages.slice(-MAX_CHAT_HISTORY_MESSAGES);
+  safeSessionStorage.setJSON(STORAGE_KEYS.CHAT_HISTORY, toSave);
+};
 
 const SUGGESTED_QUESTIONS = [
   "What is the current VAT rate in Nigeria?",
@@ -36,28 +67,9 @@ const SUGGESTED_QUESTIONS = [
   "What items are VAT exempt?",
 ];
 
-const getStoredPosition = (): Position => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (typeof parsed.x === "number" && typeof parsed.y === "number") {
-        return parsed;
-      }
-    }
-  } catch {}
-  return DEFAULT_POSITION;
-};
-
-const savePosition = (pos: Position) => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(pos));
-  } catch {}
-};
-
 export function TaxAssistant() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(getStoredMessages);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [position, setPosition] = useState<Position>(getStoredPosition);
@@ -66,9 +78,17 @@ export function TaxAssistant() {
   const hasMovedRef = useRef(false);
   const dragStartPos = useRef<{ x: number; y: number; posX: number; posY: number } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const lastSentRef = useRef<number>(0); // Rate limiting
   
   const { savedBusinesses } = useSubscription();
   const primaryBusiness = savedBusinesses[0];
+
+  // Save messages to sessionStorage whenever they change
+  useEffect(() => {
+    if (messages.length > 0) {
+      saveMessages(messages);
+    }
+  }, [messages]);
 
   // Lock body scroll when chat is open
   useEffect(() => {
@@ -247,8 +267,27 @@ export function TaxAssistant() {
   };
 
   const sendMessage = async (messageText?: string) => {
-    const text = messageText || input.trim();
+    // Rate limiting check
+    const now = Date.now();
+    if (now - lastSentRef.current < CHAT_RATE_LIMIT_MS) {
+      toast.warning('Please wait a moment before sending another message');
+      return;
+    }
+
+    // Input validation and sanitization
+    let text = (messageText || input.trim()).slice(0, MAX_CHAT_MESSAGE_LENGTH);
+    
     if (!text || isLoading) return;
+    
+    if (text.length < MIN_CHAT_MESSAGE_LENGTH) {
+      toast.error('Please enter a longer question');
+      return;
+    }
+    
+    // Basic sanitization - remove potential script/HTML tags
+    text = text.replace(/<[^>]*>/g, '');
+
+    lastSentRef.current = now;
 
     const userMessage: Message = { role: "user", content: text };
     const newMessages = [...messages, userMessage];
@@ -329,6 +368,7 @@ export function TaxAssistant() {
             size="icon"
             onClick={() => setIsOpen(false)}
             className="text-white hover:bg-white/20 h-7 w-7"
+            aria-label="Close chat"
           >
             <X className="h-4 w-4" />
           </Button>

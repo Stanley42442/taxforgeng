@@ -210,7 +210,9 @@ export const NavMenu = () => {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const totalNotificationCount = notificationCount + newNotificationCount;
+  // Use notificationCount from useSyncedNotifications (already includes realtime updates)
+  // Don't add newNotificationCount to avoid double-counting
+  const totalNotificationCount = notificationCount + urgentCount;
 
   const handleSignOut = async () => {
     await signOut();

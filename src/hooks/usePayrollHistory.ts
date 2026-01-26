@@ -69,6 +69,7 @@ export function usePayrollHistory(businessId?: string) {
         .from('payroll_runs')
         .select('*')
         .eq('user_id', user.id)
+        .is('deleted_at', null) // Filter soft-deleted records
         .order('pay_period', { ascending: false });
       
       if (businessId) {

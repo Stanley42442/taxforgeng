@@ -13,6 +13,7 @@ import { ReminderNotificationProvider } from "@/components/ReminderNotificationP
 import { TrialBanner } from "@/components/TrialBanner";
 import { TierSelectionWrapper } from "@/components/TierSelectionWrapper";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { LazyRouteErrorBoundary } from "@/components/LazyRouteErrorBoundary";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { InstallPWAPrompt } from "@/components/InstallPWAPrompt";
 import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
@@ -230,8 +231,10 @@ const App = () => (
                           </div>
                           <TierSelectionWrapper />
                           <Suspense fallback={<PageLoader />}>
-                            <AnimatedRoutes />
-                            <TaxAssistant />
+                            <LazyRouteErrorBoundary>
+                              <AnimatedRoutes />
+                              <TaxAssistant />
+                            </LazyRouteErrorBoundary>
                             <OfflineIndicator />
                             <InstallPWAPrompt />
                             <PWAUpdatePrompt />

@@ -40,13 +40,7 @@ export default function PaymentCallback() {
           setTier(result.tier || '');
           setReceiptNumber(result.receiptNumber || '');
           
-          // Refresh subscription context to update tier across the app
-          console.log('[PaymentCallback] Refreshing subscription after successful payment...');
-          await refreshSubscription();
-          
-          // Also refresh after delays to ensure sync with proper async handling
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          console.log('[PaymentCallback] Retry refreshing subscription after delay...');
+          // Single refresh is sufficient - realtime subscription handles updates
           await refreshSubscription();
           
           // Dispatch event to notify other components
