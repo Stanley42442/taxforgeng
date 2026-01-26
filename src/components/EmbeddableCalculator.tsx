@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calculator, Building2, Briefcase } from "lucide-react";
+import { DEFAULT_BORDER_RADIUS } from "@/lib/constants";
 
 export interface PartnerTheme {
   brandName?: string;
@@ -41,6 +42,9 @@ export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate }: Embe
   const [result, setResult] = useState<any>(null);
   const [isCalculating, setIsCalculating] = useState(false);
 
+  // Parse border radius with fallback to prevent NaN
+  const borderRadius = parseInt(theme.borderRadius, 10) || DEFAULT_BORDER_RADIUS;
+
   // Format number with commas for display
   const formatWithCommas = (num: number): string => {
     if (!num) return '';
@@ -61,7 +65,7 @@ export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate }: Embe
       fontFamily: theme.fontFamily || 'Inter, sans-serif',
       backgroundColor: theme.backgroundColor,
       color: theme.textColor,
-      borderRadius: `${theme.borderRadius}px`,
+      borderRadius: `${borderRadius}px`,
       padding: '24px',
       maxWidth: '480px',
       margin: '0 auto',
@@ -85,7 +89,7 @@ export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate }: Embe
     iconContainer: {
       backgroundColor: theme.primaryColor,
       padding: '10px',
-      borderRadius: `${parseInt(theme.borderRadius) / 2}px`,
+      borderRadius: `${borderRadius / 2}px`,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -98,7 +102,7 @@ export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate }: Embe
     },
     entityButton: (selected: boolean) => ({
       padding: '16px',
-      borderRadius: `${parseInt(theme.borderRadius) / 2}px`,
+      borderRadius: `${borderRadius / 2}px`,
       border: `2px solid ${selected ? theme.primaryColor : '#e5e7eb'}`,
       backgroundColor: selected ? `${theme.primaryColor}10` : 'transparent',
       cursor: 'pointer',
@@ -125,7 +129,7 @@ export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate }: Embe
     input: {
       width: '100%',
       padding: '12px 16px',
-      borderRadius: `${parseInt(theme.borderRadius) / 2}px`,
+      borderRadius: `${borderRadius / 2}px`,
       border: '1px solid #e5e7eb',
       fontSize: '16px',
       outline: 'none',
@@ -134,7 +138,7 @@ export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate }: Embe
     button: {
       width: '100%',
       padding: '14px',
-      borderRadius: `${parseInt(theme.borderRadius) / 2}px`,
+      borderRadius: `${borderRadius / 2}px`,
       backgroundColor: theme.primaryColor,
       color: '#ffffff',
       fontSize: '16px',
@@ -150,7 +154,7 @@ export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate }: Embe
     resultCard: {
       marginTop: '24px',
       padding: '20px',
-      borderRadius: `${parseInt(theme.borderRadius) / 2}px`,
+      borderRadius: `${borderRadius / 2}px`,
       backgroundColor: `${theme.primaryColor}10`,
       border: `1px solid ${theme.primaryColor}30`,
     },
@@ -173,7 +177,7 @@ export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate }: Embe
     },
     resultItem: {
       padding: '12px',
-      borderRadius: `${parseInt(theme.borderRadius) / 3}px`,
+      borderRadius: `${borderRadius / 3}px`,
       backgroundColor: theme.backgroundColor,
       border: '1px solid #e5e7eb',
     },

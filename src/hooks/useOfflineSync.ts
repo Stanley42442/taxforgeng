@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { 
   addToSyncQueue, 
   getSyncQueue, 
@@ -37,6 +37,7 @@ export const useOfflineSync = (): UseOfflineSyncReturn => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [pendingSyncCount, setPendingSyncCount] = useState(0);
   const [conflicts, setConflicts] = useState<SyncConflict[]>([]);
+  const isSyncingRef = useRef(false); // Guard against multiple simultaneous syncs
 
   const refreshCounts = useCallback(async () => {
     const queue = await getSyncQueue();
@@ -122,10 +123,13 @@ export const useOfflineSync = (): UseOfflineSyncReturn => {
     refreshCounts();
   }, [refreshCounts]);
 
-  // Auto-sync when coming back online
+  // Auto-sync when coming back online with guard against infinite loops
   useEffect(() => {
-    if (isOnline && pendingSyncCount > 0) {
-      syncNow();
+    if (isOnline && pendingSyncCount > 0 && !isSyncingRef.current) {
+      isSyncingRef.current = true;
+      syncNow().finally(() => {
+        isSyncingRef.current = false;
+      });
     }
   }, [isOnline, pendingSyncCount, syncNow]);
 

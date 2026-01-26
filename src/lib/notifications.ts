@@ -13,13 +13,29 @@ export interface AppNotification {
   user_id?: string;
 }
 
+// Shared AudioContext to prevent memory leaks
+let sharedAudioContext: AudioContext | null = null;
+
+const getAudioContext = (): AudioContext => {
+  if (!sharedAudioContext || sharedAudioContext.state === 'closed') {
+    sharedAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  }
+  // Resume if suspended (browser autoplay policy)
+  if (sharedAudioContext.state === 'suspended') {
+    sharedAudioContext.resume().catch(() => {
+      // Ignore resume errors - user interaction may be required
+    });
+  }
+  return sharedAudioContext;
+};
+
 // Play notification sound using Web Audio API
 export const playNotificationSound = () => {
   try {
     const soundEnabled = localStorage.getItem('notification-sound-enabled') !== 'false';
     if (!soundEnabled) return;
 
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const audioContext = getAudioContext();
     
     const playTone = (frequency: number, startTime: number, duration: number) => {
       const oscillator = audioContext.createOscillator();

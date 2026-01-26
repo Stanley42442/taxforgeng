@@ -80,6 +80,7 @@ export function useEmployees(businessId?: string) {
         .from('employees')
         .select('*')
         .eq('user_id', user.id)
+        .is('deleted_at', null) // Filter soft-deleted records
         .order('last_name');
       
       if (businessId) {

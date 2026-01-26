@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Check, Crown, Sparkles, Zap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { TRIAL_DURATION_DAYS, TRIAL_DURATION_MS } from '@/lib/constants';
 
 interface TierSelectionModalProps {
   open: boolean;
@@ -34,7 +35,7 @@ const tiers = [
     id: 'business',
     name: 'Business',
     price: '₦0',
-    period: 'for 7 days',
+    period: `for ${TRIAL_DURATION_DAYS} days`,
     description: 'Full access to all business features',
     icon: Crown,
     features: [
@@ -60,7 +61,7 @@ export const TierSelectionModal = ({ open, onComplete, userId }: TierSelectionMo
     
     try {
       const now = new Date();
-      const trialExpiry = isTrial ? new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) : null;
+      const trialExpiry = isTrial ? new Date(now.getTime() + TRIAL_DURATION_MS) : null;
       
       const { error } = await supabase
         .from('profiles')
@@ -75,7 +76,7 @@ export const TierSelectionModal = ({ open, onComplete, userId }: TierSelectionMo
       if (error) throw error;
 
       if (isTrial) {
-        toast.success('Welcome! Your 7-day Business trial has started.', {
+        toast.success(`Welcome! Your ${TRIAL_DURATION_DAYS}-day Business trial has started.`, {
           description: 'Enjoy full access to all premium features.',
         });
       } else {
