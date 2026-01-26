@@ -146,7 +146,7 @@ const Pricing = () => {
       try {
         // Get session first
         const { data } = await supabase.auth.getSession();
-        console.log('[Pricing] Session pre-warmed:', !!data.session);
+        logger.debug('[Pricing] Session pre-warmed:', !!data.session);
         
         // Check connection quality
         const start = Date.now();
@@ -172,13 +172,13 @@ const Pricing = () => {
             },
             body: JSON.stringify({ ping: true }),
           }).then(() => {
-            console.log('[Pricing] Edge function pre-warmed with auth');
+            logger.debug('[Pricing] Edge function pre-warmed with auth');
           }).catch(() => {
             // Ignore errors, this is just warming
           });
         }
       } catch (err) {
-        console.log('[Pricing] Pre-warm error (non-critical):', err);
+        logger.debug('[Pricing] Pre-warm error (non-critical):', err);
         setConnectionStatus('slow');
       }
     };
@@ -204,7 +204,7 @@ const Pricing = () => {
   };
 
   const handleTierSelect = async (tier: SubscriptionTier) => {
-    console.log('[TierSelect] Called with tier:', tier, {
+    logger.debug('[TierSelect] Called with tier:', tier, {
       user: user?.email,
       currentTier,
       policiesAccepted,
@@ -213,20 +213,20 @@ const Pricing = () => {
     });
 
     if (tier === 'free') {
-      console.log('[TierSelect] Free tier selected - no action');
+      logger.debug('[TierSelect] Free tier selected - no action');
       toast.info("You're already on the free tier or this is the free tier");
       return;
     }
 
     if (tier === 'corporate') {
-      console.log('[TierSelect] Corporate tier - contact required');
+      logger.debug('[TierSelect] Corporate tier - contact required');
       toast.info("Contact us for Corporate pricing");
       return;
     }
 
     // Require authentication
     if (!user) {
-      console.log('[TierSelect] No user - redirecting to auth');
+      logger.debug('[TierSelect] No user - redirecting to auth');
       toast.info("Please sign in to upgrade");
       navigate('/auth?redirect=/pricing');
       return;
@@ -234,7 +234,7 @@ const Pricing = () => {
 
     // Check if this is a downgrade
     if (isDowngrade(tier)) {
-      console.log('[TierSelect] Downgrade detected - showing dialog');
+      logger.debug('[TierSelect] Downgrade detected - showing dialog');
       setPendingDowngradeTier(tier);
       setShowDowngradeDialog(true);
       return;
@@ -242,22 +242,22 @@ const Pricing = () => {
 
     // Check if policies are accepted for paid tiers
     if (!policiesAccepted) {
-      console.log('[TierSelect] Policies not accepted - blocking payment');
+      logger.debug('[TierSelect] Policies not accepted - blocking payment');
       toast.error("Please accept the Terms & Conditions, Privacy Policy, and Refund Policy to continue");
       return;
     }
 
-    console.log('[TierSelect] All checks passed - processing payment');
+    logger.debug('[TierSelect] All checks passed - processing payment');
     // Process payment with Paystack
     await processPayment(tier);
   };
 
   const processPayment = async (tier: SubscriptionTier) => {
-    console.log('[Payment] Starting payment for tier:', tier, { billingCycle, promoCode, promoValidation });
+    logger.debug('[Payment] Starting payment for tier:', tier, { billingCycle, promoCode, promoValidation });
     setProcessingTier(tier);
     
     try {
-      console.log('[Payment] Calling initializePayment...');
+      logger.debug('[Payment] Calling initializePayment...');
       const result = await initializePayment(
         tier,
         billingCycle,

@@ -119,7 +119,7 @@ export const IPWhitelistManager = ({ userId }: IPWhitelistManagerProps) => {
           .from('profiles')
           .select('ip_whitelist_enabled')
           .eq('id', userId)
-          .single();
+          .maybeSingle();
         
         setWhitelistEnabled(profile?.ip_whitelist_enabled || false);
 
