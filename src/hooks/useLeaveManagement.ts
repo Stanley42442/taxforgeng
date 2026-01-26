@@ -381,7 +381,7 @@ export function useLeaveManagement() {
       .eq('employee_id', employeeId)
       .eq('leave_type_id', leaveTypeId)
       .eq('year', year)
-      .single();
+      .maybeSingle();
     
     if (existing) {
       await supabase
