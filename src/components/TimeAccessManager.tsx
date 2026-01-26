@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { getErrorMessage } from "@/lib/errorUtils";
+import logger from "@/lib/logger";
 
 interface TimeAccessManagerProps {
   userId: string;
@@ -83,7 +85,7 @@ export const TimeAccessManager = ({ userId }: TimeAccessManagerProps) => {
         setEndHour(data?.allowed_end_hour ?? 24);
         setTimezone(data?.time_restriction_timezone || 'UTC');
       } catch (error) {
-        console.error("Error loading time settings:", error);
+        logger.error("Error loading time settings:", error);
       } finally {
         setLoading(false);
       }
@@ -128,8 +130,8 @@ export const TimeAccessManager = ({ userId }: TimeAccessManagerProps) => {
       if (error) throw error;
 
       toast.success("Time restrictions updated");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to save settings");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to save settings"));
     } finally {
       setSaving(false);
     }
