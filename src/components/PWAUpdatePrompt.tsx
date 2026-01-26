@@ -1,4 +1,5 @@
 import { useRegisterSW } from 'virtual:pwa-register/react';
+import logger from '@/lib/logger';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { RefreshCw } from 'lucide-react';
@@ -9,13 +10,13 @@ export const PWAUpdatePrompt = () => {
     updateServiceWorker,
   } = useRegisterSW({
     onRegistered(registration) {
-      console.log('[PWA] Service worker registered:', registration?.scope);
+      logger.debug('[PWA] Service worker registered:', registration?.scope);
     },
     onRegisterError(error) {
-      console.error('[PWA] Service worker registration failed:', error);
+      logger.error('[PWA] Service worker registration failed:', error);
     },
     onOfflineReady() {
-      console.log('[PWA] Ready for offline use');
+      logger.debug('[PWA] Ready for offline use');
     },
   });
 
@@ -31,7 +32,7 @@ export const PWAUpdatePrompt = () => {
         },
         onDismiss: () => {
           // If dismissed, update on next page load
-          console.log('[PWA] Update dismissed, will apply on next load');
+          logger.debug('[PWA] Update dismissed, will apply on next load');
         },
       });
     }

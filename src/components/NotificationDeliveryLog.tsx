@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import logger from "@/lib/logger";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -143,7 +144,7 @@ export const NotificationDeliveryLog = () => {
       if (error) throw error;
       setDeliveries((data || []) as NotificationDelivery[]);
     } catch (error) {
-      console.error("Error fetching notification deliveries:", error);
+      logger.error("Error fetching notification deliveries:", error);
     } finally {
       setLoading(false);
     }

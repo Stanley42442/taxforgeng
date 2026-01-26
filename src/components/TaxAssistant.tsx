@@ -298,7 +298,6 @@ export function TaxAssistant() {
     try {
       await streamChat(newMessages);
     } catch (error) {
-      console.error("Chat error:", error);
       toast.error(error instanceof Error ? error.message : "Failed to get response");
     } finally {
       setIsLoading(false);

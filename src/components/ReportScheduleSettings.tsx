@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import logger from "@/lib/logger";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -100,7 +101,7 @@ export const ReportScheduleSettings = () => {
           });
         }
       } catch (error) {
-        console.error('Error fetching schedules:', error);
+        logger.error('Error fetching schedules:', error);
       } finally {
         setLoading(false);
       }
@@ -148,7 +149,7 @@ export const ReportScheduleSettings = () => {
 
       toast.success(`${schedule.schedule_type === 'weekly' ? 'Weekly' : 'Monthly'} report schedule saved`);
     } catch (error) {
-      console.error('Error saving schedule:', error);
+      logger.error('Error saving schedule:', error);
       toast.error('Failed to save schedule');
     } finally {
       setSaving(false);

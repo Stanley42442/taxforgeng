@@ -1,4 +1,5 @@
 import { useState } from "react";
+import logger from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -79,7 +80,7 @@ export const FeedbackForm = ({ trigger }: FeedbackFormProps) => {
         setMessage('');
       }, 2000);
     } catch (error) {
-      console.error('Error submitting feedback:', error);
+      logger.error('Error submitting feedback:', error);
       toast.error('Failed to submit feedback. Please try again.');
     } finally {
       setLoading(false);

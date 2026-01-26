@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import logger from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
@@ -155,7 +156,7 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
         taxNote: data.taxNote,
       };
     } catch (error) {
-      console.error('AI categorization failed:', error);
+      logger.error('AI categorization failed:', error);
       return null;
     }
   };
@@ -216,7 +217,7 @@ export const OCRReceiptScanner = ({ open, onOpenChange, onReceiptParsed }: OCRRe
         toast.info('Receipt scanned - please verify the details');
       }
     } catch (error) {
-      console.error('OCR Error:', error);
+      logger.error('OCR Error:', error);
       toast.error('Failed to process receipt');
     } finally {
       setProcessing(false);

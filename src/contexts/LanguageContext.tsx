@@ -4167,13 +4167,13 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
             .from('profiles')
             .select('language_preference')
             .eq('id', user.id)
-            .single();
+            .maybeSingle();
           
           if (data?.language_preference) {
             setLanguageState(data.language_preference as Language);
           }
-        } catch (error) {
-          console.error('Error fetching language preference:', error);
+        } catch {
+          // Silent fail - use default language
         }
       }
       setIsLoading(false);
@@ -4203,8 +4203,8 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
           .from('profiles')
           .update({ language_preference: lang })
           .eq('id', user.id);
-      } catch (error) {
-        console.error('Error saving language preference:', error);
+      } catch {
+        // Silent fail - language will still work from localStorage
       }
     }
   };

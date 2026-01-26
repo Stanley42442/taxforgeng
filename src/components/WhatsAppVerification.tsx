@@ -1,4 +1,5 @@
 import { useState } from "react";
+import logger from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,7 +63,7 @@ export const WhatsAppVerification = ({
       toast.info("Demo mode: Use code 123456");
       setStep("verify");
     } catch (error) {
-      console.error("Error sending verification:", error);
+      logger.error("Error sending verification:", error);
       toast.error("Failed to send verification code");
     } finally {
       setLoading(false);
@@ -94,7 +95,7 @@ export const WhatsAppVerification = ({
         toast.error("Invalid verification code");
       }
     } catch (error) {
-      console.error("Error verifying:", error);
+      logger.error("Error verifying:", error);
       toast.error("Verification failed");
     } finally {
       setLoading(false);

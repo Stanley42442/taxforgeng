@@ -98,7 +98,7 @@ export const TierUpgradeRequirements = ({
         .from('profiles')
         .select('whatsapp_number, whatsapp_verified')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -113,8 +113,8 @@ export const TierUpgradeRequirements = ({
 
       if (data?.whatsapp_number) setPhone(data.whatsapp_number);
       // state_of_residence and tin will be pre-filled after types regenerate
-    } catch (error) {
-      console.error('Failed to fetch profile:', error);
+    } catch {
+      // Silent fail - use defaults
     } finally {
       setLoading(false);
     }
@@ -213,8 +213,7 @@ export const TierUpgradeRequirements = ({
 
       toast.success('Profile updated successfully');
       onRequirementsMet();
-    } catch (error) {
-      console.error('Failed to update profile:', error);
+    } catch {
       toast.error('Failed to update profile. Please try again.');
     } finally {
       setSaving(false);

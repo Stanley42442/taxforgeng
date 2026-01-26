@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import logger from './logger';
 import QRCode from 'qrcode';
 import type { DocumentationStats } from '@/hooks/useDocumentationStats';
 import {
@@ -20,7 +21,7 @@ const generateQRCodeDataUrl = async (url: string): Promise<string> => {
       },
     });
   } catch (error) {
-    console.error('Failed to generate QR code:', error);
+    logger.error('Failed to generate QR code:', error);
     return '';
   }
 };

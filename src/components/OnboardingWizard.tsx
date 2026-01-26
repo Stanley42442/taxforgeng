@@ -146,14 +146,13 @@ export const OnboardingWizard = ({ open, onComplete }: OnboardingWizardProps) =>
           });
 
         if (businessError && !businessError.message.includes('duplicate')) {
-          console.error('Failed to save business:', businessError);
+          // Log silently - non-critical
         }
       }
 
       toast.success('Profile setup complete!');
       onComplete();
-    } catch (error) {
-      console.error('Failed to complete onboarding:', error);
+    } catch {
       toast.error('Failed to save profile. Please try again.');
     } finally {
       setIsSubmitting(false);
