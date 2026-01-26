@@ -212,20 +212,23 @@ const trackDevice = async (userId: string, userEmail: string) => {
       return { blocked: false, ipBlocked: false, timeBlocked: true };
     }
 
-    // Check if device exists
-    const { data: existingDevice } = await supabase
-      .from('known_devices')
-      .select('id, is_trusted, last_country')
-      .eq('user_id', userId)
-      .eq('device_fingerprint', deviceInfo.fingerprint)
-      .single();
+    // Check if device exists and get previous locations in parallel
+    const [existingDeviceResult, previousDevicesResult] = await Promise.all([
+      supabase
+        .from('known_devices')
+        .select('id, is_trusted, last_country')
+        .eq('user_id', userId)
+        .eq('device_fingerprint', deviceInfo.fingerprint)
+        .single(),
+      supabase
+        .from('known_devices')
+        .select('last_country')
+        .eq('user_id', userId)
+        .not('last_country', 'is', null)
+    ]);
     
-    // Get user's previous known locations for new country detection
-    const { data: previousDevices } = await supabase
-      .from('known_devices')
-      .select('last_country')
-      .eq('user_id', userId)
-      .not('last_country', 'is', null);
+    const existingDevice = existingDeviceResult.data;
+    const previousDevices = previousDevicesResult.data;
     
     const knownCountries = new Set(previousDevices?.map(d => d.last_country).filter(Boolean) || []);
     const currentCountry = location?.country || null;
