@@ -113,7 +113,10 @@ const Team = () => {
     toast.success('Role updated');
   };
 
-  if (tier === 'free' || tier === 'basic') {
+  const tierOrder = ['free', 'starter', 'basic', 'professional', 'business', 'corporate'];
+  const canAccessTeam = tierOrder.indexOf(tier) >= tierOrder.indexOf('business');
+
+  if (!canAccessTeam) {
     return (
       <PageLayout title="Team Settings" description="Manage team members and access" icon={Users}>
         <Card className="max-w-2xl mx-auto text-center glass-frosted shadow-futuristic">

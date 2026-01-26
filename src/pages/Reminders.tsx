@@ -336,7 +336,7 @@ const Reminders = () => {
     deleteWithUndo.cancelDelete();
   };
 
-  const tierOrder = ['free', 'starter', 'basic', 'freelancer', 'business', 'corporate'];
+  const tierOrder = ['free', 'starter', 'basic', 'professional', 'business', 'corporate'];
   const canAccessReminders = tierOrder.indexOf(tier) >= tierOrder.indexOf('starter');
 
   if (!canAccessReminders) {
