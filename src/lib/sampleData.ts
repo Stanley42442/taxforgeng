@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import logger from "@/lib/logger";
 
 const SAMPLE_EXPENSES = [
   // Income entries - spread across 3 months
@@ -75,7 +76,7 @@ export const seedSampleData = async (userId: string): Promise<{ businessId: stri
       .maybeSingle();
 
     if (businessError || !business) {
-      console.error('Error creating sample business:', businessError);
+      logger.error('Error creating sample business:', businessError);
       return { businessId: null, success: false };
     }
 
@@ -102,13 +103,13 @@ export const seedSampleData = async (userId: string): Promise<{ businessId: stri
       .insert(expenseInserts);
 
     if (expenseError) {
-      console.error('Error creating sample expenses:', expenseError);
+      logger.error('Error creating sample expenses:', expenseError);
       return { businessId: business.id, success: false };
     }
 
     return { businessId: business.id, success: true };
   } catch (error) {
-    console.error('Error seeding sample data:', error);
+    logger.error('Error seeding sample data:', error);
     return { businessId: null, success: false };
   }
 };

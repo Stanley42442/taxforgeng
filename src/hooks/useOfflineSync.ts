@@ -12,6 +12,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect } from 'react';
 import { useOfflineStatus } from './useOfflineStatus';
+import logger from '@/lib/logger';
 
 export interface SyncResult {
   success: boolean;
@@ -95,7 +96,7 @@ export const useOfflineSync = (): UseOfflineSyncReturn => {
           await removeFromSyncQueue(action.id);
           result.synced++;
         } catch (error) {
-          console.error('[OfflineSync] Failed to sync action:', error);
+          logger.error('[OfflineSync] Failed to sync action:', error);
           result.failed++;
         }
       }

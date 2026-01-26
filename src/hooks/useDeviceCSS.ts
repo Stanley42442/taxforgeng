@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-
+import logger from '@/lib/logger';
 type DeviceType = 'mobile' | 'tablet' | 'desktop';
 
 interface DeviceConfig {
@@ -41,7 +41,7 @@ export const useDeviceCSS = () => {
         }
         setIsLoaded(true);
       } catch (error) {
-        console.error('Failed to load device CSS:', error);
+        logger.error('Failed to load device CSS:', error);
       }
     };
 

@@ -50,6 +50,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/taxCalculations";
+import logger from "@/lib/logger";
 import {
   XAxis,
   YAxis,
@@ -409,7 +410,7 @@ const AdminAnalytics = () => {
       
       setLastUpdated(new Date());
     } catch (error) {
-      console.error('Error fetching analytics:', error);
+      logger.error('Error fetching analytics:', error);
       // Set mock data on error
       setAnalytics({
         totalUsers: 156,

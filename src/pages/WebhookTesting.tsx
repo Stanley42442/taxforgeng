@@ -31,6 +31,7 @@ import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import logger from "@/lib/logger";
 
 interface WebhookLog {
   id: string;
@@ -96,7 +97,7 @@ const WebhookTesting = () => {
       if (error) throw error;
       setWebhookLogs(data || []);
     } catch (error) {
-      console.error('Error fetching webhook logs:', error);
+      logger.error('Error fetching webhook logs:', error);
       toast.error('Failed to fetch webhook logs');
     } finally {
       setLoading(false);

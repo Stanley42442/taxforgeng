@@ -105,7 +105,7 @@ const Reminders = () => {
         .eq('id', reminder.id);
 
       if (error) {
-        console.error('Error deleting reminder:', error);
+        logger.error('Error deleting reminder:', error);
         setReminders(prev => [...prev, reminder]);
         toast.error('Failed to delete reminder');
       }
@@ -149,7 +149,7 @@ const Reminders = () => {
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('Error fetching reminders:', error);
+      logger.error('Error fetching reminders:', error);
       toast.error('Failed to load reminders');
     } else {
       const mapped: Reminder[] = (data || []).map(r => ({
@@ -197,7 +197,7 @@ const Reminders = () => {
         .eq('user_id', user.id);
 
       if (error) {
-        console.error('Error updating reminder:', error);
+        logger.error('Error updating reminder:', error);
         setReminders(prev => prev.map(r => 
           r.businessId === businessId && r.type === type ? { ...r, enabled: existing.enabled } : r
         ));

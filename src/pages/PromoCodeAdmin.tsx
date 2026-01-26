@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import logger from "@/lib/logger";
 import { PageLayout } from "@/components/PageLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -146,7 +147,7 @@ const PromoCodeAdmin = () => {
       if (error) throw error;
       setPromoCodes(data || []);
     } catch (error) {
-      console.error('Error fetching promo codes:', error);
+      logger.error('Error fetching promo codes:', error);
       toast.error('Failed to fetch promo codes');
     } finally {
       setLoading(false);
@@ -170,7 +171,7 @@ const PromoCodeAdmin = () => {
         totalDiscountGiven: redemptions.reduce((sum, r) => sum + (r.discount_amount || 0), 0) / 100
       });
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      logger.error('Error fetching stats:', error);
     }
   };
 
@@ -260,7 +261,7 @@ const PromoCodeAdmin = () => {
       fetchPromoCodes();
       fetchStats();
     } catch (error) {
-      console.error('Error saving promo code:', error);
+      logger.error('Error saving promo code:', error);
       const message = error instanceof Error ? error.message : 'Failed to save promo code';
       toast.error(message);
     } finally {
@@ -282,7 +283,7 @@ const PromoCodeAdmin = () => {
       fetchPromoCodes();
       fetchStats();
     } catch (error) {
-      console.error('Error deleting promo code:', error);
+      logger.error('Error deleting promo code:', error);
       toast.error('Failed to delete promo code');
     }
   };
@@ -299,7 +300,7 @@ const PromoCodeAdmin = () => {
       fetchPromoCodes();
       fetchStats();
     } catch (error) {
-      console.error('Error toggling promo code:', error);
+      logger.error('Error toggling promo code:', error);
       toast.error('Failed to update promo code');
     }
   };

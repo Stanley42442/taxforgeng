@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/taxCalculations";
+import logger from "@/lib/logger";
 
 import {
   Code,
@@ -73,7 +74,7 @@ const ApiDocs = () => {
       if (error) throw error;
       setPartnerKeys(data || []);
     } catch (error) {
-      console.error('Error fetching partner keys:', error);
+      logger.error('Error fetching partner keys:', error);
     }
   };
 
@@ -108,7 +109,7 @@ const ApiDocs = () => {
       setShowNewKeyForm(false);
       toast.success("API key created successfully! Copy it now - you won't see it again.");
     } catch (error) {
-      console.error('Error creating API key:', error);
+      logger.error('Error creating API key:', error);
       toast.error("Failed to create API key");
     } finally {
       setIsLoading(false);
@@ -127,7 +128,7 @@ const ApiDocs = () => {
       setPartnerKeys(prev => prev.filter(k => k.id !== keyId));
       toast.success("API key deleted");
     } catch (error) {
-      console.error('Error deleting API key:', error);
+      logger.error('Error deleting API key:', error);
       toast.error("Failed to delete API key");
     }
   };
@@ -146,7 +147,7 @@ const ApiDocs = () => {
       ));
       toast.success(currentStatus ? "API key deactivated" : "API key activated");
     } catch (error) {
-      console.error('Error toggling key status:', error);
+      logger.error('Error toggling key status:', error);
       toast.error("Failed to update API key");
     }
   };
@@ -209,7 +210,7 @@ const ApiDocs = () => {
         });
       }
     } catch (error) {
-      console.error('Demo error:', error);
+      logger.error('Demo error:', error);
       toast.error("Demo request failed");
     } finally {
       setIsRunningDemo(false);

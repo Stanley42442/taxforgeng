@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import logger from '@/lib/logger';
 import { useSubscription, SavedBusiness } from '@/contexts/SubscriptionContext';
 import { 
   generateBulkExportZip, 
@@ -122,7 +123,7 @@ export const BulkExportDialog: React.FC<BulkExportDialogProps> = ({
 
       onClose();
     } catch (error) {
-      console.error('Bulk export error:', error);
+      logger.error('Bulk export error:', error);
       toast({
         title: 'Export Failed',
         description: 'There was an error creating the export. Please try again.',

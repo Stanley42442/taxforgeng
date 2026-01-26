@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Quote, Star, Building2, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import logger from "@/lib/logger";
 
 interface Testimonial {
   id: string;
@@ -78,7 +79,7 @@ export const SuccessStories = ({
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("Error fetching reviews:", error);
+        logger.error("Error fetching reviews:", error);
         return;
       }
 
@@ -99,7 +100,7 @@ export const SuccessStories = ({
         setTestimonials(combined);
       }
     } catch (error) {
-      console.error("Error fetching reviews:", error);
+      logger.error("Error fetching reviews:", error);
     } finally {
       setIsLoading(false);
     }

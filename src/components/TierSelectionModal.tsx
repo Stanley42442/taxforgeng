@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import logger from '@/lib/logger';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -87,7 +88,7 @@ export const TierSelectionModal = ({ open, onComplete, userId }: TierSelectionMo
       
       onComplete();
     } catch (error) {
-      console.error('Error selecting tier:', error);
+      logger.error('Error selecting tier:', error);
       toast.error('Failed to set up your account. Please try again.');
     } finally {
       setLoading(null);

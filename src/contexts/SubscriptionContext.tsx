@@ -248,7 +248,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         trialEndsAt,
       });
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      logger.error('Error fetching user data:', error);
       setState(prev => ({ ...prev, loading: false }));
     }
   }, [user]);
@@ -531,7 +531,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         changeType: isDowngrade ? 'downgrade' : 'upgrade',
       }
     }).catch(err => {
-      console.error('Failed to send tier change email:', err);
+      logger.error('Failed to send tier change email:', err);
     });
 
     setState(prev => ({

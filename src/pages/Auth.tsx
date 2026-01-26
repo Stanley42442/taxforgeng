@@ -9,6 +9,7 @@ import { Calculator, Mail, Lock, User, ArrowLeft, Eye, EyeOff, KeyRound, Shield,
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import logger from "@/lib/logger";
 import { z } from "zod";
 import { getDeviceInfo } from "@/lib/deviceFingerprint";
 import { TermsAcceptanceGate } from "@/components/TermsAcceptanceGate";
@@ -124,7 +125,7 @@ const Auth = () => {
       const { data, error } = await supabase.rpc('check_account_locked', { check_email: checkEmail });
       
       if (error) {
-        console.error('Error checking lockout:', error);
+        logger.error('Error checking lockout:', error);
         return false;
       }
       
@@ -140,7 +141,7 @@ const Auth = () => {
       setFailedAttempts(data?.[0]?.failed_count || 0);
       return false;
     } catch (err) {
-      console.error('Lockout check error:', err);
+      logger.error('Lockout check error:', err);
       return false;
     }
   };
@@ -154,7 +155,7 @@ const Auth = () => {
         attempt_ip: null
       });
     } catch (err) {
-      console.error('Failed to record login attempt:', err);
+      logger.error('Failed to record login attempt:', err);
     }
   };
 
@@ -485,7 +486,7 @@ const Auth = () => {
               }
             });
           } catch (alertError) {
-            console.error('Failed to send security alert:', alertError);
+            logger.error('Failed to send security alert:', alertError);
           }
           toast.error("Too many failed attempts. Please try again in 15 minutes.");
           return;
@@ -531,7 +532,7 @@ const Auth = () => {
                 }
               });
             } catch (alertError) {
-              console.error('Failed to send security alert:', alertError);
+              logger.error('Failed to send security alert:', alertError);
             }
           }
           
@@ -568,7 +569,7 @@ const Auth = () => {
                 }
               });
             } catch (alertError) {
-              console.error('Failed to send security alert:', alertError);
+              logger.error('Failed to send security alert:', alertError);
             }
           }
           
@@ -606,9 +607,9 @@ const Auth = () => {
                 remainingCodes: remaining
               }
             });
-            console.log('Backup code alert email sent');
+            logger.debug('Backup code alert email sent');
           } catch (emailError) {
-            console.error('Failed to send backup code alert:', emailError);
+            logger.error('Failed to send backup code alert:', emailError);
           }
         }
 

@@ -17,6 +17,7 @@ import {
 import { formatCurrency } from "@/lib/taxCalculations";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import logger from "@/lib/logger";
 
 interface Expense {
   id: string;
@@ -215,7 +216,7 @@ export const ExpenseAnalytics = ({ expenses, businessName }: ExpenseAnalyticsPro
       setAiInsight(data.insight);
       setInsightGenerated(true);
     } catch (error) {
-      console.error('Error generating insight:', error);
+      logger.error('Error generating insight:', error);
       toast.error('Failed to generate AI insight');
     } finally {
       setLoadingInsight(false);

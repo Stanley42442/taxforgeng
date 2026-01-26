@@ -14,25 +14,25 @@ const CACHE_VERSION = import.meta.env.VITE_BUILD_TIME || 'dev';
   const lastVersion = localStorage.getItem('cache-version');
   
   if (lastVersion !== CACHE_VERSION && 'serviceWorker' in navigator) {
-    console.log('[PWA] Clearing old service worker and caches...');
+    // PWA cache clearing - production-only logging via console since logger may not be loaded
     
     try {
       // Unregister all service workers
       const registrations = await navigator.serviceWorker.getRegistrations();
       await Promise.all(registrations.map(r => r.unregister()));
-      console.log('[PWA] Unregistered', registrations.length, 'service workers');
+      // SW unregistered
       
       // Clear all caches
       const cacheNames = await caches.keys();
       await Promise.all(cacheNames.map(name => caches.delete(name)));
-      console.log('[PWA] Cleared', cacheNames.length, 'caches');
+      // Caches cleared
       
       // Set version and reload
       localStorage.setItem('cache-version', CACHE_VERSION);
       window.location.reload();
       return;
     } catch (error) {
-      console.error('[PWA] Cache clear failed:', error);
+      // PWA cache clear failed - set version anyway to avoid loops
       localStorage.setItem('cache-version', CACHE_VERSION);
     }
   }
