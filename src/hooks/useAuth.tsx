@@ -370,32 +370,20 @@ const trackDevice = async (userId: string, userEmail: string) => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  // CRITICAL FIX: Start with loading=false so app renders immediately
+  // Individual pages check auth state as needed
+  const [loading, setLoading] = useState(false);
 
   // Track if this is a fresh login vs session restoration
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [lastSessionId, setLastSessionId] = useState<string | null>(null);
 
   useEffect(() => {
-    // SAFETY: Set loading to false after 10 seconds regardless of auth status
-    // This prevents infinite loading on slow networks or when Supabase is unreachable
-    const authTimeout = setTimeout(() => {
-      setLoading((currentLoading) => {
-        if (currentLoading) {
-          logger.warn('[Auth] Session check timed out after 10s - proceeding without auth');
-          return false;
-        }
-        return currentLoading;
-      });
-    }, 10000);
-
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        setLoading(false);
-        clearTimeout(authTimeout); // Cancel timeout on successful auth state change
 
         // Only log login events for actual new logins, not session restorations
         if (session?.user) {
@@ -440,16 +428,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
 
-    // THEN check for existing session
+    // THEN check for existing session (fire-and-forget, doesn't block)
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
-      clearTimeout(authTimeout); // Cancel timeout on successful session fetch
     }).catch((error) => {
       logger.error('[Auth] Failed to get session:', error);
-      setLoading(false);
-      clearTimeout(authTimeout);
     });
 
     // Handle session-only mode (clear on browser close)
@@ -465,7 +449,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
-      clearTimeout(authTimeout);
       subscription.unsubscribe();
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
