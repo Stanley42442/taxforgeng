@@ -46,7 +46,7 @@ import { usePersonalExpenses } from "@/hooks/usePersonalExpenses";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { downloadIndividualTaxPDF } from "@/lib/individualPdfExport";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import logger from "@/lib/logger";
 import { safeLocalStorage } from "@/lib/safeStorage";

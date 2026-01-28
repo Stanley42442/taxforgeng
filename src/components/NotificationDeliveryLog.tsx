@@ -16,7 +16,7 @@ import {
   Filter,
   CheckCircle2
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 

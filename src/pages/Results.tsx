@@ -32,7 +32,7 @@ import { downloadPDF } from "@/lib/pdfExport";
 import { useState, useEffect, useRef } from "react";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/hooks/useAuth";
 import { notifyTaxCalculation } from "@/lib/notifications";
 import { PageLayout } from "@/components/PageLayout";

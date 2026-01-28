@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { notifyExpenseAdded } from "@/lib/notifications";

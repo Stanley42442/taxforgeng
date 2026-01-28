@@ -1,5 +1,5 @@
 // Notification utility for adding app-wide notifications with cross-device sync
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import logger from "@/lib/logger";
 import { safeLocalStorage } from "@/lib/safeStorage";
 

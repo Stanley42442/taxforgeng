@@ -19,7 +19,7 @@ import {
   CheckCircle2,
   Info
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/errorUtils";
 import logger from "@/lib/logger";
