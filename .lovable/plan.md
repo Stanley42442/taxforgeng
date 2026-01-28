@@ -1,84 +1,164 @@
 
 
-# Fix: Infinite Loading on Low-Power Mobile Devices
+# Fix: White Page on Mobile Devices (Root Cause Found)
 
-## Problem Analysis
+## Problem Identified
 
-The app hangs indefinitely on Redmi 12c (and similar devices) for these reasons:
+After tracing through the changelog and initialization code, I found the **root cause**:
 
-### 1. AuthLoadingScreen Never Resolves
-The `AuthLoadingScreen` waits for `loading` from `useAuth` to become `false`. This depends on `supabase.auth.getSession()` completing successfully. On slow networks or if Supabase is unreachable, this promise may never resolve, causing an infinite loading screen.
+### The Critical Bug
 
-### 2. No Auth Timeout
-The current code has no timeout for the auth session check:
+In `src/integrations/supabase/client.ts`:
 ```typescript
-// useAuth.tsx line 431
-supabase.auth.getSession().then(({ data: { session } }) => {
-  setSession(session);
-  setUser(session?.user ?? null);
-  setLoading(false);  // <-- Never called if promise hangs
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    storage: localStorage,  // <-- RAW localStorage - crashes on restricted storage!
+    persistSession: true,
+    autoRefreshToken: true,
+  }
 });
 ```
 
-### 3. Development Mode Creates 150+ Network Requests
-Each module is loaded separately, overwhelming low-powered devices with slow CPUs and limited memory.
+**The Supabase client uses raw `localStorage` directly**, not the safe wrapper. When this fails on devices with storage restrictions (private browsing, certain Android browsers, quota exceeded), the **entire import chain fails**.
+
+### Why This Causes White Page
+
+The initialization flow in `main.tsx` is:
+
+```
+1. Import errorTracking.ts (imports supabase/client.ts)
+   └── supabase/client.ts uses raw localStorage → CRASH
+2. Import webVitals.ts (imports supabase/client.ts)  
+   └── Already crashed above
+3. initGlobalErrorHandlers() ← Never reached
+4. initWebVitals() ← Never reached
+5. createRoot().render(<App />) ← NEVER REACHED = WHITE PAGE
+```
+
+### Why It's Worse on Low-End Devices
+
+Devices like Redmi 12c often have:
+- Aggressive memory management that restricts storage
+- Browser privacy modes enabled by default
+- Storage quota exhaustion from other apps
+- Older WebView versions with stricter security
 
 ---
 
 ## Solution
 
-### 1. Add Auth Timeout to useAuth
+### 1. Create Safe Storage Adapter for Supabase
 
-Add a timeout that sets `loading` to `false` after 10 seconds even if Supabase hasn't responded:
+Create a custom storage adapter that wraps localStorage with try-catch, matching the Supabase storage interface:
 
+**New file: `src/lib/supabaseStorage.ts`**
 ```typescript
-// In useAuth.tsx useEffect
-useEffect(() => {
-  // SAFETY: Set loading to false after 10 seconds regardless of auth status
-  // This prevents infinite loading on slow networks
-  const authTimeout = setTimeout(() => {
-    if (loading) {
-      setLoading(false);
-      console.warn('[Auth] Session check timed out after 10s');
+/**
+ * Safe storage adapter for Supabase Auth
+ * Prevents crashes on devices with restricted localStorage access
+ */
+export const safeSupabaseStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
     }
-  }, 10000);
-
-  // Existing auth setup...
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    setSession(session);
-    setUser(session?.user ?? null);
-    setLoading(false);
-    clearTimeout(authTimeout); // Cancel timeout on success
-  });
-
-  return () => {
-    clearTimeout(authTimeout);
-    // ...existing cleanup
-  };
-}, []);
+  },
+  setItem: (key: string, value: string): void => {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // Silently fail - user will need to re-login
+    }
+  },
+  removeItem: (key: string): void => {
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      // Silently fail
+    }
+  },
+};
 ```
 
-### 2. Add Race Condition with Promise.race in AuthLoadingScreen
+### 2. Update Supabase Client to Use Safe Storage
 
-As a secondary safeguard, add a max loading time in the component itself:
+**File: `src/integrations/supabase/client.ts`**
 
+Since this file is auto-generated and we cannot edit it, we need an alternative approach:
+
+**Alternative: Create a wrapper initialization**
+
+Create `src/lib/supabaseClient.ts` that safely initializes the client:
 ```typescript
-// AuthLoadingScreen.tsx
-useEffect(() => {
-  // Force hide splash after 15 seconds as a fallback
-  const forceTimeout = setTimeout(() => {
-    if (showSplash) {
-      setShowSplash(false);
-    }
-  }, 15000);
+import { createClient } from '@supabase/supabase-js';
+import type { Database } from '@/integrations/supabase/types';
+import { safeSupabaseStorage } from './supabaseStorage';
 
-  return () => clearTimeout(forceTimeout);
-}, []);
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    storage: safeSupabaseStorage,
+    persistSession: true,
+    autoRefreshToken: true,
+  }
+});
 ```
 
-### 3. Ensure Initial HTML Loader Works
+Then update all imports from `@/integrations/supabase/client` to `@/lib/supabaseClient`.
 
-The initial loader in `index.html` shows while React is loading. Once React mounts, `AuthLoadingScreen` takes over. Both should be visible and provide feedback.
+**However**, since the client file is auto-generated and we're told NOT to edit it, we have a constraint. 
+
+### 3. Wrap Initialization in Try-Catch (Alternative Fix)
+
+If we cannot modify the Supabase client, we can wrap the problematic initializers:
+
+**File: `src/main.tsx`**
+
+```typescript
+import { createRoot } from "react-dom/client";
+import App from "./App.tsx";
+import "./index.css";
+
+import "./styles/mobile.css";
+import "./styles/tablet.css";
+import "./styles/desktop.css";
+
+import { safeLocalStorage, safeSessionStorage } from "./lib/safeStorage";
+
+// SAFETY: Wrap initialization modules that import supabase client
+// This prevents white page on devices with storage restrictions
+const initializeModules = async () => {
+  try {
+    const { initGlobalErrorHandlers } = await import("./lib/errorTracking");
+    initGlobalErrorHandlers();
+  } catch (e) {
+    console.warn('[Init] Error tracking failed to initialize:', e);
+  }
+  
+  try {
+    const { initWebVitals } = await import("./lib/webVitals");
+    initWebVitals();
+  } catch (e) {
+    console.warn('[Init] Web vitals failed to initialize:', e);
+  }
+};
+
+// ... rest of cache busting logic ...
+
+(async () => {
+  // Initialize optional modules (safe to fail)
+  await initializeModules();
+  
+  // ... existing cache logic ...
+  
+  // This MUST run even if modules above fail
+  createRoot(document.getElementById("root")!).render(<App />);
+})();
+```
 
 ---
 
@@ -86,25 +166,40 @@ The initial loader in `index.html` shows while React is loading. Once React moun
 
 | File | Change |
 |------|--------|
-| `src/hooks/useAuth.tsx` | Add 10-second auth timeout |
-| `src/components/AuthLoadingScreen.tsx` | Add 15-second failsafe timeout |
+| `src/main.tsx` | Wrap error tracking and web vitals imports in try-catch with dynamic imports |
 
 ---
 
-## Expected Behavior After Fix
+## Why This Fix Works
 
-| Scenario | Before | After |
-|----------|--------|-------|
-| Normal load | Works | Works |
-| Slow network (Supabase unreachable) | Infinite spinner | Shows app after 10s (logged out state) |
-| Very slow device | May hang forever | Shows app after 15s max |
+| Issue | Before | After |
+|-------|--------|-------|
+| localStorage crash in Supabase client | Entire app fails to load | Error is caught, app continues |
+| Error tracking init fails | White page | Gracefully skipped, app loads |
+| Web vitals init fails | White page | Gracefully skipped, app loads |
+| React render blocked | Never called | Always called at the end |
 
 ---
 
-## Technical Notes
+## Technical Details
 
-- The 10-second timeout matches Supabase's internal timeout for network requests
-- Users will be in a "logged out" state if timeout triggers, but can retry login
-- The 15-second component timeout is a secondary fallback if the hook fails
-- Both timeouts are non-blocking - if auth completes faster, they're cancelled
+### Dynamic Import Benefits
+- Errors in dynamically imported modules don't crash the main bundle
+- We can catch and handle initialization failures
+- The app still loads, just without error tracking/vitals on problematic devices
+
+### Impact on Affected Devices
+- **Normal devices**: No change, error tracking and vitals work as before
+- **Restricted storage devices**: App loads successfully, just without optional monitoring features
+
+---
+
+## Verification Steps
+
+After implementing:
+1. Test on Redmi 12c in normal browser mode
+2. Test in Chrome incognito mode
+3. Test in Firefox private browsing
+4. Test with storage quota exceeded (fill localStorage in devtools)
+5. Verify error tracking still works on normal devices
 
