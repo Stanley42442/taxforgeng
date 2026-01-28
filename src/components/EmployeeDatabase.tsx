@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { EmployeeTableRow } from "@/components/employees/EmployeeTableRow";
+import { VIRTUALIZATION_THRESHOLD } from "@/components/employees/VirtualEmployeeTable";
 import { 
   Users, Plus, Search, Edit, Trash2, Download, Upload, 
   UserPlus, Building, DollarSign, Calendar, Mail, Phone,
@@ -589,61 +591,13 @@ export const EmployeeDatabase = () => {
                 </TableHeader>
                 <TableBody>
                   {filteredEmployees.map((employee) => (
-                    <TableRow key={employee.id}>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{employee.first_name} {employee.last_name}</p>
-                          <p className="text-sm text-muted-foreground">{employee.email}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>{employee.position || "-"}</TableCell>
-                      <TableCell>{employee.department || "-"}</TableCell>
-                      <TableCell className="text-right font-medium">
-                        {formatCurrency(employee.current_gross_salary)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={employee.status === "active" ? "default" : "secondary"}>
-                          {employee.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => openEditDialog(employee)}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit Details
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => openSalaryDialog(employee)}>
-                              <DollarSign className="h-4 w-4 mr-2" />
-                              Update Salary
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <History className="h-4 w-4 mr-2" />
-                              Salary History
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <FileText className="h-4 w-4 mr-2" />
-                              View Payslips
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem 
-                              className="text-destructive"
-                              onClick={() => deleteEmployee.mutate(employee.id)}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
+                    <EmployeeTableRow
+                      key={employee.id}
+                      employee={employee}
+                      onEdit={openEditDialog}
+                      onUpdateSalary={openSalaryDialog}
+                      onDelete={(id) => deleteEmployee.mutate(id)}
+                    />
                   ))}
                 </TableBody>
               </Table>

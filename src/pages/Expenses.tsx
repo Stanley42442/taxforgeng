@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { notifyExpenseAdded } from "@/lib/notifications";
 import logger from "@/lib/logger";
 import { safeLocalStorage } from "@/lib/safeStorage";
+import { ExpenseList } from "@/components/expenses/VirtualExpenseList";
 import {
   Receipt,
   Plus,
@@ -1657,75 +1658,14 @@ const Expenses = () => {
                 </div>
               </div>
             ) : (
-              <div className="space-y-3">
-                {filteredExpenses.map((expense) => {
-                  const businessName = getBusinessName(expense.businessId);
-                  const isExpanded = expandedCardId === expense.id;
-                  return (
-                    <div 
-                      key={expense.id} 
-                      className={`rounded-xl p-4 cursor-pointer active:opacity-80 transition-all border ${getCategoryColor(expense.category)}`}
-                      onClick={() => setExpandedCardId(isExpanded ? null : expense.id)}
-                    >
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <span className="text-xl">{getCategoryIcon(expense.category)}</span>
-                          <div className="min-w-0 flex-1">
-                            <p className={`font-medium ${isExpanded ? '' : 'truncate'}`}>
-                              {expense.description}
-                            </p>
-                            {isExpanded && (
-                              <p className="text-xs opacity-75 mt-1">
-                                Category: {EXPENSE_CATEGORIES.find(c => c.value === expense.category)?.label || expense.category}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          {isExpanded ? (
-                            <ChevronUp className="h-4 w-4 opacity-60" />
-                          ) : (
-                            <ChevronDown className="h-4 w-4 opacity-60" />
-                          )}
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="text-destructive hover:bg-destructive/10 h-7 w-7" 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteExpense(expense.id);
-                            }}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-2 text-xs opacity-75">
-                        <span>{new Date(expense.date).toLocaleDateString()}</span>
-                        {businessName && <span>• {businessName}</span>}
-                        {expense.isDeductible && (
-                          <span className="px-1.5 py-0.5 rounded-full bg-success/10 text-success font-medium">Deductible</span>
-                        )}
-                      </div>
-                      <div className={`font-bold text-base mt-1 ${expense.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
-                        ₦{expense.amount >= 1_000_000_000 
-                          ? `${(expense.amount / 1_000_000_000).toFixed(1)}B`
-                          : expense.amount >= 1_000_000 
-                            ? `${(expense.amount / 1_000_000).toFixed(1)}M`
-                            : expense.amount >= 1_000 
-                              ? `${(expense.amount / 1_000).toFixed(1)}K`
-                              : expense.amount.toLocaleString()
-                        }
-                        {isExpanded && expense.amount >= 1_000 && (
-                          <span className="text-sm font-normal opacity-75 ml-2">
-                            (₦{expense.amount.toLocaleString()})
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <ExpenseList
+                expenses={filteredExpenses}
+                expandedCardId={expandedCardId}
+                onExpand={setExpandedCardId}
+                onDelete={handleDeleteExpense}
+                getBusinessName={getBusinessName}
+                maxHeight={600}
+              />
             )}
           </div>
 
