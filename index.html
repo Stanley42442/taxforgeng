@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TaxForge NG - Nigerian Tax Calculator & Business Advisory</title>
     
-    <!-- Security Headers - Enhanced CSP with strict-dynamic -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'strict-dynamic' 'unsafe-inline' https://*.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.paystack.co https://fonts.googleapis.com https://fonts.gstatic.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;">
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co https://api.ipify.org; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.paystack.co https://api.ipify.org https://fonts.googleapis.com https://fonts.gstatic.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
@@ -76,12 +76,27 @@
       <!-- Initial loading state - replaced when React mounts -->
       <div id="initial-loader" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f8faf9;">
         <div style="text-align:center;">
-          <div style="width:48px;height:48px;border:3px solid #e5e7eb;border-top-color:#16a34a;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
-          <p style="color:#6b7280;font-family:system-ui;margin:0;">Loading TaxForge...</p>
+          <div id="loader-spinner" style="width:48px;height:48px;border:3px solid #e5e7eb;border-top-color:#16a34a;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
+          <p id="loader-text" style="color:#6b7280;font-family:system-ui;margin:0;">Loading TaxForge...</p>
         </div>
       </div>
       <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
     </div>
+    <script>
+      // FAILSAFE: If React doesn't mount within 8 seconds, show error and reload option
+      setTimeout(function() {
+        var loader = document.getElementById('initial-loader');
+        if (loader && loader.style.display !== 'none') {
+          var spinner = document.getElementById('loader-spinner');
+          var text = document.getElementById('loader-text');
+          if (spinner) spinner.style.display = 'none';
+          if (text) {
+            text.innerHTML = 'App failed to load. <a href="javascript:location.reload(true)" style="color:#16a34a;text-decoration:underline;">Tap to retry</a>';
+            text.style.color = '#ef4444';
+          }
+        }
+      }, 8000);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
