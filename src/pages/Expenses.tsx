@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { notifyExpenseAdded } from "@/lib/notifications";
 import logger from "@/lib/logger";
+import { safeLocalStorage } from "@/lib/safeStorage";
 import {
   Receipt,
   Plus,
@@ -169,14 +170,13 @@ const Expenses = () => {
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
   const [showMonthlySummary, setShowMonthlySummary] = useState(false);
   const [monthlyBudget, setMonthlyBudget] = useState<number>(() => {
-    const saved = localStorage.getItem('expenseBudget');
+    const saved = safeLocalStorage.getItem('expenseBudget');
     return saved ? Number(saved) : 0;
   });
   const [showBudgetDialog, setShowBudgetDialog] = useState(false);
   const [showCategoryBudgetsDialog, setShowCategoryBudgetsDialog] = useState(false);
   const [categoryBudgets, setCategoryBudgets] = useState<Record<string, number>>(() => {
-    const saved = localStorage.getItem('categoryBudgets');
-    return saved ? JSON.parse(saved) : {};
+    return safeLocalStorage.getJSON('categoryBudgets', {});
   });
   const [showRecurringDialog, setShowRecurringDialog] = useState(false);
   const [recurringTemplates, setRecurringTemplates] = useState<Array<{
@@ -188,18 +188,16 @@ const Expenses = () => {
     dueDay?: number; // Day of month (1-31)
     lastPaidDate?: string;
   }>>(() => {
-    const saved = localStorage.getItem('recurringTemplates');
-    return saved ? JSON.parse(saved) : [
+    return safeLocalStorage.getJSON('recurringTemplates', [
       { id: '1', description: 'Office Rent', amount: 150000, category: 'rent', dueDay: 1 },
       { id: '2', description: 'Internet & Phone', amount: 25000, category: 'utilities', dueDay: 15 },
       { id: '3', description: 'Staff Salaries', amount: 350000, category: 'salary', dueDay: 25 },
-    ];
+    ]);
   });
   const [newTemplate, setNewTemplate] = useState({ description: '', amount: '', category: 'rent' as Expense['category'], dueDay: '' });
   const [showComparison, setShowComparison] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(() => {
-    const saved = localStorage.getItem('expenseNotificationsEnabled');
-    return saved === 'true';
+    return safeLocalStorage.getItem('expenseNotificationsEnabled') === 'true';
   });
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(
     typeof Notification !== 'undefined' ? Notification.permission : 'denied'
@@ -212,16 +210,13 @@ const Expenses = () => {
     targetAmount: number;
     targetDate: string;
     description: string;
-  }>>(() => {
-    const saved = localStorage.getItem('savingsGoals');
-    return saved ? JSON.parse(saved) : {};
-  });
+  }>>(() => safeLocalStorage.getJSON('savingsGoals', {}));
   const [editingGoalBusiness, setEditingGoalBusiness] = useState<string | null>(null);
   const [newGoal, setNewGoal] = useState({ targetAmount: '', targetDate: '', description: '' });
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [notifiedAchievements, setNotifiedAchievements] = useState<Set<string>>(() => {
-    const saved = localStorage.getItem('notifiedGoalAchievements');
-    return saved ? new Set(JSON.parse(saved)) : new Set();
+    const saved = safeLocalStorage.getJSON<string[]>('notifiedGoalAchievements', []);
+    return new Set(saved);
   });
   
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
@@ -280,13 +275,13 @@ const Expenses = () => {
       const granted = await requestNotificationPermission();
       if (granted) {
         setNotificationsEnabled(true);
-        localStorage.setItem('expenseNotificationsEnabled', 'true');
+        safeLocalStorage.setItem('expenseNotificationsEnabled', 'true');
         // Send a test notification
         sendExpenseNotification('Expense Reminders Enabled', 'You will now receive reminders for upcoming expenses.');
       }
     } else {
       setNotificationsEnabled(false);
-      localStorage.setItem('expenseNotificationsEnabled', 'false');
+      safeLocalStorage.setItem('expenseNotificationsEnabled', 'false');
       toast.success('Notifications disabled');
     }
   };
@@ -318,13 +313,13 @@ const Expenses = () => {
         const daysUntilDue = template.dueDay - currentDay;
         const notifiedKey = `notified_${template.id}_${today.getFullYear()}_${today.getMonth()}_${daysUntilDue}`;
         
-        if ((daysUntilDue === 3 || daysUntilDue === 1 || daysUntilDue === 0) && !localStorage.getItem(notifiedKey)) {
+        if ((daysUntilDue === 3 || daysUntilDue === 1 || daysUntilDue === 0) && !safeLocalStorage.getItem(notifiedKey)) {
           const message = daysUntilDue === 0 
             ? `${template.description} (${formatCurrency(template.amount)}) is due today!`
             : `${template.description} (${formatCurrency(template.amount)}) is due in ${daysUntilDue} day${daysUntilDue > 1 ? 's' : ''}.`;
           
           sendExpenseNotification('Expense Reminder', message);
-          localStorage.setItem(notifiedKey, 'true');
+          safeLocalStorage.setItem(notifiedKey, 'true');
         }
       });
     };
@@ -394,7 +389,7 @@ const Expenses = () => {
         const newNotified = new Set(notifiedAchievements);
         newNotified.add(business.id);
         setNotifiedAchievements(newNotified);
-        localStorage.setItem('notifiedGoalAchievements', JSON.stringify([...newNotified]));
+        safeLocalStorage.setJSON('notifiedGoalAchievements', [...newNotified]);
       }
     });
   }, [expenses, savingsGoals, notificationsEnabled, savedBusinesses, notifiedAchievements]);
@@ -678,7 +673,7 @@ const Expenses = () => {
   const handleSetBudget = () => {
     const budget = Number(budgetInput) || 0;
     setMonthlyBudget(budget);
-    localStorage.setItem('expenseBudget', budget.toString());
+    safeLocalStorage.setItem('expenseBudget', budget.toString());
     setShowBudgetDialog(false);
     setBudgetInput('');
     toast.success(budget > 0 ? `Monthly budget set to ${formatCurrency(budget)}` : 'Budget limit removed');
@@ -688,7 +683,7 @@ const Expenses = () => {
     const updated = { ...categoryBudgets, [category]: amount };
     if (amount === 0) delete updated[category];
     setCategoryBudgets(updated);
-    localStorage.setItem('categoryBudgets', JSON.stringify(updated));
+    safeLocalStorage.setJSON('categoryBudgets', updated);
   };
 
   const getCategorySpending = (category: string) => {
@@ -718,7 +713,7 @@ const Expenses = () => {
     };
     const updated = [...recurringTemplates, template];
     setRecurringTemplates(updated);
-    localStorage.setItem('recurringTemplates', JSON.stringify(updated));
+    safeLocalStorage.setJSON('recurringTemplates', updated);
     setNewTemplate({ description: '', amount: '', category: 'rent', dueDay: '' });
     toast.success('Template added');
   };
@@ -726,7 +721,7 @@ const Expenses = () => {
   const handleDeleteTemplate = (id: string) => {
     const updated = recurringTemplates.filter(t => t.id !== id);
     setRecurringTemplates(updated);
-    localStorage.setItem('recurringTemplates', JSON.stringify(updated));
+    safeLocalStorage.setJSON('recurringTemplates', updated);
     toast.success('Template removed');
   };
 
@@ -773,7 +768,7 @@ const Expenses = () => {
       t.id === template.id ? { ...t, lastPaidDate: new Date().toISOString().split('T')[0] } : t
     );
     setRecurringTemplates(updatedTemplates);
-    localStorage.setItem('recurringTemplates', JSON.stringify(updatedTemplates));
+    safeLocalStorage.setJSON('recurringTemplates', updatedTemplates);
     
     toast.success(`Added ${template.description}`);
   };
@@ -783,7 +778,7 @@ const Expenses = () => {
       t.id === templateId ? { ...t, lastPaidDate: new Date().toISOString().split('T')[0] } : t
     );
     setRecurringTemplates(updatedTemplates);
-    localStorage.setItem('recurringTemplates', JSON.stringify(updatedTemplates));
+    safeLocalStorage.setJSON('recurringTemplates', updatedTemplates);
     toast.success('Marked as paid');
   };
 
@@ -802,7 +797,7 @@ const Expenses = () => {
       }
     };
     setSavingsGoals(updated);
-    localStorage.setItem('savingsGoals', JSON.stringify(updated));
+    safeLocalStorage.setJSON('savingsGoals', updated);
     setEditingGoalBusiness(null);
     setNewGoal({ targetAmount: '', targetDate: '', description: '' });
     toast.success('Savings goal saved!');
@@ -812,7 +807,7 @@ const Expenses = () => {
     const updated = { ...savingsGoals };
     delete updated[businessId];
     setSavingsGoals(updated);
-    localStorage.setItem('savingsGoals', JSON.stringify(updated));
+    safeLocalStorage.setJSON('savingsGoals', updated);
     toast.success('Goal removed');
   };
 
