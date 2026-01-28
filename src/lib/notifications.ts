@@ -1,6 +1,7 @@
 // Notification utility for adding app-wide notifications with cross-device sync
 import { supabase } from "@/integrations/supabase/client";
 import logger from "@/lib/logger";
+import { safeLocalStorage } from "@/lib/safeStorage";
 
 export type NotificationType = 'reminder' | 'warning' | 'info' | 'success';
 
@@ -33,12 +34,7 @@ const getAudioContext = (): AudioContext => {
 // Play notification sound using Web Audio API
 export const playNotificationSound = () => {
   try {
-    let soundEnabled = true;
-    try {
-      soundEnabled = localStorage.getItem('notification-sound-enabled') !== 'false';
-    } catch {
-      // Use default if localStorage unavailable
-    }
+    const soundEnabled = safeLocalStorage.getItem('notification-sound-enabled') !== 'false';
     if (!soundEnabled) return;
 
     const audioContext = getAudioContext();
@@ -73,12 +69,7 @@ export const playNotificationSound = () => {
 
 // Show browser notification
 export const showBrowserNotification = (title: string, body: string, redirectUrl?: string) => {
-  let browserEnabled = true;
-  try {
-    browserEnabled = localStorage.getItem('notification-browser-enabled') !== 'false';
-  } catch {
-    // Use default if localStorage unavailable
-  }
+  const browserEnabled = safeLocalStorage.getItem('notification-browser-enabled') !== 'false';
   
   if (Notification.permission === "granted" && browserEnabled) {
     const notification = new Notification(title, {
@@ -186,15 +177,10 @@ const addNotificationToLocalStorage = (
     read: false
   };
 
-  try {
-    const existing = localStorage.getItem('app-notifications');
-    const notifications: AppNotification[] = existing ? JSON.parse(existing) : [];
-    const updated = [notification, ...notifications].slice(0, 50);
-    localStorage.setItem('app-notifications', JSON.stringify(updated));
-    window.dispatchEvent(new CustomEvent('notification-added', { detail: notification }));
-  } catch {
-    // Silent fail if localStorage unavailable
-  }
+  const existing = safeLocalStorage.getJSON<AppNotification[]>('app-notifications', []);
+  const updated = [notification, ...existing].slice(0, 50);
+  safeLocalStorage.setJSON('app-notifications', updated);
+  window.dispatchEvent(new CustomEvent('notification-added', { detail: notification }));
 
   if (options?.playSound) {
     playNotificationSound();
@@ -214,12 +200,7 @@ export const getNotifications = async (): Promise<AppNotification[]> => {
     
     if (!user) {
       // Fall back to localStorage for non-authenticated users
-      try {
-        const saved = localStorage.getItem('app-notifications');
-        return saved ? JSON.parse(saved) : [];
-      } catch {
-        return [];
-      }
+      return safeLocalStorage.getJSON<AppNotification[]>('app-notifications', []);
     }
 
     const { data, error } = await supabase
@@ -256,16 +237,12 @@ export const markNotificationRead = async (id: string): Promise<void> => {
     
     if (!user) {
       // Fall back to localStorage
-      try {
-        const notifications = JSON.parse(localStorage.getItem('app-notifications') || '[]');
-        const updated = notifications.map((n: AppNotification) => 
-          n.id === id ? { ...n, read: true } : n
-        );
-        localStorage.setItem('app-notifications', JSON.stringify(updated));
-        window.dispatchEvent(new CustomEvent('notification-added'));
-      } catch {
-        // Silent fail
-      }
+      const notifications = safeLocalStorage.getJSON<AppNotification[]>('app-notifications', []);
+      const updated = notifications.map((n: AppNotification) => 
+        n.id === id ? { ...n, read: true } : n
+      );
+      safeLocalStorage.setJSON('app-notifications', updated);
+      window.dispatchEvent(new CustomEvent('notification-added'));
       return;
     }
 
@@ -291,14 +268,10 @@ export const markAllNotificationsRead = async (): Promise<void> => {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      try {
-        const notifications = JSON.parse(localStorage.getItem('app-notifications') || '[]');
-        const updated = notifications.map((n: AppNotification) => ({ ...n, read: true }));
-        localStorage.setItem('app-notifications', JSON.stringify(updated));
-        window.dispatchEvent(new CustomEvent('notification-added'));
-      } catch {
-        // Silent fail
-      }
+      const notifications = safeLocalStorage.getJSON<AppNotification[]>('app-notifications', []);
+      const updated = notifications.map((n: AppNotification) => ({ ...n, read: true }));
+      safeLocalStorage.setJSON('app-notifications', updated);
+      window.dispatchEvent(new CustomEvent('notification-added'));
       return;
     }
 
@@ -324,14 +297,10 @@ export const deleteNotification = async (id: string): Promise<void> => {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      try {
-        const notifications = JSON.parse(localStorage.getItem('app-notifications') || '[]');
-        const updated = notifications.filter((n: AppNotification) => n.id !== id);
-        localStorage.setItem('app-notifications', JSON.stringify(updated));
-        window.dispatchEvent(new CustomEvent('notification-added'));
-      } catch {
-        // Silent fail
-      }
+      const notifications = safeLocalStorage.getJSON<AppNotification[]>('app-notifications', []);
+      const updated = notifications.filter((n: AppNotification) => n.id !== id);
+      safeLocalStorage.setJSON('app-notifications', updated);
+      window.dispatchEvent(new CustomEvent('notification-added'));
       return;
     }
 
@@ -357,12 +326,8 @@ export const clearAllNotifications = async (): Promise<void> => {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      try {
-        localStorage.removeItem('app-notifications');
-        window.dispatchEvent(new CustomEvent('notification-added'));
-      } catch {
-        // Silent fail
-      }
+      safeLocalStorage.removeItem('app-notifications');
+      window.dispatchEvent(new CustomEvent('notification-added'));
       return;
     }
 
