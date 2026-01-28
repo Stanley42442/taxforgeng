@@ -8,14 +8,33 @@ import "./styles/tablet.css";
 import "./styles/desktop.css";
 
 import { safeLocalStorage, safeSessionStorage } from "./lib/safeStorage";
-import { initGlobalErrorHandlers } from "./lib/errorTracking";
-import { initWebVitals } from "./lib/webVitals";
 
-// Initialize global error handlers for production error tracking
-initGlobalErrorHandlers();
-
-// Initialize Web Vitals monitoring for production performance tracking
-initWebVitals();
+/**
+ * SAFETY: Initialize optional modules with dynamic imports and try-catch
+ * This prevents white page on devices with restricted localStorage access
+ * (private browsing, certain Android browsers, quota exceeded)
+ * 
+ * These modules import supabase/client.ts which uses raw localStorage.
+ * If localStorage is restricted, the import itself crashes.
+ * Dynamic imports isolate these crashes so React can still render.
+ */
+const initializeOptionalModules = async (): Promise<void> => {
+  // Error tracking - nice to have, not critical
+  try {
+    const { initGlobalErrorHandlers } = await import("./lib/errorTracking");
+    initGlobalErrorHandlers();
+  } catch (e) {
+    console.warn('[Init] Error tracking failed to initialize:', e);
+  }
+  
+  // Web vitals monitoring - nice to have, not critical
+  try {
+    const { initWebVitals } = await import("./lib/webVitals");
+    initWebVitals();
+  } catch (e) {
+    console.warn('[Init] Web vitals failed to initialize:', e);
+  }
+};
 
 // Automatic cache busting - uses build timestamp so every deploy triggers cache clear
 const CACHE_VERSION = import.meta.env.VITE_BUILD_TIME || 'dev';
@@ -30,6 +49,10 @@ const MAX_RELOADS = 2;
 
 // Main initialization - blocking to prevent race conditions
 (async () => {
+  // Initialize optional modules first (safe to fail)
+  // These won't block the app from loading even if they crash
+  await initializeOptionalModules();
+  
   const lastVersion = safeLocalStorage.getItem('cache-version');
   const reloadCount = parseInt(safeLocalStorage.getItem(RELOAD_KEY) || '0', 10);
   
