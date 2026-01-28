@@ -4,6 +4,23 @@ All notable changes to this project are documented in this file.
 
 ---
 
+## [2026-01-28] Final Audit Fixes
+
+### Storage Safety
+- Migrated `src/components/InstallPWAPrompt.tsx` to use `safeLocalStorage`
+- Added try-catch wrapper to `src/hooks/useReminderNotifications.ts` for `localStorage` access
+
+### Security Scanner Cleanup
+All scanner findings now properly categorized:
+- `clients_table_public_exposure` - Marked as FALSE POSITIVE (has auth.uid() = user_id)
+- `paystack_subscriptions_table_public_exposure` - Marked as FALSE POSITIVE (has auth.uid() = user_id)
+- `paystack_plans_public_readable` - Marked as INTENTIONAL (pricing display)
+- `SUPA_extension_in_public` - Marked as ACCEPTED RISK (Lovable Cloud managed)
+- `SUPA_rls_policy_always_true` - Marked as INTENTIONAL (login_attempts logging)
+- `react_vulnerabilities` - Marked as NOT EXPLOITABLE (no user iframes)
+
+---
+
 ## Phase 3: Security Hardening & Code Quality ✅ COMPLETE
 
 ### Completed
@@ -29,6 +46,8 @@ Migrated files to use safe wrappers that prevent crashes in private browsing mod
 | `src/pages/Dashboard.tsx` | ✅ Migrated |
 | `src/pages/Team.tsx` | ✅ Migrated |
 | `src/components/WelcomeSplash.tsx` | ✅ Migrated |
+| `src/components/InstallPWAPrompt.tsx` | ✅ Migrated |
+| `src/hooks/useReminderNotifications.ts` | ✅ Migrated |
 | `src/hooks/useRealtimeNotifications.ts` | ✅ Already safe (try-catch) |
 | `src/hooks/useAuth.tsx` | ⚠️ Intentional (Supabase token key) |
 | `src/main.tsx` | ⚠️ Already wrapped in try-catch |
