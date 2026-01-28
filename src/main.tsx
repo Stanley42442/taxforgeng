@@ -10,7 +10,7 @@ import "./styles/desktop.css";
 import { safeLocalStorage, safeSessionStorage } from "./lib/safeStorage";
 
 /**
- * SAFETY: Initialize optional modules with dynamic imports and try-catch
+ * SAFETY: Initialize optional modules with dynamic imports, try-catch, and timeout
  * This prevents white page on devices with restricted localStorage access
  * (private browsing, certain Android browsers, quota exceeded)
  * 
@@ -19,21 +19,29 @@ import { safeLocalStorage, safeSessionStorage } from "./lib/safeStorage";
  * Dynamic imports isolate these crashes so React can still render.
  */
 const initializeOptionalModules = async (): Promise<void> => {
-  // Error tracking - nice to have, not critical
-  try {
-    const { initGlobalErrorHandlers } = await import("./lib/errorTracking");
-    initGlobalErrorHandlers();
-  } catch (e) {
-    console.warn('[Init] Error tracking failed to initialize:', e);
-  }
+  // 3-second timeout - if modules don't load by then, give up
+  const timeout = new Promise<void>((resolve) => setTimeout(resolve, 3000));
   
-  // Web vitals monitoring - nice to have, not critical
-  try {
-    const { initWebVitals } = await import("./lib/webVitals");
-    initWebVitals();
-  } catch (e) {
-    console.warn('[Init] Web vitals failed to initialize:', e);
-  }
+  const init = async () => {
+    // Error tracking - nice to have, not critical
+    try {
+      const { initGlobalErrorHandlers } = await import("./lib/errorTracking");
+      initGlobalErrorHandlers();
+    } catch (e) {
+      console.warn('[Init] Error tracking failed to initialize:', e);
+    }
+    
+    // Web vitals monitoring - nice to have, not critical
+    try {
+      const { initWebVitals } = await import("./lib/webVitals");
+      initWebVitals();
+    } catch (e) {
+      console.warn('[Init] Web vitals failed to initialize:', e);
+    }
+  };
+  
+  // Race: either init completes or timeout wins
+  await Promise.race([init(), timeout]);
 };
 
 // Automatic cache busting - uses build timestamp so every deploy triggers cache clear
@@ -47,59 +55,76 @@ const SESSION_ONLY_KEY = 'taxforge-session-only';
 const RELOAD_KEY = 'cache-reload-count';
 const MAX_RELOADS = 2;
 
-// Main initialization - blocking to prevent race conditions
-(async () => {
-  // Initialize optional modules first (safe to fail)
-  // These won't block the app from loading even if they crash
-  await initializeOptionalModules();
-  
+// In-memory guard to prevent reload loops even if storage fails completely
+let hasAttemptedCacheClear = false;
+
+// Main initialization - render React IMMEDIATELY, don't block on anything
+(() => {
   const lastVersion = safeLocalStorage.getItem('cache-version');
   const reloadCount = parseInt(safeLocalStorage.getItem(RELOAD_KEY) || '0', 10);
   
-  // Only attempt cache clear if version changed AND we haven't exceeded max reloads
-  if (lastVersion !== CACHE_VERSION && 'serviceWorker' in navigator && reloadCount < MAX_RELOADS) {
-    try {
-      // Increment reload counter BEFORE doing anything else
-      safeLocalStorage.setItem(RELOAD_KEY, String(reloadCount + 1));
-      
-      // CRITICAL: Preserve auth token before clearing caches
-      // This prevents users from being logged out on every deploy
-      const authToken = safeLocalStorage.getItem(AUTH_TOKEN_KEY);
-      const sessionOnly = safeSessionStorage.getItem(SESSION_ONLY_KEY);
-      
-      // Unregister all service workers
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(registrations.map(r => r.unregister()));
-      
-      // Clear all caches
-      const cacheNames = await caches.keys();
-      await Promise.all(cacheNames.map(name => caches.delete(name)));
-      
-      // Set version to prevent loop
-      safeLocalStorage.setItem('cache-version', CACHE_VERSION);
-      
-      // CRITICAL: Restore auth token after cache clear
-      if (authToken) {
-        safeLocalStorage.setItem(AUTH_TOKEN_KEY, authToken);
+  // Only attempt cache clear if:
+  // 1. Version changed
+  // 2. Service workers are supported
+  // 3. We haven't exceeded max reloads
+  // 4. We haven't already attempted in this session (in-memory guard)
+  if (!hasAttemptedCacheClear && lastVersion !== CACHE_VERSION && 'serviceWorker' in navigator && reloadCount < MAX_RELOADS) {
+    // Set in-memory flag FIRST - prevents loops even if storage fails
+    hasAttemptedCacheClear = true;
+    
+    // Increment reload counter BEFORE doing anything else
+    safeLocalStorage.setItem(RELOAD_KEY, String(reloadCount + 1));
+    
+    // CRITICAL: Preserve auth token before clearing caches
+    const authToken = safeLocalStorage.getItem(AUTH_TOKEN_KEY);
+    const sessionOnly = safeSessionStorage.getItem(SESSION_ONLY_KEY);
+    
+    // Async cache clear - but don't block React render
+    (async () => {
+      try {
+        // Unregister all service workers
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map(r => r.unregister()));
+        
+        // Clear all caches
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+        
+        // Set version to prevent loop
+        safeLocalStorage.setItem('cache-version', CACHE_VERSION);
+        
+        // CRITICAL: Restore auth token after cache clear
+        if (authToken) {
+          safeLocalStorage.setItem(AUTH_TOKEN_KEY, authToken);
+        }
+        if (sessionOnly) {
+          safeSessionStorage.setItem(SESSION_ONLY_KEY, sessionOnly);
+        }
+        
+        // Reload to get fresh assets
+        window.location.reload();
+      } catch (error) {
+        // PWA cache clear failed - set version anyway to avoid loops
+        safeLocalStorage.setItem('cache-version', CACHE_VERSION);
+        // Reset reload counter on error
+        safeLocalStorage.removeItem(RELOAD_KEY);
+        console.warn('[Init] Cache clear failed:', error);
       }
-      if (sessionOnly) {
-        safeSessionStorage.setItem(SESSION_ONLY_KEY, sessionOnly);
-      }
-      
-      // Reload and exit - don't render React yet
-      window.location.reload();
-      return;
-    } catch (error) {
-      // PWA cache clear failed - set version anyway to avoid loops
-      safeLocalStorage.setItem('cache-version', CACHE_VERSION);
-      // Reset reload counter on error
-      safeLocalStorage.removeItem(RELOAD_KEY);
-    }
+    })();
+    
+    // DON'T return here - render React anyway while cache clears
+    // The reload will happen async, but user sees the app immediately
   } else {
     // Reset reload counter on successful load (no cache clear needed)
     safeLocalStorage.removeItem(RELOAD_KEY);
   }
   
-  // Only render React AFTER cache check is complete
+  // RENDER REACT IMMEDIATELY - don't wait for anything
   createRoot(document.getElementById("root")!).render(<App />);
+  
+  // Fire-and-forget: Initialize optional modules in background
+  // This won't block the app from showing
+  initializeOptionalModules().catch(() => {
+    // Silently fail - these are truly optional
+  });
 })();
