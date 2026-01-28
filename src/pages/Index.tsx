@@ -265,7 +265,7 @@ const Index = () => {
               ))}
             </div>
             <p className="text-sm text-muted-foreground text-center">
-              © 2025 TaxForge NG. For educational purposes.
+              © 2026 TaxForge NG. For educational purposes.
             </p>
           </div>
         </div>

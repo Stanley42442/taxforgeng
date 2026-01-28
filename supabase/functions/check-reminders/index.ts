@@ -243,7 +243,7 @@ function generateEmailHtml(params: {
               </p>
               <hr style="border: none; border-top: 1px solid #e4e4e7; margin: 16px 0;">
               <p style="color: #a1a1aa; font-size: 11px; margin: 0;">
-                © 2025 TaxForge NG. All rights reserved.
+                © ${new Date().getFullYear()} TaxForge NG | Operated by Gillespie Benjamin Mclee
               </p>
             </td>
           </tr>

@@ -108,7 +108,7 @@ serve(async (req) => {
   </div>
   
   <div style="text-align: center; padding: 20px; color: #94a3b8; font-size: 12px;">
-    <p>© 2025 TaxForge NG. All rights reserved.</p>
+    <p>© ${new Date().getFullYear()} TaxForge NG | Operated by Gillespie Benjamin Mclee</p>
     <p>This is a transaction receipt for your records.</p>
   </div>
 </body>

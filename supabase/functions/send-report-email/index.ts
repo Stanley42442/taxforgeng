@@ -166,7 +166,7 @@ const handler = async (req: Request): Promise<Response> => {
                 <tr>
                   <td>
                     <p style="margin: 0; color: #666666; font-size: 12px;">
-                      © ${new Date().getFullYear()} TaxForge Nigeria Limited
+                      © ${new Date().getFullYear()} TaxForge NG | Operated by Gillespie Benjamin Mclee
                     </p>
                     <p style="margin: 5px 0 0 0; color: #999999; font-size: 11px;">
                       This email was sent on behalf of a TaxForge NG user.
