@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { AlertTriangle, Shield, Scale, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
+import { safeLocalStorage } from "@/lib/safeStorage";
 
 interface DisclaimerModalProps {
   onAccept: () => void;
@@ -22,7 +23,7 @@ export const DisclaimerModal = ({ onAccept }: DisclaimerModalProps) => {
 
   const handleAccept = () => {
     if (accepted) {
-      localStorage.setItem('taxforge_disclaimer_accepted', 'true');
+      safeLocalStorage.setItem('taxforge_disclaimer_accepted', 'true');
       setOpen(false);
       onAccept();
     }

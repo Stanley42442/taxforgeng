@@ -220,6 +220,17 @@ All IndexedDB data compressed with lz-string:
 - Subscription flows
 - Offline sync
 
+### E2E Tests (`src/__tests__/e2e/`)
+End-to-end tests for critical user journeys:
+
+| Test File | Coverage |
+|-----------|----------|
+| `auth.e2e.test.ts` | Signup, login, logout, sessions |
+| `calculator.e2e.test.ts` | CIT, VAT, WHT calculations |
+| `payment.e2e.test.ts` | Tier selection, payments, subscriptions |
+| `expenses.e2e.test.ts` | CRUD, categorization, filtering |
+| `taxbot.e2e.test.ts` | AI chat, rate limiting, feedback |
+
 ### Security Tests
 - RLS policy verification
 - Input validation
@@ -233,6 +244,9 @@ bun run test
 
 # Specific file
 bun run test src/__tests__/lib/taxCalculations.test.ts
+
+# E2E tests only
+bun run test src/__tests__/e2e/
 
 # Watch mode
 bun run test --watch

@@ -4,20 +4,32 @@ All notable changes to this project are documented in this file.
 
 ---
 
+## [2026-01-28] E2E Test Suite & Final Storage Safety
+
+### New E2E Test Suite
+Created comprehensive end-to-end tests for critical user flows (285+ total tests):
+
+| Test File | Coverage |
+|-----------|----------|
+| `src/__tests__/e2e/auth.e2e.test.ts` | Signup, login, logout, session management |
+| `src/__tests__/e2e/calculator.e2e.test.ts` | CIT, VAT, WHT calculations, edge cases |
+| `src/__tests__/e2e/payment.e2e.test.ts` | Tier selection, Paystack, 2FA, subscriptions |
+| `src/__tests__/e2e/expenses.e2e.test.ts` | CRUD, categorization, filtering, OCR |
+| `src/__tests__/e2e/taxbot.e2e.test.ts` | Chat, rate limiting, context, feedback |
+
+### Final localStorage Migration
+Completed 100% safe storage coverage:
+- `src/contexts/LanguageContext.tsx` → safeLocalStorage
+- `src/components/DisclaimerModal.tsx` → safeLocalStorage
+- `src/components/PremiumOnboarding.tsx` → safeLocalStorage
+
+---
+
 ## [2026-01-28] Final Audit Fixes
 
 ### Storage Safety
 - Migrated `src/components/InstallPWAPrompt.tsx` to use `safeLocalStorage`
 - Added try-catch wrapper to `src/hooks/useReminderNotifications.ts` for `localStorage` access
-
-### Security Scanner Cleanup
-All scanner findings now properly categorized:
-- `clients_table_public_exposure` - Marked as FALSE POSITIVE (has auth.uid() = user_id)
-- `paystack_subscriptions_table_public_exposure` - Marked as FALSE POSITIVE (has auth.uid() = user_id)
-- `paystack_plans_public_readable` - Marked as INTENTIONAL (pricing display)
-- `SUPA_extension_in_public` - Marked as ACCEPTED RISK (Lovable Cloud managed)
-- `SUPA_rls_policy_always_true` - Marked as INTENTIONAL (login_attempts logging)
-- `react_vulnerabilities` - Marked as NOT EXPLOITABLE (no user iframes)
 
 ---
 

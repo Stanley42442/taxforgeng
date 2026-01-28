@@ -17,6 +17,7 @@ import {
   Shield,
   TrendingUp,
 } from "lucide-react";
+import { safeLocalStorage } from "@/lib/safeStorage";
 
 interface PremiumOnboardingProps {
   onComplete: () => void;
@@ -91,7 +92,7 @@ export const PremiumOnboarding = ({ onComplete }: PremiumOnboardingProps) => {
   };
 
   const handleComplete = () => {
-    localStorage.setItem('taxforge_welcome_shown', 'true');
+    safeLocalStorage.setItem('taxforge_welcome_shown', 'true');
     setOpen(false);
     onComplete();
   };
