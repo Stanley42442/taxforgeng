@@ -1,138 +1,144 @@
 
 
-# PWA Final Fixes & Enhancements Plan
+# Safe Storage Migration - Complete Code Consistency Plan
 
-## Current Status
+## Overview
 
-The PWA Professional Standards plan has been **95% completed**. The core fixes (auth token preservation, manifest enhancements, iOS support, update checking) are all implemented correctly.
+This plan migrates all remaining raw `localStorage` and `sessionStorage` calls to use the `safeLocalStorage` and `safeSessionStorage` wrappers for 100% code consistency across the codebase.
 
-However, I found **5 remaining unsafe storage calls** that should be fixed for complete reliability in private browsing mode.
-
----
-
-## Issues to Fix
-
-### Issue 1: Unsafe sessionStorage in Auth.tsx
-
-**Location**: `src/pages/Auth.tsx` - Lines 235, 237, 263, 265, 619, 621, 655, 657
-
-**Problem**: Raw `sessionStorage.setItem()` and `sessionStorage.removeItem()` calls without try-catch protection.
-
-**Fix**: Replace with `safeSessionStorage.setItem()` and `safeSessionStorage.removeItem()` from the existing safe storage wrapper.
-
-```typescript
-// Before
-sessionStorage.setItem('taxforge-session-only', 'true');
-sessionStorage.removeItem('taxforge-session-only');
-
-// After  
-safeSessionStorage.setItem('taxforge-session-only', 'true');
-safeSessionStorage.removeItem('taxforge-session-only');
-```
-
-### Issue 2: Unsafe sessionStorage in Transactions.tsx
-
-**Location**: `src/pages/Transactions.tsx` - Line 88
-
-**Problem**: Raw `sessionStorage.setItem()` call for imported transactions.
-
-**Fix**: Wrap with try-catch or use safeSessionStorage.
-
-```typescript
-// Before
-sessionStorage.setItem('imported_transactions', JSON.stringify({...}));
-
-// After
-safeSessionStorage.setJSON('imported_transactions', {...});
-```
-
----
-
-## Additional Enhancements
-
-### Enhancement 1: Add Narrow Screenshot for Mobile Install
-
-**File**: `public/manifest.json`
-
-Add a mobile-optimized screenshot for better install UX:
-
-```json
-"screenshots": [
-  {
-    "src": "/og-image.png",
-    "sizes": "1200x630",
-    "type": "image/png",
-    "form_factor": "wide",
-    "label": "TaxForge NG Dashboard"
-  },
-  {
-    "src": "/icon-512.png",
-    "sizes": "512x512",
-    "type": "image/png",
-    "form_factor": "narrow",
-    "label": "TaxForge NG App Icon"
-  }
-]
-```
-
-### Enhancement 2: Add Related Applications
-
-**File**: `public/manifest.json`
-
-Add prefer_related_applications flag for native app promotion (future-proofing):
-
-```json
-"prefer_related_applications": false,
-"related_applications": []
-```
-
-### Enhancement 3: Network Information API Support
-
-**File**: `src/components/OfflineBanner.tsx`
-
-Enhance to show connection quality (slow 2G, 3G, 4G, etc.):
-
-```typescript
-// Show "Slow connection" warning when on 2G/slow-2g
-const connection = (navigator as any).connection;
-const isSlowConnection = connection?.effectiveType === '2g' || 
-                         connection?.effectiveType === 'slow-2g';
-```
+While most of these calls are already protected by try-catch blocks, using the unified wrapper ensures:
+- Consistent error handling patterns
+- Cleaner, more readable code
+- Future-proof against any missed edge cases
 
 ---
 
 ## Files to Modify
 
-| File | Changes |
-|------|---------|
-| `src/pages/Auth.tsx` | Replace 8 `sessionStorage` calls with `safeSessionStorage` |
-| `src/pages/Transactions.tsx` | Replace 1 `sessionStorage.setItem` with safe wrapper |
-| `public/manifest.json` | Add narrow screenshot, related_applications |
-| `src/components/OfflineBanner.tsx` | Add slow connection warning (optional) |
-| `docs/CHANGELOG.md` | Document final PWA fixes |
+### 1. src/pages/Team.tsx (3 occurrences)
+
+| Line | Current Code | Replacement |
+|------|-------------|-------------|
+| 34 | `localStorage.getItem('taxforge_ng_team')` | `safeLocalStorage.getItem('taxforge_ng_team')` |
+| 50 | `localStorage.setItem('taxforge_ng_team', ...)` | `safeLocalStorage.setItem('taxforge_ng_team', ...)` |
+| 61 | `localStorage.setItem('taxforge_ng_team', ...)` | `safeLocalStorage.setItem('taxforge_ng_team', ...)` |
+
+**Changes:**
+- Add import: `import { safeLocalStorage } from "@/lib/safeStorage";`
+- Replace all 3 localStorage calls with safeLocalStorage equivalents
+- Remove surrounding try-catch blocks (now handled by wrapper)
 
 ---
 
-## Implementation Priority
+### 2. src/pages/Dashboard.tsx (6 occurrences)
 
-1. **High Priority**: Fix unsafe sessionStorage calls (prevents crashes in private browsing)
-2. **Medium Priority**: Add narrow screenshot (improves mobile install experience)
-3. **Low Priority**: Network quality indicator (nice-to-have UX improvement)
+| Line | Current Code | Replacement |
+|------|-------------|-------------|
+| 108 | `localStorage.getItem('dashboard_summary_expanded')` | `safeLocalStorage.getItem('dashboard_summary_expanded')` |
+| 116 | `localStorage.getItem('dashboard_date_range')` | `safeLocalStorage.getItem('dashboard_date_range')` |
+| 124 | `localStorage.setItem('dashboard_date_range', ...)` | `safeLocalStorage.setItem('dashboard_date_range', ...)` |
+| 128 | `localStorage.setItem('dashboard_summary_expanded', ...)` | `safeLocalStorage.setItem('dashboard_summary_expanded', ...)` |
+| 147-149 | `localStorage.getItem('taxforge_disclaimer_accepted')` | `safeLocalStorage.getItem('taxforge_disclaimer_accepted')` |
+| 405 | `localStorage.getItem('taxforge_welcome_shown')` | `safeLocalStorage.getItem('taxforge_welcome_shown')` |
+
+**Changes:**
+- Add import: `import { safeLocalStorage } from "@/lib/safeStorage";`
+- Replace all 6 localStorage calls with safeLocalStorage equivalents
+- Simplify try-catch blocks to direct calls
 
 ---
 
-## Security Notes
+### 3. src/pages/Notifications.tsx (4 occurrences)
 
-The Supabase linter warnings are already documented and acceptable:
-- **Extension in public schema**: Managed by Supabase, cannot be moved
-- **Permissive RLS policy**: Already documented in `docs/SECURITY.md` as intentional for specific tables (login_attempts, document_verifications, sector_presets, user_reviews)
+| Line | Current Code | Replacement |
+|------|-------------|-------------|
+| 82-84 | `localStorage.getItem('notification-sound-enabled')` | `safeLocalStorage.getItem('notification-sound-enabled')` |
+| 110 | `localStorage.setItem('notification-sound-enabled', ...)` | `safeLocalStorage.setItem('notification-sound-enabled', ...)` |
+| 121 | `localStorage.setItem('notification-browser-enabled', ...)` | `safeLocalStorage.setItem('notification-browser-enabled', ...)` |
+
+**Changes:**
+- Add import: `import { safeLocalStorage } from "@/lib/safeStorage";`
+- Replace all localStorage calls with safeLocalStorage equivalents
+- Remove try-catch wrappers
 
 ---
 
-## Expected Outcome After Implementation
+### 4. src/pages/Settings.tsx (1 occurrence)
 
-- 100% safe storage coverage (no crashes in private browsing)
-- Better mobile install experience with narrow screenshot
-- Complete PWA professional standards compliance
-- Improved offline UX with connection quality indicators
+| Line | Current Code | Replacement |
+|------|-------------|-------------|
+| 546 | `localStorage.removeItem('cache-version')` | `safeLocalStorage.removeItem('cache-version')` |
+
+**Changes:**
+- Add import: `import { safeLocalStorage } from "@/lib/safeStorage";`
+- Replace the localStorage call with safeLocalStorage
+
+---
+
+### 5. src/hooks/useReminderNotifications.ts (1 occurrence)
+
+| Line | Current Code | Replacement |
+|------|-------------|-------------|
+| 34 | `localStorage.getItem('notification-sound-enabled')` | `safeLocalStorage.getItem('notification-sound-enabled')` |
+
+**Changes:**
+- Add import: `import { safeLocalStorage } from "@/lib/safeStorage";`
+- Replace localStorage call with safeLocalStorage
+- Remove try-catch wrapper (now handled by safeLocalStorage)
+
+---
+
+## Summary Table
+
+| File | Raw Calls | Safe Wrapper Import |
+|------|-----------|---------------------|
+| Team.tsx | 3 | Add safeLocalStorage |
+| Dashboard.tsx | 6 | Add safeLocalStorage |
+| Notifications.tsx | 4 | Add safeLocalStorage |
+| Settings.tsx | 1 | Add safeLocalStorage |
+| useReminderNotifications.ts | 1 | Add safeLocalStorage |
+| **Total** | **15** | |
+
+---
+
+## Technical Details
+
+### Before (Example from Team.tsx)
+
+```typescript
+const [members, setMembers] = useState<TeamMember[]>(() => {
+  try {
+    const saved = localStorage.getItem('taxforge_ng_team');
+    return saved ? JSON.parse(saved) : MOCK_MEMBERS;
+  } catch {
+    return MOCK_MEMBERS;
+  }
+});
+```
+
+### After (Cleaner with safeLocalStorage)
+
+```typescript
+import { safeLocalStorage } from "@/lib/safeStorage";
+
+const [members, setMembers] = useState<TeamMember[]>(() => {
+  return safeLocalStorage.getJSON('taxforge_ng_team', MOCK_MEMBERS);
+});
+```
+
+---
+
+## Benefits
+
+1. **Code Consistency**: All storage access uses the same pattern
+2. **Cleaner Code**: Remove redundant try-catch blocks
+3. **DRY Principle**: Error handling is centralized in the wrapper
+4. **Maintainability**: Easier to audit and update storage patterns
+5. **Documentation Compliance**: Aligns with CODE_STANDARDS.md requirements
+
+---
+
+## Documentation Update
+
+Update `docs/CHANGELOG.md` to document the complete safe storage migration.
 
