@@ -54,6 +54,7 @@ import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
+import { BusinessCard } from "@/components/businesses/BusinessCard";
 
 const SavedBusinesses = () => {
   const navigate = useNavigate();
@@ -308,58 +309,13 @@ const SavedBusinesses = () => {
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {sortedBusinesses.map((business, index) => (
-                <SharedElement key={business.id} id={`business-card-${business.id}`}>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    whileHover={{ y: -4 }}
-                  >
-                    <Card 
-                      className={`shadow-card glass-frosted card-interactive h-full ${
-                        business.verificationStatus === 'verified' ? 'border-success/30 glow-sm' : ''
-                      }`}
-                    >
-                      <CardContent className="p-5">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center gap-3">
-                            <SharedElement id={`business-icon-${business.id}`}>
-                              <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${
-                                business.entityType === 'company' ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'
-                              }`}>
-                                {business.entityType === 'company' ? <Building2 className="h-5 w-5" /> : <Briefcase className="h-5 w-5" />}
-                              </div>
-                            </SharedElement>
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-2">
-                                <SharedElement id={`business-name-${business.id}`}>
-                                  <h3 className="font-semibold text-foreground truncate">{business.name}</h3>
-                                </SharedElement>
-                                {business.verificationStatus === 'verified' && (
-                                  <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
-                                )}
-                              </div>
-                              <p className="text-xs text-muted-foreground">
-                                {business.entityType === 'company' ? 'Limited Company' : 'Business Name'}
-                                {business.rcBnNumber && ` • ${business.rcBnNumber}`}
-                              </p>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="icon" onClick={() => deleteWithUndo.requestDelete(business)}>
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </div>
-                        <div className="text-sm text-muted-foreground mb-3">
-                          Turnover: <span className="font-medium text-foreground">{formatCurrency(business.turnover)}</span>
-                        </div>
-                        <Button variant="outline" size="sm" className="w-full" onClick={() => handleVerify(business)}>
-                          <Shield className="h-4 w-4" />
-                          {business.verificationStatus === 'verified' ? 'View Verification' : 'Verify CAC'}
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                </SharedElement>
+                <BusinessCard
+                  key={business.id}
+                  business={business}
+                  index={index}
+                  onVerify={handleVerify}
+                  onDelete={deleteWithUndo.requestDelete}
+                />
               ))}
             </div>
           )}
