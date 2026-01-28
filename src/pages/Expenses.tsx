@@ -1819,7 +1819,7 @@ const Expenses = () => {
           </div>
           <DialogFooter className="gap-2">
             {monthlyBudget > 0 && (
-              <Button variant="outline" onClick={() => { setMonthlyBudget(0); localStorage.removeItem('expenseBudget'); setShowBudgetDialog(false); toast.success('Budget removed'); }}>
+              <Button variant="outline" onClick={() => { setMonthlyBudget(0); safeLocalStorage.removeItem('expenseBudget'); setShowBudgetDialog(false); toast.success('Budget removed'); }}>
                 Remove
               </Button>
             )}

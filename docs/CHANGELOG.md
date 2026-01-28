@@ -6,6 +6,7 @@
 Migrated ALL remaining raw `localStorage` calls to use the `safeLocalStorage` wrapper. **Zero raw storage calls remain in codebase.**
 
 **Files Updated (Final Batch):**
+- `src/pages/Expenses.tsx` - 1 occurrence (budget removal button)
 - `src/hooks/useRealtimeNotifications.ts` - 2 occurrences (notification preferences)
 - `src/lib/notifications.ts` - 12 occurrences (sound settings, notification fallback storage)
 
@@ -16,7 +17,7 @@ Migrated ALL remaining raw `localStorage` calls to use the `safeLocalStorage` wr
 - `src/pages/Settings.tsx` - 1 occurrence
 - `src/hooks/useReminderNotifications.ts` - 1 occurrence
 
-**Total Migrated:** 29 raw localStorage calls → safeLocalStorage
+**Total Migrated:** 30 raw localStorage calls → safeLocalStorage
 
 **Benefits:**
 - Centralized error handling for storage access
