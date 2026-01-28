@@ -8,6 +8,7 @@ import {
   showBrowserNotification
 } from "@/lib/notifications";
 import { logger } from "@/lib/logger";
+import { safeLocalStorage } from "@/lib/safeStorage";
 
 interface RealtimeConfig {
   enableToasts?: boolean;
@@ -28,21 +29,13 @@ export const useRealtimeNotifications = (config: RealtimeConfig = {}) => {
 
   // Get preferences from localStorage (with safe access)
   const getSoundEnabled = useCallback(() => {
-    try {
-      const saved = localStorage.getItem('notification-sound-enabled');
-      return saved !== null ? saved === 'true' : true;
-    } catch {
-      return true;
-    }
+    const saved = safeLocalStorage.getItem('notification-sound-enabled');
+    return saved !== null ? saved === 'true' : true;
   }, []);
 
   const getBrowserEnabled = useCallback(() => {
-    try {
-      const saved = localStorage.getItem('notification-browser-enabled');
-      return saved !== null ? saved === 'true' : true;
-    } catch {
-      return true;
-    }
+    const saved = safeLocalStorage.getItem('notification-browser-enabled');
+    return saved !== null ? saved === 'true' : true;
   }, []);
 
   // Use ref to generate stable unique channel IDs
