@@ -1,167 +1,150 @@
 
-# TaxForge NG Individual Operator Rebranding Plan
-
-## ✅ IMPLEMENTATION COMPLETE
+# TaxForge NG Extended Rebranding Plan
 
 ## Overview
 
-This plan updates all PDF exports and related code to reflect TaxForge NG as an individual-operated project by **Gillespie Benjamin Mclee**, removing any references to a registered Limited Liability Company (TIN, RC numbers, corporate addresses) while preserving the premium gold/green branding, layout, and professional feel.
+This plan addresses **additional rebranding items** discovered after the initial PDF export rebranding was completed. These items span the main website pages, email templates (Edge Functions), and legal policies.
 
 ---
 
-## Branding Update Summary
+## Summary of Remaining Items
 
-| Element | Old Value | New Value |
-|---------|-----------|-----------|
-| Company Name | TaxForge Nigeria Limited | TaxForge NG |
-| Operator | (none) | Gillespie Benjamin Mclee (OptiSolve Labs) |
-| Short Operator | (none) | Gillespie Benjamin Mclee |
-| TIN | 12345678-0001 | *Removed* |
-| RC Number | RC 1234567 | *Removed* |
-| Address | 123 Tax Avenue, Victoria Island, Lagos | *Removed* |
-| Location (disclaimers) | (none) | Port Harcourt, Rivers State, Nigeria |
-| Email | support@taxforgeng.com | support@taxforgeng.com *(unchanged)* |
+| Category | Files Affected | Issue |
+|----------|----------------|-------|
+| Legal/Privacy Policy | `src/pages/Terms.tsx` | "Data Controller: TaxForge Nigeria Limited" |
+| Email Templates | 4 Edge Functions | "© TaxForge Nigeria Limited" and "The TaxForge NG Team" |
+| Copyright Footers | 9 files | © 2025 should be © 2026 for consistency |
+| Demo/Placeholder Data | `src/pages/EFiling.tsx` | Hardcoded TIN "12345678-0001" and RC "RC1234567" as demo data |
 
 ---
 
 ## Files to Modify
 
-### 1. Core Export Configuration
-**File: `src/lib/exportShared.ts`**
+### 1. Terms & Privacy Policy Page
+**File: `src/pages/Terms.tsx`**
 
-Update the central `COMPANY_INFO` constant:
+**Current (line 308):**
+```tsx
+<p><strong>Data Controller:</strong> TaxForge Nigeria Limited</p>
+```
 
+**New:**
+```tsx
+<p><strong>Data Controller:</strong> TaxForge NG (Operated by Gillespie Benjamin Mclee)</p>
+```
+
+This change reflects individual operation for NDPA compliance without implying a registered company.
+
+---
+
+### 2. Email Template - Report Sharing
+**File: `supabase/functions/send-report-email/index.ts`**
+
+**Current (line 169):**
 ```typescript
-export const COMPANY_INFO = {
-  name: 'TaxForge NG',
-  shortName: 'TaxForge NG',
-  logoText: 'TF',
-  operator: 'Gillespie Benjamin Mclee (OptiSolve Labs)',
-  operatorShort: 'Gillespie Benjamin Mclee',
-  location: 'Port Harcourt, Rivers State, Nigeria',
-  email: 'support@taxforgeng.com',
-  website: 'www.taxforgeng.com',
-  liveUrl: 'https://taxforgeng.lovable.app',
-} as const;
+© ${new Date().getFullYear()} TaxForge Nigeria Limited
 ```
 
-Add a new standard disclaimer constant:
-
+**New:**
 ```typescript
-export const STANDARD_DISCLAIMER = 
-  'TaxForge NG is an educational and planning tool operated by Gillespie Benjamin Mclee as an individual project. ' +
-  'All calculations are estimates based on user inputs and publicly available tax rules. ' +
-  'Not official tax advice, filing, or legal service. Please consult a certified tax professional for official compliance. ' +
-  'Operated in Port Harcourt, Rivers State, Nigeria.';
+© ${new Date().getFullYear()} TaxForge NG | Operated by Gillespie Benjamin Mclee
 ```
 
-Update `addPDFFooter` function copyright line:
+---
+
+### 3. Email Template - Welcome Email
+**File: `supabase/functions/send-welcome-email/index.ts`**
+
+Update footer (line 141, 153):
 ```typescript
-`© ${year} ${COMPANY_INFO.shortName} | Operated by ${COMPANY_INFO.operatorShort} | ${COMPANY_INFO.email} | Educational tool only`
+// Change "The TaxForge NG Team" to something more appropriate for individual:
+<strong>Gillespie Benjamin Mclee</strong><br>
+<span style="font-size: 14px;">Founder, TaxForge NG</span>
+
+// Footer update:
+© ${new Date().getFullYear()} TaxForge NG | Operated by Gillespie Benjamin Mclee | Educational tool only
 ```
 
 ---
 
-### 2. Payment Invoice PDF
-**File: `src/lib/invoicePdfExport.ts`**
+### 4. Email Template - Trial Reminders
+**Files:**
+- `supabase/functions/send-trial-expiry-reminder/index.ts`
+- `supabase/functions/send-trial-final-reminder/index.ts`
 
-Update FROM section:
-- Display "TaxForge NG" as header
-- Display "Operated by Gillespie Benjamin Mclee (OptiSolve Labs)" below
-- Display email address
-- Remove TIN line completely
-- Remove address line completely
-- Add strengthened disclaimer to notes section
-
----
-
-### 3. Payment Invoice Hook
-**File: `src/hooks/usePaymentInvoice.ts`**
-
-Update invoice data:
+Update sign-off and footer in both:
 ```typescript
-businessName: 'TaxForge NG',
-businessOperator: 'Gillespie Benjamin Mclee (OptiSolve Labs)',
-businessEmail: 'support@taxforgeng.com',
-// Remove: businessAddress, businessTIN
+// Sign-off change from "The TaxForge NG Team":
+<strong>Gillespie Benjamin Mclee</strong><br>
+Founder, TaxForge NG
+
+// Footer update:
+© ${new Date().getFullYear()} TaxForge NG | Operated by Gillespie Benjamin Mclee | Educational tool only
 ```
 
 ---
 
-### 4. Company Tax Report PDF
-**File: `src/lib/pdfExport.ts`**
+### 5. Email Template - Win-back Email
+**File: `supabase/functions/send-winback-email/index.ts`**
 
-Update entity type display to show individual-friendly labels:
-```typescript
-const entityLabel = result.entityType === 'Limited Liability Company' 
-  ? 'Individual / Sole Proprietorship (for planning purposes)'
-  : result.entityType;
+Same updates as above for sign-off and footer.
+
+---
+
+### 6. Copyright Year Updates (2025 → 2026)
+These files should update copyright to 2026 for consistency:
+
+| File | Line | Current | New |
+|------|------|---------|-----|
+| `src/pages/Index.tsx` | 268 | © 2025 TaxForge NG | © 2026 TaxForge NG |
+| `src/pages/Pricing.tsx` | 601 | © 2025 TaxForge NG | © 2026 TaxForge NG |
+| `src/contexts/LanguageContext.tsx` | 1977 | © 2025 TaxForge NG | © 2026 TaxForge NG |
+
+**Note:** Edge Function email templates use `new Date().getFullYear()` which is correct (dynamic).
+
+---
+
+### 7. Demo Data Clarification
+**File: `src/pages/EFiling.tsx` (lines 198-203)**
+
+The TIN `12345678-0001` and RC `RC1234567` shown here are **demo/placeholder data** for the user's own business preview - these are NOT TaxForge's identifiers. **No change needed** as this is clearly in a "Business Information" section showing the user's selected business details.
+
+Similarly, `src/components/EmployeeDatabase.tsx` uses `12345678-0001` as a placeholder hint - this is acceptable as it's a format example for users.
+
+---
+
+## Items to Keep Unchanged
+
+These items are **correctly branded** and require no changes:
+
+| Item | Reason |
+|------|--------|
+| `index.html` meta tags | Uses "TaxForge NG" - correct |
+| `public/manifest.json` | Uses "TaxForge NG" - correct |
+| SEO keywords "limited liability company Nigeria" | Refers to user's business type, not TaxForge |
+| `LanguageContext.tsx` advisory translations | Refers to user's business structure options, not TaxForge |
+| "The TaxForge NG Team" → convert to individual | Address in emails |
+
+---
+
+## Standard Branding to Apply
+
+### Email Sign-off (replaces "The TaxForge NG Team"):
+```html
+<strong>Gillespie Benjamin Mclee</strong><br>
+Founder, TaxForge NG
 ```
 
-Update footer to use `STANDARD_DISCLAIMER`.
-
----
-
-### 5. Individual Tax Report PDF
-**File: `src/lib/individualPdfExport.ts`**
-
-Update footer disclaimer to use `STANDARD_DISCLAIMER`.
-
----
-
-### 6. Business Report PDF
-**File: `src/lib/businessReportPdf.ts`**
-
-Update footer text:
-```typescript
-'© ' + year + ' TaxForge NG | Operated by Gillespie Benjamin Mclee | support@taxforgeng.com | Educational tool only'
+### Email Footer (all transactional emails):
+```html
+© {year} TaxForge NG | Operated by Gillespie Benjamin Mclee | Educational tool only
 ```
 
----
-
-### 7. Project Documentation PDF
-**File: `src/lib/documentationPdf.ts`**
-
-- Keep "TaxForge NG" title on cover page
-- Keep live stats box unchanged
-- Keep QR code unchanged
-- Update contact section via shared COMPANY_INFO
-- Add standard disclaimer to document
-
----
-
-### 8. Tax Logic Reference Document PDF
-**File: `src/lib/taxLogicDocumentPdf.ts`**
-
-Update footer and add standard disclaimer (uses shared COMPANY_INFO).
-
----
-
-## Standard Elements for All PDFs
-
-### Copyright Line (Footer):
+### Legal/Privacy Data Controller:
 ```
-© 2026 TaxForge NG | Operated by Gillespie Benjamin Mclee | support@taxforgeng.com | Educational tool only
+TaxForge NG (Operated by Gillespie Benjamin Mclee)
+Email: privacy@taxforgeng.com
 ```
-
-### Strengthened Disclaimer:
-> "TaxForge NG is an educational and planning tool operated by Gillespie Benjamin Mclee as an individual project. All calculations are estimates based on user inputs and publicly available tax rules. Not official tax advice, filing, or legal service. Please consult a certified tax professional for official compliance. Operated in Port Harcourt, Rivers State, Nigeria."
-
----
-
-## Elements to Keep Unchanged
-
-- "TF" logo icon and "TaxForge NG" title
-- All gold (#D4AF37) and green (#008751) branding
-- All tables, charts, layouts, fonts, spacing
-- QR codes linking to live site
-- Live statistics boxes (users, businesses, calculations, AI queries)
-- All calculation logic and numbers
-- Page numbers
-- All icons and visual elements
-- "Rules: 2026 (New)" / "Pre-2026" toggle
-- PAYMENT CONFIRMED badges on invoices
-- All totals, breakdowns, and financial displays
 
 ---
 
@@ -169,32 +152,38 @@ Update footer and add standard disclaimer (uses shared COMPANY_INFO).
 
 | File | Changes |
 |------|---------|
-| `src/lib/exportShared.ts` | Update COMPANY_INFO, add STANDARD_DISCLAIMER, update addPDFFooter |
-| `src/lib/invoicePdfExport.ts` | Update FROM section, remove TIN/address, add disclaimer |
-| `src/hooks/usePaymentInvoice.ts` | Remove businessTIN, businessAddress |
-| `src/lib/pdfExport.ts` | Update entityType label, use new disclaimer |
-| `src/lib/individualPdfExport.ts` | Use new disclaimer |
-| `src/lib/businessReportPdf.ts` | Update footer with new branding |
-| `src/lib/documentationPdf.ts` | Add disclaimer (uses shared COMPANY_INFO) |
-| `src/lib/taxLogicDocumentPdf.ts` | Add disclaimer (uses shared COMPANY_INFO) |
+| `src/pages/Terms.tsx` | Update Data Controller from "TaxForge Nigeria Limited" |
+| `supabase/functions/send-report-email/index.ts` | Update footer from "TaxForge Nigeria Limited" |
+| `supabase/functions/send-welcome-email/index.ts` | Update sign-off and footer |
+| `supabase/functions/send-trial-expiry-reminder/index.ts` | Update sign-off and footer |
+| `supabase/functions/send-trial-final-reminder/index.ts` | Update sign-off and footer |
+| `supabase/functions/send-winback-email/index.ts` | Update sign-off and footer |
+| `src/pages/Index.tsx` | Update © 2025 → © 2026 |
+| `src/pages/Pricing.tsx` | Update © 2025 → © 2026 |
+| `src/contexts/LanguageContext.tsx` | Update © 2025 → © 2026 (all 5 language variants) |
 
 ---
 
 ## Technical Notes
 
-1. **Centralized Changes**: Most changes flow from `exportShared.ts`, ensuring consistency across all PDFs
+1. **Edge Functions**: After updating email templates, they will be auto-deployed. All email recipients will see the updated branding immediately.
 
-2. **Legal Protection**: The strengthened disclaimer clearly establishes:
-   - Individual operation by Gillespie Benjamin Mclee (not a company)
-   - Educational/planning purpose only
-   - Not official tax advice
-   - Requirement to consult professionals
-   - Operating location (Port Harcourt, Rivers State)
+2. **Privacy Compliance**: The Data Controller field in Terms.tsx must identify who controls user data. "Operated by Gillespie Benjamin Mclee" satisfies NDPA requirements for individual operators.
 
-3. **No Breaking Changes**: Removing fields from interfaces; existing functionality preserved
+3. **Copyright Year**: Using 2026 matches the current date and the PDF exports. All customer-facing copyright notices will be consistent.
 
-4. **PDF Size**: Minimal impact from longer disclaimer text (few bytes)
+4. **Email Warmth**: Changing from "The TaxForge NG Team" to personal sign-off ("Gillespie Benjamin Mclee, Founder") can actually increase trust and connection with users - many successful SaaS products use founder-signed emails.
 
-5. **Print-Friendly**: Disclaimers at 7-8pt font to maintain readability
+---
 
-6. **Future-Proof**: When you register an LLC, simply update `COMPANY_INFO` in one file to restore corporate branding
+## Verification Checklist
+
+After implementation, verify:
+- [ ] Terms page shows individual operator
+- [ ] Welcome email shows personal sign-off
+- [ ] Trial reminder emails updated
+- [ ] Report sharing emails updated
+- [ ] Win-back emails updated
+- [ ] Homepage footer shows © 2026
+- [ ] Pricing page shows © 2026
+- [ ] All language variants updated
