@@ -1,111 +1,145 @@
-# TaxForge NG Individual Operator Rebranding - COMPLETED ✅
 
-## Status: FULLY IMPLEMENTED
 
-Both phases of rebranding have been completed:
-- **Phase 1**: PDF exports and core branding (completed earlier)
-- **Phase 2**: Website, email templates, and legal pages (completed now)
+# Additional Rebranding Fixes Required
 
----
+## Summary
 
-## Summary of All Changes Made
-
-### Phase 1: PDF Exports (Previously Completed)
-| File | Changes |
-|------|---------|
-| `src/lib/exportShared.ts` | Updated COMPANY_INFO, added STANDARD_DISCLAIMER |
-| `src/lib/invoicePdfExport.ts` | Updated FROM section, removed TIN/address |
-| `src/hooks/usePaymentInvoice.ts` | Removed businessTIN, businessAddress |
-| `src/lib/pdfExport.ts` | Updated entityType label, new disclaimer |
-| `src/lib/individualPdfExport.ts` | New disclaimer |
-| `src/lib/businessReportPdf.ts` | Updated footer with new branding |
-| `src/lib/documentationPdf.ts` | Added disclaimer |
-| `src/lib/taxLogicDocumentPdf.ts` | Added disclaimer |
-
-### Phase 2: Website & Email Templates (Now Completed)
-| File | Changes |
-|------|---------|
-| `src/pages/Terms.tsx` | Data Controller → "TaxForge NG (Operated by Gillespie Benjamin Mclee)" |
-| `src/pages/Index.tsx` | © 2025 → © 2026 |
-| `src/pages/Pricing.tsx` | © 2025 → © 2026 |
-| `src/contexts/LanguageContext.tsx` | © 2025 → © 2026 (all 5 language variants) |
-| `supabase/functions/send-report-email/index.ts` | "TaxForge Nigeria Limited" → individual branding |
-| `supabase/functions/send-welcome-email/index.ts` | Personal sign-off + updated footer |
-| `supabase/functions/send-trial-expiry-reminder/index.ts` | Personal sign-off + updated footer |
-| `supabase/functions/send-trial-final-reminder/index.ts` | Personal sign-off + updated footer |
-| `supabase/functions/send-winback-email/index.ts` | Personal sign-off + updated footer |
-| `supabase/functions/send-payment-confirmation/index.ts` | Dynamic year + individual branding |
-| `supabase/functions/check-reminders/index.ts` | Dynamic year + individual branding |
+My comprehensive audit using 15+ search patterns and browser testing revealed **6 more edge functions** that still need rebranding updates. The main application UI and PDF exports are correctly branded, but some email templates still use outdated branding.
 
 ---
 
-## Final Branding Applied
+## Items Verified Working ✅
 
-### Copyright Line:
-```
-© 2026 TaxForge NG | Operated by Gillespie Benjamin Mclee | Educational tool only
-```
+| Item | Status |
+|------|--------|
+| Terms Page Data Controller | "TaxForge NG (Operated by Gillespie Benjamin Mclee)" ✓ |
+| Homepage Footer | "© 2026 TaxForge NG. For educational purposes." ✓ |
+| PDF Exports | Using correct `COMPANY_INFO` from `exportShared.ts` ✓ |
+| Welcome Email | Personal sign-off + updated footer ✓ |
+| Trial Reminders | Updated ✓ |
+| Win-back Email | Updated ✓ |
+| Payment Confirmation | Updated ✓ |
+| Report Email | Updated ✓ |
 
-### Email Sign-off:
+---
+
+## Additional Updates Required
+
+### 1. send-2fa-code (Line 74)
+**File:** `supabase/functions/send-2fa-code/index.ts`
+
+**Current:**
 ```html
-<strong>Gillespie Benjamin Mclee</strong><br>
-<span style="font-size: 14px;">Founder, TaxForge NG</span>
+<p>© ${new Date().getFullYear()} TaxForge NG. All rights reserved.</p>
 ```
 
-### Data Controller (Privacy Policy):
-```
-TaxForge NG (Operated by Gillespie Benjamin Mclee)
-```
-
-### Standard Disclaimer (PDFs):
-```
-TaxForge NG is an educational and planning tool operated by Gillespie Benjamin Mclee as an individual project. 
-All calculations are estimates based on user inputs and publicly available tax rules. 
-Not official tax advice, filing, or legal service. Please consult a certified tax professional for official compliance. 
-Operated in Port Harcourt, Rivers State, Nigeria.
+**Updated:**
+```html
+<p>© ${new Date().getFullYear()} TaxForge NG | Operated by Gillespie Benjamin Mclee | Educational tool only</p>
 ```
 
 ---
 
-## Verification Checklist ✅
+### 2. send-tier-change-email (Lines 98, 142)
+**File:** `supabase/functions/send-tier-change-email/index.ts`
 
-- [x] Terms page shows individual operator
-- [x] Welcome email shows personal sign-off
-- [x] Trial reminder emails updated  
-- [x] Report sharing emails updated
-- [x] Win-back emails updated
-- [x] Payment confirmation emails updated
-- [x] Check reminders emails updated
-- [x] Homepage footer shows © 2026
-- [x] Pricing page shows © 2026
-- [x] All language variants updated (en, pcm, yo, ha, ig)
-- [x] All PDF exports use new branding
-- [x] All invoices show individual operator
+Same footer updates as above (appears twice - upgrade and downgrade templates).
 
 ---
 
-## Items Kept Unchanged (Correctly Branded)
+### 3. send-reminder-email (Multiple Issues)
+**File:** `supabase/functions/send-reminder-email/index.ts`
+
+**Issues:**
+- Line 33: `from: "TaxNaija"` → `from: "TaxForge NG"`
+- Line 79: URL `taxnaija.lovable.app` → `taxforgeng.lovable.app`
+- Line 85: Text `TaxNaija` → `TaxForge NG`
+
+This is legacy branding from before the rename.
+
+---
+
+### 4. send-scheduled-reports (Multiple Issues)
+**File:** `supabase/functions/send-scheduled-reports/index.ts`
+
+**Issues:**
+- Line 145: `from: "TaxForge"` → `from: "TaxForge NG"`
+- Line 215: URL `taxnaija.lovable.app` → `taxforgeng.lovable.app`
+- Line 223: Text reference
+- Line 225: URL `taxnaija.lovable.app` → `taxforgeng.lovable.app`
+
+---
+
+### 5. send-backup-code-alert (Optional Enhancement)
+**File:** `supabase/functions/send-backup-code-alert/index.ts`
+
+**Current (Line 73):**
+```html
+This is an automated security notification from TaxForge NG.
+```
+
+**Enhancement (optional but recommended):**
+Add footer with operator info for consistency.
+
+---
+
+### 6. send-security-alert (Optional Enhancement)
+**File:** `supabase/functions/send-security-alert/index.ts`
+
+**Current (Line 549):**
+```html
+This is an automated security notification from TaxForge NG.
+```
+
+**Enhancement (optional but recommended):**
+Add footer with operator info for consistency.
+
+---
+
+## Unchanged Items (Verified Correct)
 
 | Item | Reason |
 |------|--------|
-| `index.html` meta tags | Uses "TaxForge NG" - correct |
-| `public/manifest.json` | Uses "TaxForge NG" - correct |
-| Demo TIN/RC in EFiling.tsx | User's business preview data, not TaxForge |
-| Placeholder TIN hints | Format examples for users |
+| Demo TIN `12345678-0001` in EFiling.tsx | User's business placeholder |
+| Demo RC `RC1234567` in EFiling.tsx | User's business placeholder |
+| "Victoria Island" in PersonalExpenses.tsx | Example expense location |
+| "Limited Liability Company" references | User's entity type options |
+| "Corporate" tier | Subscription tier name |
 
 ---
 
-## Future Updates
+## Email Test Result
 
-When/if you register as a Limited Liability Company, update `src/lib/exportShared.ts` COMPANY_INFO to restore corporate branding:
+The welcome email test to `benjamingillespie001@gmail.com` failed due to Resend domain verification requirements:
 
-```typescript
-export const COMPANY_INFO = {
-  name: 'TaxForge Nigeria Limited',
-  shortName: 'TaxForge NG',
-  tin: 'XXXX-XXXX', // Your actual TIN
-  rcNumber: 'RC XXXXXXX', // Your actual RC
-  address: 'Your registered address',
-  // ... etc
-} as const;
 ```
+"You can only send testing emails to your own email address (optisolvelabs@gmail.com)"
+```
+
+**Action Required:** Verify a domain at resend.com/domains to send emails to external recipients.
+
+---
+
+## Files to Modify
+
+| File | Change Type |
+|------|-------------|
+| `supabase/functions/send-2fa-code/index.ts` | Update footer |
+| `supabase/functions/send-tier-change-email/index.ts` | Update footer (2 places) |
+| `supabase/functions/send-reminder-email/index.ts` | Fix TaxNaija → TaxForge NG |
+| `supabase/functions/send-scheduled-reports/index.ts` | Fix TaxNaija URLs and naming |
+| `supabase/functions/send-backup-code-alert/index.ts` | Optional: Add operator footer |
+| `supabase/functions/send-security-alert/index.ts` | Optional: Add operator footer |
+
+---
+
+## Technical Notes
+
+1. **Edge Functions Will Auto-Deploy:** After updating, the edge functions will be deployed automatically.
+
+2. **Resend Domain Setup:** To test emails externally, verify a domain at resend.com/domains and update the `from` addresses.
+
+3. **No Breaking Changes:** All changes are cosmetic text updates with no functional impact.
+
+4. **PDF Testing:** Browser navigation to the Calculator page was blocked by a loading issue. Once the app builds correctly, PDF generation can be tested from the Calculator or Invoice pages.
+
