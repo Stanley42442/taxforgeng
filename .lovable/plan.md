@@ -1,213 +1,184 @@
 
-# Performance Optimization Plan: React.memo + Virtual Scrolling
 
-## Status: ✅ COMPLETED
+# PWA Professional Standards & Session Persistence Fix Plan
 
-Implementation completed on 2026-01-28. All memoized components and virtual scrolling wrappers have been created and integrated.
+## Issues Identified
+
+### 1. CRITICAL: Session Persistence Problem in PWA
+
+**Root Cause Found**: The cache-busting mechanism in `src/main.tsx` uses **direct `localStorage` access without try-catch**, and more importantly, on **every new build**, it:
+1. Clears all service worker caches
+2. Clears all browser caches
+3. Triggers a hard reload
+
+**Problem**: When a new version is deployed, the auth token (`sb-uhuxqrrtsiintcwpxxwy-auth-token`) may not survive the cache clearing process on some browsers/PWA contexts. The `localStorage.getItem('cache-version')` call also uses raw localStorage which can fail in private browsing.
+
+**Additionally**: The `beforeunload` handler in `useAuth.tsx` removes the auth token for "Remember Me = false" users, but this doesn't work reliably in PWA standalone mode since PWAs don't fire `beforeunload` consistently when the app is suspended/closed.
+
+### 2. PWA Manifest Missing Professional Features
+
+The current manifest lacks:
+
+| Feature | Current Status | Professional Standard |
+|---------|---------------|----------------------|
+| Screenshots | Missing | Required for app store listings |
+| Shortcuts | Missing | Quick actions from home screen |
+| Scope | Missing | Defines PWA boundary |
+| Share Target | Missing | Allows sharing to app |
+| Additional Icons | Only 192/512 | Need 48, 96, 128, 256, 384 sizes |
+| Splash Screen Config | Missing | iOS launch images |
+| handle_links | Missing | Link handling preference |
+
+### 3. Auth Page Using Unsafe localStorage
+
+`src/pages/Auth.tsx` still uses raw `localStorage` in 4 places:
+- Lines 42, 63: `localStorage.getItem()` for rememberMe and termsAccepted
+- Lines 172, 315: `localStorage.setItem()` for saving preferences
+
+### 4. main.tsx Using Unsafe localStorage
+
+`src/main.tsx` uses raw `localStorage` without try-catch on lines 14, 31, 36, which can crash in private browsing mode.
 
 ---
 
-## Overview
+## Implementation Plan
 
-This plan implements both **React.memo** for component memoization and **@tanstack/react-virtual** for virtual scrolling to ensure the app performs smoothly with thousands of users and large datasets.
+### Phase 1: Fix Critical Auth Persistence Issue
 
----
+**File: `src/main.tsx`**
 
-## Why These Optimizations Matter
+1. Use `safeLocalStorage` for all localStorage calls
+2. **CRITICALLY**: Preserve auth token during cache clearing by:
+   - Reading the auth token before clearing
+   - Restoring it after cache clear
+   - This prevents logout on every deploy
 
-### Current State
-| Component | List Type | Items per Page | Re-render Risk |
-|-----------|-----------|----------------|----------------|
-| Expenses.tsx | Expense cards | Unlimited | HIGH - every state change re-renders all items |
-| PersonalExpenses.tsx | Expense cards | Unlimited | MEDIUM - uses framer-motion animations |
-| EmployeeDatabase.tsx | Table rows | Unlimited | HIGH - no memoization |
-| SavedBusinesses.tsx | Business cards | Limited by tier | LOW - typically <20 items |
-
-### After Optimization
-- Lists with 1000+ items will render only ~20 visible items
-- Individual list items won't re-render unless their specific data changes
-- Scroll performance will be smooth even on mobile devices
-
----
-
-## Technical Approach
-
-### 1. Install @tanstack/react-virtual
-
-```bash
-npm install @tanstack/react-virtual
-```
-
-This library provides:
-- Efficient virtual scrolling with only visible items rendered
-- Dynamic row height support
-- Smooth scrolling experience
-- Small bundle size (~5KB)
-
-### 2. Create Memoized List Item Components
-
-Extract inline list items into dedicated memoized components:
-
-**ExpenseListItem** (new file):
 ```typescript
-import React, { memo } from 'react';
+// Before clearing, preserve auth
+const authToken = localStorage.getItem('sb-uhuxqrrtsiintcwpxxwy-auth-token');
 
-interface ExpenseListItemProps {
-  expense: Expense;
-  isExpanded: boolean;
-  businessName?: string;
-  onExpand: (id: string | null) => void;
-  onDelete: (id: string) => void;
+// ... clear caches ...
+
+// Restore auth token after cache clear
+if (authToken) {
+  localStorage.setItem('sb-uhuxqrrtsiintcwpxxwy-auth-token', authToken);
 }
-
-export const ExpenseListItem = memo(({ 
-  expense, 
-  isExpanded, 
-  businessName,
-  onExpand,
-  onDelete 
-}: ExpenseListItemProps) => {
-  // Existing expense card JSX
-}, (prevProps, nextProps) => {
-  // Custom comparison - only re-render if relevant props changed
-  return prevProps.expense.id === nextProps.expense.id &&
-         prevProps.isExpanded === nextProps.isExpanded &&
-         prevProps.expense.amount === nextProps.expense.amount &&
-         prevProps.expense.description === nextProps.expense.description;
-});
 ```
 
-**EmployeeTableRow** (new file):
+**File: `src/pages/Auth.tsx`**
+
+1. Import and use `safeLocalStorage` for all localStorage operations
+2. Change all `localStorage.getItem()` to `safeLocalStorage.getItem()`
+3. Change all `localStorage.setItem()` to `safeLocalStorage.setItem()`
+
+**File: `src/hooks/useAuth.tsx`**
+
+1. Use `safeLocalStorage.removeItem()` instead of direct `localStorage.removeItem()`
+2. Use `safeSessionStorage.getItem()` for session-only check
+
+### Phase 2: Enhance PWA Manifest to Professional Standards
+
+**File: `public/manifest.json`**
+
+Add missing professional features:
+
+```json
+{
+  "name": "TaxForge NG",
+  "short_name": "TaxForge",
+  "description": "Smart tax advice for Nigerian businesses. Calculate CIT, PIT, VAT and get business structure recommendations.",
+  "start_url": "/",
+  "scope": "/",
+  "id": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#0a0a0b",
+  "theme_color": "#16a34a",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Calculate Tax",
+      "short_name": "Calculator",
+      "description": "Open the tax calculator",
+      "url": "/calculator",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "My Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your dashboard",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Expenses",
+      "short_name": "Expenses",
+      "description": "Manage business expenses",
+      "url": "/expenses",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "TaxForge NG Dashboard"
+    }
+  ],
+  "categories": ["finance", "business", "productivity"],
+  "lang": "en-NG",
+  "dir": "ltr",
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
+}
+```
+
+**File: `vite.config.ts`**
+
+Update VitePWA manifest config to match the enhanced manifest.
+
+### Phase 3: Improve PWA Offline Handling
+
+**File: `src/components/PWAUpdatePrompt.tsx`**
+
+Add periodic update checking (every 60 minutes) to ensure users get updates:
+
 ```typescript
-import React, { memo } from 'react';
+useEffect(() => {
+  // Check for updates periodically
+  const intervalId = setInterval(() => {
+    if (navigator.serviceWorker?.controller) {
+      navigator.serviceWorker.controller.postMessage({ type: 'CHECK_UPDATE' });
+    }
+  }, 60 * 60 * 1000); // Every hour
 
-export const EmployeeTableRow = memo(({ 
-  employee, 
-  onEdit, 
-  onUpdateSalary, 
-  onDelete 
-}: EmployeeTableRowProps) => {
-  // Existing table row JSX
-});
+  return () => clearInterval(intervalId);
+}, []);
 ```
 
-**PersonalExpenseCard** (new file):
-```typescript
-import React, { memo } from 'react';
+### Phase 4: Add iOS-Specific PWA Enhancements
 
-export const PersonalExpenseCard = memo(({ 
-  expense, 
-  category, 
-  annualAmount,
-  onEdit,
-  onDelete,
-  device,
-  isMobile
-}: PersonalExpenseCardProps) => {
-  // Existing card JSX
-});
+**File: `index.html`**
+
+Add iOS-specific meta tags for better PWA experience:
+
+```html
+<!-- iOS PWA Enhancements -->
+<meta name="apple-mobile-web-app-title" content="TaxForge">
+<link rel="apple-touch-startup-image" href="/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
 ```
-
-**BusinessCard** (new file):
-```typescript
-import React, { memo } from 'react';
-
-export const BusinessCard = memo(({ 
-  business, 
-  onVerify, 
-  onDelete 
-}: BusinessCardProps) => {
-  // Existing business card JSX
-});
-```
-
-### 3. Implement Virtual Scrolling for Large Lists
-
-**Virtual Expense List Pattern**:
-```typescript
-import { useVirtualizer } from '@tanstack/react-virtual';
-
-const VirtualExpenseList = ({ expenses, ... }) => {
-  const parentRef = useRef<HTMLDivElement>(null);
-  
-  const virtualizer = useVirtualizer({
-    count: expenses.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 100, // Estimated row height
-    overscan: 5, // Render 5 extra items above/below viewport
-  });
-
-  return (
-    <div ref={parentRef} className="h-[600px] overflow-auto">
-      <div style={{ height: virtualizer.getTotalSize() }}>
-        {virtualizer.getVirtualItems().map((virtualRow) => {
-          const expense = expenses[virtualRow.index];
-          return (
-            <div
-              key={expense.id}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                transform: `translateY(${virtualRow.start}px)`,
-              }}
-            >
-              <ExpenseListItem expense={expense} ... />
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-```
-
-**Virtual Employee Table Pattern**:
-```typescript
-const VirtualEmployeeTable = ({ employees, ... }) => {
-  const parentRef = useRef<HTMLDivElement>(null);
-  
-  const virtualizer = useVirtualizer({
-    count: employees.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 60, // Table row height
-    overscan: 10,
-  });
-
-  return (
-    <Table>
-      <TableHeader>...</TableHeader>
-      <TableBody>
-        <div ref={parentRef} className="h-[500px] overflow-auto">
-          <div style={{ height: virtualizer.getTotalSize() }}>
-            {virtualizer.getVirtualItems().map((virtualRow) => (
-              <EmployeeTableRow 
-                key={employees[virtualRow.index].id}
-                employee={employees[virtualRow.index]}
-                style={{ transform: `translateY(${virtualRow.start}px)` }}
-              />
-            ))}
-          </div>
-        </div>
-      </TableBody>
-    </Table>
-  );
-};
-```
-
----
-
-## Files to Create
-
-| File | Purpose |
-|------|---------|
-| `src/components/expenses/ExpenseListItem.tsx` | Memoized expense card component |
-| `src/components/expenses/VirtualExpenseList.tsx` | Virtual scrolling wrapper for expenses |
-| `src/components/employees/EmployeeTableRow.tsx` | Memoized employee table row |
-| `src/components/employees/VirtualEmployeeTable.tsx` | Virtual scrolling for employee table |
-| `src/components/expenses/PersonalExpenseCard.tsx` | Memoized personal expense card |
-| `src/components/businesses/BusinessCard.tsx` | Memoized business card component |
 
 ---
 
@@ -215,106 +186,91 @@ const VirtualEmployeeTable = ({ employees, ... }) => {
 
 | File | Changes |
 |------|---------|
-| `src/pages/Expenses.tsx` | Replace inline list with VirtualExpenseList, use ExpenseListItem |
-| `src/pages/PersonalExpenses.tsx` | Use PersonalExpenseCard, add virtualization for large lists |
-| `src/components/EmployeeDatabase.tsx` | Replace table body with VirtualEmployeeTable |
-| `src/pages/SavedBusinesses.tsx` | Use memoized BusinessCard (no virtualization needed - small lists) |
-| `package.json` | Add @tanstack/react-virtual dependency |
-| `docs/CHANGELOG.md` | Document performance optimizations |
-| `docs/ARCHITECTURE.md` | Add performance patterns section |
+| `src/main.tsx` | Use safeLocalStorage, preserve auth token during cache clear |
+| `src/pages/Auth.tsx` | Migrate 4 localStorage calls to safeLocalStorage |
+| `src/hooks/useAuth.tsx` | Use safe storage wrappers |
+| `public/manifest.json` | Add shortcuts, screenshots, scope, launch_handler |
+| `vite.config.ts` | Sync manifest config with enhanced manifest.json |
+| `index.html` | Add iOS-specific PWA meta tags |
+| `src/components/PWAUpdatePrompt.tsx` | Add periodic update checking |
+| `docs/CHANGELOG.md` | Document PWA improvements |
 
 ---
 
-## Implementation Strategy
+## Technical Details
 
-### Phase 1: Create Memoized Components (Extract & Wrap)
+### Auth Token Preservation During Cache Bust
 
-1. Create `ExpenseListItem.tsx` - extract expense card from Expenses.tsx
-2. Create `PersonalExpenseCard.tsx` - extract from PersonalExpenses.tsx  
-3. Create `EmployeeTableRow.tsx` - extract from EmployeeDatabase.tsx
-4. Create `BusinessCard.tsx` - extract from SavedBusinesses.tsx
-
-### Phase 2: Implement Virtual Scrolling
-
-5. Install @tanstack/react-virtual
-6. Create `VirtualExpenseList.tsx` for Expenses.tsx
-7. Create `VirtualEmployeeTable.tsx` for EmployeeDatabase.tsx
-8. Conditionally apply virtualization (only when list > 50 items)
-
-### Phase 3: Integration & Testing
-
-9. Update parent components to use new virtualized lists
-10. Add fallback to regular rendering for small lists
-11. Test on mobile devices for smooth scrolling
-12. Update documentation
-
----
-
-## Conditional Virtualization
-
-To avoid complexity for small lists, we'll apply virtualization conditionally:
+The key fix is in `src/main.tsx`:
 
 ```typescript
-const ExpensesList = ({ expenses, ... }) => {
-  // Use virtual scrolling only for large lists
-  if (expenses.length > 50) {
-    return <VirtualExpenseList expenses={expenses} ... />;
-  }
+import { safeLocalStorage, safeSessionStorage } from "./lib/safeStorage";
+
+const CACHE_VERSION = import.meta.env.VITE_BUILD_TIME || 'dev';
+
+(async () => {
+  const lastVersion = safeLocalStorage.getItem('cache-version');
   
-  // Regular rendering for small lists (keeps animations)
-  return (
-    <div className="space-y-3">
-      {expenses.map(expense => (
-        <ExpenseListItem key={expense.id} expense={expense} ... />
-      ))}
-    </div>
-  );
-};
+  if (lastVersion !== CACHE_VERSION && 'serviceWorker' in navigator) {
+    try {
+      // CRITICAL: Preserve auth token before clearing
+      const authToken = safeLocalStorage.getItem('sb-uhuxqrrtsiintcwpxxwy-auth-token');
+      const sessionOnly = safeSessionStorage.getItem('taxforge-session-only');
+      
+      // Unregister service workers
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map(r => r.unregister()));
+      
+      // Clear caches
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map(name => caches.delete(name)));
+      
+      // Set version
+      safeLocalStorage.setItem('cache-version', CACHE_VERSION);
+      
+      // CRITICAL: Restore auth token after clearing
+      if (authToken) {
+        safeLocalStorage.setItem('sb-uhuxqrrtsiintcwpxxwy-auth-token', authToken);
+      }
+      if (sessionOnly) {
+        safeSessionStorage.setItem('taxforge-session-only', sessionOnly);
+      }
+      
+      window.location.reload();
+      return;
+    } catch (error) {
+      safeLocalStorage.setItem('cache-version', CACHE_VERSION);
+    }
+  }
+})();
 ```
 
----
+### PWA Shortcuts
 
-## Performance Impact
+Adding shortcuts allows users to:
+- Long-press the app icon on mobile
+- Right-click the app icon on desktop
+- Access common features directly
 
-| Metric | Before | After |
-|--------|--------|-------|
-| Render 1000 expenses | ~800ms | ~50ms |
-| Memory usage (1000 items) | ~15MB | ~2MB |
-| Scroll FPS | ~30 FPS | ~60 FPS |
-| Re-render on filter change | All items | Visible items only |
+### Why Updates Affect Auth
 
----
-
-## Technical Considerations
-
-### Preserved Functionality
-- All existing animations via framer-motion (for small lists)
-- Expandable card behavior
-- Search and filter functionality
-- Delete with undo
-- Touch-friendly mobile interactions
-
-### Trade-offs
-- Framer-motion exit animations won't work with virtual lists (acceptable for large datasets)
-- Slightly more complex code structure
-- Small bundle size increase (~5KB for react-virtual)
-
-### Browser Support
-- Works in all modern browsers
-- Graceful fallback for older browsers (regular list rendering)
+Every deploy generates a new `VITE_BUILD_TIME`, triggering the cache-bust logic. Without preserving the auth token, users are logged out on every update (which can happen multiple times daily).
 
 ---
 
 ## Summary
 
-**New Dependencies**: @tanstack/react-virtual
+**What this plan fixes:**
 
-**New Files**: 6 component files for memoized items and virtual lists
+1. **Critical Auth Persistence**: Users will stay logged in across app updates
+2. **Safe Storage**: All localStorage access will be protected with try-catch
+3. **Professional PWA**: Shortcuts, screenshots, and proper scope for app store quality
+4. **iOS Compatibility**: Enhanced meta tags for better iOS PWA experience
+5. **Reliable Updates**: Periodic update checking for consistent experience
 
-**Modified Files**: 6 existing files updated to use new patterns
+**After implementation:**
+- Users remain logged in when the app updates
+- PWA meets professional app store standards
+- Better iOS PWA experience
+- More resilient to storage restrictions
 
-**Expected Outcome**: 
-- Smooth 60 FPS scrolling with 1000+ items
-- Reduced memory usage by 80%+ for large lists
-- Minimal re-renders through React.memo
-- Better user experience at scale
