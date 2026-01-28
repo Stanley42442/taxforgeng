@@ -1,6 +1,6 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import type { Json } from '@/integrations/supabase/types';
 import { getDeviceInfo } from '@/lib/deviceFingerprint';
 import { notifyIPBlocked, notifyTimeRestricted } from '@/lib/notifications';

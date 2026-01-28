@@ -9,7 +9,7 @@
  */
 
 import { onCLS, onLCP, onINP, onFCP, onTTFB, type Metric } from 'web-vitals';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import logger from '@/lib/logger';
 
 interface WebVitalReport {

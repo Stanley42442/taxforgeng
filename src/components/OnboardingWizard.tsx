@@ -28,7 +28,7 @@ import {
   DialogContent,
 } from '@/components/ui/dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { NIGERIAN_STATES, EMPLOYMENT_STATUSES, ENTITY_TYPES } from '@/lib/nigerianStates';

@@ -9,7 +9,7 @@ import {
   PendingAction,
   SyncConflict,
 } from '@/lib/offlineStorage';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import { useEffect } from 'react';
 import { useOfflineStatus } from './useOfflineStatus';
 import logger from '@/lib/logger';
