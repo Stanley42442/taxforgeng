@@ -1,204 +1,135 @@
 
-# Complete Rebranding Documentation & Audit Results
 
-## Executive Summary
+# Fix: White Page Issue
 
-The comprehensive rebranding audit using 20+ search patterns confirms:
-- **Zero legacy branding issues remain** - No "TaxNaija", "TaxForge Nigeria Limited", "The TaxForge NG Team", or © 2025 references
-- **All 14 email-sending Edge Functions** now use consistent individual operator branding
-- **All PDF exports** use centralized `COMPANY_INFO` from `exportShared.ts`
-- **3 test emails sent successfully** to `optisolvelabs@gmail.com`
+## Problem Identified
 
----
+The white page is caused by a **race condition** in the cache-busting logic in `src/main.tsx`. The current code has these issues:
 
-## Documentation File to Create
+1. **Non-blocking async function**: The cache-busting runs as an immediately-invoked async function (IIFE), but React rendering happens simultaneously outside this function
+2. **Potential reload loops**: If localStorage access fails or the cache version comparison doesn't work correctly, it can cause:
+   - The page to reload before React mounts
+   - Multiple reloads in quick succession
+   - React and the reload fighting each other
+3. **No visual feedback**: During cache clearing/reload, users see a completely blank white page
 
-**File:** `docs/BRANDING.md`
-
-This comprehensive document will include:
-
-### 1. Current Branding Configuration
-
-| Element | Current Value | Location |
-|---------|---------------|----------|
-| Company Name | TaxForge NG | `src/lib/exportShared.ts:88` |
-| Operator (Full) | Gillespie Benjamin Mclee (OptiSolve Labs) | `src/lib/exportShared.ts:91` |
-| Operator (Short) | Gillespie Benjamin Mclee | `src/lib/exportShared.ts:92` |
-| Location | Port Harcourt, Rivers State, Nigeria | `src/lib/exportShared.ts:93` |
-| Email | support@taxforgeng.com | `src/lib/exportShared.ts:94` |
-| Website | www.taxforgeng.com | `src/lib/exportShared.ts:95` |
-| Live URL | https://taxforgeng.lovable.app | `src/lib/exportShared.ts:96` |
-
-### 2. Standard Branding Elements
-
-**Copyright Line (all exports and emails):**
-```
-© {year} TaxForge NG | Operated by Gillespie Benjamin Mclee | Educational tool only
-```
-
-**Standard Disclaimer (PDFs):**
-```
-TaxForge NG is an educational and planning tool operated by Gillespie Benjamin Mclee 
-as an individual project. All calculations are estimates based on user inputs and 
-publicly available tax rules. Not official tax advice, filing, or legal service. 
-Please consult a certified tax professional for official compliance. Operated in 
-Port Harcourt, Rivers State, Nigeria.
-```
-
-**Email Sign-off:**
-```html
-<strong>Gillespie Benjamin Mclee</strong><br>
-<span style="font-size: 14px; color: #6b7280;">Founder, TaxForge NG</span>
-```
-
-### 3. Files Containing Branding
-
-#### Core Configuration (Update First When Rebranding)
-| File | Elements |
-|------|----------|
-| `src/lib/exportShared.ts` | COMPANY_INFO constant, STANDARD_DISCLAIMER |
-| `src/hooks/usePaymentInvoice.ts` | businessOperator, businessEmail |
-| `src/pages/Terms.tsx` | Data Controller |
-
-#### Frontend Pages (13 files)
-| File | Branding Elements |
-|------|-------------------|
-| `src/pages/Index.tsx` | Copyright footer |
-| `src/pages/Pricing.tsx` | Copyright footer, contact email |
-| `src/pages/Terms.tsx` | Data Controller, DPO email |
-| `src/pages/CancelSubscription.tsx` | Support email |
-| `src/components/NavMenu.tsx` | Brand name in navigation |
-| `src/components/EmbeddableCalculator.tsx` | "Powered by" link |
-| `src/components/FeedbackForm.tsx` | Brand references |
-| `src/components/ErrorBoundary.tsx` | Support email |
-| `src/contexts/LanguageContext.tsx` | 5 language variants of copyright |
-
-#### PDF Export Files (6 files)
-| File | Uses |
-|------|------|
-| `src/lib/exportShared.ts` | COMPANY_INFO, STANDARD_DISCLAIMER |
-| `src/lib/pdfExport.ts` | Company tax reports |
-| `src/lib/individualPdfExport.ts` | Individual tax reports |
-| `src/lib/businessReportPdf.ts` | Business summaries |
-| `src/lib/documentationPdf.ts` | Documentation exports |
-| `src/lib/taxLogicDocumentPdf.ts` | Tax logic reference |
-| `src/lib/invoicePdfExport.ts` | Payment invoices |
-
-#### Edge Functions (14 email-sending functions)
-| Function | Email Type |
-|----------|------------|
-| `send-welcome-email` | New user welcome |
-| `send-trial-expiry-reminder` | Trial ending (2 days) |
-| `send-trial-final-reminder` | Trial ending (same day) |
-| `send-winback-email` | Re-engagement |
-| `send-tier-change-email` | Upgrade/downgrade confirmation |
-| `send-payment-confirmation` | Payment receipts |
-| `send-reminder-email` | Tax deadline reminders |
-| `send-scheduled-reports` | Scheduled financial summaries |
-| `send-report-email` | Shared reports |
-| `send-2fa-code` | 2FA verification codes |
-| `send-backup-code-alert` | Backup codes running low |
-| `send-security-alert` | Security notifications |
-| `check-reminders` | Automated reminder emails |
-| `send-whatsapp-notification` | WhatsApp messages |
-
-### 4. Future Business Registration Guide
-
-When registering as a Limited Liability Company, update these files:
-
-**Step 1: Update Core Constants** (`src/lib/exportShared.ts`)
+**Current problematic code:**
 ```typescript
-export const COMPANY_INFO = {
-  name: 'TaxForge NG',  // Keep or update
-  shortName: 'TaxForge NG',
-  logoText: 'TF',
-  operator: 'TaxForge Nigeria Limited',  // ← Update
-  operatorShort: 'TaxForge Nigeria Ltd',  // ← Update
-  tin: 'NEW-TIN-NUMBER',  // ← Add back
-  rcNumber: 'RC-NEW-NUMBER',  // ← Add back
-  address: 'New registered address',  // ← Add back
-  location: 'Lagos, Nigeria',  // ← Update if needed
-  email: 'support@taxforgeng.com',
-  website: 'www.taxforgeng.com',
-  liveUrl: 'https://taxforgeng.lovable.app',
-} as const;
-```
+(async () => {
+  const lastVersion = safeLocalStorage.getItem('cache-version');
+  if (lastVersion !== CACHE_VERSION && 'serviceWorker' in navigator) {
+    // ... cache clearing ...
+    window.location.reload();
+    return;  // Only exits IIFE, not the module
+  }
+})();  // Runs async, non-blocking
 
-**Step 2: Update Invoice Export** (`src/lib/invoicePdfExport.ts`)
-- Add TIN and address lines back to FROM section
-- Update operator name
-
-**Step 3: Update Payment Invoice Hook** (`src/hooks/usePaymentInvoice.ts`)
-- Add businessTIN field
-- Add businessAddress field
-
-**Step 4: Update Terms Page** (`src/pages/Terms.tsx`)
-- Change Data Controller to "TaxForge Nigeria Limited"
-
-**Step 5: Bulk Update Edge Functions**
-- Search for "Operated by Gillespie Benjamin Mclee"
-- Replace with "© {year} TaxForge Nigeria Limited"
-- Update email sign-offs from personal to team
-
-### 5. Email Test Results
-
-| Email Type | Status | Email ID |
-|------------|--------|----------|
-| Welcome Email | ✅ Sent | 84ce9608-523a-4785-8ce7-3bee737c2c1a |
-| Tier Change | ✅ Sent | b711a8ba-7ccc-4020-a18a-af8c45be5744 |
-| Reminder | ✅ Sent | 18e3581c-7921-49e8-8bf4-5f24257faec8 |
-
-### 6. Items Verified as Correct (Not Rebranding Issues)
-
-| Item | Location | Reason |
-|------|----------|--------|
-| RC1234567 | EFiling.tsx, AuditLog.tsx | User's demo business data |
-| 12345678-0001 | EmployeeDatabase.tsx | TIN format placeholder hint |
-| Victoria Island | PersonalExpenses.tsx | Example expense location |
-| Limited Liability Company | Multiple | User's entity type option |
-| Corporate tier | Subscription system | Tier name, not company |
-
-### 7. Resend Domain Configuration
-
-**Current Status:** Using `onboarding@resend.dev` (Resend's shared domain)
-**Limitation:** Cannot send to external emails without domain verification
-
-**To Enable External Emails:**
-1. Go to https://resend.com/domains
-2. Add and verify taxforgeng.com
-3. Update `from` addresses in Edge Functions:
-   - `"TaxForge NG <noreply@taxforgeng.com>"`
-   - `"TaxForge Security <security@taxforgeng.com>"`
-
----
-
-## Audit Verification Commands Used
-
-```bash
-# Legacy patterns (all returned 0 results)
-TaxNaija
-TaxForge Nigeria
-Nigeria Limited
-taxnaija\.lovable
-The TaxForge.*Team
-All rights reserved
-© 2025
-123 Tax Avenue
-
-# Current branding (verified correct)
-Gillespie Benjamin  # 120+ matches across 17 files
-Operated by         # 119 matches across 19 files
-Educational tool    # 85 matches across 15 files
-TaxForge NG         # 614 matches across 45 files
+createRoot(document.getElementById("root")!).render(<App />);  // Always runs immediately
 ```
 
 ---
 
-## Implementation Summary
+## Solution
 
-This documentation file will serve as the single source of truth for:
-1. Where branding elements exist in the codebase
-2. What values to update when registering the business
-3. Testing verification that rebranding was complete
-4. Quick reference for future branding consistency checks
+### 1. Make Cache Busting Blocking
+
+Move the React render inside the async function so it only runs after cache-busting completes:
+
+```typescript
+(async () => {
+  const lastVersion = safeLocalStorage.getItem('cache-version');
+  
+  if (lastVersion !== CACHE_VERSION && 'serviceWorker' in navigator) {
+    try {
+      // Preserve auth tokens...
+      // Clear caches...
+      safeLocalStorage.setItem('cache-version', CACHE_VERSION);
+      // Restore auth tokens...
+      window.location.reload();
+      return; // Stop here - page will reload
+    } catch (error) {
+      safeLocalStorage.setItem('cache-version', CACHE_VERSION);
+    }
+  }
+  
+  // Only render after cache check is complete
+  createRoot(document.getElementById("root")!).render(<App />);
+})();
+```
+
+### 2. Add Loading Indicator in HTML
+
+Add a visible loading state in `index.html` that shows before React loads, preventing the blank white page:
+
+```html
+<div id="root">
+  <!-- Initial loading state - hidden when React mounts -->
+  <div id="initial-loader" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f8faf9;">
+    <div style="text-align:center;">
+      <div style="width:48px;height:48px;border:3px solid #e5e7eb;border-top-color:#16a34a;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
+      <p style="color:#6b7280;font-family:system-ui;">Loading TaxForge...</p>
+    </div>
+  </div>
+  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+</div>
+```
+
+React will automatically replace this content when it mounts.
+
+### 3. Add Reload Loop Prevention
+
+Add a counter to prevent infinite reload loops:
+
+```typescript
+const RELOAD_KEY = 'cache-reload-count';
+const MAX_RELOADS = 2;
+
+const reloadCount = parseInt(safeLocalStorage.getItem(RELOAD_KEY) || '0', 10);
+
+if (lastVersion !== CACHE_VERSION && reloadCount < MAX_RELOADS) {
+  safeLocalStorage.setItem(RELOAD_KEY, String(reloadCount + 1));
+  // ... clear caches and reload ...
+} else {
+  // Reset counter on successful load
+  safeLocalStorage.removeItem(RELOAD_KEY);
+}
+```
+
+### 4. Remove Invalid Meta Tag
+
+The console shows an error for X-Frame-Options in a meta tag. This should be removed as it's ineffective:
+
+```html
+<!-- REMOVE THIS LINE -->
+<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+```
+
+X-Frame-Options only works as an HTTP header, not a meta tag.
+
+---
+
+## Files to Modify
+
+| File | Change |
+|------|--------|
+| `src/main.tsx` | Make cache-busting blocking, add reload loop prevention |
+| `index.html` | Add loading indicator, remove invalid X-Frame-Options meta |
+
+---
+
+## Technical Details
+
+### Why This Happens on Some Browsers
+
+- **Chrome with extensions**: Extensions can intercept/delay JavaScript execution
+- **Slow network/CPU**: Race between async function and render
+- **Private browsing**: localStorage failures can disrupt the version check
+- **Service Worker issues**: Stale workers can interfere with fresh loads
+
+### Expected Behavior After Fix
+
+1. User opens page → sees loading spinner immediately
+2. Cache version checked → if outdated, reload happens (max 2 times)
+3. React mounts → spinner replaced with app
+4. No more white pages
 
