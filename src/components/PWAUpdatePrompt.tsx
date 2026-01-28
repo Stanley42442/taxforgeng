@@ -11,6 +11,14 @@ export const PWAUpdatePrompt = () => {
   } = useRegisterSW({
     onRegistered(registration) {
       logger.debug('[PWA] Service worker registered:', registration?.scope);
+      
+      // Set up periodic update checking (every 60 minutes)
+      if (registration) {
+        setInterval(() => {
+          registration.update();
+          logger.debug('[PWA] Checking for updates...');
+        }, 60 * 60 * 1000); // Every hour
+      }
     },
     onRegisterError(error) {
       logger.error('[PWA] Service worker registration failed:', error);
@@ -19,6 +27,18 @@ export const PWAUpdatePrompt = () => {
       logger.debug('[PWA] Ready for offline use');
     },
   });
+
+  // Also check for updates when page becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && navigator.serviceWorker?.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'CHECK_UPDATE' });
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 
   useEffect(() => {
     if (needRefresh) {

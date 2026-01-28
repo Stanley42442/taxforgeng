@@ -7,33 +7,49 @@ import "./styles/mobile.css";
 import "./styles/tablet.css";
 import "./styles/desktop.css";
 
+import { safeLocalStorage, safeSessionStorage } from "./lib/safeStorage";
+
 // Automatic cache busting - uses build timestamp so every deploy triggers cache clear
 const CACHE_VERSION = import.meta.env.VITE_BUILD_TIME || 'dev';
 
+// Auth token key for Supabase
+const AUTH_TOKEN_KEY = 'sb-uhuxqrrtsiintcwpxxwy-auth-token';
+const SESSION_ONLY_KEY = 'taxforge-session-only';
+
 (async () => {
-  const lastVersion = localStorage.getItem('cache-version');
+  const lastVersion = safeLocalStorage.getItem('cache-version');
   
   if (lastVersion !== CACHE_VERSION && 'serviceWorker' in navigator) {
-    // PWA cache clearing - production-only logging via console since logger may not be loaded
-    
     try {
+      // CRITICAL: Preserve auth token before clearing caches
+      // This prevents users from being logged out on every deploy
+      const authToken = safeLocalStorage.getItem(AUTH_TOKEN_KEY);
+      const sessionOnly = safeSessionStorage.getItem(SESSION_ONLY_KEY);
+      
       // Unregister all service workers
       const registrations = await navigator.serviceWorker.getRegistrations();
       await Promise.all(registrations.map(r => r.unregister()));
-      // SW unregistered
       
       // Clear all caches
       const cacheNames = await caches.keys();
       await Promise.all(cacheNames.map(name => caches.delete(name)));
-      // Caches cleared
       
-      // Set version and reload
-      localStorage.setItem('cache-version', CACHE_VERSION);
+      // Set version to prevent loop
+      safeLocalStorage.setItem('cache-version', CACHE_VERSION);
+      
+      // CRITICAL: Restore auth token after cache clear
+      if (authToken) {
+        safeLocalStorage.setItem(AUTH_TOKEN_KEY, authToken);
+      }
+      if (sessionOnly) {
+        safeSessionStorage.setItem(SESSION_ONLY_KEY, sessionOnly);
+      }
+      
       window.location.reload();
       return;
     } catch (error) {
       // PWA cache clear failed - set version anyway to avoid loops
-      localStorage.setItem('cache-version', CACHE_VERSION);
+      safeLocalStorage.setItem('cache-version', CACHE_VERSION);
     }
   }
 })();

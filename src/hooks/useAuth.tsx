@@ -5,6 +5,7 @@ import type { Json } from '@/integrations/supabase/types';
 import { getDeviceInfo } from '@/lib/deviceFingerprint';
 import { notifyIPBlocked, notifyTimeRestricted } from '@/lib/notifications';
 import logger from '@/lib/logger';
+import { safeLocalStorage, safeSessionStorage } from '@/lib/safeStorage';
 
 interface AuthContextType {
   user: User | null;
@@ -435,11 +436,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Handle session-only mode (clear on browser close)
     const handleBeforeUnload = () => {
-      const isSessionOnly = sessionStorage.getItem('taxforge-session-only');
+      const isSessionOnly = safeSessionStorage.getItem('taxforge-session-only');
       if (isSessionOnly === 'true') {
         // Clear auth tokens from localStorage when browser closes
         // This effectively logs out users who didn't check "Remember me"
-        localStorage.removeItem('sb-uhuxqrrtsiintcwpxxwy-auth-token');
+        safeLocalStorage.removeItem('sb-uhuxqrrtsiintcwpxxwy-auth-token');
       }
     };
 

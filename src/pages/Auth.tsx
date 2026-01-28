@@ -14,6 +14,7 @@ import { z } from "zod";
 import { getDeviceInfo } from "@/lib/deviceFingerprint";
 import { TermsAcceptanceGate } from "@/components/TermsAcceptanceGate";
 import { REFERRAL_SOURCES } from "@/lib/nigerianStates";
+import { safeLocalStorage } from "@/lib/safeStorage";
 import {
   Select,
   SelectContent,
@@ -39,7 +40,7 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [rememberMe, setRememberMe] = useState(() => {
-    return localStorage.getItem(REMEMBER_ME_KEY) !== 'false';
+    return safeLocalStorage.getItem(REMEMBER_ME_KEY) !== 'false';
   });
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
@@ -60,7 +61,7 @@ const Auth = () => {
   const [referralCodeChecking, setReferralCodeChecking] = useState(false);
   const [showTermsGate, setShowTermsGate] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(() => {
-    return localStorage.getItem(TERMS_ACCEPTED_KEY) === 'true';
+    return safeLocalStorage.getItem(TERMS_ACCEPTED_KEY) === 'true';
   });
   
   const { signIn, signUp, user, loading } = useAuth();
@@ -169,7 +170,7 @@ const Auth = () => {
     setIsSubmitting(true);
     
     // Save remember me preference
-    localStorage.setItem(REMEMBER_ME_KEY, rememberMe.toString());
+    safeLocalStorage.setItem(REMEMBER_ME_KEY, rememberMe.toString());
     
     try {
       if (view === 'login') {
@@ -312,7 +313,7 @@ const Auth = () => {
   // Handle terms acceptance
   const handleTermsAccepted = () => {
     setTermsAccepted(true);
-    localStorage.setItem(TERMS_ACCEPTED_KEY, 'true');
+    safeLocalStorage.setItem(TERMS_ACCEPTED_KEY, 'true');
     setShowTermsGate(false);
   };
 

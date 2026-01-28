@@ -4,6 +4,35 @@ All notable changes to this project are documented in this file.
 
 ---
 
+## [2026-01-28] PWA Professional Standards & Session Persistence
+
+### Critical Fix: Auth Persistence Across Updates
+- **Problem**: Users were being logged out on every app update due to cache-busting clearing auth tokens
+- **Solution**: Modified `src/main.tsx` to preserve and restore Supabase auth tokens during cache clearing
+- Migrated all remaining `localStorage` calls to `safeLocalStorage` wrapper
+
+### PWA Enhancements
+| Feature | Status |
+|---------|--------|
+| App shortcuts (Calculator, Dashboard, Expenses) | ✅ Added |
+| Screenshots for app store | ✅ Added |
+| Scope and ID definitions | ✅ Added |
+| iOS-specific meta tags | ✅ Added |
+| Periodic update checking (60 min) | ✅ Added |
+| Visibility-based update checking | ✅ Added |
+| Enhanced manifest with launch_handler | ✅ Added |
+
+### Files Modified
+- `src/main.tsx` - Safe storage + auth token preservation
+- `src/pages/Auth.tsx` - Migrated 4 localStorage calls to safeLocalStorage
+- `src/hooks/useAuth.tsx` - Safe storage wrappers for session handling
+- `public/manifest.json` - Professional PWA manifest with shortcuts
+- `vite.config.ts` - Synced VitePWA config with enhanced manifest
+- `index.html` - iOS PWA meta tags
+- `src/components/PWAUpdatePrompt.tsx` - Periodic update checking
+
+---
+
 ## [2026-01-28] Performance Optimization - React.memo + Virtual Scrolling
 
 ### Performance Improvements

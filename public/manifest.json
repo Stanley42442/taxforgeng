@@ -3,7 +3,10 @@
   "short_name": "TaxForge",
   "description": "Smart tax advice for Nigerian businesses. Calculate CIT, PIT, VAT and get business structure recommendations.",
   "start_url": "/",
+  "scope": "/",
+  "id": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#0a0a0b",
   "theme_color": "#16a34a",
   "orientation": "portrait-primary",
@@ -12,22 +15,69 @@
       "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/apple-touch-icon.png",
       "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Calculate Tax",
+      "short_name": "Calculator",
+      "description": "Open the tax calculator",
+      "url": "/calculator",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "My Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your dashboard",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Expenses",
+      "short_name": "Expenses",
+      "description": "Manage business expenses",
+      "url": "/expenses",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/og-image.png",
+      "sizes": "1200x630",
       "type": "image/png",
-      "purpose": "any"
+      "form_factor": "wide",
+      "label": "TaxForge NG Dashboard"
     }
   ],
   "categories": ["finance", "business", "productivity"],
   "lang": "en-NG",
-  "dir": "ltr"
+  "dir": "ltr",
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
 }
