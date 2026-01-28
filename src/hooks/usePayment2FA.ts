@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
 
 export type TokenType = 'subscription_change' | 'add_payment_method' | 'remove_payment_method' | 'set_default_payment_method';

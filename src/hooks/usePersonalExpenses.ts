@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/hooks/useAuth';
 import { calculateAnnualAmount, PERSONAL_EXPENSE_CATEGORIES } from '@/lib/personalExpenseCategories';
 import { toast } from 'sonner';
