@@ -14,7 +14,7 @@ import { z } from "zod";
 import { getDeviceInfo } from "@/lib/deviceFingerprint";
 import { TermsAcceptanceGate } from "@/components/TermsAcceptanceGate";
 import { REFERRAL_SOURCES } from "@/lib/nigerianStates";
-import { safeLocalStorage } from "@/lib/safeStorage";
+import { safeLocalStorage, safeSessionStorage } from "@/lib/safeStorage";
 import {
   Select,
   SelectContent,
@@ -232,9 +232,9 @@ const Auth = () => {
         // No need to call checkAndRegisterDevice here - it would cause duplicate tracking
         
         if (!rememberMe) {
-          sessionStorage.setItem('taxforge-session-only', 'true');
+          safeSessionStorage.setItem('taxforge-session-only', 'true');
         } else {
-          sessionStorage.removeItem('taxforge-session-only');
+          safeSessionStorage.removeItem('taxforge-session-only');
         }
         toast.success("Welcome back!");
         navigate("/");
@@ -260,9 +260,9 @@ const Auth = () => {
           }
         } else {
           if (!rememberMe) {
-            sessionStorage.setItem('taxforge-session-only', 'true');
+            safeSessionStorage.setItem('taxforge-session-only', 'true');
           } else {
-            sessionStorage.removeItem('taxforge-session-only');
+            safeSessionStorage.removeItem('taxforge-session-only');
           }
           // Show verification message instead of immediate redirect
           toast.success("Account created! Please check your email to verify your account.", {
@@ -616,9 +616,9 @@ const Auth = () => {
 
         // Complete the login
         if (!rememberMe) {
-          sessionStorage.setItem('taxforge-session-only', 'true');
+          safeSessionStorage.setItem('taxforge-session-only', 'true');
         } else {
-          sessionStorage.removeItem('taxforge-session-only');
+          safeSessionStorage.removeItem('taxforge-session-only');
         }
         
         toast.success("Welcome back! Remember to generate new backup codes.");
@@ -652,9 +652,9 @@ const Auth = () => {
         }
 
         if (!rememberMe) {
-          sessionStorage.setItem('taxforge-session-only', 'true');
+          safeSessionStorage.setItem('taxforge-session-only', 'true');
         } else {
-          sessionStorage.removeItem('taxforge-session-only');
+          safeSessionStorage.removeItem('taxforge-session-only');
         }
         
         toast.success("Welcome back!");
