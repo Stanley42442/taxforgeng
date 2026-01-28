@@ -8,6 +8,7 @@ import {
   addNotification 
 } from "@/lib/notifications";
 import logger from "@/lib/logger";
+import { safeLocalStorage } from "@/lib/safeStorage";
 
 // Request notification permission
 export const requestNotificationPermission = async (): Promise<boolean> => {
@@ -30,11 +31,7 @@ export const requestNotificationPermission = async (): Promise<boolean> => {
 
 // Check if sound is enabled
 const isSoundEnabled = () => {
-  try {
-    return localStorage.getItem('notification-sound-enabled') !== 'false';
-  } catch {
-    return true; // Default to enabled if storage access fails
-  }
+  return safeLocalStorage.getItem('notification-sound-enabled') !== 'false';
 };
 
 interface DueReminder {

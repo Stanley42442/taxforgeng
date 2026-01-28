@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { PageLayout } from "@/components/PageLayout";
+import { safeLocalStorage } from "@/lib/safeStorage";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,12 +31,7 @@ const Team = () => {
   const { tier } = useSubscription();
   
   const [members, setMembers] = useState<TeamMember[]>(() => {
-    try {
-      const saved = localStorage.getItem('taxforge_ng_team');
-      return saved ? JSON.parse(saved) : MOCK_MEMBERS;
-    } catch {
-      return MOCK_MEMBERS;
-    }
+    return safeLocalStorage.getJSON('taxforge_ng_team', MOCK_MEMBERS);
   });
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
@@ -47,7 +43,7 @@ const Team = () => {
     onDelete: (member) => {
       // Persist to localStorage after undo timeout
       const currentMembers = members.filter(m => m.id !== member.id);
-      try { localStorage.setItem('taxforge_ng_team', JSON.stringify(currentMembers)); } catch { /* ignore */ }
+      safeLocalStorage.setJSON('taxforge_ng_team', currentMembers);
     },
     onRestore: (member) => {
       setMembers(prev => [...prev, member]);
@@ -58,7 +54,7 @@ const Team = () => {
 
   const saveMembers = (newMembers: TeamMember[]) => {
     setMembers(newMembers);
-    try { localStorage.setItem('taxforge_ng_team', JSON.stringify(newMembers)); } catch { /* ignore */ }
+    safeLocalStorage.setJSON('taxforge_ng_team', newMembers);
   };
 
   const getMaxMembers = () => {

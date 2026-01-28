@@ -49,6 +49,7 @@ import { SparklineChart } from "@/components/SparklineChart";
 import { exportDashboardToPDF, exportDashboardToCSV, DashboardExportData } from "@/lib/dashboardExport";
 import { toast } from "sonner";
 import logger from "@/lib/logger";
+import { safeLocalStorage } from "@/lib/safeStorage";
 import { ExpenseCharts } from "@/components/ExpenseCharts";
 import { PremiumOnboarding } from "@/components/PremiumOnboarding";
 import { DisclaimerModal } from "@/components/DisclaimerModal";
@@ -104,28 +105,20 @@ const Dashboard = () => {
   const [expandedBusinessId, setExpandedBusinessId] = useState<string | null>(null);
   const [expandedReminderId, setExpandedReminderId] = useState<string | null>(null);
   const [summaryExpanded, setSummaryExpanded] = useState(() => {
-    try {
-      const saved = localStorage.getItem('dashboard_summary_expanded');
-      return saved !== 'false';
-    } catch {
-      return true;
-    }
+    const saved = safeLocalStorage.getItem('dashboard_summary_expanded');
+    return saved !== 'false';
   });
   const [dateRange, setDateRange] = useState<'week' | 'month' | 'quarter' | 'year'>(() => {
-    try {
-      const saved = localStorage.getItem('dashboard_date_range');
-      return (saved as 'week' | 'month' | 'quarter' | 'year') || 'month';
-    } catch {
-      return 'month';
-    }
+    const saved = safeLocalStorage.getItem('dashboard_date_range');
+    return (saved as 'week' | 'month' | 'quarter' | 'year') || 'month';
   });
 
   useEffect(() => {
-    try { localStorage.setItem('dashboard_date_range', dateRange); } catch { /* ignore */ }
+    safeLocalStorage.setItem('dashboard_date_range', dateRange);
   }, [dateRange]);
 
   useEffect(() => {
-    try { localStorage.setItem('dashboard_summary_expanded', summaryExpanded.toString()); } catch { /* ignore */ }
+    safeLocalStorage.setItem('dashboard_summary_expanded', summaryExpanded.toString());
   }, [summaryExpanded]);
 
   useEffect(() => {
@@ -143,14 +136,10 @@ const Dashboard = () => {
       if (data && data.onboarding_completed === false) {
         setShowOnboarding(true);
       } else {
-        try {
-          if (!localStorage.getItem('taxforge_disclaimer_accepted')) {
-            setShowDisclaimer(true);
-          } else if (!localStorage.getItem('taxforge_welcome_shown')) {
-            setShowWelcome(true);
-          }
-        } catch {
-          // Storage access failed, skip modals
+        if (!safeLocalStorage.getItem('taxforge_disclaimer_accepted')) {
+          setShowDisclaimer(true);
+        } else if (!safeLocalStorage.getItem('taxforge_welcome_shown')) {
+          setShowWelcome(true);
         }
       }
     };
@@ -402,7 +391,7 @@ const Dashboard = () => {
       {showDisclaimer && (
         <DisclaimerModal onAccept={() => {
           setShowDisclaimer(false);
-          if (!localStorage.getItem('taxforge_welcome_shown')) {
+          if (!safeLocalStorage.getItem('taxforge_welcome_shown')) {
             setShowWelcome(true);
           }
         }} />
