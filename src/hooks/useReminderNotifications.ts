@@ -30,7 +30,11 @@ export const requestNotificationPermission = async (): Promise<boolean> => {
 
 // Check if sound is enabled
 const isSoundEnabled = () => {
-  return localStorage.getItem('notification-sound-enabled') !== 'false';
+  try {
+    return localStorage.getItem('notification-sound-enabled') !== 'false';
+  } catch {
+    return true; // Default to enabled if storage access fails
+  }
 };
 
 interface DueReminder {
