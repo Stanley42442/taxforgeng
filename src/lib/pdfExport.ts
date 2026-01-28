@@ -4,6 +4,7 @@ import { CACVerificationDetails } from "@/contexts/SubscriptionContext";
 import {
   BRAND_COLORS,
   COMPANY_INFO,
+  STANDARD_DISCLAIMER,
   PDF_SETTINGS,
   formatNigerianDate,
   addPDFHeader,
@@ -154,7 +155,11 @@ export const generateProfessionalPDF = (
   doc.setFont('helvetica', 'normal');
   const dateStr = formatNigerianDate(new Date().toISOString());
   doc.text(`Generated: ${dateStr}`, margin, y);
-  doc.text(`Entity: ${result.entityType}`, pageWidth / 2, y);
+  // Map entity type for individual-friendly display
+  const entityLabel = result.entityType === 'Limited Liability Company' 
+    ? 'Individual / Sole Proprietorship (for planning purposes)'
+    : result.entityType;
+  doc.text(`Entity: ${entityLabel}`, pageWidth / 2, y);
   doc.text(`Rules: ${inputs.use2026Rules ? '2026 (New)' : 'Pre-2026'}`, pageWidth - margin, y, { align: 'right' });
   
   y += 8;
@@ -386,7 +391,7 @@ export const generateProfessionalPDF = (
 
   // === FOOTER ===
   addPDFFooter(doc, {
-    disclaimer: 'DISCLAIMER: This report is for educational and planning purposes only. Please consult a certified tax professional.',
+    disclaimer: STANDARD_DISCLAIMER,
   });
 
   // === WATERMARK (Free tier) ===

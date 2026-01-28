@@ -82,19 +82,29 @@ export const BRAND_COLORS = {
 
 /**
  * Company Information
+ * Updated for individual operator (no registered LLC yet)
  */
 export const COMPANY_INFO = {
-  name: 'TaxForge Nigeria Limited',
+  name: 'TaxForge NG',
   shortName: 'TaxForge NG',
   logoText: 'TF',
-  address: '123 Tax Avenue, Victoria Island, Lagos, Nigeria',
-  tin: '12345678-0001',
-  rcNumber: 'RC 1234567',
+  operator: 'Gillespie Benjamin Mclee (OptiSolve Labs)',
+  operatorShort: 'Gillespie Benjamin Mclee',
+  location: 'Port Harcourt, Rivers State, Nigeria',
   email: 'support@taxforgeng.com',
-  billingEmail: 'billing@taxforgeng.com',
   website: 'www.taxforgeng.com',
   liveUrl: 'https://taxforgeng.lovable.app',
 } as const;
+
+/**
+ * Standard Disclaimer for all PDFs
+ * Provides legal protection as an individual-operated educational tool
+ */
+export const STANDARD_DISCLAIMER = 
+  'TaxForge NG is an educational and planning tool operated by Gillespie Benjamin Mclee as an individual project. ' +
+  'All calculations are estimates based on user inputs and publicly available tax rules. ' +
+  'Not official tax advice, filing, or legal service. Please consult a certified tax professional for official compliance. ' +
+  'Operated in Port Harcourt, Rivers State, Nigeria.';
 
 /**
  * PDF Page Settings
@@ -359,8 +369,8 @@ export function addPDFFooter(
     doc.text(disclaimer, pageWidth / 2, footerY + 2, { align: 'center' });
   }
   
-  // Copyright and website
-  const copyrightText = `\u00A9 ${new Date().getFullYear()} ${COMPANY_INFO.shortName} | ${COMPANY_INFO.website}`;
+  // Copyright and website - updated for individual operator
+  const copyrightText = `\u00A9 ${new Date().getFullYear()} ${COMPANY_INFO.shortName} | Operated by ${COMPANY_INFO.operatorShort} | ${COMPANY_INFO.email} | Educational tool only`;
   doc.text(copyrightText, pageWidth / 2, footerY + 7, { align: 'center' });
   
   // Timestamp

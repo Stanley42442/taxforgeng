@@ -61,10 +61,9 @@ export function usePaymentInvoice() {
         periodEnd: calculatePeriodEnd(transaction.created_at, transaction.billing_cycle || 'monthly'),
         customerName: profile?.full_name || 'Valued Customer',
         customerEmail: profile?.email || user.email || '',
-        businessName: 'TaxForge Nigeria Limited',
-        businessAddress: '123 Tax Avenue, Victoria Island, Lagos, Nigeria',
-        businessTIN: '12345678-0001', // Nigerian TIN format
-        businessEmail: 'billing@taxforgeng.com',
+        businessName: 'TaxForge NG',
+        businessOperator: 'Gillespie Benjamin Mclee (OptiSolve Labs)',
+        businessEmail: 'support@taxforgeng.com',
         invoiceDate: transaction.created_at,
         paymentDate: transaction.updated_at || transaction.created_at,
         vatRate,
