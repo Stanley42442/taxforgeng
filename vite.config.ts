@@ -22,9 +22,44 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         skipWaiting: true,
         clientsClaim: true,
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // CRITICAL: Only cache static assets, NOT JS/CSS bundles
+        // This prevents stale code from blocking app updates
+        globPatterns: ['**/*.{ico,png,svg,woff2}'],
+        // Don't precache the HTML - always fetch fresh
+        navigateFallback: null,
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB limit
+        // Clean up old caches on activation
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
+          // JS/CSS bundles - Network First so deploys take effect immediately
+          {
+            urlPattern: /\.(?:js|css)$/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'app-assets',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24, // 1 day max
+              },
+              networkTimeoutSeconds: 5, // Fall back to cache if network slow
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          // HTML pages - Network First, never serve stale HTML
+          {
+            urlPattern: /\.html$/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'html-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60, // 1 hour
+              },
+              networkTimeoutSeconds: 3,
+            },
+          },
           // Supabase API - Network First with fallback
           {
             urlPattern: /^https:\/\/.*supabase.*\/rest\/v1\/.*/i,
