@@ -1,110 +1,84 @@
 
 
-# Fix: White Page Issue
+# Fix: Infinite Loading on Low-Power Mobile Devices
 
-## Problem Identified
+## Problem Analysis
 
-The white page is caused by a **race condition** in the cache-busting logic in `src/main.tsx`. The current code has these issues:
+The app hangs indefinitely on Redmi 12c (and similar devices) for these reasons:
 
-1. **Non-blocking async function**: The cache-busting runs as an immediately-invoked async function (IIFE), but React rendering happens simultaneously outside this function
-2. **Potential reload loops**: If localStorage access fails or the cache version comparison doesn't work correctly, it can cause:
-   - The page to reload before React mounts
-   - Multiple reloads in quick succession
-   - React and the reload fighting each other
-3. **No visual feedback**: During cache clearing/reload, users see a completely blank white page
+### 1. AuthLoadingScreen Never Resolves
+The `AuthLoadingScreen` waits for `loading` from `useAuth` to become `false`. This depends on `supabase.auth.getSession()` completing successfully. On slow networks or if Supabase is unreachable, this promise may never resolve, causing an infinite loading screen.
 
-**Current problematic code:**
+### 2. No Auth Timeout
+The current code has no timeout for the auth session check:
 ```typescript
-(async () => {
-  const lastVersion = safeLocalStorage.getItem('cache-version');
-  if (lastVersion !== CACHE_VERSION && 'serviceWorker' in navigator) {
-    // ... cache clearing ...
-    window.location.reload();
-    return;  // Only exits IIFE, not the module
-  }
-})();  // Runs async, non-blocking
-
-createRoot(document.getElementById("root")!).render(<App />);  // Always runs immediately
+// useAuth.tsx line 431
+supabase.auth.getSession().then(({ data: { session } }) => {
+  setSession(session);
+  setUser(session?.user ?? null);
+  setLoading(false);  // <-- Never called if promise hangs
+});
 ```
+
+### 3. Development Mode Creates 150+ Network Requests
+Each module is loaded separately, overwhelming low-powered devices with slow CPUs and limited memory.
 
 ---
 
 ## Solution
 
-### 1. Make Cache Busting Blocking
+### 1. Add Auth Timeout to useAuth
 
-Move the React render inside the async function so it only runs after cache-busting completes:
+Add a timeout that sets `loading` to `false` after 10 seconds even if Supabase hasn't responded:
 
 ```typescript
-(async () => {
-  const lastVersion = safeLocalStorage.getItem('cache-version');
-  
-  if (lastVersion !== CACHE_VERSION && 'serviceWorker' in navigator) {
-    try {
-      // Preserve auth tokens...
-      // Clear caches...
-      safeLocalStorage.setItem('cache-version', CACHE_VERSION);
-      // Restore auth tokens...
-      window.location.reload();
-      return; // Stop here - page will reload
-    } catch (error) {
-      safeLocalStorage.setItem('cache-version', CACHE_VERSION);
+// In useAuth.tsx useEffect
+useEffect(() => {
+  // SAFETY: Set loading to false after 10 seconds regardless of auth status
+  // This prevents infinite loading on slow networks
+  const authTimeout = setTimeout(() => {
+    if (loading) {
+      setLoading(false);
+      console.warn('[Auth] Session check timed out after 10s');
     }
-  }
-  
-  // Only render after cache check is complete
-  createRoot(document.getElementById("root")!).render(<App />);
-})();
+  }, 10000);
+
+  // Existing auth setup...
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    setSession(session);
+    setUser(session?.user ?? null);
+    setLoading(false);
+    clearTimeout(authTimeout); // Cancel timeout on success
+  });
+
+  return () => {
+    clearTimeout(authTimeout);
+    // ...existing cleanup
+  };
+}, []);
 ```
 
-### 2. Add Loading Indicator in HTML
+### 2. Add Race Condition with Promise.race in AuthLoadingScreen
 
-Add a visible loading state in `index.html` that shows before React loads, preventing the blank white page:
-
-```html
-<div id="root">
-  <!-- Initial loading state - hidden when React mounts -->
-  <div id="initial-loader" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f8faf9;">
-    <div style="text-align:center;">
-      <div style="width:48px;height:48px;border:3px solid #e5e7eb;border-top-color:#16a34a;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
-      <p style="color:#6b7280;font-family:system-ui;">Loading TaxForge...</p>
-    </div>
-  </div>
-  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-</div>
-```
-
-React will automatically replace this content when it mounts.
-
-### 3. Add Reload Loop Prevention
-
-Add a counter to prevent infinite reload loops:
+As a secondary safeguard, add a max loading time in the component itself:
 
 ```typescript
-const RELOAD_KEY = 'cache-reload-count';
-const MAX_RELOADS = 2;
+// AuthLoadingScreen.tsx
+useEffect(() => {
+  // Force hide splash after 15 seconds as a fallback
+  const forceTimeout = setTimeout(() => {
+    if (showSplash) {
+      setShowSplash(false);
+    }
+  }, 15000);
 
-const reloadCount = parseInt(safeLocalStorage.getItem(RELOAD_KEY) || '0', 10);
-
-if (lastVersion !== CACHE_VERSION && reloadCount < MAX_RELOADS) {
-  safeLocalStorage.setItem(RELOAD_KEY, String(reloadCount + 1));
-  // ... clear caches and reload ...
-} else {
-  // Reset counter on successful load
-  safeLocalStorage.removeItem(RELOAD_KEY);
-}
+  return () => clearTimeout(forceTimeout);
+}, []);
 ```
 
-### 4. Remove Invalid Meta Tag
+### 3. Ensure Initial HTML Loader Works
 
-The console shows an error for X-Frame-Options in a meta tag. This should be removed as it's ineffective:
-
-```html
-<!-- REMOVE THIS LINE -->
-<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
-```
-
-X-Frame-Options only works as an HTTP header, not a meta tag.
+The initial loader in `index.html` shows while React is loading. Once React mounts, `AuthLoadingScreen` takes over. Both should be visible and provide feedback.
 
 ---
 
@@ -112,24 +86,25 @@ X-Frame-Options only works as an HTTP header, not a meta tag.
 
 | File | Change |
 |------|--------|
-| `src/main.tsx` | Make cache-busting blocking, add reload loop prevention |
-| `index.html` | Add loading indicator, remove invalid X-Frame-Options meta |
+| `src/hooks/useAuth.tsx` | Add 10-second auth timeout |
+| `src/components/AuthLoadingScreen.tsx` | Add 15-second failsafe timeout |
 
 ---
 
-## Technical Details
+## Expected Behavior After Fix
 
-### Why This Happens on Some Browsers
+| Scenario | Before | After |
+|----------|--------|-------|
+| Normal load | Works | Works |
+| Slow network (Supabase unreachable) | Infinite spinner | Shows app after 10s (logged out state) |
+| Very slow device | May hang forever | Shows app after 15s max |
 
-- **Chrome with extensions**: Extensions can intercept/delay JavaScript execution
-- **Slow network/CPU**: Race between async function and render
-- **Private browsing**: localStorage failures can disrupt the version check
-- **Service Worker issues**: Stale workers can interfere with fresh loads
+---
 
-### Expected Behavior After Fix
+## Technical Notes
 
-1. User opens page → sees loading spinner immediately
-2. Cache version checked → if outdated, reload happens (max 2 times)
-3. React mounts → spinner replaced with app
-4. No more white pages
+- The 10-second timeout matches Supabase's internal timeout for network requests
+- Users will be in a "logged out" state if timeout triggers, but can retry login
+- The 15-second component timeout is a secondary fallback if the hook fails
+- Both timeouts are non-blocking - if auth completes faster, they're cancelled
 
