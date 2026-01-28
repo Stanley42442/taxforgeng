@@ -1974,11 +1974,11 @@ export const translations: Translations = {
     ig: 'Nweta ntụnye ma ị ga-edebanye aha dị ka Aha Azụmaahịa ma ọ bụ Ụlọ Ọrụ Nwere Oke Ntụkwasị dabere n\'ihe ị chọrọ.' 
   },
   'home.copyright': { 
-    en: '© 2025 TaxForge NG. For educational purposes only.', 
-    pcm: '© 2025 TaxForge NG. Na for learning only.', 
-    yo: '© 2025 TaxForge NG. Fún àwọn ète ẹ̀kọ́ nìkan.', 
-    ha: '© 2025 TaxForge NG. Don dalilan ilimi kawai.', 
-    ig: '© 2025 TaxForge NG. Maka ebumnuche mmụta naanị.' 
+    en: '© 2026 TaxForge NG. For educational purposes only.', 
+    pcm: '© 2026 TaxForge NG. Na for learning only.', 
+    yo: '© 2026 TaxForge NG. Fún àwọn ète ẹ̀kọ́ nìkan.', 
+    ha: '© 2026 TaxForge NG. Don dalilan ilimi kawai.', 
+    ig: '© 2026 TaxForge NG. Maka ebumnuche mmụta naanị.' 
   },
   'home.taxCalculatorTitle': {
     en: 'Tax Calculator', 

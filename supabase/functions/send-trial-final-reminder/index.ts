@@ -151,7 +151,8 @@ const handler = async (req: Request): Promise<Response> => {
               
               <p style="margin: 0; color: #374151; font-size: 16px; line-height: 1.6;">
                 Thanks for being part of TaxForge NG!<br>
-                <strong>The TaxForge NG Team</strong>
+                <strong>Gillespie Benjamin Mclee</strong><br>
+                <span style="font-size: 14px; color: #6b7280;">Founder, TaxForge NG</span>
               </p>
             </td>
           </tr>
@@ -163,7 +164,7 @@ const handler = async (req: Request): Promise<Response> => {
                 TaxForge NG — Smart Tax Advice for Nigerian Businesses
               </p>
               <p style="margin: 0; color: #9ca3af; font-size: 12px;">
-                © 2025 TaxForge NG. For educational purposes only.
+                © ${new Date().getFullYear()} TaxForge NG | Operated by Gillespie Benjamin Mclee | Educational tool only
               </p>
             </td>
           </tr>

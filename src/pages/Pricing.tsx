@@ -598,7 +598,7 @@ const Pricing = () => {
       {/* Footer */}
       <div className="mt-16 pt-6 border-t border-border text-center">
         <p className="text-sm text-muted-foreground">
-          © 2025 TaxForge NG. All prices include VAT. For educational purposes.
+          © 2026 TaxForge NG. All prices include VAT. For educational purposes.
         </p>
       </div>
     </PageLayout>

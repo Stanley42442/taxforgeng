@@ -304,8 +304,8 @@ const Terms = () => {
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-success/10 text-xs font-bold text-success">1</span>
                   Data Controller & DPO
                 </h3>
-                <div className="rounded-lg bg-card border p-3 space-y-1">
-                  <p><strong>Data Controller:</strong> TaxForge Nigeria Limited</p>
+              <div className="rounded-lg bg-card border p-3 space-y-1">
+                  <p><strong>Data Controller:</strong> TaxForge NG (Operated by Gillespie Benjamin Mclee)</p>
                   <p>Email: <a href="mailto:privacy@taxforgeng.com" className="text-primary hover:underline">privacy@taxforgeng.com</a></p>
                   <p><strong>Data Protection Officer:</strong> <a href="mailto:dpo@taxforgeng.com" className="text-primary hover:underline">dpo@taxforgeng.com</a></p>
                 </div>
