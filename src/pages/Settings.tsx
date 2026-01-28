@@ -63,6 +63,7 @@ import { SecurityScoreWidget } from "@/components/SecurityScoreWidget";
 import { ReportScheduleSettings } from "@/components/ReportScheduleSettings";
 import { WhatsAppVerification } from "@/components/WhatsAppVerification";
 import logger from "@/lib/logger";
+import { safeLocalStorage } from "@/lib/safeStorage";
 
 const nameSchema = z.string().min(1, "Name is required").max(100, "Name must be less than 100 characters");
 const emailSchema = z.string().email("Please enter a valid email address");
@@ -543,7 +544,7 @@ const Settings = () => {
                       await Promise.all(cacheNames.map(name => caches.delete(name)));
                     }
                     // Clear localStorage cache version
-                    localStorage.removeItem('cache-version');
+                    safeLocalStorage.removeItem('cache-version');
                     toast.dismiss(toastId);
                     toast.success("Cache cleared! Reloading...");
                     setTimeout(() => window.location.reload(), 500);

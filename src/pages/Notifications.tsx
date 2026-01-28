@@ -47,6 +47,7 @@ import {
   vibrateDevice
 } from "@/lib/pwaNotifications";
 import { useSyncedNotifications } from "@/hooks/useSyncedNotifications";
+import { safeLocalStorage } from "@/lib/safeStorage";
 
 const Notifications = () => {
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | 'unsupported'>('default');
@@ -78,14 +79,10 @@ const Notifications = () => {
       setNotificationPermission('unsupported');
     }
 
-    try {
-      const savedSound = localStorage.getItem('notification-sound-enabled');
-      const savedBrowser = localStorage.getItem('notification-browser-enabled');
-      if (savedSound !== null) setSoundEnabled(savedSound === 'true');
-      if (savedBrowser !== null) setBrowserNotificationsEnabled(savedBrowser === 'true');
-    } catch {
-      // Use defaults if localStorage unavailable
-    }
+    const savedSound = safeLocalStorage.getItem('notification-sound-enabled');
+    const savedBrowser = safeLocalStorage.getItem('notification-browser-enabled');
+    if (savedSound !== null) setSoundEnabled(savedSound === 'true');
+    if (savedBrowser !== null) setBrowserNotificationsEnabled(savedBrowser === 'true');
   }, []);
 
   const handleEnableNotifications = async () => {
@@ -106,22 +103,14 @@ const Notifications = () => {
 
   const handleSoundToggle = (enabled: boolean) => {
     setSoundEnabled(enabled);
-    try {
-      localStorage.setItem('notification-sound-enabled', String(enabled));
-    } catch {
-      // Silent fail
-    }
+    safeLocalStorage.setItem('notification-sound-enabled', String(enabled));
     if (enabled) vibrateDevice([50]);
     toast.success(enabled ? 'Sound notifications enabled' : 'Sound notifications disabled');
   };
 
   const handleBrowserToggle = (enabled: boolean) => {
     setBrowserNotificationsEnabled(enabled);
-    try {
-      localStorage.setItem('notification-browser-enabled', String(enabled));
-    } catch {
-      // Silent fail
-    }
+    safeLocalStorage.setItem('notification-browser-enabled', String(enabled));
     toast.success(enabled ? 'Browser notifications enabled' : 'Browser notifications disabled');
   };
 
