@@ -71,7 +71,7 @@ export const WelcomeSplash = ({ onComplete }: WelcomeSplashProps) => {
   };
 
   const handleComplete = () => {
-    localStorage.setItem('taxforge_welcome_shown', 'true');
+    try { localStorage.setItem('taxforge_welcome_shown', 'true'); } catch { /* ignore */ }
     setOpen(false);
     onComplete();
   };

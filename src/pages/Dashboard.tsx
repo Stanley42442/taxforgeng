@@ -104,20 +104,28 @@ const Dashboard = () => {
   const [expandedBusinessId, setExpandedBusinessId] = useState<string | null>(null);
   const [expandedReminderId, setExpandedReminderId] = useState<string | null>(null);
   const [summaryExpanded, setSummaryExpanded] = useState(() => {
-    const saved = localStorage.getItem('dashboard_summary_expanded');
-    return saved !== 'false';
+    try {
+      const saved = localStorage.getItem('dashboard_summary_expanded');
+      return saved !== 'false';
+    } catch {
+      return true;
+    }
   });
   const [dateRange, setDateRange] = useState<'week' | 'month' | 'quarter' | 'year'>(() => {
-    const saved = localStorage.getItem('dashboard_date_range');
-    return (saved as 'week' | 'month' | 'quarter' | 'year') || 'month';
+    try {
+      const saved = localStorage.getItem('dashboard_date_range');
+      return (saved as 'week' | 'month' | 'quarter' | 'year') || 'month';
+    } catch {
+      return 'month';
+    }
   });
 
   useEffect(() => {
-    localStorage.setItem('dashboard_date_range', dateRange);
+    try { localStorage.setItem('dashboard_date_range', dateRange); } catch { /* ignore */ }
   }, [dateRange]);
 
   useEffect(() => {
-    localStorage.setItem('dashboard_summary_expanded', summaryExpanded.toString());
+    try { localStorage.setItem('dashboard_summary_expanded', summaryExpanded.toString()); } catch { /* ignore */ }
   }, [summaryExpanded]);
 
   useEffect(() => {
@@ -134,10 +142,16 @@ const Dashboard = () => {
       // Show onboarding wizard if not completed
       if (data && data.onboarding_completed === false) {
         setShowOnboarding(true);
-      } else if (!localStorage.getItem('taxforge_disclaimer_accepted')) {
-        setShowDisclaimer(true);
-      } else if (!localStorage.getItem('taxforge_welcome_shown')) {
-        setShowWelcome(true);
+      } else {
+        try {
+          if (!localStorage.getItem('taxforge_disclaimer_accepted')) {
+            setShowDisclaimer(true);
+          } else if (!localStorage.getItem('taxforge_welcome_shown')) {
+            setShowWelcome(true);
+          }
+        } catch {
+          // Storage access failed, skip modals
+        }
       }
     };
 

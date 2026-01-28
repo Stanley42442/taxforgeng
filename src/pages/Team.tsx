@@ -30,8 +30,12 @@ const Team = () => {
   const { tier } = useSubscription();
   
   const [members, setMembers] = useState<TeamMember[]>(() => {
-    const saved = localStorage.getItem('taxforge_ng_team');
-    return saved ? JSON.parse(saved) : MOCK_MEMBERS;
+    try {
+      const saved = localStorage.getItem('taxforge_ng_team');
+      return saved ? JSON.parse(saved) : MOCK_MEMBERS;
+    } catch {
+      return MOCK_MEMBERS;
+    }
   });
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
@@ -43,7 +47,7 @@ const Team = () => {
     onDelete: (member) => {
       // Persist to localStorage after undo timeout
       const currentMembers = members.filter(m => m.id !== member.id);
-      localStorage.setItem('taxforge_ng_team', JSON.stringify(currentMembers));
+      try { localStorage.setItem('taxforge_ng_team', JSON.stringify(currentMembers)); } catch { /* ignore */ }
     },
     onRestore: (member) => {
       setMembers(prev => [...prev, member]);
@@ -54,7 +58,7 @@ const Team = () => {
 
   const saveMembers = (newMembers: TeamMember[]) => {
     setMembers(newMembers);
-    localStorage.setItem('taxforge_ng_team', JSON.stringify(newMembers));
+    try { localStorage.setItem('taxforge_ng_team', JSON.stringify(newMembers)); } catch { /* ignore */ }
   };
 
   const getMaxMembers = () => {
