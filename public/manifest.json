@@ -71,11 +71,20 @@
       "type": "image/png",
       "form_factor": "wide",
       "label": "TaxForge NG Dashboard"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "TaxForge NG App Icon"
     }
   ],
   "categories": ["finance", "business", "productivity"],
   "lang": "en-NG",
   "dir": "ltr",
+  "prefer_related_applications": false,
+  "related_applications": [],
   "handle_links": "preferred",
   "launch_handler": {
     "client_mode": "navigate-existing"

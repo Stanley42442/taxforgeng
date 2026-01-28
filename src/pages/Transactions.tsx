@@ -11,6 +11,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Upload, FileSpreadsheet, Crown, Building2, Check, X, HelpCircle, ArrowRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { safeSessionStorage } from "@/lib/safeStorage";
 
 interface Transaction {
   id: string;
@@ -85,13 +86,13 @@ const Transactions = () => {
 
   const applyToCalculator = () => {
     const totals = getTotals();
-    sessionStorage.setItem('imported_transactions', JSON.stringify({
+    safeSessionStorage.setJSON('imported_transactions', {
       businessId: selectedBusinessId,
       turnover: totals.income,
       expenses: totals.expenses,
       vatableSales: totals.vatableIncome,
       vatablePurchases: totals.vatableExpenses,
-    }));
+    });
     toast.success('Transactions applied to calculator');
     navigate('/calculator');
   };
