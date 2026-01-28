@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Camera, Upload, Loader2, Sparkles, CheckCircle2, AlertCircle, Brain, FileText } from "lucide-react";
 import { createWorker, type Worker } from "tesseract.js";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { CurrencyInput } from "@/components/ui/currency-input";
 
 interface ParsedReceipt {

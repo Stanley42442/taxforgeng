@@ -47,7 +47,7 @@ import { SectorPresets } from "@/components/SectorPresets";
 import { toast } from "sonner";
 import { useSubscription, type SavedBusiness } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import logger from "@/lib/logger";
 
 // Move components OUTSIDE main function to prevent re-creation on every render

@@ -15,7 +15,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import logger from "@/lib/logger";
 

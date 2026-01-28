@@ -49,7 +49,7 @@ import {
   WifiOff
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { formatDistanceToNow, format } from "date-fns";
 import { toast } from "sonner";
 import { getDeviceInfo } from "@/lib/deviceFingerprint";

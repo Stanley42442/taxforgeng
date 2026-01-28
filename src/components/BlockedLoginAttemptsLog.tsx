@@ -15,7 +15,7 @@ import {
   AlertTriangle,
   Monitor
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { formatDistanceToNow, format } from "date-fns";
 
 interface BlockedAttempt {

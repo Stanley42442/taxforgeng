@@ -27,7 +27,7 @@ import {
   ArrowRight,
   Sparkles,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 

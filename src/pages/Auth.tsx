@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Calculator, Mail, Lock, User, ArrowLeft, Eye, EyeOff, KeyRound, Shield, Gift, HelpCircle, CheckCircle, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import logger from "@/lib/logger";
 import { z } from "zod";

@@ -40,7 +40,7 @@ import { BillingCycleToggle } from "@/components/BillingCycleToggle";
 import { PromoCodeInput } from "@/components/PromoCodeInput";
 import { usePaystack, DiscountValidationResult } from "@/hooks/usePaystack";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import logger from "@/lib/logger";
 
 interface TierFeature {
