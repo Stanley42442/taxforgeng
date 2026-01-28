@@ -71,7 +71,7 @@ serve(async (req) => {
   </div>
   
   <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 11px;">
-    <p>© ${new Date().getFullYear()} TaxForge NG. All rights reserved.</p>
+    <p>© ${new Date().getFullYear()} TaxForge NG | Operated by Gillespie Benjamin Mclee | Educational tool only</p>
   </div>
 </body>
 </html>

@@ -70,7 +70,7 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             <div style="background: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
               <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-                This is an automated security notification from TaxForge NG.
+                © ${new Date().getFullYear()} TaxForge NG | Operated by Gillespie Benjamin Mclee | Educational tool only
               </p>
             </div>
           </div>

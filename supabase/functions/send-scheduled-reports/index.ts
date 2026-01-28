@@ -142,9 +142,9 @@ const handler = async (req: Request): Promise<Response> => {
 
         // Send the email
         const emailResponse = await resend.emails.send({
-          from: "TaxForge <onboarding@resend.dev>",
+          from: "TaxForge NG <onboarding@resend.dev>",
           to: [profile.email],
-          subject: `Your ${periodLabel} TaxForge Financial Summary`,
+          subject: `Your ${periodLabel} TaxForge NG Financial Summary`,
           html: `
             <!DOCTYPE html>
             <html>
@@ -212,7 +212,7 @@ const handler = async (req: Request): Promise<Response> => {
                   </div>
 
                   <div style="text-align: center;">
-                    <a href="https://taxnaija.lovable.app/dashboard" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
+                    <a href="https://taxforgeng.lovable.app/dashboard" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
                       View Full Dashboard
                     </a>
                   </div>
@@ -220,9 +220,9 @@ const handler = async (req: Request): Promise<Response> => {
 
                 <div style="background: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
                   <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-                    You're receiving this because you enabled ${schedule.schedule_type} reports on TaxForge.
+                    © ${new Date().getFullYear()} TaxForge NG | Operated by Gillespie Benjamin Mclee | Educational tool only
                     <br>
-                    <a href="https://taxnaija.lovable.app/settings" style="color: #10b981;">Manage preferences</a>
+                    <a href="https://taxforgeng.lovable.app/settings" style="color: #10b981;">Manage preferences</a>
                   </p>
                 </div>
               </div>

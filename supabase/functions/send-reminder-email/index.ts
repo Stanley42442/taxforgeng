@@ -30,7 +30,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Sending reminder email to:", userEmail, "for business:", businessName);
 
     const emailResponse = await resend.emails.send({
-      from: "TaxNaija <onboarding@resend.dev>",
+      from: "TaxForge NG <onboarding@resend.dev>",
       to: [userEmail],
       subject: `Tax Reminder: ${reminderTitle} for ${businessName}`,
       html: `
@@ -76,13 +76,13 @@ const handler = async (req: Request): Promise<Response> => {
                 Don't forget to file your tax returns on time to avoid penalties and interest charges.
               </p>
               
-              <a href="https://taxnaija.lovable.app" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
+              <a href="https://taxforgeng.lovable.app" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
                 Go to Dashboard
               </a>
             </div>
             <div style="background: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
               <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-                You received this email because you enabled tax reminders on TaxNaija.
+                © ${new Date().getFullYear()} TaxForge NG | Operated by Gillespie Benjamin Mclee | Educational tool only
               </p>
             </div>
           </div>
