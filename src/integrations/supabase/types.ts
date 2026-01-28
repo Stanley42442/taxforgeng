@@ -3357,6 +3357,45 @@ export type Database = {
         }
         Relationships: []
       }
+      web_vitals: {
+        Row: {
+          connection_type: string | null
+          created_at: string | null
+          id: string
+          metric_id: string | null
+          metric_name: string
+          metric_rating: string | null
+          metric_value: number
+          page_url: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          connection_type?: string | null
+          created_at?: string | null
+          id?: string
+          metric_id?: string | null
+          metric_name: string
+          metric_rating?: string | null
+          metric_value: number
+          page_url?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          connection_type?: string | null
+          created_at?: string | null
+          id?: string
+          metric_id?: string | null
+          metric_name?: string
+          metric_rating?: string | null
+          metric_value?: number
+          page_url?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -3387,6 +3426,7 @@ export type Database = {
       cleanup_expired_sessions: { Args: never; Returns: undefined }
       cleanup_old_backup_attempts: { Args: never; Returns: undefined }
       cleanup_old_login_attempts: { Args: never; Returns: undefined }
+      cleanup_old_logs: { Args: never; Returns: undefined }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       cleanup_security_data: { Args: never; Returns: undefined }
       has_role: {

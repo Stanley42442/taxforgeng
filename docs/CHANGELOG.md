@@ -1,5 +1,68 @@
 # TaxForge NG - Changelog
 
+## Phase 6: Enterprise PWA Enhancements (2026-01-28)
+
+### 1. Web Vitals Monitoring
+| Feature | Implementation |
+|---------|---------------|
+| Core Web Vitals | Track LCP, CLS, INP, FCP, TTFB using official `web-vitals` package |
+| Batched reporting | 5-second flush interval to reduce database writes |
+| User attribution | Attach user_id when available |
+| Network info | Capture connection type (4G, 3G, etc.) |
+
+### 2. Error Log Rate Limiting
+| Table | Limit | Purpose |
+|-------|-------|---------|
+| `error_logs` | 10/min per user_agent | Prevent INSERT abuse |
+| `web_vitals` | 50/min per user_agent | Allow all 6 metrics per page |
+
+### 3. Admin Error Dashboard (`/admin/errors`)
+| Feature | Description |
+|---------|-------------|
+| Web Vitals Summary | Cards showing avg LCP/CLS/INP with rating distribution |
+| Error Logs Table | Paginated, filterable by date range |
+| Error Frequency Chart | Bar chart showing errors per day |
+| CSV Export | Download both error logs and web vitals |
+
+### 4. Enhanced Service Worker Precaching
+| Resource | Strategy | TTL |
+|----------|----------|-----|
+| Supabase API | NetworkFirst (10s timeout) | 24 hours |
+| Google Fonts CSS | StaleWhileRevalidate | 1 year |
+| Google Fonts WOFF2 | CacheFirst | 1 year |
+| Static Images | CacheFirst | 30 days |
+
+### 5. Stricter CSP
+| Directive | Change |
+|-----------|--------|
+| `script-src` | Added `'strict-dynamic'` for stricter XSS protection |
+| `upgrade-insecure-requests` | Added for HTTPS enforcement |
+| Removed | `'unsafe-eval'` no longer needed |
+
+### 6. Auto-cleanup Retention Policy
+| Table | Retention | Method |
+|-------|-----------|--------|
+| `error_logs` | 30 days | Edge function `cleanup-logs` |
+| `web_vitals` | 90 days | Edge function `cleanup-logs` |
+
+### Files Created
+- `src/lib/webVitals.ts` - Web Vitals monitoring module
+- `src/pages/ErrorDashboard.tsx` - Admin error monitoring page
+- `supabase/functions/cleanup-logs/index.ts` - Retention policy edge function
+
+### Files Modified
+- `index.html` - Enhanced CSP with strict-dynamic
+- `vite.config.ts` - Expanded workbox runtime caching
+- `src/main.tsx` - Initialize web vitals
+- `src/App.tsx` - Added ErrorDashboard route
+- `src/components/NavMenu.tsx` - Added Error Dashboard link
+- `src/components/ui/premium-skeleton.tsx` - Added ErrorDashboardSkeleton
+
+### New Dependencies
+- `web-vitals` - Official Core Web Vitals measurement
+
+---
+
 ## Phase 5: Professional PWA Enhancements (2026-01-28)
 
 ### Security Hardening
