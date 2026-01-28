@@ -319,3 +319,54 @@ export function InvoicesSkeleton() {
     </div>
   );
 }
+
+export function ErrorDashboardSkeleton() {
+  return (
+    <div className="space-y-6 p-6 animate-fade-in">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div className="space-y-2">
+          <PremiumSkeleton variant="text" className="h-8 w-48" />
+          <PremiumSkeleton variant="text" className="h-4 w-64" />
+        </div>
+        <div className="flex gap-2">
+          <PremiumSkeleton variant="button" className="h-10 w-32" />
+          <PremiumSkeleton variant="button" className="h-10 w-24" />
+        </div>
+      </div>
+      
+      {/* Tabs */}
+      <PremiumSkeleton variant="button" className="h-10 w-48" />
+      
+      {/* Metric Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="glass-frosted rounded-xl p-4 space-y-3">
+            <PremiumSkeleton variant="text" className="h-3 w-12" />
+            <PremiumSkeleton variant="text" className="h-6 w-16" />
+            <PremiumSkeleton variant="card" className="h-2 w-full rounded-full" />
+            <PremiumSkeleton variant="text" className="h-2 w-20" />
+          </div>
+        ))}
+      </div>
+      
+      {/* Chart */}
+      <div className="glass-frosted rounded-xl p-6">
+        <PremiumSkeleton variant="text" className="h-5 w-32 mb-4" />
+        <PremiumSkeleton variant="card" className="h-48 w-full" />
+      </div>
+      
+      {/* Table */}
+      <div className="glass-frosted rounded-xl p-6 space-y-4">
+        <PremiumSkeleton variant="text" className="h-5 w-40" />
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="flex gap-4 items-center">
+            <PremiumSkeleton variant="text" className="h-4 w-32" />
+            <PremiumSkeleton variant="text" className="h-4 flex-1" />
+            <PremiumSkeleton variant="text" className="h-4 w-20" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

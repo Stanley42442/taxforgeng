@@ -9,9 +9,13 @@ import "./styles/desktop.css";
 
 import { safeLocalStorage, safeSessionStorage } from "./lib/safeStorage";
 import { initGlobalErrorHandlers } from "./lib/errorTracking";
+import { initWebVitals } from "./lib/webVitals";
 
 // Initialize global error handlers for production error tracking
 initGlobalErrorHandlers();
+
+// Initialize Web Vitals monitoring for production performance tracking
+initWebVitals();
 
 // Automatic cache busting - uses build timestamp so every deploy triggers cache clear
 const CACHE_VERSION = import.meta.env.VITE_BUILD_TIME || 'dev';

@@ -93,6 +93,7 @@ const OfflineDashboard = lazy(() => import("./pages/OfflineDashboard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const TaxLogicReference = lazy(() => import("./pages/TaxLogicReference"));
 const VerifyDocument = lazy(() => import("./pages/VerifyDocument"));
+const ErrorDashboard = lazy(() => import("./pages/ErrorDashboard"));
 
 // Lazy load TaxAssistant (heavy component with AI chat)
 const TaxAssistant = lazy(() => import("./components/TaxAssistant").then(m => ({ default: m.TaxAssistant })));
@@ -190,6 +191,7 @@ const AnimatedRoutes = () => {
           <Route path="/admin/webhooks" element={<WebhookTesting />} />
           <Route path="/admin/promo-codes" element={<PromoCodeAdmin />} />
           <Route path="/admin/security-tests" element={<SecurityTestResults />} />
+          <Route path="/admin/errors" element={<ErrorDashboard />} />
           <Route path="/offline" element={<OfflineDashboard />} />
           <Route path="/verify/:documentId" element={<VerifyDocument />} />
           <Route path="/tax-logic" element={<TaxLogicReference />} />

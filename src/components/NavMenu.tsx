@@ -54,6 +54,7 @@ import {
   Search,
   X,
   Scale,
+  AlertTriangle,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -194,6 +195,7 @@ const navGroups: NavGroup[] = [
       { to: "/admin/promo-codes", label: "Promo Codes", icon: Gift },
       { to: "/admin/webhooks", label: "Webhook Testing", icon: Code },
       { to: "/ai-analytics", label: "AI Analytics", icon: BarChart3 },
+      { to: "/admin/errors", label: "Error Dashboard", icon: AlertTriangle },
     ]
   },
 ];

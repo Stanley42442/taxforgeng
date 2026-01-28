@@ -23,7 +23,9 @@ export default defineConfig(({ mode }) => ({
         skipWaiting: true,
         clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB limit
         runtimeCaching: [
+          // Supabase API - Network First with fallback
           {
             urlPattern: /^https:\/\/.*supabase.*\/rest\/v1\/.*/i,
             handler: 'NetworkFirst',
@@ -34,6 +36,48 @@ export default defineConfig(({ mode }) => ({
                 maxAgeSeconds: 86400,
               },
               networkTimeoutSeconds: 10,
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          // Google Fonts stylesheets - Stale While Revalidate
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'google-fonts-stylesheets',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+              },
+            },
+          },
+          // Google Fonts webfont files - Cache First
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-webfonts',
+              expiration: {
+                maxEntries: 30,
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          // Static images - Cache First with 30-day TTL
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'static-images',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
             },
           },
         ],
