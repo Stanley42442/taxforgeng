@@ -97,16 +97,13 @@ const VerifyDocument = lazy(() => import("./pages/VerifyDocument"));
 // Lazy load TaxAssistant (heavy component with AI chat)
 const TaxAssistant = lazy(() => import("./components/TaxAssistant").then(m => ({ default: m.TaxAssistant })));
 
-// Minimal loading fallback with premium styling
+// Import page skeletons for better perceived performance
+import { PageSkeleton } from "@/components/ui/premium-skeleton";
+
+// Minimal loading fallback with premium skeleton
 const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="glass-frosted rounded-2xl p-8"
-    >
-      <div className="h-10 w-10 rounded-full border-2 border-primary border-t-transparent animate-spin glow-primary" />
-    </motion.div>
+  <div className="min-h-screen p-6">
+    <PageSkeleton />
   </div>
 );
 

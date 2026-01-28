@@ -3,6 +3,7 @@ import { AlertTriangle, RefreshCw, Home, Bug } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logger from "@/lib/logger";
 import { sanitizeErrorForDisplay } from "@/lib/errorUtils";
+import { reportError } from "@/lib/errorTracking";
 
 interface Props {
   children: ReactNode;
@@ -30,6 +31,10 @@ export class ErrorBoundary extends Component<Props, State> {
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     logger.error("ErrorBoundary caught an error:", error, errorInfo);
     this.setState({ errorInfo });
+    
+    // Report error to tracking system
+    reportError(error, errorInfo.componentStack ?? undefined);
+    
     this.props.onError?.(error, errorInfo);
   }
 
