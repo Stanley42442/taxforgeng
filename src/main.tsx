@@ -24,11 +24,21 @@ const CACHE_VERSION = import.meta.env.VITE_BUILD_TIME || 'dev';
 const AUTH_TOKEN_KEY = 'sb-uhuxqrrtsiintcwpxxwy-auth-token';
 const SESSION_ONLY_KEY = 'taxforge-session-only';
 
+// Reload loop prevention
+const RELOAD_KEY = 'cache-reload-count';
+const MAX_RELOADS = 2;
+
+// Main initialization - blocking to prevent race conditions
 (async () => {
   const lastVersion = safeLocalStorage.getItem('cache-version');
+  const reloadCount = parseInt(safeLocalStorage.getItem(RELOAD_KEY) || '0', 10);
   
-  if (lastVersion !== CACHE_VERSION && 'serviceWorker' in navigator) {
+  // Only attempt cache clear if version changed AND we haven't exceeded max reloads
+  if (lastVersion !== CACHE_VERSION && 'serviceWorker' in navigator && reloadCount < MAX_RELOADS) {
     try {
+      // Increment reload counter BEFORE doing anything else
+      safeLocalStorage.setItem(RELOAD_KEY, String(reloadCount + 1));
+      
       // CRITICAL: Preserve auth token before clearing caches
       // This prevents users from being logged out on every deploy
       const authToken = safeLocalStorage.getItem(AUTH_TOKEN_KEY);
@@ -53,13 +63,20 @@ const SESSION_ONLY_KEY = 'taxforge-session-only';
         safeSessionStorage.setItem(SESSION_ONLY_KEY, sessionOnly);
       }
       
+      // Reload and exit - don't render React yet
       window.location.reload();
       return;
     } catch (error) {
       // PWA cache clear failed - set version anyway to avoid loops
       safeLocalStorage.setItem('cache-version', CACHE_VERSION);
+      // Reset reload counter on error
+      safeLocalStorage.removeItem(RELOAD_KEY);
     }
+  } else {
+    // Reset reload counter on successful load (no cache clear needed)
+    safeLocalStorage.removeItem(RELOAD_KEY);
   }
+  
+  // Only render React AFTER cache check is complete
+  createRoot(document.getElementById("root")!).render(<App />);
 })();
-
-createRoot(document.getElementById("root")!).render(<App />);
