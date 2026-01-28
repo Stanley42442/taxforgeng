@@ -315,13 +315,13 @@ export const generateBusinessReportPDF = (data: BusinessReportData) => {
   doc.rect(margin, footerY - 5, contentWidth, 0.5, 'F');
 
   setColor(mutedColor);
-  doc.setFontSize(7);
+  doc.setFontSize(6);
   doc.text(
-    'DISCLAIMER: This report is for educational and planning purposes only. Tax calculations are estimates.',
+    'TaxForge NG is an educational and planning tool operated by Gillespie Benjamin Mclee. Not official tax advice.',
     pageWidth / 2, footerY + 2, { align: 'center' }
   );
   doc.text(
-    `© ${new Date().getFullYear()} TaxForge NG | Generated on ${dateStr}`,
+    `© ${new Date().getFullYear()} TaxForge NG | Operated by Gillespie Benjamin Mclee | support@taxforgeng.com | Educational tool only`,
     pageWidth / 2, footerY + 7, { align: 'center' }
   );
 

@@ -5,6 +5,7 @@ import type { DocumentationStats } from '@/hooks/useDocumentationStats';
 import {
   BRAND_COLORS,
   COMPANY_INFO,
+  STANDARD_DISCLAIMER,
   PDF_SETTINGS,
   formatNigerianDate,
 } from './exportShared';
@@ -50,16 +51,16 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
   };
 
   const addFooter = (pageNum: number, totalPages: number) => {
-    doc.setFontSize(8);
+    doc.setFontSize(7);
     doc.setTextColor(...BRAND_COLORS.muted);
     doc.text(
-      `${COMPANY_INFO.shortName} - Project Documentation | Page ${pageNum} of ${totalPages}`,
+      `${COMPANY_INFO.shortName} - Operated by ${COMPANY_INFO.operatorShort} | Page ${pageNum} of ${totalPages}`,
       pageWidth / 2,
       pageHeight - 10,
       { align: 'center' }
     );
     doc.text(
-      `Generated: ${formatNigerianDate(new Date().toISOString())}`,
+      `${COMPANY_INFO.email} | Educational tool only | Generated: ${formatNigerianDate(new Date().toISOString())}`,
       pageWidth / 2,
       pageHeight - 5,
       { align: 'center' }
@@ -420,14 +421,14 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
   addBulletPoint('Expanded sector-specific tax modules');
   addBulletPoint('White-label solutions for accounting firms');
 
-  // Contact
+  // Contact & Disclaimer
   yPosition += 10;
-  addNewPageIfNeeded(40);
+  addNewPageIfNeeded(50);
   doc.setFillColor(...BRAND_COLORS.lightBg);
-  doc.roundedRect(margin, yPosition, contentWidth, 30, 3, 3, 'F');
+  doc.roundedRect(margin, yPosition, contentWidth, 45, 3, 3, 'F');
   doc.setDrawColor(...BRAND_COLORS.gold);
   doc.setLineWidth(1);
-  doc.roundedRect(margin, yPosition, contentWidth, 30, 3, 3, 'S');
+  doc.roundedRect(margin, yPosition, contentWidth, 45, 3, 3, 'S');
   yPosition += 12;
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
@@ -438,6 +439,20 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(...BRAND_COLORS.muted);
   doc.text(`${COMPANY_INFO.website} | ${COMPANY_INFO.email}`, pageWidth / 2, yPosition, { align: 'center' });
+  yPosition += 6;
+  doc.setFontSize(7);
+  doc.text(`Operated by ${COMPANY_INFO.operator}`, pageWidth / 2, yPosition, { align: 'center' });
+  yPosition += 12;
+  
+  // Standard disclaimer
+  doc.setFillColor(...BRAND_COLORS.warningBg);
+  doc.roundedRect(margin, yPosition, contentWidth, 20, 2, 2, 'F');
+  doc.setFontSize(7);
+  doc.setTextColor(...BRAND_COLORS.text);
+  const disclaimerLines = doc.splitTextToSize(STANDARD_DISCLAIMER, contentWidth - 10);
+  disclaimerLines.forEach((line: string, index: number) => {
+    doc.text(line, margin + 5, yPosition + 6 + (index * 4));
+  });
 
   // Add footers to all pages
   const totalPages = doc.getNumberOfPages();

@@ -2,6 +2,7 @@ import { jsPDF } from "jspdf";
 import { IndividualTaxResult, IndividualTaxInputs, formatCurrency } from "./individualTaxCalculations";
 import {
   BRAND_COLORS,
+  STANDARD_DISCLAIMER,
   PDF_SETTINGS,
   formatNaira,
   formatNigerianDate,
@@ -276,7 +277,7 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
 
   // === FOOTER ===
   addPDFFooter(doc, {
-    disclaimer: 'DISCLAIMER: This report is for educational and planning purposes only. Please consult a certified tax professional.',
+    disclaimer: STANDARD_DISCLAIMER,
   });
 
   // Watermark

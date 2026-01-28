@@ -2,6 +2,7 @@ import { jsPDF } from 'jspdf';
 import {
   BRAND_COLORS,
   COMPANY_INFO,
+  STANDARD_DISCLAIMER,
   PDF_SETTINGS,
   formatNaira,
   formatNigerianDate,
@@ -30,10 +31,9 @@ export interface PaymentInvoiceData {
   customerName: string;
   customerEmail: string;
   
-  // Business details (TaxForge)
+  // Business details (TaxForge - individual operator)
   businessName: string;
-  businessAddress: string;
-  businessTIN?: string;
+  businessOperator?: string;
   businessEmail: string;
   
   // Dates
@@ -89,11 +89,11 @@ export const generatePaymentInvoicePDF = (data: PaymentInvoiceData): jsPDF => {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.text(data.businessName || COMPANY_INFO.name, margin + 8, y + 22);
-  doc.text(data.businessAddress || COMPANY_INFO.address, margin + 8, y + 30);
-  if (data.businessTIN) {
-    doc.text(`TIN: ${data.businessTIN}`, margin + 8, y + 38);
-  }
-  doc.text(data.businessEmail || COMPANY_INFO.email, margin + 8, y + 46);
+  doc.text(data.businessOperator || COMPANY_INFO.operator, margin + 8, y + 30);
+  doc.text(data.businessEmail || COMPANY_INFO.email, margin + 8, y + 38);
+  doc.setTextColor(...BRAND_COLORS.muted);
+  doc.setFontSize(8);
+  doc.text('Educational tool only', margin + 8, y + 46);
 
   // To section
   doc.setFillColor(...BRAND_COLORS.lightBg);
@@ -220,7 +220,7 @@ export const generatePaymentInvoicePDF = (data: PaymentInvoiceData): jsPDF => {
 
   // === NOTES SECTION ===
   doc.setFillColor(...BRAND_COLORS.lightBg);
-  doc.roundedRect(margin, y, contentWidth, 40, 3, 3, 'F');
+  doc.roundedRect(margin, y, contentWidth, 50, 3, 3, 'F');
   
   doc.setTextColor(...BRAND_COLORS.nigerianGreen);
   doc.setFontSize(9);
@@ -232,11 +232,12 @@ export const generatePaymentInvoicePDF = (data: PaymentInvoiceData): jsPDF => {
   doc.setFontSize(8);
   doc.text(`\u2022 This invoice serves as confirmation of payment for your ${COMPANY_INFO.shortName} subscription.`, margin + 8, y + 18);
   doc.text('\u2022 Your subscription will automatically renew unless cancelled before the end of the billing period.', margin + 8, y + 26);
-  doc.text(`\u2022 For support, contact: ${COMPANY_INFO.email}`, margin + 8, y + 34);
+  doc.text(`\u2022 ${COMPANY_INFO.shortName} is operated by ${COMPANY_INFO.operatorShort} as an individual educational project.`, margin + 8, y + 34);
+  doc.text(`\u2022 For support, contact: ${COMPANY_INFO.email}`, margin + 8, y + 42);
 
   // === FOOTER ===
   addPDFFooter(doc, {
-    disclaimer: 'This is an electronically generated invoice and is valid without signature.',
+    disclaimer: STANDARD_DISCLAIMER,
     pageNumber: 1,
     totalPages: 1,
   });

@@ -8,6 +8,7 @@ import QRCode from 'qrcode';
 import {
   BRAND_COLORS,
   COMPANY_INFO,
+  STANDARD_DISCLAIMER,
   PDF_SETTINGS,
   formatNigerianDate,
 } from './exportShared';
@@ -54,16 +55,16 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
   };
 
   const addFooter = (pageNum: number, totalPages: number) => {
-    doc.setFontSize(8);
+    doc.setFontSize(7);
     doc.setTextColor(...BRAND_COLORS.muted);
     doc.text(
-      `${COMPANY_INFO.shortName} - Tax Logic Reference Document v2.0 | Page ${pageNum} of ${totalPages}`,
+      `${COMPANY_INFO.shortName} - Operated by ${COMPANY_INFO.operatorShort} | Page ${pageNum} of ${totalPages}`,
       pageWidth / 2,
       pageHeight - 10,
       { align: 'center' }
     );
     doc.text(
-      `Generated: ${formatNigerianDate(new Date().toISOString())}`,
+      `${COMPANY_INFO.email} | Educational tool only | Generated: ${formatNigerianDate(new Date().toISOString())}`,
       pageWidth / 2,
       pageHeight - 5,
       { align: 'center' }
@@ -691,10 +692,7 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(...BRAND_COLORS.text);
   const disclaimerLines = doc.splitTextToSize(
-    'This document is provided for educational and informational purposes only. While TaxForge NG strives for accuracy, ' +
-    'tax laws are complex and subject to change. This document does not constitute professional tax advice. ' +
-    'Users should always consult with a qualified tax professional or the Federal Inland Revenue Service (FIRS) ' +
-    'for specific guidance on their tax obligations. TaxForge NG accepts no liability for decisions made based on this document.',
+    STANDARD_DISCLAIMER,
     contentWidth - 10
   );
   disclaimerLines.forEach((line: string) => {
@@ -706,10 +704,10 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
 
   // Contact info
   doc.setFillColor(...BRAND_COLORS.lightBg);
-  doc.roundedRect(margin, yPosition, contentWidth, 35, 3, 3, 'F');
+  doc.roundedRect(margin, yPosition, contentWidth, 45, 3, 3, 'F');
   doc.setDrawColor(...BRAND_COLORS.gold);
   doc.setLineWidth(1);
-  doc.roundedRect(margin, yPosition, contentWidth, 35, 3, 3, 'S');
+  doc.roundedRect(margin, yPosition, contentWidth, 45, 3, 3, 'S');
   yPosition += 12;
 
   doc.setFontSize(12);
@@ -724,6 +722,8 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
   doc.text(`Website: ${COMPANY_INFO.website}`, pageWidth / 2, yPosition, { align: 'center' });
   yPosition += 6;
   doc.text(`Email: ${COMPANY_INFO.email}`, pageWidth / 2, yPosition, { align: 'center' });
+  yPosition += 6;
+  doc.text(`Operated by: ${COMPANY_INFO.operator}`, pageWidth / 2, yPosition, { align: 'center' });
 
   // ========== ADD FOOTERS TO ALL PAGES ==========
   const totalPages = doc.getNumberOfPages();
