@@ -10,6 +10,7 @@ export const AuthLoadingScreen = ({ children }: AuthLoadingScreenProps) => {
   const [showSplash, setShowSplash] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
 
+  // Normal flow: hide splash when auth loading completes
   useEffect(() => {
     if (!loading && showSplash) {
       // Start fade-out animation
@@ -21,6 +22,20 @@ export const AuthLoadingScreen = ({ children }: AuthLoadingScreenProps) => {
       return () => clearTimeout(timer);
     }
   }, [loading, showSplash]);
+
+  // FAILSAFE: Force hide splash after 15 seconds as a fallback
+  // This prevents infinite loading on very slow devices or network issues
+  useEffect(() => {
+    const forceTimeout = setTimeout(() => {
+      if (showSplash) {
+        console.warn('[AuthLoadingScreen] Force hiding splash after 15s timeout');
+        setIsExiting(true);
+        setTimeout(() => setShowSplash(false), 400);
+      }
+    }, 15000);
+
+    return () => clearTimeout(forceTimeout);
+  }, [showSplash]);
 
   if (showSplash && (loading || isExiting)) {
     return (
