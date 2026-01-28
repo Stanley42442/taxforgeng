@@ -49,6 +49,7 @@ import { downloadIndividualTaxPDF } from "@/lib/individualPdfExport";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import logger from "@/lib/logger";
+import { safeLocalStorage } from "@/lib/safeStorage";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { useDeviceCSS, getResponsiveClasses } from "@/hooks/useDeviceCSS";
@@ -227,16 +228,16 @@ const IndividualCalculatorPage = () => {
   
   // Load saved state from localStorage
   const loadSavedState = useCallback(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
+    const saved = safeLocalStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
         const parsed = JSON.parse(saved);
         if (parsed.timestamp && Date.now() - parsed.timestamp < STORAGE_EXPIRY_MS) {
           return parsed.data;
         }
+      } catch {
+        // Ignore
       }
-    } catch {
-      // Ignore
     }
     return null;
   }, []);
@@ -301,7 +302,7 @@ const IndividualCalculatorPage = () => {
         action: {
           label: 'Clear',
           onClick: () => {
-            localStorage.removeItem(STORAGE_KEY);
+            safeLocalStorage.removeItem(STORAGE_KEY);
             // Reset all fields
             setEmploymentIncome('');
             setPensionContribution('');
@@ -349,14 +350,10 @@ const IndividualCalculatorPage = () => {
         location,
       };
       
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          data: formState,
-          timestamp: Date.now(),
-        }));
-      } catch {
-        // Ignore storage errors
-      }
+      safeLocalStorage.setJSON(STORAGE_KEY, {
+        data: formState,
+        timestamp: Date.now(),
+      });
     }, 500);
 
     return () => clearTimeout(saveTimeout);

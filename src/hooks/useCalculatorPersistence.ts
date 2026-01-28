@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
+import { safeLocalStorage } from '@/lib/safeStorage';
 
 const STORAGE_KEYS = {
   individual: 'taxforge_individual_calculator',
@@ -36,9 +37,9 @@ export function useCalculatorPersistence<T extends Record<string, unknown>>(
   const hasShownToast = useRef(false);
   
   const [state, setState] = useState<T>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS[calculatorType]);
-      if (saved) {
+    const saved = safeLocalStorage.getItem(STORAGE_KEYS[calculatorType]);
+    if (saved) {
+      try {
         const parsed: StoredData<T> = JSON.parse(saved);
         // Check if data is less than 24 hours old
         const isRecent = parsed.timestamp && Date.now() - parsed.timestamp < 86400000;
@@ -46,9 +47,9 @@ export function useCalculatorPersistence<T extends Record<string, unknown>>(
           setWasRestored(true);
           return { ...initialState, ...parsed.data };
         }
+      } catch {
+        // Ignore parse errors
       }
-    } catch {
-      // Ignore parse errors
     }
     return initialState;
   });
@@ -59,15 +60,11 @@ export function useCalculatorPersistence<T extends Record<string, unknown>>(
   // Debounced save function - using storageKey to prevent stale closure
   const saveToStorage = useCallback(
     debounce((data: T) => {
-      try {
-        const storageData: StoredData<T> = {
-          data,
-          timestamp: Date.now(),
-        };
-        localStorage.setItem(storageKey, JSON.stringify(storageData));
-      } catch {
-        // Ignore storage errors (quota exceeded, etc.)
-      }
+      const storageData: StoredData<T> = {
+        data,
+        timestamp: Date.now(),
+      };
+      safeLocalStorage.setJSON(storageKey, storageData);
     }, 500),
     [storageKey]
   );
@@ -86,7 +83,7 @@ export function useCalculatorPersistence<T extends Record<string, unknown>>(
         action: {
           label: 'Clear',
           onClick: () => {
-            localStorage.removeItem(STORAGE_KEYS[calculatorType]);
+            safeLocalStorage.removeItem(STORAGE_KEYS[calculatorType]);
             setState(initialState);
             toast.success('Session cleared');
           },
@@ -97,7 +94,7 @@ export function useCalculatorPersistence<T extends Record<string, unknown>>(
   }, [wasRestored, calculatorType, initialState]);
 
   const clearSaved = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEYS[calculatorType]);
+    safeLocalStorage.removeItem(STORAGE_KEYS[calculatorType]);
     setState(initialState);
     setWasRestored(false);
     toast.success('Saved data cleared');
@@ -113,16 +110,16 @@ export function usePersistedState<T>(
   expiryMs: number = 86400000 // 24 hours
 ): [T, (value: T | ((prev: T) => T)) => void] {
   const [state, setState] = useState<T>(() => {
-    try {
-      const stored = localStorage.getItem(key);
-      if (stored) {
+    const stored = safeLocalStorage.getItem(key);
+    if (stored) {
+      try {
         const parsed: StoredData<T> = JSON.parse(stored);
         if (parsed.timestamp && Date.now() - parsed.timestamp < expiryMs) {
           return parsed.data;
         }
+      } catch {
+        // Ignore
       }
-    } catch {
-      // Ignore
     }
     return initialValue;
   });
@@ -130,15 +127,11 @@ export function usePersistedState<T>(
   const setValue = useCallback((value: T | ((prev: T) => T)) => {
     setState((prev) => {
       const newValue = typeof value === 'function' ? (value as (prev: T) => T)(prev) : value;
-      try {
-        const storageData: StoredData<T> = {
-          data: newValue,
-          timestamp: Date.now(),
-        };
-        localStorage.setItem(key, JSON.stringify(storageData));
-      } catch {
-        // Ignore
-      }
+      const storageData: StoredData<T> = {
+        data: newValue,
+        timestamp: Date.now(),
+      };
+      safeLocalStorage.setJSON(key, storageData);
       return newValue;
     });
   }, [key]);

@@ -207,7 +207,7 @@ export const PayrollAnalyticsDashboard = () => {
           <p className="text-muted-foreground">Insights into your payroll data</p>
         </div>
         <div className="flex gap-2">
-          <Select value={selectedYear.toString()} onValueChange={(v) => setSelectedYear(parseInt(v))}>
+          <Select value={selectedYear.toString()} onValueChange={(v) => setSelectedYear(parseInt(v, 10))}>
             <SelectTrigger className="w-[120px]">
               <SelectValue />
             </SelectTrigger>
@@ -339,7 +339,7 @@ export const PayrollAnalyticsDashboard = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Year-over-Year Comparison</CardTitle>
-            <Select value={compareToYear.toString()} onValueChange={(v) => setCompareToYear(parseInt(v))}>
+            <Select value={compareToYear.toString()} onValueChange={(v) => setCompareToYear(parseInt(v, 10))}>
               <SelectTrigger className="w-[120px]">
                 <SelectValue />
               </SelectTrigger>

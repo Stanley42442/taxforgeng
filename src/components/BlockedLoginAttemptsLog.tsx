@@ -95,10 +95,10 @@ export const BlockedLoginAttemptsLog = ({ userId }: BlockedLoginAttemptsLogProps
           if (item.alert_type === 'time_restricted') {
             const hourMatch = item.message_preview.match(/(\d{1,2}):00/);
             const tzMatch = item.message_preview.match(/\(([^)]+)\)/);
-            if (hourMatch) {
-              attempt.time_info = {
-                hour: parseInt(hourMatch[1]),
-                timezone: tzMatch?.[1] || undefined
+          if (hourMatch) {
+            attempt.time_info = {
+              hour: parseInt(hourMatch[1], 10),
+              timezone: tzMatch?.[1] || undefined
               };
             }
           }
