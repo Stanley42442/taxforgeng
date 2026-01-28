@@ -8,6 +8,10 @@ import "./styles/tablet.css";
 import "./styles/desktop.css";
 
 import { safeLocalStorage, safeSessionStorage } from "./lib/safeStorage";
+import { initGlobalErrorHandlers } from "./lib/errorTracking";
+
+// Initialize global error handlers for production error tracking
+initGlobalErrorHandlers();
 
 // Automatic cache busting - uses build timestamp so every deploy triggers cache clear
 const CACHE_VERSION = import.meta.env.VITE_BUILD_TIME || 'dev';
