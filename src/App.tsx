@@ -7,7 +7,7 @@ import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/hooks/useAuth";
-import { AuthLoadingScreen } from "@/components/AuthLoadingScreen";
+
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ReminderNotificationProvider } from "@/components/ReminderNotificationProvider";
 import { TrialBanner } from "@/components/TrialBanner";
@@ -208,9 +208,8 @@ const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="taxforge-ng-theme">
-        <AuthProvider>
-          <AuthLoadingScreen>
-            <SubscriptionProvider>
+      <AuthProvider>
+          <SubscriptionProvider>
               <LanguageProvider>
               <TooltipProvider>
                 <OfflineDataProvider>
@@ -246,7 +245,6 @@ const App = () => (
               </TooltipProvider>
             </LanguageProvider>
           </SubscriptionProvider>
-        </AuthLoadingScreen>
       </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
