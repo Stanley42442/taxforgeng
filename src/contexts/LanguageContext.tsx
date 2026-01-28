@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { safeLocalStorage } from '@/lib/safeStorage';
 
 export type Language = 'en' | 'pcm' | 'yo' | 'ha' | 'ig';
 
@@ -4185,7 +4186,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   // Also check localStorage for non-logged-in users
   useEffect(() => {
     if (!user) {
-      const saved = localStorage.getItem('taxforge-language');
+      const saved = safeLocalStorage.getItem('taxforge-language');
       if (saved === 'en' || saved === 'pcm' || saved === 'yo' || saved === 'ha' || saved === 'ig') {
         setLanguageState(saved);
       }
@@ -4195,7 +4196,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 
   const setLanguage = async (lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem('taxforge-language', lang);
+    safeLocalStorage.setItem('taxforge-language', lang);
 
     if (user) {
       try {
