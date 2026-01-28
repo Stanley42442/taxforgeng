@@ -95,7 +95,7 @@ const handler = async (req: Request): Promise<Response> => {
         </div>
         
         <div style="background: #1f2937; padding: 20px; border-radius: 0 0 12px 12px; text-align: center;">
-          <p style="color: #9ca3af; margin: 0; font-size: 12px;">© ${new Date().getFullYear()} TaxForge NG. All rights reserved.</p>
+          <p style="color: #9ca3af; margin: 0; font-size: 12px;">© ${new Date().getFullYear()} TaxForge NG | Operated by Gillespie Benjamin Mclee | Educational tool only</p>
           <p style="color: #6b7280; margin: 10px 0 0 0; font-size: 11px;">Questions? Reply to this email or visit our support center.</p>
         </div>
       </body>
@@ -139,7 +139,7 @@ const handler = async (req: Request): Promise<Response> => {
         </div>
         
         <div style="background: #1f2937; padding: 20px; border-radius: 0 0 12px 12px; text-align: center;">
-          <p style="color: #9ca3af; margin: 0; font-size: 12px;">© ${new Date().getFullYear()} TaxForge NG. All rights reserved.</p>
+          <p style="color: #9ca3af; margin: 0; font-size: 12px;">© ${new Date().getFullYear()} TaxForge NG | Operated by Gillespie Benjamin Mclee | Educational tool only</p>
           <p style="color: #6b7280; margin: 10px 0 0 0; font-size: 11px;">Questions? Reply to this email or visit our support center.</p>
         </div>
       </body>
