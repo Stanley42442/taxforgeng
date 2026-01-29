@@ -577,7 +577,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </Link>
-        <Link to="/saved-businesses">
+        <Link to="/businesses">
           <Card className="h-full glass-frosted hover:shadow-futuristic hover:border-success/30 transition-all cursor-pointer group hover-lift">
             <CardContent className="p-4 text-center">
               <div className="h-10 w-10 rounded-lg bg-success/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-success/20 transition-colors">
@@ -606,7 +606,7 @@ const Dashboard = () => {
                 {savedBusinesses.length === 0 ? 'No businesses saved yet' : `${savedBusinesses.length} business${savedBusinesses.length > 1 ? 'es' : ''}`}
               </CardDescription>
             </div>
-            <Link to="/saved-businesses">
+            <Link to="/businesses">
               <Button variant="outline" size="sm">
                 View All <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
