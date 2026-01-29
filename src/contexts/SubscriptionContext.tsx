@@ -498,10 +498,10 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     // If downgrading, create data snapshot for future reference
     if (isDowngrade) {
       const dataCounts = await Promise.all([
-        supabase.from('businesses').select('id', { count: 'exact', head: true }),
-        supabase.from('invoices').select('id', { count: 'exact', head: true }),
-        supabase.from('expenses').select('id', { count: 'exact', head: true }),
-        supabase.from('tax_calculations').select('id', { count: 'exact', head: true }),
+        supabase.from('businesses').select('id', { count: 'exact', head: true }).is('deleted_at', null),
+        supabase.from('invoices').select('id', { count: 'exact', head: true }).is('deleted_at', null),
+        supabase.from('expenses').select('id', { count: 'exact', head: true }).is('deleted_at', null),
+        supabase.from('tax_calculations').select('id', { count: 'exact', head: true }).is('deleted_at', null),
       ]);
 
       const snapshots = [

@@ -174,7 +174,7 @@ export function useEmployees(businessId?: string) {
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from('employees')
-        .delete()
+        .update({ deleted_at: new Date().toISOString() })
         .eq('id', id);
       
       if (error) throw error;

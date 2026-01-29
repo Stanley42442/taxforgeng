@@ -13,6 +13,7 @@ import {
 } from '@/types/verification';
 import type { TaxResult, TaxInputs } from './taxCalculations';
 import type { PayrollResult, PayrollInput } from './payrollCalculations';
+import logger from '@/lib/logger';
 
 // Rule verification timestamp - when rules were last verified against official sources
 export const VERIFICATION_TIMESTAMP = '2026-01-21';
@@ -670,24 +671,21 @@ export function toVerificationData(report: VerificationReport): VerificationData
  * Log verification results to console in development mode
  */
 export function logVerificationResults(report: VerificationReport, context: string): void {
-  if (!import.meta.env.DEV) return;
-  
-  console.group(`📋 Tax Verification Report: ${context}`);
-  console.log(`Timestamp: ${report.timestamp}`);
-  console.log(`All Passed: ${report.allPassed ? '✅' : '❌'}`);
-  console.log(`Rules Age: ${report.rulesAge} days`);
+  // Logger already checks for dev mode internally
+  logger.debug(`📋 Tax Verification Report: ${context}`);
+  logger.debug(`Timestamp: ${report.timestamp}`);
+  logger.debug(`All Passed: ${report.allPassed ? '✅' : '❌'}`);
+  logger.debug(`Rules Age: ${report.rulesAge} days`);
   
   if (report.warnings.length > 0) {
-    console.warn('⚠️ Warnings:', report.warnings);
+    logger.warn('⚠️ Warnings:', report.warnings);
   }
   
-  console.group('Validation Results:');
+  logger.debug('Validation Results:');
   report.results.forEach(result => {
     const icon = result.passed ? '✅' : '❌';
-    console.log(`${icon} ${result.ruleName}: ${result.explanation}`);
+    logger.debug(`${icon} ${result.ruleName}: ${result.explanation}`);
   });
-  console.groupEnd();
   
-  console.log('Sources:', report.sources);
-  console.groupEnd();
+  logger.debug('Sources:', report.sources);
 }
