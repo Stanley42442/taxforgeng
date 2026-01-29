@@ -97,6 +97,9 @@ const SavedBusinesses = () => {
   const deleteWithUndo = useDeleteWithUndo<SavedBusiness>({
     onDelete: async (business) => {
       await removeBusiness(business.id);
+      // Immediately refresh deleted list so it shows in Recently Deleted
+      const updated = await getDeletedBusinesses();
+      setDeletedBusinesses(updated);
     },
     onRestore: async (business) => {
       await restoreBusiness(business.id);
