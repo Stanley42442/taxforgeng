@@ -10,16 +10,18 @@ import {
   ArrowRight,
   CheckCircle2,
   Sparkles,
-  ChevronLeft,
-  ChevronRight
 } from "lucide-react";
 
 import { FreeTrialCTA } from "@/components/FreeTrialCTA";
 import { SuccessStories } from "@/components/SuccessStories";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
+import Fade from "embla-carousel-fade";
+import Autoplay from "embla-carousel-autoplay";
 
 const Index = () => {
+  const [api, setApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const CAROUSEL_ITEMS = [
@@ -43,15 +45,25 @@ const Index = () => {
     },
   ];
 
+  // Sync Embla state
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % CAROUSEL_ITEMS.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
+    if (!api) return;
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % CAROUSEL_ITEMS.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + CAROUSEL_ITEMS.length) % CAROUSEL_ITEMS.length);
+    const onSelect = () => {
+      setCurrentSlide(api.selectedScrollSnap());
+    };
+
+    api.on("select", onSelect);
+    onSelect();
+
+    return () => {
+      api.off("select", onSelect);
+    };
+  }, [api]);
+
+  const scrollTo = useCallback((index: number) => {
+    api?.scrollTo(index);
+  }, [api]);
 
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden relative">
@@ -74,18 +86,25 @@ const Index = () => {
           {/* Carousel */}
           <div className="mb-10 animate-slide-up">
             <div className="relative glass-frosted rounded-2xl p-6 md:p-8 overflow-hidden">
-              {/* Carousel Content */}
-              <div className="relative z-10">
-                {CAROUSEL_ITEMS.map((item, index) => (
-                  <div
-                    key={index}
-                    className={`transition-all duration-500 ${
-                      index === currentSlide 
-                        ? 'opacity-100 translate-x-0' 
-                        : 'opacity-0 absolute inset-0 translate-x-8'
-                    }`}
-                  >
-                    {index === currentSlide && (
+              <Carousel
+                setApi={setApi}
+                opts={{
+                  loop: true,
+                  duration: 30,
+                }}
+                plugins={[
+                  Fade(),
+                  Autoplay({
+                    delay: 5000,
+                    stopOnInteraction: false,
+                    stopOnMouseEnter: true,
+                  }),
+                ]}
+                className="w-full"
+              >
+                <CarouselContent className="carousel-fade-container">
+                  {CAROUSEL_ITEMS.map((item, index) => (
+                    <CarouselItem key={index} className="carousel-fade-slide">
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div className="flex items-start gap-4">
                           <div className="h-14 w-14 rounded-xl bg-gradient-primary flex items-center justify-center shrink-0 shadow-lg glow-primary">
@@ -102,39 +121,26 @@ const Index = () => {
                           </Button>
                         </Link>
                       </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
 
               {/* Carousel Controls */}
-              <div className="flex items-center justify-between mt-6">
+              <div className="flex items-center justify-center mt-6">
                 <div className="flex gap-2">
                   {CAROUSEL_ITEMS.map((_, index) => (
                     <button
                       key={index}
-                      onClick={() => setCurrentSlide(index)}
-                      className={`h-2 rounded-full transition-all duration-300 ${
+                      onClick={() => scrollTo(index)}
+                      className={`h-2 rounded-full transition-all duration-500 ${
                         index === currentSlide 
                           ? 'w-8 bg-primary glow-primary' 
                           : 'w-2 bg-border hover:bg-muted-foreground'
                       }`}
+                      aria-label={`Go to slide ${index + 1}`}
                     />
                   ))}
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={prevSlide}
-                    className="h-10 w-10 rounded-full glass flex items-center justify-center hover:bg-secondary transition-colors"
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={nextSlide}
-                    className="h-10 w-10 rounded-full glass flex items-center justify-center hover:bg-secondary transition-colors"
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </button>
                 </div>
               </div>
             </div>
