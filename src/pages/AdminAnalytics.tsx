@@ -171,9 +171,9 @@ const AdminAnalytics = () => {
       
       // Build queries with date filters
       let profilesQuery = supabase.from('profiles').select('subscription_tier, created_at', { count: 'exact' });
-      let businessesQuery = supabase.from('businesses').select('id, created_at', { count: 'exact' });
-      let calculationsQuery = supabase.from('tax_calculations').select('id, created_at', { count: 'exact' });
-      let expensesQuery = supabase.from('expenses').select('id, created_at', { count: 'exact' });
+      let businessesQuery = supabase.from('businesses').select('id, created_at', { count: 'exact' }).is('deleted_at', null);
+      let calculationsQuery = supabase.from('tax_calculations').select('id, created_at', { count: 'exact' }).is('deleted_at', null);
+      let expensesQuery = supabase.from('expenses').select('id, created_at', { count: 'exact' }).is('deleted_at', null);
       let feedbackQuery = (supabase.from('feedback') as any).select('rating, created_at', { count: 'exact' });
       let remindersQuery = supabase.from('reminders').select('id, created_at', { count: 'exact' });
       let partnersQuery = supabase.from('partners').select('id, requests_total, created_at', { count: 'exact' });

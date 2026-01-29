@@ -104,6 +104,7 @@ const BusinessReport = () => {
         .from('expenses')
         .select('*')
         .eq('user_id', user.id)
+        .is('deleted_at', null)
         .order('date', { ascending: false });
 
       const mapped: Expense[] = (data || []).map(e => ({

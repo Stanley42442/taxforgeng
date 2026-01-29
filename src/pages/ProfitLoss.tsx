@@ -40,12 +40,12 @@ const ProfitLoss = () => {
     if (!user) return;
     try {
       setLoading(true);
-      let expenseQuery = supabase.from('expenses').select('category, type, amount, date').eq('user_id', user.id);
+      let expenseQuery = supabase.from('expenses').select('category, type, amount, date').eq('user_id', user.id).is('deleted_at', null);
       if (selectedBusiness !== 'all') expenseQuery = expenseQuery.eq('business_id', selectedBusiness);
       const { data: expenseData } = await expenseQuery;
       setExpenses(expenseData || []);
 
-      let invoiceQuery = supabase.from('invoices').select('total, status, issued_date, paid_date').eq('user_id', user.id).eq('status', 'paid');
+      let invoiceQuery = supabase.from('invoices').select('total, status, issued_date, paid_date').eq('user_id', user.id).eq('status', 'paid').is('deleted_at', null);
       if (selectedBusiness !== 'all') invoiceQuery = invoiceQuery.eq('business_id', selectedBusiness);
       const { data: invoiceData } = await invoiceQuery;
       setInvoices(invoiceData || []);

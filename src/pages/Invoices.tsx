@@ -96,6 +96,7 @@ const Invoices = () => {
         .from('invoices')
         .select('*')
         .eq('user_id', user.id)
+        .is('deleted_at', null)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -251,7 +252,7 @@ const Invoices = () => {
     try {
       const { error } = await supabase
         .from('invoices')
-        .delete()
+        .update({ deleted_at: new Date().toISOString() })
         .eq('id', invoiceId);
 
       if (error) throw error;

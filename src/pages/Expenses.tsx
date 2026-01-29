@@ -366,6 +366,7 @@ const Expenses = () => {
         .from('expenses')
         .select('*')
         .eq('user_id', user.id)
+        .is('deleted_at', null)
         .order('date', { ascending: false });
 
       if (error) {
@@ -558,7 +559,7 @@ const Expenses = () => {
   const handleDeleteExpense = async (id: string) => {
     const { error } = await supabase
       .from('expenses')
-      .delete()
+      .update({ deleted_at: new Date().toISOString() })
       .eq('id', id);
 
     if (error) {

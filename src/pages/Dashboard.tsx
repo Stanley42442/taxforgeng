@@ -160,6 +160,7 @@ const Dashboard = () => {
         .from('expenses')
         .select('*')
         .eq('user_id', user.id)
+        .is('deleted_at', null)
         .order('date', { ascending: false });
 
       if (expenseData) {
