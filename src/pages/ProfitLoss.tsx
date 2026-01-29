@@ -34,7 +34,14 @@ const ProfitLoss = () => {
 
   useEffect(() => {
     if (user && canAccess) fetchData();
-  }, [user, canAccess, selectedBusiness]);
+  }, [user, canAccess, selectedBusiness, savedBusinesses]);
+
+  // Reset selected business if it no longer exists
+  useEffect(() => {
+    if (selectedBusiness !== 'all' && !savedBusinesses.find(b => b.id === selectedBusiness)) {
+      setSelectedBusiness('all');
+    }
+  }, [savedBusinesses, selectedBusiness]);
 
   const fetchData = async () => {
     if (!user) return;

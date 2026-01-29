@@ -224,12 +224,28 @@ const Dashboard = () => {
     }
   }, [dateRange]);
 
-  const filteredExpenses = useMemo(() => {
+  // Create set of active business IDs for filtering orphaned expenses
+  const activeBusinessIds = useMemo(() => 
+    new Set(savedBusinesses.map(b => b.id)),
+    [savedBusinesses]
+  );
+
+  // Filter expenses to only include those from active businesses
+  const validExpenses = useMemo(() => {
     return expenses.filter(e => {
+      // Keep expenses without business_id (general expenses)
+      if (!e.businessId) return true;
+      // Only keep expenses linked to active businesses
+      return activeBusinessIds.has(e.businessId);
+    });
+  }, [expenses, activeBusinessIds]);
+
+  const filteredExpenses = useMemo(() => {
+    return validExpenses.filter(e => {
       const expenseDate = new Date(e.date);
       return isWithinInterval(expenseDate, { start: dateRangeStart, end: new Date() });
     });
-  }, [expenses, dateRangeStart]);
+  }, [validExpenses, dateRangeStart]);
 
   const filteredSummary = useMemo(() => {
     const income = filteredExpenses.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
@@ -243,13 +259,13 @@ const Dashboard = () => {
     const last7Days = eachDayOfInterval({ start: subDays(today, 6), end: today });
     
     const incomeByDay = last7Days.map(day => {
-      return expenses
+      return validExpenses
         .filter(e => e.type === 'income' && format(new Date(e.date), 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd'))
         .reduce((sum, e) => sum + e.amount, 0);
     });
     
     const expensesByDay = last7Days.map(day => {
-      return expenses
+      return validExpenses
         .filter(e => e.type === 'expense' && format(new Date(e.date), 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd'))
         .reduce((sum, e) => sum + e.amount, 0);
     });
@@ -257,7 +273,7 @@ const Dashboard = () => {
     const netByDay = incomeByDay.map((inc, i) => inc - expensesByDay[i]);
     
     return { income: incomeByDay, expenses: expensesByDay, net: netByDay };
-  }, [expenses]);
+  }, [validExpenses]);
 
   if (!user) {
     return (

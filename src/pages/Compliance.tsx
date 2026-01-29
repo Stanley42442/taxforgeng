@@ -65,7 +65,14 @@ const Compliance = () => {
 
   useEffect(() => {
     if (user && canAccess) fetchItems();
-  }, [user, canAccess]);
+  }, [user, canAccess, savedBusinesses]);
+
+  // Reset selected business if it no longer exists
+  useEffect(() => {
+    if (selectedBusiness && !savedBusinesses.find(b => b.id === selectedBusiness)) {
+      setSelectedBusiness('');
+    }
+  }, [savedBusinesses, selectedBusiness]);
 
   const fetchItems = async () => {
     if (!user) return;
