@@ -1,98 +1,188 @@
 
-# Fix: Notification Errors & Navigation Issues
 
-## Problems Identified
+# Fix: Missing Soft-Delete Filters, Convert Hard Deletes, and Replace Console Logs
 
-### Issue 1: Notification Constructor Error
-**Error Message:** `Failed to construct 'Notification': Illegal constructor. Use ServiceWorkerRegistration.showNotification() instead.`
+## Overview
 
-**Root Cause:** On mobile PWAs (installed to home screen), the `new Notification()` constructor is blocked by browsers. Instead, notifications must go through the Service Worker via `ServiceWorkerRegistration.showNotification()`.
-
-**Affected Files:**
-| File | Line | Issue |
-|------|------|-------|
-| `src/lib/notifications.ts` | 75 | Uses `new Notification()` directly |
-| `src/lib/pwaNotifications.ts` | 148 | Fallback uses `new Notification()` |
-| `src/pages/Expenses.tsx` | 294 | Uses `new Notification()` directly |
-
-### Issue 2: Navigation from Dashboard to Saved Businesses Broken
-**Root Cause:** The Dashboard links to `/saved-businesses` but the actual route defined in `App.tsx` is `/businesses`.
-
-**Evidence:**
-- App.tsx line 148: `<Route path="/businesses" element={<SavedBusinesses />} />`
-- Dashboard.tsx line 580: `<Link to="/saved-businesses">` (WRONG)
-- Dashboard.tsx line 609: `<Link to="/saved-businesses">` (WRONG)
+This plan addresses three categories of issues identified in the codebase:
+1. **Category 1**: Missing `deleted_at` filters in queries (showing deleted records)
+2. **Category 2**: Hard deletes that should be soft deletes (expenses, invoices, employees)
+3. **Category 5**: Console.log statements that should use the logger utility
 
 ---
 
-## Solution
+## Category 1: Missing `deleted_at` Filters
 
-### Fix 1: Create a PWA-Safe Notification Wrapper
-Create a utility function that:
-1. First attempts to use Service Worker registration to show notifications
-2. Falls back to `new Notification()` only if running in a regular browser tab (not PWA)
-3. Wraps all notification calls in try-catch to prevent crashes
+These queries currently fetch soft-deleted records, causing incorrect data displays and calculations.
 
-**Changes to `src/lib/notifications.ts`:**
+### Files to Fix
+
+| File | Issue | Fix |
+|------|-------|-----|
+| `src/pages/Expenses.tsx` | Line ~559 fetches all expenses | Add `.is('deleted_at', null)` |
+| `src/pages/Invoices.tsx` | Line ~95 fetches all invoices | Add `.is('deleted_at', null)` |
+| `src/pages/ProfitLoss.tsx` | Profit/loss calculations include deleted entries | Add `.is('deleted_at', null)` to all queries |
+| `src/pages/BusinessReport.tsx` | Business report includes deleted records | Add `.is('deleted_at', null)` |
+| `src/pages/Dashboard.tsx` | Stats may include deleted records | Add `.is('deleted_at', null)` |
+| `src/pages/AccountantPortal.tsx` | Accountant view shows deleted records | Add `.is('deleted_at', null)` |
+| `src/pages/AdminAnalytics.tsx` | Admin metrics include deleted records | Add `.is('deleted_at', null)` |
+| `src/hooks/useDocumentationStats.ts` | All stat counts include deleted records | Add `.is('deleted_at', null)` to applicable tables |
+| `src/contexts/SubscriptionContext.tsx` | Tier snapshot logic counts deleted items | Add `.is('deleted_at', null)` |
+
+### Pattern
+
 ```typescript
-// New PWA-safe notification function
-export const showBrowserNotification = async (
-  title: string, 
-  body: string, 
-  redirectUrl?: string
-) => {
-  const browserEnabled = safeLocalStorage.getItem('notification-browser-enabled') !== 'false';
-  if (Notification.permission !== 'granted' || !browserEnabled) return;
-  
-  try {
-    // Prefer Service Worker method (required for PWA)
-    if ('serviceWorker' in navigator) {
-      const registration = await navigator.serviceWorker.ready;
-      await registration.showNotification(title, {
-        body,
-        icon: '/favicon.ico',
-        badge: '/favicon.ico',
-        tag: `notification-${Date.now()}`,
-        data: { url: redirectUrl }
-      });
-      return;
-    }
-  } catch (e) {
-    // Service Worker method failed, try fallback
-  }
-  
-  // Fallback for regular browser tabs only
-  try {
-    const notification = new Notification(title, { body, icon: '/favicon.ico' });
-    notification.onclick = () => { /* ... */ };
-  } catch {
-    // Silently fail - PWA context doesn't support this
-  }
-};
+// Before
+const { data } = await supabase
+  .from('expenses')
+  .select('*')
+  .eq('user_id', user.id);
+
+// After  
+const { data } = await supabase
+  .from('expenses')
+  .select('*')
+  .eq('user_id', user.id)
+  .is('deleted_at', null);
 ```
 
-### Fix 2: Update Expenses.tsx to Use Safe Wrapper
-Replace direct `new Notification()` call with the shared utility function.
+---
 
-### Fix 3: Fix Dashboard Navigation Links
-Change `/saved-businesses` to `/businesses` in Dashboard.tsx.
+## Category 2: Convert Hard Deletes to Soft Deletes
+
+Convert direct `.delete()` calls to soft deletes for data recovery capability.
+
+### Files to Convert
+
+| File | Table | Current | Change To |
+|------|-------|---------|-----------|
+| `src/pages/Expenses.tsx` | expenses | `.delete()` | `.update({ deleted_at: new Date().toISOString() })` |
+| `src/pages/Invoices.tsx` | invoices | `.delete()` | `.update({ deleted_at: new Date().toISOString() })` |
+| `src/hooks/useEmployees.ts` | employees | `.delete()` | `.update({ deleted_at: new Date().toISOString() })` |
+| `src/hooks/usePayrollHistory.ts` | payroll_runs | `.delete()` | `.update({ deleted_at: new Date().toISOString() })` |
+
+### Keep as Hard Delete (per recommendation)
+
+| File | Table | Reason |
+|------|-------|--------|
+| `src/pages/Reminders.tsx` | reminders | Low-value ephemeral data, no audit need |
+| `src/lib/notifications.ts` | user_notifications | User-initiated clear action |
+| `src/pages/CalculationHistory.tsx` | individual_calculations | User-initiated clear, no business need |
+| `src/components/IPWhitelistManager.tsx` | ip_whitelist | Security data, user controls |
+| `src/components/EmailRecipientsManager.tsx` | email_recipients | User preference, no audit need |
+
+### Soft Delete Pattern
+
+```typescript
+// Before (hard delete)
+const deleteEmployee = useMutation({
+  mutationFn: async (id: string) => {
+    const { error } = await supabase
+      .from('employees')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+  },
+  onSuccess: () => {
+    toast.success('Employee deleted');
+  },
+});
+
+// After (soft delete)
+const deleteEmployee = useMutation({
+  mutationFn: async (id: string) => {
+    const { error } = await supabase
+      .from('employees')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id);
+    if (error) throw error;
+  },
+  onSuccess: () => {
+    toast.success('Employee deleted');
+  },
+});
+```
 
 ---
 
-## Files to Modify
+## Category 5: Replace Console.log with Logger
 
-| File | Change |
-|------|--------|
-| `src/lib/notifications.ts` | Make `showBrowserNotification` async and use Service Worker |
-| `src/lib/pwaNotifications.ts` | Wrap fallback `new Notification()` in try-catch |
-| `src/pages/Expenses.tsx` | Replace inline notification with shared utility |
-| `src/pages/Dashboard.tsx` | Change `/saved-businesses` to `/businesses` (2 locations) |
+The `src/lib/taxValidators.ts` file uses raw `console.log/group/warn` statements instead of the project's logger utility.
+
+### File to Fix
+
+**`src/lib/taxValidators.ts`** (lines 675-693)
+
+### Current Code
+```typescript
+export function logVerificationResults(report: VerificationReport, context: string): void {
+  if (!import.meta.env.DEV) return;
+  
+  console.group(`📋 Tax Verification Report: ${context}`);
+  console.log(`Timestamp: ${report.timestamp}`);
+  console.log(`All Passed: ${report.allPassed ? '✅' : '❌'}`);
+  console.log(`Rules Age: ${report.rulesAge} days`);
+  
+  if (report.warnings.length > 0) {
+    console.warn('⚠️ Warnings:', report.warnings);
+  }
+  
+  console.group('Validation Results:');
+  report.results.forEach(result => {
+    const icon = result.passed ? '✅' : '❌';
+    console.log(`${icon} ${result.ruleName}: ${result.explanation}`);
+  });
+  console.groupEnd();
+  
+  console.log('Sources:', report.sources);
+  console.groupEnd();
+}
+```
+
+### Fixed Code
+```typescript
+import logger from '@/lib/logger';
+
+export function logVerificationResults(report: VerificationReport, context: string): void {
+  // Logger already checks for dev mode internally
+  logger.debug(`📋 Tax Verification Report: ${context}`);
+  logger.debug(`Timestamp: ${report.timestamp}`);
+  logger.debug(`All Passed: ${report.allPassed ? '✅' : '❌'}`);
+  logger.debug(`Rules Age: ${report.rulesAge} days`);
+  
+  if (report.warnings.length > 0) {
+    logger.warn('⚠️ Warnings:', report.warnings);
+  }
+  
+  logger.debug('Validation Results:');
+  report.results.forEach(result => {
+    const icon = result.passed ? '✅' : '❌';
+    logger.debug(`${icon} ${result.ruleName}: ${result.explanation}`);
+  });
+  
+  logger.debug('Sources:', report.sources);
+}
+```
+
+---
+
+## Summary of Changes
+
+| Category | Files | Changes |
+|----------|-------|---------|
+| 1 - Missing filters | 9 files | Add `.is('deleted_at', null)` to queries |
+| 2 - Hard to soft delete | 4 files | Convert `.delete()` to `.update({ deleted_at })` |
+| 5 - Console.log | 1 file | Replace with logger utility |
+
+**Total: 14 files to modify**
 
 ---
 
 ## Expected Results
 
-After these changes:
-1. **No more notification errors** - Notifications will work properly in PWA mode
-2. **Dashboard navigation works** - Clicking "Businesses" card navigates correctly to the saved businesses page
-3. **Graceful degradation** - If notifications can't be shown, the app silently continues without crashing
+After implementation:
+- Deleted records no longer appear in lists, reports, or calculations
+- Users can recover accidentally deleted expenses, invoices, and employees
+- Consistent logging through the project's logger utility
+- Cleaner production console output
+
