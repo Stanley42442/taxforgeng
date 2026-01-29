@@ -67,11 +67,35 @@ export const playNotificationSound = () => {
   }
 };
 
-// Show browser notification
-export const showBrowserNotification = (title: string, body: string, redirectUrl?: string) => {
+// Show browser notification (PWA-safe: uses Service Worker when available)
+export const showBrowserNotification = async (title: string, body: string, redirectUrl?: string): Promise<void> => {
   const browserEnabled = safeLocalStorage.getItem('notification-browser-enabled') !== 'false';
   
-  if (Notification.permission === "granted" && browserEnabled) {
+  if (Notification.permission !== "granted" || !browserEnabled) {
+    return;
+  }
+
+  // Prefer Service Worker method (required for PWA/standalone mode)
+  try {
+    if ('serviceWorker' in navigator) {
+      const registration = await navigator.serviceWorker.ready;
+      await registration.showNotification(title, {
+        body,
+        icon: "/favicon.ico",
+        badge: "/favicon.ico",
+        tag: `notification-${Date.now()}`,
+        requireInteraction: false,
+        data: { url: redirectUrl }
+      });
+      return;
+    }
+  } catch (error) {
+    // Service Worker method failed, try fallback
+    logger.debug('Service Worker notification failed, trying fallback:', error);
+  }
+
+  // Fallback for regular browser tabs (not PWA)
+  try {
     const notification = new Notification(title, {
       body,
       icon: "/favicon.ico",
@@ -87,6 +111,9 @@ export const showBrowserNotification = (title: string, body: string, redirectUrl
         window.location.href = redirectUrl;
       }
     };
+  } catch {
+    // Silently fail - PWA context doesn't support direct Notification constructor
+    logger.debug('Direct Notification constructor not supported in this context');
   }
 };
 

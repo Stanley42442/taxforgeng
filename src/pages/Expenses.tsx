@@ -287,16 +287,37 @@ const Expenses = () => {
     }
   };
 
-  // Send notification
-  const sendExpenseNotification = (title: string, body: string) => {
+  // Send notification (PWA-safe: uses Service Worker when available)
+  const sendExpenseNotification = async (title: string, body: string) => {
     if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
     
-    new Notification(title, {
-      body,
-      icon: '/favicon.ico',
-      badge: '/favicon.ico',
-      tag: 'expense-reminder',
-    });
+    // Prefer Service Worker method (required for PWA/standalone mode)
+    try {
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.ready;
+        await registration.showNotification(title, {
+          body,
+          icon: '/favicon.ico',
+          badge: '/favicon.ico',
+          tag: 'expense-reminder',
+        });
+        return;
+      }
+    } catch {
+      // Service Worker method failed, try fallback
+    }
+
+    // Fallback for regular browser tabs (not PWA)
+    try {
+      new Notification(title, {
+        body,
+        icon: '/favicon.ico',
+        badge: '/favicon.ico',
+        tag: 'expense-reminder',
+      });
+    } catch {
+      // Silently fail - PWA context doesn't support direct Notification constructor
+    }
   };
 
   // Check for due expenses and notify

@@ -142,7 +142,7 @@ export const showPWANotification = async (
     }
   }
 
-  // Fallback to regular Notification API
+  // Fallback to regular Notification API (only works in regular browser tabs, not PWA)
   if (Notification.permission === 'granted') {
     try {
       const notification = new Notification(title, {
@@ -163,8 +163,10 @@ export const showPWANotification = async (
 
       logger.debug('[PWA] Notification shown via Notification API');
       return true;
-    } catch (error) {
-      logger.error('[PWA] Notification API failed:', error);
+    } catch {
+      // Silently fail - PWA/standalone mode doesn't support direct Notification constructor
+      // This is expected behavior, not an error
+      logger.debug('[PWA] Direct Notification constructor not supported (PWA mode)');
     }
   }
 
