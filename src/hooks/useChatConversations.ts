@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { safeLocalStorage } from '@/lib/safeStorage';
 import { STORAGE_KEYS } from '@/lib/constants';
+import { logger } from '@/lib/logger';
 import { useAuth } from '@/hooks/useAuth';
 
 export interface ChatMessage {
@@ -103,7 +104,7 @@ export function useChatConversations() {
         }
       }
     } catch (error) {
-      console.error('Failed to load conversations:', error);
+      logger.error('Failed to load conversations:', error);
     } finally {
       setIsLoading(false);
     }
@@ -165,7 +166,7 @@ export function useChatConversations() {
       setCurrentConversationId(newId);
       return newId;
     } catch (error) {
-      console.error('Failed to create conversation:', error);
+      logger.error('Failed to create conversation:', error);
       return null;
     }
   }, [user]);
@@ -228,7 +229,7 @@ export function useChatConversations() {
         return c;
       }));
     } catch (error) {
-      console.error('Failed to update messages:', error);
+      logger.error('Failed to update messages:', error);
     }
   }, [user]);
 
@@ -252,17 +253,23 @@ export function useChatConversations() {
         safeLocalStorage.setJSON(STORAGE_KEYS.GUEST_CONVERSATIONS, filtered);
       }
 
-      setConversations(prev => prev.filter(c => c.id !== conversationId));
-      
-      // If deleting current, switch to another
-      if (currentConversationId === conversationId) {
-        const remaining = conversations.filter(c => c.id !== conversationId);
-        setCurrentConversationId(remaining.length > 0 ? remaining[0].id : null);
-      }
+      // Update conversations and handle current selection atomically
+      setConversations(prev => {
+        const updated = prev.filter(c => c.id !== conversationId);
+        
+        // If deleting current conversation, switch to next available
+        if (currentConversationId === conversationId) {
+          const nextConversation = updated.length > 0 ? updated[0].id : null;
+          // Use setTimeout to avoid state update during render
+          setTimeout(() => setCurrentConversationId(nextConversation), 0);
+        }
+        
+        return updated;
+      });
     } catch (error) {
-      console.error('Failed to delete conversation:', error);
+      logger.error('Failed to delete conversation:', error);
     }
-  }, [user, currentConversationId, conversations]);
+  }, [user, currentConversationId]);
 
   // Switch conversation
   const switchConversation = useCallback((conversationId: string) => {
