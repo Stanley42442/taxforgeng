@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { safeLocalStorage } from '@/lib/safeStorage';
 import { STORAGE_KEYS } from '@/lib/constants';
@@ -32,6 +32,29 @@ export function useChatConversations() {
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Filter conversations based on search query
+  const filteredConversations = useMemo(() => {
+    if (!searchQuery.trim()) return conversations;
+    
+    const lowercaseQuery = searchQuery.toLowerCase();
+    
+    return conversations.filter(conv => {
+      // Match by title
+      if (conv.title.toLowerCase().includes(lowercaseQuery)) return true;
+      
+      // Match by message content
+      return conv.messages.some(msg => 
+        msg.content.toLowerCase().includes(lowercaseQuery)
+      );
+    });
+  }, [conversations, searchQuery]);
+
+  // Clear search
+  const clearSearch = useCallback(() => {
+    setSearchQuery('');
+  }, []);
 
   // Load conversations from database or localStorage
   const loadConversations = useCallback(async () => {
@@ -248,9 +271,13 @@ export function useChatConversations() {
 
   return {
     conversations,
+    filteredConversations,
     currentConversation,
     currentConversationId,
     isLoading,
+    searchQuery,
+    setSearchQuery,
+    clearSearch,
     createConversation,
     updateMessages,
     deleteConversation,

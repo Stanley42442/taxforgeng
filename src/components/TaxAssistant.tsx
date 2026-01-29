@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bot, Send, User, Loader2, X, MessageCircle, Sparkles, Building2, Plus, History, Trash2, ChevronRight, Download, FileText, FileDown } from "lucide-react";
+import { Bot, Send, User, Loader2, X, MessageCircle, Sparkles, Building2, Plus, History, Trash2, ChevronRight, Download, FileText, FileDown, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { safeLocalStorage } from "@/lib/safeStorage";
@@ -23,7 +23,7 @@ import {
   MAX_CHAT_HISTORY_MESSAGES,
   STORAGE_KEYS 
 } from "@/lib/constants";
-import { useChatConversations, ChatMessage } from "@/hooks/useChatConversations";
+import { useChatConversations, ChatMessage, ChatConversation } from "@/hooks/useChatConversations";
 import { formatDistanceToNow } from "date-fns";
 import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
 import { exportChatToPDF, exportChatToText } from "@/lib/chatExport";
@@ -81,14 +81,35 @@ export function TaxAssistant() {
   const primaryBusiness = savedBusinesses[0];
 
   const {
-    conversations,
+    filteredConversations,
     currentConversation,
     currentConversationId,
+    searchQuery,
+    setSearchQuery,
+    clearSearch,
     createConversation,
     updateMessages,
     deleteConversation,
     switchConversation,
   } = useChatConversations();
+
+  // Get matching snippet for search results
+  const getMatchSnippet = (conv: ChatConversation, query: string): string | null => {
+    if (!query) return null;
+    
+    const lowerQuery = query.toLowerCase();
+    
+    for (const msg of conv.messages) {
+      const idx = msg.content.toLowerCase().indexOf(lowerQuery);
+      if (idx !== -1) {
+        const start = Math.max(0, idx - 20);
+        const end = Math.min(msg.content.length, idx + query.length + 20);
+        const snippet = msg.content.slice(start, end);
+        return `...${snippet}...`;
+      }
+    }
+    return null;
+  };
 
   // Local messages state for streaming
   const [streamingMessages, setStreamingMessages] = useState<ChatMessage[]>([]);
@@ -279,7 +300,15 @@ export function TaxAssistant() {
 
   const handleNewChat = async () => {
     await createConversation();
+    clearSearch();
     setShowHistory(false);
+  };
+
+  const handleHistoryClose = (open: boolean) => {
+    setShowHistory(open);
+    if (!open) {
+      clearSearch();
+    }
   };
 
   const handleDeleteConversation = (id: string) => {
@@ -424,7 +453,7 @@ export function TaxAssistant() {
         <CardHeader className="bg-gradient-primary text-white rounded-t-lg py-2 px-3 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Popover open={showHistory} onOpenChange={setShowHistory}>
+              <Popover open={showHistory} onOpenChange={handleHistoryClose}>
                 <PopoverTrigger asChild>
                   <button 
                     className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
@@ -452,18 +481,38 @@ export function TaxAssistant() {
                       </Button>
                     </div>
                   </div>
+                  {/* Search Input */}
+                  <div className="relative px-3 py-2 border-b">
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                    <Input
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search chats..."
+                      className="h-8 pl-8 pr-8 text-xs"
+                    />
+                    {searchQuery && (
+                      <button 
+                        onClick={clearSearch}
+                        className="absolute right-5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-muted rounded"
+                        aria-label="Clear search"
+                      >
+                        <X className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
+                      </button>
+                    )}
+                  </div>
                   <ScrollArea className="max-h-64">
-                    {conversations.length === 0 ? (
+                    {filteredConversations.length === 0 ? (
                       <div className="p-4 text-center text-sm text-muted-foreground">
-                        No conversations yet
+                        {searchQuery ? 'No matches found' : 'No conversations yet'}
                       </div>
                     ) : (
                       <div className="p-1">
-                        {conversations.map((conv) => (
+                        {filteredConversations.map((conv) => (
                           <button
                             key={conv.id}
                             onClick={() => {
                               switchConversation(conv.id);
+                              clearSearch();
                               setShowHistory(false);
                             }}
                             className={`w-full text-left p-2 rounded-md flex items-center gap-2 hover:bg-muted transition-colors group ${
@@ -472,6 +521,11 @@ export function TaxAssistant() {
                           >
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium truncate">{conv.title}</p>
+                              {searchQuery && (
+                                <p className="text-[10px] text-muted-foreground truncate italic">
+                                  {getMatchSnippet(conv, searchQuery)}
+                                </p>
+                              )}
                               <p className="text-xs text-muted-foreground">
                                 {formatDistanceToNow(new Date(conv.updated_at), { addSuffix: true })}
                               </p>
