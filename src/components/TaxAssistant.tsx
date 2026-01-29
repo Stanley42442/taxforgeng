@@ -6,7 +6,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Bot, Send, User, Loader2, X, MessageCircle, Sparkles, Building2, Plus, History, Trash2, ChevronRight } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Bot, Send, User, Loader2, X, MessageCircle, Sparkles, Building2, Plus, History, Trash2, ChevronRight, Download, FileText, FileDown } from "lucide-react";
 import { toast } from "sonner";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { safeLocalStorage } from "@/lib/safeStorage";
@@ -20,6 +26,7 @@ import {
 import { useChatConversations, ChatMessage } from "@/hooks/useChatConversations";
 import { formatDistanceToNow } from "date-fns";
 import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
+import { exportChatToPDF, exportChatToText } from "@/lib/chatExport";
 
 interface Position {
   x: number;
@@ -288,6 +295,32 @@ export function TaxAssistant() {
     }
   };
 
+  const handleExportPDF = () => {
+    if (!currentConversation || currentConversation.messages.length === 0) {
+      toast.error('No messages to export');
+      return;
+    }
+    try {
+      exportChatToPDF(currentConversation);
+      toast.success('Conversation exported as PDF');
+    } catch (error) {
+      toast.error('Failed to export PDF');
+    }
+  };
+
+  const handleExportText = () => {
+    if (!currentConversation || currentConversation.messages.length === 0) {
+      toast.error('No messages to export');
+      return;
+    }
+    try {
+      exportChatToText(currentConversation);
+      toast.success('Conversation exported as text file');
+    } catch (error) {
+      toast.error('Failed to export text file');
+    }
+  };
+
   const sendMessage = async (messageText?: string) => {
     const now = Date.now();
     if (now - lastSentRef.current < CHAT_RATE_LIMIT_MS) {
@@ -471,6 +504,29 @@ export function TaxAssistant() {
               </div>
             </div>
             <div className="flex items-center gap-1">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:bg-white/20 h-7 w-7"
+                    disabled={!currentConversation || currentConversation.messages.length === 0}
+                    aria-label="Export conversation"
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuItem onClick={handleExportPDF}>
+                    <FileDown className="h-4 w-4 mr-2" />
+                    Export as PDF
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleExportText}>
+                    <FileText className="h-4 w-4 mr-2" />
+                    Export as Text
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button
                 variant="ghost"
                 size="icon"
