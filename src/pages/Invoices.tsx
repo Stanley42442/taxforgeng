@@ -86,7 +86,14 @@ const Invoices = () => {
     if (user && canAccess) {
       fetchInvoices();
     }
-  }, [user, canAccess]);
+  }, [user, canAccess, savedBusinesses]);
+
+  // Reset selected business if it no longer exists
+  useEffect(() => {
+    if (selectedBusiness && !savedBusinesses.find(b => b.id === selectedBusiness)) {
+      setSelectedBusiness('');
+    }
+  }, [savedBusinesses, selectedBusiness]);
 
   const fetchInvoices = async () => {
     if (!user) return;

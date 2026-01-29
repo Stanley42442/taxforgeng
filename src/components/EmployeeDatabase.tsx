@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,7 @@ import {
   TrendingUp, MoreHorizontal, History, FileText, AlertCircle
 } from "lucide-react";
 import { useEmployees, type Employee, type CreateEmployeeInput } from "@/hooks/useEmployees";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -294,6 +295,7 @@ const EmployeeForm = ({ formData, setFormData, isEdit = false }: EmployeeFormPro
 
 export const EmployeeDatabase = () => {
   const { employees, isLoading, addEmployee, updateEmployee, deleteEmployee } = useEmployees();
+  const { savedBusinesses } = useSubscription();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterDepartment, setFilterDepartment] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("active");
@@ -305,8 +307,24 @@ export const EmployeeDatabase = () => {
   const [newSalary, setNewSalary] = useState<number>(0);
   const [salaryChangeReason, setSalaryChangeReason] = useState("");
 
-  // Filter employees
-  const filteredEmployees = employees?.filter(emp => {
+  // Create set of active business IDs for filtering orphaned employees
+  const activeBusinessIds = useMemo(() => 
+    new Set(savedBusinesses.map(b => b.id)),
+    [savedBusinesses]
+  );
+
+  // Filter employees to only include those from active businesses
+  const validEmployees = useMemo(() => {
+    return (employees || []).filter(emp => {
+      // Keep employees without business_id
+      if (!emp.business_id) return true;
+      // Only keep employees linked to active businesses
+      return activeBusinessIds.has(emp.business_id);
+    });
+  }, [employees, activeBusinessIds]);
+
+  // Filter employees with active business filtering applied
+  const filteredEmployees = validEmployees.filter(emp => {
     const matchesSearch = 
       emp.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       emp.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -317,18 +335,18 @@ export const EmployeeDatabase = () => {
     const matchesStatus = filterStatus === "all" || emp.status === filterStatus;
     
     return matchesSearch && matchesDepartment && matchesStatus;
-  }) || [];
+  });
 
-  // Stats
-  const totalEmployees = employees?.filter(e => e.status === "active").length || 0;
-  const totalPayroll = employees?.filter(e => e.status === "active").reduce((sum, e) => sum + e.current_gross_salary, 0) || 0;
+  // Stats - use validEmployees for accurate counts
+  const totalEmployees = validEmployees.filter(e => e.status === "active").length;
+  const totalPayroll = validEmployees.filter(e => e.status === "active").reduce((sum, e) => sum + e.current_gross_salary, 0);
   const avgSalary = totalEmployees > 0 ? totalPayroll / totalEmployees : 0;
-  const departmentCounts = employees?.reduce((acc, e) => {
+  const departmentCounts = validEmployees.reduce((acc, e) => {
     if (e.status === "active" && e.department) {
       acc[e.department] = (acc[e.department] || 0) + 1;
     }
     return acc;
-  }, {} as Record<string, number>) || {};
+  }, {} as Record<string, number>);
 
   const handleAddEmployee = async () => {
     if (!formData.firstName || !formData.lastName || formData.currentGrossSalary <= 0) {

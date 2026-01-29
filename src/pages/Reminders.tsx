@@ -171,6 +171,13 @@ const Reminders = () => {
     fetchReminders();
   }, [fetchReminders]);
 
+  // Reset selectedBusiness if it no longer exists
+  useEffect(() => {
+    if (selectedBusiness && !savedBusinesses.find(b => b.id === selectedBusiness.id)) {
+      setSelectedBusiness(null);
+    }
+  }, [savedBusinesses, selectedBusiness]);
+
   const getBusinessReminders = (businessId: string) => {
     return reminders.filter(r => r.businessId === businessId);
   };

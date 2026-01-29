@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { useSubscription, SavedBusiness } from "@/contexts/SubscriptionContext";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,14 @@ const Transactions = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const canAccess = tier === 'business' || tier === 'corporate';
+
+  // Reset selected business if it no longer exists
+  useEffect(() => {
+    if (selectedBusinessId && !savedBusinesses.find(b => b.id === selectedBusinessId)) {
+      setSelectedBusinessId('');
+      setTransactions([]);
+    }
+  }, [savedBusinesses, selectedBusinessId]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

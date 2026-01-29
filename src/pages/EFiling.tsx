@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
 import { useSubscription } from "@/contexts/SubscriptionContext";
@@ -42,6 +42,14 @@ const EFiling = () => {
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
 
   const isBusinessPlus = tier === 'business' || tier === 'corporate';
+
+  // Reset selected business if it no longer exists
+  useEffect(() => {
+    if (selectedBusiness && !savedBusinesses.find(b => b.id === selectedBusiness)) {
+      setSelectedBusiness('');
+      setFilingStep('select');
+    }
+  }, [savedBusinesses, selectedBusiness]);
 
   if (!isBusinessPlus) {
     return (

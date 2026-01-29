@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import {
   FileText, DollarSign, TrendingUp, ChevronDown
 } from "lucide-react";
 import { usePayrollHistory } from "@/hooks/usePayrollHistory";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { generatePayslipPDF } from "@/lib/payslipPdfExport";
 import { format } from "date-fns";
@@ -24,6 +25,7 @@ import {
 
 export const PayrollHistory = () => {
   const { payrollRuns, isLoading, getPayrollEntries } = usePayrollHistory();
+  const { savedBusinesses } = useSubscription();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterYear, setFilterYear] = useState<string>("all");
   const [selectedRun, setSelectedRun] = useState<string | null>(null);
@@ -32,19 +34,35 @@ export const PayrollHistory = () => {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 5 }, (_, i) => (currentYear - i).toString());
 
-  // Filter runs
-  const filteredRuns = payrollRuns?.filter(run => {
+  // Create set of active business IDs for filtering orphaned payroll runs
+  const activeBusinessIds = useMemo(() => 
+    new Set(savedBusinesses.map(b => b.id)),
+    [savedBusinesses]
+  );
+
+  // Filter payroll runs to only include those from active businesses
+  const validPayrollRuns = useMemo(() => {
+    return (payrollRuns || []).filter(run => {
+      // Keep runs without business_id
+      if (!run.business_id) return true;
+      // Only keep runs linked to active businesses
+      return activeBusinessIds.has(run.business_id);
+    });
+  }, [payrollRuns, activeBusinessIds]);
+
+  // Filter runs by year - using validPayrollRuns
+  const filteredRuns = validPayrollRuns.filter(run => {
     const matchesYear = filterYear === "all" || run.pay_period.startsWith(filterYear);
     return matchesYear;
-  }) || [];
+  });
 
   // Note: We'll fetch entries for selected run when needed via getPayrollEntries
   const [selectedRunEntries, setSelectedRunEntries] = useState<any[]>([]);
-  const selectedRunData = payrollRuns?.find(r => r.id === selectedRun);
+  const selectedRunData = validPayrollRuns.find(r => r.id === selectedRun);
 
-  // Stats
-  const totalRuns = payrollRuns?.length || 0;
-  const totalPaid = payrollRuns?.reduce((sum, r) => sum + (r.total_net_salaries || 0), 0) || 0;
+  // Stats - use validPayrollRuns for accurate counts
+  const totalRuns = validPayrollRuns.length;
+  const totalPaid = validPayrollRuns.reduce((sum, r) => sum + (r.total_net_salaries || 0), 0);
 
   const handleViewDetails = async (runId: string) => {
     setSelectedRun(runId);
@@ -130,7 +148,7 @@ export const PayrollHistory = () => {
               <div>
                 <p className="text-sm text-muted-foreground">Latest Period</p>
                 <p className="text-2xl font-bold">
-                  {payrollRuns?.[0]?.pay_period || "N/A"}
+                  {validPayrollRuns[0]?.pay_period || "N/A"}
                 </p>
               </div>
             </div>
@@ -182,7 +200,7 @@ export const PayrollHistory = () => {
               <History className="h-12 w-12 text-muted-foreground/50 mb-4" />
               <h3 className="font-medium mb-1">No payroll runs found</h3>
               <p className="text-sm text-muted-foreground">
-                {payrollRuns?.length === 0 
+                {validPayrollRuns.length === 0 
                   ? "Run your first payroll to see history" 
                   : "Try adjusting your filters"}
               </p>

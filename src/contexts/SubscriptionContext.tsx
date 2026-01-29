@@ -304,6 +304,32 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     await fetchUserData();
   }, [fetchUserData]);
 
+  // Subscribe to business changes for immediate UI updates across all pages
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel(`business-changes-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // INSERT, UPDATE, DELETE
+          schema: 'public',
+          table: 'businesses',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          logger.debug('Business changed in real-time:', payload.eventType);
+          refreshBusinesses();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, refreshBusinesses]);
+
   const setTier = async (tier: SubscriptionTier) => {
     if (!user) return;
     

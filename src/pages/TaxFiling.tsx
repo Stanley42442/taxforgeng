@@ -18,7 +18,7 @@ import {
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { PageLayout } from "@/components/PageLayout";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { generateTaxFormPDF } from "@/lib/taxFormsPdf";
 
 const TaxFiling = () => {
@@ -26,6 +26,13 @@ const TaxFiling = () => {
   const { tier, canAccessFiling, savedBusinesses } = useSubscription();
   const [selectedBusiness, setSelectedBusiness] = useState<string | null>(null);
   const [showGuide, setShowGuide] = useState(false);
+
+  // Reset selected business if it no longer exists
+  useEffect(() => {
+    if (selectedBusiness && !savedBusinesses.find(b => b.id === selectedBusiness)) {
+      setSelectedBusiness(null);
+    }
+  }, [savedBusinesses, selectedBusiness]);
 
   const handleGenerateForm = (formType: string) => {
     if (!selectedBusiness) {

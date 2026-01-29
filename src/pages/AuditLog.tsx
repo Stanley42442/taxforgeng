@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,13 @@ const AuditLog = () => {
   const [filterAction, setFilterAction] = useState<string>('all');
 
   const canAccess = tier === 'corporate';
+
+  // Reset filter if selected business no longer exists
+  useEffect(() => {
+    if (filterBusiness !== 'all' && !savedBusinesses.find(b => b.id === filterBusiness)) {
+      setFilterBusiness('all');
+    }
+  }, [savedBusinesses, filterBusiness]);
 
   const filteredLogs = useMemo(() => {
     return MOCK_AUDIT_LOG.filter(entry => {

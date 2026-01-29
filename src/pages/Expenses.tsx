@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -389,7 +389,30 @@ const Expenses = () => {
     };
 
     fetchExpenses();
-  }, [user]);
+  }, [user, savedBusinesses]);
+
+  // Reset filter if selected business no longer exists
+  useEffect(() => {
+    if (filterBusinessId !== 'all' && !savedBusinesses.find(b => b.id === filterBusinessId)) {
+      setFilterBusinessId('all');
+    }
+  }, [savedBusinesses, filterBusinessId]);
+
+  // Create set of active business IDs for filtering orphaned expenses
+  const activeBusinessIds = useMemo(() => 
+    new Set(savedBusinesses.map(b => b.id)),
+    [savedBusinesses]
+  );
+
+  // Filter expenses to only include those from active businesses
+  const validExpenses = useMemo(() => {
+    return expenses.filter(e => {
+      // Keep expenses without business_id (general expenses)
+      if (!e.businessId) return true;
+      // Only keep expenses linked to active businesses
+      return activeBusinessIds.has(e.businessId);
+    });
+  }, [expenses, activeBusinessIds]);
 
   // Goal achievement notification effect
   useEffect(() => {
@@ -572,7 +595,7 @@ const Expenses = () => {
     toast.success("Expense deleted successfully");
   };
 
-  const filteredExpenses = expenses.filter(e => {
+  const filteredExpenses = validExpenses.filter(e => {
     if (filterBusinessId !== 'all' && e.businessId !== filterBusinessId) return false;
     if (filterType !== 'all' && e.type !== filterType) return false;
     if (filterCategory !== 'all' && e.category !== filterCategory) return false;
