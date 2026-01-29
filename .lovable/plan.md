@@ -1,127 +1,98 @@
 
-# Fix: Business Deletion & Page Loading Issues
+# Fix: Notification Errors & Navigation Issues
 
 ## Problems Identified
 
-### Issue 1: Slow Page Loading
-The recent Service Worker configuration change to `NetworkFirst` for JS/CSS files means:
-- Every page load now attempts a network request first
-- If network is slow, there's a 5-second timeout before falling back to cache
-- This is causing perceived slowness, especially on mobile networks
+### Issue 1: Notification Constructor Error
+**Error Message:** `Failed to construct 'Notification': Illegal constructor. Use ServiceWorkerRegistration.showNotification() instead.`
 
-### Issue 2: Business Deletion Not Working Properly
-**Root Cause Found:** The `fetchUserData` function in `SubscriptionContext.tsx` does NOT filter out soft-deleted businesses.
+**Root Cause:** On mobile PWAs (installed to home screen), the `new Notification()` constructor is blocked by browsers. Instead, notifications must go through the Service Worker via `ServiceWorkerRegistration.showNotification()`.
 
-Current query (line 201-205):
-```typescript
-const { data: businesses } = await supabase
-  .from('businesses')
-  .select('*')
-  .eq('user_id', user.id)
-  .order('created_at', { ascending: false });
-// ❌ Missing: .is('deleted_at', null)
-```
+**Affected Files:**
+| File | Line | Issue |
+|------|------|-------|
+| `src/lib/notifications.ts` | 75 | Uses `new Notification()` directly |
+| `src/lib/pwaNotifications.ts` | 148 | Fallback uses `new Notification()` |
+| `src/pages/Expenses.tsx` | 294 | Uses `new Notification()` directly |
 
-**Symptoms this causes:**
-1. After deleting a business, UI shows it's deleted (local state update)
-2. Refreshing the page re-fetches ALL businesses including soft-deleted ones
-3. Business reappears because the query doesn't filter by `deleted_at`
-4. Recently Deleted section doesn't show immediately because `getDeletedBusinesses` is only called once on mount
+### Issue 2: Navigation from Dashboard to Saved Businesses Broken
+**Root Cause:** The Dashboard links to `/saved-businesses` but the actual route defined in `App.tsx` is `/businesses`.
+
+**Evidence:**
+- App.tsx line 148: `<Route path="/businesses" element={<SavedBusinesses />} />`
+- Dashboard.tsx line 580: `<Link to="/saved-businesses">` (WRONG)
+- Dashboard.tsx line 609: `<Link to="/saved-businesses">` (WRONG)
 
 ---
 
 ## Solution
 
-### Fix 1: Filter Soft-Deleted Businesses
-Add `.is('deleted_at', null)` to the businesses query in `fetchUserData`.
+### Fix 1: Create a PWA-Safe Notification Wrapper
+Create a utility function that:
+1. First attempts to use Service Worker registration to show notifications
+2. Falls back to `new Notification()` only if running in a regular browser tab (not PWA)
+3. Wraps all notification calls in try-catch to prevent crashes
 
-| File | Change |
-|------|--------|
-| `src/contexts/SubscriptionContext.tsx` | Add filter to exclude soft-deleted businesses |
+**Changes to `src/lib/notifications.ts`:**
+```typescript
+// New PWA-safe notification function
+export const showBrowserNotification = async (
+  title: string, 
+  body: string, 
+  redirectUrl?: string
+) => {
+  const browserEnabled = safeLocalStorage.getItem('notification-browser-enabled') !== 'false';
+  if (Notification.permission !== 'granted' || !browserEnabled) return;
+  
+  try {
+    // Prefer Service Worker method (required for PWA)
+    if ('serviceWorker' in navigator) {
+      const registration = await navigator.serviceWorker.ready;
+      await registration.showNotification(title, {
+        body,
+        icon: '/favicon.ico',
+        badge: '/favicon.ico',
+        tag: `notification-${Date.now()}`,
+        data: { url: redirectUrl }
+      });
+      return;
+    }
+  } catch (e) {
+    // Service Worker method failed, try fallback
+  }
+  
+  // Fallback for regular browser tabs only
+  try {
+    const notification = new Notification(title, { body, icon: '/favicon.ico' });
+    notification.onclick = () => { /* ... */ };
+  } catch {
+    // Silently fail - PWA context doesn't support this
+  }
+};
+```
 
-### Fix 2: Refresh Deleted List After Delete
-Update the `removeBusiness` function to refresh the deleted businesses list after a successful soft delete.
+### Fix 2: Update Expenses.tsx to Use Safe Wrapper
+Replace direct `new Notification()` call with the shared utility function.
 
-| File | Change |
-|------|--------|
-| `src/pages/SavedBusinesses.tsx` | Add callback to refresh deleted list after delete |
-
-### Fix 3: Optimize Service Worker Timeout
-Reduce the network timeout for JS/CSS from 5s to 2s so fallback happens faster on slow networks.
-
-| File | Change |
-|------|--------|
-| `vite.config.ts` | Reduce `networkTimeoutSeconds` from 5 to 2 |
+### Fix 3: Fix Dashboard Navigation Links
+Change `/saved-businesses` to `/businesses` in Dashboard.tsx.
 
 ---
 
-## Technical Implementation
+## Files to Modify
 
-### Change 1: SubscriptionContext.tsx (Line ~201-205)
-
-```typescript
-// BEFORE
-const { data: businesses } = await supabase
-  .from('businesses')
-  .select('*')
-  .eq('user_id', user.id)
-  .order('created_at', { ascending: false });
-
-// AFTER
-const { data: businesses } = await supabase
-  .from('businesses')
-  .select('*')
-  .eq('user_id', user.id)
-  .is('deleted_at', null)  // ← CRITICAL: Exclude soft-deleted
-  .order('created_at', { ascending: false });
-```
-
-### Change 2: SavedBusinesses.tsx (Line ~97-110)
-
-```typescript
-// BEFORE
-const deleteWithUndo = useDeleteWithUndo<SavedBusiness>({
-  onDelete: async (business) => {
-    await removeBusiness(business.id);
-  },
-  // ...
-});
-
-// AFTER
-const deleteWithUndo = useDeleteWithUndo<SavedBusiness>({
-  onDelete: async (business) => {
-    await removeBusiness(business.id);
-    // Immediately refresh deleted list so it shows in Recently Deleted
-    const updated = await getDeletedBusinesses();
-    setDeletedBusinesses(updated);
-  },
-  // ...
-});
-```
-
-### Change 3: vite.config.ts (Line ~44)
-
-```typescript
-// BEFORE
-networkTimeoutSeconds: 5,
-
-// AFTER
-networkTimeoutSeconds: 2,  // Faster fallback on slow networks
-```
+| File | Change |
+|------|--------|
+| `src/lib/notifications.ts` | Make `showBrowserNotification` async and use Service Worker |
+| `src/lib/pwaNotifications.ts` | Wrap fallback `new Notification()` in try-catch |
+| `src/pages/Expenses.tsx` | Replace inline notification with shared utility |
+| `src/pages/Dashboard.tsx` | Change `/saved-businesses` to `/businesses` (2 locations) |
 
 ---
 
 ## Expected Results
 
 After these changes:
-1. **Deleted businesses stay deleted** - They won't reappear after page refresh
-2. **Recently Deleted section updates immediately** - No refresh needed to see it
-3. **Faster page loads** - Cache fallback happens in 2s instead of 5s on slow networks
-
-## Files to Modify
-
-| File | Purpose |
-|------|---------|
-| `src/contexts/SubscriptionContext.tsx` | Filter out soft-deleted businesses |
-| `src/pages/SavedBusinesses.tsx` | Refresh deleted list after deletion |
-| `vite.config.ts` | Reduce network timeout for faster loading |
+1. **No more notification errors** - Notifications will work properly in PWA mode
+2. **Dashboard navigation works** - Clicking "Businesses" card navigates correctly to the saved businesses page
+3. **Graceful degradation** - If notifications can't be shown, the app silently continues without crashing
