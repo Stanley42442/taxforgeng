@@ -41,7 +41,7 @@ export default defineConfig(({ mode }) => ({
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24, // 1 day max
               },
-              networkTimeoutSeconds: 5, // Fall back to cache if network slow
+              networkTimeoutSeconds: 2, // Faster fallback on slow networks
               cacheableResponse: {
                 statuses: [0, 200],
               },

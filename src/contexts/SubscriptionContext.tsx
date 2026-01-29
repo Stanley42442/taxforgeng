@@ -197,11 +197,12 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         }
       }
 
-      // Fetch businesses
+      // Fetch businesses (exclude soft-deleted)
       const { data: businesses } = await supabase
         .from('businesses')
         .select('*')
         .eq('user_id', user.id)
+        .is('deleted_at', null)
         .order('created_at', { ascending: false });
 
       const mappedBusinesses: SavedBusiness[] = (businesses || []).map(b => ({
