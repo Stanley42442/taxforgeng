@@ -1284,3 +1284,22 @@ html, body, #root {
     color: hsl(var(--foreground));
   }
 }
+
+/* ================================================
+   CAROUSEL FADE ANIMATION
+   Smooth crossfade for Embla carousel
+   ================================================ */
+.carousel-fade-container {
+  position: relative;
+}
+
+.carousel-fade-slide {
+  opacity: 1;
+  transition: opacity 700ms ease-in-out;
+}
+
+/* Embla fade plugin handles the opacity via inline styles,
+   these classes provide additional smooth transitions */
+[data-embla-fade] .embla__slide {
+  transition: opacity 700ms ease-in-out;
+}

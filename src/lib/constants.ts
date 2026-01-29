@@ -18,6 +18,8 @@ export const MAX_CHAT_HISTORY_MESSAGES = 20;
 export const STORAGE_KEYS = {
   CHAT_HISTORY: 'taxbot-chat-history',
   CHAT_POSITION: 'taxbot-position',
+  CURRENT_CONVERSATION_ID: 'taxbot-current-conversation',
+  GUEST_CONVERSATIONS: 'taxbot-guest-conversations',
   REMEMBER_ME: 'taxforge-remember-me',
   TERMS_ACCEPTED: 'taxforge-terms-accepted',
   THEME: 'taxforge-ng-theme',
