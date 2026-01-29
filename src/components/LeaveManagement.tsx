@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useLeaveManagement, type LeaveRequest, type LeaveType, type LeaveBalance } from "@/hooks/useLeaveManagement";
 import { useEmployees } from "@/hooks/useEmployees";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { format, differenceInBusinessDays, addDays } from "date-fns";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -54,6 +55,20 @@ export const LeaveManagement = () => {
     initializeLeaveTypes,
   } = useLeaveManagement();
   const { employees } = useEmployees();
+  const { savedBusinesses } = useSubscription();
+
+  // Filter employees by active businesses
+  const activeBusinessIds = useMemo(() => 
+    new Set(savedBusinesses.map(b => b.id)),
+    [savedBusinesses]
+  );
+
+  const validEmployees = useMemo(() => {
+    return (employees || []).filter(emp => {
+      if (!emp.business_id) return true;
+      return activeBusinessIds.has(emp.business_id);
+    });
+  }, [employees, activeBusinessIds]);
   
   const [activeTab, setActiveTab] = useState("requests");
   const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -88,8 +103,12 @@ export const LeaveManagement = () => {
     return differenceInBusinessDays(endDate, startDate) + 1;
   };
 
-  // Filter requests
+  // Filter requests - only show requests for employees from active businesses
+  const validEmployeeIds = useMemo(() => new Set(validEmployees.map(e => e.id)), [validEmployees]);
+  
   const filteredRequests = leaveRequests?.filter(req => {
+    // First filter by active business employees
+    if (!validEmployeeIds.has(req.employee_id)) return false;
     const matchesStatus = filterStatus === "all" || req.status === filterStatus;
     const matchesEmployee = filterEmployee === "all" || req.employee_id === filterEmployee;
     return matchesStatus && matchesEmployee;
@@ -136,12 +155,13 @@ export const LeaveManagement = () => {
     initializeLeaveTypes.mutate();
   };
 
-  // Stats
-  const pendingCount = leaveRequests?.filter(r => r.status === "pending").length || 0;
-  const approvedThisMonth = leaveRequests?.filter(r => 
+  // Stats - only count requests for employees from active businesses
+  const validRequests = leaveRequests?.filter(r => validEmployeeIds.has(r.employee_id)) || [];
+  const pendingCount = validRequests.filter(r => r.status === "pending").length;
+  const approvedThisMonth = validRequests.filter(r => 
     r.status === "approved" && 
     r.start_date.startsWith(format(new Date(), "yyyy-MM"))
-  ).length || 0;
+  ).length;
 
   const getEmployeeName = (employeeId: string) => {
     const emp = employees?.find(e => e.id === employeeId);
@@ -196,7 +216,7 @@ export const LeaveManagement = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Employees</p>
-                <p className="text-2xl font-bold">{employees?.length || 0}</p>
+                <p className="text-2xl font-bold">{validEmployees.length}</p>
               </div>
             </div>
           </CardContent>
@@ -247,7 +267,7 @@ export const LeaveManagement = () => {
                           <SelectValue placeholder="Select employee" />
                         </SelectTrigger>
                         <SelectContent>
-                          {employees?.filter(e => e.status === "active").map(emp => (
+                          {validEmployees.filter(e => e.status === "active").map(emp => (
                             <SelectItem key={emp.id} value={emp.id}>
                               {emp.first_name} {emp.last_name}
                             </SelectItem>
@@ -385,7 +405,7 @@ export const LeaveManagement = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Employees</SelectItem>
-                    {employees?.map(emp => (
+                    {validEmployees.map(emp => (
                       <SelectItem key={emp.id} value={emp.id}>
                         {emp.first_name} {emp.last_name}
                       </SelectItem>
