@@ -19,6 +19,7 @@ import {
 import { useEmployees } from "@/hooks/useEmployees";
 import { usePayrollHistory } from "@/hooks/usePayrollHistory";
 import { usePayrollTemplates } from "@/hooks/usePayrollTemplates";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { calculatePayroll, type PayrollInput, type PayrollResult } from "@/lib/payrollCalculations";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { generatePayslipPDF } from "@/lib/payslipPdfExport";
@@ -60,6 +61,20 @@ export const BulkPayrollCalculator = () => {
   const { employees } = useEmployees();
   const { createPayrollRun } = usePayrollHistory();
   const { templates, createTemplate } = usePayrollTemplates();
+  const { savedBusinesses } = useSubscription();
+
+  // Filter employees by active businesses
+  const activeBusinessIds = useMemo(() => 
+    new Set(savedBusinesses.map(b => b.id)),
+    [savedBusinesses]
+  );
+
+  const validEmployees = useMemo(() => {
+    return (employees || []).filter(emp => {
+      if (!emp.business_id) return true;
+      return activeBusinessIds.has(emp.business_id);
+    });
+  }, [employees, activeBusinessIds]);
   
   const [use2026Rules, setUse2026Rules] = useState(true);
   const [payPeriod, setPayPeriod] = useState(format(new Date(), "yyyy-MM"));
@@ -72,12 +87,12 @@ export const BulkPayrollCalculator = () => {
 
   // Load employees into entries
   const loadEmployees = () => {
-    if (!employees || employees.length === 0) {
+    if (!validEmployees || validEmployees.length === 0) {
       toast.error("No employees found");
       return;
     }
 
-    const activeEmployees = employees.filter(e => e.status === "active");
+    const activeEmployees = validEmployees.filter(e => e.status === "active");
     setEntries(activeEmployees.map(emp => ({
       id: crypto.randomUUID(),
       employeeId: emp.id,

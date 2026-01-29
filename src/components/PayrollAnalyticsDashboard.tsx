@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { usePayrollHistory } from "@/hooks/usePayrollHistory";
 import { useEmployees } from "@/hooks/useEmployees";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { ReusableAreaChart } from "@/components/ui/reusable-area-chart";
 import { ReusableBarChart } from "@/components/ui/reusable-bar-chart";
@@ -58,14 +59,35 @@ const MetricCard = ({ title, value, change, icon, subtitle }: MetricCardProps) =
 export const PayrollAnalyticsDashboard = () => {
   const { payrollRuns, isLoading } = usePayrollHistory();
   const { employees } = useEmployees();
+  const { savedBusinesses } = useSubscription();
   
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [compareToYear, setCompareToYear] = useState(currentYear - 1);
 
+  // Filter by active businesses
+  const activeBusinessIds = useMemo(() => 
+    new Set(savedBusinesses.map(b => b.id)),
+    [savedBusinesses]
+  );
+
+  const validPayrollRuns = useMemo(() => {
+    return (payrollRuns || []).filter(run => {
+      if (!run.business_id) return true;
+      return activeBusinessIds.has(run.business_id);
+    });
+  }, [payrollRuns, activeBusinessIds]);
+
+  const validEmployees = useMemo(() => {
+    return (employees || []).filter(emp => {
+      if (!emp.business_id) return true;
+      return activeBusinessIds.has(emp.business_id);
+    });
+  }, [employees, activeBusinessIds]);
+
   // Calculate analytics
   const analytics = useMemo(() => {
-    if (!payrollRuns || !employees) {
+    if (!validPayrollRuns || !validEmployees) {
       return {
         monthlyTrends: [],
         departmentMetrics: [],
@@ -82,8 +104,8 @@ export const PayrollAnalyticsDashboard = () => {
     }
 
     // Filter runs by year
-    const yearRuns = payrollRuns.filter(r => r.pay_period.startsWith(selectedYear.toString()));
-    const prevYearRuns = payrollRuns.filter(r => r.pay_period.startsWith(compareToYear.toString()));
+    const yearRuns = validPayrollRuns.filter(r => r.pay_period.startsWith(selectedYear.toString()));
+    const prevYearRuns = validPayrollRuns.filter(r => r.pay_period.startsWith(compareToYear.toString()));
 
     // Monthly trends
     const months = Array.from({ length: 12 }, (_, i) => {
@@ -108,7 +130,7 @@ export const PayrollAnalyticsDashboard = () => {
     });
 
     // Department metrics
-    const activeEmployees = employees.filter(e => e.status === "active");
+    const activeEmployees = validEmployees.filter(e => e.status === "active");
     const deptGroups = activeEmployees.reduce((acc, emp) => {
       const dept = emp.department || "Unassigned";
       if (!acc[dept]) {
@@ -183,7 +205,7 @@ export const PayrollAnalyticsDashboard = () => {
       headcountChange: 0,
       avgSalaryChange: 0,
     };
-  }, [payrollRuns, employees, selectedYear, compareToYear]);
+  }, [validPayrollRuns, validEmployees, selectedYear, compareToYear]);
 
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
