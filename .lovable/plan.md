@@ -1,125 +1,173 @@
 
 
-# Add Chat Conversation Export (PDF and Text)
+# Add Conversation Search Functionality
 
 ## Overview
 
-Add the ability to export chat conversations as PDF or plain text files directly from the TaxBot interface.
+Add the ability to search through TaxBot conversations by content or date, allowing users to quickly find specific past chats.
 
 ## New Features
 
-- Export current conversation as formatted PDF with TaxForge branding
-- Export current conversation as plain text file
-- Export menu accessible from the chat header
-- Disable export when conversation is empty
-
-## File Changes
-
-### 1. `src/lib/chatExport.ts` (NEW)
-
-New utility file for chat export functions:
-
-```typescript
-// Functions to implement:
-// - exportChatToPDF(conversation, options)
-// - exportChatToText(conversation)
-// - Format messages with timestamps and role labels
-// - Apply TaxForge branding for PDF
-```
-
-PDF Structure:
-```text
-+------------------------------------------+
-| [TF] TaxForge NG           [Conversation]|
-+------------------------------------------+
-| Conversation Title                       |
-| Date: Jan 29, 2026                       |
-+------------------------------------------+
-| You:                                     |
-| What is the current VAT rate in Nigeria? |
-|                                          |
-| TaxBot:                                  |
-| The current VAT rate in Nigeria is 7.5%, |
-| effective since February 2020...         |
-+------------------------------------------+
-| [Footer with disclaimer]                 |
-+------------------------------------------+
-```
-
-Text Format:
-```text
-TaxForge NG - Chat Conversation Export
-Title: What is the current VAT rate...
-Date: 29 Jan 2026, 14:30
-
----
-
-You:
-What is the current VAT rate in Nigeria?
-
-TaxBot:
-The current VAT rate in Nigeria is 7.5%...
-
----
-
-Exported from TaxForge NG (www.taxforgeng.com)
-```
-
-### 2. `src/components/TaxAssistant.tsx` (MODIFY)
-
-Add export functionality to the chat header:
-- Import new export functions
-- Add `DropdownMenu` for export options
-- Add `Download` icon to header
-- Disable export when no messages exist
-
-New UI element in header:
-```text
-+------------------------------------------+
-| [☰] TaxBot        [⬇️] [+New] [X]       |
-+------------------------------------------+
-              └─ Dropdown Menu:
-                  - Export as PDF
-                  - Export as Text
-```
-
-Changes:
-- Add `DropdownMenu` component import
-- Add `Download` icon import from lucide-react
-- Add export dropdown between title and New Chat button
-- Call export functions with current conversation
-- Show success toast after export
+- Search input field in the conversation history panel
+- Real-time filtering as user types
+- Search by message content (both questions and answers)
+- Search by date (today, yesterday, this week, etc.)
+- Highlight matching terms in results
+- Clear search button
 
 ## Technical Approach
 
-1. **PDF Export**: Use existing `exportShared.ts` utilities for consistent branding:
-   - `addPDFHeader()` for branded header
-   - `addPDFFooter()` with disclaimer
-   - `generateFilename()` for consistent naming
-   - `downloadFile()` for triggering download
+### 1. `src/hooks/useChatConversations.ts` (MODIFY)
 
-2. **Text Export**: Simple formatted text with:
-   - Header with title and date
-   - Messages separated by dividers
-   - Footer with attribution
+Add search/filter functionality:
 
-3. **User Experience**:
-   - Export dropdown appears only when there are messages
-   - Loading state while generating PDF
-   - Toast notification on success
+```typescript
+// New state and logic to add:
+const [searchQuery, setSearchQuery] = useState('');
+
+// Filter function
+const filterConversations = useCallback((query: string) => {
+  if (!query.trim()) return conversations;
+  
+  const lowercaseQuery = query.toLowerCase();
+  
+  return conversations.filter(conv => {
+    // Match by title
+    if (conv.title.toLowerCase().includes(lowercaseQuery)) return true;
+    
+    // Match by message content
+    return conv.messages.some(msg => 
+      msg.content.toLowerCase().includes(lowercaseQuery)
+    );
+  });
+}, [conversations]);
+
+// Return filtered conversations based on search
+const filteredConversations = useMemo(() => 
+  filterConversations(searchQuery),
+  [filterConversations, searchQuery]
+);
+```
+
+New exports:
+- `searchQuery`: Current search string
+- `setSearchQuery`: Update search string
+- `filteredConversations`: Filtered conversation list
+- `clearSearch`: Reset search
+
+### 2. `src/components/TaxAssistant.tsx` (MODIFY)
+
+Add search UI in the history popover:
+
+Current structure:
+```
++---------------------------+
+| Conversations    [+ New]  |
++---------------------------+
+| - VAT Questions (today)   |
+| - CIT Rates (yesterday)   |
++---------------------------+
+```
+
+New structure with search:
+```
++---------------------------+
+| Conversations    [+ New]  |
++---------------------------+
+| [🔍 Search chats...    X] |
++---------------------------+
+| Matching conversations:   |
+| - VAT Questions (today)   |
+|   "...current VAT rate..." |
++---------------------------+
+```
+
+Changes:
+- Add search input at the top of popover content
+- Import `Search` and `X` icons from lucide-react
+- Display `filteredConversations` instead of `conversations`
+- Show matching text snippet when searching
+- Add empty state for "No matches found"
+- Clear search button when query exists
+
+### 3. Search UI Component Details
+
+Search input styling:
+```tsx
+<div className="relative px-3 py-2 border-b">
+  <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+  <Input
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    placeholder="Search chats..."
+    className="h-8 pl-8 pr-8 text-xs"
+  />
+  {searchQuery && (
+    <button 
+      onClick={clearSearch}
+      className="absolute right-5 top-1/2 -translate-y-1/2"
+    >
+      <X className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
+    </button>
+  )}
+</div>
+```
+
+### 4. Matching Text Highlight
+
+When search is active, show a preview of the matching message:
+
+```tsx
+// Find first matching message content
+const getMatchSnippet = (conv: ChatConversation, query: string) => {
+  if (!query) return null;
+  
+  const lowerQuery = query.toLowerCase();
+  
+  for (const msg of conv.messages) {
+    const idx = msg.content.toLowerCase().indexOf(lowerQuery);
+    if (idx !== -1) {
+      // Get surrounding context
+      const start = Math.max(0, idx - 20);
+      const end = Math.min(msg.content.length, idx + query.length + 20);
+      const snippet = msg.content.slice(start, end);
+      return `...${snippet}...`;
+    }
+  }
+  return null;
+};
+```
+
+Display snippet below conversation title:
+```tsx
+{searchQuery && (
+  <p className="text-[10px] text-muted-foreground truncate italic">
+    {getMatchSnippet(conv, searchQuery)}
+  </p>
+)}
+```
 
 ## Summary of Changes
 
 | File | Action | Purpose |
 |------|--------|---------|
-| `src/lib/chatExport.ts` | CREATE | Export utilities for PDF and text |
-| `src/components/TaxAssistant.tsx` | MODIFY | Add export dropdown menu |
+| `src/hooks/useChatConversations.ts` | MODIFY | Add search state and filter logic |
+| `src/components/TaxAssistant.tsx` | MODIFY | Add search input and filtered display |
 
-## Expected Results
+## User Experience
 
-After implementation:
-- Users can download any conversation as a branded PDF
-- Users can download any conversation as plain text
-- Exports are properly formatted and branded
-- Empty conversations cannot be exported
+1. User opens conversation history popover
+2. Search input is immediately visible at top
+3. As user types, conversations filter in real-time
+4. Matching text snippets appear under each result
+5. Clear button (X) resets the search
+6. "No matches found" message when search has no results
+7. Search persists while popover is open, clears when closed
+
+## Technical Considerations
+
+1. **Performance**: Search runs client-side on loaded conversations (already fetched)
+2. **Case-insensitive**: All searches are lowercase-compared
+3. **Debouncing**: Not needed since filtering is instant on small datasets
+4. **State Reset**: Search clears when popover closes or user switches chats
 
