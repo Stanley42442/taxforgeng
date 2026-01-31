@@ -1,136 +1,88 @@
 
-# PDF Export Quality Fixes - Phase 2: Text Wrapping
+# PDF Export Quality Fixes - Completed
 
-## Problem Summary
+## Summary
 
-From the screenshots, content is overflowing table cells and page boundaries because text is being truncated instead of wrapped. Users need **complete information** in their financial documents.
-
----
-
-## Technical Approach: Multi-Line Table Rows
-
-Instead of truncating text, we'll implement proper **text wrapping** that:
-1. Automatically calculates how many lines each cell needs
-2. Dynamically adjusts row height based on the tallest cell
-3. Keeps all columns aligned regardless of line count
-4. Handles page breaks when wrapped content would overflow
+Implemented proper text wrapping instead of truncation to ensure all content is fully readable in PDF exports.
 
 ---
 
-## Solution Details
+## Changes Made
 
-### 1. Create Enhanced Table Row Function
+### 1. New Wrapped Table Utilities (`exportShared.ts`)
 
-A new `addWrappedTableRow()` function in `exportShared.ts` that:
-
-```text
-+-------------------+--------------------------------+-----------------+
-| Relief Type       | Description                    | Amount          |
-+-------------------+--------------------------------+-----------------+
-| Rent Relief       | 20% of annual rent paid        | (NGN 100,000.00)|
-|                   | (max NGN 500,000)              |                 |
-+-------------------+--------------------------------+-----------------+
-| Consolidated      | Higher of NGN 200,000 or       | (NGN 640,000.00)|
-| Relief Allowance  | 1% of gross + 20% of gross     |                 |
-+-------------------+--------------------------------+-----------------+
-```
+Added two new functions:
+- `addWrappedTableRow()` - Dynamically wraps text using `doc.splitTextToSize()` and adjusts row height based on tallest cell
+- `addWrappedTableHeader()` - Matching header function with explicit column widths
 
 Key features:
-- Uses `doc.splitTextToSize()` to split text into lines that fit column width
-- Calculates maximum lines needed across all columns
-- Renders each line at correct vertical position within the row
-- Draws background and borders based on dynamic height
+- Uses `doc.splitTextToSize()` for accurate PDF text wrapping
+- Dynamic row height based on content
+- Explicit column width definitions
+- Maintains alignment for multi-line cells
 
-### 2. Define Column Widths for Tables
+### 2. Naira Symbol Cleanup
 
-Create explicit column width definitions instead of using absolute X positions:
+Replaced all embedded `₦` symbols with `NGN ` prefix across:
+- `individualTaxCalculations.ts` - Relief descriptions and breakdown labels
+- `taxRulesData.ts` - PIT band labels, key changes, and deduction rules
 
-```text
-| Column        | Width | Purpose                       |
-|---------------|-------|-------------------------------|
-| Relief Type   | 50px  | Short labels, rarely wraps    |
-| Description   | 80px  | Longest content, needs wrap   |
-| Amount        | 40px  | Currency values, right-align  |
+### 3. Updated Individual PDF Export (`individualPdfExport.ts`)
+
+Converted all tables to use wrapped row functions:
+- Progressive Tax Bands table
+- Tax Reliefs & Allowances table (full descriptions now visible)
+- Detailed Tax Calculation table
+
+---
+
+## Technical Details
+
+### Column Width Definitions
+
+```
+Reliefs Table:
+| Column      | Width | Purpose                    |
+|-------------|-------|----------------------------|
+| Relief Type | 50px  | Short labels               |
+| Description | 75px  | Wraps long descriptions    |
+| Amount      | 45px  | Right-aligned currency     |
+
+Breakdown Table:
+| Column    | Width        | Purpose                    |
+|-----------|--------------|----------------------------|
+| Component | ~115px       | Wraps label + description  |
+| Amount    | 55px         | Right-aligned currency     |
 ```
 
-### 3. Fix Naira Symbols in Source Data
+### Text Wrapping Logic
 
-Replace embedded `₦` symbols in `individualTaxCalculations.ts` with `NGN `:
+```typescript
+// Calculates lines that fit column width
+const lines = doc.splitTextToSize(text, columnWidth - 4);
 
-| Before | After |
-|--------|-------|
-| `'max ₦500,000'` | `'max NGN 500,000'` |
-| `'₦200k or 1%'` | `'NGN 200,000 or 1%'` |
+// Finds tallest cell
+const maxLines = Math.max(...columns.map(c => c.lines.length));
 
----
-
-## Files to Modify
-
-| File | Changes |
-|------|---------|
-| `src/lib/exportShared.ts` | Add `addWrappedTableRow()` function with multi-line support |
-| `src/lib/individualPdfExport.ts` | Use new wrapped table row function in reliefs section |
-| `src/lib/individualTaxCalculations.ts` | Replace `₦` with `NGN ` in description strings |
-| Other PDF exports | Apply wrapped table rows where content overflows |
-
----
-
-## Technical Implementation
-
-### New `addWrappedTableRow()` Function
-
-The function will:
-
-1. **Accept column definitions with explicit widths**:
-   - Each column has: text, x position, width, alignment, color
-
-2. **Calculate wrapped lines for each cell**:
-   - Use `doc.splitTextToSize(text, columnWidth)` for each cell
-
-3. **Determine dynamic row height**:
-   - Find the column with the most lines
-   - Row height = base height + (extra lines * line spacing)
-
-4. **Render multi-line content**:
-   - Draw background based on dynamic height
-   - Render each line at correct Y offset within the cell
-   - Right-aligned columns: each line aligns to right edge
-
-5. **Add row separator**:
-   - Draw bottom border after content
-
-### Page Break Handling
-
-Before rendering a wrapped row, check if it fits on the current page:
-- Calculate total row height first
-- If it would overflow, trigger a new page
-- Continue rendering on the new page
+// Dynamic row height
+const rowHeight = Math.max(minRowHeight, (maxLines * lineHeight) + 8);
+```
 
 ---
 
 ## Expected Results
 
-### Before (Current - Truncated/Overflow):
-```text
-| Relief Type | Description                        | Amount     |
-| Rent Relief | 20% of annual rent paid (max :5... | :100,000   |
+**Before (truncated):**
+```
+| Relief Type | Description                        | Amount    |
+| Rent Relief | 20% of annual rent paid (max :5... | :100,000  |
 ```
 
-### After (Fixed - Wrapped):
-```text
-| Relief Type | Description                  | Amount           |
-| Rent Relief | 20% of annual rent paid      | (NGN 100,000.00) |
-|             | (max NGN 500,000)            |                  |
+**After (wrapped):**
+```
+| Relief Type | Description               | Amount           |
+| Rent Relief | 20% of annual rent paid   | (NGN 100,000.00) |
+|             | (max NGN 500,000)         |                  |
 ```
 
-All content is visible, properly formatted, and no text overflows its boundaries.
-
----
-
-## Summary of Changes
-
-1. **New utility function**: `addWrappedTableRow()` with multi-line text support
-2. **Source data cleanup**: Replace `₦` symbols with `NGN ` in calculations
-3. **Table layout updates**: Use explicit column widths instead of absolute positions
-4. **Dynamic row heights**: Rows expand to fit content automatically
-5. **Page break awareness**: Long content triggers proper page breaks
+All content is now fully visible with proper formatting.

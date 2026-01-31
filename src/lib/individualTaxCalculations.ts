@@ -105,9 +105,9 @@ function calculateProgressiveTax(
 
     if (taxableInBand > 0 && band.rate > 0) {
       breakdown.push({
-        label: `₦${formatNumber(previousThreshold)} - ₦${band.threshold === Infinity ? '∞' : formatNumber(band.threshold)}`,
+        label: `NGN ${formatNumber(previousThreshold)} - NGN ${band.threshold === Infinity ? '∞' : formatNumber(band.threshold)}`,
         amount: taxInBand,
-        description: `${(band.rate * 100).toFixed(0)}% on ₦${formatNumber(taxableInBand)}`,
+        description: `${(band.rate * 100).toFixed(0)}% on NGN ${formatNumber(taxableInBand)}`,
       });
     }
 
@@ -135,14 +135,14 @@ export function calculatePersonalIncomeTax(inputs: IndividualTaxInputs): Individ
     // 2026 Rules: CRA is ABOLISHED - replaced with specific deductions
     // Per Nigeria Tax Act 2025: Rent Relief, Pension, NHF, NHIS, Life Insurance
     
-    // Rent Relief: 20% of actual rent paid, capped at ₦500,000
+    // Rent Relief: 20% of actual rent paid, capped at NGN 500,000
     const annualRent = inputs.annualRentPaid || 0;
     if (annualRent > 0) {
       const rentRelief = Math.min(annualRent * 0.20, 500000);
       reliefs.push({
         name: 'Rent Relief',
         amount: rentRelief,
-        description: '20% of annual rent paid (max ₦500,000)'
+        description: '20% of annual rent paid (max NGN 500,000)'
       });
       totalReliefs += rentRelief;
     }
@@ -152,7 +152,7 @@ export function calculatePersonalIncomeTax(inputs: IndividualTaxInputs): Individ
     reliefs.push({
       name: 'Consolidated Relief Allowance',
       amount: cra,
-      description: 'Higher of ₦200k or 1% of gross + 20% of gross'
+      description: 'Higher of NGN 200,000 or 1% of gross + 20% of gross'
     });
     totalReliefs += cra;
   }
