@@ -494,6 +494,132 @@ export function addSectionDivider(doc: jsPDF, y: number): number {
 }
 
 // ============================================
+// WRAPPED TABLE ROW (Multi-line text support)
+// ============================================
+
+export interface WrappedTableColumn {
+  text: string;
+  x: number;
+  width: number;
+  align?: 'left' | 'right' | 'center';
+  color?: RGB;
+  bold?: boolean;
+}
+
+/**
+ * Add a table row with automatic text wrapping for long content
+ * Dynamically adjusts row height based on the tallest cell
+ * Uses doc.splitTextToSize() for accurate text wrapping
+ */
+export function addWrappedTableRow(
+  doc: jsPDF,
+  columns: WrappedTableColumn[],
+  y: number,
+  isAlternate: boolean = false,
+  options?: {
+    fontSize?: number;
+    lineHeight?: number;
+    minRowHeight?: number;
+    showBorder?: boolean;
+  }
+): number {
+  const margin = PDF_SETTINGS.margin;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const contentWidth = pageWidth - margin * 2;
+  
+  const {
+    fontSize = 9,
+    lineHeight = 4,
+    minRowHeight = 10,
+    showBorder = true
+  } = options || {};
+  
+  doc.setFontSize(fontSize);
+  
+  // Step 1: Calculate wrapped lines for each column
+  const wrappedColumns = columns.map(col => {
+    doc.setFont('helvetica', col.bold ? 'bold' : 'normal');
+    const lines = doc.splitTextToSize(col.text, col.width - 4); // 4px padding
+    return {
+      ...col,
+      lines: Array.isArray(lines) ? lines : [lines]
+    };
+  });
+  
+  // Step 2: Find the maximum number of lines (tallest cell)
+  const maxLines = Math.max(...wrappedColumns.map(col => col.lines.length));
+  
+  // Step 3: Calculate dynamic row height
+  const rowHeight = Math.max(minRowHeight, (maxLines * lineHeight) + 8);
+  
+  // Step 4: Draw alternating background
+  if (isAlternate) {
+    doc.setFillColor(...BRAND_COLORS.lightBg);
+    doc.rect(margin, y, contentWidth, rowHeight, 'F');
+  }
+  
+  // Step 5: Render each column's wrapped text
+  wrappedColumns.forEach(col => {
+    doc.setTextColor(...(col.color || BRAND_COLORS.text));
+    doc.setFont('helvetica', col.bold ? 'bold' : 'normal');
+    
+    col.lines.forEach((line, lineIndex) => {
+      const lineY = y + 6 + (lineIndex * lineHeight);
+      
+      if (col.align === 'right') {
+        doc.text(line, col.x + col.width - 4, lineY, { align: 'right' });
+      } else if (col.align === 'center') {
+        doc.text(line, col.x + col.width / 2, lineY, { align: 'center' });
+      } else {
+        doc.text(line, col.x + 2, lineY);
+      }
+    });
+  });
+  
+  // Step 6: Add subtle bottom border for visual row separation
+  if (showBorder) {
+    doc.setDrawColor(220, 220, 220);
+    doc.setLineWidth(0.3);
+    doc.line(margin, y + rowHeight, pageWidth - margin, y + rowHeight);
+  }
+  
+  doc.setFont('helvetica', 'normal');
+  return y + rowHeight;
+}
+
+/**
+ * Add a wrapped table header (matches addWrappedTableRow column structure)
+ */
+export function addWrappedTableHeader(
+  doc: jsPDF,
+  columns: Array<{ text: string; x: number; width: number; align?: 'left' | 'right' | 'center' }>,
+  y: number
+): number {
+  const margin = PDF_SETTINGS.margin;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const contentWidth = pageWidth - margin * 2;
+  
+  doc.setFillColor(...BRAND_COLORS.nigerianGreen);
+  doc.roundedRect(margin, y, contentWidth, 10, 2, 2, 'F');
+  
+  doc.setTextColor(...BRAND_COLORS.white);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  
+  columns.forEach(col => {
+    if (col.align === 'right') {
+      doc.text(col.text, col.x + col.width - 4, y + 7, { align: 'right' });
+    } else if (col.align === 'center') {
+      doc.text(col.text, col.x + col.width / 2, y + 7, { align: 'center' });
+    } else {
+      doc.text(col.text, col.x + 2, y + 7);
+    }
+  });
+  
+  return y + 12;
+}
+
+// ============================================
 // PDF SUMMARY/HIGHLIGHT COMPONENTS
 // ============================================
 

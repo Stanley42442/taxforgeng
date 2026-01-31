@@ -10,8 +10,8 @@ import {
   addPDFFooter,
   addPageNumbers,
   addSummaryBox,
-  addTableHeader,
-  addTableRow,
+  addWrappedTableHeader,
+  addWrappedTableRow,
   addAlertBox,
   addSectionTitle,
   checkPageBreak,
@@ -148,20 +148,25 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
       { band: 'Above NGN 3,200,000', rate: '24%' },
     ];
 
-    y = addTableHeader(doc, [
-      { text: 'Income Band', x: margin + 5 },
-      { text: 'Rate', x: margin + 100 },
-      { text: 'Tax Amount', x: pageWidth - margin - 5, align: 'right' },
+    // Define column structure with explicit widths
+    const bandCol = { x: margin, width: 70 };
+    const rateCol = { x: margin + 70, width: 30 };
+    const amountCol = { x: margin + 100, width: contentWidth - 100 };
+
+    y = addWrappedTableHeader(doc, [
+      { text: 'Income Band', x: bandCol.x, width: bandCol.width },
+      { text: 'Rate', x: rateCol.x, width: rateCol.width, align: 'center' },
+      { text: 'Tax Amount', x: amountCol.x, width: amountCol.width, align: 'right' },
     ], y);
 
     taxBands.forEach((band, index) => {
       const bandItem = result.breakdown.find(b => b.label.includes(band.rate.replace('%', '')));
       const taxAmount = bandItem ? formatCurrency(bandItem.amount) : formatNaira(0);
       
-      y = addTableRow(doc, [
-        { text: band.band, x: margin + 5 },
-        { text: band.rate, x: margin + 100 },
-        { text: taxAmount, x: pageWidth - margin - 5, align: 'right' },
+      y = addWrappedTableRow(doc, [
+        { text: band.band, x: bandCol.x, width: bandCol.width },
+        { text: band.rate, x: rateCol.x, width: rateCol.width, align: 'center' },
+        { text: taxAmount, x: amountCol.x, width: amountCol.width, align: 'right' },
       ], y, index % 2 === 0);
     });
 
@@ -173,24 +178,27 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
     y = checkPageBreak(doc, y, 100, () => margin + 20);
     y = addSectionTitle(doc, 'Tax Reliefs & Allowances', y);
 
+    // Define column structure with explicit widths for proper text wrapping
+    const reliefTypeCol = { x: margin, width: 50 };
+    const descriptionCol = { x: margin + 50, width: 75 };  // Wider for descriptions
+    const amountCol = { x: margin + 125, width: contentWidth - 125 };
+
     // Header row
-    y = addTableHeader(doc, [
-      { text: 'Relief Type', x: margin + 5 },
-      { text: 'Description', x: margin + 70 },
-      { text: 'Amount', x: pageWidth - margin - 5, align: 'right' },
+    y = addWrappedTableHeader(doc, [
+      { text: 'Relief Type', x: reliefTypeCol.x, width: reliefTypeCol.width },
+      { text: 'Description', x: descriptionCol.x, width: descriptionCol.width },
+      { text: 'Amount', x: amountCol.x, width: amountCol.width, align: 'right' },
     ], y);
 
     let totalReliefs = 0;
     result.reliefs.forEach((relief, index) => {
-      y = checkPageBreak(doc, y, 15, () => margin + 20);
-
-      // Truncate description if needed
-      const descText = relief.description.length > 50 ? relief.description.substring(0, 47) + '...' : relief.description;
+      y = checkPageBreak(doc, y, 25, () => margin + 20);  // Increased for wrapped rows
       
-      y = addTableRow(doc, [
-        { text: relief.name, x: margin + 5 },
-        { text: descText, x: margin + 70, color: BRAND_COLORS.muted },
-        { text: `(${formatNaira(relief.amount)})`, x: pageWidth - margin - 5, align: 'right', color: BRAND_COLORS.success },
+      // Use full description - wrapping will handle overflow
+      y = addWrappedTableRow(doc, [
+        { text: relief.name, x: reliefTypeCol.x, width: reliefTypeCol.width, bold: true },
+        { text: relief.description, x: descriptionCol.x, width: descriptionCol.width, color: BRAND_COLORS.muted },
+        { text: `(${formatNaira(relief.amount)})`, x: amountCol.x, width: amountCol.width, align: 'right', color: BRAND_COLORS.success },
       ], y, index % 2 === 0);
       
       totalReliefs += relief.amount;
@@ -211,31 +219,31 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
   y = checkPageBreak(doc, y, 80, () => margin + 20);
   y = addSectionTitle(doc, 'Detailed Tax Calculation', y);
 
+  // Define column structure with explicit widths
+  const componentCol = { x: margin, width: contentWidth - 55 };
+  const breakdownAmountCol = { x: margin + contentWidth - 55, width: 55 };
+
   // Header
-  y = addTableHeader(doc, [
-    { text: 'Component', x: margin + 5 },
-    { text: 'Amount', x: pageWidth - margin - 5, align: 'right' },
+  y = addWrappedTableHeader(doc, [
+    { text: 'Component', x: componentCol.x, width: componentCol.width },
+    { text: 'Amount', x: breakdownAmountCol.x, width: breakdownAmountCol.width, align: 'right' },
   ], y);
 
   result.breakdown.forEach((item, index) => {
-    y = checkPageBreak(doc, y, 20, () => margin + 20);
+    y = checkPageBreak(doc, y, 25, () => margin + 20);
 
     const isNegative = item.amount < 0;
     const amountStr = isNegative 
       ? `(${formatNaira(Math.abs(item.amount))})` 
       : formatNaira(item.amount);
 
-    y = addTableRow(doc, [
-      { text: item.label, x: margin + 5 },
-      { text: amountStr, x: pageWidth - margin - 5, align: 'right', color: isNegative ? BRAND_COLORS.success : BRAND_COLORS.text },
-    ], y, index % 2 === 0, item.description ? 16 : 10);
+    // Combine label and description for full context
+    const fullText = item.description ? `${item.label}\n${item.description}` : item.label;
 
-    if (item.description) {
-      doc.setTextColor(...BRAND_COLORS.muted);
-      doc.setFontSize(8);
-      doc.setFont('helvetica', 'normal');
-      doc.text(item.description, margin + 10, y - 2);
-    }
+    y = addWrappedTableRow(doc, [
+      { text: fullText, x: componentCol.x, width: componentCol.width },
+      { text: amountStr, x: breakdownAmountCol.x, width: breakdownAmountCol.width, align: 'right', color: isNegative ? BRAND_COLORS.success : BRAND_COLORS.text },
+    ], y, index % 2 === 0);
   });
 
   // Final total row
