@@ -140,12 +140,12 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
     y = addSectionTitle(doc, 'Progressive Tax Bands Applied', y);
     
     const taxBands = [
-      { band: 'First \u20A6300,000', rate: '7%' },
-      { band: 'Next \u20A6300,000', rate: '11%' },
-      { band: 'Next \u20A6500,000', rate: '15%' },
-      { band: 'Next \u20A6500,000', rate: '19%' },
-      { band: 'Next \u20A61,600,000', rate: '21%' },
-      { band: 'Above \u20A63,200,000', rate: '24%' },
+      { band: 'First NGN 300,000', rate: '7%' },
+      { band: 'Next NGN 300,000', rate: '11%' },
+      { band: 'Next NGN 500,000', rate: '15%' },
+      { band: 'Next NGN 500,000', rate: '19%' },
+      { band: 'Next NGN 1,600,000', rate: '21%' },
+      { band: 'Above NGN 3,200,000', rate: '24%' },
     ];
 
     y = addTableHeader(doc, [

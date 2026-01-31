@@ -119,12 +119,13 @@ export const PDF_SETTINGS = {
 } as const;
 
 // ============================================
-// CURRENCY FORMATTING (Critical for Naira Symbol)
+// CURRENCY FORMATTING (Critical for PDF rendering)
 // ============================================
 
 /**
- * Format amount as Nigerian Naira with proper symbol
- * Uses Unicode \u20A6 for reliable rendering in PDFs
+ * Format amount as Nigerian Naira with "NGN" prefix
+ * Uses "NGN" text prefix for reliable PDF rendering (jsPDF's Helvetica doesn't support ₦)
+ * This matches Nigerian banking standards (Access Bank, GTBank, Paystack, FIRS)
  */
 export function formatNaira(
   amount: number,
@@ -135,7 +136,7 @@ export function formatNaira(
   }
 ): string {
   const {
-    showDecimals = false,
+    showDecimals = true,  // Default to TRUE for professional financial documents
     showSign = false,
     useParenthesesForNegative = true
   } = options || {};
@@ -143,20 +144,21 @@ export function formatNaira(
   const isNegative = amount < 0;
   const absAmount = Math.abs(amount);
 
+  // Always use 2 decimal places for consistency in financial documents
   const formatted = absAmount.toLocaleString('en-NG', {
     minimumFractionDigits: showDecimals ? 2 : 0,
     maximumFractionDigits: 2,
   });
 
-  // Use Unicode for Naira symbol (more reliable than literal ₦ in PDFs)
-  const nairaSymbol = '\u20A6';
+  // Use "NGN" prefix for reliable PDF rendering (industry standard)
+  const nairaPrefix = 'NGN ';
 
   if (isNegative && useParenthesesForNegative) {
-    return `(${nairaSymbol}${formatted})`;
+    return `(${nairaPrefix}${formatted})`;
   }
 
   const sign = isNegative ? '-' : (showSign ? '+' : '');
-  return `${sign}${nairaSymbol}${formatted}`;
+  return `${sign}${nairaPrefix}${formatted}`;
 }
 
 /**
@@ -228,23 +230,24 @@ export function formatShortDate(date: string | Date): string {
 
 /**
  * Add Nigerian flag-inspired header bar to PDF
+ * Optimized for reduced whitespace
  */
 export function addNigerianHeader(doc: jsPDF): number {
   const pageWidth = doc.internal.pageSize.getWidth();
   
-  // Nigerian flag-inspired header
+  // Nigerian flag-inspired header (reduced heights for tighter layout)
   doc.setFillColor(...BRAND_COLORS.nigerianGreen);
-  doc.rect(0, 0, pageWidth, 12, 'F');
+  doc.rect(0, 0, pageWidth, 8, 'F');  // Reduced from 12px to 8px
   
   // White stripe
   doc.setFillColor(...BRAND_COLORS.white);
-  doc.rect(0, 12, pageWidth, 4, 'F');
+  doc.rect(0, 8, pageWidth, 2, 'F');  // Reduced from 4px to 2px
   
-  // Green stripe
+  // Green accent line
   doc.setFillColor(...BRAND_COLORS.nigerianGreen);
-  doc.rect(0, 16, pageWidth, 2, 'F');
+  doc.rect(0, 10, pageWidth, 2, 'F');
   
-  return 30; // Return Y position after header
+  return 18; // Return tighter Y position (was 30)
 }
 
 /**
@@ -433,7 +436,7 @@ export function addTableHeader(
 }
 
 /**
- * Add a table row with alternating background
+ * Add a table row with alternating background and subtle row separator
  */
 export function addTableRow(
   doc: jsPDF,
@@ -446,10 +449,16 @@ export function addTableRow(
   const pageWidth = doc.internal.pageSize.getWidth();
   const contentWidth = pageWidth - margin * 2;
   
+  // Alternating background
   if (isAlternate) {
     doc.setFillColor(...BRAND_COLORS.lightBg);
     doc.rect(margin, y - 4, contentWidth, rowHeight, 'F');
   }
+  
+  // Add subtle bottom border for visual row separation
+  doc.setDrawColor(220, 220, 220);
+  doc.setLineWidth(0.3);
+  doc.line(margin, y + rowHeight - 4, pageWidth - margin, y + rowHeight - 4);
   
   doc.setFontSize(9);
   
@@ -457,12 +466,31 @@ export function addTableRow(
     doc.setTextColor(...(item.color || BRAND_COLORS.text));
     doc.setFont('helvetica', item.bold ? 'bold' : 'normal');
     
+    // Improved padding: +8 from margin (was +5)
+    const adjustedX = item.align === 'right' 
+      ? item.x - 3  // More padding from right edge
+      : item.x + 3; // More padding from left edge
+    
     const textOptions = item.align && item.align !== 'left' ? { align: item.align as 'right' | 'center' } : undefined;
-    doc.text(item.text, item.x, y + 2, textOptions);
+    doc.text(item.text, adjustedX, y + 2, textOptions);
   });
   
   doc.setFont('helvetica', 'normal');
   return y + rowHeight;
+}
+
+/**
+ * Add a section divider with gold accent line
+ */
+export function addSectionDivider(doc: jsPDF, y: number): number {
+  const margin = PDF_SETTINGS.margin;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  
+  // Gold accent line
+  doc.setFillColor(...BRAND_COLORS.gold);
+  doc.rect(margin, y, pageWidth - margin * 2, 1, 'F');
+  
+  return y + 8;
 }
 
 // ============================================

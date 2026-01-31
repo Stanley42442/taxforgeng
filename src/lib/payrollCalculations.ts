@@ -376,15 +376,17 @@ export interface PayrollTotals {
 }
 
 /**
- * Format currency for display
+ * Format currency for display using NGN prefix
+ * Uses "NGN" text prefix for reliable rendering (matches Nigerian banking standards)
  */
 export function formatNaira(amount: number): string {
-  return new Intl.NumberFormat('en-NG', {
-    style: 'currency',
-    currency: 'NGN',
-    minimumFractionDigits: 0,
+  const formatted = new Intl.NumberFormat('en-NG', {
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(amount);
+  }).format(Math.abs(amount));
+  
+  const sign = amount < 0 ? '-' : '';
+  return `${sign}NGN ${formatted}`;
 }
 
 /**

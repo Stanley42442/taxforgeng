@@ -549,8 +549,8 @@ export function formatCurrency(amount: number): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(Math.abs(amount));
-  // Use Unicode \u20A6 for reliable Naira symbol rendering in PDFs
-  return `${amount < 0 ? '-' : ''}\u20A6${formatted}`;
+  // Use NGN prefix for reliable rendering in PDFs (Helvetica doesn't support ₦)
+  return `${amount < 0 ? '-' : ''}NGN ${formatted}`;
 }
 
 export function formatNumber(num: number): string {

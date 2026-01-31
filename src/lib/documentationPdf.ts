@@ -221,7 +221,7 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
 
   addSubsectionTitle('Tax Calculators');
   addBulletPoint('Personal Income Tax (PIT) with 2026 rules (Nigeria Tax Act 2025)');
-  addBulletPoint('Company Income Tax (CIT) with small company exemptions (0% for turnover < \u20A650M)');
+  addBulletPoint('Company Income Tax (CIT) with small company exemptions (0% for turnover < NGN 50M)');
   addBulletPoint('VAT calculations with sector-specific rules (exempt, zero-rated, standard)');
   addBulletPoint('Withholding Tax (WHT) credit tracking and reconciliation');
   addBulletPoint('Capital Gains Tax (CGT) with investor exemptions');
@@ -267,11 +267,11 @@ export const generateDocumentationPDF = async (stats: DocumentationStats): Promi
 
   // Pricing Table
   const tiers = [
-    { name: 'Free (Individual)', price: '\u20A60', target: 'Employees', features: 'Personal tax calc, crypto taxes, foreign income' },
-    { name: 'Starter', price: '\u20A6500/mo', target: 'Side hustlers', features: '1 business, exports, email reminders' },
-    { name: 'Basic', price: '\u20A62,000/mo', target: 'Freelancers', features: '2 businesses, invoices, OCR, 75 AI queries' },
-    { name: 'Professional', price: '\u20A64,999/mo', target: 'Small business', features: '5 businesses, payroll, digital VAT' },
-    { name: 'Business', price: '\u20A68,999/mo', target: 'Growing business', features: '10 businesses, CAC verification, 2 seats' },
+    { name: 'Free (Individual)', price: 'NGN 0', target: 'Employees', features: 'Personal tax calc, crypto taxes, foreign income' },
+    { name: 'Starter', price: 'NGN 500/mo', target: 'Side hustlers', features: '1 business, exports, email reminders' },
+    { name: 'Basic', price: 'NGN 2,000/mo', target: 'Freelancers', features: '2 businesses, invoices, OCR, 75 AI queries' },
+    { name: 'Professional', price: 'NGN 4,999/mo', target: 'Small business', features: '5 businesses, payroll, digital VAT' },
+    { name: 'Business', price: 'NGN 8,999/mo', target: 'Growing business', features: '10 businesses, CAC verification, 2 seats' },
     { name: 'Corporate', price: 'Custom', target: 'Enterprises', features: 'Unlimited, API, audit log, white-label' },
   ];
 

@@ -14,6 +14,9 @@ import {
 } from './exportShared';
 import logger from './logger';
 
+// Use NGN prefix instead of Unicode Naira symbol for reliable PDF rendering
+const NGN = 'NGN ';
+
 // Generate QR code as base64 data URL
 const generateQRCodeDataUrl = async (url: string): Promise<string> => {
   try {
@@ -267,19 +270,19 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
 
   addParagraph(
     'Personal Income Tax in Nigeria follows a progressive tax system where higher income attracts higher tax rates. ' +
-    'The Nigeria Tax Act 2025 (effective from 2026) introduced significant changes including a tax-free threshold of \u20A6800,000.'
+    `The Nigeria Tax Act 2025 (effective from 2026) introduced significant changes including a tax-free threshold of ${NGN}800,000.`
   );
 
   addSubsectionTitle('2026 Tax Bands (Nigeria Tax Act 2025)');
   addTable(
     ['Band', 'Income Threshold', 'Tax Rate'],
     [
-      ['1', 'First \u20A6800,000', '0% (Exempt)'],
-      ['2', '\u20A6800,001 - \u20A63,000,000', '15%'],
-      ['3', '\u20A63,000,001 - \u20A612,000,000', '18%'],
-      ['4', '\u20A612,000,001 - \u20A625,000,000', '21%'],
-      ['5', '\u20A625,000,001 - \u20A650,000,000', '23%'],
-      ['6', 'Above \u20A650,000,000', '25%'],
+      ['1', `First ${NGN}800,000`, '0% (Exempt)'],
+      ['2', `${NGN}800,001 - ${NGN}3,000,000`, '15%'],
+      ['3', `${NGN}3,000,001 - ${NGN}12,000,000`, '18%'],
+      ['4', `${NGN}12,000,001 - ${NGN}25,000,000`, '21%'],
+      ['5', `${NGN}25,000,001 - ${NGN}50,000,000`, '23%'],
+      ['6', `Above ${NGN}50,000,000`, '25%'],
     ],
     [30, 70, 70]
   );
@@ -288,18 +291,18 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
   addTable(
     ['Band', 'Income Threshold', 'Tax Rate'],
     [
-      ['1', 'First \u20A6300,000', '7%'],
-      ['2', '\u20A6300,001 - \u20A6600,000', '11%'],
-      ['3', '\u20A6600,001 - \u20A61,100,000', '15%'],
-      ['4', '\u20A61,100,001 - \u20A61,600,000', '19%'],
-      ['5', '\u20A61,600,001 - \u20A63,200,000', '21%'],
-      ['6', 'Above \u20A63,200,000', '24%'],
+      ['1', `First ${NGN}300,000`, '7%'],
+      ['2', `${NGN}300,001 - ${NGN}600,000`, '11%'],
+      ['3', `${NGN}600,001 - ${NGN}1,100,000`, '15%'],
+      ['4', `${NGN}1,100,001 - ${NGN}1,600,000`, '19%'],
+      ['5', `${NGN}1,600,001 - ${NGN}3,200,000`, '21%'],
+      ['6', `Above ${NGN}3,200,000`, '24%'],
     ],
     [30, 70, 70]
   );
 
   addParagraph(
-    'Key Difference: The 2026 rules introduce an \u20A6800,000 tax-free threshold and cap the maximum rate at 25% (vs 24% pre-2026). ' +
+    `Key Difference: The 2026 rules introduce an ${NGN}800,000 tax-free threshold and cap the maximum rate at 25% (vs 24% pre-2026). ` +
     'The new bands are also significantly wider, reducing the tax burden for middle-income earners.'
   );
 
@@ -319,7 +322,7 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
   addTable(
     ['Deduction Type', 'Calculation', 'Maximum Cap'],
     [
-      ['Rent Relief', '20% of actual rent paid', '\u20A6500,000 per annum'],
+      ['Rent Relief', '20% of actual rent paid', `${NGN}500,000 per annum`],
       ['Pension Contribution', 'Actual contribution', '8% of gross income'],
       ['NHF (National Housing Fund)', 'Actual contribution', '2.5% of basic salary'],
       ['NHIS (Health Insurance)', 'Actual premium paid', 'No cap'],
@@ -333,7 +336,7 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
   addTable(
     ['Deduction Type', 'Calculation'],
     [
-      ['Consolidated Relief Allowance (CRA)', 'Higher of \u20A6200,000 or 1% of gross + 20% of gross income'],
+      ['Consolidated Relief Allowance (CRA)', `Higher of ${NGN}200,000 or 1% of gross + 20% of gross income`],
       ['Pension Contribution', 'Up to 8% of gross income'],
       ['NHF', '2.5% of basic salary'],
       ['Life Insurance Premium', 'Actual premiums paid'],
@@ -357,8 +360,8 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
   addParagraph(
     'A company qualifies as a "small company" and is exempt from CIT if it meets BOTH of the following criteria:'
   );
-  addBulletPoint('Annual Turnover: \u2264 \u20A650,000,000 (Fifty Million Naira)');
-  addBulletPoint('Fixed Assets: \u2264 \u20A6250,000,000 (Two Hundred Fifty Million Naira)');
+  addBulletPoint(`Annual Turnover: \u2264 ${NGN}50,000,000 (Fifty Million Naira)`);
+  addBulletPoint(`Fixed Assets: \u2264 ${NGN}250,000,000 (Two Hundred Fifty Million Naira)`);
   yPosition += 5;
 
   addSubsectionTitle('2026 CIT Rates');
@@ -393,7 +396,7 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
     ['Parameter', 'Value'],
     [
       ['Standard VAT Rate', '7.5%'],
-      ['VAT Registration Threshold', '\u20A625,000,000 annual turnover'],
+      ['VAT Registration Threshold', `${NGN}25,000,000 annual turnover`],
       ['Filing Frequency', 'Monthly (by 21st of following month)'],
     ],
     [80, 90]
@@ -453,7 +456,7 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
   addParagraph(
     'The 2026 rules introduce a small investor exemption and apply progressive PIT rates to capital gains for individuals:'
   );
-  addBulletPoint('Small Investor Exemption: Gains \u2264 \u20A610,000,000 are exempt if total proceeds < \u20A6150,000,000');
+  addBulletPoint(`Small Investor Exemption: Gains \u2264 ${NGN}10,000,000 are exempt if total proceeds < ${NGN}150,000,000`);
   addBulletPoint('Above exemption: Progressive PIT rates (0-25%) apply to gains');
   yPosition += 3;
 
@@ -487,10 +490,10 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
   addTable(
     ['Gain Threshold', 'Tax Rate'],
     [
-      ['Gains \u2264 \u20A610,000,000', '0% (Exempt)'],
-      ['\u20A610,000,001 - \u20A650,000,000', '10%'],
-      ['\u20A650,000,001 - \u20A6150,000,000', '15%'],
-      ['Above \u20A6150,000,000', '25%'],
+      [`Gains \u2264 ${NGN}10,000,000`, '0% (Exempt)'],
+      [`${NGN}10,000,001 - ${NGN}50,000,000`, '10%'],
+      [`${NGN}50,000,001 - ${NGN}150,000,000`, '15%'],
+      [`Above ${NGN}150,000,000`, '25%'],
     ],
     [85, 85]
   );
@@ -550,18 +553,18 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
   addTable(
     ['Location', 'Minimum Tax', 'Maximum Tax'],
     [
-      ['Lagos', '\u20A620,000', '\u20A650,000'],
-      ['Abuja (FCT)', '\u20A615,000', '\u20A640,000'],
-      ['Port Harcourt', '\u20A612,000', '\u20A635,000'],
-      ['Kano', '\u20A68,000', '\u20A625,000'],
-      ['Other Urban Areas', '\u20A65,000', '\u20A620,000'],
-      ['Rural Areas', '\u20A65,000', '\u20A610,000'],
+      ['Lagos', `${NGN}20,000`, `${NGN}50,000`],
+      ['Abuja (FCT)', `${NGN}15,000`, `${NGN}40,000`],
+      ['Port Harcourt', `${NGN}12,000`, `${NGN}35,000`],
+      ['Kano', `${NGN}8,000`, `${NGN}25,000`],
+      ['Other Urban Areas', `${NGN}5,000`, `${NGN}20,000`],
+      ['Rural Areas', `${NGN}5,000`, `${NGN}10,000`],
     ],
     [60, 55, 55]
   );
 
   addParagraph(
-    'Note: Businesses with turnover exceeding \u20A625,000,000 should register for VAT and use the standard tax system.'
+    `Note: Businesses with turnover exceeding ${NGN}25,000,000 should register for VAT and use the standard tax system.`
   );
 
   // ========== SECTION 10: SECTOR RULES ==========
