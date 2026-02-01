@@ -189,11 +189,8 @@ const Expenses = () => {
     dueDay?: number; // Day of month (1-31)
     lastPaidDate?: string;
   }>>(() => {
-    return safeLocalStorage.getJSON('recurringTemplates', [
-      { id: '1', description: 'Office Rent', amount: 150000, category: 'rent', dueDay: 1 },
-      { id: '2', description: 'Internet & Phone', amount: 25000, category: 'utilities', dueDay: 15 },
-      { id: '3', description: 'Staff Salaries', amount: 350000, category: 'salary', dueDay: 25 },
-    ]);
+    // Start with empty templates - users create their own
+    return safeLocalStorage.getJSON('recurringTemplates', []);
   });
   const [newTemplate, setNewTemplate] = useState({ description: '', amount: '', category: 'rent' as Expense['category'], dueDay: '' });
   const [showComparison, setShowComparison] = useState(false);

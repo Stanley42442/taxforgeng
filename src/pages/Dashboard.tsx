@@ -149,69 +149,97 @@ const Dashboard = () => {
 
   // Auto-seeding removed - sample data is now opt-in only via SavedBusinesses page
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      const { data: expenseData } = await supabase
-        .from('expenses')
-        .select('*')
-        .eq('user_id', user.id)
-        .is('deleted_at', null)
-        .order('date', { ascending: false });
-
-      if (expenseData) {
-        const mapped: Expense[] = expenseData.map(e => ({
-          id: e.id,
-          date: e.date,
-          description: e.description || '',
-          amount: Number(e.amount),
-          category: e.category,
-          type: e.type as 'income' | 'expense',
-          isDeductible: e.is_deductible,
-          businessId: e.business_id || undefined,
-        }));
-        setExpenses(mapped);
-
-        const income = mapped.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
-        const expense = mapped.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
-        const deductible = mapped.filter(e => e.isDeductible).reduce((sum, e) => sum + e.amount, 0);
-
-        setExpenseSummary({ totalIncome: income, totalExpenses: expense, deductibleExpenses: deductible });
-      }
-
-      // Fetch incomplete reminders (not completed) for dashboard
-      const { data: reminders } = await supabase
-        .from('reminders')
-        .select('id, title, due_date, business_id, is_completed')
-        .eq('user_id', user.id)
-        .eq('is_completed', false)
-        .order('due_date', { ascending: true })
-        .limit(5);
-
-      if (reminders) {
-        const reminderList: ReminderSummary[] = reminders.map(r => {
-          const business = savedBusinesses.find(b => b.id === r.business_id);
-          return {
-            id: r.id,
-            title: r.title,
-            dueDate: r.due_date,
-            businessName: business?.name || 'General',
-          };
-        });
-        setUpcomingReminders(reminderList);
-      }
-
+  // Fetch dashboard data function - extracted to allow re-use
+  const fetchDashboardData = async () => {
+    if (!user) {
       setLoading(false);
-    };
+      return;
+    }
 
+    const { data: expenseData } = await supabase
+      .from('expenses')
+      .select('*')
+      .eq('user_id', user.id)
+      .is('deleted_at', null)
+      .order('date', { ascending: false });
+
+    if (expenseData) {
+      const mapped: Expense[] = expenseData.map(e => ({
+        id: e.id,
+        date: e.date,
+        description: e.description || '',
+        amount: Number(e.amount),
+        category: e.category,
+        type: e.type as 'income' | 'expense',
+        isDeductible: e.is_deductible,
+        businessId: e.business_id || undefined,
+      }));
+      setExpenses(mapped);
+
+      const income = mapped.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
+      const expense = mapped.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
+      const deductible = mapped.filter(e => e.isDeductible).reduce((sum, e) => sum + e.amount, 0);
+
+      setExpenseSummary({ totalIncome: income, totalExpenses: expense, deductibleExpenses: deductible });
+    }
+
+    // Fetch incomplete reminders (not completed) for dashboard
+    const { data: reminders } = await supabase
+      .from('reminders')
+      .select('id, title, due_date, business_id, is_completed')
+      .eq('user_id', user.id)
+      .eq('is_completed', false)
+      .order('due_date', { ascending: true })
+      .limit(5);
+
+    if (reminders) {
+      const reminderList: ReminderSummary[] = reminders.map(r => {
+        const business = savedBusinesses.find(b => b.id === r.business_id);
+        return {
+          id: r.id,
+          title: r.title,
+          dueDate: r.due_date,
+          businessName: business?.name || 'General',
+        };
+      });
+      setUpcomingReminders(reminderList);
+    }
+
+    setLoading(false);
+  };
+
+  // Initial data fetch
+  useEffect(() => {
     if (!businessLoading) {
       fetchDashboardData();
     }
   }, [user, businessLoading, savedBusinesses]);
+
+  // Realtime subscription for expenses - updates dashboard when expenses change
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('dashboard-expenses')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'expenses',
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => {
+          // Refetch data when expenses change
+          fetchDashboardData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
 
   const dateRangeStart = useMemo(() => {
     const now = new Date();
