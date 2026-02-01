@@ -47,6 +47,8 @@ import {
   Heart,
   Wallet,
   Shield,
+  GraduationCap,
+  Users,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { format, isAfter, addDays, subDays, subMonths, startOfWeek, startOfMonth, startOfQuarter, startOfYear, eachDayOfInterval, isWithinInterval } from "date-fns";
@@ -56,6 +58,7 @@ import { toast } from "sonner";
 import logger from "@/lib/logger";
 import { safeLocalStorage } from "@/lib/safeStorage";
 import { ExpenseCharts } from "@/components/ExpenseCharts";
+import { PersonalExpenseCharts } from "@/components/PersonalExpenseCharts";
 import { PremiumOnboarding } from "@/components/PremiumOnboarding";
 import { DisclaimerModal } from "@/components/DisclaimerModal";
 import { FeedbackForm } from "@/components/FeedbackForm";
@@ -125,7 +128,7 @@ const Dashboard = () => {
   });
   
   // Personal expenses data
-  const { annualTotals, totalDeductible, loading: personalLoading } = usePersonalExpenses();
+  const { expenses: personalExpenses, annualTotals, totalDeductible, loading: personalLoading } = usePersonalExpenses();
 
   useEffect(() => {
     safeLocalStorage.setItem('dashboard_date_range', dateRange);
@@ -700,164 +703,355 @@ const Dashboard = () => {
         </Link>
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid gap-6 lg:grid-cols-2 animate-slide-up-delay-2">
-        {/* Businesses Card */}
-        <Card className="glass-frosted shadow-futuristic">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Building2 className="h-5 w-5 text-primary" />
+      {/* Main Content Grid - Conditional based on mode */}
+      {dashboardMode === 'business' ? (
+        <>
+          <div className="grid gap-6 lg:grid-cols-2 animate-slide-up-delay-2">
+            {/* Businesses Card */}
+            <Card className="glass-frosted shadow-futuristic">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Building2 className="h-5 w-5 text-primary" />
+                    </div>
+                    My Businesses
+                  </CardTitle>
+                  <CardDescription>
+                    {savedBusinesses.length === 0 ? 'No businesses saved yet' : `${savedBusinesses.length} business${savedBusinesses.length > 1 ? 'es' : ''}`}
+                  </CardDescription>
                 </div>
-                My Businesses
-              </CardTitle>
-              <CardDescription>
-                {savedBusinesses.length === 0 ? 'No businesses saved yet' : `${savedBusinesses.length} business${savedBusinesses.length > 1 ? 'es' : ''}`}
-              </CardDescription>
-            </div>
-            <Link to="/businesses">
-              <Button variant="outline" size="sm">
-                View All <ArrowRight className="h-4 w-4 ml-1" />
-              </Button>
-            </Link>
-          </CardHeader>
-          <CardContent>
-            {savedBusinesses.length === 0 ? (
-              <div className="text-center py-8">
-                <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground mb-4">Start by calculating taxes for your business</p>
-                <Link to="/calculator">
-                  <Button variant="hero" size="sm">
-                    <Plus className="h-4 w-4" />
-                    Add Business
+                <Link to="/businesses">
+                  <Button variant="outline" size="sm">
+                    View All <ArrowRight className="h-4 w-4 ml-1" />
                   </Button>
                 </Link>
-              </div>
-            ) : (
-              <div className="space-y-3 max-h-[300px] overflow-y-auto">
-                {savedBusinesses.slice(0, 5).map((business, index) => (
-                  <SharedElement key={business.id} id={`business-card-${business.id}`}>
-                    <motion.div
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                    >
-                      <Collapsible
-                        open={expandedBusinessId === business.id}
-                        onOpenChange={() => setExpandedBusinessId(expandedBusinessId === business.id ? null : business.id)}
-                      >
-                        <div className="glass p-3 rounded-xl hover:bg-muted/50 transition-colors">
-                          <CollapsibleTrigger className="w-full">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <SharedElement id={`business-icon-${business.id}`}>
-                                  <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
-                                    business.entityType === 'company' ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'
-                                  }`}>
-                                    <Building2 className="h-5 w-5" />
+              </CardHeader>
+              <CardContent>
+                {savedBusinesses.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-muted-foreground mb-4">Start by calculating taxes for your business</p>
+                    <Link to="/calculator">
+                      <Button variant="hero" size="sm">
+                        <Plus className="h-4 w-4" />
+                        Add Business
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                    {savedBusinesses.slice(0, 5).map((business, index) => (
+                      <SharedElement key={business.id} id={`business-card-${business.id}`}>
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                        >
+                          <Collapsible
+                            open={expandedBusinessId === business.id}
+                            onOpenChange={() => setExpandedBusinessId(expandedBusinessId === business.id ? null : business.id)}
+                          >
+                            <div className="glass p-3 rounded-xl hover:bg-muted/50 transition-colors">
+                              <CollapsibleTrigger className="w-full">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    <SharedElement id={`business-icon-${business.id}`}>
+                                      <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
+                                        business.entityType === 'company' ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'
+                                      }`}>
+                                        <Building2 className="h-5 w-5" />
+                                      </div>
+                                    </SharedElement>
+                                    <div className="text-left">
+                                      <SharedElement id={`business-name-${business.id}`}>
+                                        <p className="font-medium text-sm">{business.name}</p>
+                                      </SharedElement>
+                                      <p className="text-xs text-muted-foreground">{formatCurrency(business.turnover)}</p>
+                                    </div>
                                   </div>
-                                </SharedElement>
-                                <div className="text-left">
-                                  <SharedElement id={`business-name-${business.id}`}>
-                                    <p className="font-medium text-sm">{business.name}</p>
-                                  </SharedElement>
-                                  <p className="text-xs text-muted-foreground">{formatCurrency(business.turnover)}</p>
+                                  {expandedBusinessId === business.id ? (
+                                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                                  ) : (
+                                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                                  )}
                                 </div>
-                              </div>
-                              {expandedBusinessId === business.id ? (
-                                <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                              ) : (
-                                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                              )}
+                              </CollapsibleTrigger>
+                              <CollapsibleContent>
+                                <div className="mt-3 pt-3 border-t border-border/50 text-xs text-muted-foreground">
+                                  <p>Entity: {business.entityType === 'company' ? 'Limited Company' : 'Business Name'}</p>
+                                  {business.sector && <p>Sector: {business.sector.replace(/_/g, ' ')}</p>}
+                                </div>
+                              </CollapsibleContent>
                             </div>
-                          </CollapsibleTrigger>
-                          <CollapsibleContent>
-                            <div className="mt-3 pt-3 border-t border-border/50 text-xs text-muted-foreground">
-                              <p>Entity: {business.entityType === 'company' ? 'Limited Company' : 'Business Name'}</p>
-                              {business.sector && <p>Sector: {business.sector.replace(/_/g, ' ')}</p>}
-                            </div>
-                          </CollapsibleContent>
-                        </div>
-                      </Collapsible>
-                    </motion.div>
-                  </SharedElement>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                          </Collapsible>
+                        </motion.div>
+                      </SharedElement>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
-        {/* Reminders Card */}
-        <Card className="glass-frosted shadow-futuristic">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <div className="h-10 w-10 rounded-lg bg-warning/10 flex items-center justify-center">
-                  <Calendar className="h-5 w-5 text-warning" />
+            {/* Reminders Card */}
+            <Card className="glass-frosted shadow-futuristic">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <div className="h-10 w-10 rounded-lg bg-warning/10 flex items-center justify-center">
+                      <Calendar className="h-5 w-5 text-warning" />
+                    </div>
+                    Upcoming Reminders
+                  </CardTitle>
+                  <CardDescription>
+                    {upcomingReminders.length === 0 ? 'No upcoming reminders' : `${upcomingReminders.length} reminder${upcomingReminders.length > 1 ? 's' : ''}`}
+                  </CardDescription>
                 </div>
-                Upcoming Reminders
-              </CardTitle>
-              <CardDescription>
-                {upcomingReminders.length === 0 ? 'No upcoming reminders' : `${upcomingReminders.length} reminder${upcomingReminders.length > 1 ? 's' : ''}`}
-              </CardDescription>
-            </div>
-            <Link to="/reminders">
-              <Button variant="outline" size="sm">
-                View All <ArrowRight className="h-4 w-4 ml-1" />
-              </Button>
-            </Link>
-          </CardHeader>
-          <CardContent>
-            {upcomingReminders.length === 0 ? (
-              <div className="text-center py-8">
-                <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground mb-4">No upcoming tax reminders</p>
                 <Link to="/reminders">
                   <Button variant="outline" size="sm">
-                    <Plus className="h-4 w-4" />
-                    Add Reminder
+                    View All <ArrowRight className="h-4 w-4 ml-1" />
                   </Button>
                 </Link>
-              </div>
-            ) : (
-              <div className="space-y-3 max-h-[300px] overflow-y-auto">
-                {upcomingReminders.map((reminder) => {
-                  const dueDate = new Date(reminder.dueDate);
-                  const isUrgent = dueDate <= addDays(new Date(), 7);
-                  
-                  return (
-                    <div key={reminder.id} className={`glass p-3 rounded-xl ${isUrgent ? 'border border-warning/30' : ''}`}>
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-3">
-                          {isUrgent ? (
-                            <AlertTriangle className="h-5 w-5 text-warning mt-0.5" />
-                          ) : (
-                            <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
-                          )}
-                          <div>
-                            <p className="font-medium text-sm">{reminder.title}</p>
-                            <p className="text-xs text-muted-foreground">{reminder.businessName}</p>
+              </CardHeader>
+              <CardContent>
+                {upcomingReminders.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-muted-foreground mb-4">No upcoming tax reminders</p>
+                    <Link to="/reminders">
+                      <Button variant="outline" size="sm">
+                        <Plus className="h-4 w-4" />
+                        Add Reminder
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                    {upcomingReminders.map((reminder) => {
+                      const dueDate = new Date(reminder.dueDate);
+                      const isUrgent = dueDate <= addDays(new Date(), 7);
+                      
+                      return (
+                        <div key={reminder.id} className={`glass p-3 rounded-xl ${isUrgent ? 'border border-warning/30' : ''}`}>
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-start gap-3">
+                              {isUrgent ? (
+                                <AlertTriangle className="h-5 w-5 text-warning mt-0.5" />
+                              ) : (
+                                <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
+                              )}
+                              <div>
+                                <p className="font-medium text-sm">{reminder.title}</p>
+                                <p className="text-xs text-muted-foreground">{reminder.businessName}</p>
+                              </div>
+                            </div>
+                            <Badge variant={isUrgent ? "destructive" : "secondary"} className="text-xs">
+                              {format(dueDate, 'MMM d')}
+                            </Badge>
                           </div>
                         </div>
-                        <Badge variant={isUrgent ? "destructive" : "secondary"} className="text-xs">
-                          {format(dueDate, 'MMM d')}
-                        </Badge>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
 
-      {/* Charts Section */}
-      {expenses.length > 0 && (
-        <div className="mt-6 animate-slide-up-delay-2">
-          <ExpenseCharts expenses={expenses} />
-        </div>
+          {/* Business Charts Section */}
+          {expenses.length > 0 && (
+            <div className="mt-6 animate-slide-up-delay-2">
+              <ExpenseCharts expenses={expenses} />
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          {/* Personal Mode - Deductions Summary and Tax Relief Cards */}
+          <div className="grid gap-6 lg:grid-cols-2 animate-slide-up-delay-2">
+            {/* Personal Deductions Summary Card */}
+            <Card className="glass-frosted shadow-futuristic">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                      <Receipt className="h-5 w-5 text-accent" />
+                    </div>
+                    Personal Deductions
+                  </CardTitle>
+                  <CardDescription>
+                    Your tax-deductible personal expenses
+                  </CardDescription>
+                </div>
+                <Link to="/personal-expenses">
+                  <Button variant="outline" size="sm">
+                    Manage <ArrowRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </Link>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                  {annualTotals.rent > 0 && (
+                    <div className="glass p-3 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                          <Home className="h-5 w-5 text-blue-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Rent</p>
+                          <p className="text-xs text-muted-foreground">Housing expenses</p>
+                        </div>
+                      </div>
+                      <p className="font-semibold text-sm">{formatCurrency(annualTotals.rent)}</p>
+                    </div>
+                  )}
+                  {annualTotals.pension_contribution > 0 && (
+                    <div className="glass p-3 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                          <Wallet className="h-5 w-5 text-green-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Pension</p>
+                          <p className="text-xs text-muted-foreground">Retirement contributions</p>
+                        </div>
+                      </div>
+                      <p className="font-semibold text-sm">{formatCurrency(annualTotals.pension_contribution)}</p>
+                    </div>
+                  )}
+                  {(annualTotals.health_insurance > 0 || annualTotals.life_insurance > 0) && (
+                    <div className="glass p-3 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-pink-500/10 flex items-center justify-center">
+                          <Heart className="h-5 w-5 text-pink-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Insurance</p>
+                          <p className="text-xs text-muted-foreground">Health & Life premiums</p>
+                        </div>
+                      </div>
+                      <p className="font-semibold text-sm">{formatCurrency(annualTotals.health_insurance + annualTotals.life_insurance)}</p>
+                    </div>
+                  )}
+                  {annualTotals.child_education > 0 && (
+                    <div className="glass p-3 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                          <GraduationCap className="h-5 w-5 text-amber-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Child Education</p>
+                          <p className="text-xs text-muted-foreground">School fees & books</p>
+                        </div>
+                      </div>
+                      <p className="font-semibold text-sm">{formatCurrency(annualTotals.child_education)}</p>
+                    </div>
+                  )}
+                  {annualTotals.dependent_care > 0 && (
+                    <div className="glass p-3 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                          <Users className="h-5 w-5 text-cyan-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Dependent Care</p>
+                          <p className="text-xs text-muted-foreground">Relative support</p>
+                        </div>
+                      </div>
+                      <p className="font-semibold text-sm">{formatCurrency(annualTotals.dependent_care)}</p>
+                    </div>
+                  )}
+                  {totalDeductible === 0 && (
+                    <div className="text-center py-8">
+                      <Receipt className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                      <p className="text-muted-foreground mb-4">No personal expenses recorded yet</p>
+                      <Link to="/personal-expenses">
+                        <Button variant="hero" size="sm">
+                          <Plus className="h-4 w-4" />
+                          Add Expense
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Tax Relief Summary Card */}
+            <Card className="glass-frosted shadow-futuristic">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <div className="h-10 w-10 rounded-lg bg-success/10 flex items-center justify-center">
+                    <Shield className="h-5 w-5 text-success" />
+                  </div>
+                  Tax Reliefs Summary
+                </CardTitle>
+                <CardDescription>
+                  Calculated reliefs based on your expenses
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="glass p-3 rounded-xl">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm font-medium">Rent Relief</p>
+                      <p className="text-sm font-semibold text-success">
+                        {formatCurrency(Math.min(annualTotals.rent * 0.2, 500000))}
+                      </p>
+                    </div>
+                    <p className="text-xs text-muted-foreground">20% of rent, max ₦500,000</p>
+                  </div>
+                  <div className="glass p-3 rounded-xl">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm font-medium">Pension Relief</p>
+                      <p className="text-sm font-semibold text-success">
+                        {formatCurrency(annualTotals.pension_contribution)}
+                      </p>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Fully deductible</p>
+                  </div>
+                  <div className="glass p-3 rounded-xl">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm font-medium">Insurance Relief</p>
+                      <p className="text-sm font-semibold text-success">
+                        {formatCurrency(annualTotals.health_insurance + annualTotals.life_insurance)}
+                      </p>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Health & Life premiums</p>
+                  </div>
+                  <div className="glass p-3 rounded-xl">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm font-medium">NHF Contribution</p>
+                      <p className="text-sm font-semibold text-success">
+                        {formatCurrency(annualTotals.nhf_contribution)}
+                      </p>
+                    </div>
+                    <p className="text-xs text-muted-foreground">National Housing Fund</p>
+                  </div>
+                  <div className="border-t border-border/50 pt-3 mt-3">
+                    <div className="flex items-center justify-between">
+                      <p className="font-semibold">Total Tax Relief</p>
+                      <p className="font-bold text-lg text-success">
+                        {formatCurrency(
+                          Math.min(annualTotals.rent * 0.2, 500000) +
+                          annualTotals.pension_contribution +
+                          annualTotals.health_insurance +
+                          annualTotals.life_insurance +
+                          annualTotals.nhf_contribution
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Personal Charts Section */}
+          <div className="mt-6 animate-slide-up-delay-2">
+            <PersonalExpenseCharts expenses={personalExpenses} annualTotals={annualTotals} />
+          </div>
+        </>
       )}
 
       {/* Feedback Form */}
