@@ -17,7 +17,6 @@ import { SuccessStories } from "@/components/SuccessStories";
 import { useState, useEffect, useCallback } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
-import Fade from "embla-carousel-fade";
 import Autoplay from "embla-carousel-autoplay";
 
 const Index = () => {
@@ -93,7 +92,6 @@ const Index = () => {
                   duration: 30,
                 }}
                 plugins={[
-                  Fade(),
                   Autoplay({
                     delay: 5000,
                     stopOnInteraction: false,
@@ -102,9 +100,9 @@ const Index = () => {
                 ]}
                 className="w-full"
               >
-                <CarouselContent className="carousel-fade-container">
+                <CarouselContent>
                   {CAROUSEL_ITEMS.map((item, index) => (
-                    <CarouselItem key={index} className="carousel-fade-slide">
+                    <CarouselItem key={index}>
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div className="flex items-start gap-4">
                           <div className="h-14 w-14 rounded-xl bg-gradient-primary flex items-center justify-center shrink-0 shadow-lg glow-primary">
