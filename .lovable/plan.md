@@ -1,100 +1,136 @@
 
-# Bug Fixes: Expenses, Notifications, and Dashboard Issues
 
-## Issues Identified
+# Dashboard Toggle & Carousel Restoration
 
-### Issue 1: Hardcoded Recurring Templates Appearing as Expenses
-**Location**: `src/pages/Expenses.tsx` lines 192-196
+## Overview
 
-The recurring expense templates are initialized with default values in localStorage. These default templates (Office Rent, Internet & Phone, Staff Salaries) are:
-- Stored in localStorage, NOT in the database
-- Being displayed alongside actual expenses when applied via the template system
-- When a template is "applied", it creates a database expense WITHOUT a `business_id`
-
-**Root Cause**: The default templates are only meant to be quick-add shortcuts, but they persist in localStorage and auto-populate even for new users. Additionally, expenses created from templates don't have proper business association.
+This plan addresses two distinct features:
+1. **Dashboard Mode Toggle** - Add a toggle to switch between Business and Personal expense views
+2. **Carousel Restoration** - Revert the landing page carousel from crossfade to sliding animation
 
 ---
 
-### Issue 2: Notification Error in Calculator Results Page
-**Location**: `src/pages/Results.tsx` lines 73-91 and `src/lib/notifications.ts` line 399
+## Part 1: Dashboard Personal/Business Toggle
 
-The `notifyTaxCalculation()` function is called after saving a tax calculation. The issue is:
-- If the user is not authenticated or the `user_notifications` table has issues, the notification fails
-- The error is silently caught but may cause UI inconsistencies
-- The notification uses `result.entityType` which displays raw values like "company" or "business_name" instead of user-friendly names
+### Current State
 
-**Root Cause**: The notification system handles errors gracefully but the entity type formatting is poor.
+The Dashboard currently displays:
+- Business expenses from the `expenses` table (linked via `business_id`)
+- Business-related summary (income, expenses, net, deductible)
+- Sparkline charts for the last 7 days of business transactions
+- Saved businesses list and reminders
 
----
+### Proposed Changes
 
-### Issue 3: Dashboard Not Updating Income/Expenses Overview
-**Location**: `src/pages/Dashboard.tsx` lines 152-214
+Add a toggle switch at the top of the Financial Summary section that allows users to switch between:
 
-The dashboard fetches expenses once and calculates totals, but:
-1. The summary is computed from ALL expenses at lines 179-183
-2. But the UI displays `filteredSummary` which uses date filtering
-3. The `expenseSummary` state (unfiltered totals) is calculated but never displayed - only `filteredSummary` is shown
-4. There's no real-time subscription to expense changes - the dashboard only updates when you navigate away and back
+| Mode | Data Source | Summary Shows |
+|------|-------------|---------------|
+| **Business** (default) | `expenses` table | Business income, expenses, net, deductible amounts |
+| **Personal** | `personal_expenses` table | Rent, pension, health insurance, child education, etc. |
 
-**Root Cause**: Dashboard uses `filteredSummary` (date-filtered) for display but calculates `expenseSummary` (all-time) which goes unused. Additionally, no realtime updates when expenses change.
+### Implementation Details
 
----
+**File: `src/pages/Dashboard.tsx`**
 
-## Technical Solution
+1. **Add State for Dashboard Mode**
+   ```typescript
+   const [dashboardMode, setDashboardMode] = useState<'business' | 'personal'>('business');
+   ```
 
-### Fix 1: Remove Default Recurring Templates
-**File**: `src/pages/Expenses.tsx`
+2. **Import Personal Expenses Hook**
+   ```typescript
+   import { usePersonalExpenses } from '@/hooks/usePersonalExpenses';
+   ```
 
-Change the default initialization from hardcoded values to an empty array:
+3. **Add Toggle UI** - Place a segmented toggle in the Financial Summary header:
+   - Two options: "Business" and "Personal" with appropriate icons
+   - Persisted to localStorage for user preference
 
-```typescript
-// BEFORE (line 192-196)
-return safeLocalStorage.getJSON('recurringTemplates', [
-  { id: '1', description: 'Office Rent', amount: 150000, category: 'rent', dueDay: 1 },
-  { id: '2', description: 'Internet & Phone', amount: 25000, category: 'utilities', dueDay: 15 },
-  { id: '3', description: 'Staff Salaries', amount: 350000, category: 'salary', dueDay: 25 },
-]);
+4. **Conditional Data Display**
+   - When `dashboardMode === 'business'`: Show current business expenses view
+   - When `dashboardMode === 'personal'`: Show personal expenses summary with:
+     - Total rent paid
+     - Pension contributions
+     - Health/life insurance
+     - Child education expenses
+     - Other deductible categories
+     - Link to Personal Expenses page instead of Business Expenses
 
-// AFTER
-return safeLocalStorage.getJSON('recurringTemplates', []);
+5. **Personal Summary Cards** (when in Personal mode):
+   - Card 1: **Rent Relief** - Annual rent amount
+   - Card 2: **Pension** - Total pension contributions
+   - Card 3: **Insurance** - Health + Life insurance totals
+   - Card 4: **Total Deductible** - Sum of all personal deductions
+
+6. **Quick Actions Update**
+   - In Personal mode, replace "Expenses" quick action with "Personal Expenses"
+   - Keep other actions the same
+
+### Personal Dashboard View Structure
+
+```text
++--------------------------------------------------+
+| Financial Summary          [Business] [Personal] |
++--------------------------------------------------+
+| Date Range: [This Month ▼]         [PDF] [CSV]   |
++--------------------------------------------------+
+| +----------+ +----------+ +----------+ +--------+|
+| | Rent     | | Pension  | | Insurance| | Total  ||
+| | NGN X    | | NGN X    | | NGN X    | | NGN X  ||
+| | Relief   | | Contrib  | | Premiums | | Deduct ||
+| +----------+ +----------+ +----------+ +--------+|
++--------------------------------------------------+
 ```
 
-This ensures users start with a clean slate - they can create their own templates.
-
 ---
 
-### Fix 2: Improve Notification Error Handling and Formatting
-**File**: `src/lib/notifications.ts`
+## Part 2: Carousel Restoration to Sliding Animation
 
-Update the `notifyTaxCalculation` function to use proper entity type labels:
+### Current State
+
+The landing page carousel uses:
+- `embla-carousel-fade` plugin for crossfade transitions
+- `embla-carousel-autoplay` for automatic advancement
+- CSS classes `carousel-fade-container` and `carousel-fade-slide` for fade effects
+
+### Proposed Changes
+
+Revert to the standard sliding animation by:
+
+1. **Remove Fade Plugin** from carousel configuration
+2. **Remove Fade CSS Classes** from carousel markup
+3. **Keep Autoplay** - Still auto-advance slides
+4. **Maintain Loop** - Still loop infinitely
+
+### Implementation Details
+
+**File: `src/pages/Index.tsx`**
 
 ```typescript
-// BEFORE (line 399)
-export const notifyTaxCalculation = (entityType: string, totalTax: number) => {
-  // ...uses raw entityType like "company"
+// BEFORE
+import Fade from "embla-carousel-fade";
 
-// AFTER
-export const notifyTaxCalculation = (entityType: string, totalTax: number) => {
-  const entityLabels: Record<string, string> = {
-    'company': 'Limited Company',
-    'business_name': 'Business Name'
-  };
-  const displayName = entityLabels[entityType] || entityType;
-  // ...use displayName in message
+plugins={[
+  Fade(),
+  Autoplay({ delay: 5000, stopOnInteraction: false, stopOnMouseEnter: true }),
+]}
+
+<CarouselContent className="carousel-fade-container">
+  <CarouselItem key={index} className="carousel-fade-slide">
+
+// AFTER (remove Fade, keep Autoplay)
+// Remove: import Fade from "embla-carousel-fade";
+
+plugins={[
+  Autoplay({ delay: 5000, stopOnInteraction: false, stopOnMouseEnter: true }),
+]}
+
+<CarouselContent>
+  <CarouselItem key={index}>
 ```
 
----
-
-### Fix 3: Dashboard Real-time Updates
-**File**: `src/pages/Dashboard.tsx`
-
-Add a Supabase realtime subscription to the expenses table to update the summary when expenses change:
-
-1. Subscribe to expenses table changes on mount
-2. Refetch data when INSERT, UPDATE, or DELETE events occur
-3. Clean up subscription on unmount
-
-Also ensure the data fetching triggers when `savedBusinesses` updates (currently in the dependency array but the filter logic may not be applied correctly).
+The carousel will now use the default Embla sliding animation, which smoothly slides between items horizontally.
 
 ---
 
@@ -102,14 +138,29 @@ Also ensure the data fetching triggers when `savedBusinesses` updates (currently
 
 | File | Changes |
 |------|---------|
-| `src/pages/Expenses.tsx` | Remove default recurring templates initialization |
-| `src/lib/notifications.ts` | Improve entity type formatting in tax calculation notification |
-| `src/pages/Dashboard.tsx` | Add realtime subscription for expenses and ensure proper refetch logic |
+| `src/pages/Dashboard.tsx` | Add toggle state, import usePersonalExpenses, add toggle UI, conditional rendering for personal/business views |
+| `src/pages/Index.tsx` | Remove Fade import, remove Fade() from plugins array, remove fade CSS classes from CarouselContent and CarouselItem |
 
 ---
 
-## Expected Results
+## Technical Notes
 
-1. **Recurring Templates**: Users start with no pre-populated templates - they create their own
-2. **Notifications**: Tax calculation notifications show "Limited Company" instead of "company"
-3. **Dashboard**: Income/Expenses/Net values update in real-time when expenses are added, edited, or deleted without needing to refresh the page
+### Dashboard Toggle Persistence
+The toggle preference will be saved to localStorage using `safeLocalStorage`:
+```typescript
+const [dashboardMode, setDashboardMode] = useState<'business' | 'personal'>(() => {
+  const saved = safeLocalStorage.getItem('dashboard_mode');
+  return (saved as 'business' | 'personal') || 'business';
+});
+```
+
+### Personal Expenses Summary Calculation
+Will reuse the `annualTotals` from `usePersonalExpenses` hook which already calculates:
+- `rent`, `pension_contribution`, `nhf_contribution`
+- `health_insurance`, `life_insurance`
+- `child_education`, `dependent_care`, `disability_support`
+- `other`
+
+### No Database Changes Required
+Both features only require frontend changes - no migrations or RLS policy updates needed.
+
