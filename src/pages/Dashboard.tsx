@@ -42,6 +42,11 @@ import {
   Filter,
   Download,
   FileSpreadsheet,
+  User,
+  Home,
+  Heart,
+  Wallet,
+  Shield,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { format, isAfter, addDays, subDays, subMonths, startOfWeek, startOfMonth, startOfQuarter, startOfYear, eachDayOfInterval, isWithinInterval } from "date-fns";
@@ -60,6 +65,8 @@ import { Badge } from "@/components/ui/badge";
 import { SharedElement } from "@/components/PageTransition";
 import { motion } from "framer-motion";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
+import { usePersonalExpenses } from "@/hooks/usePersonalExpenses";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface Expense {
   id: string;
@@ -112,6 +119,13 @@ const Dashboard = () => {
     const saved = safeLocalStorage.getItem('dashboard_date_range');
     return (saved as 'week' | 'month' | 'quarter' | 'year') || 'month';
   });
+  const [dashboardMode, setDashboardMode] = useState<'business' | 'personal'>(() => {
+    const saved = safeLocalStorage.getItem('dashboard_mode');
+    return (saved as 'business' | 'personal') || 'business';
+  });
+  
+  // Personal expenses data
+  const { annualTotals, totalDeductible, loading: personalLoading } = usePersonalExpenses();
 
   useEffect(() => {
     safeLocalStorage.setItem('dashboard_date_range', dateRange);
@@ -120,6 +134,10 @@ const Dashboard = () => {
   useEffect(() => {
     safeLocalStorage.setItem('dashboard_summary_expanded', summaryExpanded.toString());
   }, [summaryExpanded]);
+  
+  useEffect(() => {
+    safeLocalStorage.setItem('dashboard_mode', dashboardMode);
+  }, [dashboardMode]);
 
   useEffect(() => {
     const checkOnboardingStatus = async () => {
@@ -316,7 +334,7 @@ const Dashboard = () => {
     );
   }
 
-  if (loading || businessLoading) {
+  if (loading || businessLoading || personalLoading) {
     return (
       <PageLayout title="Dashboard" icon={LayoutDashboard}>
         <div className="space-y-6 animate-fade-in">
@@ -447,136 +465,183 @@ const Dashboard = () => {
       {/* Collapsible Summary Section */}
       <Collapsible open={summaryExpanded} onOpenChange={setSummaryExpanded} className="mb-6 animate-slide-up">
         <div className="glass-frosted rounded-2xl shadow-futuristic border-border/40 overflow-hidden">
-          <CollapsibleTrigger asChild>
-            <button className="w-full p-4 flex items-center justify-between hover:bg-secondary/30 transition-colors">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-lg">
-                  <Activity className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <div className="text-left">
-                  <h2 className="font-semibold text-foreground">Financial Summary</h2>
-                  <p className="text-xs text-muted-foreground">
-                    {summaryExpanded ? 'Click to collapse' : `${savedBusinesses.length} businesses • ${formatCurrency(netIncome)} net income`}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                {!summaryExpanded && (
-                  <div className="hidden sm:flex items-center gap-3 mr-4">
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-primary/10">
-                      <Building2 className="h-4 w-4 text-primary" />
-                      <span className="text-xs font-medium text-primary">{savedBusinesses.length}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10">
-                      <TrendingUp className="h-4 w-4 text-success" />
-                      <span className="text-xs font-medium text-success">{formatCurrency(filteredSummary.totalIncome)}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-destructive/10">
-                      <TrendingDown className="h-4 w-4 text-destructive" />
-                      <span className="text-xs font-medium text-destructive">{formatCurrency(filteredSummary.totalExpenses)}</span>
-                    </div>
-                    {urgentCount > 0 && (
-                      <Badge variant="destructive" size="sm" className="h-5 min-w-5 px-1.5 flex items-center justify-center">
-                        {urgentCount} urgent
-                      </Badge>
-                    )}
-                  </div>
+          {/* Toggle Header */}
+          <div className="flex items-center justify-between p-4 border-b border-border/30">
+            <ToggleGroup 
+              type="single" 
+              value={dashboardMode} 
+              onValueChange={(value) => value && setDashboardMode(value as 'business' | 'personal')}
+              className="bg-muted/50 rounded-lg p-1"
+            >
+              <ToggleGroupItem 
+                value="business" 
+                className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-4 py-2 text-sm gap-2"
+              >
+                <Building2 className="h-4 w-4" />
+                Business
+              </ToggleGroupItem>
+              <ToggleGroupItem 
+                value="personal" 
+                className="data-[state=on]:bg-accent data-[state=on]:text-accent-foreground px-4 py-2 text-sm gap-2"
+              >
+                <User className="h-4 w-4" />
+                Personal
+              </ToggleGroupItem>
+            </ToggleGroup>
+            
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
+                {summaryExpanded ? (
+                  <Minimize2 className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <Maximize2 className="h-4 w-4 text-muted-foreground" />
                 )}
-                <div className="h-10 w-10 rounded-lg bg-secondary/50 flex items-center justify-center">
-                  {summaryExpanded ? (
-                    <Minimize2 className="h-5 w-5 text-muted-foreground" />
-                  ) : (
-                    <Maximize2 className="h-5 w-5 text-muted-foreground" />
-                  )}
-                </div>
-              </div>
-            </button>
-          </CollapsibleTrigger>
+              </Button>
+            </CollapsibleTrigger>
+          </div>
           
           <CollapsibleContent>
-            <div className="px-4 pb-4 pt-2 border-t border-border/30">
-              {/* Date Range Filter and Export Buttons */}
-              <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Filter className="h-4 w-4" />
-                  <span>Showing data for</span>
-                  <Select value={dateRange} onValueChange={(v) => setDateRange(v as typeof dateRange)}>
-                    <SelectTrigger className="w-[130px] h-8 text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="week">This Week</SelectItem>
-                      <SelectItem value="month">This Month</SelectItem>
-                      <SelectItem value="quarter">This Quarter</SelectItem>
-                      <SelectItem value="year">This Year</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="h-8 text-xs"
-                    onClick={() => handleExport('pdf')}
-                  >
-                    <Download className="h-3.5 w-3.5 mr-1" />
-                    PDF
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="h-8 text-xs"
-                    onClick={() => handleExport('csv')}
-                  >
-                    <FileSpreadsheet className="h-3.5 w-3.5 mr-1" />
-                    CSV
-                  </Button>
-                </div>
-              </div>
+            <div className="px-4 pb-4 pt-2">
+              {dashboardMode === 'business' ? (
+                <>
+                  {/* Date Range Filter and Export Buttons */}
+                  <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Filter className="h-4 w-4" />
+                      <span>Showing data for</span>
+                      <Select value={dateRange} onValueChange={(v) => setDateRange(v as typeof dateRange)}>
+                        <SelectTrigger className="w-[130px] h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="week">This Week</SelectItem>
+                          <SelectItem value="month">This Month</SelectItem>
+                          <SelectItem value="quarter">This Quarter</SelectItem>
+                          <SelectItem value="year">This Year</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="h-8 text-xs"
+                        onClick={() => handleExport('pdf')}
+                      >
+                        <Download className="h-3.5 w-3.5 mr-1" />
+                        PDF
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="h-8 text-xs"
+                        onClick={() => handleExport('csv')}
+                      >
+                        <FileSpreadsheet className="h-3.5 w-3.5 mr-1" />
+                        CSV
+                      </Button>
+                    </div>
+                  </div>
 
-              {/* Summary Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
-                  <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="h-4 w-4 text-success" />
-                    <span className="text-xs text-muted-foreground">Income</span>
+                  {/* Business Summary Cards */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
+                      <div className="flex items-center gap-2 mb-2">
+                        <TrendingUp className="h-4 w-4 text-success" />
+                        <span className="text-xs text-muted-foreground">Income</span>
+                      </div>
+                      <p className="text-lg font-bold text-success">{formatCurrency(filteredSummary.totalIncome)}</p>
+                      <div className="mt-2">
+                        <SparklineChart data={sparklineData.income} color="hsl(var(--success))" height={30} width={100} />
+                      </div>
+                    </div>
+                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
+                      <div className="flex items-center gap-2 mb-2">
+                        <TrendingDown className="h-4 w-4 text-destructive" />
+                        <span className="text-xs text-muted-foreground">Expenses</span>
+                      </div>
+                      <p className="text-lg font-bold text-destructive">{formatCurrency(filteredSummary.totalExpenses)}</p>
+                      <div className="mt-2">
+                        <SparklineChart data={sparklineData.expenses} color="hsl(var(--destructive))" height={30} width={100} />
+                      </div>
+                    </div>
+                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
+                      <div className="flex items-center gap-2 mb-2">
+                        <PieChart className="h-4 w-4 text-primary" />
+                        <span className="text-xs text-muted-foreground">Net</span>
+                      </div>
+                      <p className={`text-lg font-bold ${netIncome >= 0 ? 'text-success' : 'text-destructive'}`}>
+                        {formatCurrency(netIncome)}
+                      </p>
+                      <div className="mt-2">
+                        <SparklineChart data={sparklineData.net} color={netIncome >= 0 ? "hsl(var(--success))" : "hsl(var(--destructive))"} height={30} width={100} />
+                      </div>
+                    </div>
+                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Receipt className="h-4 w-4 text-accent" />
+                        <span className="text-xs text-muted-foreground">Deductible</span>
+                      </div>
+                      <p className="text-lg font-bold text-accent">{formatCurrency(filteredSummary.deductibleExpenses)}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Tax savings potential</p>
+                    </div>
                   </div>
-                  <p className="text-lg font-bold text-success">{formatCurrency(filteredSummary.totalIncome)}</p>
-                  <div className="mt-2">
-                    <SparklineChart data={sparklineData.income} color="hsl(var(--success))" height={30} width={100} />
+                </>
+              ) : (
+                <>
+                  {/* Personal Summary Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-sm text-muted-foreground">
+                      Your personal tax deductions for {new Date().getFullYear()}
+                    </p>
+                    <Link to="/personal-expenses">
+                      <Button variant="outline" size="sm" className="h-8 text-xs">
+                        Manage <ArrowRight className="h-3.5 w-3.5 ml-1" />
+                      </Button>
+                    </Link>
                   </div>
-                </div>
-                <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
-                  <div className="flex items-center gap-2 mb-2">
-                    <TrendingDown className="h-4 w-4 text-destructive" />
-                    <span className="text-xs text-muted-foreground">Expenses</span>
+
+                  {/* Personal Summary Cards */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Home className="h-4 w-4 text-primary" />
+                        <span className="text-xs text-muted-foreground">Rent Relief</span>
+                      </div>
+                      <p className="text-lg font-bold text-primary">{formatCurrency(annualTotals.rent)}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Annual rent paid</p>
+                    </div>
+                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Wallet className="h-4 w-4 text-success" />
+                        <span className="text-xs text-muted-foreground">Pension</span>
+                      </div>
+                      <p className="text-lg font-bold text-success">
+                        {formatCurrency(annualTotals.pension_contribution + annualTotals.nhf_contribution)}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">Contributions</p>
+                    </div>
+                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Heart className="h-4 w-4 text-accent" />
+                        <span className="text-xs text-muted-foreground">Insurance</span>
+                      </div>
+                      <p className="text-lg font-bold text-accent">
+                        {formatCurrency(annualTotals.health_insurance + annualTotals.life_insurance)}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">Health + Life</p>
+                    </div>
+                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Shield className="h-4 w-4 text-warning" />
+                        <span className="text-xs text-muted-foreground">Total Deductible</span>
+                      </div>
+                      <p className="text-lg font-bold text-warning">{formatCurrency(totalDeductible)}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Tax relief potential</p>
+                    </div>
                   </div>
-                  <p className="text-lg font-bold text-destructive">{formatCurrency(filteredSummary.totalExpenses)}</p>
-                  <div className="mt-2">
-                    <SparklineChart data={sparklineData.expenses} color="hsl(var(--destructive))" height={30} width={100} />
-                  </div>
-                </div>
-                <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
-                  <div className="flex items-center gap-2 mb-2">
-                    <PieChart className="h-4 w-4 text-primary" />
-                    <span className="text-xs text-muted-foreground">Net</span>
-                  </div>
-                  <p className={`text-lg font-bold ${netIncome >= 0 ? 'text-success' : 'text-destructive'}`}>
-                    {formatCurrency(netIncome)}
-                  </p>
-                  <div className="mt-2">
-                    <SparklineChart data={sparklineData.net} color={netIncome >= 0 ? "hsl(var(--success))" : "hsl(var(--destructive))"} height={30} width={100} />
-                  </div>
-                </div>
-                <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Receipt className="h-4 w-4 text-accent" />
-                    <span className="text-xs text-muted-foreground">Deductible</span>
-                  </div>
-                  <p className="text-lg font-bold text-accent">{formatCurrency(filteredSummary.deductibleExpenses)}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Tax savings potential</p>
-                </div>
-              </div>
+                </>
+              )}
             </div>
           </CollapsibleContent>
         </div>
@@ -595,14 +660,14 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </Link>
-        <Link to="/expenses">
+        <Link to={dashboardMode === 'business' ? '/expenses' : '/personal-expenses'}>
           <Card className="h-full glass-frosted hover:shadow-futuristic hover:border-accent/30 transition-all cursor-pointer group hover-lift">
             <CardContent className="p-4 text-center">
               <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-accent/20 transition-colors">
                 <Receipt className="h-5 w-5 text-accent" />
               </div>
-              <h3 className="font-medium text-sm">Expenses</h3>
-              <p className="text-xs text-muted-foreground">Track spending</p>
+              <h3 className="font-medium text-sm">{dashboardMode === 'business' ? 'Expenses' : 'Personal'}</h3>
+              <p className="text-xs text-muted-foreground">{dashboardMode === 'business' ? 'Track spending' : 'Tax deductions'}</p>
             </CardContent>
           </Card>
         </Link>
