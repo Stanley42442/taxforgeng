@@ -397,6 +397,16 @@ export const notifyAchievement = (badgeName: string, points: number) =>
 
 // Tax calculation notification
 export const notifyTaxCalculation = (entityType: string, totalTax: number) => {
+  // Map raw entity types to user-friendly labels
+  const entityLabels: Record<string, string> = {
+    'company': 'Limited Company',
+    'business_name': 'Business Name',
+    'enterprise': 'Enterprise',
+    'partnership': 'Partnership',
+    'sole_proprietor': 'Sole Proprietor',
+  };
+  const displayName = entityLabels[entityType] || entityType;
+  
   const formattedTax = new Intl.NumberFormat('en-NG', { 
     style: 'currency', 
     currency: 'NGN',
@@ -405,7 +415,7 @@ export const notifyTaxCalculation = (entityType: string, totalTax: number) => {
   
   return addNotification(
     `Tax Calculation Complete`,
-    `Your ${entityType} tax calculation is ready. Estimated tax: ${formattedTax}`,
+    `Your ${displayName} tax calculation is ready. Estimated tax: ${formattedTax}`,
     'success',
     { playSound: false }
   );
