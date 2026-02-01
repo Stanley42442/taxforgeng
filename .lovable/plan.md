@@ -1,166 +1,173 @@
 
 
-# Dashboard Toggle & Carousel Restoration
+# Personal Dashboard Data Source & Layout Fixes
 
-## Overview
+## Issues Identified
 
-This plan addresses two distinct features:
-1. **Dashboard Mode Toggle** - Add a toggle to switch between Business and Personal expense views
-2. **Carousel Restoration** - Revert the landing page carousel from crossfade to sliding animation
+### Issue 1: Monthly Overview & Expense Breakdown Using Wrong Data Source
+**Location**: `src/pages/Dashboard.tsx` lines 856-860 and `src/components/ExpenseCharts.tsx`
+
+The Personal Dashboard currently uses the `ExpenseCharts` component which receives `expenses` - the **business expenses** array from the `expenses` table. This means:
+- The "Monthly Overview" bar chart shows business income vs expenses
+- The "Expense Breakdown" pie chart shows business expense categories (rent, transport, marketing, salary, etc.)
+
+These should show **personal expense** data when in Personal mode (from `personal_expenses` table).
+
+### Issue 2: My Businesses & Upcoming Reminders Appearing in Personal Dashboard
+**Location**: `src/pages/Dashboard.tsx` lines 704-854
+
+The Main Content Grid always displays:
+- "My Businesses" card (lines 706-788)
+- "Upcoming Reminders" card (lines 791-853)
+
+These business-focused sections should **not** appear in Personal Dashboard mode.
 
 ---
 
-## Part 1: Dashboard Personal/Business Toggle
+## Technical Solution
 
-### Current State
+### Fix 1: Conditional Charts Based on Dashboard Mode
 
-The Dashboard currently displays:
-- Business expenses from the `expenses` table (linked via `business_id`)
-- Business-related summary (income, expenses, net, deductible)
-- Sparkline charts for the last 7 days of business transactions
-- Saved businesses list and reminders
+Create a new `PersonalExpenseCharts` component that visualizes personal expense data:
 
-### Proposed Changes
+**File: `src/components/PersonalExpenseCharts.tsx`** (New File)
 
-Add a toggle switch at the top of the Financial Summary section that allows users to switch between:
+| Feature | Personal Mode Display |
+|---------|----------------------|
+| Expense Breakdown (Pie) | Categories: Rent, Pension, Health Insurance, Life Insurance, Child Education, etc. |
+| Monthly Overview (Bar) | Monthly personal expense totals by category |
 
-| Mode | Data Source | Summary Shows |
-|------|-------------|---------------|
-| **Business** (default) | `expenses` table | Business income, expenses, net, deductible amounts |
-| **Personal** | `personal_expenses` table | Rent, pension, health insurance, child education, etc. |
+The component will:
+- Accept `annualTotals` and `expenses` from `usePersonalExpenses` hook
+- Use personal expense categories from `PERSONAL_EXPENSE_CATEGORIES`
+- Display appropriate colors matching the category icons
 
-### Implementation Details
+### Fix 2: Conditionally Render Main Content Grid
 
 **File: `src/pages/Dashboard.tsx`**
 
-1. **Add State for Dashboard Mode**
-   ```typescript
-   const [dashboardMode, setDashboardMode] = useState<'business' | 'personal'>('business');
-   ```
+| Mode | Visible Sections |
+|------|-----------------|
+| **Business** | My Businesses, Upcoming Reminders, ExpenseCharts |
+| **Personal** | Personal Expense Categories, Tax Relief Summary, PersonalExpenseCharts |
 
-2. **Import Personal Expenses Hook**
-   ```typescript
-   import { usePersonalExpenses } from '@/hooks/usePersonalExpenses';
-   ```
-
-3. **Add Toggle UI** - Place a segmented toggle in the Financial Summary header:
-   - Two options: "Business" and "Personal" with appropriate icons
-   - Persisted to localStorage for user preference
-
-4. **Conditional Data Display**
-   - When `dashboardMode === 'business'`: Show current business expenses view
-   - When `dashboardMode === 'personal'`: Show personal expenses summary with:
-     - Total rent paid
-     - Pension contributions
-     - Health/life insurance
-     - Child education expenses
-     - Other deductible categories
-     - Link to Personal Expenses page instead of Business Expenses
-
-5. **Personal Summary Cards** (when in Personal mode):
-   - Card 1: **Rent Relief** - Annual rent amount
-   - Card 2: **Pension** - Total pension contributions
-   - Card 3: **Insurance** - Health + Life insurance totals
-   - Card 4: **Total Deductible** - Sum of all personal deductions
-
-6. **Quick Actions Update**
-   - In Personal mode, replace "Expenses" quick action with "Personal Expenses"
-   - Keep other actions the same
-
-### Personal Dashboard View Structure
-
-```text
-+--------------------------------------------------+
-| Financial Summary          [Business] [Personal] |
-+--------------------------------------------------+
-| Date Range: [This Month ▼]         [PDF] [CSV]   |
-+--------------------------------------------------+
-| +----------+ +----------+ +----------+ +--------+|
-| | Rent     | | Pension  | | Insurance| | Total  ||
-| | NGN X    | | NGN X    | | NGN X    | | NGN X  ||
-| | Relief   | | Contrib  | | Premiums | | Deduct ||
-| +----------+ +----------+ +----------+ +--------+|
-+--------------------------------------------------+
-```
+In Personal mode, replace the business sections with:
+- **Personal Deductions Summary**: List of each personal expense category with amounts
+- **Tax Relief Breakdown**: Show which reliefs are being claimed
 
 ---
 
-## Part 2: Carousel Restoration to Sliding Animation
+## Implementation Details
 
-### Current State
-
-The landing page carousel uses:
-- `embla-carousel-fade` plugin for crossfade transitions
-- `embla-carousel-autoplay` for automatic advancement
-- CSS classes `carousel-fade-container` and `carousel-fade-slide` for fade effects
-
-### Proposed Changes
-
-Revert to the standard sliding animation by:
-
-1. **Remove Fade Plugin** from carousel configuration
-2. **Remove Fade CSS Classes** from carousel markup
-3. **Keep Autoplay** - Still auto-advance slides
-4. **Maintain Loop** - Still loop infinitely
-
-### Implementation Details
-
-**File: `src/pages/Index.tsx`**
+### New PersonalExpenseCharts Component
 
 ```typescript
-// BEFORE
-import Fade from "embla-carousel-fade";
-
-plugins={[
-  Fade(),
-  Autoplay({ delay: 5000, stopOnInteraction: false, stopOnMouseEnter: true }),
-]}
-
-<CarouselContent className="carousel-fade-container">
-  <CarouselItem key={index} className="carousel-fade-slide">
-
-// AFTER (remove Fade, keep Autoplay)
-// Remove: import Fade from "embla-carousel-fade";
-
-plugins={[
-  Autoplay({ delay: 5000, stopOnInteraction: false, stopOnMouseEnter: true }),
-]}
-
-<CarouselContent>
-  <CarouselItem key={index}>
+interface PersonalExpenseChartsProps {
+  expenses: PersonalExpense[];
+  annualTotals: AnnualTotals;
+}
 ```
 
-The carousel will now use the default Embla sliding animation, which smoothly slides between items horizontally.
+**Pie Chart Data** (Expense Breakdown):
+- Transform `annualTotals` into pie chart format
+- Use colors matching personal expense category themes:
+  - Rent: Blue
+  - Pension: Green
+  - Health Insurance: Pink
+  - Life Insurance: Purple
+  - Child Education: Amber
+  - Dependent Care: Cyan
+  - Other: Gray
+
+**Bar Chart Data** (Monthly Overview):
+- Group personal expenses by month
+- Show stacked or grouped bars for different categories
+
+### Dashboard Layout Changes
+
+```text
+BUSINESS MODE:
++--------------------------------------------------+
+| [My Businesses]          | [Upcoming Reminders]  |
++--------------------------------------------------+
+| [Expense Breakdown]      | [Monthly Overview]    |
++--------------------------------------------------+
+
+PERSONAL MODE:
++--------------------------------------------------+
+| [Personal Deductions]    | [Tax Reliefs Summary] |
++--------------------------------------------------+
+| [Personal Breakdown]     | [Monthly Personal]    |
++--------------------------------------------------+
+```
+
+### Personal Deductions Card
+
+A new card showing all personal expense categories:
+- List each category with icon, name, and annual amount
+- Show which categories have entries
+- Link to Personal Expenses page for each category
+
+### Tax Reliefs Summary Card
+
+Shows calculated tax reliefs based on personal expenses:
+- Rent Relief (20% of rent, max NGN 500,000)
+- Pension contributions (fully deductible)
+- Insurance premiums
+- Child Education Allowance
+- Dependent Relative Relief
 
 ---
 
-## Files to Modify
+## Files to Modify/Create
 
 | File | Changes |
 |------|---------|
-| `src/pages/Dashboard.tsx` | Add toggle state, import usePersonalExpenses, add toggle UI, conditional rendering for personal/business views |
-| `src/pages/Index.tsx` | Remove Fade import, remove Fade() from plugins array, remove fade CSS classes from CarouselContent and CarouselItem |
+| `src/components/PersonalExpenseCharts.tsx` | **NEW** - Personal expense visualization component |
+| `src/pages/Dashboard.tsx` | Conditional rendering of business vs personal sections, import and use PersonalExpenseCharts |
+
+---
+
+## Expected Results
+
+### Business Mode (unchanged):
+- My Businesses card with saved businesses list
+- Upcoming Reminders card with tax deadlines
+- Expense Breakdown pie chart (business categories)
+- Monthly Overview bar chart (income vs expenses)
+
+### Personal Mode (fixed):
+- Personal Deductions card with all personal expense categories
+- Tax Reliefs Summary showing calculated reliefs
+- Personal Expense Breakdown pie chart (rent, pension, insurance, etc.)
+- Monthly Personal Overview showing expense trends
+
+No more business-focused content (businesses, reminders) appearing in Personal Dashboard.
 
 ---
 
 ## Technical Notes
 
-### Dashboard Toggle Persistence
-The toggle preference will be saved to localStorage using `safeLocalStorage`:
+### Data Flow
+- Business mode: Uses `expenses` state from `fetchDashboardData()`
+- Personal mode: Uses `expenses` and `annualTotals` from `usePersonalExpenses()` hook (already imported)
+
+### Category Colors for Personal Expenses
 ```typescript
-const [dashboardMode, setDashboardMode] = useState<'business' | 'personal'>(() => {
-  const saved = safeLocalStorage.getItem('dashboard_mode');
-  return (saved as 'business' | 'personal') || 'business';
-});
+const PERSONAL_CATEGORY_COLORS: Record<string, string> = {
+  rent: '#3b82f6',           // Blue
+  pension_contribution: '#22c55e', // Green
+  nhf_contribution: '#10b981',     // Emerald
+  health_insurance: '#ec4899',     // Pink
+  life_insurance: '#8b5cf6',       // Purple
+  child_education: '#f59e0b',      // Amber
+  dependent_care: '#06b6d4',       // Cyan
+  disability_support: '#6366f1',   // Indigo
+  gratuity_received: '#f97316',    // Orange
+  other: '#6b7280',               // Gray
+};
 ```
 
-### Personal Expenses Summary Calculation
-Will reuse the `annualTotals` from `usePersonalExpenses` hook which already calculates:
-- `rent`, `pension_contribution`, `nhf_contribution`
-- `health_insurance`, `life_insurance`
-- `child_education`, `dependent_care`, `disability_support`
-- `other`
-
-### No Database Changes Required
-Both features only require frontend changes - no migrations or RLS policy updates needed.
+### Realtime Updates
+Personal expenses should also have realtime subscription for updates when in Personal mode. Will add a subscription to `personal_expenses` table similar to the existing `expenses` subscription.
 
