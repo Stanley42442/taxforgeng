@@ -77,6 +77,7 @@ import { cn } from "@/lib/utils";
 import { useFormFeedback } from "@/hooks/useFormFeedback";
 import { SuccessCelebration } from "@/components/ui/form-feedback";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
+import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
 
 interface Expense {
   id: string;
@@ -201,6 +202,10 @@ const Expenses = () => {
     typeof Notification !== 'undefined' ? Notification.permission : 'denied'
   );
   const [budgetInput, setBudgetInput] = useState('');
+  
+  // Delete confirmation state
+  const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
   // Savings Goals per business
   const [showGoalsDialog, setShowGoalsDialog] = useState(false);
@@ -488,12 +493,43 @@ const Expenses = () => {
       return;
     }
 
-    expenseFormFeedback.setLoading();
-
     const categoryInfo = EXPENSE_CATEGORIES.find(c => c.value === newExpense.category);
     const expenseType = categoryInfo?.type || 'expense';
     const isDeductible = expenseType === 'expense' ? (categoryInfo?.deductible ?? false) : false;
 
+    // Generate temporary ID for optimistic update
+    const tempId = `temp-${crypto.randomUUID()}`;
+    
+    // Create optimistic expense
+    const optimisticExpense: Expense = {
+      id: tempId,
+      date: newExpense.date,
+      description: newExpense.description.trim(),
+      amount: Number(newExpense.amount),
+      category: newExpense.category,
+      type: expenseType,
+      isDeductible: isDeductible,
+      businessId: newExpense.businessId || undefined,
+    };
+    
+    // Add to state IMMEDIATELY (optimistic update)
+    setExpenses(prev => [optimisticExpense, ...prev]);
+    
+    // Close dialog and reset form immediately
+    setShowAddDialog(false);
+    setNewExpense({
+      date: new Date().toISOString().split('T')[0],
+      description: '',
+      amount: '',
+      category: 'other',
+      businessId: filterBusinessId !== 'all' ? filterBusinessId : '',
+    });
+    
+    // Show instant feedback
+    toast.success(expenseType === 'income' ? "Income Recorded! 💰" : "Expense Added! ✅");
+    notifyExpenseAdded(optimisticExpense.description, optimisticExpense.amount, expenseType === 'income');
+
+    // Insert to database in background
     const { data, error } = await supabase
       .from('expenses')
       .insert({
@@ -511,30 +547,16 @@ const Expenses = () => {
 
     if (error) {
       logger.error('Error adding expense:', error);
-      expenseFormFeedback.setError("Failed to add expense");
+      // Rollback optimistic update
+      setExpenses(prev => prev.filter(e => e.id !== tempId));
+      toast.error("Failed to save expense. Please try again.");
       return;
     }
 
-    const expense: Expense = {
-      id: data.id,
-      date: data.date,
-      description: data.description || '',
-      amount: Number(data.amount),
-      category: data.category as Expense['category'],
-      type: data.type as 'income' | 'expense',
-      isDeductible: data.is_deductible,
-      businessId: data.business_id || undefined,
-    };
-
-    setExpenses(prev => [expense, ...prev]);
-    
-    // Show success celebration with confetti
-    expenseFormFeedback.setSuccess(
-      expenseType === 'income' ? "Income Recorded! 💰" : "Expense Added! ✅",
-      `${formatCurrency(expense.amount)} ${expenseType === 'income' ? 'added to income' : 'tracked'}`
-    );
-    
-    notifyExpenseAdded(expense.description, expense.amount, expense.type === 'income');
+    // Replace temp ID with real ID
+    setExpenses(prev => prev.map(e => 
+      e.id === tempId ? { ...e, id: data.id } : e
+    ));
   };
 
   const handleCSVImport = async () => {
@@ -576,20 +598,71 @@ const Expenses = () => {
     toast.success("Expenses imported successfully");
   };
 
-  const handleDeleteExpense = async (id: string) => {
+  // Request delete - shows confirmation dialog
+  const requestDeleteExpense = (expense: Expense) => {
+    setExpenseToDelete(expense);
+    setShowDeleteDialog(true);
+  };
+
+  // Confirm delete - called after user confirms
+  const confirmDeleteExpense = async () => {
+    if (!expenseToDelete) return;
+    
+    const deletedExpense = expenseToDelete;
+    
+    // Close dialog and optimistically remove from UI
+    setShowDeleteDialog(false);
+    setExpenseToDelete(null);
+    setExpenses(prev => prev.filter(e => e.id !== deletedExpense.id));
+    
     const { error } = await supabase
       .from('expenses')
       .update({ deleted_at: new Date().toISOString() })
-      .eq('id', id);
+      .eq('id', deletedExpense.id);
 
     if (error) {
       logger.error('Error deleting expense:', error);
+      // Rollback on failure
+      setExpenses(prev => [deletedExpense, ...prev].sort((a, b) => 
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+      ));
       toast.error("Failed to delete expense");
       return;
     }
 
-    setExpenses(prev => prev.filter(e => e.id !== id));
-    toast.success("Expense deleted successfully");
+    // Show success toast with undo action
+    toast.success("Expense deleted", {
+      action: {
+        label: "Undo",
+        onClick: async () => {
+          // Restore the expense
+          const { error: restoreError } = await supabase
+            .from('expenses')
+            .update({ deleted_at: null })
+            .eq('id', deletedExpense.id);
+          
+          if (restoreError) {
+            logger.error('Error restoring expense:', restoreError);
+            toast.error("Failed to restore expense");
+            return;
+          }
+          
+          setExpenses(prev => [deletedExpense, ...prev].sort((a, b) => 
+            new Date(b.date).getTime() - new Date(a.date).getTime()
+          ));
+          toast.success("Expense restored");
+        },
+      },
+      duration: 5000,
+    });
+  };
+
+  // Legacy handler for direct deletes (backward compatibility)
+  const handleDeleteExpense = async (id: string) => {
+    const expense = expenses.find(e => e.id === id);
+    if (expense) {
+      requestDeleteExpense(expense);
+    }
   };
 
   const filteredExpenses = validExpenses.filter(e => {
@@ -2053,6 +2126,18 @@ const Expenses = () => {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={confirmDeleteExpense}
+        title="Delete Expense"
+        description={expenseToDelete ? `Are you sure you want to delete "${expenseToDelete.description}"? You can undo this action for 5 seconds after deletion.` : undefined}
+        itemName={expenseToDelete?.description}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+      />
     </PageLayout>
   );
 };
