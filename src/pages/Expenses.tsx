@@ -406,6 +406,12 @@ const Expenses = () => {
     [savedBusinesses]
   );
 
+  // Count unlinked expenses (no business_id)
+  const unlinkedExpenses = useMemo(() => 
+    expenses.filter(e => !e.businessId),
+    [expenses]
+  );
+
   // Filter expenses to only include those from active businesses
   const validExpenses = useMemo(() => {
     return expenses.filter(e => {
@@ -415,6 +421,52 @@ const Expenses = () => {
       return activeBusinessIds.has(e.businessId);
     });
   }, [expenses, activeBusinessIds]);
+
+  // Delete all unlinked expenses
+  const handleDeleteUnlinkedExpenses = async () => {
+    if (!user || unlinkedExpenses.length === 0) return;
+    
+    const unlinkedIds = unlinkedExpenses.map(e => e.id);
+    const count = unlinkedIds.length;
+    
+    // Optimistically remove from UI
+    setExpenses(prev => prev.filter(e => e.businessId));
+    
+    const { error } = await supabase
+      .from('expenses')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('user_id', user.id)
+      .is('business_id', null);
+
+    if (error) {
+      logger.error('Error deleting unlinked expenses:', error);
+      // Rollback on failure by refetching
+      const { data } = await supabase
+        .from('expenses')
+        .select('*')
+        .eq('user_id', user.id)
+        .is('deleted_at', null)
+        .order('date', { ascending: false });
+      
+      if (data) {
+        const mapped: Expense[] = data.map(e => ({
+          id: e.id,
+          date: e.date,
+          description: e.description || '',
+          amount: Number(e.amount),
+          category: e.category as Expense['category'],
+          type: e.type as 'income' | 'expense',
+          isDeductible: e.is_deductible,
+          businessId: e.business_id || undefined,
+        }));
+        setExpenses(mapped);
+      }
+      toast.error("Failed to delete unlinked expenses");
+      return;
+    }
+
+    toast.success(`${count} unlinked expense${count > 1 ? 's' : ''} deleted`);
+  };
 
   // Goal achievement notification effect
   useEffect(() => {
@@ -565,6 +617,9 @@ const Expenses = () => {
       return;
     }
 
+    // Use currently selected business ID for imported expenses
+    const businessId = filterBusinessId !== 'all' ? filterBusinessId : null;
+
     const mockData = [
       { date: '2025-12-01', description: 'Client Payment - Project A', amount: 500000, category: 'income', type: 'income', is_deductible: false },
       { date: '2025-12-05', description: 'Office Rent December', amount: 150000, category: 'rent', type: 'expense', is_deductible: true },
@@ -575,7 +630,11 @@ const Expenses = () => {
 
     const { data, error } = await supabase
       .from('expenses')
-      .insert(mockData.map(e => ({ ...e, user_id: user.id })))
+      .insert(mockData.map(e => ({ 
+        ...e, 
+        user_id: user.id,
+        business_id: businessId, // Associate with selected business
+      })))
       .select();
 
     if (error) {
@@ -592,10 +651,11 @@ const Expenses = () => {
       category: e.category as Expense['category'],
       type: e.type as 'income' | 'expense',
       isDeductible: e.is_deductible,
+      businessId: e.business_id || undefined,
     }));
 
     setExpenses(prev => [...mapped, ...prev]);
-    toast.success("Expenses imported successfully");
+    toast.success(businessId ? "Expenses imported and linked to business" : "Expenses imported successfully");
   };
 
   // Request delete - shows confirmation dialog
@@ -1306,6 +1366,49 @@ const Expenses = () => {
                     </Select>
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Unlinked Expenses Warning */}
+          {unlinkedExpenses.length > 0 && (
+            <div className="bg-warning/10 border border-warning/30 rounded-xl p-4 mb-4">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-warning/20">
+                    <AlertTriangle className="h-5 w-5 text-warning" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">
+                      {unlinkedExpenses.length} expense{unlinkedExpenses.length > 1 ? 's' : ''} not linked to any business
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      These may be from CSV imports or entries created without a business selected
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      setFilterBusinessId('all');
+                      setSearchQuery('');
+                      // The unlinked expenses are visible when viewing "All Businesses"
+                      toast.info("Showing all expenses including unlinked ones");
+                    }}
+                  >
+                    View
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    onClick={handleDeleteUnlinkedExpenses}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Delete All
+                  </Button>
+                </div>
               </div>
             </div>
           )}
