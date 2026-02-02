@@ -1,97 +1,89 @@
 
-# Fix Business Expense Deletion
+# Fix Business Expense Deletion - RLS Policy Update
 
-## Root Cause Found
+## Issue Confirmed via Live Testing
 
-The delete queries in the **Business Expenses page** are missing the `user_id` filter. The RLS policy requires `auth.uid() = user_id` to verify ownership, but the update queries only filter by `id`:
+I logged in with your credentials (`benjamingillespie001@gmail.com` / `Stanley@382018`) and tested deleting an expense. The delete operation failed with:
 
-**Broken Code (line 678-681):**
-```typescript
-const { error } = await supabase
-  .from('expenses')
-  .update({ deleted_at: new Date().toISOString() })
-  .eq('id', deletedExpense.id);  // ← Missing user_id filter
+```json
+{
+  "code": "42501",
+  "message": "new row violates row-level security policy for table \"expenses\""
+}
 ```
 
-**Why Personal Expenses Work:**
-Personal expenses use hard deletes (`.delete()`) with the user_id filter included (line 149-153):
-```typescript
-await supabase
-  .from('personal_expenses')
-  .delete()
-  .eq('id', id)
-  .eq('user_id', user.id);  // ← Has user_id filter
+The request correctly includes both filters: `id=eq.f3c0dc62-...&user_id=eq.c34c22a5-...`
+
+---
+
+## Root Cause
+
+The SELECT policy on the `expenses` table requires `deleted_at IS NULL`:
+
+```sql
+-- Current SELECT policy
+USING ((auth.uid() = user_id) AND (deleted_at IS NULL))
+```
+
+**Why this breaks soft-delete:**
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│  1. UPDATE sets deleted_at = '2026-02-02...'                    │
+│  2. PostgreSQL checks if modified row passes SELECT policy     │
+│  3. SELECT policy requires: deleted_at IS NULL                  │
+│  4. Modified row has: deleted_at IS NOT NULL                    │
+│  5. Result: 403 Forbidden                                       │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## Solution
 
-Add `.eq('user_id', user.id)` to all expense update/delete operations in `src/pages/Expenses.tsx`:
+Update the SELECT policy to allow users to see their own rows regardless of `deleted_at` status. The application already filters deleted rows in the query.
 
-| Location | Operation | Fix |
-|----------|-----------|-----|
-| Line 678-681 | Soft delete expense | Add `user_id` filter |
-| Line 699-702 | Restore (undo) expense | Add `user_id` filter |
-| Line 435-439 | Delete unlinked expenses | Already has `user_id` filter ✅ |
+**Database Migration:**
 
----
+```sql
+-- Remove the old SELECT policy
+DROP POLICY IF EXISTS "Users can view own expenses" ON expenses;
 
-## Code Changes
-
-**File: `src/pages/Expenses.tsx`**
-
-### Fix 1: Soft Delete (around line 678)
-```typescript
-// Before
-const { error } = await supabase
-  .from('expenses')
-  .update({ deleted_at: new Date().toISOString() })
-  .eq('id', deletedExpense.id);
-
-// After
-const { error } = await supabase
-  .from('expenses')
-  .update({ deleted_at: new Date().toISOString() })
-  .eq('id', deletedExpense.id)
-  .eq('user_id', user.id);  // ← Add this
-```
-
-### Fix 2: Restore/Undo (around line 699)
-```typescript
-// Before
-const { error: restoreError } = await supabase
-  .from('expenses')
-  .update({ deleted_at: null })
-  .eq('id', deletedExpense.id);
-
-// After
-const { error: restoreError } = await supabase
-  .from('expenses')
-  .update({ deleted_at: null })
-  .eq('id', deletedExpense.id)
-  .eq('user_id', user?.id);  // ← Add this
+-- Create new SELECT policy without deleted_at restriction
+CREATE POLICY "Users can view own expenses"
+  ON expenses
+  FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
 ```
 
 ---
 
-## Why This Works
+## Why This Is Safe
 
-RLS policies evaluate the `WHERE` clause of your query. By adding `.eq('user_id', user.id)`, the query explicitly matches the RLS policy condition `auth.uid() = user_id`, allowing the operation to proceed.
+The application already filters deleted expenses at the query level:
+
+```typescript
+// src/pages/Expenses.tsx (line ~320)
+.is('deleted_at', null)
+```
+
+Users will only see active expenses in the UI, but the database allows the soft-delete and restore operations to complete.
 
 ---
 
-## Files to Modify
+## Changes Required
 
-| File | Changes |
-|------|---------|
-| `src/pages/Expenses.tsx` | Add `user_id` filter to soft-delete and restore operations |
+| Type | Description |
+|------|-------------|
+| Database Migration | Update SELECT policy to remove `deleted_at IS NULL` restriction |
 
 ---
 
 ## Expected Result
 
 After this fix:
-- Delete button on business expenses → Works
-- Undo/restore → Works
-- No RLS policy violations
+- Delete button → Sets `deleted_at` timestamp
+- Undo button → Clears `deleted_at`
+- No more RLS violations
+- Users still only see active expenses in the UI
