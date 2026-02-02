@@ -678,7 +678,8 @@ const Expenses = () => {
     const { error } = await supabase
       .from('expenses')
       .update({ deleted_at: new Date().toISOString() })
-      .eq('id', deletedExpense.id);
+      .eq('id', deletedExpense.id)
+      .eq('user_id', user.id);
 
     if (error) {
       logger.error('Error deleting expense:', error);
@@ -699,7 +700,8 @@ const Expenses = () => {
           const { error: restoreError } = await supabase
             .from('expenses')
             .update({ deleted_at: null })
-            .eq('id', deletedExpense.id);
+            .eq('id', deletedExpense.id)
+            .eq('user_id', user?.id);
           
           if (restoreError) {
             logger.error('Error restoring expense:', restoreError);
