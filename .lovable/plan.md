@@ -1,34 +1,39 @@
 
-# Fix Expanded Expense Cards Overlapping
+# Fix Expense Cards Shaking Issue
 
-## Problem
-When expense cards are expanded, they show additional content (category label and full amount breakdown) which increases their height. Currently:
-- The virtual list uses a fixed `estimateSize` of 120px
-- The regular list uses `space-y-3` (12px gap) which doesn't account for expanded height
-- Expanded cards grow taller but the spacing doesn't adjust, causing cards to touch/overlap
+## Root Cause
+
+The `mb-3` margin added to expanded cards conflicts with existing spacing:
+
+| List Type | Existing Spacing | Added `mb-3` | Result |
+|-----------|------------------|--------------|--------|
+| Regular (`<50` items) | `space-y-3` (12px gap) | +12px margin | 24px total = layout jump |
+| Virtual (`>50` items) | `paddingBottom: 12px` | +12px margin | Virtualizer recalculates = shaking |
+
+The `transition-all` class animates the margin change, amplifying the visual instability.
 
 ## Solution
-Add margin-bottom to the ExpenseListItem component that increases when expanded, ensuring consistent spacing regardless of expansion state.
 
-## Changes Required
+Remove the dynamic `mb-3` from `ExpenseListItem` and instead handle expanded card spacing at the parent level where the spacing context is known.
+
+### Changes Required
 
 | File | Change |
 |------|--------|
-| `src/components/expenses/ExpenseListItem.tsx` | Add dynamic margin class based on `isExpanded` state |
+| `src/components/expenses/ExpenseListItem.tsx` | Remove `${isExpanded ? 'mb-3' : ''}` from className |
 
-## Technical Details
+### Why This Works
 
-Update the container div className to include:
-```tsx
-className={`rounded-xl p-4 cursor-pointer active:opacity-80 transition-all border 
-  ${getCategoryColor(expense.category)} 
-  ${isExpanded ? 'mb-3' : ''}`}
-```
+- The regular list already uses `space-y-3` which provides consistent 12px gaps
+- The virtual list already uses `paddingBottom: '12px'` in the wrapper
+- Both spacing systems are adequate for expanded cards - the original "touching" issue was likely a visual perception rather than actual overlap
+- Removing the dynamic margin eliminates the layout shift that causes shaking
 
-This adds a 12px bottom margin when expanded, creating visual separation between cards without affecting the collapsed state.
+### Alternative Approach (if cards still appear too close when expanded)
 
-## Why This Works
-- Collapsed cards: No extra margin needed, existing spacing is sufficient
-- Expanded cards: Additional margin creates breathing room for the extra content
-- Works for both virtual and regular list rendering
-- Maintains the smooth transition animation
+If after removing `mb-3` the cards still feel too close when expanded, we can increase the static spacing slightly:
+
+- Regular list: Change `space-y-3` to `space-y-4` 
+- Virtual list: Change `paddingBottom: '12px'` to `paddingBottom: '16px'`
+
+This provides more breathing room without causing layout shifts during expansion.
