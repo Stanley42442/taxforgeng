@@ -663,14 +663,14 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </Link>
-        <Link to={dashboardMode === 'business' ? '/expenses' : '/personal-expenses'}>
+        <Link to={dashboardMode === 'business' ? '/business-transactions' : '/personal-transactions'}>
           <Card className="h-full glass-frosted hover:shadow-futuristic hover:border-accent/30 transition-all cursor-pointer group hover-lift">
             <CardContent className="p-4 text-center">
               <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-accent/20 transition-colors">
                 <Receipt className="h-5 w-5 text-accent" />
               </div>
-              <h3 className="font-medium text-sm">{dashboardMode === 'business' ? 'Expenses' : 'Personal'}</h3>
-              <p className="text-xs text-muted-foreground">{dashboardMode === 'business' ? 'Track spending' : 'Tax deductions'}</p>
+              <h3 className="font-medium text-sm">{dashboardMode === 'business' ? 'Transactions' : 'Transactions'}</h3>
+              <p className="text-xs text-muted-foreground">{dashboardMode === 'business' ? 'View all' : 'Tax deductions'}</p>
             </CardContent>
           </Card>
         </Link>

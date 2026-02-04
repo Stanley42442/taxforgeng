@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
+import { DateRangeProvider } from "@/contexts/DateRangeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/hooks/useAuth";
@@ -80,6 +81,8 @@ const Payroll = lazy(() => import("./pages/Payroll"));
 const ProfitLoss = lazy(() => import("./pages/ProfitLoss"));
 const Compliance = lazy(() => import("./pages/Compliance"));
 const PersonalExpenses = lazy(() => import("./pages/PersonalExpenses"));
+const PersonalTransactions = lazy(() => import("./pages/PersonalTransactions"));
+const BusinessTransactions = lazy(() => import("./pages/BusinessTransactions"));
 const CalculationHistory = lazy(() => import("./pages/CalculationHistory"));
 const Documentation = lazy(() => import("./pages/Documentation"));
 const PaymentCallback = lazy(() => import("./pages/PaymentCallback"));
@@ -153,7 +156,8 @@ const AnimatedRoutes = () => {
           <Route path="/audit-log" element={<AuditLog />} />
           <Route path="/learn" element={<Learn />} />
           <Route path="/expenses" element={<Expenses />} />
-          <Route path="/scenarios" element={<ScenarioModeling />} />
+          <Route path="/business-transactions" element={<BusinessTransactions />} />
+          <Route path="/personal-transactions" element={<PersonalTransactions />} />
           <Route path="/e-filing" element={<EFiling />} />
           <Route path="/api-docs" element={<ApiDocs />} />
           <Route path="/achievements" element={<Achievements />} />
@@ -210,6 +214,7 @@ const App = () => (
       <ThemeProvider defaultTheme="light" storageKey="taxforge-ng-theme">
       <AuthProvider>
           <SubscriptionProvider>
+            <DateRangeProvider>
               <LanguageProvider>
               <TooltipProvider>
                 <OfflineDataProvider>
@@ -244,6 +249,7 @@ const App = () => (
                 </OfflineDataProvider>
               </TooltipProvider>
             </LanguageProvider>
+          </DateRangeProvider>
           </SubscriptionProvider>
       </AuthProvider>
     </ThemeProvider>
