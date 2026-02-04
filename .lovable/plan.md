@@ -1,61 +1,89 @@
 
-# Fix Expense Cards Shaking Issue (Second Attempt)
+# Fix React Hooks Violation in Expenses Page
 
-## Problem Analysis
+## Problem Identified
 
-The previous fix (removing `mb-3`) was not sufficient because the root cause is different. The `transition-all` class on the expense card container animates **all CSS property changes**, including the height change when a card is expanded. This creates layout instability because:
-
-| What Happens | Why It Shakes |
-|--------------|---------------|
-| Card expands → height increases | `transition-all` animates the height change over ~300ms |
-| Parent recalculates layout | Cards below shift positions during animation |
-| Virtual list measures items | Virtualizer detects height change, repositions all items |
-
-## Root Cause
-
-```tsx
-// Current code (line 92 of ExpenseListItem.tsx)
-className={`rounded-xl p-4 cursor-pointer active:opacity-80 transition-all border ${getCategoryColor(expense.category)}`}
+The Expenses page has a **React hooks rule violation** that causes a crash with the error:
+```
+Error: Rendered more hooks than during the previous render
 ```
 
-The `transition-all` class transitions:
-- `opacity` (good - for active state)
-- `background-color`, `border-color` (fine - for hover states)
-- **`height`, `padding`, all box model properties (BAD - causes layout shifts)**
+### Root Cause Analysis
+
+| Location | Issue |
+|----------|-------|
+| Lines 498-518 | Early return for free tier users (upgrade prompt) |
+| Lines 522-535 | `useFormFeedback` hook called **after** the early return |
+
+React requires that hooks are called in the **same order** on every render. When the component returns early for free-tier users, the `useFormFeedback` hook is skipped. If the tier changes or during certain re-renders, React detects a different number of hooks and crashes.
+
+```tsx
+// CURRENT CODE (BROKEN)
+if (!isBasicPlus) {
+  return (<UpgradePrompt />);  // <-- Early return
+}
+
+const expenseFormFeedback = useFormFeedback({...});  // <-- Hook after return = VIOLATION
+```
 
 ## Solution
 
-Replace `transition-all` with specific transition properties that should animate, excluding layout-affecting properties:
+Move the `useFormFeedback` hook **before** the early return statement. All hooks must be called unconditionally at the top of the component, before any conditional returns.
 
-```tsx
-className={`rounded-xl p-4 cursor-pointer active:opacity-80 transition-colors border ${getCategoryColor(expense.category)}`}
-```
-
-The `transition-colors` utility only transitions:
-- `color`
-- `background-color`
-- `border-color`
-- `text-decoration-color`
-- `fill`
-- `stroke`
-
-This keeps the visual feedback for interactions while preventing height/layout animations.
-
-## Changes Required
+### Changes Required
 
 | File | Change |
 |------|--------|
-| `src/components/expenses/ExpenseListItem.tsx` | Replace `transition-all` with `transition-colors` |
+| `src/pages/Expenses.tsx` | Move `useFormFeedback` call from line ~522 to before line 498 |
 
-## Why This Fixes Both Issues
+### Updated Code Structure
 
-1. **Shaking**: Height changes happen instantly instead of animating, so the parent layout recalculates once (not continuously)
-2. **Visual polish**: Color transitions for hover/active states still work smoothly
-3. **Performance**: Fewer properties to animate = less work for the browser
+```tsx
+// All hooks at the top, unconditionally
+const { tier, savedBusinesses } = useSubscription();
+const { user } = useAuth();
+const navigate = useNavigate();
+// ... other useState hooks ...
 
-## Additional Note: Navigation Errors
+const EXPENSE_CATEGORIES = getExpenseCategories();  // Move this up too
 
-The "page could not be loaded" error you're seeing is likely due to a temporary deployment issue (the build log shows a rate limit error: `429 ServiceUnavailable`). This means:
-- Some code updates may not have deployed yet
-- The fix for the shaking issue needs a successful deployment to take effect
-- Try refreshing the page or waiting a few minutes for the deployment to retry automatically
+// Move hook BEFORE any early returns
+const expenseFormFeedback = useFormFeedback({
+  successDuration: 3000,
+  onSuccess: () => {
+    setShowAddDialog(false);
+    setNewExpense({
+      date: new Date().toISOString().split('T')[0],
+      description: '',
+      amount: '',
+      category: 'other',
+      businessId: '',
+    });
+  }
+});
+
+// NOW the early return is safe
+if (!isBasicPlus) {
+  return (<UpgradePrompt />);
+}
+
+// Rest of component...
+```
+
+## Why This Also Fixes the Shaking Issue
+
+The crash is happening when React tries to reconcile the component state after the hooks mismatch. This causes repeated re-renders and error recovery attempts, which manifests as "shaking" in the UI before the error boundary catches it and shows "Something Went Wrong".
+
+Once the hooks violation is fixed:
+1. The component will render correctly for all users
+2. State changes (like expanding expense cards) won't trigger the hooks error
+3. The `transition-colors` fix we applied will work as intended
+
+## Verification Steps
+
+After the fix:
+1. Log in with a paid tier account
+2. Navigate to /expenses
+3. Page should load without "Something Went Wrong" error
+4. Expand/collapse expense cards - no shaking should occur
+5. Add and delete expenses - UI should remain stable
