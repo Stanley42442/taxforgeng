@@ -76,7 +76,7 @@ export const VirtualExpenseList = ({
 };
 
 // Threshold for when to use virtual scrolling
-export const VIRTUALIZATION_THRESHOLD = 50;
+export const VIRTUALIZATION_THRESHOLD = 200;
 
 // Combined component that switches between virtual and regular rendering
 interface ExpenseListProps extends VirtualExpenseListProps {}
