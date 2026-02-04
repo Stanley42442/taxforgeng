@@ -1,76 +1,89 @@
 
-# Fix Expense List Shaking and Card Touching Issues
+# Fix Business Expense Deletion - RLS Policy Update
 
-## Problem Summary
+## Issue Confirmed via Live Testing
 
-Based on the user's feedback:
-1. The page shakes vertically when trying to scroll, even before reaching the expense cards
-2. When expenses are expanded, they "touch" or overlap with adjacent cards
+I logged in with your credentials (`benjamingillespie001@gmail.com` / `Stanley@382018`) and tested deleting an expense. The delete operation failed with:
 
-## Investigation Findings
-
-After examining the code and testing in a browser:
-- The current `ExpenseList` component uses regular rendering for lists with 50 or fewer items (uses `space-y-3` for spacing)
-- The virtualized list (for 51+ items) was updated with dynamic height measurement
-- The `ExpenseListItem` has `transition-colors` (previously had `transition-all`)
-- No JavaScript errors are appearing in the console
-
-The shaking issue before reaching the expense cards suggests something page-wide might be causing layout thrashing, or there could be a device-specific issue.
-
-## Proposed Solution
-
-### Option 1: Simplify the Expense List (Recommended)
-
-Remove the virtualizer complexity entirely and use a simple scrollable list with proper margins. This eliminates the virtualizer as a potential source of issues.
-
-| File | Change |
-|------|--------|
-| `src/components/expenses/VirtualExpenseList.tsx` | Increase threshold to 200 and add explicit margins to cards |
-| `src/components/expenses/ExpenseListItem.tsx` | Restore `transition-all` but with specific properties for smooth expand/collapse |
-
-**Key Changes:**
-
-1. **Increase virtualization threshold** from 50 to 200 - most users won't have 200+ visible expenses, so this effectively disables virtualization for typical usage
-2. **Add explicit bottom margin** to ExpenseListItem to ensure spacing even when expanded
-3. **Use controlled transitions** - only animate opacity and background-color, not height
-
-### Changes to VirtualExpenseList.tsx
-
-```tsx
-// Increase threshold - virtualization rarely needed for expense lists
-export const VIRTUALIZATION_THRESHOLD = 200;
+```json
+{
+  "code": "42501",
+  "message": "new row violates row-level security policy for table \"expenses\""
+}
 ```
 
-### Changes to ExpenseListItem.tsx
+The request correctly includes both filters: `id=eq.f3c0dc62-...&user_id=eq.c34c22a5-...`
 
-Remove the dynamic height estimation complexity and ensure cards have explicit margins:
+---
 
-```tsx
-// Line 92 - Add mb-3 to ensure spacing even when container uses different layouts
-className={`rounded-xl p-4 mb-3 cursor-pointer active:opacity-80 transition-colors border ${getCategoryColor(expense.category)}`}
+## Root Cause
+
+The SELECT policy on the `expenses` table requires `deleted_at IS NULL`:
+
+```sql
+-- Current SELECT policy
+USING ((auth.uid() = user_id) AND (deleted_at IS NULL))
 ```
 
-### Option 2: Alternative - Remove Virtualization Entirely
+**Why this breaks soft-delete:**
 
-If Option 1 doesn't work, we could remove virtualization entirely from the Expenses page and use a simple paginated approach instead.
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│  1. UPDATE sets deleted_at = '2026-02-02...'                    │
+│  2. PostgreSQL checks if modified row passes SELECT policy     │
+│  3. SELECT policy requires: deleted_at IS NULL                  │
+│  4. Modified row has: deleted_at IS NOT NULL                    │
+│  5. Result: 403 Forbidden                                       │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-## Why This Should Work
+---
 
-| Issue | Solution |
-|-------|----------|
-| Cards touching when expanded | Adding `mb-3` margin directly to each card ensures consistent spacing regardless of expand state |
-| Page shaking | Increasing virtualization threshold to 200 means most users get the simple, stable rendering path |
-| Layout thrashing | `transition-colors` prevents height animations from causing layout recalculations |
+## Solution
 
-## Files to Modify
+Update the SELECT policy to allow users to see their own rows regardless of `deleted_at` status. The application already filters deleted rows in the query.
 
-1. `src/components/expenses/VirtualExpenseList.tsx` - Increase VIRTUALIZATION_THRESHOLD to 200
-2. `src/components/expenses/ExpenseListItem.tsx` - Add `mb-3` class for explicit bottom margin
+**Database Migration:**
 
-## Testing Verification
+```sql
+-- Remove the old SELECT policy
+DROP POLICY IF EXISTS "Users can view own expenses" ON expenses;
 
-After implementation:
-1. Navigate to /expenses
-2. Scroll down - page should not shake
-3. Click on expense cards to expand/collapse - cards should have consistent spacing
-4. No visual overlap between adjacent cards
+-- Create new SELECT policy without deleted_at restriction
+CREATE POLICY "Users can view own expenses"
+  ON expenses
+  FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+```
+
+---
+
+## Why This Is Safe
+
+The application already filters deleted expenses at the query level:
+
+```typescript
+// src/pages/Expenses.tsx (line ~320)
+.is('deleted_at', null)
+```
+
+Users will only see active expenses in the UI, but the database allows the soft-delete and restore operations to complete.
+
+---
+
+## Changes Required
+
+| Type | Description |
+|------|-------------|
+| Database Migration | Update SELECT policy to remove `deleted_at IS NULL` restriction |
+
+---
+
+## Expected Result
+
+After this fix:
+- Delete button → Sets `deleted_at` timestamp
+- Undo button → Clears `deleted_at`
+- No more RLS violations
+- Users still only see active expenses in the UI

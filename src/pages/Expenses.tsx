@@ -494,23 +494,6 @@ const Expenses = () => {
     });
   }, [expenses, savingsGoals, notificationsEnabled, savedBusinesses, notifiedAchievements]);
 
-  const EXPENSE_CATEGORIES = getExpenseCategories();
-
-  // Form feedback hook for success celebrations - MUST be called before any early returns
-  const expenseFormFeedback = useFormFeedback({
-    successDuration: 3000,
-    onSuccess: () => {
-      setShowAddDialog(false);
-      setNewExpense({
-        date: new Date().toISOString().split('T')[0],
-        description: '',
-        amount: '',
-        category: 'other',
-        businessId: '',
-      });
-    }
-  });
-
   // Upgrade prompt for free tier
   if (!isBasicPlus) {
     return (
@@ -533,6 +516,23 @@ const Expenses = () => {
       </PageLayout>
     );
   }
+
+  const EXPENSE_CATEGORIES = getExpenseCategories();
+
+  // Form feedback hook for success celebrations
+  const expenseFormFeedback = useFormFeedback({
+    successDuration: 3000,
+    onSuccess: () => {
+      setShowAddDialog(false);
+      setNewExpense({
+        date: new Date().toISOString().split('T')[0],
+        description: '',
+        amount: '',
+        category: 'other',
+        businessId: '',
+      });
+    }
+  });
 
   const handleAddExpense = async () => {
     if (!user) {

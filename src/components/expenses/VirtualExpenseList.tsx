@@ -24,11 +24,8 @@ export const VirtualExpenseList = ({
   const virtualizer = useVirtualizer({
     count: expenses.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: useCallback((index: number) => {
-      // Expanded cards are taller (~160px), collapsed are ~120px
-      return expandedCardId === expenses[index]?.id ? 160 : 120;
-    }, [expandedCardId, expenses]),
-    overscan: 5,
+    estimateSize: useCallback(() => 120, []), // Estimated row height
+    overscan: 5, // Render 5 extra items above/below viewport
   });
 
   return (
@@ -49,8 +46,6 @@ export const VirtualExpenseList = ({
           return (
             <div
               key={expense.id}
-              data-index={virtualRow.index}
-              ref={virtualizer.measureElement}
               style={{
                 position: 'absolute',
                 top: 0,
@@ -76,7 +71,7 @@ export const VirtualExpenseList = ({
 };
 
 // Threshold for when to use virtual scrolling
-export const VIRTUALIZATION_THRESHOLD = 200;
+export const VIRTUALIZATION_THRESHOLD = 50;
 
 // Combined component that switches between virtual and regular rendering
 interface ExpenseListProps extends VirtualExpenseListProps {}
