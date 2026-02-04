@@ -332,6 +332,41 @@ const Dashboard = () => {
     return { totalIncome: income, totalExpenses: expense, deductibleExpenses: deductible };
   }, [filteredExpenses]);
 
+  // Filtered personal expenses based on date range
+  const filteredPersonalExpenses = useMemo(() => {
+    return personalExpenses.filter(e => {
+      const expenseDate = new Date(e.start_date);
+      return isWithinInterval(expenseDate, { start: dateRangeStart, end: dateRangeEnd });
+    });
+  }, [personalExpenses, dateRangeStart, dateRangeEnd]);
+
+  // Filtered annual totals for personal expenses
+  const filteredAnnualTotals = useMemo(() => {
+    return filteredPersonalExpenses.reduce((totals, expense) => {
+      const amount = Number(expense.amount);
+      const category = expense.category as keyof typeof totals;
+      if (category in totals) {
+        totals[category] += amount;
+      }
+      return totals;
+    }, {
+      rent: 0,
+      pension_contribution: 0,
+      nhf_contribution: 0,
+      health_insurance: 0,
+      life_insurance: 0,
+      child_education: 0,
+      dependent_care: 0,
+      disability_support: 0,
+      gratuity_received: 0,
+      other: 0,
+    });
+  }, [filteredPersonalExpenses]);
+
+  const filteredPersonalTotalDeductible = useMemo(() => {
+    return Object.values(filteredAnnualTotals).reduce((sum, val) => sum + val, 0);
+  }, [filteredAnnualTotals]);
+
   const sparklineData = useMemo(() => {
     const today = new Date();
     const last7Days = eachDayOfInterval({ start: subDays(today, 6), end: today });
@@ -666,11 +701,65 @@ const Dashboard = () => {
                 </>
               ) : (
                 <>
-                  {/* Personal Summary Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="text-sm text-muted-foreground">
-                      Your personal tax deductions for {new Date().getFullYear()}
-                    </p>
+                  {/* Date Range Filter for Personal Mode */}
+                  <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
+                      <Filter className="h-4 w-4" />
+                      <span>Showing data for</span>
+                      <Select value={dateRange} onValueChange={(v) => setDateRange(v as typeof dateRange)}>
+                        <SelectTrigger className="w-[130px] h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="week">This Week</SelectItem>
+                          <SelectItem value="month">This Month</SelectItem>
+                          <SelectItem value="quarter">This Quarter</SelectItem>
+                          <SelectItem value="year">This Year</SelectItem>
+                          <SelectItem value="custom">Custom Range</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      
+                      {/* Custom Date Range Picker */}
+                      {dateRange === 'custom' && (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={cn(
+                                "h-8 text-xs justify-start text-left font-normal",
+                                !customDateRange && "text-muted-foreground"
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+                              {customDateRange ? (
+                                <>
+                                  {format(customDateRange.start, "MMM d")} - {format(customDateRange.end, "MMM d, yyyy")}
+                                </>
+                              ) : (
+                                <span>Pick dates</span>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <CalendarComponent
+                              mode="range"
+                              selected={customDateRange ? { from: customDateRange.start, to: customDateRange.end } : undefined}
+                              onSelect={(range) => {
+                                if (range?.from && range?.to) {
+                                  setCustomDateRange({ start: range.from, end: range.to });
+                                } else if (range?.from) {
+                                  setCustomDateRange({ start: range.from, end: range.from });
+                                }
+                              }}
+                              initialFocus
+                              className={cn("p-3 pointer-events-auto")}
+                              numberOfMonths={2}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      )}
+                    </div>
                     <Link to="/personal-expenses">
                       <Button variant="outline" size="sm" className="h-8 text-xs">
                         Manage <ArrowRight className="h-3.5 w-3.5 ml-1" />
@@ -685,8 +774,8 @@ const Dashboard = () => {
                         <Home className="h-4 w-4 text-primary" />
                         <span className="text-xs text-muted-foreground">Rent Relief</span>
                       </div>
-                      <p className="text-lg font-bold text-primary">{formatCurrency(annualTotals.rent)}</p>
-                      <p className="text-xs text-muted-foreground mt-1">Annual rent paid</p>
+                      <p className="text-lg font-bold text-primary">{formatCurrency(filteredAnnualTotals.rent)}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Rent paid</p>
                     </div>
                     <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
                       <div className="flex items-center gap-2 mb-2">
@@ -694,7 +783,7 @@ const Dashboard = () => {
                         <span className="text-xs text-muted-foreground">Pension</span>
                       </div>
                       <p className="text-lg font-bold text-success">
-                        {formatCurrency(annualTotals.pension_contribution + annualTotals.nhf_contribution)}
+                        {formatCurrency(filteredAnnualTotals.pension_contribution + filteredAnnualTotals.nhf_contribution)}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">Contributions</p>
                     </div>
@@ -704,7 +793,7 @@ const Dashboard = () => {
                         <span className="text-xs text-muted-foreground">Insurance</span>
                       </div>
                       <p className="text-lg font-bold text-accent">
-                        {formatCurrency(annualTotals.health_insurance + annualTotals.life_insurance)}
+                        {formatCurrency(filteredAnnualTotals.health_insurance + filteredAnnualTotals.life_insurance)}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">Health + Life</p>
                     </div>
@@ -713,7 +802,7 @@ const Dashboard = () => {
                         <Shield className="h-4 w-4 text-warning" />
                         <span className="text-xs text-muted-foreground">Total Deductible</span>
                       </div>
-                      <p className="text-lg font-bold text-warning">{formatCurrency(totalDeductible)}</p>
+                      <p className="text-lg font-bold text-warning">{formatCurrency(filteredPersonalTotalDeductible)}</p>
                       <p className="text-xs text-muted-foreground mt-1">Tax relief potential</p>
                     </div>
                   </div>
@@ -737,7 +826,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </Link>
-        <Link to={dashboardMode === 'business' ? '/business-transactions' : '/personal-transactions'}>
+        <Link to={dashboardMode === 'business' ? '/expenses' : '/personal-expenses'}>
           <Card className="h-full glass-frosted hover:shadow-futuristic hover:border-accent/30 transition-all cursor-pointer group hover-lift">
             <CardContent className="p-4 text-center">
               <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-accent/20 transition-colors">
@@ -933,9 +1022,9 @@ const Dashboard = () => {
           </div>
 
           {/* Business Charts Section */}
-          {expenses.length > 0 && (
+          {filteredExpenses.length > 0 && (
             <div className="mt-6 animate-slide-up-delay-2">
-              <ExpenseCharts expenses={expenses} />
+              <ExpenseCharts expenses={filteredExpenses} />
             </div>
           )}
         </>
@@ -965,80 +1054,80 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3 max-h-[300px] overflow-y-auto">
-                  {annualTotals.rent > 0 && (
+                  {filteredAnnualTotals.rent > 0 && (
                     <div className="glass p-3 rounded-xl flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                          <Home className="h-5 w-5 text-blue-500" />
+                        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <Home className="h-5 w-5 text-primary" />
                         </div>
                         <div>
                           <p className="font-medium text-sm">Rent</p>
                           <p className="text-xs text-muted-foreground">Housing expenses</p>
                         </div>
                       </div>
-                      <p className="font-semibold text-sm">{formatCurrency(annualTotals.rent)}</p>
+                      <p className="font-semibold text-sm">{formatCurrency(filteredAnnualTotals.rent)}</p>
                     </div>
                   )}
-                  {annualTotals.pension_contribution > 0 && (
+                  {filteredAnnualTotals.pension_contribution > 0 && (
                     <div className="glass p-3 rounded-xl flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-                          <Wallet className="h-5 w-5 text-green-500" />
+                        <div className="h-10 w-10 rounded-lg bg-success/10 flex items-center justify-center">
+                          <Wallet className="h-5 w-5 text-success" />
                         </div>
                         <div>
                           <p className="font-medium text-sm">Pension</p>
                           <p className="text-xs text-muted-foreground">Retirement contributions</p>
                         </div>
                       </div>
-                      <p className="font-semibold text-sm">{formatCurrency(annualTotals.pension_contribution)}</p>
+                      <p className="font-semibold text-sm">{formatCurrency(filteredAnnualTotals.pension_contribution)}</p>
                     </div>
                   )}
-                  {(annualTotals.health_insurance > 0 || annualTotals.life_insurance > 0) && (
+                  {(filteredAnnualTotals.health_insurance > 0 || filteredAnnualTotals.life_insurance > 0) && (
                     <div className="glass p-3 rounded-xl flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-pink-500/10 flex items-center justify-center">
-                          <Heart className="h-5 w-5 text-pink-500" />
+                        <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                          <Heart className="h-5 w-5 text-accent" />
                         </div>
                         <div>
                           <p className="font-medium text-sm">Insurance</p>
                           <p className="text-xs text-muted-foreground">Health & Life premiums</p>
                         </div>
                       </div>
-                      <p className="font-semibold text-sm">{formatCurrency(annualTotals.health_insurance + annualTotals.life_insurance)}</p>
+                      <p className="font-semibold text-sm">{formatCurrency(filteredAnnualTotals.health_insurance + filteredAnnualTotals.life_insurance)}</p>
                     </div>
                   )}
-                  {annualTotals.child_education > 0 && (
+                  {filteredAnnualTotals.child_education > 0 && (
                     <div className="glass p-3 rounded-xl flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                          <GraduationCap className="h-5 w-5 text-amber-500" />
+                        <div className="h-10 w-10 rounded-lg bg-warning/10 flex items-center justify-center">
+                          <GraduationCap className="h-5 w-5 text-warning" />
                         </div>
                         <div>
                           <p className="font-medium text-sm">Child Education</p>
                           <p className="text-xs text-muted-foreground">School fees & books</p>
                         </div>
                       </div>
-                      <p className="font-semibold text-sm">{formatCurrency(annualTotals.child_education)}</p>
+                      <p className="font-semibold text-sm">{formatCurrency(filteredAnnualTotals.child_education)}</p>
                     </div>
                   )}
-                  {annualTotals.dependent_care > 0 && (
+                  {filteredAnnualTotals.dependent_care > 0 && (
                     <div className="glass p-3 rounded-xl flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
-                          <Users className="h-5 w-5 text-cyan-500" />
+                        <div className="h-10 w-10 rounded-lg bg-secondary/50 flex items-center justify-center">
+                          <Users className="h-5 w-5 text-secondary-foreground" />
                         </div>
                         <div>
                           <p className="font-medium text-sm">Dependent Care</p>
                           <p className="text-xs text-muted-foreground">Relative support</p>
                         </div>
                       </div>
-                      <p className="font-semibold text-sm">{formatCurrency(annualTotals.dependent_care)}</p>
+                      <p className="font-semibold text-sm">{formatCurrency(filteredAnnualTotals.dependent_care)}</p>
                     </div>
                   )}
-                  {totalDeductible === 0 && (
+                  {filteredPersonalTotalDeductible === 0 && (
                     <div className="text-center py-8">
                       <Receipt className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                      <p className="text-muted-foreground mb-4">No personal expenses recorded yet</p>
+                      <p className="text-muted-foreground mb-4">No personal expenses in selected period</p>
                       <Link to="/personal-expenses">
                         <Button variant="hero" size="sm">
                           <Plus className="h-4 w-4" />
@@ -1070,7 +1159,7 @@ const Dashboard = () => {
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-medium">Rent Relief</p>
                       <p className="text-sm font-semibold text-success">
-                        {formatCurrency(Math.min(annualTotals.rent * 0.2, 500000))}
+                        {formatCurrency(Math.min(filteredAnnualTotals.rent * 0.2, 500000))}
                       </p>
                     </div>
                     <p className="text-xs text-muted-foreground">20% of rent, max ₦500,000</p>
@@ -1079,7 +1168,7 @@ const Dashboard = () => {
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-medium">Pension Relief</p>
                       <p className="text-sm font-semibold text-success">
-                        {formatCurrency(annualTotals.pension_contribution)}
+                        {formatCurrency(filteredAnnualTotals.pension_contribution)}
                       </p>
                     </div>
                     <p className="text-xs text-muted-foreground">Fully deductible</p>
@@ -1088,7 +1177,7 @@ const Dashboard = () => {
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-medium">Insurance Relief</p>
                       <p className="text-sm font-semibold text-success">
-                        {formatCurrency(annualTotals.health_insurance + annualTotals.life_insurance)}
+                        {formatCurrency(filteredAnnualTotals.health_insurance + filteredAnnualTotals.life_insurance)}
                       </p>
                     </div>
                     <p className="text-xs text-muted-foreground">Health & Life premiums</p>
@@ -1097,7 +1186,7 @@ const Dashboard = () => {
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-medium">NHF Contribution</p>
                       <p className="text-sm font-semibold text-success">
-                        {formatCurrency(annualTotals.nhf_contribution)}
+                        {formatCurrency(filteredAnnualTotals.nhf_contribution)}
                       </p>
                     </div>
                     <p className="text-xs text-muted-foreground">National Housing Fund</p>
@@ -1107,11 +1196,11 @@ const Dashboard = () => {
                       <p className="font-semibold">Total Tax Relief</p>
                       <p className="font-bold text-lg text-success">
                         {formatCurrency(
-                          Math.min(annualTotals.rent * 0.2, 500000) +
-                          annualTotals.pension_contribution +
-                          annualTotals.health_insurance +
-                          annualTotals.life_insurance +
-                          annualTotals.nhf_contribution
+                          Math.min(filteredAnnualTotals.rent * 0.2, 500000) +
+                          filteredAnnualTotals.pension_contribution +
+                          filteredAnnualTotals.health_insurance +
+                          filteredAnnualTotals.life_insurance +
+                          filteredAnnualTotals.nhf_contribution
                         )}
                       </p>
                     </div>
@@ -1123,7 +1212,7 @@ const Dashboard = () => {
 
           {/* Personal Charts Section */}
           <div className="mt-6 animate-slide-up-delay-2">
-            <PersonalExpenseCharts expenses={personalExpenses} annualTotals={annualTotals} />
+            <PersonalExpenseCharts expenses={filteredPersonalExpenses} annualTotals={filteredAnnualTotals} />
           </div>
         </>
       )}
