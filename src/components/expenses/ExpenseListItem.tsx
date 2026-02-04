@@ -89,7 +89,7 @@ export const ExpenseListItem = memo(function ExpenseListItem({
   return (
     <div 
       style={style}
-      className={`rounded-xl p-4 cursor-pointer active:opacity-80 transition-all border ${getCategoryColor(expense.category)}`}
+      className={`rounded-xl p-4 cursor-pointer active:opacity-80 transition-colors border ${getCategoryColor(expense.category)}`}
       onClick={handleClick}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
