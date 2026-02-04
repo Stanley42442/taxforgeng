@@ -1,89 +1,34 @@
 
-# Fix Business Expense Deletion - RLS Policy Update
+# Fix Expanded Expense Cards Overlapping
 
-## Issue Confirmed via Live Testing
-
-I logged in with your credentials (`benjamingillespie001@gmail.com` / `Stanley@382018`) and tested deleting an expense. The delete operation failed with:
-
-```json
-{
-  "code": "42501",
-  "message": "new row violates row-level security policy for table \"expenses\""
-}
-```
-
-The request correctly includes both filters: `id=eq.f3c0dc62-...&user_id=eq.c34c22a5-...`
-
----
-
-## Root Cause
-
-The SELECT policy on the `expenses` table requires `deleted_at IS NULL`:
-
-```sql
--- Current SELECT policy
-USING ((auth.uid() = user_id) AND (deleted_at IS NULL))
-```
-
-**Why this breaks soft-delete:**
-
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│  1. UPDATE sets deleted_at = '2026-02-02...'                    │
-│  2. PostgreSQL checks if modified row passes SELECT policy     │
-│  3. SELECT policy requires: deleted_at IS NULL                  │
-│  4. Modified row has: deleted_at IS NOT NULL                    │
-│  5. Result: 403 Forbidden                                       │
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
+## Problem
+When expense cards are expanded, they show additional content (category label and full amount breakdown) which increases their height. Currently:
+- The virtual list uses a fixed `estimateSize` of 120px
+- The regular list uses `space-y-3` (12px gap) which doesn't account for expanded height
+- Expanded cards grow taller but the spacing doesn't adjust, causing cards to touch/overlap
 
 ## Solution
-
-Update the SELECT policy to allow users to see their own rows regardless of `deleted_at` status. The application already filters deleted rows in the query.
-
-**Database Migration:**
-
-```sql
--- Remove the old SELECT policy
-DROP POLICY IF EXISTS "Users can view own expenses" ON expenses;
-
--- Create new SELECT policy without deleted_at restriction
-CREATE POLICY "Users can view own expenses"
-  ON expenses
-  FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-```
-
----
-
-## Why This Is Safe
-
-The application already filters deleted expenses at the query level:
-
-```typescript
-// src/pages/Expenses.tsx (line ~320)
-.is('deleted_at', null)
-```
-
-Users will only see active expenses in the UI, but the database allows the soft-delete and restore operations to complete.
-
----
+Add margin-bottom to the ExpenseListItem component that increases when expanded, ensuring consistent spacing regardless of expansion state.
 
 ## Changes Required
 
-| Type | Description |
-|------|-------------|
-| Database Migration | Update SELECT policy to remove `deleted_at IS NULL` restriction |
+| File | Change |
+|------|--------|
+| `src/components/expenses/ExpenseListItem.tsx` | Add dynamic margin class based on `isExpanded` state |
 
----
+## Technical Details
 
-## Expected Result
+Update the container div className to include:
+```tsx
+className={`rounded-xl p-4 cursor-pointer active:opacity-80 transition-all border 
+  ${getCategoryColor(expense.category)} 
+  ${isExpanded ? 'mb-3' : ''}`}
+```
 
-After this fix:
-- Delete button → Sets `deleted_at` timestamp
-- Undo button → Clears `deleted_at`
-- No more RLS violations
-- Users still only see active expenses in the UI
+This adds a 12px bottom margin when expanded, creating visual separation between cards without affecting the collapsed state.
+
+## Why This Works
+- Collapsed cards: No extra margin needed, existing spacing is sufficient
+- Expanded cards: Additional margin creates breathing room for the extra content
+- Works for both virtual and regular list rendering
+- Maintains the smooth transition animation
