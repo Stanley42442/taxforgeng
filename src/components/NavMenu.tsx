@@ -98,7 +98,8 @@ const navGroups: NavGroup[] = [
     icon: User,
     links: [
       { to: "/individual-calculator", label: "Personal Tax Calculator", icon: Calculator },
-      { to: "/personal-expenses", label: "Personal Expenses", icon: Wallet },
+      { to: "/personal-transactions", label: "Personal Transactions", icon: Wallet },
+      { to: "/personal-expenses", label: "Manage Expenses", icon: Wallet },
       { to: "/calculation-history", label: "Tax History", icon: History },
     ]
   },
@@ -110,7 +111,8 @@ const navGroups: NavGroup[] = [
     links: [
       { to: "/calculator", label: "Business Calculator", icon: Calculator, minTier: 'starter' },
       { to: "/businesses", label: "My Businesses", icon: FolderOpen, minTier: 'starter' },
-      { to: "/expenses", label: "Expenses", icon: Receipt, minTier: 'starter' },
+      { to: "/business-transactions", label: "Business Transactions", icon: Receipt, minTier: 'starter' },
+      { to: "/expenses", label: "Manage Expenses", icon: Receipt, minTier: 'starter' },
       { to: "/invoices", label: "Invoices", icon: FileText, minTier: 'basic' },
       { to: "/payroll", label: "Payroll", icon: Users, minTier: 'basic' },
       { to: "/profit-loss", label: "P&L Statement", icon: PieChart, minTier: 'basic' },
