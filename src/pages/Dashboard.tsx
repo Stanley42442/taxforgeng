@@ -51,7 +51,7 @@ import {
   Users,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
-import { format, isAfter, addDays, subDays, subMonths, startOfWeek, startOfMonth, startOfQuarter, startOfYear, eachDayOfInterval, isWithinInterval } from "date-fns";
+import { format, isAfter, addDays, subDays, subMonths, startOfWeek, startOfMonth, startOfQuarter, startOfYear, eachDayOfInterval, isWithinInterval, parseISO } from "date-fns";
 import { SparklineChart } from "@/components/SparklineChart";
 import { exportDashboardToPDF, exportDashboardToCSV, DashboardExportData } from "@/lib/dashboardExport";
 import { toast } from "sonner";
@@ -70,6 +70,10 @@ import { motion } from "framer-motion";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { usePersonalExpenses } from "@/hooks/usePersonalExpenses";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { CalendarIcon } from "lucide-react";
 
 interface Expense {
   id: string;
@@ -118,9 +122,17 @@ const Dashboard = () => {
     const saved = safeLocalStorage.getItem('dashboard_summary_expanded');
     return saved !== 'false';
   });
-  const [dateRange, setDateRange] = useState<'week' | 'month' | 'quarter' | 'year'>(() => {
+  const [dateRange, setDateRange] = useState<'week' | 'month' | 'quarter' | 'year' | 'custom'>(() => {
     const saved = safeLocalStorage.getItem('dashboard_date_range');
-    return (saved as 'week' | 'month' | 'quarter' | 'year') || 'month';
+    return (saved as 'week' | 'month' | 'quarter' | 'year' | 'custom') || 'month';
+  });
+  const [customDateRange, setCustomDateRange] = useState<{ start: Date; end: Date } | null>(() => {
+    const savedStart = safeLocalStorage.getItem('dashboard_custom_start');
+    const savedEnd = safeLocalStorage.getItem('dashboard_custom_end');
+    if (savedStart && savedEnd) {
+      return { start: parseISO(savedStart), end: parseISO(savedEnd) };
+    }
+    return null;
   });
   const [dashboardMode, setDashboardMode] = useState<'business' | 'personal'>(() => {
     const saved = safeLocalStorage.getItem('dashboard_mode');
@@ -133,6 +145,13 @@ const Dashboard = () => {
   useEffect(() => {
     safeLocalStorage.setItem('dashboard_date_range', dateRange);
   }, [dateRange]);
+
+  useEffect(() => {
+    if (customDateRange) {
+      safeLocalStorage.setItem('dashboard_custom_start', customDateRange.start.toISOString());
+      safeLocalStorage.setItem('dashboard_custom_end', customDateRange.end.toISOString());
+    }
+  }, [customDateRange]);
 
   useEffect(() => {
     safeLocalStorage.setItem('dashboard_summary_expanded', summaryExpanded.toString());
@@ -263,6 +282,9 @@ const Dashboard = () => {
   }, [user]);
 
   const dateRangeStart = useMemo(() => {
+    if (dateRange === 'custom' && customDateRange) {
+      return customDateRange.start;
+    }
     const now = new Date();
     switch (dateRange) {
       case 'week': return startOfWeek(now);
@@ -271,7 +293,14 @@ const Dashboard = () => {
       case 'year': return startOfYear(now);
       default: return startOfMonth(now);
     }
-  }, [dateRange]);
+  }, [dateRange, customDateRange]);
+
+  const dateRangeEnd = useMemo(() => {
+    if (dateRange === 'custom' && customDateRange) {
+      return customDateRange.end;
+    }
+    return new Date();
+  }, [dateRange, customDateRange]);
 
   // Create set of active business IDs for filtering orphaned expenses
   const activeBusinessIds = useMemo(() => 
@@ -292,9 +321,9 @@ const Dashboard = () => {
   const filteredExpenses = useMemo(() => {
     return validExpenses.filter(e => {
       const expenseDate = new Date(e.date);
-      return isWithinInterval(expenseDate, { start: dateRangeStart, end: new Date() });
+      return isWithinInterval(expenseDate, { start: dateRangeStart, end: dateRangeEnd });
     });
-  }, [validExpenses, dateRangeStart]);
+  }, [validExpenses, dateRangeStart, dateRangeEnd]);
 
   const filteredSummary = useMemo(() => {
     const income = filteredExpenses.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
@@ -403,18 +432,21 @@ const Dashboard = () => {
   const netIncome = filteredSummary.totalIncome - filteredSummary.totalExpenses;
   const totalTurnover = savedBusinesses.reduce((sum, b) => sum + b.turnover, 0);
 
-  const dateRangeLabels = {
+  const dateRangeLabels: Record<typeof dateRange, string> = {
     week: 'This Week',
     month: 'This Month',
     quarter: 'This Quarter',
     year: 'This Year',
+    custom: customDateRange 
+      ? `${format(customDateRange.start, 'MMM d')} - ${format(customDateRange.end, 'MMM d, yyyy')}`
+      : 'Custom',
   };
 
   const handleExport = (format: 'pdf' | 'csv') => {
     const exportData: DashboardExportData = {
       dateRange: dateRangeLabels[dateRange],
       dateRangeStart: dateRangeStart,
-      dateRangeEnd: new Date(),
+      dateRangeEnd: dateRangeEnd,
       totalIncome: filteredSummary.totalIncome,
       totalExpenses: filteredSummary.totalExpenses,
       netIncome: netIncome,
@@ -509,7 +541,7 @@ const Dashboard = () => {
                 <>
                   {/* Date Range Filter and Export Buttons */}
                   <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
                       <Filter className="h-4 w-4" />
                       <span>Showing data for</span>
                       <Select value={dateRange} onValueChange={(v) => setDateRange(v as typeof dateRange)}>
@@ -521,8 +553,50 @@ const Dashboard = () => {
                           <SelectItem value="month">This Month</SelectItem>
                           <SelectItem value="quarter">This Quarter</SelectItem>
                           <SelectItem value="year">This Year</SelectItem>
+                          <SelectItem value="custom">Custom Range</SelectItem>
                         </SelectContent>
                       </Select>
+                      
+                      {/* Custom Date Range Picker */}
+                      {dateRange === 'custom' && (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={cn(
+                                "h-8 text-xs justify-start text-left font-normal",
+                                !customDateRange && "text-muted-foreground"
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+                              {customDateRange ? (
+                                <>
+                                  {format(customDateRange.start, "MMM d")} - {format(customDateRange.end, "MMM d, yyyy")}
+                                </>
+                              ) : (
+                                <span>Pick dates</span>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <CalendarComponent
+                              mode="range"
+                              selected={customDateRange ? { from: customDateRange.start, to: customDateRange.end } : undefined}
+                              onSelect={(range) => {
+                                if (range?.from && range?.to) {
+                                  setCustomDateRange({ start: range.from, end: range.to });
+                                } else if (range?.from) {
+                                  setCustomDateRange({ start: range.from, end: range.from });
+                                }
+                              }}
+                              initialFocus
+                              className={cn("p-3 pointer-events-auto")}
+                              numberOfMonths={2}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <Button 
