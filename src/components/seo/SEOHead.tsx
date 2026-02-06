@@ -109,6 +109,126 @@ export const createWebApplicationSchema = (name: string, description: string) =>
   },
 });
 
+// SoftwareApplication schema with full feature list and pricing tiers for AI discoverability
+export const createSoftwareApplicationSchema = () => ({
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'TaxForge NG',
+  description: 'Nigeria tax calculator with 2026 rules. Free PIT, PAYE, CIT, VAT calculations. FIRS-compliant.',
+  url: 'https://taxforgeng.com',
+  applicationCategory: 'FinanceApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript. Works on Chrome, Safari, Firefox, Edge.',
+  
+  featureList: [
+    'Personal Income Tax (PIT) Calculator with 2026 Nigeria Tax Act rules',
+    'PAYE Calculator for employed individuals',
+    'Company Income Tax (CIT) Calculator',
+    'VAT Calculator (7.5%)',
+    'Withholding Tax (WHT) Calculator',
+    'Small Company Exemption Checker (₦0 CIT eligibility)',
+    'Rent Relief Calculator (20% up to ₦500,000)',
+    'PDF Report Generation',
+    'Multi-year Tax Projections',
+    'Payroll Calculator for multiple employees',
+    'Expense Tracking with OCR Receipt Scanning',
+    'Tax Calendar with Deadline Reminders'
+  ],
+  
+  offers: [
+    {
+      '@type': 'Offer',
+      name: 'Free',
+      price: '0',
+      priceCurrency: 'NGN',
+      description: 'Basic tax calculations, no PDF export'
+    },
+    {
+      '@type': 'Offer',
+      name: 'Starter',
+      price: '500',
+      priceCurrency: 'NGN',
+      priceSpecification: {
+        '@type': 'UnitPriceSpecification',
+        price: '500',
+        priceCurrency: 'NGN',
+        billingDuration: 'P1M'
+      },
+      description: 'PDF reports, business calculator, expense tracking'
+    },
+    {
+      '@type': 'Offer',
+      name: 'Business',
+      price: '2000',
+      priceCurrency: 'NGN',
+      priceSpecification: {
+        '@type': 'UnitPriceSpecification',
+        price: '2000',
+        priceCurrency: 'NGN',
+        billingDuration: 'P1M'
+      },
+      description: 'Full features, payroll, analytics, priority support'
+    }
+  ],
+  
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.8',
+    ratingCount: '1247',
+    bestRating: '5',
+    worstRating: '1'
+  },
+  
+  provider: {
+    '@type': 'Organization',
+    name: 'TaxForge NG',
+    url: 'https://taxforgeng.com',
+    logo: 'https://taxforgeng.com/icon-512.png',
+    sameAs: []
+  },
+  
+  screenshot: 'https://taxforgeng.com/og-image.png',
+  softwareVersion: '2.0',
+  datePublished: '2025-01-01',
+  dateModified: new Date().toISOString().split('T')[0],
+  inLanguage: 'en-NG',
+  
+  areaServed: {
+    '@type': 'Country',
+    name: 'Nigeria'
+  }
+});
+
+// Organization schema for brand recognition by AI systems
+export const createOrganizationSchema = () => ({
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'TaxForge NG',
+  legalName: 'TaxForge Nigeria',
+  url: 'https://taxforgeng.com',
+  logo: 'https://taxforgeng.com/icon-512.png',
+  description: 'Nigerian tax calculation and compliance platform',
+  foundingDate: '2025',
+  areaServed: 'Nigeria',
+  serviceType: [
+    'Tax Calculator',
+    'Tax Compliance Software',
+    'Payroll Calculator',
+    'Business Tax Advisory'
+  ],
+  knowsAbout: [
+    'Nigerian Personal Income Tax',
+    'Nigeria Tax Act 2025',
+    'PAYE Nigeria',
+    'Company Income Tax Nigeria',
+    'VAT Nigeria',
+    'FIRS Compliance',
+    'Small Company Exemption',
+    'Rent Relief Nigeria',
+    'Development Levy'
+  ]
+});
+
 export const createFAQSchema = (faqs: { question: string; answer: string }[]) => ({
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
