@@ -95,6 +95,13 @@ const TaxLogicReference = lazy(() => import("./pages/TaxLogicReference"));
 const VerifyDocument = lazy(() => import("./pages/VerifyDocument"));
 const ErrorDashboard = lazy(() => import("./pages/ErrorDashboard"));
 
+// SEO Landing Pages
+const FreeCalculator = lazy(() => import("./pages/seo/FreeCalculator"));
+const SmallCompanyExemption = lazy(() => import("./pages/seo/SmallCompanyExemption"));
+const RentRelief2026 = lazy(() => import("./pages/seo/RentRelief2026"));
+const PITPAYECalculator = lazy(() => import("./pages/seo/PITPAYECalculator"));
+const TaxReforms2026 = lazy(() => import("./pages/seo/TaxReforms2026"));
+
 // Lazy load TaxAssistant (heavy component with AI chat)
 const TaxAssistant = lazy(() => import("./components/TaxAssistant").then(m => ({ default: m.TaxAssistant })));
 
@@ -194,6 +201,12 @@ const AnimatedRoutes = () => {
           <Route path="/offline" element={<OfflineDashboard />} />
           <Route path="/verify/:documentId" element={<VerifyDocument />} />
           <Route path="/tax-logic" element={<TaxLogicReference />} />
+          {/* SEO Landing Pages */}
+          <Route path="/free-tax-calculator" element={<FreeCalculator />} />
+          <Route path="/small-company-exemption" element={<SmallCompanyExemption />} />
+          <Route path="/rent-relief-2026" element={<RentRelief2026 />} />
+          <Route path="/pit-paye-calculator" element={<PITPAYECalculator />} />
+          <Route path="/tax-reforms-2026" element={<TaxReforms2026 />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
