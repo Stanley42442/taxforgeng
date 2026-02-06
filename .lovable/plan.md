@@ -1,86 +1,67 @@
 
-# Fix Empty Space in Pricing Feature Table
+# Update Live URLs from .lovable.app to .com
 
-## Issue Identified
+## Summary
 
-The feature comparison table has **empty whitespace on the right side** on both tablet and PC views. This happens because:
+Change all occurrences of `.lovable.app` URLs to `taxforgeng.com` across the documentation page, exports, QR codes, and edge function email templates.
 
-1. The previous fix removed `table-fixed` layout and replaced percentage widths with `min-w-[px]` values
-2. `min-w-[100px]` only sets a minimum - it doesn't tell columns to expand and fill available space
-3. Without `table-fixed`, the table columns only use their minimum widths and don't distribute remaining space
+## Files to Update
 
-## Solution
+### 1. Core Configuration (Source of Truth)
 
-Restore `table-fixed` layout while keeping the minimum width for scrollability:
+**File: `src/lib/exportShared.ts` (Line 96)**
+- Change `liveUrl` from `https://taxforgeng.lovable.app` to `https://taxforgeng.com`
+- This automatically updates all PDF exports and QR codes that reference `COMPANY_INFO.liveUrl`
 
-1. **Add back `table-fixed`** - This ensures columns distribute equally across the full table width
-2. **Use percentage widths for columns** - Ensures proportional distribution
-3. **Keep `min-w-[900px]`** - Maintains horizontal scroll on narrow screens
+### 2. Documentation Page
 
-## Changes Required
+**File: `src/pages/Documentation.tsx`**
+- Line 239: Change `https://taxforgeng.lovable.app` to `https://taxforgeng.com`
+- Line 724: Change `https://taxforgeng.lovable.app` to `https://taxforgeng.com`
 
-### File: `src/pages/Pricing.tsx`
+### 3. Edge Functions (Email Templates)
 
-**Line 517 - Add back table-fixed:**
-```tsx
-// BEFORE
-<table className="w-full min-w-[900px]" style={{ borderCollapse: 'collapse', borderSpacing: 0 }}>
+These have hardcoded URLs that need updating:
 
-// AFTER
-<table className="w-full min-w-[900px] table-fixed" style={{ borderCollapse: 'collapse', borderSpacing: 0 }}>
-```
+| File | Line | Current URL | New URL |
+|------|------|-------------|---------|
+| `send-payment-confirmation/index.ts` | 102 | `taxforgeng.lovable.app/dashboard` | `taxforgeng.com/dashboard` |
+| `send-reminder-email/index.ts` | 79 | `taxforgeng.lovable.app` | `taxforgeng.com` |
+| `send-scheduled-reports/index.ts` | 215, 225 | `taxforgeng.lovable.app/dashboard`, `/settings` | `taxforgeng.com/...` |
+| `send-tier-change-email/index.ts` | 91, 135 | `taxforgeng.lovable.app/dashboard`, `/pricing` | `taxforgeng.com/...` |
+| `send-report-email/index.ts` | 176 | `taxforgeng.lovable.app` | `taxforgeng.com` |
+| `send-welcome-email/index.ts` | 117 | `taxforge.lovable.app/dashboard` | `taxforgeng.com/dashboard` |
+| `send-winback-email/index.ts` | 150 | `taxforge.lovable.app/pricing` | `taxforgeng.com/pricing` |
+| `send-trial-expiry-reminder/index.ts` | 155 | `taxforge.lovable.app/pricing` | `taxforgeng.com/pricing` |
+| `send-trial-final-reminder/index.ts` | 139 | `taxforge.lovable.app/pricing` | `taxforgeng.com/pricing` |
+| `check-reminders/index.ts` | 269 | `taxforge.lovable.app` | `taxforgeng.com` |
 
-**Lines 520-526 - Restore percentage widths to headers:**
-```tsx
-// BEFORE
-<th className="text-left p-4 font-semibold text-foreground min-w-[200px]">Feature</th>
-<th className="text-center p-4 font-semibold text-foreground min-w-[100px]">Individual</th>
-// ... etc
+### 4. Branding Documentation Update
 
-// AFTER  
-<th className="text-left p-4 font-semibold text-foreground w-[28%]">Feature</th>
-<th className="text-center p-4 font-semibold text-foreground w-[12%]">Individual</th>
-<th className="text-center p-4 font-semibold text-foreground w-[12%]">Starter</th>
-<th className="text-center p-4 font-semibold text-foreground w-[12%]">Basic</th>
-<th className="text-center p-4 font-semibold text-foreground w-[12%]">Professional</th>
-<th className="text-center p-4 font-semibold text-primary w-[12%]">Business ✦</th>
-<th className="text-center p-4 font-semibold text-foreground w-[12%]">Corporate</th>
-```
+**File: `docs/BRANDING.md`**
+- Update the example `liveUrl` value from `https://taxforgeng.lovable.app` to `https://taxforgeng.com` in both the code block (line 36) and the reference table (line 50)
 
-**Lines 544-550 - Restore percentage widths to body cells:**
-```tsx
-// BEFORE
-<td className="p-4 text-sm text-foreground">{feature.name}</td>
-<td className="p-4 text-center"><FeatureValue value={feature.free} /></td>
-// ... etc
+## Technical Details
 
-// AFTER
-<td className="p-4 text-sm text-foreground w-[28%]">{feature.name}</td>
-<td className="p-4 text-center w-[12%]"><FeatureValue value={feature.free} /></td>
-<td className="p-4 text-center w-[12%]"><FeatureValue value={feature.starter} /></td>
-<td className="p-4 text-center w-[12%]"><FeatureValue value={feature.basic} /></td>
-<td className="p-4 text-center w-[12%]"><FeatureValue value={feature.professional} /></td>
-<td className="p-4 text-center w-[12%]"><FeatureValue value={feature.business} /></td>
-<td className="p-4 text-center w-[12%]"><FeatureValue value={feature.corporate} /></td>
-```
+### QR Code Impact
+The following files generate QR codes using `COMPANY_INFO.liveUrl`:
+- `src/lib/documentationPdf.ts` (Line 181) - Documentation export QR
+- `src/lib/taxLogicDocumentPdf.ts` (Line 224) - Tax Logic reference QR
 
-## How This Fixes Both Issues
+These will automatically use the new `.com` URL after updating `exportShared.ts`.
 
-| Viewport | Behavior |
-|----------|----------|
-| **Desktop (>900px)** | `table-fixed` + percentage widths = columns fill 100% of container width, no empty space |
-| **Tablet (<900px)** | `min-w-[900px]` forces table to maintain minimum width, `overflow-x-auto` enables horizontal scroll |
+### ICS Calendar Export
+- `src/lib/taxCalendarExport.ts` (Line 49) - Uses `COMPANY_INFO.liveUrl` for calendar event descriptions
+
+This will also automatically update.
 
 ## Summary of Changes
 
-| Line | Change |
-|------|--------|
-| 517 | Add `table-fixed` back to table class |
-| 520-526 | Change header `min-w-[px]` back to `w-[%]` values |
-| 544-550 | Add `w-[%]` to body cells |
+| Category | Files | Changes |
+|----------|-------|---------|
+| Core Config | 1 | Update `liveUrl` constant |
+| Frontend | 1 | 2 hardcoded URLs in Documentation page |
+| Edge Functions | 10 | ~15 hardcoded URLs in email templates |
+| Documentation | 1 | Update BRANDING.md examples |
 
-## Expected Result
-
-- **PC view**: Table fills the full width of the card with no empty space on the right
-- **Tablet view**: Table scrolls horizontally with all columns properly sized
-- **Mobile view**: Same horizontal scroll behavior as tablet
+**Total: 13 files, ~19 URL changes**
