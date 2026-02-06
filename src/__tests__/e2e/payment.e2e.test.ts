@@ -71,7 +71,7 @@ describe('Payment E2E Flow', () => {
         email: 'test@example.com',
         amount: 500000, // 5000 NGN in kobo
         plan: 'basic_monthly',
-        callback_url: 'https://taxforgeng.lovable.app/payment-callback',
+        callback_url: 'https://taxforgeng.com/payment-callback',
       };
 
       expect(paymentData.amount).toBe(500000);
