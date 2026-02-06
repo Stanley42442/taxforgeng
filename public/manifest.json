@@ -1,7 +1,7 @@
 {
   "name": "TaxForge NG",
   "short_name": "TaxForge",
-  "description": "Smart tax advice for Nigerian businesses. Calculate CIT, PIT, VAT and get business structure recommendations.",
+  "description": "Nigeria's leading tax calculator with 2026 rules. Free PIT, PAYE, CIT, VAT calculations. FIRS-compliant. No signup required.",
   "start_url": "/",
   "scope": "/",
   "id": "/",
@@ -43,24 +43,31 @@
   ],
   "shortcuts": [
     {
-      "name": "Calculate Tax",
+      "name": "Free Tax Calculator",
       "short_name": "Calculator",
-      "description": "Open the tax calculator",
-      "url": "/calculator",
+      "description": "Calculate PIT/PAYE with 2026 rules - no login required",
+      "url": "/free-tax-calculator",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Small Company Exemption",
+      "short_name": "SME Check",
+      "description": "Check if you qualify for 0% CIT",
+      "url": "/small-company-exemption",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Rent Relief Calculator",
+      "short_name": "Rent Relief",
+      "description": "Calculate your 20% rent relief",
+      "url": "/rent-relief-2026",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "My Dashboard",
       "short_name": "Dashboard",
-      "description": "View your dashboard",
+      "description": "View your tax dashboard",
       "url": "/dashboard",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Expenses",
-      "short_name": "Expenses",
-      "description": "Manage business expenses",
-      "url": "/expenses",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ],
@@ -70,7 +77,7 @@
       "sizes": "1200x630",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "TaxForge NG Dashboard"
+      "label": "TaxForge NG - Nigerian Tax Calculator Dashboard"
     },
     {
       "src": "/icon-512.png",
@@ -80,7 +87,7 @@
       "label": "TaxForge NG App Icon"
     }
   ],
-  "categories": ["finance", "business", "productivity"],
+  "categories": ["finance", "business", "productivity", "utilities"],
   "lang": "en-NG",
   "dir": "ltr",
   "prefer_related_applications": false,
@@ -88,5 +95,22 @@
   "handle_links": "preferred",
   "launch_handler": {
     "client_mode": "navigate-existing"
-  }
+  },
+  "features": [
+    "Personal Income Tax (PIT) Calculator",
+    "PAYE Calculator for employees",
+    "Company Income Tax (CIT) Calculator",
+    "VAT Calculator (7.5%)",
+    "Withholding Tax (WHT) Calculator",
+    "Small Company Exemption Checker",
+    "Rent Relief Calculator (20% up to ₦500,000)",
+    "2026 Nigeria Tax Act compliance",
+    "PDF Report Generation",
+    "Payroll Calculator",
+    "Expense Tracking with OCR",
+    "Tax Calendar with Reminders",
+    "Multi-year Projections",
+    "Offline calculations support"
+  ],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7"
 }
