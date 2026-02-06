@@ -1,38 +1,45 @@
 
-# Update Live URLs from .lovable.app to .com
+# Fix Remaining Old URL Instance
 
-## ✅ COMPLETED
+## Issue Identified
 
-All URLs have been updated from `.lovable.app` to `taxforgeng.com`.
+The screenshot shows a PDF with the old URL `https://taxforgeng.lovable.app`. After investigation:
 
-## Files Updated
+1. **The main code is already updated correctly** - `src/lib/exportShared.ts` now has `liveUrl: 'https://taxforgeng.com'`
+2. **The PDF in your screenshot was generated before the deployment** - You need to regenerate the PDF to see the new URL
+3. **One remaining file still has the old URL** - A test file that needs updating
 
-### 1. Core Configuration (Source of Truth)
-- ✅ `src/lib/exportShared.ts` - Updated `liveUrl` to `https://taxforgeng.com`
+## Remaining Change
 
-### 2. Documentation Page
-- ✅ `src/pages/Documentation.tsx` (Line 239) - Visit Live Site button
-- ✅ `src/pages/Documentation.tsx` (Line 724) - Visit TaxForge NG link
+### File: `src/__tests__/e2e/payment.e2e.test.ts` (Line 74)
 
-### 3. Edge Functions (Email Templates)
-- ✅ `send-payment-confirmation/index.ts` - Dashboard link
-- ✅ `send-reminder-email/index.ts` - Go to Dashboard link
-- ✅ `send-scheduled-reports/index.ts` - Dashboard and Settings links
-- ✅ `send-tier-change-email/index.ts` - Dashboard and Pricing links
-- ✅ `send-report-email/index.ts` - Visit TaxForge NG link
-- ✅ `send-welcome-email/index.ts` - Dashboard link
-- ✅ `send-winback-email/index.ts` - Pricing link
-- ✅ `send-trial-expiry-reminder/index.ts` - Pricing link
-- ✅ `send-trial-final-reminder/index.ts` - Pricing link
-- ✅ `check-reminders/index.ts` - App URL constant
+Update the test callback URL:
 
-### 4. Branding Documentation
-- ✅ `docs/BRANDING.md` - Updated example `liveUrl` value in code blocks and reference table
+```typescript
+// BEFORE
+callback_url: 'https://taxforgeng.lovable.app/payment-callback',
 
-## Automatic Updates (via COMPANY_INFO.liveUrl)
-The following files automatically use the new `.com` URL:
-- `src/lib/documentationPdf.ts` - Documentation export QR code
-- `src/lib/taxLogicDocumentPdf.ts` - Tax Logic reference QR code
-- `src/lib/taxCalendarExport.ts` - ICS calendar export
+// AFTER
+callback_url: 'https://taxforgeng.com/payment-callback',
+```
 
-**Total: 13 files, 18 URL changes completed**
+## Verification Steps
+
+After the fix is deployed:
+
+1. Go to the Documentation page (`/documentation`)
+2. Click "Export PDF" to generate a new PDF
+3. The new PDF should show `Live URL: https://taxforgeng.com`
+4. The QR code will also link to `https://taxforgeng.com`
+
+## Summary
+
+| Category | Status |
+|----------|--------|
+| Core Config (`exportShared.ts`) | Already Fixed |
+| Documentation Page | Already Fixed |
+| Edge Functions (10 files) | Already Fixed |
+| Branding Docs | Already Fixed |
+| Test file (`payment.e2e.test.ts`) | Needs Fix |
+
+The PDF you're viewing was generated before the deployment. Regenerating it will show the correct `.com` URL.
