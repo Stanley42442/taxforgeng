@@ -173,7 +173,7 @@ const handler = async (req: Request): Promise<Response> => {
                     </p>
                   </td>
                   <td style="text-align: right;">
-                    <a href="https://taxforgeng.lovable.app" style="color: #008751; text-decoration: none; font-size: 12px; font-weight: 500;">
+                    <a href="https://taxforgeng.com" style="color: #008751; text-decoration: none; font-size: 12px; font-weight: 500;">
                       Visit TaxForge NG →
                     </a>
                   </td>

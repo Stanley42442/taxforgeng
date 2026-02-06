@@ -212,7 +212,7 @@ const handler = async (req: Request): Promise<Response> => {
                   </div>
 
                   <div style="text-align: center;">
-                    <a href="https://taxforgeng.lovable.app/dashboard" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
+                    <a href="https://taxforgeng.com/dashboard" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
                       View Full Dashboard
                     </a>
                   </div>
@@ -222,7 +222,7 @@ const handler = async (req: Request): Promise<Response> => {
                   <p style="color: #9ca3af; font-size: 12px; margin: 0;">
                     © ${new Date().getFullYear()} TaxForge NG | Operated by Gillespie Benjamin Mclee | Educational tool only
                     <br>
-                    <a href="https://taxforgeng.lovable.app/settings" style="color: #10b981;">Manage preferences</a>
+                    <a href="https://taxforgeng.com/settings" style="color: #10b981;">Manage preferences</a>
                   </p>
                 </div>
               </div>

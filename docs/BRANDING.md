@@ -33,7 +33,7 @@ export const COMPANY_INFO = {
   location: 'Port Harcourt, Rivers State, Nigeria',
   email: 'support@taxforgeng.com',
   website: 'www.taxforgeng.com',
-  liveUrl: 'https://taxforgeng.lovable.app',
+  liveUrl: 'https://taxforgeng.com',
 } as const;
 ```
 
@@ -47,7 +47,7 @@ export const COMPANY_INFO = {
 | Location | Port Harcourt, Rivers State, Nigeria | `src/lib/exportShared.ts:93` |
 | Support Email | support@taxforgeng.com | `src/lib/exportShared.ts:94` |
 | Website | www.taxforgeng.com | `src/lib/exportShared.ts:95` |
-| Live URL | https://taxforgeng.lovable.app | `src/lib/exportShared.ts:96` |
+| Live URL | https://taxforgeng.com | `src/lib/exportShared.ts:96` |
 
 ---
 
@@ -168,7 +168,7 @@ export const COMPANY_INFO = {
   location: 'Lagos, Nigeria',                     // ← UPDATE if needed
   email: 'support@taxforgeng.com',
   website: 'www.taxforgeng.com',
-  liveUrl: 'https://taxforgeng.lovable.app',
+  liveUrl: 'https://taxforgeng.com',
 } as const;
 ```
 

@@ -88,7 +88,7 @@ const handler = async (req: Request): Promise<Response> => {
           <p>Start exploring your new capabilities right away!</p>
           
           <div style="text-align: center; margin: 30px 0;">
-            <a href="https://taxforgeng.lovable.app/dashboard" style="background: linear-gradient(135deg, #059669 0%, #10B981 100%); color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">Go to Dashboard</a>
+            <a href="https://taxforgeng.com/dashboard" style="background: linear-gradient(135deg, #059669 0%, #10B981 100%); color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">Go to Dashboard</a>
           </div>
           
           <p style="color: #6b7280; font-size: 14px;">Thank you for choosing TaxForge NG for your tax management needs!</p>
@@ -132,7 +132,7 @@ const handler = async (req: Request): Promise<Response> => {
           <p>Ready to unlock more features? Upgrade anytime to access premium capabilities.</p>
           
           <div style="text-align: center; margin: 30px 0;">
-            <a href="https://taxforgeng.lovable.app/pricing" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">View Plans</a>
+            <a href="https://taxforgeng.com/pricing" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">View Plans</a>
           </div>
           
           <p style="color: #6b7280; font-size: 14px;">Thank you for being a TaxForge NG user!</p>
