@@ -152,7 +152,7 @@ const handler = async (req: Request): Promise<Response> => {
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 30px 0;">
                 <tr>
                   <td style="text-align: center;">
-                    <a href="https://taxforge.lovable.app/pricing" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; text-decoration: none; padding: 18px 48px; border-radius: 8px; font-size: 18px; font-weight: 700; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);">
+                    <a href="https://taxforgeng.com/pricing" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; text-decoration: none; padding: 18px 48px; border-radius: 8px; font-size: 18px; font-weight: 700; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);">
                       Upgrade Now →
                     </a>
                   </td>

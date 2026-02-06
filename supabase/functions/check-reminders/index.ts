@@ -266,7 +266,7 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const appUrl = "https://taxforge.lovable.app";
+    const appUrl = "https://taxforgeng.com";
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 

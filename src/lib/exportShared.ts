@@ -93,7 +93,7 @@ export const COMPANY_INFO = {
   location: 'Port Harcourt, Rivers State, Nigeria',
   email: 'support@taxforgeng.com',
   website: 'www.taxforgeng.com',
-  liveUrl: 'https://taxforgeng.lovable.app',
+  liveUrl: 'https://taxforgeng.com',
 } as const;
 
 /**

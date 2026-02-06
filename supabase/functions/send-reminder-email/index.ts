@@ -76,7 +76,7 @@ const handler = async (req: Request): Promise<Response> => {
                 Don't forget to file your tax returns on time to avoid penalties and interest charges.
               </p>
               
-              <a href="https://taxforgeng.lovable.app" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
+              <a href="https://taxforgeng.com" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
                 Go to Dashboard
               </a>
             </div>

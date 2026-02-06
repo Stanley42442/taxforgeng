@@ -1,67 +1,38 @@
 
 # Update Live URLs from .lovable.app to .com
 
-## Summary
+## ✅ COMPLETED
 
-Change all occurrences of `.lovable.app` URLs to `taxforgeng.com` across the documentation page, exports, QR codes, and edge function email templates.
+All URLs have been updated from `.lovable.app` to `taxforgeng.com`.
 
-## Files to Update
+## Files Updated
 
 ### 1. Core Configuration (Source of Truth)
-
-**File: `src/lib/exportShared.ts` (Line 96)**
-- Change `liveUrl` from `https://taxforgeng.lovable.app` to `https://taxforgeng.com`
-- This automatically updates all PDF exports and QR codes that reference `COMPANY_INFO.liveUrl`
+- ✅ `src/lib/exportShared.ts` - Updated `liveUrl` to `https://taxforgeng.com`
 
 ### 2. Documentation Page
-
-**File: `src/pages/Documentation.tsx`**
-- Line 239: Change `https://taxforgeng.lovable.app` to `https://taxforgeng.com`
-- Line 724: Change `https://taxforgeng.lovable.app` to `https://taxforgeng.com`
+- ✅ `src/pages/Documentation.tsx` (Line 239) - Visit Live Site button
+- ✅ `src/pages/Documentation.tsx` (Line 724) - Visit TaxForge NG link
 
 ### 3. Edge Functions (Email Templates)
+- ✅ `send-payment-confirmation/index.ts` - Dashboard link
+- ✅ `send-reminder-email/index.ts` - Go to Dashboard link
+- ✅ `send-scheduled-reports/index.ts` - Dashboard and Settings links
+- ✅ `send-tier-change-email/index.ts` - Dashboard and Pricing links
+- ✅ `send-report-email/index.ts` - Visit TaxForge NG link
+- ✅ `send-welcome-email/index.ts` - Dashboard link
+- ✅ `send-winback-email/index.ts` - Pricing link
+- ✅ `send-trial-expiry-reminder/index.ts` - Pricing link
+- ✅ `send-trial-final-reminder/index.ts` - Pricing link
+- ✅ `check-reminders/index.ts` - App URL constant
 
-These have hardcoded URLs that need updating:
+### 4. Branding Documentation
+- ✅ `docs/BRANDING.md` - Updated example `liveUrl` value in code blocks and reference table
 
-| File | Line | Current URL | New URL |
-|------|------|-------------|---------|
-| `send-payment-confirmation/index.ts` | 102 | `taxforgeng.lovable.app/dashboard` | `taxforgeng.com/dashboard` |
-| `send-reminder-email/index.ts` | 79 | `taxforgeng.lovable.app` | `taxforgeng.com` |
-| `send-scheduled-reports/index.ts` | 215, 225 | `taxforgeng.lovable.app/dashboard`, `/settings` | `taxforgeng.com/...` |
-| `send-tier-change-email/index.ts` | 91, 135 | `taxforgeng.lovable.app/dashboard`, `/pricing` | `taxforgeng.com/...` |
-| `send-report-email/index.ts` | 176 | `taxforgeng.lovable.app` | `taxforgeng.com` |
-| `send-welcome-email/index.ts` | 117 | `taxforge.lovable.app/dashboard` | `taxforgeng.com/dashboard` |
-| `send-winback-email/index.ts` | 150 | `taxforge.lovable.app/pricing` | `taxforgeng.com/pricing` |
-| `send-trial-expiry-reminder/index.ts` | 155 | `taxforge.lovable.app/pricing` | `taxforgeng.com/pricing` |
-| `send-trial-final-reminder/index.ts` | 139 | `taxforge.lovable.app/pricing` | `taxforgeng.com/pricing` |
-| `check-reminders/index.ts` | 269 | `taxforge.lovable.app` | `taxforgeng.com` |
+## Automatic Updates (via COMPANY_INFO.liveUrl)
+The following files automatically use the new `.com` URL:
+- `src/lib/documentationPdf.ts` - Documentation export QR code
+- `src/lib/taxLogicDocumentPdf.ts` - Tax Logic reference QR code
+- `src/lib/taxCalendarExport.ts` - ICS calendar export
 
-### 4. Branding Documentation Update
-
-**File: `docs/BRANDING.md`**
-- Update the example `liveUrl` value from `https://taxforgeng.lovable.app` to `https://taxforgeng.com` in both the code block (line 36) and the reference table (line 50)
-
-## Technical Details
-
-### QR Code Impact
-The following files generate QR codes using `COMPANY_INFO.liveUrl`:
-- `src/lib/documentationPdf.ts` (Line 181) - Documentation export QR
-- `src/lib/taxLogicDocumentPdf.ts` (Line 224) - Tax Logic reference QR
-
-These will automatically use the new `.com` URL after updating `exportShared.ts`.
-
-### ICS Calendar Export
-- `src/lib/taxCalendarExport.ts` (Line 49) - Uses `COMPANY_INFO.liveUrl` for calendar event descriptions
-
-This will also automatically update.
-
-## Summary of Changes
-
-| Category | Files | Changes |
-|----------|-------|---------|
-| Core Config | 1 | Update `liveUrl` constant |
-| Frontend | 1 | 2 hardcoded URLs in Documentation page |
-| Edge Functions | 10 | ~15 hardcoded URLs in email templates |
-| Documentation | 1 | Update BRANDING.md examples |
-
-**Total: 13 files, ~19 URL changes**
+**Total: 13 files, 18 URL changes completed**

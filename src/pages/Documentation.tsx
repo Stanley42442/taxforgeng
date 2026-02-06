@@ -236,7 +236,7 @@ const Documentation = () => {
               {isExportingTaxLogic ? 'Generating...' : 'Tax Logic Reference'}
             </Button>
             <Button variant="outline" size="lg" asChild>
-              <a href="https://taxforgeng.lovable.app" target="_blank" rel="noopener noreferrer">
+              <a href="https://taxforgeng.com" target="_blank" rel="noopener noreferrer">
                 <Globe className="h-4 w-4 mr-2" />
                 Visit Live Site
               </a>
@@ -721,7 +721,7 @@ const Documentation = () => {
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Button asChild>
-                  <a href="https://taxforgeng.lovable.app" target="_blank" rel="noopener noreferrer">
+                  <a href="https://taxforgeng.com" target="_blank" rel="noopener noreferrer">
                     Visit TaxForge NG
                   </a>
                 </Button>

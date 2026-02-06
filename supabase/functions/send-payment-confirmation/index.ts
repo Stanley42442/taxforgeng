@@ -99,7 +99,7 @@ serve(async (req) => {
     <p>Your ${tierName} subscription is now active. You can access all premium features immediately.</p>
     
     <div style="text-align: center; margin: 30px 0;">
-      <a href="https://taxforgeng.lovable.app/dashboard" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); color: white; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: 600;">Go to Dashboard</a>
+      <a href="https://taxforgeng.com/dashboard" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); color: white; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: 600;">Go to Dashboard</a>
     </div>
     
     <p style="color: #64748b; font-size: 14px;">
