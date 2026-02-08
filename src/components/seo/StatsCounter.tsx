@@ -22,9 +22,9 @@ const iconMap = {
 };
 
 const defaultStats: StatItem[] = [
-  { icon: 'calculator', value: 12847, suffix: '+', label: 'Calculations this month' },
-  { icon: 'users', value: 1200, suffix: '+', label: 'Businesses trust us' },
-  { icon: 'file', value: 5000, suffix: '+', label: 'Reports generated' },
+  { icon: 'calculator', value: 6, suffix: '', label: 'Tax types covered' },
+  { icon: 'file', value: 10, suffix: '+', label: 'Free tools available' },
+  { icon: 'trend', value: 2026, suffix: '', label: 'Tax rules version' },
 ];
 
 /**

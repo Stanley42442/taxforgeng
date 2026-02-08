@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { MessageCircle, Linkedin, Link2, Share2 } from "lucide-react";
+import { MessageCircle, Linkedin, Link2, Share2, Twitter } from "lucide-react";
 
 interface SocialShareButtonsProps {
   title: string;
@@ -35,6 +35,14 @@ export const SocialShareButtons = ({
   const handleLinkedInShare = () => {
     window.open(
       `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
+  };
+
+  const handleTwitterShare = () => {
+    window.open(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodedUrl}`,
       '_blank',
       'noopener,noreferrer'
     );
@@ -96,6 +104,18 @@ export const SocialShareButtons = ({
       >
         <Linkedin className="h-4 w-4" />
         <span className="hidden sm:inline">LinkedIn</span>
+      </Button>
+
+      {/* X/Twitter - For professional discussions */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleTwitterShare}
+        className="gap-1.5 hover:bg-foreground/10 hover:text-foreground hover:border-foreground/30"
+        title="Share on X"
+      >
+        <Twitter className="h-4 w-4" />
+        <span className="hidden sm:inline">X</span>
       </Button>
 
       {/* Copy Link */}

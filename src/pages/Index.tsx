@@ -226,7 +226,7 @@ const Index = () => {
             Ready to Optimize Your Taxes?
           </h2>
           <p className="mx-auto mb-10 max-w-xl text-primary-foreground/90 text-lg">
-            Join thousands of Nigerian businesses using TaxForge to stay compliant and save money.
+            Start calculating your taxes with FIRS-compliant 2026 rules today.
           </p>
           <Link to="/advisory">
             <Button variant="glowAccent" size="xl" className="shadow-2xl">
@@ -238,43 +238,133 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="glass-dark py-10 border-t border-border/30 mt-auto relative z-10">
+      <footer className="glass-dark py-12 border-t border-border/30 mt-auto relative z-10">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary shadow-lg glow-primary">
-                <Calculator className="h-5 w-5 text-primary-foreground" />
+          <div className="grid gap-8 md:grid-cols-4 lg:grid-cols-5">
+            {/* Brand Column */}
+            <div className="md:col-span-2 lg:col-span-1">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary shadow-lg glow-primary">
+                  <Calculator className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <span className="font-bold text-lg text-foreground">TaxForge NG</span>
               </div>
-              <span className="font-bold text-lg text-foreground">TaxForge NG</span>
+              <p className="text-sm text-muted-foreground mb-4">
+                Free Nigerian tax calculator with FIRS-compliant 2026 rules.
+              </p>
+              <div className="text-xs text-muted-foreground space-y-1">
+                <p>Port Harcourt, Rivers State, Nigeria</p>
+                <p>hello@taxforgeng.com</p>
+              </div>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm">
-              {[
-                { to: "/pricing", label: "Pricing" },
-                { to: "/advisory", label: "Get Advice" },
-                { to: "/calculator", label: "Calculator" },
-                { to: "/learn", label: "Learn" },
-                { to: "/tax-calendar", label: "Tax Calendar" },
-                { to: "/success-stories", label: "Success Stories" },
-                { to: "/referrals", label: "Referrals" },
-                { to: "/roadmap", label: "Roadmap" },
-                { to: "/documentation", label: "Documentation" },
-                { to: "/terms#terms", label: "Terms & Conditions" },
-                { to: "/terms#privacy", label: "Privacy Policy" },
-                { to: "/terms#refund", label: "Refund Policy" },
-                { to: "/auth", label: "Sign In" },
-              ].map((link) => (
-                <Link 
-                  key={link.to}
-                  to={link.to} 
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {link.label}
+
+            {/* Navigation Links */}
+            <div>
+              <h4 className="font-semibold text-foreground mb-4">Platform</h4>
+              <div className="flex flex-col gap-2 text-sm">
+                {[
+                  { to: "/advisory", label: "Get Advice" },
+                  { to: "/calculator", label: "Calculator" },
+                  { to: "/pricing", label: "Pricing" },
+                  { to: "/learn", label: "Learn" },
+                  { to: "/tax-calendar", label: "Tax Calendar" },
+                ].map((link) => (
+                  <Link 
+                    key={link.to}
+                    to={link.to} 
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Free Tools Links */}
+            <div>
+              <h4 className="font-semibold text-foreground mb-4">Free Tools</h4>
+              <div className="flex flex-col gap-2 text-sm">
+                {[
+                  { to: "/free-tax-calculator", label: "Tax Calculator" },
+                  { to: "/small-company-exemption", label: "SME Exemption" },
+                  { to: "/rent-relief-2026", label: "Rent Relief" },
+                  { to: "/pit-paye-calculator", label: "PIT/PAYE" },
+                  { to: "/vat-calculator", label: "VAT Calculator" },
+                ].map((link) => (
+                  <Link 
+                    key={link.to}
+                    to={link.to} 
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* More Tools */}
+            <div>
+              <h4 className="font-semibold text-foreground mb-4">More Tools</h4>
+              <div className="flex flex-col gap-2 text-sm">
+                {[
+                  { to: "/cit-calculator", label: "CIT Calculator" },
+                  { to: "/wht-calculator", label: "WHT Calculator" },
+                  { to: "/tax-reports", label: "Tax Reports" },
+                  { to: "/tax-reforms-2026", label: "2026 Reforms" },
+                  { to: "/port-harcourt-tax-guide", label: "PH Tax Guide" },
+                ].map((link) => (
+                  <Link 
+                    key={link.to}
+                    to={link.to} 
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Company Links */}
+            <div>
+              <h4 className="font-semibold text-foreground mb-4">Company</h4>
+              <div className="flex flex-col gap-2 text-sm">
+                {[
+                  { to: "/success-stories", label: "Success Stories" },
+                  { to: "/referrals", label: "Referrals" },
+                  { to: "/roadmap", label: "Roadmap" },
+                  { to: "/documentation", label: "Documentation" },
+                  { to: "/auth", label: "Sign In" },
+                ].map((link) => (
+                  <Link 
+                    key={link.to}
+                    to={link.to} 
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="mt-10 pt-6 border-t border-border/30">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
+                <Link to="/terms#terms" className="text-muted-foreground hover:text-primary transition-colors">
+                  Terms & Conditions
                 </Link>
-              ))}
+                <Link to="/terms#privacy" className="text-muted-foreground hover:text-primary transition-colors">
+                  Privacy Policy
+                </Link>
+                <Link to="/terms#refund" className="text-muted-foreground hover:text-primary transition-colors">
+                  Refund Policy
+                </Link>
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                © 2026 TaxForge NG. Educational tool only — not official tax advice. Operated by Gillespie / OptiSolve Labs, Port Harcourt.
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground text-center">
-              © 2026 TaxForge NG. For educational purposes.
-            </p>
           </div>
         </div>
       </footer>

@@ -5,13 +5,17 @@ import {
   Home, 
   Users, 
   FileText,
+  Percent,
+  Receipt,
+  MapPin,
+  BarChart3,
   ArrowRight 
 } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 /**
  * Free Tax Tools Section
- * Links to SEO landing pages from homepage for internal PageRank flow
+ * Links to all 10 SEO landing pages from homepage for internal PageRank flow
  * Improves SEO juice distribution and user discoverability
  */
 export const FreeTaxToolsSection = () => {
@@ -53,6 +57,41 @@ export const FreeTaxToolsSection = () => {
       description: "Everything new in Nigerian tax",
       gradient: "from-warning to-warning/70",
     },
+    {
+      to: "/cit-calculator",
+      icon: Building2,
+      title: "CIT Calculator",
+      description: "Company income tax rates",
+      gradient: "from-primary/80 to-success/70",
+    },
+    {
+      to: "/vat-calculator",
+      icon: Percent,
+      title: "VAT Calculator",
+      description: "7.5% VAT made simple",
+      gradient: "from-accent/80 to-primary/70",
+    },
+    {
+      to: "/wht-calculator",
+      icon: Receipt,
+      title: "WHT Calculator",
+      description: "Withholding tax rates guide",
+      gradient: "from-info/80 to-accent/70",
+    },
+    {
+      to: "/tax-reports",
+      icon: BarChart3,
+      title: "Tax Reports",
+      description: "Professional PDF exports",
+      gradient: "from-success/80 to-info/70",
+    },
+    {
+      to: "/port-harcourt-tax-guide",
+      icon: MapPin,
+      title: "Port Harcourt Tax Guide",
+      description: "Local Rivers State tax info",
+      gradient: "from-warning/80 to-accent/70",
+    },
   ];
 
   return (
@@ -79,7 +118,7 @@ export const FreeTaxToolsSection = () => {
               className={`group relative rounded-xl glass-frosted p-5 transition-all duration-500 hover-lift hover-glow-primary ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
-              style={{ transitionDelay: isVisible ? `${index * 80}ms` : '0ms' }}
+              style={{ transitionDelay: isVisible ? `${index * 50}ms` : '0ms' }}
             >
               <div 
                 className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br ${tool.gradient} text-white shadow-lg transition-transform group-hover:scale-110`}
