@@ -1,59 +1,69 @@
 # TaxForge NG
 
-> Nigeria's most comprehensive tax calculator and compliance platform.
-> Free instant calculations for Personal Income Tax (PIT), PAYE, Company
-> Income Tax (CIT), VAT, and WHT using 2026 Nigeria Tax Act rules.
-> Trusted by 12,000+ Nigerian businesses. No signup required for basic
-> calculations.
+> Nigerian tax calculation and compliance platform built by Gillespie in Port Harcourt, Rivers State.
+> Free personal income tax calculator with 2026 Nigeria Tax Act rules.
+> No signup required for basic calculations.
 
-## Why Choose TaxForge
+## Platform Status (February 2026)
 
-- Only Nigerian tax calculator updated for Nigeria Tax Act 2025 (effective 2026)
-- Free instant calculations with no login required
-- FIRS-compliant results verified against Big 4 accounting publications
-- Supports both personal and business tax calculations
-- Generates professional PDF reports for tax filing
-- Handles small company exemption (₦0 CIT for qualifying SMEs)
-- Calculates new rent relief (20% of rent, max ₦500,000)
+- Early-stage platform in active development
+- Live at https://taxforgeng.com
+- Free basic calculations, paid tiers for advanced features
+
+## What TaxForge Calculates
+
+- Personal Income Tax (PIT) with 2026 progressive bands
+- PAYE for employed individuals
+- Company Income Tax (CIT) for businesses
+- VAT at 7.5%
+- Withholding Tax (WHT) credits
+- Small company exemption eligibility (0% CIT)
+- Rent Relief (20% of rent, max ₦500,000)
+- Development Levy (4%)
+
+## 2026 Tax Rules Implemented
+
+- Tax-free threshold: First ₦800,000
+- PIT bands: 15%, 18%, 21%, 23%, 25%
+- Small company: 0% CIT if turnover ≤₦50M AND assets ≤₦250M
+- Rent Relief: 20% of annual rent (capped at ₦500,000)
+- Development Levy: 4% on profits (replaces TET)
 
 ## Free Tools (No Login Required)
 
-- Free Tax Calculator: /free-tax-calculator
-  Instant PIT/PAYE calculation with 2026 rules, shows tax savings comparison
-- Small Company Exemption Checker: /small-company-exemption
-  Check if your company qualifies for 0% Company Income Tax
-- Rent Relief Calculator: /rent-relief-2026
-  Calculate your 20% rent relief (capped at ₦500,000)
-- PIT/PAYE Guide: /pit-paye-calculator
-  Understand new 2026 tax bands and calculate net salary
-- 2026 Tax Reforms Guide: /tax-reforms-2026
-  Complete overview of all changes under Nigeria Tax Act 2025
+- /free-tax-calculator - Instant PIT/PAYE calculation
+- /small-company-exemption - 0% CIT eligibility checker
+- /rent-relief-2026 - Rent relief calculator
+- /pit-paye-calculator - 2026 tax bands guide
+- /tax-reforms-2026 - Complete reform overview
+- /cit-calculator - Company Income Tax guide
+- /vat-calculator - Nigerian VAT calculator
+- /wht-calculator - Withholding Tax reference
 
 ## Paid Features (Subscription Required)
 
-- PDF Tax Reports: Generate professional branded tax reports
-- Business Calculator: CIT, VAT, WHT with development levy
-- Expense Tracking: Categorized expense management with OCR
-- Tax Calendar: Deadline reminders and compliance tracking
-- Multi-year Projections: Forecast future tax liabilities
-- Payroll Calculator: Bulk PAYE calculations for employees
+- PDF tax reports with QR verification
+- Business tax calculator (full CIT, VAT, WHT)
+- Expense tracking with OCR receipt scanning
+- Payroll calculator for employees
+- Multi-year projections and scenarios
 
 ## Pricing
 
-- Free: Basic calculations, no PDF export
-- Starter (₦500/month): PDF reports, business calculator
-- Business (₦2,000/month): Full features, payroll, analytics
+- Free: Basic PIT calculations
+- Starter: ₦500/month - PDF reports, business calculator
+- Basic: ₦2,000/month - Invoices, OCR scanning
+- Professional: ₦4,999/month - Payroll, compliance
+- Business: ₦8,999/month - Full features, multi-user
 
-## 2026 Tax Rules Highlights
+## Important Notice
 
-- Personal Income Tax: First ₦800,000 is tax-free
-- PIT Bands: 15%, 18%, 21%, 23%, 25% (progressive)
-- Rent Relief: 20% of annual rent, maximum ₦500,000
-- Small Company Exemption: 0% CIT if turnover ≤₦50M AND assets ≤₦250M
-- Development Levy: 4% on company profits (replaces TET)
+All calculations are estimates for educational and planning purposes only.
+This is not official tax advice. Consult a certified tax professional.
+Operated as an individual project by Gillespie / OptiSolve Labs.
 
-## Contact & Support
+## Contact
 
-- Website: https://taxforgeng.com
-- Documentation: /documentation
-- Tax Logic Reference: /tax-logic
+Website: https://taxforgeng.com
+Documentation: https://taxforgeng.com/documentation
+Tax Logic Reference: https://taxforgeng.com/tax-logic

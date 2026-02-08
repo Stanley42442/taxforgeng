@@ -5,7 +5,8 @@ import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
 import { EligibilityChecker } from '@/components/seo/EligibilityChecker';
 import { ComparisonTable, CIT_COMPARISON_ROWS } from '@/components/seo/ComparisonTable';
-import { CheckCircle2, AlertTriangle, Building2, FileText, ArrowRight } from 'lucide-react';
+import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { CheckCircle2, AlertTriangle, Building2, FileText, ArrowRight, Landmark, Car, Monitor, Factory } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/taxCalculations';
 
@@ -244,16 +245,90 @@ const SmallCompanyExemption = () => {
                 </div>
               </section>
 
+              {/* What Counts as Fixed Assets */}
+              <section className="mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  What Counts as Fixed Assets?
+                </h2>
+                <p className="text-center text-muted-foreground mb-6 max-w-2xl mx-auto">
+                  Understanding what counts toward the ₦250 million fixed asset limit is critical. 
+                  Here's a comprehensive checklist of assets to include:
+                </p>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  {[
+                    { icon: Landmark, title: 'Land & Buildings', items: ['Factory premises', 'Warehouse space', 'Office buildings', 'Retail shops'] },
+                    { icon: Factory, title: 'Plant & Machinery', items: ['Manufacturing equipment', 'Industrial machines', 'Production lines', 'Heavy equipment'] },
+                    { icon: Car, title: 'Motor Vehicles', items: ['Delivery trucks', 'Company cars', 'Motorcycles', 'Forklifts'] },
+                    { icon: Monitor, title: 'Office Equipment', items: ['Computers & laptops', 'Furniture & fixtures', 'Air conditioners', 'Generators'] },
+                  ].map((category, index) => (
+                    <div key={index} className="glass-frosted rounded-xl p-5">
+                      <div className="flex items-center gap-2 mb-3">
+                        <category.icon className="h-5 w-5 text-primary" />
+                        <h3 className="font-semibold text-foreground">{category.title}</h3>
+                      </div>
+                      <ul className="space-y-1">
+                        {category.items.map((item, i) => (
+                          <li key={i} className="text-sm text-muted-foreground flex items-center gap-2">
+                            <CheckCircle2 className="h-3 w-3 text-success" />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 p-4 rounded-xl bg-muted/50 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Pro Tip:</strong> Fixed assets are valued at cost or revalued amounts on your balance sheet. 
+                    Depreciation is already factored in, so use the net book value for your calculations.
+                  </p>
+                </div>
+              </section>
+
+              {/* Filing Requirements */}
+              <section className="mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  How to Claim the 0% CIT Exemption
+                </h2>
+                <div className="glass-frosted rounded-2xl p-6 md:p-8">
+                  <p className="text-muted-foreground mb-6 text-center">
+                    Even though you pay 0% CIT, you must still file returns with FIRS to claim the exemption. 
+                    Here's what you need to do:
+                  </p>
+                  <div className="space-y-4">
+                    {[
+                      { step: 1, title: 'Prepare Audited Accounts', desc: 'Have your annual accounts audited by a registered accountant showing turnover ≤₦50M and fixed assets ≤₦250M.' },
+                      { step: 2, title: 'Complete Self-Assessment Form', desc: 'Fill out FIRS Form C for Company Income Tax, declaring your small company status.' },
+                      { step: 3, title: 'Submit to FIRS', desc: 'File electronically via TaxPro Max portal or submit physically at your local FIRS office within 6 months of year-end.' },
+                      { step: 4, title: 'Keep Records', desc: 'Maintain supporting documents for 6 years - FIRS may audit your small company claim at any time.' },
+                    ].map((item) => (
+                      <div key={item.step} className="flex items-start gap-4 p-4 glass rounded-xl">
+                        <div className="h-10 w-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold shrink-0">
+                          {item.step}
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-foreground">{item.title}</h3>
+                          <p className="text-sm text-muted-foreground">{item.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
               {/* Final CTA */}
               <CTASection
                 variant="gradient"
                 headline="Ready to Calculate Your Company Tax?"
                 subtext="Get a complete tax breakdown with all deductions, exemptions, and a professional PDF report."
-                primaryText="Calculate Business Tax"
+                primaryText="Check Your Eligibility Free"
                 primaryLink="/calculator"
-                secondaryText="View Documentation"
-                secondaryLink="/documentation"
+                secondaryText="View CIT Calculator"
+                secondaryLink="/cit-calculator"
               />
+
+              {/* Disclaimer */}
+              <SEODisclaimer />
             </div>
           </div>
         </main>

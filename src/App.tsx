@@ -101,6 +101,11 @@ const SmallCompanyExemption = lazy(() => import("./pages/seo/SmallCompanyExempti
 const RentRelief2026 = lazy(() => import("./pages/seo/RentRelief2026"));
 const PITPAYECalculator = lazy(() => import("./pages/seo/PITPAYECalculator"));
 const TaxReforms2026 = lazy(() => import("./pages/seo/TaxReforms2026"));
+const CITCalculator = lazy(() => import("./pages/seo/CITCalculator"));
+const VATCalculator = lazy(() => import("./pages/seo/VATCalculator"));
+const WHTCalculator = lazy(() => import("./pages/seo/WHTCalculator"));
+const TaxReports = lazy(() => import("./pages/seo/TaxReports"));
+const PortHarcourtGuide = lazy(() => import("./pages/seo/PortHarcourtGuide"));
 
 // Lazy load TaxAssistant (heavy component with AI chat)
 const TaxAssistant = lazy(() => import("./components/TaxAssistant").then(m => ({ default: m.TaxAssistant })));
@@ -207,6 +212,11 @@ const AnimatedRoutes = () => {
           <Route path="/rent-relief-2026" element={<RentRelief2026 />} />
           <Route path="/pit-paye-calculator" element={<PITPAYECalculator />} />
           <Route path="/tax-reforms-2026" element={<TaxReforms2026 />} />
+          <Route path="/cit-calculator" element={<CITCalculator />} />
+          <Route path="/vat-calculator" element={<VATCalculator />} />
+          <Route path="/wht-calculator" element={<WHTCalculator />} />
+          <Route path="/tax-reports" element={<TaxReports />} />
+          <Route path="/port-harcourt-tax-guide" element={<PortHarcourtGuide />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>

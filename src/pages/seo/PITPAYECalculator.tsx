@@ -5,7 +5,8 @@ import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
 import { QuickTaxCalculator } from '@/components/seo/QuickTaxCalculator';
 import { ComparisonTable, PIT_COMPARISON_ROWS } from '@/components/seo/ComparisonTable';
-import { TrendingDown, CheckCircle2, Wallet, ArrowRight } from 'lucide-react';
+import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { TrendingDown, CheckCircle2, Wallet, ArrowRight, Building2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/taxCalculations';
 
@@ -169,6 +170,99 @@ const PITPAYECalculator = () => {
                 </div>
               </section>
 
+              {/* Monthly Salary Examples */}
+              <section className="mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  Monthly Salary Tax Examples
+                </h2>
+                <p className="text-center text-muted-foreground mb-6 max-w-2xl mx-auto">
+                  See how the 2026 tax rules affect different income levels. These examples show approximate 
+                  monthly PAYE deductions under the new bands.
+                </p>
+                <div className="overflow-x-auto">
+                  <table className="w-full glass-frosted rounded-2xl overflow-hidden">
+                    <thead>
+                      <tr className="border-b border-border/50 bg-muted/30">
+                        <th className="p-4 text-left text-sm font-semibold text-foreground">Monthly Salary</th>
+                        <th className="p-4 text-center text-sm font-semibold text-foreground">Annual Income</th>
+                        <th className="p-4 text-center text-sm font-semibold text-foreground">Monthly Tax</th>
+                        <th className="p-4 text-right text-sm font-semibold text-foreground">Take-Home</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { monthly: 100_000, annual: 1_200_000, tax: 5_000, takeHome: 95_000, note: 'Most in tax-free band' },
+                        { monthly: 300_000, annual: 3_600_000, tax: 35_000, takeHome: 265_000, note: '15% band' },
+                        { monthly: 500_000, annual: 6_000_000, tax: 70_000, takeHome: 430_000, note: '18% band' },
+                        { monthly: 1_000_000, annual: 12_000_000, tax: 162_500, takeHome: 837_500, note: '21% band' },
+                        { monthly: 2_500_000, annual: 30_000_000, tax: 520_000, takeHome: 1_980_000, note: '23% band' },
+                      ].map((example, index) => (
+                        <tr key={index} className="border-b border-border/30 last:border-0">
+                          <td className="p-4">
+                            <span className="font-semibold text-foreground">{formatCurrency(example.monthly)}</span>
+                            <span className="text-xs text-muted-foreground block">{example.note}</span>
+                          </td>
+                          <td className="p-4 text-center text-sm text-muted-foreground">{formatCurrency(example.annual)}</td>
+                          <td className="p-4 text-center">
+                            <span className="text-primary font-medium">{formatCurrency(example.tax)}</span>
+                          </td>
+                          <td className="p-4 text-right">
+                            <span className="text-success font-semibold">{formatCurrency(example.takeHome)}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="text-center text-xs text-muted-foreground mt-4">
+                  *Estimates assume 8% pension and 2.5% NHF deductions. Actual amounts vary based on individual reliefs.
+                </p>
+              </section>
+
+              {/* What Employers Need to Know */}
+              <section className="mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  What Employers Need to Know
+                </h2>
+                <div className="glass-frosted rounded-2xl p-6 md:p-8 border-l-4 border-primary">
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
+                      <Building2 className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-foreground mb-2">PAYE Remittance Obligations</h3>
+                      <p className="text-muted-foreground">
+                        As an employer, you're required to deduct PAYE from employee salaries and remit to 
+                        the relevant tax authority. Failure to remit attracts penalties.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="glass rounded-xl p-4">
+                      <h4 className="font-semibold text-foreground mb-2">Your Responsibilities</h4>
+                      <ul className="space-y-1 text-sm text-muted-foreground">
+                        <li className="flex items-center gap-2"><CheckCircle2 className="h-3 w-3 text-success" /> Calculate PAYE using 2026 bands</li>
+                        <li className="flex items-center gap-2"><CheckCircle2 className="h-3 w-3 text-success" /> Deduct at source monthly</li>
+                        <li className="flex items-center gap-2"><CheckCircle2 className="h-3 w-3 text-success" /> Remit by 10th of next month</li>
+                        <li className="flex items-center gap-2"><CheckCircle2 className="h-3 w-3 text-success" /> Issue annual P9 forms to employees</li>
+                      </ul>
+                    </div>
+                    <div className="glass rounded-xl p-4 border border-warning/30">
+                      <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-warning" />
+                        Penalties for Non-Compliance
+                      </h4>
+                      <ul className="space-y-1 text-sm text-muted-foreground">
+                        <li>• 10% penalty on unremitted PAYE</li>
+                        <li>• Interest at CBN rate + 2%</li>
+                        <li>• Criminal prosecution possible</li>
+                        <li>• Employee may claim from employer</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
               {/* What Changed Comparison */}
               <section className="mb-12">
                 <ComparisonTable
@@ -299,11 +393,14 @@ const PITPAYECalculator = () => {
                 variant="gradient"
                 headline="Get Your Complete Tax Breakdown"
                 subtext="Include all reliefs, see your take-home pay, and download a professional PDF report."
-                primaryText="Full Tax Calculator"
+                primaryText="Get Your Net Salary Breakdown"
                 primaryLink="/individual-calculator"
                 secondaryText="Business Calculator"
                 secondaryLink="/calculator"
               />
+
+              {/* Disclaimer */}
+              <SEODisclaimer />
             </div>
           </div>
         </main>
