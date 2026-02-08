@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -65,10 +65,20 @@ const TaxReports = () => {
     },
   ];
 
-  const schema = createWebApplicationSchema(
-    'Nigerian Tax Reports & Invoices Generator',
-    'Generate professional tax reports and invoices with QR verification. FIRS-compliant format. Download PDF instantly.'
-  );
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      createWebApplicationSchema(
+        'Nigerian Tax Reports & Invoices Generator',
+        'Generate professional tax reports and invoices with QR verification. FIRS-compliant format. Download PDF instantly.'
+      ),
+      createBreadcrumbSchema([
+        { name: 'Home', url: 'https://taxforgeng.com/' },
+        { name: 'Features', url: 'https://taxforgeng.com/pricing' },
+        { name: 'Tax Reports', url: 'https://taxforgeng.com/tax-reports' },
+      ]),
+    ],
+  };
 
   return (
     <>

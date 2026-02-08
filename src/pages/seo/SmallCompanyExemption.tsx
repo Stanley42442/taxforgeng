@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createArticleSchema, createHowToSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createArticleSchema, createHowToSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -32,6 +32,11 @@ const SmallCompanyExemption = () => {
         'Step-by-step guide to checking if your Nigerian company qualifies for the small company CIT exemption under 2026 rules.',
         howToSteps
       ),
+      createBreadcrumbSchema([
+        { name: 'Home', url: 'https://taxforgeng.com/' },
+        { name: 'Tax Tools', url: 'https://taxforgeng.com/free-tax-calculator' },
+        { name: 'Small Company Exemption', url: 'https://taxforgeng.com/small-company-exemption' },
+      ]),
     ],
   };
 

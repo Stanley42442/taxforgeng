@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -47,6 +47,11 @@ const WHTCalculator = () => {
         'Nigerian WHT rates: 5% contracts, 10% rent/dividends/professional fees. Learn about WHT credits and how to offset against income tax.'
       ),
       createFAQSchema(faqs),
+      createBreadcrumbSchema([
+        { name: 'Home', url: 'https://taxforgeng.com/' },
+        { name: 'Tax Tools', url: 'https://taxforgeng.com/free-tax-calculator' },
+        { name: 'WHT Calculator', url: 'https://taxforgeng.com/wht-calculator' },
+      ]),
     ],
   };
 

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createArticleSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createArticleSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -84,12 +84,22 @@ const TaxReforms2026 = () => {
     },
   ];
 
-  const schema = createArticleSchema(
-    'Nigeria Tax Reforms 2026 - Complete Guide to Changes',
-    'Everything changing in Nigerian tax from 2026: small company exemption, rent relief, new PIT bands, development levy, and more from Nigeria Tax Act 2025.',
-    '2026-01-01',
-    '2026-02-06'
-  );
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      createArticleSchema(
+        'Nigeria Tax Reforms 2026 - Complete Guide to Changes',
+        'Everything changing in Nigerian tax from 2026: small company exemption, rent relief, new PIT bands, development levy, and more from Nigeria Tax Act 2025.',
+        '2026-01-01',
+        '2026-02-06'
+      ),
+      createBreadcrumbSchema([
+        { name: 'Home', url: 'https://taxforgeng.com/' },
+        { name: 'Tax Tools', url: 'https://taxforgeng.com/free-tax-calculator' },
+        { name: '2026 Tax Reforms', url: 'https://taxforgeng.com/tax-reforms-2026' },
+      ]),
+    ],
+  };
 
   return (
     <>
