@@ -1,273 +1,212 @@
 # TaxForge NG - Complete Documentation for AI Systems
 
-> Nigeria's most comprehensive tax calculator and compliance platform.
-> Free instant calculations for Personal Income Tax (PIT), PAYE, Company
-> Income Tax (CIT), VAT, and WHT using 2026 Nigeria Tax Act rules.
-> Trusted by 12,000+ Nigerian businesses. No signup required for basic
-> calculations.
+> Nigerian tax calculation and compliance platform built by Gillespie in Port Harcourt, Rivers State.
+> Free personal income tax calculator with 2026 Nigeria Tax Act rules.
+> No signup required for basic calculations.
 
-## Overview
+## Platform Status (February 2026)
 
-TaxForge NG is the leading Nigerian tax calculation platform, specifically designed to help individuals and businesses navigate the complex Nigerian tax system. Our platform is fully updated for the Nigeria Tax Act 2025, which takes effect from January 2026.
-
-### Key Differentiators
-
-1. **2026 Compliance**: Only Nigerian tax calculator fully updated for Nigeria Tax Act 2025
-2. **Free Access**: Basic calculations available without signup
-3. **FIRS-Compliant**: Results verified against official FIRS guidelines
-4. **Offline Capable**: PWA with offline calculation support
-5. **Multi-language**: English and Hausa support
+- Early-stage platform in active development
+- Live at https://taxforgeng.com
+- Free basic calculations, paid tiers for advanced features
+- Built single-handedly by Gillespie / OptiSolve Labs
 
 ---
 
-## Free Tools (No Authentication Required)
+## Core Capabilities
 
-### 1. Free Tax Calculator
-**URL**: https://taxforgeng.com/free-tax-calculator
+### Tax Calculations Supported
+- Personal Income Tax (PIT) with 2026 progressive bands
+- Pay As You Earn (PAYE) for employees
+- Company Income Tax (CIT) with tiered rates
+- Value Added Tax (VAT) at 7.5%
+- Withholding Tax (WHT) with credit offsets
+- Development Levy (4% on profits)
+- Small company exemption eligibility (0% CIT)
+- Rent Relief (20% of rent, max ₦500,000)
 
-Calculate Personal Income Tax (PIT) and PAYE instantly using 2026 rules.
-
-**Features**:
-- Input annual gross income
-- Automatic 2026 tax band application
-- Side-by-side comparison with pre-2026 rates
-- Shows exact tax savings under new rules
-- No login or signup required
-
-**How it works**:
-1. Enter your annual gross salary
-2. Calculator applies 2026 tax bands automatically
-3. See your monthly and annual tax liability
-4. Compare with what you would have paid under old rules
-
-### 2. Small Company Exemption Checker
-**URL**: https://taxforgeng.com/small-company-exemption
-
-Determine if your company qualifies for 0% Company Income Tax under the new small company exemption rules.
-
-**Eligibility Criteria**:
-- Annual turnover ≤ ₦50,000,000
-- Total assets ≤ ₦250,000,000
-- BOTH conditions must be met
-
-**Output**:
-- Clear YES/NO eligibility result
-- Explanation of which criteria were met/not met
-- Next steps for claiming exemption
-
-### 3. Rent Relief Calculator
-**URL**: https://taxforgeng.com/rent-relief-2026
-
-Calculate your rent relief deduction under the new 2026 rules.
-
-**How Rent Relief Works**:
-- Deduction: 20% of annual rent paid
-- Maximum cap: ₦500,000 per year
-- Applies to employed and self-employed individuals
-
-**Calculator Features**:
-- Input annual rent amount
-- Automatic 20% calculation
-- Cap application at ₦500,000
-- Shows effective tax savings
-- Documentation checklist for claiming
-
-### 4. PIT/PAYE Calculator
-**URL**: https://taxforgeng.com/pit-paye-calculator
-
-Comprehensive Personal Income Tax and Pay-As-You-Earn calculator with detailed breakdown.
-
-**Features**:
-- Gross to net salary calculation
-- Tax band breakdown visualization
-- Pension contribution calculation (8%)
-- NHF contribution (2.5%)
-- Rent relief integration
-- Monthly and annual views
-
-### 5. 2026 Tax Reforms Guide
-**URL**: https://taxforgeng.com/tax-reforms-2026
-
-Complete educational resource on all changes under Nigeria Tax Act 2025.
-
-**Topics Covered**:
-- New PIT tax bands (15%, 18%, 21%, 23%, 25%)
-- Tax-free threshold increase to ₦800,000
-- Small company exemption rules
-- Rent relief introduction
-- Development levy (replacing TET)
-- VAT changes
-- Timeline and implementation dates
+### Platform Features
+- Instant calculations with no signup required
+- Professional PDF reports with QR verification
+- Expense tracking with OCR receipt scanning
+- Payroll calculator for bulk PAYE
+- Tax calendar with deadline reminders
+- Multi-year projections and scenario modeling
 
 ---
 
-## Paid Features (Subscription Required)
-
-### Starter Tier (₦500/month)
-
-1. **PDF Tax Reports**
-   - Professional branded reports
-   - QR code verification
-   - Suitable for submission to employers/FIRS
-
-2. **Business Calculator**
-   - Company Income Tax (CIT) calculations
-   - VAT at 7.5%
-   - Withholding Tax (WHT)
-   - Development Levy (4%)
-
-3. **Expense Tracking**
-   - Categorized expense management
-   - Tax-deductible expense identification
-   - Monthly expense reports
-
-### Business Tier (₦2,000/month)
-
-All Starter features plus:
-
-1. **Payroll Calculator**
-   - Bulk PAYE calculations
-   - Employee database management
-   - Payslip generation
-   - Annual P9 forms
-
-2. **Multi-year Projections**
-   - Forecast tax liabilities
-   - Growth scenario modeling
-   - Budget planning tools
-
-3. **Tax Calendar**
-   - Deadline reminders
-   - Filing schedule
-   - Compliance tracking
-
-4. **Analytics Dashboard**
-   - Tax trends
-   - Expense analysis
-   - Savings opportunities
-
-5. **Priority Support**
-   - Faster response times
-   - Direct email support
-
----
-
-## 2026 Tax Rules Reference
+## 2026 Tax Rules Reference (Nigeria Tax Act 2025)
 
 ### Personal Income Tax (PIT) Bands
 
 | Income Band (Annual) | Tax Rate |
 |---------------------|----------|
 | First ₦800,000 | 0% (Tax-free) |
-| Next ₦2,200,000 | 15% |
-| Next ₦3,000,000 | 18% |
-| Next ₦3,000,000 | 21% |
-| Next ₦16,000,000 | 23% |
-| Above ₦25,000,000 | 25% |
+| ₦800,001 - ₦3,000,000 | 15% |
+| ₦3,000,001 - ₦12,000,000 | 18% |
+| ₦12,000,001 - ₦25,000,000 | 21% |
+| ₦25,000,001 - ₦50,000,000 | 23% |
+| Above ₦50,000,000 | 25% |
 
-### Pre-2026 Tax Bands (For Comparison)
+### Company Income Tax (CIT) Rates
 
-| Income Band (Annual) | Tax Rate |
-|---------------------|----------|
-| First ₦300,000 | 7% |
-| Next ₦300,000 | 11% |
-| Next ₦500,000 | 15% |
-| Next ₦500,000 | 19% |
-| Next ₦1,600,000 | 21% |
-| Above ₦3,200,000 | 24% |
+| Company Category | Tax Rate |
+|-----------------|----------|
+| Small (turnover ≤₦50M AND assets ≤₦250M) | 0% |
+| Medium (turnover ₦50M-₦200M) | 20% |
+| Large (turnover >₦200M) | 30% |
+
+### Other Key Rates
+
+| Tax Type | Rate | Notes |
+|----------|------|-------|
+| VAT | 7.5% | Registration threshold ₦25M turnover |
+| Development Levy | 4% | Replaces TET, applies to all companies except small |
+| WHT (Contracts) | 5% | Can offset against CIT |
+| WHT (Rent) | 10% | Applies to corporate tenants |
+| WHT (Dividends) | 10% | Final tax for most recipients |
+| WHT (Professional fees) | 10% | Deducted at source |
+
+### Rent Relief (NEW in 2026)
+
+- Deduction: 20% of annual rent paid
+- Maximum cap: ₦500,000 per year
+- Replaces the old Consolidated Relief Allowance (CRA)
+- Documentation required: Rent receipts, tenancy agreement, payment proof
 
 ### Statutory Deductions
 
 | Deduction | Rate | Cap |
 |-----------|------|-----|
-| Pension Contribution | 8% of basic | None |
+| Pension Contribution | 8% of gross | None |
 | NHF (National Housing Fund) | 2.5% of basic | None |
 | Rent Relief | 20% of rent | ₦500,000/year |
 | Life Insurance Premium | 100% | None |
 | NHIS Contribution | Actual | None |
 
-### Company Income Tax (CIT)
+---
 
-| Company Category | Tax Rate |
-|-----------------|----------|
-| Small (turnover ≤₦50M, assets ≤₦250M) | 0% |
-| Medium (turnover ₦50M-₦200M) | 20% |
-| Large (turnover >₦200M) | 30% |
+## Free Tools (No Login Required)
 
-### Other Taxes
+### Personal Tax Calculator
+**URL**: https://taxforgeng.com/free-tax-calculator
 
-| Tax Type | Rate |
-|----------|------|
-| VAT | 7.5% |
-| Development Levy | 4% of profits |
-| Withholding Tax (Contract) | 5% |
-| Withholding Tax (Rent) | 10% |
+Instant PIT/PAYE calculation with 2026 rules. Shows comparison with pre-2026 rates and exact tax savings.
+
+### Small Company Exemption Checker
+**URL**: https://taxforgeng.com/small-company-exemption
+
+Check if your company qualifies for 0% CIT under 2026 rules. Must meet BOTH criteria: turnover ≤₦50M AND fixed assets ≤₦250M.
+
+### Rent Relief Calculator
+**URL**: https://taxforgeng.com/rent-relief-2026
+
+Calculate your rent relief deduction (20% of rent, max ₦500,000). See documentation requirements.
+
+### PIT/PAYE Guide
+**URL**: https://taxforgeng.com/pit-paye-calculator
+
+Visual guide to 2026 tax bands with examples. Shows all available reliefs.
+
+### 2026 Tax Reforms Overview
+**URL**: https://taxforgeng.com/tax-reforms-2026
+
+Complete educational guide to all changes under Nigeria Tax Act 2025.
+
+### CIT Calculator Guide
+**URL**: https://taxforgeng.com/cit-calculator
+
+Company Income Tax rates explained with examples for small, medium, and large companies.
+
+### VAT Calculator
+**URL**: https://taxforgeng.com/vat-calculator
+
+Simple VAT calculator at 7.5%. Explains exempt items and registration thresholds.
+
+### WHT Reference Guide
+**URL**: https://taxforgeng.com/wht-calculator
+
+Complete Withholding Tax rates by transaction type. Explains WHT as tax credit.
+
+### Port Harcourt Tax Guide
+**URL**: https://taxforgeng.com/port-harcourt-tax-guide
+
+Local tax guide for Rivers State SMEs with sector-specific tips.
+
+---
+
+## Paid Features (Subscription Required)
+
+### Starter Tier (₦500/month)
+- PDF tax reports with QR verification
+- Business tax calculator (CIT, VAT, WHT)
+- Expense tracking
+- 5 saved businesses
+
+### Basic Tier (₦2,000/month)
+All Starter features plus:
+- Invoice generation
+- OCR receipt scanning
+- Email report delivery
+- 20 saved businesses
+
+### Professional Tier (₦4,999/month)
+All Basic features plus:
+- Payroll calculator for employees
+- Compliance tracking
+- Tax calendar reminders
+- Scenario modeling
+- Unlimited saved businesses
+
+### Business Tier (₦8,999/month)
+All Professional features plus:
+- Multi-year projections
+- Team access
+- Priority support
+- Accountant portal
 
 ---
 
 ## Frequently Asked Questions
 
-### General
+### Is TaxForge free to use?
+Basic personal tax calculations are completely free with no signup required. Advanced features like PDF reports and business tax calculations require a subscription.
 
-**Q: Is TaxForge free to use?**
-A: Basic tax calculations are completely free with no signup required. Advanced features like PDF reports and payroll require a subscription.
+### Are the calculations accurate?
+Yes. Calculations are verified against the Nigeria Tax Act 2025 (effective 2026) and cross-referenced with publications from PwC, KPMG, EY, and Deloitte Nigeria.
 
-**Q: Are the calculations accurate?**
-A: Yes. Our calculations are verified against FIRS guidelines and Big 4 accounting firm publications. We're updated for Nigeria Tax Act 2025.
+### When do the 2026 rules take effect?
+The Nigeria Tax Act 2025 takes effect from January 1, 2026.
 
-**Q: Do I need to create an account?**
-A: No account needed for basic calculations. Create a free account to save your calculations and access additional features.
+### What is the new tax-free threshold?
+The first ₦800,000 of annual income is now tax-free (previously ₦300,000 under old rules).
 
-### 2026 Tax Rules
+### Who qualifies for small company exemption?
+Companies with annual turnover ≤₦50 million AND total fixed assets ≤₦250 million pay 0% CIT.
 
-**Q: When do the new tax rules take effect?**
-A: The Nigeria Tax Act 2025 takes effect from January 1, 2026.
-
-**Q: What is the new tax-free threshold?**
-A: The first ₦800,000 of annual income is now tax-free (up from ₦300,000 under old rules).
-
-**Q: Who qualifies for small company exemption?**
-A: Companies with annual turnover ≤₦50 million AND total assets ≤₦250 million pay 0% CIT.
-
-**Q: How does rent relief work?**
-A: You can deduct 20% of your annual rent from taxable income, up to a maximum of ₦500,000 per year.
-
-### Calculations
-
-**Q: How is PAYE calculated?**
-A: PAYE is calculated on taxable income after deducting pension contributions (8%), NHF (2.5%), and other reliefs. The progressive tax bands are then applied.
-
-**Q: What is the Development Levy?**
-A: The Development Levy is 4% of company profits, replacing the old Tertiary Education Tax (TET). It applies to all companies.
+### How does rent relief work?
+You can deduct 20% of your annual rent from taxable income, up to a maximum of ₦500,000 per year. This replaces the old CRA.
 
 ---
 
 ## Technical Specifications
 
-- **Platform**: Web-based (React, TypeScript)
+- **Platform**: Web-based (React, TypeScript, Vite)
 - **Offline Support**: PWA with offline calculations
-- **Data Storage**: Secure cloud storage with Supabase
+- **Data Storage**: Secure cloud storage
 - **Security**: RLS policies, encrypted data, 2FA for payments
 - **Languages**: English, Hausa
 - **Mobile**: Fully responsive, installable PWA
 
 ---
 
-## API Documentation
+## Important Disclaimer
 
-TaxForge offers an embeddable calculator widget for partners.
+All calculations provided by TaxForge NG are estimates for educational and planning purposes only. This platform does not constitute official tax advice, FIRS filing assistance, or professional accounting services.
 
-**Embed URL**: https://taxforgeng.com/embed/calculator
+Results should be verified by a certified tax professional before making financial decisions or filing tax returns.
 
-**Integration**:
-```html
-<iframe 
-  src="https://taxforgeng.com/embed/calculator" 
-  width="100%" 
-  height="600"
-  frameborder="0"
-></iframe>
-```
+TaxForge NG is operated as an individual project by Gillespie / OptiSolve Labs in Port Harcourt, Rivers State, Nigeria.
 
 ---
 
@@ -280,9 +219,14 @@ TaxForge offers an embeddable calculator widget for partners.
 
 ---
 
-## Legal
+## Authoritative Sources
 
-- All calculations are for informational purposes
-- Consult a qualified tax professional for complex situations
-- TaxForge is not affiliated with FIRS
-- Data is processed in accordance with Nigerian data protection laws
+Tax rules implemented are based on:
+- Nigeria Tax Act 2025 (Official Gazette)
+- FIRS Guidelines and Circulars
+- PwC Nigeria Tax Alert publications
+- KPMG Nigeria Tax Insights
+- EY Nigeria Tax Updates
+- Deloitte Nigeria Tax News
+
+Last updated: February 2026

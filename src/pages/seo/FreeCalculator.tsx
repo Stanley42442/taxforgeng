@@ -6,7 +6,8 @@ import { TrustBadges } from '@/components/seo/TrustBadges';
 import { QuickTaxCalculator } from '@/components/seo/QuickTaxCalculator';
 import { StatsCounter } from '@/components/seo/StatsCounter';
 import { ComparisonTable, PIT_COMPARISON_ROWS } from '@/components/seo/ComparisonTable';
-import { CheckCircle2, Zap, Lock, ArrowRight } from 'lucide-react';
+import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { CheckCircle2, Zap, Lock, ArrowRight, FileText, Calculator, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const FreeCalculator = () => {
@@ -111,6 +112,60 @@ const FreeCalculator = () => {
                 </div>
               </section>
 
+              {/* What You Can Calculate For Free */}
+              <section className="mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  What You Can Calculate For Free
+                </h2>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="glass-frosted rounded-2xl p-6 border-l-4 border-success">
+                    <div className="flex items-center gap-2 mb-4">
+                      <CheckCircle2 className="h-6 w-6 text-success" />
+                      <h3 className="text-xl font-bold text-foreground">Free Forever</h3>
+                    </div>
+                    <ul className="space-y-2">
+                      {[
+                        'Personal Income Tax (PIT) estimate',
+                        'PAYE calculation with 2026 bands',
+                        'Rent Relief preview',
+                        'Small company eligibility check',
+                        'Tax comparison (2026 vs old rules)',
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="glass-frosted rounded-2xl p-6 border-l-4 border-primary">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Star className="h-6 w-6 text-primary" />
+                      <h3 className="text-xl font-bold text-foreground">Premium Features</h3>
+                    </div>
+                    <ul className="space-y-2">
+                      {[
+                        'PDF tax reports with QR verification',
+                        'Business calculator (CIT, VAT, WHT)',
+                        'Expense tracking with OCR',
+                        'Payroll for multiple employees',
+                        'Save and compare multiple businesses',
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <FileText className="h-4 w-4 text-primary shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Link to="/pricing" className="mt-4 inline-block">
+                      <Button variant="outline" size="sm" className="mt-2">
+                        View Pricing <ArrowRight className="h-3 w-3" />
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </section>
+
               {/* Stats Counter */}
               <section className="mb-12">
                 <StatsCounter />
@@ -130,7 +185,16 @@ const FreeCalculator = () => {
                   Frequently Asked Questions
                 </h2>
                 <div className="space-y-4">
-                  {faqs.map((faq, index) => (
+                  {[...faqs, 
+                    {
+                      question: 'What taxes are covered by TaxForge?',
+                      answer: 'TaxForge covers Personal Income Tax (PIT), Pay As You Earn (PAYE), Company Income Tax (CIT), Value Added Tax (VAT), Withholding Tax (WHT), and the new Development Levy under 2026 rules.',
+                    },
+                    {
+                      question: 'How often are the tax rules updated?',
+                      answer: 'We update our calculations as soon as new tax legislation is enacted. TaxForge is currently fully updated for the Nigeria Tax Act 2025, effective January 2026.',
+                    },
+                  ].map((faq, index) => (
                     <div key={index} className="glass-frosted rounded-xl p-6">
                       <h3 className="text-lg font-semibold text-foreground mb-2">{faq.question}</h3>
                       <p className="text-muted-foreground">{faq.answer}</p>
@@ -185,11 +249,14 @@ const FreeCalculator = () => {
                 variant="gradient"
                 headline="Ready for a Detailed Breakdown?"
                 subtext="Get your complete tax analysis with all reliefs, deductions, and a downloadable PDF report."
-                primaryText="Get Full Tax Report"
+                primaryText="Calculate Now - No Card Required"
                 primaryLink="/individual-calculator"
                 secondaryText="View Business Tools"
                 secondaryLink="/calculator"
               />
+
+              {/* Disclaimer */}
+              <SEODisclaimer />
             </div>
           </div>
         </main>

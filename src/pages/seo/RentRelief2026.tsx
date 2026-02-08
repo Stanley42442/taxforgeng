@@ -5,7 +5,8 @@ import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
 import { RentReliefCalculator } from '@/components/seo/RentReliefCalculator';
 import { ComparisonTable } from '@/components/seo/ComparisonTable';
-import { CheckCircle2, Home, FileText, AlertCircle, ArrowRight } from 'lucide-react';
+import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { CheckCircle2, Home, FileText, AlertCircle, ArrowRight, XCircle, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/taxCalculations';
 
@@ -132,35 +133,97 @@ const RentRelief2026 = () => {
                 </div>
               </section>
 
-              {/* Real Examples */}
+              {/* Who Qualifies */}
               <section className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
-                  Real Examples
+                  Who Qualifies for Rent Relief?
                 </h2>
-                <div className="grid gap-4 md:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="glass-frosted rounded-2xl p-6 border-l-4 border-success">
+                    <div className="flex items-center gap-2 mb-4">
+                      <CheckCircle2 className="h-6 w-6 text-success" />
+                      <h3 className="text-xl font-bold text-foreground">Eligible</h3>
+                    </div>
+                    <ul className="space-y-3">
+                      {[
+                        'Employed individuals paying rent for residence',
+                        'Self-employed persons paying rent',
+                        'Contractors with rental accommodation',
+                        'Business owners who rent their personal home',
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                          <CheckCircle2 className="h-4 w-4 text-success shrink-0 mt-0.5" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="glass-frosted rounded-2xl p-6 border-l-4 border-destructive">
+                    <div className="flex items-center gap-2 mb-4">
+                      <XCircle className="h-6 w-6 text-destructive" />
+                      <h3 className="text-xl font-bold text-foreground">Not Eligible</h3>
+                    </div>
+                    <ul className="space-y-3">
+                      {[
+                        'Homeowners (living in own property)',
+                        'Those with employer-provided housing',
+                        'Rent paid by company on your behalf',
+                        'Cash payments without receipts',
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                          <XCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </section>
+
+              {/* Real Examples by City */}
+              <section className="mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  Real Examples Across Nigerian Cities
+                </h2>
+                <div className="grid gap-4 md:grid-cols-2">
                   {[
-                    { rent: 600_000, relief: 120_000, taxSaving: 24_000 },
-                    { rent: 1_200_000, relief: 240_000, taxSaving: 48_000 },
-                    { rent: 3_000_000, relief: 500_000, taxSaving: 100_000, capped: true },
+                    { city: 'Lagos (Lekki)', rent: 1_800_000, relief: 360_000, taxSaving: 72_000, capped: false, note: 'Middle-income area' },
+                    { city: 'Abuja (Maitama)', rent: 3_500_000, relief: 500_000, taxSaving: 100_000, capped: true, note: 'High-rent area - cap applies' },
+                    { city: 'Port Harcourt (GRA)', rent: 600_000, relief: 120_000, taxSaving: 24_000, capped: false, note: 'Reasonable rates' },
+                    { city: 'Self-Owned Home', rent: 0, relief: 0, taxSaving: 0, capped: false, note: 'Not eligible - no rent paid', ineligible: true },
                   ].map((example, index) => (
-                    <div key={index} className="glass-frosted rounded-xl p-5 text-center">
-                      <p className="text-sm text-muted-foreground mb-2">Annual Rent</p>
-                      <p className="text-2xl font-bold text-foreground mb-3">{formatCurrency(example.rent)}</p>
-                      <div className="glass rounded-lg p-3 mb-3">
-                        <p className="text-xs text-muted-foreground">Your Relief</p>
-                        <p className="text-xl font-bold text-success">{formatCurrency(example.relief)}</p>
-                        {example.capped && (
-                          <span className="text-xs text-warning">Cap Applied</span>
-                        )}
+                    <div key={index} className={`glass-frosted rounded-xl p-5 ${example.ineligible ? 'opacity-60' : ''}`}>
+                      <div className="flex items-center gap-2 mb-3">
+                        <MapPin className={`h-5 w-5 ${example.ineligible ? 'text-muted-foreground' : 'text-primary'}`} />
+                        <h3 className="font-semibold text-foreground">{example.city}</h3>
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        Est. Tax Saved: <span className="text-success font-medium">{formatCurrency(example.taxSaving)}</span>
+                      <div className="grid grid-cols-3 gap-3 text-center mb-3">
+                        <div>
+                          <p className="text-xs text-muted-foreground">Rent/Year</p>
+                          <p className="font-semibold text-foreground">{formatCurrency(example.rent)}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Relief</p>
+                          <p className={`font-semibold ${example.ineligible ? 'text-muted-foreground' : 'text-success'}`}>
+                            {formatCurrency(example.relief)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Tax Saved</p>
+                          <p className={`font-semibold ${example.ineligible ? 'text-muted-foreground' : 'text-primary'}`}>
+                            {formatCurrency(example.taxSaving)}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground text-center">
+                        {example.note}
+                        {example.capped && <span className="text-warning ml-1">(₦500k cap applied)</span>}
                       </p>
                     </div>
                   ))}
                 </div>
                 <p className="text-center text-sm text-muted-foreground mt-4">
-                  *Tax savings estimated at 20% average tax rate
+                  *Tax savings estimated at 20% average tax rate. Actual savings depend on your income bracket.
                 </p>
               </section>
 
@@ -252,11 +315,14 @@ const RentRelief2026 = () => {
                 variant="gradient"
                 headline="Calculate Your Full Tax with Rent Relief"
                 subtext="Include Rent Relief, Pension, NHF and all other deductions in one comprehensive calculation."
-                primaryText="Calculate Full Tax"
+                primaryText="Calculate My Full Tax"
                 primaryLink="/individual-calculator"
-                secondaryText="View All Deductions"
-                secondaryLink="/documentation"
+                secondaryText="View PIT Calculator"
+                secondaryLink="/pit-paye-calculator"
               />
+
+              {/* Disclaimer */}
+              <SEODisclaimer />
             </div>
           </div>
         </main>
