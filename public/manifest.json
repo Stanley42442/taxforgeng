@@ -1,7 +1,7 @@
 {
   "name": "TaxForge NG",
   "short_name": "TaxForge",
-  "description": "Nigeria's leading tax calculator with 2026 rules. Free PIT, PAYE, CIT, VAT calculations. FIRS-compliant. No signup required.",
+  "description": "Free Nigerian tax calculator with 2026 rules. Calculate PIT, PAYE, CIT, VAT instantly. FIRS-compliant. No signup required.",
   "start_url": "/",
   "scope": "/",
   "id": "/",

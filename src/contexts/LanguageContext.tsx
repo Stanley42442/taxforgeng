@@ -2079,11 +2079,11 @@ export const translations: Translations = {
     ig: 'Ọ Dị Njikere Ịkwalite Ụtụ Gị?' 
   },
   'home.joinThousands': { 
-    en: 'Join thousands of Nigerian businesses making smarter tax decisions. Start with our free advisory tool.', 
-    pcm: 'Join plenty Nigerian business wey dey make better tax decision. Start with our free tool.', 
-    yo: 'Darapọ̀ mọ́ ẹgbẹẹgbẹ̀rún àwọn iṣẹ́ Nàìjíríà tí wọ́n ń ṣe àwọn ìpinnu owó-orí tó dára jùlọ. Bẹ̀rẹ̀ pẹ̀lú ọ̀pá iṣẹ́ ìmọ̀ràn ọ̀fẹ́ wa.', 
-    ha: 'Ku haɗa da dubbannin kasuwancin Najeriya da ke yanke shawara mafi kyau na haraji. Fara tare da kayan aikin ba da shawara kyauta.', 
-    ig: 'Sonye na puku kwuru puku azụmaahịa Naịjirịa na-eme mkpebi ụtụ ka mma. Malite na ngwa ndụmọdụ n\'efu anyị.' 
+    en: 'Start calculating your taxes with FIRS-compliant 2026 rules today.', 
+    pcm: 'Start calculate your tax with 2026 rules today.', 
+    yo: 'Bẹ̀rẹ̀ láti ṣe ìṣirò owó-orí rẹ pẹ̀lú àwọn òfin 2026 lónìí.', 
+    ha: 'Fara ƙididdige harajin ku tare da dokokin 2026 yau.', 
+    ig: 'Malite ịgbakọ ụtụ gị na iwu 2026 taa.' 
   },
   'home.startFreeAssessment': { 
     en: 'Start Free Assessment', 
