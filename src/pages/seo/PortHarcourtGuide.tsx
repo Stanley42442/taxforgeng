@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createArticleSchema, createFAQSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createArticleSchema, createFAQSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -94,6 +94,11 @@ const PortHarcourtGuide = () => {
           name: 'Rivers',
         },
       },
+      createBreadcrumbSchema([
+        { name: 'Home', url: 'https://taxforgeng.com/' },
+        { name: 'Tax Guides', url: 'https://taxforgeng.com/free-tax-calculator' },
+        { name: 'Port Harcourt Guide', url: 'https://taxforgeng.com/port-harcourt-tax-guide' },
+      ]),
     ],
   };
 

@@ -171,13 +171,7 @@ export const createSoftwareApplicationSchema = () => ({
     }
   ],
   
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '4.8',
-    ratingCount: '1247',
-    bestRating: '5',
-    worstRating: '1'
-  },
+  // Note: aggregateRating removed - only add when real reviews exist
   
   provider: {
     '@type': 'Organization',
@@ -283,4 +277,32 @@ export const createHowToSchema = (
     name: step.name,
     text: step.text,
   })),
+});
+
+// BreadcrumbList schema for site hierarchy (SEO + AI discoverability)
+export const createBreadcrumbSchema = (items: { name: string; url: string }[]) => ({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: items.map((item, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: item.name,
+    item: item.url,
+  })),
+});
+
+// Speakable schema for voice search and AI summaries (AEO optimization)
+export const createSpeakableSchema = (
+  pageName: string,
+  pageUrl: string,
+  cssSelectors: string[]
+) => ({
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: pageName,
+  url: pageUrl,
+  speakable: {
+    '@type': 'SpeakableSpecification',
+    cssSelector: cssSelectors,
+  },
 });

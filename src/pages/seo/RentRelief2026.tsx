@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createArticleSchema, createFAQSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createArticleSchema, createFAQSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -48,6 +48,11 @@ const RentRelief2026 = () => {
         '2026-02-06'
       ),
       createFAQSchema(faqs),
+      createBreadcrumbSchema([
+        { name: 'Home', url: 'https://taxforgeng.com/' },
+        { name: 'Tax Tools', url: 'https://taxforgeng.com/free-tax-calculator' },
+        { name: 'Rent Relief 2026', url: 'https://taxforgeng.com/rent-relief-2026' },
+      ]),
     ],
   };
 

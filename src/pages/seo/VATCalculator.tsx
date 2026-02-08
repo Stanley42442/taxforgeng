@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -55,6 +55,11 @@ const VATCalculator = () => {
         'Calculate Nigerian VAT at 7.5%. Know exempt items, registration thresholds, and filing deadlines. Free instant calculator.'
       ),
       createFAQSchema(faqs),
+      createBreadcrumbSchema([
+        { name: 'Home', url: 'https://taxforgeng.com/' },
+        { name: 'Tax Tools', url: 'https://taxforgeng.com/free-tax-calculator' },
+        { name: 'VAT Calculator', url: 'https://taxforgeng.com/vat-calculator' },
+      ]),
     ],
   };
 

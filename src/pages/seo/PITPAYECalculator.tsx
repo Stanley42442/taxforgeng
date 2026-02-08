@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -43,6 +43,11 @@ const PITPAYECalculator = () => {
         'Calculate Nigerian Personal Income Tax with 2026 rules. First ₦800,000 tax-free. Progressive rates from 15% to 25%.'
       ),
       createFAQSchema(faqs),
+      createBreadcrumbSchema([
+        { name: 'Home', url: 'https://taxforgeng.com/' },
+        { name: 'Tax Tools', url: 'https://taxforgeng.com/free-tax-calculator' },
+        { name: 'PIT/PAYE Calculator', url: 'https://taxforgeng.com/pit-paye-calculator' },
+      ]),
     ],
   };
 

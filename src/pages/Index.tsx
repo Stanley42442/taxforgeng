@@ -14,6 +14,7 @@ import {
 
 import { FreeTrialCTA } from "@/components/FreeTrialCTA";
 import { SuccessStories } from "@/components/SuccessStories";
+import { FreeTaxToolsSection } from "@/components/FreeTaxToolsSection";
 import { useState, useEffect, useCallback } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
@@ -203,6 +204,9 @@ const Index = () => {
 
       {/* Features Grid */}
       <FeaturesSection />
+
+      {/* Free Tax Tools - SEO Internal Links */}
+      <FreeTaxToolsSection />
 
       {/* Success Stories Section */}
       <SuccessStories limit={3} />

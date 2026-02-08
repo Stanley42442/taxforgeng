@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -61,6 +61,11 @@ const CITCalculator = () => {
         'Calculate Nigerian CIT with 2026 rates. 0% for small companies, 20% medium, 30% large. Includes Development Levy.'
       ),
       createFAQSchema(faqs),
+      createBreadcrumbSchema([
+        { name: 'Home', url: 'https://taxforgeng.com/' },
+        { name: 'Tax Tools', url: 'https://taxforgeng.com/free-tax-calculator' },
+        { name: 'CIT Calculator', url: 'https://taxforgeng.com/cit-calculator' },
+      ]),
     ],
   };
 

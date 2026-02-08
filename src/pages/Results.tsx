@@ -26,6 +26,7 @@ import {
   Mail,
   Printer
 } from "lucide-react";
+import { SocialShareButtons } from "@/components/SocialShareButtons";
 import { ExportActionsMenu } from "@/components/ExportActionsMenu";
 import { formatCurrency, calculateTax, type TaxResult, type TaxInputs } from "@/lib/taxCalculations";
 import { downloadPDF } from "@/lib/pdfExport";
@@ -248,6 +249,15 @@ const Results = () => {
           onExportCSV={exportToCSV}
           reportTitle={`Tax Calculation - ${result.entityType}`}
           reportType="tax-calculation"
+        />
+      </div>
+
+      {/* Social Share Buttons */}
+      <div className="flex justify-center mb-6 animate-slide-up">
+        <SocialShareButtons
+          title={`My ${result.entityType === 'company' ? 'Company' : 'Business'} Tax Calculation`}
+          text={`Total Tax: ${formatCurrency(result.totalTaxPayable)} (${result.effectiveRate.toFixed(1)}% effective rate) - Calculated with TaxForge NG`}
+          url="https://taxforgeng.com/calculator"
         />
       </div>
 
