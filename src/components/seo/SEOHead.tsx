@@ -198,10 +198,9 @@ export const createOrganizationSchema = () => ({
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'TaxForge NG',
-  legalName: 'TaxForge Nigeria',
   url: 'https://taxforgeng.com',
   logo: 'https://taxforgeng.com/icon-512.png',
-  description: 'Nigerian tax calculation and compliance platform',
+  description: 'Nigerian tax calculation and compliance platform operated by Gillespie Benjamin Mclee (OptiSolve Labs)',
   foundingDate: '2025',
   areaServed: 'Nigeria',
   serviceType: [
@@ -221,6 +220,37 @@ export const createOrganizationSchema = () => ({
     'Rent Relief Nigeria',
     'Development Levy'
   ]
+});
+
+// LocalBusiness schema for Port Harcourt local SEO
+export const createLocalBusinessSchema = () => ({
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: 'TaxForge NG',
+  description: 'Nigerian tax calculator with 2026 rules. Free PIT, PAYE, CIT, VAT calculations.',
+  url: 'https://taxforgeng.com',
+  logo: 'https://taxforgeng.com/icon-512.png',
+  image: 'https://taxforgeng.com/og-image.png',
+  telephone: '',
+  email: 'hello@taxforgeng.com',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Port Harcourt',
+    addressRegion: 'Rivers State',
+    addressCountry: 'NG'
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '4.8156',
+    longitude: '7.0498'
+  },
+  areaServed: {
+    '@type': 'Country',
+    name: 'Nigeria'
+  },
+  priceRange: '₦0 - ₦8,999',
+  openingHours: 'Mo-Su 00:00-24:00',
+  sameAs: []
 });
 
 export const createFAQSchema = (faqs: { question: string; answer: string }[]) => ({

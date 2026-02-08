@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { SEOHead, createArticleSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
+import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
 import { TrustBadges } from '@/components/seo/TrustBadges';
 import { StatsCounter } from '@/components/seo/StatsCounter';
 import { 
@@ -175,13 +176,7 @@ const TaxReforms2026 = () => {
 
               {/* Stats Section */}
               <section className="mb-14">
-                <StatsCounter
-                  stats={[
-                    { icon: 'calculator', value: 12847, suffix: '+', label: 'Tax calculations this month' },
-                    { icon: 'users', value: 1200, suffix: '+', label: 'Businesses trust TaxForge' },
-                    { icon: 'trend', value: 35, suffix: '%', label: 'Average tax savings' },
-                  ]}
-                />
+                <StatsCounter />
               </section>
 
               {/* Who Benefits Most */}
@@ -311,6 +306,9 @@ const TaxReforms2026 = () => {
                 secondaryText="View Pricing"
                 secondaryLink="/pricing"
               />
+
+              {/* Disclaimer */}
+              <SEODisclaimer />
             </div>
           </div>
         </main>
