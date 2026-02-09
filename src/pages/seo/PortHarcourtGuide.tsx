@@ -76,7 +76,7 @@ const PortHarcourtGuide = () => {
         'Port Harcourt Tax Guide 2026 - Rivers State SME Tips',
         'Complete tax guide for Port Harcourt businesses. Local SME compliance tips, oil & gas sector advice, FIRS office locations.',
         '2026-01-01',
-        '2026-02-06'
+        '2026-02-09'
       ),
       createFAQSchema(faqs),
       {
