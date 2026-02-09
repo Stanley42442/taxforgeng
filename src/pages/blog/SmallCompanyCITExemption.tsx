@@ -38,6 +38,11 @@ const SmallCompanyCITExemption = () => {
       relatedPosts={[
         { title: 'Tax Reforms 2026: Full Summary', slug: 'tax-reforms-2026-summary' },
         { title: 'Tax Guide for Tech Startups', slug: 'tax-guide-tech-startups' },
+        { title: 'PIT & PAYE Guide 2026', slug: 'pit-paye-guide-2026' },
+      ]}
+      relatedTools={[
+        { title: 'CIT Calculator', to: '/cit-calculator' },
+        { title: 'Small Company Exemption Checker', to: '/small-company-exemption' },
       ]}
       ctaHeadline="Check Your Eligibility"
       ctaSubtext="Use our Small Company Exemption checker to instantly see if you qualify for 0% CIT."

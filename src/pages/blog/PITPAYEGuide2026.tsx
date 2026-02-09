@@ -37,6 +37,11 @@ const PITPAYEGuide2026 = () => {
       relatedPosts={[
         { title: 'Tax Reforms 2026: Full Summary', slug: 'tax-reforms-2026-summary' },
         { title: '0% CIT for Small Companies', slug: 'small-company-cit-exemption' },
+        { title: 'Tax Guide for Tech Startups', slug: 'tax-guide-tech-startups' },
+      ]}
+      relatedTools={[
+        { title: 'PIT/PAYE Calculator', to: '/pit-paye-calculator' },
+        { title: 'Rent Relief Calculator', to: '/rent-relief-2026' },
       ]}
       ctaHeadline="Calculate Your PIT Now"
       ctaSubtext="Enter your salary and see your exact 2026 tax breakdown instantly."

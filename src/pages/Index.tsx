@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { BlogCard } from "@/components/blog/BlogCard";
 import { 
   Calculator, 
   FileText, 
@@ -77,7 +78,6 @@ const Index = () => {
       <div className="fixed top-60 right-10 w-64 h-64 rounded-full bg-accent/12 blur-3xl animate-float pointer-events-none" />
       <div className="fixed bottom-20 left-1/4 w-72 h-72 rounded-full bg-primary/6 blur-3xl animate-float-slow pointer-events-none" />
       <div className="fixed bottom-40 right-1/4 w-48 h-48 rounded-full bg-success/8 blur-3xl animate-float pointer-events-none" />
-      
       
 
       {/* Hero Section */}
@@ -207,6 +207,9 @@ const Index = () => {
 
       {/* Free Tax Tools - SEO Internal Links */}
       <FreeTaxToolsSection />
+
+      {/* Latest from the Blog */}
+      <BlogPromoSection />
 
       {/* Success Stories Section */}
       <SuccessStories limit={3} />
@@ -474,5 +477,44 @@ const FeatureCard = ({
     <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
   </div>
 );
+
+// Blog Promotion Section
+const BlogPromoSection = () => {
+  const { ref, isVisible } = useScrollAnimation();
+  const blogPosts = [
+    { slug: 'tax-reforms-2026-summary', title: 'Nigeria Tax Reforms 2026: Complete Summary', excerpt: 'Everything that changed under the Nigeria Tax Act 2025 — PIT, CIT, VAT, WHT, and Rent Relief explained.', date: 'Feb 8, 2026', category: 'Tax Reforms', readTime: '8 min' },
+    { slug: 'small-company-cit-exemption', title: '0% CIT for Small Companies', excerpt: 'How to qualify for the Small Company Exemption. The turnover threshold doubled to ₦50 million.', date: 'Feb 5, 2026', category: 'Guides', readTime: '7 min' },
+    { slug: 'pit-paye-guide-2026', title: 'PIT & PAYE Calculator Guide 2026', excerpt: 'Step-by-step personal income tax calculation with worked Naira examples and Rent Relief.', date: 'Jan 30, 2026', category: 'Guides', readTime: '6 min' },
+    { slug: 'tax-guide-tech-startups', title: 'Tax Guide for Tech Startups', excerpt: 'CIT, VAT, WHT, PAYE — which taxes apply to your startup? Practical guide for founders.', date: 'Jan 25, 2026', category: 'Guides', readTime: '9 min' },
+  ];
+
+  return (
+    <section ref={ref} className="py-12 md:py-16 relative z-10">
+      <div className="container mx-auto px-4">
+        <div className={`text-center mb-10 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">Latest from the Blog</h2>
+          <p className="text-muted-foreground max-w-xl mx-auto">Expert tax guides and analysis for Nigerian businesses</p>
+        </div>
+        <div className={`grid gap-4 sm:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto mb-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          {blogPosts.map((post) => (
+            <BlogCard key={post.slug} {...post} />
+          ))}
+        </div>
+        <div className="flex items-center justify-center gap-4">
+          <Link to="/blog">
+            <Button variant="outline" className="group">
+              View All Posts <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </Link>
+          <Link to="/faq">
+            <Button variant="ghost" className="group">
+              Have Questions? <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 export default Index;

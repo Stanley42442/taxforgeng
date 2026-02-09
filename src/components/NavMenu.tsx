@@ -156,10 +156,13 @@ const navGroups: NavGroup[] = [
     label: 'Resources',
     icon: GraduationCap,
     links: [
+      { to: "/blog", label: "Blog", icon: FileText },
+      { to: "/faq", label: "FAQ", icon: GraduationCap },
       { to: "/learn", label: "Learn", icon: GraduationCap },
       { to: "/tax-logic", label: "Tax Logic Reference", icon: FileText },
-      { to: "/pricing", label: "Pricing", icon: DollarSign },
+      { to: "/tax-calendar", label: "Tax Calendar", icon: Calendar },
       { to: "/documentation", label: "Documentation", icon: FileText },
+      { to: "/pricing", label: "Pricing", icon: DollarSign },
       { to: "/roadmap", label: "Roadmap", icon: Map },
       { to: "/success-stories", label: "Success Stories", icon: Star },
     ]
