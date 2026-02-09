@@ -1,0 +1,32 @@
+import { List } from 'lucide-react';
+
+interface TOCItem {
+  id: string;
+  label: string;
+}
+
+interface TableOfContentsProps {
+  items: TOCItem[];
+}
+
+export const TableOfContents = ({ items }: TableOfContentsProps) => (
+  <nav className="glass-frosted rounded-xl p-5 mb-8" aria-label="Table of contents">
+    <div className="flex items-center gap-2 mb-3">
+      <List className="h-4 w-4 text-primary" />
+      <h2 className="text-sm font-bold text-foreground uppercase tracking-wide">In This Article</h2>
+    </div>
+    <ol className="space-y-1.5">
+      {items.map((item, i) => (
+        <li key={item.id}>
+          <a
+            href={`#${item.id}`}
+            className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-baseline gap-2"
+          >
+            <span className="text-xs text-muted-foreground/60 font-mono">{i + 1}.</span>
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+);
