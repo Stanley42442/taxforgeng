@@ -121,6 +121,44 @@
     <changefreq>monthly</changefreq>
     <priority>0.70</priority>
   </url>
+  <!-- State Guides -->
+  <url>
+    <loc>https://taxforgeng.com/state-guides</loc>
+    <lastmod>2026-02-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://taxforgeng.com/state-guides/lagos</loc>
+    <lastmod>2026-02-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://taxforgeng.com/state-guides/abuja</loc>
+    <lastmod>2026-02-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://taxforgeng.com/state-guides/kano</loc>
+    <lastmod>2026-02-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <!-- About & Resources -->
+  <url>
+    <loc>https://taxforgeng.com/about</loc>
+    <lastmod>2026-02-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.60</priority>
+  </url>
+  <url>
+    <loc>https://taxforgeng.com/resources</loc>
+    <lastmod>2026-02-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
   <!-- Blog & FAQ -->
   <url>
     <loc>https://taxforgeng.com/blog</loc>
@@ -148,6 +186,30 @@
   </url>
   <url>
     <loc>https://taxforgeng.com/blog/tax-guide-tech-startups</loc>
+    <lastmod>2026-02-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
+  </url>
+  <url>
+    <loc>https://taxforgeng.com/blog/vat-guide-nigeria</loc>
+    <lastmod>2026-02-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
+  </url>
+  <url>
+    <loc>https://taxforgeng.com/blog/wht-explained</loc>
+    <lastmod>2026-02-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
+  </url>
+  <url>
+    <loc>https://taxforgeng.com/blog/payroll-tax-guide</loc>
+    <lastmod>2026-02-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
+  </url>
+  <url>
+    <loc>https://taxforgeng.com/blog/tax-calendar-2026</loc>
     <lastmod>2026-02-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.70</priority>

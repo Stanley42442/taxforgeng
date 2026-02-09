@@ -332,11 +332,11 @@ const Index = () => {
               <h4 className="font-semibold text-foreground mb-4">Company</h4>
               <div className="flex flex-col gap-2 text-sm">
                 {[
+                  { to: "/about", label: "About Us" },
+                  { to: "/resources", label: "Resources" },
+                  { to: "/state-guides", label: "State Guides" },
                   { to: "/success-stories", label: "Success Stories" },
-                  { to: "/referrals", label: "Referrals" },
                   { to: "/roadmap", label: "Roadmap" },
-                  { to: "/documentation", label: "Documentation" },
-                  { to: "/auth", label: "Sign In" },
                 ].map((link) => (
                   <Link 
                     key={link.to}

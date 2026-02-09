@@ -16,6 +16,38 @@ const POSTS: BlogPostMeta[] = [
     readTime: '8 min read',
   },
   {
+    slug: 'vat-guide-nigeria',
+    title: 'VAT Guide for Nigerian Businesses',
+    excerpt: 'Registration threshold, filing deadlines, exempt items, input vs output VAT, and penalties — everything you need for VAT compliance in 2026.',
+    date: 'February 9, 2026',
+    category: 'VAT',
+    readTime: '10 min read',
+  },
+  {
+    slug: 'wht-explained',
+    title: 'Withholding Tax (WHT) Explained',
+    excerpt: 'WHT rates by payment type, credit notes, final tax treatment, non-resident WHT, and remittance deadlines for Nigerian businesses.',
+    date: 'February 9, 2026',
+    category: 'WHT',
+    readTime: '10 min read',
+  },
+  {
+    slug: 'payroll-tax-guide',
+    title: 'Payroll Tax Guide for Employers',
+    excerpt: 'PAYE calculation under 2026 bands, pension contributions, NHF, ITF, NSITF, Rent Relief, and monthly filing deadlines for Nigerian employers.',
+    date: 'February 9, 2026',
+    category: 'Payroll',
+    readTime: '10 min read',
+  },
+  {
+    slug: 'tax-calendar-2026',
+    title: 'Tax Calendar 2026: Key Deadlines',
+    excerpt: 'Month-by-month guide to every CIT, VAT, WHT, PAYE, and pension filing deadline — with penalties for late filing.',
+    date: 'February 9, 2026',
+    category: 'Guides',
+    readTime: '8 min read',
+  },
+  {
     slug: 'small-company-cit-exemption',
     title: '0% CIT for Small Companies: Complete Guide',
     excerpt: 'How to qualify for the Small Company Exemption under the 2026 rules. Turnover threshold doubled to ₦50M — here\'s everything you need to know.',
@@ -41,7 +73,7 @@ const POSTS: BlogPostMeta[] = [
   },
 ];
 
-const CATEGORIES = ['All', 'Tax Reforms', 'Guides'];
+const CATEGORIES = ['All', 'Tax Reforms', 'Guides', 'VAT', 'WHT', 'Payroll'];
 
 const Blog = () => {
   const [category, setCategory] = useState('All');
