@@ -18,7 +18,12 @@ interface RelatedPost {
   slug: string;
 }
 
-interface BlogPostLayoutProps {
+interface RelatedTool {
+  title: string;
+  to: string;
+}
+
+export interface BlogPostLayoutProps {
   title: string;
   titleHighlight?: string;
   subtitle: string;
@@ -32,6 +37,7 @@ interface BlogPostLayoutProps {
   toc: { id: string; label: string }[];
   faqs: FAQ[];
   relatedPosts: RelatedPost[];
+  relatedTools?: RelatedTool[];
   ctaHeadline?: string;
   ctaSubtext?: string;
   ctaPrimaryLink?: string;
@@ -52,6 +58,7 @@ export const BlogPostLayout = ({
   toc,
   faqs,
   relatedPosts,
+  relatedTools,
   ctaHeadline,
   ctaSubtext,
   ctaPrimaryLink = '/individual-calculator',
@@ -129,6 +136,26 @@ export const BlogPostLayout = ({
                       >
                         <span className="font-semibold text-foreground group-hover:text-primary transition-colors text-sm flex items-center gap-2">
                           {post.title} <ArrowRight className="h-3 w-3" />
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Related Tools */}
+              {relatedTools && relatedTools.length > 0 && (
+                <section className="mb-12">
+                  <h2 className="text-xl font-bold text-foreground mb-4">Related Tools</h2>
+                  <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+                    {relatedTools.map((tool) => (
+                      <Link
+                        key={tool.to}
+                        to={tool.to}
+                        className="glass-frosted rounded-xl p-4 hover-lift transition-all group"
+                      >
+                        <span className="font-semibold text-foreground group-hover:text-primary transition-colors text-sm flex items-center gap-2">
+                          {tool.title} <ArrowRight className="h-3 w-3" />
                         </span>
                       </Link>
                     ))}

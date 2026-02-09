@@ -1,68 +1,41 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createBreadcrumbSchema, createFAQSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
-import { FileText, QrCode, Download, Mail, Shield, Printer, CheckCircle2, ArrowRight, Star } from 'lucide-react';
+import { FileText, QrCode, Download, Mail, Shield, Printer, CheckCircle2, ArrowRight, Star, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const TaxReports = () => {
   const reportTypes = [
-    {
-      title: 'Personal Tax Summary',
-      description: 'Complete breakdown of your PIT with all reliefs, deductions, and comparison with pre-2026 rules.',
-      features: ['Net salary calculation', 'Rent Relief included', 'Tax band breakdown', 'Year comparison'],
-      icon: FileText,
-    },
-    {
-      title: 'Business Tax Report',
-      description: 'Comprehensive CIT, VAT, WHT, and Development Levy calculations for your company.',
-      features: ['CIT by company size', 'VAT summary', 'WHT credits', 'Development Levy'],
-      icon: FileText,
-    },
-    {
-      title: 'Payroll Summary',
-      description: 'Bulk PAYE calculations for all employees with individual breakdowns.',
-      features: ['Employee list', 'PAYE per employee', 'Total remittance', 'P9 form ready'],
-      icon: FileText,
-    },
-    {
-      title: 'Invoice Generation',
-      description: 'Professional invoices with automatic VAT and WHT calculations.',
-      features: ['Branded design', 'Auto VAT/WHT', 'Client management', 'Payment tracking'],
-      icon: FileText,
-    },
+    { title: 'Personal Tax Summary', description: 'Complete breakdown of your PIT with all reliefs, deductions, and comparison with pre-2026 rules.', features: ['Net salary calculation', 'Rent Relief included', 'Tax band breakdown', 'Year comparison'], icon: FileText },
+    { title: 'Business Tax Report', description: 'Comprehensive CIT, VAT, WHT, and Development Levy calculations for your company.', features: ['CIT by company size', 'VAT summary', 'WHT credits', 'Development Levy'], icon: FileText },
+    { title: 'Payroll Summary', description: 'Bulk PAYE calculations for all employees with individual breakdowns.', features: ['Employee list', 'PAYE per employee', 'Total remittance', 'P9 form ready'], icon: FileText },
+    { title: 'Invoice Generation', description: 'Professional invoices with automatic VAT and WHT calculations.', features: ['Branded design', 'Auto VAT/WHT', 'Client management', 'Payment tracking'], icon: FileText },
   ];
 
   const pricingTiers = [
-    {
-      name: 'Free',
-      price: '₦0',
-      period: 'forever',
-      features: ['Basic PIT calculation', 'On-screen results', 'No PDF export', 'No saved history'],
-      cta: 'Start Free',
-      link: '/free-tax-calculator',
-      highlight: false,
-    },
-    {
-      name: 'Starter',
-      price: '₦500',
-      period: '/month',
-      features: ['PDF tax reports', 'QR verification', 'Business calculator', 'Expense tracking', '5 saved businesses'],
-      cta: 'Get Started',
-      link: '/pricing',
-      highlight: true,
-    },
-    {
-      name: 'Business',
-      price: '₦2,000',
-      period: '/month',
-      features: ['Everything in Starter', 'Invoice generation', 'OCR receipt scanning', 'Email delivery', '20 saved businesses'],
-      cta: 'Upgrade',
-      link: '/pricing',
-      highlight: false,
-    },
+    { name: 'Free', price: '₦0', period: 'forever', features: ['Basic PIT calculation', 'On-screen results', 'No PDF export', 'No saved history'], cta: 'Start Free', link: '/free-tax-calculator', highlight: false },
+    { name: 'Starter', price: '₦500', period: '/month', features: ['PDF tax reports', 'QR verification', 'Business calculator', 'Expense tracking', '5 saved businesses'], cta: 'Get Started', link: '/pricing', highlight: true },
+    { name: 'Business', price: '₦2,000', period: '/month', features: ['Everything in Starter', 'Invoice generation', 'OCR receipt scanning', 'Email delivery', '20 saved businesses'], cta: 'Upgrade', link: '/pricing', highlight: false },
+  ];
+
+  const commonMistakes = [
+    { mistake: 'Downloading without reviewing figures', fix: 'Always check your calculation results on screen before generating a PDF. Once downloaded, incorrect reports may be shared accidentally.' },
+    { mistake: 'Selecting the wrong tax year', fix: 'Ensure you\'re calculating with 2026 rules if applicable. Pre-2026 calculations use different bands, reliefs, and thresholds.' },
+    { mistake: 'Not including all income sources', fix: 'For accurate personal tax reports, include all income — employment, freelance, rental, and investment income must all be aggregated.' },
+    { mistake: 'Sharing QR verification links publicly', fix: 'QR codes link to your specific report verification page. Share only with authorized parties like your accountant or tax authority.' },
+  ];
+
+  const faqs = [
+    { question: 'What format are the reports generated in?', answer: 'All reports are generated as high-quality PDF files optimized for both screen viewing and printing. They include professional formatting, branding, and a unique QR verification code.' },
+    { question: 'Can I email reports directly from TaxForge?', answer: 'Yes, paid plans include the ability to email reports directly to yourself, your accountant, or other recipients. You can also manage a list of saved email recipients.' },
+    { question: 'How does QR verification work?', answer: 'Each report includes a unique QR code that links to a verification page on TaxForge. Anyone scanning the code can confirm the report was generated by TaxForge and view the document ID, generation date, and type.' },
+    { question: 'How long are my reports stored?', answer: 'Reports are generated on-demand and downloaded to your device. TaxForge stores your calculation history (inputs and results) so you can regenerate reports at any time. Premium plans retain full history.' },
+    { question: 'Are the reports accepted by FIRS?', answer: 'TaxForge reports are formatted to be FIRS-compliant and include all required information. However, they are supplementary documents — official filing must still be done through the FIRS TaxPro Max portal.' },
+    { question: 'Can I customize the report branding?', answer: 'Business and Corporate plan users can add their company logo and details to reports. Free and Starter plans use the default TaxForge branding.' },
   ];
 
   const schema = {
@@ -72,6 +45,7 @@ const TaxReports = () => {
         'Nigerian Tax Reports & Invoices Generator',
         'Generate professional tax reports and invoices with QR verification. FIRS-compliant format. Download PDF instantly.'
       ),
+      createFAQSchema(faqs),
       createBreadcrumbSchema([
         { name: 'Home', url: 'https://taxforgeng.com/' },
         { name: 'Features', url: 'https://taxforgeng.com/pricing' },
@@ -91,7 +65,6 @@ const TaxReports = () => {
       />
 
       <div className="min-h-screen flex flex-col">
-        {/* Background */}
         <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
         <div className="fixed inset-0 bg-mesh pointer-events-none" />
         <div className="fixed inset-0 bg-dots opacity-20 pointer-events-none" />
@@ -101,46 +74,28 @@ const TaxReports = () => {
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
             <div className="max-w-4xl mx-auto">
-              {/* Hero */}
               <SEOHero
                 title="Professional Nigerian"
                 titleHighlight="Tax Reports & Invoices"
                 subtitle="Generate FIRS-compliant tax documents with QR code verification. Download professional PDF reports instantly."
               />
 
-              {/* Trust Badges */}
               <div className="mb-10 animate-slide-up-delay-2">
-                <TrustBadges
-                  badges={[
-                    { icon: 'shield', text: 'QR Verified' },
-                    { icon: 'check', text: 'FIRS Compliant' },
-                    { icon: 'clock', text: 'Instant Download' },
-                  ]}
-                />
+                <TrustBadges badges={[
+                  { icon: 'shield', text: 'QR Verified' },
+                  { icon: 'check', text: 'FIRS Compliant' },
+                  { icon: 'clock', text: 'Instant Download' },
+                ]} />
               </div>
 
               {/* Key Features */}
               <section className="mb-12">
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
-                  Why Choose TaxForge Reports?
-                </h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">Why Choose TaxForge Reports?</h2>
                 <div className="grid gap-6 md:grid-cols-3">
                   {[
-                    {
-                      icon: QrCode,
-                      title: 'QR Verification',
-                      description: 'Every report includes a unique QR code that links to verification page for authenticity.',
-                    },
-                    {
-                      icon: Shield,
-                      title: 'FIRS Compliant',
-                      description: 'Reports follow official formats and include all required information for tax filing.',
-                    },
-                    {
-                      icon: Download,
-                      title: 'Instant PDF',
-                      description: 'Generate and download professional reports immediately. No waiting, no email delays.',
-                    },
+                    { icon: QrCode, title: 'QR Verification', description: 'Every report includes a unique QR code that links to verification page for authenticity.' },
+                    { icon: Shield, title: 'FIRS Compliant', description: 'Reports follow official formats and include all required information for tax filing.' },
+                    { icon: Download, title: 'Instant PDF', description: 'Generate and download professional reports immediately. No waiting, no email delays.' },
                   ].map((feature, index) => (
                     <div key={index} className="glass-frosted rounded-2xl p-6 text-center hover-lift transition-all">
                       <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground mb-4 shadow-lg">
@@ -155,9 +110,7 @@ const TaxReports = () => {
 
               {/* Report Types */}
               <section className="mb-12">
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
-                  Available Report Types
-                </h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">Available Report Types</h2>
                 <div className="grid gap-4 md:grid-cols-2">
                   {reportTypes.map((report, index) => (
                     <div key={index} className="glass-frosted rounded-2xl p-6">
@@ -185,9 +138,7 @@ const TaxReports = () => {
 
               {/* What's Included */}
               <section className="mb-12">
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
-                  What's Included in Every Report
-                </h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">What's Included in Every Report</h2>
                 <div className="glass-frosted rounded-2xl p-6 md:p-8">
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {[
@@ -207,23 +158,33 @@ const TaxReports = () => {
                 </div>
               </section>
 
+              {/* Common Mistakes */}
+              <section className="mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">Common Mistakes to Avoid</h2>
+                <div className="space-y-4">
+                  {commonMistakes.map((item, i) => (
+                    <div key={i} className="glass-frosted rounded-xl p-5 border-l-4 border-warning/60">
+                      <div className="flex items-start gap-3">
+                        <AlertTriangle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+                        <div>
+                          <h3 className="font-semibold text-foreground text-sm mb-1">{item.mistake}</h3>
+                          <p className="text-sm text-muted-foreground">{item.fix}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
               {/* Pricing Comparison */}
               <section className="mb-12">
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
-                  Choose Your Plan
-                </h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">Choose Your Plan</h2>
                 <div className="grid gap-6 md:grid-cols-3">
                   {pricingTiers.map((tier, index) => (
-                    <div 
-                      key={index} 
-                      className={`glass-frosted rounded-2xl p-6 ${
-                        tier.highlight ? 'border-2 border-primary ring-2 ring-primary/20' : ''
-                      }`}
-                    >
+                    <div key={index} className={`glass-frosted rounded-2xl p-6 ${tier.highlight ? 'border-2 border-primary ring-2 ring-primary/20' : ''}`}>
                       {tier.highlight && (
                         <div className="flex items-center justify-center gap-1 text-xs font-semibold text-primary mb-4">
-                          <Star className="h-3 w-3 fill-primary" />
-                          MOST POPULAR
+                          <Star className="h-3 w-3 fill-primary" /> MOST POPULAR
                         </div>
                       )}
                       <div className="text-center mb-6">
@@ -242,12 +203,8 @@ const TaxReports = () => {
                         ))}
                       </ul>
                       <Link to={tier.link}>
-                        <Button 
-                          variant={tier.highlight ? 'glow' : 'outline'} 
-                          className="w-full"
-                        >
-                          {tier.cta}
-                          <ArrowRight className="h-4 w-4" />
+                        <Button variant={tier.highlight ? 'glow' : 'outline'} className="w-full">
+                          {tier.cta} <ArrowRight className="h-4 w-4" />
                         </Button>
                       </Link>
                     </div>
@@ -257,9 +214,7 @@ const TaxReports = () => {
 
               {/* How It Works */}
               <section className="mb-12">
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
-                  How to Generate a Report
-                </h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">How to Generate a Report</h2>
                 <div className="glass-frosted rounded-2xl p-6 md:p-8">
                   <div className="grid gap-6 md:grid-cols-4">
                     {[
@@ -280,32 +235,53 @@ const TaxReports = () => {
                 </div>
               </section>
 
-              {/* Related Tools */}
+              {/* FAQ Accordion */}
               <section className="mb-12">
-                <h2 className="text-2xl font-bold text-foreground text-center mb-6">
-                  Start Calculating
-                </h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">Frequently Asked Questions</h2>
+                <Accordion type="single" collapsible className="w-full space-y-2">
+                  {faqs.map((faq, index) => (
+                    <AccordionItem key={index} value={`faq-${index}`} className="glass-frosted rounded-xl border-none px-2">
+                      <AccordionTrigger className="text-left text-sm md:text-base font-semibold text-foreground hover:no-underline px-4 py-4">
+                        {faq.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-sm text-muted-foreground px-4 pb-4">
+                        {faq.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </section>
+
+              {/* Related Articles */}
+              <section className="mb-12">
+                <h2 className="text-2xl font-bold text-foreground text-center mb-6">Related Articles</h2>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <Link to="/individual-calculator" className="glass-frosted rounded-xl p-5 hover-lift transition-all group">
-                    <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
-                      Personal Tax Calculator
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Calculate PIT/PAYE and generate personal tax report
-                    </p>
+                  <Link to="/blog/tax-reforms-2026-summary" className="glass-frosted rounded-xl p-5 hover-lift transition-all group">
+                    <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">2026 Tax Reforms Summary</h3>
+                    <p className="text-sm text-muted-foreground">Everything that changed under the Nigeria Tax Act 2025</p>
                   </Link>
-                  <Link to="/calculator" className="glass-frosted rounded-xl p-5 hover-lift transition-all group">
-                    <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
-                      Business Tax Calculator
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Calculate CIT, VAT, WHT with full business report
-                    </p>
+                  <Link to="/blog/pit-paye-guide-2026" className="glass-frosted rounded-xl p-5 hover-lift transition-all group">
+                    <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">PIT & PAYE Guide 2026</h3>
+                    <p className="text-sm text-muted-foreground">Step-by-step personal income tax calculation guide</p>
                   </Link>
                 </div>
               </section>
 
-              {/* Final CTA */}
+              {/* Related Tools */}
+              <section className="mb-12">
+                <h2 className="text-2xl font-bold text-foreground text-center mb-6">Start Calculating</h2>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Link to="/individual-calculator" className="glass-frosted rounded-xl p-5 hover-lift transition-all group">
+                    <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">Personal Tax Calculator</h3>
+                    <p className="text-sm text-muted-foreground">Calculate PIT/PAYE and generate personal tax report</p>
+                  </Link>
+                  <Link to="/calculator" className="glass-frosted rounded-xl p-5 hover-lift transition-all group">
+                    <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">Business Tax Calculator</h3>
+                    <p className="text-sm text-muted-foreground">Calculate CIT, VAT, WHT with full business report</p>
+                  </Link>
+                </div>
+              </section>
+
               <CTASection
                 variant="gradient"
                 headline="Get Your Professional Tax Report"
@@ -316,7 +292,6 @@ const TaxReports = () => {
                 secondaryLink="/pricing"
               />
 
-              {/* Disclaimer */}
               <SEODisclaimer />
             </div>
           </div>

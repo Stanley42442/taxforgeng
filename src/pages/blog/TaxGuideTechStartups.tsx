@@ -38,6 +38,12 @@ const TaxGuideTechStartups = () => {
       relatedPosts={[
         { title: '0% CIT for Small Companies', slug: 'small-company-cit-exemption' },
         { title: 'Tax Reforms 2026: Full Summary', slug: 'tax-reforms-2026-summary' },
+        { title: 'PIT & PAYE Guide 2026', slug: 'pit-paye-guide-2026' },
+      ]}
+      relatedTools={[
+        { title: 'CIT Calculator', to: '/cit-calculator' },
+        { title: 'Small Company Exemption Checker', to: '/small-company-exemption' },
+        { title: 'PIT/PAYE Calculator', to: '/pit-paye-calculator' },
       ]}
       ctaHeadline="Calculate Your Startup's Tax"
       ctaSubtext="See exactly what your startup owes with our free CIT calculator."

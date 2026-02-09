@@ -9,7 +9,9 @@ import {
   Receipt,
   MapPin,
   BarChart3,
-  ArrowRight 
+  ArrowRight,
+  BookOpen,
+  HelpCircle,
 } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
@@ -92,6 +94,20 @@ export const FreeTaxToolsSection = () => {
       description: "Local Rivers State tax info",
       gradient: "from-warning/80 to-accent/70",
     },
+    {
+      to: "/blog",
+      icon: BookOpen,
+      title: "Blog",
+      description: "Tax guides and expert articles",
+      gradient: "from-primary/70 to-info/70",
+    },
+    {
+      to: "/faq",
+      icon: HelpCircle,
+      title: "FAQ",
+      description: "30+ answered tax questions",
+      gradient: "from-success/70 to-warning/70",
+    },
   ];
 
   return (
@@ -110,7 +126,7 @@ export const FreeTaxToolsSection = () => {
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 max-w-6xl mx-auto">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
           {tools.map((tool, index) => (
             <Link
               key={tool.to}

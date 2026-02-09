@@ -41,6 +41,11 @@ const TaxReforms2026Summary = () => {
         { title: 'PIT & PAYE Guide 2026', slug: 'pit-paye-guide-2026' },
         { title: 'Tax Guide for Tech Startups', slug: 'tax-guide-tech-startups' },
       ]}
+      relatedTools={[
+        { title: 'CIT Calculator', to: '/cit-calculator' },
+        { title: 'PIT/PAYE Calculator', to: '/pit-paye-calculator' },
+        { title: 'Small Company Exemption Checker', to: '/small-company-exemption' },
+      ]}
       ctaHeadline="See How the Reforms Affect You"
       ctaSubtext="Enter your income and get your personalised 2026 vs old-rules comparison."
     >
