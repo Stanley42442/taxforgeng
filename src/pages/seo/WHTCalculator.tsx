@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -7,8 +7,17 @@ import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
 import { Receipt, Building2, CreditCard, CheckCircle2, ArrowRight, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/taxCalculations';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 
 const WHTCalculator = () => {
+  const howToSteps = [
+    { name: 'Identify the Payment Type', text: 'Determine the nature of the payment: contract, rent, dividend, interest, royalty, professional fee, or technical fee. Each has a different WHT rate.' },
+    { name: 'Look Up the Applicable WHT Rate', text: 'Contracts attract 5% WHT. Most other payments (rent, dividends, professional fees, royalties) attract 10%. Check the rate table for your specific case.' },
+    { name: 'Deduct WHT Before Making Payment', text: 'Calculate the WHT amount and deduct it from the gross payment. Pay the net amount to the recipient.' },
+    { name: 'Issue WHT Credit Note', text: 'After remitting to FIRS, obtain and issue a WHT credit note to the recipient. They need this to claim the WHT as a credit against their own tax.' },
+    { name: 'Remit WHT to FIRS Within 21 Days', text: 'Pay the deducted WHT to FIRS within 21 days after the month the deduction was made. Late remittance attracts penalties.' },
+  ];
+
   const faqs = [
     {
       question: 'What is Withholding Tax (WHT)?',
@@ -25,6 +34,18 @@ const WHTCalculator = () => {
     {
       question: 'When must I remit WHT?',
       answer: 'WHT must be remitted to FIRS within 21 days after the month in which the deduction was made. Late remittance attracts penalties.',
+    },
+    {
+      question: 'What WHT rate applies to payments to non-residents?',
+      answer: 'Payments to non-resident companies and individuals generally attract WHT at 10%. However, double taxation agreements (DTAs) between Nigeria and other countries may reduce this rate. Check the applicable DTA for the specific country.',
+    },
+    {
+      question: 'Can group companies offset WHT between themselves?',
+      answer: 'No. WHT obligations exist between separate legal entities, even within the same corporate group. Each entity must deduct and remit WHT independently when making qualifying payments to other group members.',
+    },
+    {
+      question: 'How do I recover excess WHT credits?',
+      answer: 'If your WHT credits exceed your tax liability, you can carry the excess forward to offset future tax or apply for a refund from FIRS. The refund process requires submitting a formal application with supporting documentation.',
     },
   ];
 
@@ -47,6 +68,11 @@ const WHTCalculator = () => {
         'Nigerian WHT rates: 5% contracts, 10% rent/dividends/professional fees. Learn about WHT credits and how to offset against income tax.'
       ),
       createFAQSchema(faqs),
+      createHowToSchema(
+        'How to Calculate and Remit Nigerian Withholding Tax',
+        'Step-by-step guide to deducting, remitting, and claiming credits for Withholding Tax in Nigeria.',
+        howToSteps
+      ),
       createBreadcrumbSchema([
         { name: 'Home', url: 'https://taxforgeng.com/' },
         { name: 'Tax Tools', url: 'https://taxforgeng.com/free-tax-calculator' },
@@ -139,38 +165,58 @@ const WHTCalculator = () => {
               {/* How WHT Works */}
               <section className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
-                  How Withholding Tax Works
+                  How to Calculate and Remit WHT
                 </h2>
-                <div className="glass-frosted rounded-2xl p-6 md:p-8">
-                  <div className="grid gap-6 md:grid-cols-3">
-                    <div className="text-center">
-                      <div className="h-16 w-16 rounded-full bg-gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <Receipt className="h-7 w-7 text-primary-foreground" />
+                <div className="space-y-4">
+                  {howToSteps.map((step, index) => (
+                    <div key={index} className="glass-frosted rounded-xl p-5 flex items-start gap-4">
+                      <div className="h-10 w-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold shrink-0">
+                        {index + 1}
                       </div>
-                      <h3 className="font-semibold text-foreground mb-2">Deduct at Source</h3>
-                      <p className="text-sm text-muted-foreground">
-                        When making qualifying payments, deduct the WHT percentage before paying the net amount.
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <div className="h-16 w-16 rounded-full bg-gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <Building2 className="h-7 w-7 text-primary-foreground" />
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-1">{step.name}</h3>
+                        <p className="text-sm text-muted-foreground">{step.text}</p>
                       </div>
-                      <h3 className="font-semibold text-foreground mb-2">Remit to FIRS</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Pay the deducted WHT to FIRS within 21 days and obtain credit notes for the recipient.
-                      </p>
                     </div>
-                    <div className="text-center">
-                      <div className="h-16 w-16 rounded-full bg-gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <CreditCard className="h-7 w-7 text-primary-foreground" />
+                  ))}
+                </div>
+              </section>
+
+              {/* Common Mistakes */}
+              <section className="mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  Common WHT Mistakes to Avoid
+                </h2>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {[
+                    {
+                      mistake: 'Treating WHT as a final tax',
+                      fix: 'WHT is usually an advance payment (credit) against your income tax, not a final tax. The main exceptions are dividends and interest for individuals, which may be treated as final tax.',
+                    },
+                    {
+                      mistake: 'Not issuing credit notes to recipients',
+                      fix: 'After remitting WHT to FIRS, you must obtain and issue credit notes to the recipient. Without credit notes, they cannot claim the WHT as a credit against their own tax.',
+                    },
+                    {
+                      mistake: 'Applying wrong WHT rate',
+                      fix: 'Contracts attract 5% WHT, not 10%. Rent, dividends, and professional fees attract 10%. Using the wrong rate leads to under- or over-deduction and potential penalties.',
+                    },
+                    {
+                      mistake: 'Missing the 21-day remittance deadline',
+                      fix: 'WHT must be remitted to FIRS within 21 days after the month of deduction. Late remittance attracts penalties of 10% plus interest at CBN rate.',
+                    },
+                  ].map((item, index) => (
+                    <div key={index} className="glass-frosted rounded-xl p-5">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertTriangle className="h-4 w-4 text-destructive" />
+                        <h3 className="font-semibold text-destructive">{item.mistake}</h3>
                       </div>
-                      <h3 className="font-semibold text-foreground mb-2">Claim as Credit</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Recipients use WHT credit notes to offset their final income tax liability.
-                      </p>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-success shrink-0 mt-0.5" />
+                        <p className="text-sm text-muted-foreground">{item.fix}</p>
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
               </section>
 
@@ -240,34 +286,10 @@ const WHTCalculator = () => {
                 </h2>
                 <div className="grid gap-4 md:grid-cols-2">
                   {[
-                    {
-                      scenario: 'Contractor Payment',
-                      payment: 5_000_000,
-                      rate: '5%',
-                      wht: 250_000,
-                      net: 4_750_000,
-                    },
-                    {
-                      scenario: 'Office Rent (to Company)',
-                      payment: 12_000_000,
-                      rate: '10%',
-                      wht: 1_200_000,
-                      net: 10_800_000,
-                    },
-                    {
-                      scenario: 'Legal Fees',
-                      payment: 3_000_000,
-                      rate: '10%',
-                      wht: 300_000,
-                      net: 2_700_000,
-                    },
-                    {
-                      scenario: 'Dividend Distribution',
-                      payment: 10_000_000,
-                      rate: '10%',
-                      wht: 1_000_000,
-                      net: 9_000_000,
-                    },
+                    { scenario: 'Contractor Payment', payment: 5_000_000, rate: '5%', wht: 250_000, net: 4_750_000 },
+                    { scenario: 'Office Rent (to Company)', payment: 12_000_000, rate: '10%', wht: 1_200_000, net: 10_800_000 },
+                    { scenario: 'Legal Fees', payment: 3_000_000, rate: '10%', wht: 300_000, net: 2_700_000 },
+                    { scenario: 'Dividend Distribution', payment: 10_000_000, rate: '10%', wht: 1_000_000, net: 9_000_000 },
                   ].map((example, index) => (
                     <div key={index} className="glass-frosted rounded-xl p-5">
                       <h4 className="font-semibold text-foreground mb-3">{example.scenario}</h4>
@@ -331,18 +353,24 @@ const WHTCalculator = () => {
                 </div>
               </section>
 
-              {/* FAQ Section */}
+              {/* FAQ Section - Accordion */}
               <section className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Frequently Asked Questions
                 </h2>
-                <div className="space-y-4">
-                  {faqs.map((faq, index) => (
-                    <div key={index} className="glass-frosted rounded-xl p-6">
-                      <h3 className="text-lg font-semibold text-foreground mb-2">{faq.question}</h3>
-                      <p className="text-muted-foreground">{faq.answer}</p>
-                    </div>
-                  ))}
+                <div className="glass-frosted rounded-2xl p-6">
+                  <Accordion type="single" collapsible className="w-full">
+                    {faqs.map((faq, index) => (
+                      <AccordionItem key={index} value={`faq-${index}`}>
+                        <AccordionTrigger className="text-left text-foreground hover:no-underline">
+                          {faq.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground">
+                          {faq.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
                 </div>
               </section>
 

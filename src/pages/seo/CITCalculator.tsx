@@ -1,15 +1,24 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
 import { ComparisonTable, CIT_COMPARISON_ROWS } from '@/components/seo/ComparisonTable';
-import { Building2, TrendingUp, Calendar, FileText, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Building2, TrendingUp, Calendar, FileText, CheckCircle2, ArrowRight, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/taxCalculations';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 
 const CITCalculator = () => {
+  const howToSteps = [
+    { name: 'Determine Your Annual Turnover', text: 'Calculate your company\'s total gross revenue for the year. This determines which CIT category you fall into: small (≤₦50M), medium (₦50M-₦200M), or large (>₦200M).' },
+    { name: 'Calculate Total Fixed Assets', text: 'Add up all fixed assets — land, buildings, machinery, vehicles, equipment. For small company status, total must be ≤₦250M.' },
+    { name: 'Check Your CIT Category', text: 'Small companies (turnover ≤₦50M AND assets ≤₦250M) pay 0%. Medium companies pay 20%. Large companies pay 30%.' },
+    { name: 'Calculate CIT and Development Levy', text: 'Apply your CIT rate to assessable profits. Then add the 4% Development Levy (replaces TET) for medium and large companies.' },
+    { name: 'Subtract WHT Credits', text: 'Deduct any Withholding Tax credits you\'ve accumulated during the year to determine your net CIT payable.' },
+  ];
+
   const faqs = [
     {
       question: 'What is Company Income Tax (CIT) in Nigeria?',
@@ -26,6 +35,18 @@ const CITCalculator = () => {
     {
       question: 'When is CIT due?',
       answer: 'CIT returns must be filed within 6 months after the end of your accounting year. Payment is due on the same date. Late filing attracts penalties.',
+    },
+    {
+      question: 'How are newly incorporated companies taxed?',
+      answer: 'Newly incorporated companies file their first CIT return within 18 months of incorporation or 6 months after the first accounting year, whichever comes first. They are assessed based on actual profits.',
+    },
+    {
+      question: 'What if my company earns income from multiple sources?',
+      answer: 'All income from Nigerian operations is combined for CIT purposes. Investment income, trading income, and service income are aggregated. Foreign income may be subject to different rules depending on double taxation agreements.',
+    },
+    {
+      question: 'What is provisional tax for CIT?',
+      answer: 'Companies with CIT liability exceeding ₦1 million may need to pay provisional tax in installments. This is an advance payment based on estimated profits, with final reconciliation at year-end.',
     },
   ];
 
@@ -61,6 +82,11 @@ const CITCalculator = () => {
         'Calculate Nigerian CIT with 2026 rates. 0% for small companies, 20% medium, 30% large. Includes Development Levy.'
       ),
       createFAQSchema(faqs),
+      createHowToSchema(
+        'How to Calculate Nigerian Company Income Tax (CIT)',
+        'Step-by-step guide to calculating your company\'s CIT liability under the 2026 Nigerian tax rules.',
+        howToSteps
+      ),
       createBreadcrumbSchema([
         { name: 'Home', url: 'https://taxforgeng.com/' },
         { name: 'Tax Tools', url: 'https://taxforgeng.com/free-tax-calculator' },
@@ -162,6 +188,64 @@ const CITCalculator = () => {
                             <p className="font-semibold text-foreground">{formatCurrency(rate.example.levy)}</p>
                           </div>
                         </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* How It Works */}
+              <section className="mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  How to Calculate Your CIT
+                </h2>
+                <div className="space-y-4">
+                  {howToSteps.map((step, index) => (
+                    <div key={index} className="glass-frosted rounded-xl p-5 flex items-start gap-4">
+                      <div className="h-10 w-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold shrink-0">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-1">{step.name}</h3>
+                        <p className="text-sm text-muted-foreground">{step.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Common Mistakes */}
+              <section className="mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  Common CIT Mistakes to Avoid
+                </h2>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {[
+                    {
+                      mistake: 'Confusing turnover with profit for size classification',
+                      fix: 'Company size is based on TURNOVER (gross revenue), not profit. A company with ₦40M turnover but only ₦2M profit still qualifies as small.',
+                    },
+                    {
+                      mistake: 'Forgetting the asset test for small company status',
+                      fix: 'You must meet BOTH criteria: turnover ≤₦50M AND fixed assets ≤₦250M. Many companies forget the asset test and incorrectly claim 0% CIT.',
+                    },
+                    {
+                      mistake: 'Not filing returns even at 0% CIT rate',
+                      fix: 'Small companies with 0% CIT must still file annual returns with FIRS. Failure to file attracts penalties regardless of your tax rate.',
+                    },
+                    {
+                      mistake: 'Ignoring the 4% Development Levy',
+                      fix: 'The Development Levy (replacing TET) is 4% of assessable profits and applies to medium and large companies on top of CIT. Budget for it separately.',
+                    },
+                  ].map((item, index) => (
+                    <div key={index} className="glass-frosted rounded-xl p-5">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertTriangle className="h-4 w-4 text-destructive" />
+                        <h3 className="font-semibold text-destructive">{item.mistake}</h3>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-success shrink-0 mt-0.5" />
+                        <p className="text-sm text-muted-foreground">{item.fix}</p>
                       </div>
                     </div>
                   ))}
@@ -290,18 +374,24 @@ const CITCalculator = () => {
                 />
               </section>
 
-              {/* FAQ Section */}
+              {/* FAQ Section - Accordion */}
               <section className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Frequently Asked Questions
                 </h2>
-                <div className="space-y-4">
-                  {faqs.map((faq, index) => (
-                    <div key={index} className="glass-frosted rounded-xl p-6">
-                      <h3 className="text-lg font-semibold text-foreground mb-2">{faq.question}</h3>
-                      <p className="text-muted-foreground">{faq.answer}</p>
-                    </div>
-                  ))}
+                <div className="glass-frosted rounded-2xl p-6">
+                  <Accordion type="single" collapsible className="w-full">
+                    {faqs.map((faq, index) => (
+                      <AccordionItem key={index} value={`faq-${index}`}>
+                        <AccordionTrigger className="text-left text-foreground hover:no-underline">
+                          {faq.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground">
+                          {faq.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
                 </div>
               </section>
 

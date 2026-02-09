@@ -1,16 +1,25 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createArticleSchema, createFAQSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createArticleSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
 import { RentReliefCalculator } from '@/components/seo/RentReliefCalculator';
 import { ComparisonTable } from '@/components/seo/ComparisonTable';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
-import { CheckCircle2, Home, FileText, AlertCircle, ArrowRight, XCircle, MapPin } from 'lucide-react';
+import { CheckCircle2, Home, FileText, AlertCircle, ArrowRight, XCircle, MapPin, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/taxCalculations';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 
 const RentRelief2026 = () => {
+  const howToSteps = [
+    { name: 'Gather Proof of Rent Paid', text: 'Collect rent receipts, tenancy agreement, and bank transfer records. These are mandatory for claiming Rent Relief.' },
+    { name: 'Calculate 20% of Annual Rent', text: 'Multiply your total annual rent by 20%. For example, if you pay ₦2,000,000/year, your relief is ₦400,000.' },
+    { name: 'Cap at ₦500,000 Maximum', text: 'If 20% of your rent exceeds ₦500,000, your relief is capped at ₦500,000. This cap applies regardless of how much rent you pay.' },
+    { name: 'Deduct from Taxable Income', text: 'The Rent Relief amount is deducted from your taxable income BEFORE applying the progressive PIT bands.' },
+    { name: 'File with Supporting Documentation', text: 'Include your Rent Relief claim in your annual tax return with all supporting documents attached.' },
+  ];
+
   const faqs = [
     {
       question: 'What is Rent Relief in the 2026 tax rules?',
@@ -27,6 +36,18 @@ const RentRelief2026 = () => {
     {
       question: 'Can I claim Rent Relief if I own my home?',
       answer: 'No. Rent Relief is only available for taxpayers who pay rent for their residence. Homeowners don\'t qualify for this specific deduction.',
+    },
+    {
+      question: 'What if I share accommodation with a roommate?',
+      answer: 'You can only claim Rent Relief on the portion of rent YOU actually pay. If you split ₦2,400,000 rent equally with a roommate, your claimable rent is ₦1,200,000, giving you ₦240,000 relief.',
+    },
+    {
+      question: 'Can I claim relief on office rent for my business?',
+      answer: 'No. Rent Relief under the 2026 PIT rules applies only to residential rent — the property where you live. Business rent is deductible as a business expense under CIT, not as personal Rent Relief.',
+    },
+    {
+      question: 'What happens if I move mid-year?',
+      answer: 'You claim relief on the total rent paid during the tax year across all properties. If you paid ₦600,000 at one address and ₦900,000 at another, your total claimable rent is ₦1,500,000 (relief = ₦300,000).',
     },
   ];
 
@@ -48,6 +69,11 @@ const RentRelief2026 = () => {
         '2026-02-09'
       ),
       createFAQSchema(faqs),
+      createHowToSchema(
+        'How to Claim Rent Relief Under 2026 Tax Rules',
+        'Step-by-step guide to claiming the 20% Rent Relief deduction (max ₦500,000) under the Nigeria Tax Act 2025.',
+        howToSteps
+      ),
       createBreadcrumbSchema([
         { name: 'Home', url: 'https://taxforgeng.com/' },
         { name: 'Tax Tools', url: 'https://taxforgeng.com/free-tax-calculator' },
@@ -100,41 +126,61 @@ const RentRelief2026 = () => {
                 <RentReliefCalculator />
               </div>
 
-              {/* How It Works */}
+              {/* How It Works - Step by Step */}
               <section className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
-                  How Rent Relief Works
+                  How to Claim Rent Relief
                 </h2>
-                <div className="glass-frosted rounded-2xl p-6 md:p-8">
-                  <div className="grid gap-6 md:grid-cols-3">
-                    <div className="text-center">
-                      <div className="h-16 w-16 rounded-full bg-gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span className="text-2xl font-bold text-primary-foreground">1</span>
+                <div className="space-y-4">
+                  {howToSteps.map((step, index) => (
+                    <div key={index} className="glass-frosted rounded-xl p-5 flex items-start gap-4">
+                      <div className="h-10 w-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold shrink-0">
+                        {index + 1}
                       </div>
-                      <h3 className="font-semibold text-foreground mb-2">Pay Your Rent</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Keep records of all rent payments made during the tax year
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <div className="h-16 w-16 rounded-full bg-gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span className="text-2xl font-bold text-primary-foreground">2</span>
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-1">{step.name}</h3>
+                        <p className="text-sm text-muted-foreground">{step.text}</p>
                       </div>
-                      <h3 className="font-semibold text-foreground mb-2">Calculate 20%</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Your relief is 20% of annual rent, up to ₦500,000 maximum
-                      </p>
                     </div>
-                    <div className="text-center">
-                      <div className="h-16 w-16 rounded-full bg-gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span className="text-2xl font-bold text-primary-foreground">3</span>
+                  ))}
+                </div>
+              </section>
+
+              {/* Common Mistakes */}
+              <section className="mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  Common Rent Relief Mistakes to Avoid
+                </h2>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {[
+                    {
+                      mistake: 'Claiming without proof of payment',
+                      fix: 'You must have rent receipts, a tenancy agreement, and bank transfer records. Cash payments without documentation are not claimable.',
+                    },
+                    {
+                      mistake: 'Exceeding the ₦500k cap',
+                      fix: 'Even if 20% of your rent is higher, the maximum relief is ₦500,000. For rent above ₦2.5M/year, the cap applies automatically.',
+                    },
+                    {
+                      mistake: 'Homeowners trying to claim',
+                      fix: 'Rent Relief is exclusively for renters. If you live in your own property, you do not qualify — even if you have a mortgage.',
+                    },
+                    {
+                      mistake: 'Not obtaining landlord\'s TIN for large claims',
+                      fix: 'For larger rent claims, FIRS may require your landlord\'s Tax Identification Number. Obtain this upfront to avoid delays in processing your claim.',
+                    },
+                  ].map((item, index) => (
+                    <div key={index} className="glass-frosted rounded-xl p-5">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertTriangle className="h-4 w-4 text-destructive" />
+                        <h3 className="font-semibold text-destructive">{item.mistake}</h3>
                       </div>
-                      <h3 className="font-semibold text-foreground mb-2">Reduce Your Tax</h3>
-                      <p className="text-sm text-muted-foreground">
-                        The relief is deducted from your taxable income before tax is calculated
-                      </p>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-success shrink-0 mt-0.5" />
+                        <p className="text-sm text-muted-foreground">{item.fix}</p>
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
               </section>
 
@@ -275,18 +321,24 @@ const RentRelief2026 = () => {
                 </div>
               </section>
 
-              {/* FAQ Section */}
+              {/* FAQ Section - Accordion */}
               <section className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Frequently Asked Questions
                 </h2>
-                <div className="space-y-4">
-                  {faqs.map((faq, index) => (
-                    <div key={index} className="glass-frosted rounded-xl p-6">
-                      <h3 className="text-lg font-semibold text-foreground mb-2">{faq.question}</h3>
-                      <p className="text-muted-foreground">{faq.answer}</p>
-                    </div>
-                  ))}
+                <div className="glass-frosted rounded-2xl p-6">
+                  <Accordion type="single" collapsible className="w-full">
+                    {faqs.map((faq, index) => (
+                      <AccordionItem key={index} value={`faq-${index}`}>
+                        <AccordionTrigger className="text-left text-foreground hover:no-underline">
+                          {faq.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground">
+                          {faq.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
                 </div>
               </section>
 

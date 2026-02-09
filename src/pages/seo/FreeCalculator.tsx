@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -7,10 +7,19 @@ import { QuickTaxCalculator } from '@/components/seo/QuickTaxCalculator';
 import { StatsCounter } from '@/components/seo/StatsCounter';
 import { ComparisonTable, PIT_COMPARISON_ROWS } from '@/components/seo/ComparisonTable';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
-import { CheckCircle2, Zap, Lock, ArrowRight, FileText, Calculator, Star } from 'lucide-react';
+import { CheckCircle2, Zap, Lock, ArrowRight, FileText, Calculator, Star, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 
 const FreeCalculator = () => {
+  const howToSteps = [
+    { name: 'Enter Your Annual Gross Income', text: 'Type your total annual salary or business income in Naira. This is your gross income before any deductions.' },
+    { name: 'Add Rent Paid', text: 'Enter your annual rent to calculate Rent Relief (20% of rent, max ₦500,000). This replaces the old CRA under 2026 rules.' },
+    { name: 'Include Pension and NHF Contributions', text: 'Add your pension contribution (8% of gross) and NHF (2.5% of basic salary) for accurate deductions.' },
+    { name: 'View Your Tax Breakdown', text: 'See your tax calculated across the 2026 progressive bands: ₦800k tax-free, then 15%, 18%, 21%, 23%, 25%.' },
+    { name: 'Compare Savings vs Old Rules', text: 'Toggle the comparison to see how much you save under the 2026 rules compared to the previous tax regime.' },
+  ];
+
   const faqs = [
     {
       question: 'Is this calculator really free?',
@@ -24,6 +33,26 @@ const FreeCalculator = () => {
       question: 'Do I need to create an account?',
       answer: 'No account is needed for basic calculations. Sign up only if you want to save your calculations, generate PDF reports, or access business tax features.',
     },
+    {
+      question: 'What taxes are covered by TaxForge?',
+      answer: 'TaxForge covers Personal Income Tax (PIT), Pay As You Earn (PAYE), Company Income Tax (CIT), Value Added Tax (VAT), Withholding Tax (WHT), and the new Development Levy under 2026 rules.',
+    },
+    {
+      question: 'How often are the tax rules updated?',
+      answer: 'We update our calculations as soon as new tax legislation is enacted. TaxForge is currently fully updated for the Nigeria Tax Act 2025, effective January 2026.',
+    },
+    {
+      question: 'Can I use this calculator on my phone?',
+      answer: 'Yes. TaxForge is fully responsive and works on all devices — mobile, tablet, and desktop. You can even install it as an app on your phone for offline access.',
+    },
+    {
+      question: 'Is my data private?',
+      answer: 'Absolutely. Free calculations are processed entirely in your browser — no data is sent to any server. Your income details stay on your device.',
+    },
+    {
+      question: 'Can I save or download my results?',
+      answer: 'Free users can view results on screen. To save calculations, download PDF reports, or compare multiple scenarios, create a free account or upgrade to premium.',
+    },
   ];
 
   const schema = {
@@ -34,6 +63,11 @@ const FreeCalculator = () => {
         'Calculate your Nigerian personal income tax instantly with 2026 rules. Free PIT, PAYE calculator - no signup required.'
       ),
       createFAQSchema(faqs),
+      createHowToSchema(
+        'How to Calculate Your Nigerian Tax for Free',
+        'Step-by-step guide to using the free TaxForge calculator to estimate your 2026 personal income tax.',
+        howToSteps
+      ),
       createBreadcrumbSchema([
         { name: 'Home', url: 'https://taxforgeng.com/' },
         { name: 'Free Tax Calculator', url: 'https://taxforgeng.com/free-tax-calculator' },
@@ -78,6 +112,64 @@ const FreeCalculator = () => {
               <div className="mb-12">
                 <QuickTaxCalculator showComparison={true} />
               </div>
+
+              {/* How It Works */}
+              <section className="mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  How to Calculate Your Tax
+                </h2>
+                <div className="space-y-4">
+                  {howToSteps.map((step, index) => (
+                    <div key={index} className="glass-frosted rounded-xl p-5 flex items-start gap-4">
+                      <div className="h-10 w-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold shrink-0">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-1">{step.name}</h3>
+                        <p className="text-sm text-muted-foreground">{step.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Common Mistakes */}
+              <section className="mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  Common Mistakes to Avoid
+                </h2>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {[
+                    {
+                      mistake: 'Using gross instead of taxable income',
+                      fix: 'Deduct pension (8%), NHF (2.5%), and Rent Relief before applying tax bands. Tax is calculated on taxable income, not gross.',
+                    },
+                    {
+                      mistake: 'Forgetting to claim Rent Relief',
+                      fix: 'If you pay rent, you can claim 20% of annual rent (max ₦500,000) as a deduction. Many taxpayers miss this new benefit.',
+                    },
+                    {
+                      mistake: 'Assuming CRA still applies under 2026 rules',
+                      fix: 'The Consolidated Relief Allowance (CRA) has been abolished. Under 2026 rules, use the ₦800k tax-free threshold and specific reliefs instead.',
+                    },
+                    {
+                      mistake: 'Not considering employer pension contributions',
+                      fix: 'Your employer contributes 10% to your pension, but only your 8% employee contribution is deductible for tax purposes.',
+                    },
+                  ].map((item, index) => (
+                    <div key={index} className="glass-frosted rounded-xl p-5">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertTriangle className="h-4 w-4 text-destructive" />
+                        <h3 className="font-semibold text-destructive">{item.mistake}</h3>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-success shrink-0 mt-0.5" />
+                        <p className="text-sm text-muted-foreground">{item.fix}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
 
               {/* Why Free Section */}
               <section className="mb-12">
@@ -183,27 +275,24 @@ const FreeCalculator = () => {
                 />
               </section>
 
-              {/* FAQ Section */}
+              {/* FAQ Section - Accordion */}
               <section className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Frequently Asked Questions
                 </h2>
-                <div className="space-y-4">
-                  {[...faqs, 
-                    {
-                      question: 'What taxes are covered by TaxForge?',
-                      answer: 'TaxForge covers Personal Income Tax (PIT), Pay As You Earn (PAYE), Company Income Tax (CIT), Value Added Tax (VAT), Withholding Tax (WHT), and the new Development Levy under 2026 rules.',
-                    },
-                    {
-                      question: 'How often are the tax rules updated?',
-                      answer: 'We update our calculations as soon as new tax legislation is enacted. TaxForge is currently fully updated for the Nigeria Tax Act 2025, effective January 2026.',
-                    },
-                  ].map((faq, index) => (
-                    <div key={index} className="glass-frosted rounded-xl p-6">
-                      <h3 className="text-lg font-semibold text-foreground mb-2">{faq.question}</h3>
-                      <p className="text-muted-foreground">{faq.answer}</p>
-                    </div>
-                  ))}
+                <div className="glass-frosted rounded-2xl p-6">
+                  <Accordion type="single" collapsible className="w-full">
+                    {faqs.map((faq, index) => (
+                      <AccordionItem key={index} value={`faq-${index}`}>
+                        <AccordionTrigger className="text-left text-foreground hover:no-underline">
+                          {faq.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground">
+                          {faq.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
                 </div>
               </section>
 

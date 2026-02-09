@@ -1,15 +1,24 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
 import { SimpleVATCalculator } from '@/components/seo/SimpleVATCalculator';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
-import { ShoppingCart, Building2, Calendar, CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
+import { ShoppingCart, Building2, Calendar, CheckCircle2, XCircle, ArrowRight, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/taxCalculations';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 
 const VATCalculator = () => {
+  const howToSteps = [
+    { name: 'Enter Sale Price', text: 'Input the price of your goods or services. Choose whether the price is VAT-exclusive (you\'ll add 7.5% on top) or VAT-inclusive (VAT is already included in the price).' },
+    { name: 'Check if Item is VAT-Exempt', text: 'Some items are VAT-exempt: basic food, medical supplies, educational materials, baby products, agricultural equipment, and exports.' },
+    { name: 'Apply 7.5% Standard Rate', text: 'For taxable goods and services, calculate 7.5% of the VAT-exclusive price. This is your Output VAT to charge customers.' },
+    { name: 'Calculate Input vs Output VAT', text: 'Track VAT paid on business purchases (Input VAT). Subtract Input VAT from Output VAT to find your net VAT liability.' },
+    { name: 'Determine Net VAT Payable', text: 'Remit the difference (Output VAT minus Input VAT) to FIRS by the 21st of each month.' },
+  ];
+
   const faqs = [
     {
       question: 'What is the current VAT rate in Nigeria?',
@@ -26,6 +35,18 @@ const VATCalculator = () => {
     {
       question: 'When are VAT returns due?',
       answer: 'VAT returns must be filed monthly, by the 21st day of the following month. Late filing attracts penalties and interest.',
+    },
+    {
+      question: 'Do e-commerce businesses need to charge VAT?',
+      answer: 'Yes. Online businesses selling taxable goods or services in Nigeria must charge 7.5% VAT if their turnover exceeds ₦25M. This includes digital platforms, SaaS providers, and online marketplaces.',
+    },
+    {
+      question: 'How does VAT work on cross-border transactions?',
+      answer: 'Exports of goods are zero-rated (0% VAT). Imported services are subject to reverse-charge VAT at 7.5%, where the Nigerian buyer self-accounts for the VAT. Non-resident digital companies with significant economic presence must also register.',
+    },
+    {
+      question: 'What are the penalties for late VAT filing?',
+      answer: 'Late filing attracts a penalty of ₦50,000 for the first month and ₦25,000 for each subsequent month of default. Additionally, interest accrues on the unpaid VAT at the prevailing commercial rate.',
     },
   ];
 
@@ -55,6 +76,11 @@ const VATCalculator = () => {
         'Calculate Nigerian VAT at 7.5%. Know exempt items, registration thresholds, and filing deadlines. Free instant calculator.'
       ),
       createFAQSchema(faqs),
+      createHowToSchema(
+        'How to Calculate Nigerian VAT',
+        'Step-by-step guide to calculating Value Added Tax on goods and services in Nigeria at the 7.5% rate.',
+        howToSteps
+      ),
       createBreadcrumbSchema([
         { name: 'Home', url: 'https://taxforgeng.com/' },
         { name: 'Tax Tools', url: 'https://taxforgeng.com/free-tax-calculator' },
@@ -110,38 +136,58 @@ const VATCalculator = () => {
               {/* How VAT Works */}
               <section className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
-                  How Nigerian VAT Works
+                  How to Calculate Nigerian VAT
                 </h2>
-                <div className="glass-frosted rounded-2xl p-6 md:p-8">
-                  <div className="grid gap-6 md:grid-cols-3">
-                    <div className="text-center">
-                      <div className="h-16 w-16 rounded-full bg-gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span className="text-2xl font-bold text-primary-foreground">1</span>
+                <div className="space-y-4">
+                  {howToSteps.map((step, index) => (
+                    <div key={index} className="glass-frosted rounded-xl p-5 flex items-start gap-4">
+                      <div className="h-10 w-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold shrink-0">
+                        {index + 1}
                       </div>
-                      <h3 className="font-semibold text-foreground mb-2">Collect Output VAT</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Charge 7.5% VAT on your sales to customers. This is your Output VAT.
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <div className="h-16 w-16 rounded-full bg-gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span className="text-2xl font-bold text-primary-foreground">2</span>
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-1">{step.name}</h3>
+                        <p className="text-sm text-muted-foreground">{step.text}</p>
                       </div>
-                      <h3 className="font-semibold text-foreground mb-2">Track Input VAT</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Record VAT paid on business purchases. This is your Input VAT credit.
-                      </p>
                     </div>
-                    <div className="text-center">
-                      <div className="h-16 w-16 rounded-full bg-gradient-primary flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span className="text-2xl font-bold text-primary-foreground">3</span>
+                  ))}
+                </div>
+              </section>
+
+              {/* Common Mistakes */}
+              <section className="mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  Common VAT Mistakes to Avoid
+                </h2>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {[
+                    {
+                      mistake: 'Charging VAT below ₦25M turnover threshold',
+                      fix: 'VAT registration is mandatory only above ₦25M annual turnover. Below that, registration is voluntary. Charging VAT without registration is non-compliant.',
+                    },
+                    {
+                      mistake: 'Applying VAT on exempt items',
+                      fix: 'Basic food, medical supplies, educational materials, and baby products are exempt. Charging VAT on these items is incorrect and you may face penalties.',
+                    },
+                    {
+                      mistake: 'Late monthly filing (due by 21st)',
+                      fix: 'VAT returns are due by the 21st of the following month. Late filing attracts ₦50,000 penalty for the first month plus ₦25,000 each subsequent month.',
+                    },
+                    {
+                      mistake: 'Not keeping proper VAT invoices',
+                      fix: 'Maintain proper VAT invoices with your TIN, the customer\'s details, the VAT amount separately shown, and the date. Without proper invoices, you cannot claim Input VAT credits.',
+                    },
+                  ].map((item, index) => (
+                    <div key={index} className="glass-frosted rounded-xl p-5">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertTriangle className="h-4 w-4 text-destructive" />
+                        <h3 className="font-semibold text-destructive">{item.mistake}</h3>
                       </div>
-                      <h3 className="font-semibold text-foreground mb-2">Remit the Difference</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Pay (Output VAT - Input VAT) to FIRS by the 21st of each month.
-                      </p>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-success shrink-0 mt-0.5" />
+                        <p className="text-sm text-muted-foreground">{item.fix}</p>
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
               </section>
 
@@ -297,18 +343,24 @@ const VATCalculator = () => {
                 </div>
               </section>
 
-              {/* FAQ Section */}
+              {/* FAQ Section - Accordion */}
               <section className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Frequently Asked Questions
                 </h2>
-                <div className="space-y-4">
-                  {faqs.map((faq, index) => (
-                    <div key={index} className="glass-frosted rounded-xl p-6">
-                      <h3 className="text-lg font-semibold text-foreground mb-2">{faq.question}</h3>
-                      <p className="text-muted-foreground">{faq.answer}</p>
-                    </div>
-                  ))}
+                <div className="glass-frosted rounded-2xl p-6">
+                  <Accordion type="single" collapsible className="w-full">
+                    {faqs.map((faq, index) => (
+                      <AccordionItem key={index} value={`faq-${index}`}>
+                        <AccordionTrigger className="text-left text-foreground hover:no-underline">
+                          {faq.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground">
+                          {faq.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
                 </div>
               </section>
 
