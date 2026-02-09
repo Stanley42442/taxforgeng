@@ -25,7 +25,7 @@ const SmallCompanyExemption = () => {
         '2026 Small Company Tax Exemption in Nigeria - Complete Guide',
         'Learn how Nigerian small companies with turnover ≤₦50M and assets ≤₦250M can pay 0% Company Income Tax under the Nigeria Tax Act 2025.',
         '2026-01-01',
-        '2026-02-06'
+        '2026-02-09'
       ),
       createHowToSchema(
         'How to Qualify for 0% Company Income Tax in Nigeria',

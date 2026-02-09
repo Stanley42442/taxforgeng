@@ -92,7 +92,7 @@ const TaxReforms2026 = () => {
         'Nigeria Tax Reforms 2026 - Complete Guide to Changes',
         'Everything changing in Nigerian tax from 2026: small company exemption, rent relief, new PIT bands, development levy, and more from Nigeria Tax Act 2025.',
         '2026-01-01',
-        '2026-02-06'
+        '2026-02-09'
       ),
       createBreadcrumbSchema([
         { name: 'Home', url: 'https://taxforgeng.com/' },

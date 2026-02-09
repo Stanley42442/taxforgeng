@@ -48,6 +48,7 @@ export const SEOHead = ({
     updateMeta('og:image', ogImage, true);
     updateMeta('og:type', 'website', true);
     updateMeta('og:site_name', 'TaxForge NG', true);
+    updateMeta('og:locale', 'en_NG', true);
 
     // Twitter Card
     updateMeta('twitter:card', 'summary_large_image');
@@ -178,7 +179,6 @@ export const createSoftwareApplicationSchema = () => ({
     name: 'TaxForge NG',
     url: 'https://taxforgeng.com',
     logo: 'https://taxforgeng.com/icon-512.png',
-    sameAs: []
   },
   
   screenshot: 'https://taxforgeng.com/og-image.png',
@@ -232,7 +232,6 @@ export const createLocalBusinessSchema = () => ({
   url: 'https://taxforgeng.com',
   logo: 'https://taxforgeng.com/icon-512.png',
   image: 'https://taxforgeng.com/og-image.png',
-  telephone: '',
   email: 'hello@taxforgeng.com',
   address: {
     '@type': 'PostalAddress',
@@ -251,7 +250,6 @@ export const createLocalBusinessSchema = () => ({
   },
   priceRange: '₦0 - ₦8,999',
   openingHours: 'Mo-Su 00:00-24:00',
-  sameAs: []
 });
 
 export const createFAQSchema = (faqs: { question: string; answer: string }[]) => ({

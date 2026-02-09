@@ -45,7 +45,7 @@ const RentRelief2026 = () => {
         'Rent Relief 2026 Nigeria - How to Claim 20% Tax Deduction on Rent',
         'Complete guide to the new Rent Relief under Nigeria Tax Act 2025. Calculate your 20% relief (max ₦500,000) and understand documentation requirements.',
         '2026-01-01',
-        '2026-02-06'
+        '2026-02-09'
       ),
       createFAQSchema(faqs),
       createBreadcrumbSchema([
