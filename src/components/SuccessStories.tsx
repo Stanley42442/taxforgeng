@@ -134,13 +134,13 @@ export const SuccessStories = ({
           <div className="text-center mb-12 animate-slide-up">
             <div className="inline-flex items-center gap-2 rounded-full bg-success/10 px-4 py-2 text-sm font-medium text-success mb-4">
               <Star className="h-4 w-4" />
-              User Stories
+              User Feedback
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
               What Users Are Saying
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              See how Nigerian businesses and individuals use TaxForge NG for tax calculations
+              Real feedback from Nigerian businesses and individuals using TaxForge NG
             </p>
           </div>
         )}
