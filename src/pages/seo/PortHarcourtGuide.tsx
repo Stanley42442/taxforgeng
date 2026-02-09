@@ -4,7 +4,7 @@ import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
-import { MapPin, Building2, Ship, Fuel, Factory, Phone, Mail, Clock, CheckCircle2, ArrowRight } from 'lucide-react';
+import { MapPin, Building2, Ship, Fuel, Factory, Clock, CheckCircle2, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const PortHarcourtGuide = () => {
@@ -58,13 +58,11 @@ const PortHarcourtGuide = () => {
     {
       name: 'FIRS Port Harcourt',
       address: 'Plot 6, Olu Obasanjo Road, Port Harcourt',
-      phone: '+234 84 230 XXX',
       hours: 'Mon-Fri: 8AM - 4PM',
     },
     {
       name: 'Rivers State IRS (RIRS)',
       address: 'Revenue House, Moscow Road, Port Harcourt',
-      phone: '+234 84 230 XXX',
       hours: 'Mon-Fri: 8AM - 4PM',
     },
   ];
@@ -249,10 +247,6 @@ const PortHarcourtGuide = () => {
                         <div className="flex items-start gap-3">
                           <MapPin className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                           <span className="text-sm text-muted-foreground">{office.address}</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Phone className="h-5 w-5 text-primary shrink-0" />
-                          <span className="text-sm text-muted-foreground">{office.phone}</span>
                         </div>
                         <div className="flex items-center gap-3">
                           <Clock className="h-5 w-5 text-primary shrink-0" />
