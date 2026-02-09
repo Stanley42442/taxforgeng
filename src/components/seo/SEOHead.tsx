@@ -269,7 +269,8 @@ export const createArticleSchema = (
   title: string,
   description: string,
   datePublished: string,
-  dateModified: string
+  dateModified: string,
+  pageUrl?: string
 ) => ({
   '@context': 'https://schema.org',
   '@type': 'Article',
@@ -277,6 +278,13 @@ export const createArticleSchema = (
   description,
   datePublished,
   dateModified,
+  inLanguage: 'en-NG',
+  ...(pageUrl && {
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': pageUrl,
+    },
+  }),
   author: {
     '@type': 'Organization',
     name: 'TaxForge NG',
