@@ -106,6 +106,14 @@ const VATCalculator = lazy(() => import("./pages/seo/VATCalculator"));
 const WHTCalculator = lazy(() => import("./pages/seo/WHTCalculator"));
 const TaxReports = lazy(() => import("./pages/seo/TaxReports"));
 const PortHarcourtGuide = lazy(() => import("./pages/seo/PortHarcourtGuide"));
+const StateGuidesHub = lazy(() => import("./pages/seo/StateGuidesHub"));
+const LagosGuide = lazy(() => import("./pages/seo/LagosGuide"));
+const AbujaGuide = lazy(() => import("./pages/seo/AbujaGuide"));
+const KanoGuide = lazy(() => import("./pages/seo/KanoGuide"));
+
+// Standalone Pages
+const About = lazy(() => import("./pages/About"));
+const Resources = lazy(() => import("./pages/Resources"));
 
 // Blog & FAQ
 const Blog = lazy(() => import("./pages/Blog"));
@@ -114,6 +122,10 @@ const BlogTaxReforms2026Summary = lazy(() => import("./pages/blog/TaxReforms2026
 const BlogSmallCompanyCITExemption = lazy(() => import("./pages/blog/SmallCompanyCITExemption"));
 const BlogPITPAYEGuide2026 = lazy(() => import("./pages/blog/PITPAYEGuide2026"));
 const BlogTaxGuideTechStartups = lazy(() => import("./pages/blog/TaxGuideTechStartups"));
+const BlogVATGuideNigeria = lazy(() => import("./pages/blog/VATGuideNigeria"));
+const BlogWHTExplained = lazy(() => import("./pages/blog/WHTExplained"));
+const BlogPayrollTaxGuide = lazy(() => import("./pages/blog/PayrollTaxGuide"));
+const BlogTaxCalendar2026 = lazy(() => import("./pages/blog/TaxCalendar2026"));
 
 // Lazy load TaxAssistant (heavy component with AI chat)
 const TaxAssistant = lazy(() => import("./components/TaxAssistant").then(m => ({ default: m.TaxAssistant })));
@@ -225,12 +237,23 @@ const AnimatedRoutes = () => {
           <Route path="/wht-calculator" element={<WHTCalculator />} />
           <Route path="/tax-reports" element={<TaxReports />} />
           <Route path="/port-harcourt-tax-guide" element={<PortHarcourtGuide />} />
+          <Route path="/state-guides" element={<StateGuidesHub />} />
+          <Route path="/state-guides/lagos" element={<LagosGuide />} />
+          <Route path="/state-guides/abuja" element={<AbujaGuide />} />
+          <Route path="/state-guides/kano" element={<KanoGuide />} />
+          {/* Standalone Pages */}
+          <Route path="/about" element={<About />} />
+          <Route path="/resources" element={<Resources />} />
           {/* Blog & FAQ */}
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/tax-reforms-2026-summary" element={<BlogTaxReforms2026Summary />} />
           <Route path="/blog/small-company-cit-exemption" element={<BlogSmallCompanyCITExemption />} />
           <Route path="/blog/pit-paye-guide-2026" element={<BlogPITPAYEGuide2026 />} />
           <Route path="/blog/tax-guide-tech-startups" element={<BlogTaxGuideTechStartups />} />
+          <Route path="/blog/vat-guide-nigeria" element={<BlogVATGuideNigeria />} />
+          <Route path="/blog/wht-explained" element={<BlogWHTExplained />} />
+          <Route path="/blog/payroll-tax-guide" element={<BlogPayrollTaxGuide />} />
+          <Route path="/blog/tax-calendar-2026" element={<BlogTaxCalendar2026 />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
