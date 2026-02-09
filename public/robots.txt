@@ -58,9 +58,39 @@ Allow: /
 User-agent: WhatsApp
 Allow: /
 
-# Default - allow all
+# Default - allow all public pages
 User-agent: *
 Allow: /
+
+# Block internal app paths from indexing
+Disallow: /dashboard
+Disallow: /expenses
+Disallow: /invoices
+Disallow: /compliance
+Disallow: /reminders
+Disallow: /profit-loss
+Disallow: /payroll
+Disallow: /auth
+Disallow: /settings
+Disallow: /security
+Disallow: /notifications
+Disallow: /transactions
+Disallow: /audit-log
+Disallow: /billing
+Disallow: /cancel-subscription
+Disallow: /payment-callback
+Disallow: /admin/
+Disallow: /offline
+Disallow: /rewards
+Disallow: /referrals
+Disallow: /achievements
+Disallow: /businesses
+Disallow: /calculation-history
+Disallow: /e-filing
+Disallow: /personal-expenses
+Disallow: /accountant-portal
+Disallow: /business-report
+Disallow: /embed/
 
 # Important files for AI understanding
 # /llms.txt - AI-optimized site summary (concise)
