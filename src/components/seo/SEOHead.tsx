@@ -198,6 +198,7 @@ export const createOrganizationSchema = () => ({
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'TaxForge NG',
+  alternateName: 'TaxForge Nigeria',
   url: 'https://taxforgeng.com',
   logo: 'https://taxforgeng.com/icon-512.png',
   description: 'Nigerian tax calculation and compliance platform operated by Gillespie Benjamin Mclee (OptiSolve Labs)',
