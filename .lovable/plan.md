@@ -68,7 +68,44 @@ After a thorough top-to-bottom audit of all SEO and AEO implementations, the pla
 
 ---
 
-## Issues Found: Gaps to Fix
+## Issues Found: Analysis of Validator Results
+
+### Issue 1: Google Rich Results Test - Missing `aggregateRating`
+
+**Status:** This is expected behavior and NOT an error.
+
+**Explanation:**
+- The Google Rich Results Test shows `aggregateRating` as "optional" (not required)
+- We intentionally removed fake aggregateRating data to comply with Google's policies
+- The comment in `SEOHead.tsx` line 174 confirms this decision:
+  ```typescript
+  // Note: aggregateRating removed - only add when real reviews exist
+  ```
+
+**Recommendation:** No action needed. The schema is valid without aggregateRating. Only add this field when you have real, verifiable user reviews.
+
+### Issue 2: CRITICAL - Sitemap Returning HTML Instead of XML
+
+**Problem:** The sitemap validator shows:
+```
+Incorrect http header content-type: "text/html; charset=utf-8" (expected: "application/xml")
+```
+
+**Root Cause:** This is a Single Page Application (SPA) routing issue. When the browser/crawler requests `/sitemap.xml`, the server returns the React app's `index.html` instead of the actual XML file because:
+
+1. The hosting platform (Lovable/Cloudflare) serves the SPA for all routes
+2. The `public/sitemap.xml` file exists but isn't being served directly
+3. The SPA router catches the request and returns HTML
+
+**Fix Required:** The sitemap.xml file in the `public/` folder should be served with the correct content-type headers. This typically requires hosting configuration changes.
+
+**Verification:** When you visit `https://taxforgeng.com/sitemap.xml`:
+- It should return raw XML with content-type `application/xml`
+- Currently, it appears to return the React app shell (HTML)
+
+---
+
+## Gaps to Fix
 
 ### Gap 1: CRITICAL - Missing SEODisclaimer on TaxReforms2026 Page
 
