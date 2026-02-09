@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -9,6 +9,7 @@ import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
 import { TrendingDown, CheckCircle2, Wallet, ArrowRight, Building2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/taxCalculations';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 
 const PITPAYECalculator = () => {
   const taxBands2026 = [
@@ -18,6 +19,14 @@ const PITPAYECalculator = () => {
     { min: 12_000_001, max: 25_000_000, rate: '21%', description: 'Third band' },
     { min: 25_000_001, max: 50_000_000, rate: '23%', description: 'Fourth band' },
     { min: 50_000_001, max: Infinity, rate: '25%', description: 'Maximum rate' },
+  ];
+
+  const howToSteps = [
+    { name: 'Enter Your Gross Annual Salary', text: 'Input your total annual salary before deductions. Include all allowances, bonuses, and benefits in kind.' },
+    { name: 'Deduct Pension (8%) and NHF (2.5%)', text: 'Your employee pension contribution of 8% and NHF of 2.5% are automatically deducted from your gross income.' },
+    { name: 'Apply Rent Relief', text: 'If you pay rent, enter your annual rent. You get 20% of rent as a deduction, capped at ₦500,000.' },
+    { name: 'Apply Progressive Tax Bands', text: 'Tax is calculated progressively: first ₦800k is tax-free, then 15% on ₦800k-₦3M, 18% on ₦3M-₦12M, and so on.' },
+    { name: 'View Monthly PAYE Amount', text: 'Your annual tax is divided by 12 to show your monthly PAYE deduction — the amount your employer withholds each month.' },
   ];
 
   const faqs = [
@@ -33,6 +42,18 @@ const PITPAYECalculator = () => {
       question: 'How is PAYE different from PIT?',
       answer: 'PAYE (Pay As You Earn) is the system used to collect PIT (Personal Income Tax) from employees. Your employer deducts PIT from your salary each month and remits it to FIRS on your behalf.',
     },
+    {
+      question: 'What happens if I have two jobs?',
+      answer: 'If you earn income from multiple employers, each employer should deduct PAYE based on the salary they pay you. You may need to file a personal tax return to reconcile the total tax owed across all income sources.',
+    },
+    {
+      question: 'How are bonuses taxed under 2026 rules?',
+      answer: 'Bonuses are added to your annual income and taxed at your marginal rate. If your salary is ₦5M and you receive a ₦2M bonus, the bonus is taxed at the rate applicable to the ₦5M-₦7M income range (18%).',
+    },
+    {
+      question: 'What about salary arrears from previous years?',
+      answer: 'Salary arrears are taxed in the year they are received. However, if the arrears relate to a prior tax year, you may be able to apply for tax relief to avoid being pushed into a higher bracket unfairly.',
+    },
   ];
 
   const schema = {
@@ -43,6 +64,11 @@ const PITPAYECalculator = () => {
         'Calculate Nigerian Personal Income Tax with 2026 rules. First ₦800,000 tax-free. Progressive rates from 15% to 25%.'
       ),
       createFAQSchema(faqs),
+      createHowToSchema(
+        'How to Calculate Your 2026 PIT/PAYE',
+        'Step-by-step guide to calculating your Nigerian Personal Income Tax under the 2026 rules.',
+        howToSteps
+      ),
       createBreadcrumbSchema([
         { name: 'Home', url: 'https://taxforgeng.com/' },
         { name: 'Tax Tools', url: 'https://taxforgeng.com/free-tax-calculator' },
@@ -95,6 +121,26 @@ const PITPAYECalculator = () => {
                 <QuickTaxCalculator showComparison={true} />
               </div>
 
+              {/* How It Works */}
+              <section className="mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  How to Calculate Your 2026 PIT/PAYE
+                </h2>
+                <div className="space-y-4">
+                  {howToSteps.map((step, index) => (
+                    <div key={index} className="glass-frosted rounded-xl p-5 flex items-start gap-4">
+                      <div className="h-10 w-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold shrink-0">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-1">{step.name}</h3>
+                        <p className="text-sm text-muted-foreground">{step.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
               {/* 2026 Tax Bands */}
               <section className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
@@ -134,6 +180,44 @@ const PITPAYECalculator = () => {
                       </tbody>
                     </table>
                   </div>
+                </div>
+              </section>
+
+              {/* Common Mistakes */}
+              <section className="mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  Common PIT/PAYE Mistakes to Avoid
+                </h2>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {[
+                    {
+                      mistake: 'Using the old CRA formula',
+                      fix: 'The Consolidated Relief Allowance (20% of gross + higher of ₦200k or 1% of gross) is abolished in 2026. Use the new ₦800k threshold and specific reliefs instead.',
+                    },
+                    {
+                      mistake: 'Not applying the ₦800k tax-free threshold first',
+                      fix: 'Under 2026 rules, the first ₦800,000 of taxable income is completely exempt. Always deduct this before applying the 15% rate on the next band.',
+                    },
+                    {
+                      mistake: 'Confusing annual vs monthly calculations',
+                      fix: 'Tax bands are annual. If you earn ₦300,000/month, your annual income is ₦3.6M — apply bands to the annual figure, then divide by 12 for monthly PAYE.',
+                    },
+                    {
+                      mistake: 'Employers not updating payroll systems',
+                      fix: 'Payroll software must be updated with 2026 bands by January 2026. Using old bands results in over-deduction, which employees must reclaim.',
+                    },
+                  ].map((item, index) => (
+                    <div key={index} className="glass-frosted rounded-xl p-5">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertTriangle className="h-4 w-4 text-destructive" />
+                        <h3 className="font-semibold text-destructive">{item.mistake}</h3>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-success shrink-0 mt-0.5" />
+                        <p className="text-sm text-muted-foreground">{item.fix}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </section>
 
@@ -283,37 +367,12 @@ const PITPAYECalculator = () => {
                 </h2>
                 <div className="grid gap-4 md:grid-cols-2">
                   {[
-                    { 
-                      title: 'Pension Contribution', 
-                      desc: 'Up to 8% of your gross income',
-                      highlight: false,
-                    },
-                    { 
-                      title: 'NHF Contribution', 
-                      desc: '2.5% of basic salary',
-                      highlight: false,
-                    },
-                    { 
-                      title: 'Rent Relief', 
-                      desc: '20% of annual rent paid (max ₦500,000)',
-                      highlight: true,
-                      link: '/rent-relief-2026',
-                    },
-                    { 
-                      title: 'NHIS/Health Insurance', 
-                      desc: 'Health insurance premiums are now deductible',
-                      highlight: true,
-                    },
-                    { 
-                      title: 'Life Insurance', 
-                      desc: 'Premiums on own life insurance',
-                      highlight: false,
-                    },
-                    { 
-                      title: 'Tax-Free Threshold', 
-                      desc: 'First ₦800,000 is completely exempt',
-                      highlight: true,
-                    },
+                    { title: 'Pension Contribution', desc: 'Up to 8% of your gross income', highlight: false },
+                    { title: 'NHF Contribution', desc: '2.5% of basic salary', highlight: false },
+                    { title: 'Rent Relief', desc: '20% of annual rent paid (max ₦500,000)', highlight: true, link: '/rent-relief-2026' },
+                    { title: 'NHIS/Health Insurance', desc: 'Health insurance premiums are now deductible', highlight: true },
+                    { title: 'Life Insurance', desc: 'Premiums on own life insurance', highlight: false },
+                    { title: 'Tax-Free Threshold', desc: 'First ₦800,000 is completely exempt', highlight: true },
                   ].map((relief, index) => (
                     <div 
                       key={index} 
@@ -353,18 +412,24 @@ const PITPAYECalculator = () => {
                 </div>
               </section>
 
-              {/* FAQ Section */}
+              {/* FAQ Section - Accordion */}
               <section className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Frequently Asked Questions
                 </h2>
-                <div className="space-y-4">
-                  {faqs.map((faq, index) => (
-                    <div key={index} className="glass-frosted rounded-xl p-6">
-                      <h3 className="text-lg font-semibold text-foreground mb-2">{faq.question}</h3>
-                      <p className="text-muted-foreground">{faq.answer}</p>
-                    </div>
-                  ))}
+                <div className="glass-frosted rounded-2xl p-6">
+                  <Accordion type="single" collapsible className="w-full">
+                    {faqs.map((faq, index) => (
+                      <AccordionItem key={index} value={`faq-${index}`}>
+                        <AccordionTrigger className="text-left text-foreground hover:no-underline">
+                          {faq.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground">
+                          {faq.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
                 </div>
               </section>
 

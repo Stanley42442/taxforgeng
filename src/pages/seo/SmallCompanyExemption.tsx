@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createArticleSchema, createHowToSchema, createBreadcrumbSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createArticleSchema, createHowToSchema, createBreadcrumbSchema, createFAQSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -9,6 +9,7 @@ import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
 import { CheckCircle2, AlertTriangle, Building2, FileText, ArrowRight, Landmark, Car, Monitor, Factory } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/taxCalculations';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 
 const SmallCompanyExemption = () => {
   const howToSteps = [
@@ -16,6 +17,33 @@ const SmallCompanyExemption = () => {
     { name: 'Calculate Fixed Assets', text: 'Add up land, buildings, machinery, vehicles, and equipment. Must be ₦250 million or less.' },
     { name: 'Meet Both Criteria', text: 'You must satisfy BOTH conditions to qualify for the 0% CIT exemption.' },
     { name: 'File Your Returns', text: 'Even with 0% CIT, you must file annual returns with FIRS to claim the exemption.' },
+  ];
+
+  const faqs = [
+    {
+      question: 'What are the criteria for the small company exemption?',
+      answer: 'Your company must have annual turnover of ₦50 million or less AND total fixed assets of ₦250 million or less. Both criteria must be met simultaneously.',
+    },
+    {
+      question: 'Do I still need to file returns at 0% CIT?',
+      answer: 'Yes! Even though you pay zero CIT, you are legally required to file annual returns with FIRS. Failure to file attracts penalties regardless of your tax rate.',
+    },
+    {
+      question: 'What happens if I exceed the thresholds mid-year?',
+      answer: 'If your turnover or assets exceed the limits during the year, you lose the small company status for that assessment year. You would be reclassified as medium or large and taxed accordingly.',
+    },
+    {
+      question: 'Can group companies each claim the exemption separately?',
+      answer: 'Each legal entity is assessed independently. However, FIRS may apply anti-avoidance rules if they determine that a group has artificially split operations to create multiple small companies qualifying for the exemption.',
+    },
+    {
+      question: 'Does a dormant company qualify for the exemption?',
+      answer: 'A dormant company with zero turnover and minimal assets would technically meet the criteria. However, you must still file nil returns with FIRS to maintain your status and avoid penalties.',
+    },
+    {
+      question: 'How is the transition year handled for companies previously taxed?',
+      answer: 'Companies that were previously paying CIT under the old small company rate (0% on ≤₦25M) automatically benefit from the expanded threshold (≤₦50M) from January 2026. No special application is needed — just meet the new criteria.',
+    },
   ];
 
   const schema = {
@@ -32,6 +60,7 @@ const SmallCompanyExemption = () => {
         'Step-by-step guide to checking if your Nigerian company qualifies for the small company CIT exemption under 2026 rules.',
         howToSteps
       ),
+      createFAQSchema(faqs),
       createBreadcrumbSchema([
         { name: 'Home', url: 'https://taxforgeng.com/' },
         { name: 'Tax Tools', url: 'https://taxforgeng.com/free-tax-calculator' },
@@ -187,20 +216,28 @@ const SmallCompanyExemption = () => {
                 <div className="grid gap-4 md:grid-cols-2">
                   {[
                     {
+                      mistake: 'Only checking turnover, not fixed assets',
+                      solution: 'Both turnover AND assets must be under the limits. A company with ₦30M turnover but ₦300M in property does NOT qualify.',
+                    },
+                    {
+                      mistake: 'Not filing returns (still required at 0%)',
+                      solution: 'Even with 0% CIT, you must file annual returns with FIRS. Non-filing attracts penalties and may trigger an audit.',
+                    },
+                    {
+                      mistake: 'Assuming exemption is automatic without documentation',
+                      solution: 'You must actively claim the exemption by filing your returns with audited accounts showing you meet both criteria.',
+                    },
+                    {
+                      mistake: 'Exceeding thresholds mid-year',
+                      solution: 'If your turnover or assets exceed limits during the year, you lose small company status for that entire assessment year.',
+                    },
+                    {
                       mistake: 'Forgetting land in fixed assets',
-                      solution: 'Include ALL fixed assets: land, buildings, machinery, vehicles, office equipment',
-                    },
-                    {
-                      mistake: 'Only checking turnover',
-                      solution: 'Both turnover AND assets must be under the limits - check both!',
-                    },
-                    {
-                      mistake: 'Not filing returns',
-                      solution: 'Even with 0% CIT, you must file annual returns with FIRS',
+                      solution: 'Include ALL fixed assets: land, buildings, machinery, vehicles, office equipment. Use net book value from your balance sheet.',
                     },
                     {
                       mistake: 'Ignoring VAT obligations',
-                      solution: 'CIT exemption doesn\'t exempt you from VAT (if turnover > ₦25M)',
+                      solution: 'CIT exemption doesn\'t exempt you from VAT (if turnover > ₦25M). These are separate tax obligations.',
                     },
                   ].map((item, index) => (
                     <div key={index} className="glass-frosted rounded-xl p-5">
@@ -223,31 +260,6 @@ const SmallCompanyExemption = () => {
                   title="Company Income Tax: 2026 vs Pre-2026"
                   rows={CIT_COMPARISON_ROWS}
                 />
-              </section>
-
-              {/* Related Tools */}
-              <section className="mb-12">
-                <h2 className="text-2xl font-bold text-foreground text-center mb-6">
-                  Related Tax Tools
-                </h2>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <Link to="/calculator" className="glass-frosted rounded-xl p-5 hover-lift transition-all group">
-                    <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
-                      Business Tax Calculator
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Calculate full CIT, VAT, and WHT for your company
-                    </p>
-                  </Link>
-                  <Link to="/tax-reforms-2026" className="glass-frosted rounded-xl p-5 hover-lift transition-all group">
-                    <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
-                      2026 Tax Reforms Guide
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Complete overview of all tax changes
-                    </p>
-                  </Link>
-                </div>
               </section>
 
               {/* What Counts as Fixed Assets */}
@@ -318,6 +330,52 @@ const SmallCompanyExemption = () => {
                       </div>
                     ))}
                   </div>
+                </div>
+              </section>
+
+              {/* FAQ Section - Accordion */}
+              <section className="mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  Frequently Asked Questions
+                </h2>
+                <div className="glass-frosted rounded-2xl p-6">
+                  <Accordion type="single" collapsible className="w-full">
+                    {faqs.map((faq, index) => (
+                      <AccordionItem key={index} value={`faq-${index}`}>
+                        <AccordionTrigger className="text-left text-foreground hover:no-underline">
+                          {faq.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground">
+                          {faq.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </div>
+              </section>
+
+              {/* Related Tools */}
+              <section className="mb-12">
+                <h2 className="text-2xl font-bold text-foreground text-center mb-6">
+                  Related Tax Tools
+                </h2>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Link to="/calculator" className="glass-frosted rounded-xl p-5 hover-lift transition-all group">
+                    <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
+                      Business Tax Calculator
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Calculate full CIT, VAT, and WHT for your company
+                    </p>
+                  </Link>
+                  <Link to="/tax-reforms-2026" className="glass-frosted rounded-xl p-5 hover-lift transition-all group">
+                    <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
+                      2026 Tax Reforms Guide
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Complete overview of all tax changes
+                    </p>
+                  </Link>
                 </div>
               </section>
 
