@@ -1,113 +1,98 @@
 
 
-# S-Tier SEO/AEO Optimization Plan
+# Remaining SEO/AEO Improvements
 
-## What's Already Done (No Action Needed)
-- Viewport meta tag: Already in `index.html`
-- robots.txt: Already whitelists all major AI crawlers and references llms.txt
-- sitemap.xml: Complete with all public URLs
-- FAQPage schema on /faq: Already implemented with 30+ Q&As
-- HowTo schema on calculator/guide pages: Already on all SEO landing pages
-- Organization schema: Already defined in SEOHead.tsx
-- BreadcrumbList schema: Already on all SEO/blog/state-guide pages
-- Canonical URLs: Already set by SEOHead on all pages that use it
+## Status: What's Already Complete
 
-## What Needs to Be Added
+All 7 items from the Grok prompt have been addressed:
+1. Meta descriptions on homepage, calculator, pricing, blog, FAQ, all SEO pages, all blog posts, about, resources, state guides -- DONE
+2. Alt text -- audited; site uses Lucide SVG icons (no alt needed), the 2 actual `<img>` tags already have alt text -- DONE
+3. Schema markup (FAQPage, HowTo, Organization, BreadcrumbList) -- DONE across 21+ pages
+4. Heading hierarchy -- homepage has `<h1>`, all other pages use PageLayout or SEOHero which provide `<h1>` -- DONE
+5. Viewport meta tag -- already in index.html -- DONE
+6. Canonical URLs -- set by SEOHead on every page that uses it -- DONE
+7. robots.txt + sitemap.xml with AI crawler support -- DONE
 
-### 1. SEOHead on Homepage (`src/pages/Index.tsx`)
-The homepage is the highest-traffic page but has NO dynamic SEO tags. Add:
-- SEOHead with the Grok-suggested meta description
-- Organization + SoftwareApplication + LocalBusiness schemas (already defined in SEOHead.tsx, just need to be called)
-- Canonical URL for `/`
+## What Still Needs SEOHead (Public Pages Missing It)
 
-### 2. SEOHead on Calculator Page (`src/pages/Calculator.tsx`)
-Add SEOHead with:
-- Title: "Nigerian Tax Calculator 2026 - CIT, PIT, VAT, WHT | TaxForge"
-- Meta description (150-160 chars, keyword-rich)
-- HowTo schema with calculator steps
+Several public-facing pages indexed in sitemap.xml have NO dynamic SEO meta tags:
+
+| Page | Route | Currently Has SEOHead? |
+|------|-------|----------------------|
+| Individual Calculator | `/individual-calculator` | NO |
+| Advisory | `/advisory` | NO |
+| Learn | `/learn` | NO |
+| Tax Breakdown | `/tax-breakdown` | NO |
+| Sector Guide | `/sector-guide` | NO |
+| Roadmap | `/roadmap` | NO |
+| Documentation | `/documentation` | NO |
+| Tax Logic Reference | `/tax-logic` | NO |
+| Results | `/results` | NO |
+
+These pages rely on the static `index.html` title/description, which means Google sees the same generic meta for all of them -- hurting SEO.
+
+## Recommended Changes
+
+### 1. Add SEOHead to 9 remaining public pages
+
+Each page gets:
+- Unique `<title>` (60-70 chars, keyword-rich)
+- Unique `<meta description>` (150-160 chars)
+- Canonical URL
 - BreadcrumbList schema
-- Canonical `/calculator`
+- HowTo schema where applicable (Individual Calculator, Advisory)
 
-### 3. SEOHead on Pricing Page (`src/pages/Pricing.tsx`)
-Add SEOHead with:
-- Title: "Pricing - Nigerian Tax Calculator Plans | TaxForge NG"
-- Meta description
-- BreadcrumbList schema
-- Canonical `/pricing`
+**Files to modify:**
+- `src/pages/IndividualCalculator.tsx` -- "Personal Income Tax Calculator Nigeria 2026"
+- `src/pages/Advisory.tsx` -- "Free Nigerian Tax Advisory Tool"
+- `src/pages/Learn.tsx` -- "Learn Nigerian Tax Rules 2026"
+- `src/pages/TaxBreakdown.tsx` -- "Nigerian Tax Breakdown & Analysis"
+- `src/pages/SectorGuide.tsx` -- "Nigerian Tax Rates by Industry Sector"
+- `src/pages/Roadmap.tsx` -- "TaxForge NG Product Roadmap"
+- `src/pages/Documentation.tsx` -- "TaxForge NG Documentation & Tax Rules"
+- `src/pages/TaxLogicReference.tsx` -- "Nigerian Tax Logic Reference 2026"
+- `src/pages/Results.tsx` -- "Tax Calculation Results | TaxForge NG"
 
-### 4. SEOHead on Blog Hub (`src/pages/Blog.tsx`)
-Currently missing SEOHead. Add:
-- Title: "Nigerian Tax Blog 2026 - Expert Guides & Analysis | TaxForge"
-- Meta description
-- BreadcrumbList schema
-- Canonical `/blog`
+### 2. Add Open Graph article tags to all blog posts
 
-### 5. Alt Text Audit
-Review all `<img>` tags across the site for missing or generic alt text. Key areas:
-- Homepage hero/carousel icons (currently Lucide icons, which are SVG components and don't need alt text)
-- Blog card thumbnails (no actual images used, so N/A)
-- OG image references (meta tags, not visible images)
+The `SEOHead` component already sets `og:type` to "website" for everything. Blog posts should use `og:type: article` with `article:published_time` and `article:author` for richer social sharing. This requires a small update to `SEOHead.tsx` to accept an optional `ogType` prop.
 
-Since the site primarily uses Lucide icon components (SVGs rendered inline) rather than `<img>` tags, alt text gaps are minimal. The few `<img>` uses (logo, placeholder.svg) will be checked and updated.
+### 3. Add `hreflang` tag for en-NG
 
-### 6. Heading Hierarchy Review
-Ensure each page has exactly one `<h1>`. The `PageLayout` component already renders an `<h1>` for the title prop. Key pages to verify:
-- Homepage: Currently uses `<h2>` for section headings but no explicit `<h1>` at the top -- needs one
-- Calculator: Uses PageLayout which provides `<h1>`
-- SEO pages: Use SEOHero which provides `<h1>`
+Since the site targets Nigerian English specifically, adding `<link rel="alternate" hreflang="en-NG">` signals to Google that this is Nigerian-localized content. This can be added to the `SEOHead` component.
 
-### 7. Service Worker Error
-The error "Failed to update a ServiceWorker... An unknown error occurred when fetching the script" is a transient network issue. It happens when:
-- The CDN temporarily returns an error for the SW script
-- The browser is on a flaky connection
-- A deployment is in progress
+## Technical Details
 
-The current config (`skipWaiting: true`, `autoUpdate`, `NetworkFirst` for JS/CSS) is correct and self-heals. No code change needed -- this is an infrastructure/CDN-level transient issue.
+### SEOHead additions per page (example for IndividualCalculator)
 
----
-
-## Technical Implementation Details
-
-### Files to Modify
-
-| File | Change |
-|------|--------|
-| `src/pages/Index.tsx` | Add SEOHead with homepage meta, Organization + SoftwareApplication schema, add visible `<h1>` tag |
-| `src/pages/Calculator.tsx` | Add SEOHead with calculator meta, HowTo + Breadcrumb schema |
-| `src/pages/Pricing.tsx` | Add SEOHead with pricing meta, Breadcrumb schema |
-| `src/pages/Blog.tsx` | Add SEOHead with blog meta, Breadcrumb schema |
-
-### Files NOT Modified (already complete)
-- `index.html` -- viewport, CSP, OG tags, structured data all present
-- `robots.txt` -- AI crawlers already whitelisted
-- `public/sitemap.xml` -- all URLs present
-- `src/pages/FAQ.tsx` -- FAQPage schema already implemented
-- All `src/pages/seo/*.tsx` -- full schema coverage
-- All `src/pages/blog/*.tsx` -- Article schema + FAQ schema
-- `src/components/seo/SEOHead.tsx` -- all schema generators exist
-
-### Specific Meta Descriptions
-
-**Homepage:** "TaxForge NG: Free Nigerian tax calculator for CIT, VAT, WHT, PIT with 2026 reforms. Business advisory, sector guides, and small company tools. No signup needed."
-
-**Calculator:** "Calculate Nigerian CIT, PIT, PAYE, VAT, and WHT instantly. 2026 tax reform rules built in. Compare Business Name vs LLC. Free, no signup required."
-
-**Pricing:** "TaxForge NG pricing plans from free to ₦8,999/month. PDF reports, payroll calculator, expense tracking, OCR scanning. Start free, upgrade anytime."
-
-**Blog:** "Expert Nigerian tax guides for 2026. PIT/PAYE calculation walkthroughs, CIT exemption analysis, VAT filing tips, and sector-specific advice from TaxForge NG."
-
-### Homepage H1 Addition
-Add a visible, semantic `<h1>` to the hero section:
+```tsx
+<SEOHead
+  title="Personal Income Tax Calculator Nigeria 2026 - PIT & PAYE | TaxForge"
+  description="Calculate your Nigerian personal income tax with 2026 rules. First 800k tax-free, new PIT bands, Rent Relief. Free, instant, no signup required."
+  canonicalPath="/individual-calculator"
+  keywords="PIT calculator Nigeria, PAYE calculator, personal income tax Nigeria 2026, salary tax calculator"
+  schema={createBreadcrumbSchema([
+    { name: 'Home', url: 'https://taxforgeng.com/' },
+    { name: 'Personal Tax Calculator', url: 'https://taxforgeng.com/individual-calculator' },
+  ])}
+/>
 ```
-<h1>Nigerian Tax Calculator & Business Advisory for 2026</h1>
-```
-Currently the hero uses `<h3>` for carousel items. The `<h1>` will be the primary page heading above or within the hero area.
 
-### Schema Additions for Homepage
-Combine three schemas into an array for comprehensive coverage:
-- `createSoftwareApplicationSchema()` -- for rich app results
-- `createOrganizationSchema()` -- for knowledge panel
-- `createLocalBusinessSchema()` -- for local search
+### SEOHead.tsx update for og:type and hreflang
 
-**Total: 4 files modified, 0 new files created.**
+Add two optional props:
+- `ogType?: 'website' | 'article'` (default: 'website')
+- `hreflang?: string` (default: 'en-NG')
+
+This is a small, backward-compatible change.
+
+## Summary
+
+| Change | Files | Impact |
+|--------|-------|--------|
+| SEOHead on 9 public pages | 9 files modified | Each page gets unique Google snippet instead of generic fallback |
+| og:type for blog posts | 1 file (SEOHead.tsx) + 0 blog files (BlogPostLayout handles it) | Richer social sharing cards |
+| hreflang en-NG | 1 file (SEOHead.tsx) | Signals Nigerian localization to Google |
+
+**Total: 10 files modified, 0 new files created**
 
