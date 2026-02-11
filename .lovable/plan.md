@@ -1,98 +1,84 @@
 
 
-# Remaining SEO/AEO Improvements
+# Final SEO/AEO Improvements -- Remaining Items
 
-## Status: What's Already Complete
+## What's Already Complete (No Changes Needed)
 
-All 7 items from the Grok prompt have been addressed:
-1. Meta descriptions on homepage, calculator, pricing, blog, FAQ, all SEO pages, all blog posts, about, resources, state guides -- DONE
-2. Alt text -- audited; site uses Lucide SVG icons (no alt needed), the 2 actual `<img>` tags already have alt text -- DONE
-3. Schema markup (FAQPage, HowTo, Organization, BreadcrumbList) -- DONE across 21+ pages
-4. Heading hierarchy -- homepage has `<h1>`, all other pages use PageLayout or SEOHero which provide `<h1>` -- DONE
-5. Viewport meta tag -- already in index.html -- DONE
-6. Canonical URLs -- set by SEOHead on every page that uses it -- DONE
-7. robots.txt + sitemap.xml with AI crawler support -- DONE
+All core Grok prompt items (1-7) plus the 9 public pages from the previous plan are done. ComparisonTable already uses semantic HTML `<table>` elements (AI/crawler-friendly). The `llms.txt` and `llms-full.txt` are in place. FAQ has full schema. Blog posts now use `og:type: article`. hreflang is implemented.
 
-## What Still Needs SEOHead (Public Pages Missing It)
+## What Still Needs Work
 
-Several public-facing pages indexed in sitemap.xml have NO dynamic SEO meta tags:
+### 1. SEOHead on 3 Remaining Sitemap Pages
 
-| Page | Route | Currently Has SEOHead? |
-|------|-------|----------------------|
-| Individual Calculator | `/individual-calculator` | NO |
-| Advisory | `/advisory` | NO |
-| Learn | `/learn` | NO |
-| Tax Breakdown | `/tax-breakdown` | NO |
-| Sector Guide | `/sector-guide` | NO |
-| Roadmap | `/roadmap` | NO |
-| Documentation | `/documentation` | NO |
-| Tax Logic Reference | `/tax-logic` | NO |
-| Results | `/results` | NO |
+These pages appear in `sitemap.xml` but have no `SEOHead`, meaning Google sees generic fallback metadata:
 
-These pages rely on the static `index.html` title/description, which means Google sees the same generic meta for all of them -- hurting SEO.
+| Page | Route | Fix |
+|------|-------|-----|
+| Terms/Privacy/Refund | `/terms` | Add SEOHead with title "Terms of Service & Privacy Policy - TaxForge NG" |
+| Success Stories | `/success-stories` | Add SEOHead with title "Nigerian Business Tax Success Stories - TaxForge NG" |
+| Tax Calendar | `/tax-calendar` | Add SEOHead with title "Nigerian Tax Deadlines & Calendar 2026 - TaxForge NG" |
 
-## Recommended Changes
+Each gets: unique title, 150-160 char meta description, canonical URL, BreadcrumbList schema.
 
-### 1. Add SEOHead to 9 remaining public pages
+### 2. Snippet-First Voice-Search Headings on Key SEO Pages
 
-Each page gets:
-- Unique `<title>` (60-70 chars, keyword-rich)
-- Unique `<meta description>` (150-160 chars)
-- Canonical URL
-- BreadcrumbList schema
-- HowTo schema where applicable (Individual Calculator, Advisory)
+The S+ Grok prompt recommends using **conversational, question-based H2 headings** that match voice queries (e.g., "How much tax do I pay on a 100k salary?"). Several SEO pages already do this well, but the homepage and main calculator lack question-format headings that could capture "People Also Ask" boxes.
 
-**Files to modify:**
-- `src/pages/IndividualCalculator.tsx` -- "Personal Income Tax Calculator Nigeria 2026"
-- `src/pages/Advisory.tsx` -- "Free Nigerian Tax Advisory Tool"
-- `src/pages/Learn.tsx` -- "Learn Nigerian Tax Rules 2026"
-- `src/pages/TaxBreakdown.tsx` -- "Nigerian Tax Breakdown & Analysis"
-- `src/pages/SectorGuide.tsx` -- "Nigerian Tax Rates by Industry Sector"
-- `src/pages/Roadmap.tsx` -- "TaxForge NG Product Roadmap"
-- `src/pages/Documentation.tsx` -- "TaxForge NG Documentation & Tax Rules"
-- `src/pages/TaxLogicReference.tsx` -- "Nigerian Tax Logic Reference 2026"
-- `src/pages/Results.tsx` -- "Tax Calculation Results | TaxForge NG"
+**Add a small FAQ-style section to the homepage** with 3-4 question-based H2s and direct 40-60 word answers. These are not full FAQ accordions (that's on /faq) but "snippet bait" paragraphs. Examples:
+- "How Much Tax Do I Pay in Nigeria?" -- short answer + link to calculator
+- "Is My Small Company Exempt From CIT?" -- short answer + link to /small-company-exemption
 
-### 2. Add Open Graph article tags to all blog posts
+### 3. Homepage `<h1>` Visibility Check
 
-The `SEOHead` component already sets `og:type` to "website" for everything. Blog posts should use `og:type: article` with `article:published_time` and `article:author` for richer social sharing. This requires a small update to `SEOHead.tsx` to accept an optional `ogType` prop.
+The previous plan added SEOHead to the homepage but the plan mentioned adding a visible `<h1>` tag. Need to verify this was actually added -- the current code shows `<h3>` tags in the carousel but no explicit `<h1>`. If missing, add one.
 
-### 3. Add `hreflang` tag for en-NG
-
-Since the site targets Nigerian English specifically, adding `<link rel="alternate" hreflang="en-NG">` signals to Google that this is Nigerian-localized content. This can be added to the `SEOHead` component.
+---
 
 ## Technical Details
 
-### SEOHead additions per page (example for IndividualCalculator)
+### Files to Modify
 
-```tsx
-<SEOHead
-  title="Personal Income Tax Calculator Nigeria 2026 - PIT & PAYE | TaxForge"
-  description="Calculate your Nigerian personal income tax with 2026 rules. First 800k tax-free, new PIT bands, Rent Relief. Free, instant, no signup required."
-  canonicalPath="/individual-calculator"
-  keywords="PIT calculator Nigeria, PAYE calculator, personal income tax Nigeria 2026, salary tax calculator"
-  schema={createBreadcrumbSchema([
-    { name: 'Home', url: 'https://taxforgeng.com/' },
-    { name: 'Personal Tax Calculator', url: 'https://taxforgeng.com/individual-calculator' },
-  ])}
-/>
+| File | Change |
+|------|--------|
+| `src/pages/Terms.tsx` | Add SEOHead import + component with terms-specific meta |
+| `src/pages/SuccessStoriesPage.tsx` | Add SEOHead import + component with testimonial-focused meta |
+| `src/pages/TaxCalendar.tsx` | Add SEOHead import + component with deadline/calendar meta |
+| `src/pages/Index.tsx` | Add visible `<h1>` if missing + snippet-bait FAQ section with question H2s |
+
+### Specific Meta Descriptions
+
+**Terms:** "TaxForge NG terms of service, privacy policy, and refund policy. How we handle your data, your rights, and our commitment to Nigerian tax compliance."
+
+**Success Stories:** "See how Nigerian businesses use TaxForge NG to save on taxes. Real success stories from SMEs, freelancers, and companies across Lagos, Abuja, and Port Harcourt."
+
+**Tax Calendar:** "Never miss a Nigerian tax deadline. 2026 tax calendar with FIRS filing dates for VAT, CIT, PAYE, WHT returns. Set reminders and download your schedule."
+
+### Homepage Snippet-Bait Section
+
+A new section between the hero and features, containing 3 question-answer pairs in this format:
+
+```
+<section>
+  <h2>How Much Tax Do I Pay in Nigeria?</h2>
+  <p>Under the 2026 rules, the first 800,000 of your income is tax-free. Above that, 
+  rates range from 15% to 25%. Use our free calculator to see your exact breakdown 
+  in seconds -- no signup required.</p>
+  <Link to="/individual-calculator">Calculate Now</Link>
+</section>
 ```
 
-### SEOHead.tsx update for og:type and hreflang
+This format is optimized for:
+- Google Featured Snippets (direct answer under question heading)
+- "People Also Ask" boxes (question format matches)
+- Voice search / AI answer engines (conversational, extractable)
 
-Add two optional props:
-- `ogType?: 'website' | 'article'` (default: 'website')
-- `hreflang?: string` (default: 'en-NG')
+### Homepage `<h1>` Addition
 
-This is a small, backward-compatible change.
+If not already present, add above the carousel:
+```
+<h1 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+  Nigerian Tax Calculator & Business Tools for 2026
+</h1>
+```
 
-## Summary
-
-| Change | Files | Impact |
-|--------|-------|--------|
-| SEOHead on 9 public pages | 9 files modified | Each page gets unique Google snippet instead of generic fallback |
-| og:type for blog posts | 1 file (SEOHead.tsx) + 0 blog files (BlogPostLayout handles it) | Richer social sharing cards |
-| hreflang en-NG | 1 file (SEOHead.tsx) | Signals Nigerian localization to Google |
-
-**Total: 10 files modified, 0 new files created**
-
+**Total: 4 files modified, 0 new files created**
