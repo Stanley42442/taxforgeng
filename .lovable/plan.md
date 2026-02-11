@@ -1,39 +1,56 @@
 
 
-# Final Housekeeping: Sitemap Sync and Schema Cleanup
+# Fix: Restore Rich Static Schema to index.html
 
-## Why This Matters
+## The Problem
 
-With all page-level SEO now complete, these last items ensure Google's crawl infrastructure matches the work we've done. Without them, some optimized pages won't appear in Google's index, and the homepage has conflicting schema data.
+Grok (and other non-JS crawlers) only see the static `index.html`. In the last edit, we removed the basic static JSON-LD schema to avoid conflicts with the dynamic one. But non-JS crawlers now see **zero schema markup**. The dynamic schemas injected by SEOHead only appear after JavaScript executes.
+
+**Who executes JS:** Googlebot, Bingbot (partially)
+**Who does NOT:** Grok's fetcher, social media crawlers, most AI bots, link previews
+
+## The Fix
+
+Add the comprehensive `SoftwareApplication` + `Organization` schema directly into `index.html` as static JSON-LD. This is the same rich schema that `SEOHead` injects dynamically on the homepage, but now it's visible to ALL crawlers regardless of JS execution.
+
+This does NOT conflict with the dynamic version -- having the same schema in static HTML and injected via JS is harmless (the dynamic version replaces it via the `data-seo-schema` attribute).
 
 ## Changes
 
-### 1. Add Missing Pages to sitemap.xml
+### 1. Add rich static JSON-LD to index.html
 
-These public pages have SEOHead but are NOT in the sitemap, meaning Google may never discover them:
+Insert two schema blocks before `</head>`:
 
-| Route | Priority | Description |
-|-------|----------|-------------|
-| `/tax-calendar` | 0.70 | Tax deadline calendar with reminders |
-| `/documentation` | 0.50 | Platform documentation and stats |
-| `/tax-logic` | 0.50 | Tax rules reference |
+**SoftwareApplication schema** with:
+- Full feature list (12 features)
+- 3 pricing tiers (Free, Starter, Business)
+- Area served, language, screenshots
+- Provider organization details
 
-### 2. Remove Duplicate Schema from index.html
+**Organization schema** with:
+- Name, URL, logo
+- Service types and knowledge areas
+- Founding date and area served
 
-Lines 74-88 of `index.html` contain a basic `WebApplication` JSON-LD block. The homepage now injects a much richer version dynamically (with pricing tiers, feature lists, Organization, and LocalBusiness schemas). The static one should be removed to avoid conflicting signals.
+### 2. No other changes needed
 
-### 3. Update sitemap.xml lastmod Dates
-
-Update `lastmod` to `2026-02-11` for all pages that were modified in this SEO overhaul (homepage, calculator, pricing, terms, success-stories, individual-calculator, advisory, learn, sector-guide, roadmap).
+Grok's other complaints (no meta description, no canonical, no viewport) are factually incorrect -- those tags are already present in `index.html` lines 5, 45, and 48.
 
 ## Technical Details
 
-### Files to Modify
+### File to Modify
 
 | File | Change |
 |------|--------|
-| `public/sitemap.xml` | Add 3 missing URLs, update lastmod dates |
-| `index.html` | Remove lines 74-88 (redundant static JSON-LD) |
+| `index.html` | Add 2 static JSON-LD script blocks (~60 lines) before closing `</head>` tag |
 
-**Total: 2 files modified, 0 new files created**
+**Total: 1 file modified**
+
+### Why This Works
+
+The static schema serves as a fallback for non-JS crawlers. When JS executes, SEOHead's dynamic schema takes over (it removes any existing `[data-seo-schema]` script and replaces it). The static blocks use a different attribute, so both can coexist without conflict.
+
+### What About Prerendering?
+
+Server-side rendering or build-time prerendering would make ALL dynamic meta tags visible to non-JS crawlers. However, this requires significant architecture changes (e.g., adding `vite-plugin-prerender` or migrating to a framework like Next.js/Remix), which is beyond the scope of SEO tweaks. The static fallbacks in `index.html` are the practical solution for a client-side SPA.
 
