@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { SEOHead, createHowToSchema, createBreadcrumbSchema } from "@/components/seo/SEOHead";
 import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -398,6 +399,29 @@ const CalculatorPage = () => {
 
   return (
     <PageLayout maxWidth="2xl" showBackground={true}>
+      <SEOHead
+        title="Nigerian Tax Calculator 2026 - CIT, PIT, VAT, WHT | TaxForge"
+        description="Calculate Nigerian CIT, PIT, PAYE, VAT, and WHT instantly. 2026 tax reform rules built in. Compare Business Name vs LLC. Free, no signup required."
+        canonicalPath="/calculator"
+        keywords="Nigeria tax calculator, CIT calculator, PAYE calculator Nigeria, VAT calculator, WHT calculator, business tax Nigeria 2026"
+        schema={{
+          ...createHowToSchema(
+            'How to Calculate Nigerian Business Tax',
+            'Use TaxForge NG to calculate CIT, VAT, WHT, and PIT for your Nigerian business in minutes.',
+            [
+              { name: 'Select your business or start new', text: 'Choose an existing saved business or start a new calculation from scratch.' },
+              { name: 'Choose entity type', text: 'Select Business Name or Company (LTD) to apply the correct tax rules.' },
+              { name: 'Enter financial details', text: 'Input your annual turnover, expenses, rent paid, and other income sources.' },
+              { name: 'Apply sector presets', text: 'Optionally select your industry sector for tailored VAT and CIT rules.' },
+              { name: 'Calculate and review', text: 'Click Calculate to see your full tax breakdown including CIT, VAT, WHT, and effective tax rate.' },
+            ]
+          ),
+          breadcrumb: createBreadcrumbSchema([
+            { name: 'Home', url: 'https://taxforgeng.com/' },
+            { name: 'Calculator', url: 'https://taxforgeng.com/calculator' },
+          ]),
+        }}
+      />
       <div className="mx-auto max-w-2xl">
         {/* Header */}
         <div className="text-center mb-8 animate-slide-up">

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { SEOHead, createBreadcrumbSchema } from "@/components/seo/SEOHead";
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/PageLayout";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -314,6 +315,16 @@ const Pricing = () => {
 
   return (
     <>
+    <SEOHead
+      title="Pricing - Nigerian Tax Calculator Plans | TaxForge NG"
+      description="TaxForge NG pricing plans from free to ₦8,999/month. PDF reports, payroll calculator, expense tracking, OCR scanning. Start free, upgrade anytime."
+      canonicalPath="/pricing"
+      keywords="TaxForge pricing, Nigeria tax calculator plans, business tax software Nigeria, affordable tax tools"
+      schema={createBreadcrumbSchema([
+        { name: 'Home', url: 'https://taxforgeng.com/' },
+        { name: 'Pricing', url: 'https://taxforgeng.com/pricing' },
+      ])}
+    />
     <PageLayout maxWidth="7xl" showBackground={true}>
       {/* Connection Status Warning */}
       {connectionStatus === 'slow' && (
