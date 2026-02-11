@@ -20,6 +20,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
+import { SEOHead, createSoftwareApplicationSchema, createOrganizationSchema, createLocalBusinessSchema } from "@/components/seo/SEOHead";
 
 const Index = () => {
   const [api, setApi] = useState<CarouselApi>();
@@ -66,8 +67,22 @@ const Index = () => {
     api?.scrollTo(index);
   }, [api]);
 
+  const homepageSchema = [
+    createSoftwareApplicationSchema(),
+    createOrganizationSchema(),
+    createLocalBusinessSchema(),
+  ];
+
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden relative">
+      <SEOHead
+        title="TaxForge NG | Free Nigerian Tax Calculator 2026 - CIT, VAT, WHT, PIT"
+        description="TaxForge NG: Free Nigerian tax calculator for CIT, VAT, WHT, PIT with 2026 reforms. Business advisory, sector guides, and small company tools. No signup needed."
+        canonicalPath="/"
+        keywords="Nigeria tax calculator, CIT calculator Nigeria, VAT calculator Nigeria, PIT PAYE calculator, 2026 tax reforms Nigeria, FIRS compliant"
+        schema={homepageSchema}
+      />
+
       {/* Premium Background */}
       <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
       <div className="fixed inset-0 bg-mesh pointer-events-none" />
