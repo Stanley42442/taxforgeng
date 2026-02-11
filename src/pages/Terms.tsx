@@ -26,6 +26,7 @@ import {
   ArrowUp
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SEOHead, createBreadcrumbSchema } from "@/components/seo/SEOHead";
 
 type PolicySection = 'terms' | 'privacy' | 'refund';
 
@@ -74,6 +75,16 @@ const Terms = () => {
 
   return (
     <PageLayout title="Legal & Policies" description={`Last updated: ${lastUpdated}`} icon={FileText} maxWidth="4xl">
+      <SEOHead
+        title="Terms of Service & Privacy Policy - TaxForge NG"
+        description="TaxForge NG terms of service, privacy policy, and refund policy. How we handle your data, your rights, and our commitment to Nigerian tax compliance."
+        canonicalPath="/terms"
+        keywords="TaxForge NG terms, privacy policy Nigeria, tax tool terms of service, NDPA compliance"
+        schema={createBreadcrumbSchema([
+          { name: 'Home', url: 'https://taxforgeng.com/' },
+          { name: 'Legal & Policies', url: 'https://taxforgeng.com/terms' },
+        ])}
+      />
       <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4">
         <ArrowLeft className="h-4 w-4 mr-2" />Back
       </Button>

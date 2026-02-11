@@ -5,12 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight, Star, LogIn } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { SEOHead, createBreadcrumbSchema } from "@/components/seo/SEOHead";
 
 const SuccessStoriesPage = () => {
   const { user } = useAuth();
 
   return (
     <PageLayout title="Success Stories" description="Real results from real Nigerian businesses" icon={Star} maxWidth="6xl">
+      <SEOHead
+        title="Nigerian Business Tax Success Stories - TaxForge NG"
+        description="See how Nigerian businesses use TaxForge NG to save on taxes. Real success stories from SMEs, freelancers, and companies across Lagos, Abuja, and Port Harcourt."
+        canonicalPath="/success-stories"
+        keywords="TaxForge NG reviews, Nigerian tax success stories, SME tax savings Nigeria, business tax testimonials"
+        schema={createBreadcrumbSchema([
+          { name: 'Home', url: 'https://taxforgeng.com/' },
+          { name: 'Success Stories', url: 'https://taxforgeng.com/success-stories' },
+        ])}
+      />
       {/* Testimonials */}
       <SuccessStories showTitle={false} autoPlay={false} />
 

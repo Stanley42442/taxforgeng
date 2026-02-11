@@ -214,6 +214,69 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Snippet-Bait FAQ Section for Voice Search & Featured Snippets */}
+      <section className="relative z-10 py-16 md:py-20">
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-4xl grid gap-10 md:grid-cols-2">
+            <article className="glass-frosted rounded-2xl p-6 md:p-8 hover-lift">
+              <h2 className="text-xl md:text-2xl font-bold text-foreground mb-3">
+                How Much Tax Do I Pay in Nigeria?
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                Under the 2026 Nigeria Tax Act, the first ₦800,000 of your annual income is tax-free. Above that, rates range from 15% to 25%. Use our free calculator to see your exact breakdown in seconds — no signup required.
+              </p>
+              <Link to="/individual-calculator">
+                <Button variant="link" className="p-0 gap-1 text-primary">
+                  Calculate Your Tax <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </article>
+
+            <article className="glass-frosted rounded-2xl p-6 md:p-8 hover-lift">
+              <h2 className="text-xl md:text-2xl font-bold text-foreground mb-3">
+                Is My Small Company Exempt From CIT?
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                Yes — if your company's gross turnover is ₦25 million or less, you pay 0% Company Income Tax under the 2026 rules. This applies to Nigerian-registered companies in their first four years or with qualifying turnover.
+              </p>
+              <Link to="/small-company-exemption">
+                <Button variant="link" className="p-0 gap-1 text-primary">
+                  Check Your Eligibility <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </article>
+
+            <article className="glass-frosted rounded-2xl p-6 md:p-8 hover-lift">
+              <h2 className="text-xl md:text-2xl font-bold text-foreground mb-3">
+                What Is the VAT Rate in Nigeria?
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                Nigeria's VAT rate is 7.5% on taxable goods and services. Essential items like basic food, medical supplies, and educational materials are VAT-exempt. Businesses with turnover above ₦25 million must register for VAT.
+              </p>
+              <Link to="/vat-calculator">
+                <Button variant="link" className="p-0 gap-1 text-primary">
+                  Calculate VAT <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </article>
+
+            <article className="glass-frosted rounded-2xl p-6 md:p-8 hover-lift">
+              <h2 className="text-xl md:text-2xl font-bold text-foreground mb-3">
+                When Are Nigerian Tax Deadlines?
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                VAT returns are due by the 21st of each month. PAYE remittances by the 10th. CIT annual returns by June 30th, and PIT annual filing by March 31st. Track all deadlines with our free tax calendar.
+              </p>
+              <Link to="/tax-calendar">
+                <Button variant="link" className="p-0 gap-1 text-primary">
+                  View Tax Calendar <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </article>
+          </div>
+        </div>
+      </section>
+
       {/* Free Trial CTA for Guests */}
       <FreeTrialCTA />
 
