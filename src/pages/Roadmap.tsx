@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SEOHead, createBreadcrumbSchema } from "@/components/seo/SEOHead";
 import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,6 +80,17 @@ const Roadmap = () => {
   };
 
   return (
+    <>
+    <SEOHead
+      title="TaxForge NG Product Roadmap - Coming Soon Features"
+      description="See what's next for TaxForge NG: CAC API integration, bank feeds, AI tax assistant, direct FIRS e-filing, and mobile app. Join the waitlist for early access."
+      canonicalPath="/roadmap"
+      keywords="TaxForge roadmap, Nigerian tax software features, FIRS e-filing, tax app Nigeria"
+      schema={createBreadcrumbSchema([
+        { name: 'Home', url: 'https://taxforgeng.com/' },
+        { name: 'Roadmap', url: 'https://taxforgeng.com/roadmap' },
+      ])}
+    />
     <PageLayout title="Roadmap & Coming Soon" description="See what we're building next for TaxForge NG" icon={Map}>
       {/* Waitlist Signup */}
       <div className="neon-border p-8 mb-12 animate-slide-up">
@@ -198,6 +210,7 @@ const Roadmap = () => {
         Roadmap items are subject to change. Timelines are estimates only.
       </p>
     </PageLayout>
+    </>
   );
 };
 

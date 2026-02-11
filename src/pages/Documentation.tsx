@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { SEOHead, createBreadcrumbSchema } from '@/components/seo/SEOHead';
 import { motion } from 'framer-motion';
 import { 
   FileText, Download, Users, Building2, Calculator, 
@@ -205,6 +206,17 @@ const Documentation = () => {
   const currentStats = stats || defaultStats;
 
   return (
+    <>
+    <SEOHead
+      title="TaxForge NG Documentation - Platform Overview & Tax Rules"
+      description="Comprehensive documentation for TaxForge NG: live statistics, feature overview, pricing tiers, technical architecture, and security details for investors and partners."
+      canonicalPath="/documentation"
+      keywords="TaxForge documentation, Nigerian tax platform, tax software documentation, TaxForge NG overview"
+      schema={createBreadcrumbSchema([
+        { name: 'Home', url: 'https://taxforgeng.com/' },
+        { name: 'Documentation', url: 'https://taxforgeng.com/documentation' },
+      ])}
+    />
     <PageLayout 
       title="Project Documentation" 
       description="Comprehensive overview of TaxForge NG for investors and partners"
@@ -736,6 +748,7 @@ const Documentation = () => {
         </motion.div>
       </div>
     </PageLayout>
+    </>
   );
 };
 

@@ -7,6 +7,7 @@ interface SEOHeadProps {
   keywords?: string;
   schema?: object;
   ogImage?: string;
+  ogType?: 'website' | 'article';
 }
 
 /**
@@ -20,6 +21,7 @@ export const SEOHead = ({
   keywords,
   schema,
   ogImage = 'https://taxforgeng.com/og-image.png',
+  ogType = 'website',
 }: SEOHeadProps) => {
   useEffect(() => {
     // Update document title
@@ -46,9 +48,19 @@ export const SEOHead = ({
     updateMeta('og:description', description, true);
     updateMeta('og:url', `https://taxforgeng.com${canonicalPath}`, true);
     updateMeta('og:image', ogImage, true);
-    updateMeta('og:type', 'website', true);
+    updateMeta('og:type', ogType, true);
     updateMeta('og:site_name', 'TaxForge NG', true);
     updateMeta('og:locale', 'en_NG', true);
+
+    // hreflang for Nigerian English localization
+    let hreflangLink = document.querySelector('link[rel="alternate"][hreflang="en-NG"]');
+    if (!hreflangLink) {
+      hreflangLink = document.createElement('link');
+      hreflangLink.setAttribute('rel', 'alternate');
+      hreflangLink.setAttribute('hreflang', 'en-NG');
+      document.head.appendChild(hreflangLink);
+    }
+    hreflangLink.setAttribute('href', `https://taxforgeng.com${canonicalPath}`);
 
     // Twitter Card
     updateMeta('twitter:card', 'summary_large_image');
@@ -85,7 +97,7 @@ export const SEOHead = ({
         schemaScript.remove();
       }
     };
-  }, [title, description, canonicalPath, keywords, schema, ogImage]);
+  }, [title, description, canonicalPath, keywords, schema, ogImage, ogType]);
 
   return null;
 };

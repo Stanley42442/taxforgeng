@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { SEOHead, createHowToSchema, createBreadcrumbSchema } from "@/components/seo/SEOHead";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -626,9 +627,35 @@ const IndividualCalculatorPage = () => {
     }
   };
 
+  const individualCalcSchema = [
+    createHowToSchema(
+      'How to Calculate Personal Income Tax in Nigeria',
+      'Use TaxForge NG to calculate your PIT, PAYE, crypto tax, and investment income under 2026 rules.',
+      [
+        { name: 'Choose calculation type', text: 'Select PIT/PAYE, Crypto, Investment, or Informal sector calculator.' },
+        { name: 'Enter your income details', text: 'Input employment income, allowances, and deductions.' },
+        { name: 'Toggle 2026 rules', text: 'Compare results under 2026 (NTA 2025) and pre-2026 rules.' },
+        { name: 'Calculate', text: 'Click Calculate to see your tax breakdown with effective rate.' },
+        { name: 'Export or save', text: 'Download PDF report or save to your account history.' },
+      ]
+    ),
+    createBreadcrumbSchema([
+      { name: 'Home', url: 'https://taxforgeng.com/' },
+      { name: 'Personal Tax Calculator', url: 'https://taxforgeng.com/individual-calculator' },
+    ]),
+  ];
+
   return (
+    <>
+    <SEOHead
+      title="Personal Income Tax Calculator Nigeria 2026 - PIT & PAYE | TaxForge"
+      description="Calculate your Nigerian personal income tax with 2026 rules. First ₦800k tax-free, new PIT bands, Rent Relief. Free, instant, no signup required."
+      canonicalPath="/individual-calculator"
+      keywords="PIT calculator Nigeria, PAYE calculator, personal income tax Nigeria 2026, salary tax calculator"
+      schema={{ '@context': 'https://schema.org', '@graph': individualCalcSchema }}
+    />
     <PageLayout 
-      title="Individual Tax Calculator" 
+      title="Individual Tax Calculator"
       icon={User}
       description="Calculate your personal income tax under Nigerian tax law"
       maxWidth="4xl"
@@ -1447,6 +1474,7 @@ const IndividualCalculatorPage = () => {
         </Card>
       )}
     </PageLayout>
+    </>
   );
 };
 

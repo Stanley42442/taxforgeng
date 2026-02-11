@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { SEOHead, createBreadcrumbSchema } from "@/components/seo/SEOHead";
 import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
 import { useSubscription } from "@/contexts/SubscriptionContext";
@@ -58,6 +59,18 @@ const SectorGuide = () => {
   const SectorIcon = sectorIcons[guide.sector] || Package;
 
   return (
+    <>
+    <SEOHead
+      title={`${guide.title} - Nigerian Tax Rates by Sector | TaxForge`}
+      description={`${guide.description} Tax incentives, benefits, and requirements for ${guide.sector} sector businesses in Nigeria.`}
+      canonicalPath={`/sector-guide/${id}`}
+      keywords={`${guide.sector} tax Nigeria, ${guide.title}, sector tax incentives Nigeria, industry tax guide`}
+      schema={createBreadcrumbSchema([
+        { name: 'Home', url: 'https://taxforgeng.com/' },
+        { name: 'Tax Academy', url: 'https://taxforgeng.com/learn' },
+        { name: guide.title, url: `https://taxforgeng.com/sector-guide/${id}` },
+      ])}
+    />
     <PageLayout maxWidth="4xl">
       <Button variant="ghost" className="mb-6" onClick={() => navigate('/learn')}>
         <ArrowLeft className="h-4 w-4 mr-2" />Back to Tax Academy
@@ -143,6 +156,7 @@ const SectorGuide = () => {
         </Button>
       </div>
     </PageLayout>
+    </>
   );
 };
 
