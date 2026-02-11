@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { SEOHead, createBreadcrumbSchema } from "@/components/seo/SEOHead";
 import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -173,6 +174,17 @@ const Learn = () => {
   ];
 
   return (
+    <>
+    <SEOHead
+      title="Learn Nigerian Tax Rules 2026 - Myths, Guides & FAQs | TaxForge"
+      description="Master Nigerian tax laws with our 2026 guides. Debunk tax myths, explore sector guides for tech, agriculture, manufacturing, and get personalised tax tips."
+      canonicalPath="/learn"
+      keywords="Nigerian tax rules 2026, tax myths Nigeria, sector tax guides, learn Nigerian tax law"
+      schema={createBreadcrumbSchema([
+        { name: 'Home', url: 'https://taxforgeng.com/' },
+        { name: 'Tax Learning Center', url: 'https://taxforgeng.com/learn' },
+      ])}
+    />
     <PageLayout 
       title="Tax Learning Center" 
       description="Master Nigerian tax laws with our comprehensive guides" 
@@ -364,6 +376,7 @@ const Learn = () => {
         </TabsContent>
       </Tabs>
     </PageLayout>
+    </>
   );
 };
 

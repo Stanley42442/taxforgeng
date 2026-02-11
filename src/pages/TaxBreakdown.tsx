@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { SEOHead, createBreadcrumbSchema } from "@/components/seo/SEOHead";
 import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -127,6 +128,18 @@ Effective Tax Rate = ${result.effectiveRate.toFixed(2)}%`,
   const steps = generateSteps();
 
   return (
+    <>
+    <SEOHead
+      title="Step-by-Step Nigerian Tax Breakdown & Analysis | TaxForge"
+      description="Understand exactly how your Nigerian tax is calculated. Step-by-step breakdown of CIT, PIT, VAT, and WHT with educational explanations for each component."
+      canonicalPath="/tax-breakdown"
+      keywords="tax breakdown Nigeria, how Nigerian tax calculated, CIT breakdown, PIT calculation steps"
+      schema={createBreadcrumbSchema([
+        { name: 'Home', url: 'https://taxforgeng.com/' },
+        { name: 'Calculator', url: 'https://taxforgeng.com/calculator' },
+        { name: 'Tax Breakdown', url: 'https://taxforgeng.com/tax-breakdown' },
+      ])}
+    />
     <PageLayout title="Step-by-Step Tax Breakdown" description={`Understanding your ${formatCurrency(result.totalTaxPayable)} tax`} icon={BookOpen} maxWidth="2xl">
       <Button variant="ghost" className="mb-6" onClick={() => navigate('/results', { state: { result, inputs } })}>
         <ArrowLeft className="h-4 w-4" />
@@ -202,6 +215,7 @@ Effective Tax Rate = ${result.effectiveRate.toFixed(2)}%`,
         This breakdown is for educational purposes. Please consult a tax professional for specific advice.
       </p>
     </PageLayout>
+    </>
   );
 };
 

@@ -1,4 +1,5 @@
 import { useLocation, Link, useNavigate } from "react-router-dom";
+import { SEOHead, createBreadcrumbSchema } from "@/components/seo/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -198,6 +199,18 @@ const Results = () => {
   const betterOption = savings > 0 ? 'company' : 'business_name';
 
   return (
+    <>
+    <SEOHead
+      title="Tax Calculation Results | TaxForge NG"
+      description="View your Nigerian tax calculation results. Compare Business Name vs LLC, see tax breakdown, export PDF reports, and save to your portfolio."
+      canonicalPath="/results"
+      keywords="tax calculation results Nigeria, tax comparison Business Name LLC, tax report Nigeria"
+      schema={createBreadcrumbSchema([
+        { name: 'Home', url: 'https://taxforgeng.com/' },
+        { name: 'Calculator', url: 'https://taxforgeng.com/calculator' },
+        { name: 'Results', url: 'https://taxforgeng.com/results' },
+      ])}
+    />
     <PageLayout 
       title="Tax Calculation Results" 
       icon={FileText}
@@ -483,6 +496,7 @@ const Results = () => {
         </DialogContent>
       </Dialog>
     </PageLayout>
+    </>
   );
 };
 

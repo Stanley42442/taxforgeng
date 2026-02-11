@@ -85,6 +85,7 @@ export const BlogPostLayout = ({
         canonicalPath={canonicalPath}
         keywords={keywords}
         schema={schema}
+        ogType="article"
       />
 
       <div className="min-h-screen flex flex-col">

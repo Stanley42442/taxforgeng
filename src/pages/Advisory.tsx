@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { SEOHead, createHowToSchema, createBreadcrumbSchema } from "@/components/seo/SEOHead";
 import { useNavigate } from "react-router-dom";
 import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
@@ -253,7 +254,33 @@ const Advisory = () => {
     );
   }
 
+  const advisorySchema = [
+    createHowToSchema(
+      'How to Choose Your Business Structure in Nigeria',
+      'Answer 7 questions to get a personalised recommendation on Business Name vs Limited Company.',
+      [
+        { name: 'Answer partner question', text: 'Tell us if you have business partners.' },
+        { name: 'Estimate your turnover', text: 'Select your expected annual revenue range.' },
+        { name: 'Review asset protection needs', text: 'Indicate if you need personal asset protection.' },
+        { name: 'Complete all questions', text: 'Answer remaining questions about your business situation.' },
+        { name: 'Get recommendation', text: 'Receive a tailored recommendation with tax authority details and cost estimates.' },
+      ]
+    ),
+    createBreadcrumbSchema([
+      { name: 'Home', url: 'https://taxforgeng.com/' },
+      { name: 'Business Advisory', url: 'https://taxforgeng.com/advisory' },
+    ]),
+  ];
+
   return (
+    <>
+    <SEOHead
+      title="Free Nigerian Business Structure Advisory Tool | TaxForge NG"
+      description="Should you register a Business Name or Limited Company in Nigeria? Answer 7 questions for a personalised recommendation with tax implications and costs."
+      canonicalPath="/advisory"
+      keywords="business structure Nigeria, Business Name vs LLC, CAC registration advisory, Nigerian business tax advice"
+      schema={{ '@context': 'https://schema.org', '@graph': advisorySchema }}
+    />
     <PageLayout maxWidth="xl" showBackground={true}>
       {/* Milestone Popup */}
       <AnimatePresence>
@@ -406,6 +433,7 @@ const Advisory = () => {
         <div className="w-20" />
       </div>
     </PageLayout>
+    </>
   );
 };
 

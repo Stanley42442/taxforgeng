@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SEOHead, createBreadcrumbSchema } from "@/components/seo/SEOHead";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -206,6 +207,17 @@ const SourceBadge = ({ source }: { source: typeof VERIFICATION_SOURCES_DETAILED[
 
 const TaxLogicReference = () => {
   return (
+    <>
+    <SEOHead
+      title="Nigerian Tax Logic Reference 2026 - PIT, CIT, VAT Rules | TaxForge"
+      description="Side-by-side comparison of Nigeria Tax Act 2025 vs pre-2026 rules. PIT bands, CIT thresholds, VAT, WHT rates, deductions, and payroll rules verified by Big 4 firms."
+      canonicalPath="/tax-logic"
+      keywords="Nigerian tax rules 2026, PIT bands Nigeria, CIT rates, VAT rules Nigeria, tax logic reference"
+      schema={createBreadcrumbSchema([
+        { name: 'Home', url: 'https://taxforgeng.com/' },
+        { name: 'Tax Logic Reference', url: 'https://taxforgeng.com/tax-logic' },
+      ])}
+    />
     <PageLayout 
       title="Tax Logic Reference" 
       description="Nigeria Tax Act 2025 vs Pre-2026 Rules"
@@ -627,6 +639,7 @@ const TaxLogicReference = () => {
         </Card>
       </div>
     </PageLayout>
+    </>
   );
 };
 
