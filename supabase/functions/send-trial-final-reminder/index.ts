@@ -112,7 +112,7 @@ const handler = async (req: Request): Promise<Response> => {
                     ${[
                       'Save and manage up to 10 businesses',
                       'Export professional PDF & CSV reports',
-                      'Tax filing preparation for FIRS',
+                      'Tax filing preparation for NRS',
                       'CAC verification tools',
                       'Advanced scenario modeling',
                       'Priority AI tax assistant',

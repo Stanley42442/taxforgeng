@@ -2285,11 +2285,11 @@ export const translations: Translations = {
     ig: 'Gbakọọ ụtụ Naịjirịa gị nke ọma' 
   },
   'calculator.firsCompliant': { 
-    en: 'FIRS Compliant Calculator', 
-    pcm: 'FIRS Approved Calculator', 
-    yo: 'Ẹ̀rọ Ìṣirò Tó Bá FIRS Mu', 
-    ha: 'Na\'urar Ƙididdiga ta FIRS', 
-    ig: 'Ngwa Mgbako Kwekọrọ na FIRS' 
+    en: 'NRS Compliant Calculator', 
+    pcm: 'NRS Approved Calculator', 
+    yo: 'Ẹ̀rọ Ìṣirò Tó Bá NRS Mu', 
+    ha: 'Na\'urar Ƙididdiga ta NRS', 
+    ig: 'Ngwa Mgbako Kwekọrọ na NRS' 
   },
   'calculator.selectBusiness': { 
     en: 'Select Business', 
@@ -2986,11 +2986,11 @@ export const translations: Translations = {
     ig: 'Nnwale E-Filing' 
   },
   'efiling.realIntegration': { 
-    en: 'This is a demonstration. Real FIRS integration coming soon!', 
-    pcm: 'This na just demo. Real FIRS go come soon!', 
-    yo: 'Èyí jẹ́ ìfihàn. Ìsopọ̀ FIRS gangan ń bọ̀ láìpẹ́!', 
-    ha: 'Wannan nuni ne. Haɗin FIRS na gaske yana zuwa nan da nan!', 
-    ig: 'Nke a bụ ngosi. Njikọ FIRS n\'ezie na-abịa n\'oge adịghị anya!' 
+    en: 'This is a demonstration. Real NRS integration coming soon!', 
+    pcm: 'This na just demo. Real NRS go come soon!', 
+    yo: 'Èyí jẹ́ ìfihàn. Ìsopọ̀ NRS gangan ń bọ̀ láìpẹ́!', 
+    ha: 'Wannan nuni ne. Haɗin NRS na gaske yana zuwa nan da nan!', 
+    ig: 'Nke a bụ ngosi. Njikọ NRS n\'ezie na-abịa n\'oge adịghị anya!' 
   },
   'efiling.processing': { 
     en: 'Processing Your Return', 
@@ -3369,7 +3369,7 @@ export const translations: Translations = {
   'results.devLevy': { en: 'Dev Levy', pcm: 'Dev Levy', yo: 'Owó Ìdàgbàsókè', ha: 'Harajin Ci Gaba', ig: 'Ụtụ Mmepe' },
   'results.incomeTax': { en: 'Income Tax', pcm: 'Income Tax', yo: 'Owó-orí Owó-wíwọlé', ha: 'Harajin Kuɗin Shiga', ig: 'Ụtụ Ego Nnata' },
   'results.pitDescription': { en: 'Personal Income Tax via State IRS. Simpler compliance, unlimited liability.', pcm: 'Personal Tax through State IRS. E dey simple, but you go carry all the wahala.', yo: 'Owó-orí Ènìyàn nípasẹ̀ IRS Ìpínlẹ̀. Ìbọ́wọ̀ rọrùn, gbèsè àìlópin.', ha: 'Harajin Mutum ta State IRS. Biyayya mai sauƙi, alhaki maras iyaka.', ig: 'Ụtụ Ego Onwe site na Steeti IRS. Nkwekọrịta dị mfe, ọrụ enweghị oke.' },
-  'results.citDescription': { en: 'CIT via FIRS. Limited liability, better for scaling.', pcm: 'CIT through FIRS. Limited liability, e better for growth.', yo: 'CIT nípasẹ̀ FIRS. Gbèsè tó ní ìwọ̀n, ó dára fún ìdàgbà.', ha: 'CIT ta FIRS. Iyakantaccen alhaki, mafi kyau don girma.', ig: 'CIT site na FIRS. Ọrụ nwere oke, ka mma maka ịba ụba.' },
+  'results.citDescription': { en: 'CIT via NRS. Limited liability, better for scaling.', pcm: 'CIT through NRS. Limited liability, e better for growth.', yo: 'CIT nípasẹ̀ NRS. Gbèsè tó ní ìwọ̀n, ó dára fún ìdàgbà.', ha: 'CIT ta NRS. Iyakantaccen alhaki, mafi kyau don girma.', ig: 'CIT site na NRS. Ọrụ nwere oke, ka mma maka ịba ụba.' },
   'results.smallCompanyCIT': { en: '0% CIT (Small Company). Limited liability protection.', pcm: '0% CIT (Small Company). Limited liability protection.', yo: '0% CIT (Ilé-iṣẹ́ Kékeré). Ààbò gbèsè tó ní ìwọ̀n.', ha: '0% CIT (Ƙaramin Kamfani). Kariya alhaki da iyaka.', ig: '0% CIT (Obere Ụlọ Ọrụ). Nchekwa ọrụ nwere oke.' },
 
   // Individual Calculator Page
@@ -3498,7 +3498,7 @@ export const translations: Translations = {
   'disclaimer.educationalTitle': { en: 'Educational Purposes Only', pcm: 'For Learning Only', yo: 'Fún Ẹ̀kọ́ Nìkan', ha: 'Don Ilimi Kawai', ig: 'Maka Mmụta Naanị' },
   'disclaimer.educationalDesc': { en: 'This app provides tax estimates based on the Nigeria Tax Act 2025 for educational and planning purposes.', pcm: 'This app give you tax estimate based on Nigeria Tax Act 2025 for learning and planning.', yo: 'Àpp yìí pèsè àmúdájú owó-orí tó dá lórí Ìṣe Owó-orí Nàìjíríà 2025 fún ẹ̀kọ́ àti ètò.', ha: 'Wannan app yana ba da ƙiyasin haraji bisa Dokar Haraji ta Najeriya 2025 don ilimi da tsarawa.', ig: 'Ngwa a na-enye atụmatụ ụtụ dabere na Iwu Ụtụ Naịjirịa 2025 maka mmụta na atụmatụ.' },
   'disclaimer.notOfficialTitle': { en: 'Not Official Tax Advice', pcm: 'No Be Official Tax Advice', yo: 'Kìí Ṣe Ìmọ̀ràn Owó-orí Gidi', ha: 'Ba Shawarar Haraji ta Hukuma Ba', ig: 'Ọ Bụghị Ndụmọdụ Ụtụ Gọọmentị' },
-  'disclaimer.notOfficialDesc': { en: 'Always consult FIRS, your state IRS, or certified tax professionals for official guidance.', pcm: 'Always talk to FIRS, your state IRS, or certified tax people for real advice.', yo: 'Máa bá FIRS, IRS ìpínlẹ̀ rẹ, tàbí àwọn ògbóntarìgì owó-orí tí a fọwọ́sí sọ̀rọ̀ fún ìtọ́sọ́nà gidi.', ha: 'Koyaushe tuntubi FIRS, IRS na jiharku, ko ƙwararrun haraji don jagorancin hukuma.', ig: 'Mgbe niile gbakwunyere FIRS, IRS steeti gị, ma ọ bụ ndị ọkachamara ụtụ maka nduzi gọọmentị.' },
+  'disclaimer.notOfficialDesc': { en: 'Always consult NRS, your state IRS, or certified tax professionals for official guidance.', pcm: 'Always talk to NRS, your state IRS, or certified tax people for real advice.', yo: 'Máa bá NRS, IRS ìpínlẹ̀ rẹ, tàbí àwọn ògbóntarìgì owó-orí tí a fọwọ́sí sọ̀rọ̀ fún ìtọ́sọ́nà gidi.', ha: 'Koyaushe tuntubi NRS, IRS na jiharku, ko ƙwararrun haraji don jagorancin hukuma.', ig: 'Mgbe niile gbakwunyere NRS, IRS steeti gị, ma ọ bụ ndị ọkachamara ụtụ maka nduzi gọọmentị.' },
   'disclaimer.noLiabilityTitle': { en: 'No Liability', pcm: 'No Liability', yo: 'Kò Sí Gbèsè', ha: 'Babu Alhaki', ig: 'Enweghị Ọrụ' },
   'disclaimer.noLiabilityDesc': { en: 'TaxForge NG is not liable for any errors, omissions, or decisions made based on this platform.', pcm: 'TaxForge NG no go carry wahala for any error, wetin we miss, or decision wey you make based on this platform.', yo: 'TaxForge NG kò gbà gbèsè fún àṣìṣe, àìsíkùn, tàbí ìpinnu tí a ṣe dá lórí pẹpẹ yìí.', ha: 'TaxForge NG ba za ta dauki alhakin duk wani kuskure, abin da aka manta, ko yanke shawara da aka yi dangane da wannan dandali ba.', ig: 'TaxForge NG anaghị aza ọrụ maka njehie ọ bụla, ihe a hapụrụ, ma ọ bụ mkpebi emere dabere na ikpo okwu a.' },
   'disclaimer.agreeTerms': { en: 'I understand this is not official tax advice. I agree to the Terms of Service & Privacy Policy.', pcm: 'I understand say this no be official tax advice. I agree to Terms of Service & Privacy Policy.', yo: 'Mo mọ̀ pé èyí kìí ṣe ìmọ̀ràn owó-orí gidi. Mo gbà Àwọn Òfin Iṣẹ́ & Ìlànà Àṣírí.', ha: 'Na fahimci cewa wannan ba shawarar haraji ta hukuma ba ce. Na amince da Sharuɗɗan Sabis & Manufar Sirri.', ig: 'Aghọtara m na nke a abụghị ndụmọdụ ụtụ gọọmentị. Ekwenyere m Usoro Ọrụ & Amụma Nzuzo.' },

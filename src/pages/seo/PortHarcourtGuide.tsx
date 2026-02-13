@@ -46,7 +46,7 @@ const PortHarcourtGuide = () => {
     '@graph': [
       createArticleSchema(
         'Port Harcourt Tax Guide 2026 - Rivers State SME Tips',
-        'Complete tax guide for Port Harcourt businesses. Local SME compliance tips, oil & gas sector advice, FIRS office locations.',
+        'Complete tax guide for Port Harcourt businesses. Local SME compliance tips, oil & gas sector advice, NRS office locations.',
         '2026-01-01',
         '2026-02-09'
       ),
@@ -56,7 +56,7 @@ const PortHarcourtGuide = () => {
         'Step-by-step guide to tax registration for Rivers State businesses.',
         [
           { name: 'Register with CAC', text: 'Complete your CAC registration to obtain your RC number.' },
-          { name: 'Get your TIN from FIRS', text: 'Visit FIRS Port Harcourt or use TaxPro Max to obtain your Tax Identification Number.' },
+          { name: 'Get your TIN from NRS', text: 'Visit NRS Port Harcourt or use TaxPro Max to obtain your Tax Identification Number.' },
           { name: 'Register with RIRS', text: 'Register with Rivers State Internal Revenue Service for state tax obligations.' },
           { name: 'Register business premises', text: 'Register your business premises with the Rivers State government.' },
         ]
@@ -170,7 +170,7 @@ const PortHarcourtGuide = () => {
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">State vs Federal Taxes in Rivers State</h2>
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="glass-frosted rounded-2xl p-6 border-l-4 border-primary">
-                    <h3 className="text-xl font-bold text-foreground mb-4">Federal Taxes (FIRS)</h3>
+                    <h3 className="text-xl font-bold text-foreground mb-4">Federal Taxes (NRS)</h3>
                     <ul className="space-y-2">
                       {['Company Income Tax (CIT)', 'Value Added Tax (VAT)', 'Withholding Tax (WHT)', 'Petroleum Profits Tax (PPT)', 'Capital Gains Tax (companies)', 'Education Tax / Development Levy'].map((tax, index) => (
                         <li key={index} className="flex items-center gap-2 text-sm text-muted-foreground">

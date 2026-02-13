@@ -87,7 +87,7 @@ const handler = async (req: Request): Promise<Response> => {
                 ${[
                   { icon: '📊', title: 'Save up to 10 Businesses', desc: 'Track and manage multiple businesses in one dashboard' },
                   { icon: '📄', title: 'Export Reports (PDF & CSV)', desc: 'Download professional tax reports for record-keeping' },
-                  { icon: '📝', title: 'Tax Filing Preparation', desc: 'Generate pre-filled FIRS forms ready for TaxProMax' },
+                  { icon: '📝', title: 'Tax Filing Preparation', desc: 'Generate pre-filled NRS forms ready for TaxPro Max' },
                   { icon: '✅', title: 'CAC Verification Tools', desc: 'Verify RC/BN numbers instantly with official records' },
                   { icon: '📈', title: 'Scenario Modeling', desc: 'Compare different business structures and tax strategies' },
                   { icon: '🤖', title: 'Priority AI Assistant', desc: 'Get instant answers to your Nigerian tax questions' },

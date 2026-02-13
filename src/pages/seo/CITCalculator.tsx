@@ -148,7 +148,7 @@ const CITCalculator = () => {
                   <TrustBadges
                     badges={[
                       { icon: 'check', text: 'Nigeria Tax Act 2025' },
-                      { icon: 'shield', text: 'FIRS Rates' },
+                      { icon: 'shield', text: 'NRS Rates' },
                       { icon: 'clock', text: 'Development Levy Included' },
                     ]}
                   />
@@ -253,7 +253,7 @@ const CITCalculator = () => {
                     },
                     {
                       mistake: 'Not filing returns even at 0% CIT rate',
-                      fix: 'Small companies with 0% CIT must still file annual returns with FIRS. Failure to file attracts penalties regardless of your tax rate.',
+                      fix: 'Small companies with 0% CIT must still file annual returns with NRS. Failure to file attracts penalties regardless of your tax rate.',
                     },
                     {
                       mistake: 'Ignoring the 4% Development Levy',

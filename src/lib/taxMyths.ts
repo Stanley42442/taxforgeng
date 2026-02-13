@@ -219,7 +219,7 @@ export const taxMyths: TaxMyth[] = [
     id: 'crypto-unreported',
     myth: 'Cryptocurrency gains don\'t need to be reported since crypto isn\'t recognized',
     truth: 'Crypto gains are TAXABLE as capital gains (10% CGT) regardless of regulatory status.',
-    explanation: 'While CBN restricts banking services for crypto, FIRS treats crypto as property. Gains from crypto disposals attract 10% Capital Gains Tax. Losses can offset gains. Proper record-keeping of acquisition costs is essential.',
+    explanation: 'While CBN restricts banking services for crypto, NRS treats crypto as property. Gains from crypto disposals attract 10% Capital Gains Tax. Losses can offset gains. Proper record-keeping of acquisition costs is essential.',
     category: 'digital',
     severity: 'high',
     tier: 'basic',
@@ -345,7 +345,7 @@ export const taxMyths: TaxMyth[] = [
     id: 'state-federal-choice',
     myth: 'You can choose whether to pay taxes to state or federal government',
     truth: 'Tax jurisdiction is determined by LAW based on income type and business structure.',
-    explanation: 'PIT goes to your state of residence (via PAYE or self-assessment). CIT goes to federal (FIRS). VAT is federal. You can\'t choose. Operating in multiple states may require filing in each. State IGR matters for certain taxes.',
+    explanation: 'PIT goes to your state of residence (via PAYE or self-assessment). CIT goes to federal (NRS). VAT is federal. You can\'t choose. Operating in multiple states may require filing in each. State IGR matters for certain taxes.',
     category: 'general',
     severity: 'low',
     tier: 'free',
@@ -354,12 +354,12 @@ export const taxMyths: TaxMyth[] = [
       question: 'Where does a Lagos-based company pay its Company Income Tax?',
       options: [
         'Lagos State Internal Revenue',
-        'Federal Inland Revenue Service',
+        'Nigeria Revenue Service (NRS)',
         'Choice between state or federal',
         'Depends on company size'
       ],
       correctIndex: 1,
-      explanation: 'CIT is always paid to FIRS (federal). PIT goes to state. VAT is federal. Jurisdiction is determined by law, not choice.'
+      explanation: 'CIT is always paid to NRS (federal). PIT goes to state. VAT is federal. Jurisdiction is determined by law, not choice.'
     }
   },
   {
@@ -387,7 +387,7 @@ export const taxMyths: TaxMyth[] = [
     id: 'cash-untraceable',
     myth: 'Cash transactions are untraceable and don\'t need to be reported',
     truth: 'Banks report large cash transactions. Lifestyle audits can reveal unreported income.',
-    explanation: 'Nigerian banks report cash transactions above certain thresholds. FIRS conducts lifestyle audits comparing assets/spending to declared income. Third-party data (property records, vehicle registrations) is cross-referenced. Cash businesses are often flagged for audits.',
+    explanation: 'Nigerian banks report cash transactions above certain thresholds. NRS conducts lifestyle audits comparing assets/spending to declared income. Third-party data (property records, vehicle registrations) is cross-referenced. Cash businesses are often flagged for audits.',
     category: 'audits',
     severity: 'high',
     tier: 'basic',
@@ -401,7 +401,7 @@ export const taxMyths: TaxMyth[] = [
         'Yes, if deposited in multiple accounts'
       ],
       correctIndex: 1,
-      explanation: 'FIRS uses lifestyle audits, bank transaction reports, and third-party data to detect unreported cash income.'
+      explanation: 'NRS uses lifestyle audits, bank transaction reports, and third-party data to detect unreported cash income.'
     }
   },
   {
@@ -418,7 +418,7 @@ export const taxMyths: TaxMyth[] = [
       options: [
         'They can claim the VAT back',
         'They absorb it as a cost (no recovery)',
-        'FIRS automatically refunds it',
+        'NRS automatically refunds it',
         'Only pays half the VAT rate'
       ],
       correctIndex: 1,
@@ -440,7 +440,7 @@ export const taxMyths: TaxMyth[] = [
         'None if you track transactions',
         'Increased audit risk and difficulty proving deductions',
         'Only a problem for companies over ₦100m',
-        'FIRS will reject all expenses'
+        'NRS will reject all expenses'
       ],
       correctIndex: 1,
       explanation: 'Mixing accounts increases audit risk and makes it harder to prove business expenses are legitimate deductions.'
@@ -483,7 +483,7 @@ export const taxMyths: TaxMyth[] = [
         'From January 1, 2024 retroactively',
         'From January 1, 2026 onwards only',
         'Immediately upon signing',
-        'When FIRS issues guidelines'
+        'When NRS issues guidelines'
       ],
       correctIndex: 1,
       explanation: 'Tax reforms are prospective and apply from January 1, 2026. Previous years follow old rules.'
@@ -535,11 +535,11 @@ export const taxMyths: TaxMyth[] = [
     id: 'audit-means-jail',
     myth: 'Being selected for a tax audit means you\'re going to jail',
     truth: 'Most audits are ROUTINE compliance checks. Only fraud leads to criminal prosecution.',
-    explanation: 'Tax audits are normal business procedures. FIRS conducts thousands annually, most resulting in no penalties or minor adjustments. Even when issues are found, the first response is usually additional assessment and penalties, not prosecution. Criminal charges require proof of intentional fraud.',
+    explanation: 'Tax audits are normal business procedures. NRS conducts thousands annually, most resulting in no penalties or minor adjustments. Even when issues are found, the first response is usually additional assessment and penalties, not prosecution. Criminal charges require proof of intentional fraud.',
     category: 'audits',
     severity: 'high',
     tier: 'free',
-    relatedTopics: ['tax audits', 'compliance', 'FIRS procedures'],
+    relatedTopics: ['tax audits', 'compliance', 'NRS procedures'],
     quiz: {
       question: 'What happens in most tax audits?',
       options: [
@@ -576,8 +576,8 @@ export const taxMyths: TaxMyth[] = [
   {
     id: 'deductions-fake-receipts',
     myth: 'You can claim deductions with any receipt, even fabricated ones',
-    truth: 'FIRS verifies receipts. Fabricated documents are FRAUD with criminal penalties.',
-    explanation: 'FIRS cross-references receipts with supplier records and conducts random verification. Submitting fabricated receipts constitutes tax fraud with penalties including fines, back taxes with interest, and potential criminal prosecution. Always keep genuine documentation.',
+    truth: 'NRS verifies receipts. Fabricated documents are FRAUD with criminal penalties.',
+    explanation: 'NRS cross-references receipts with supplier records and conducts random verification. Submitting fabricated receipts constitutes tax fraud with penalties including fines, back taxes with interest, and potential criminal prosecution. Always keep genuine documentation.',
     category: 'penalties',
     severity: 'high',
     tier: 'basic',
@@ -619,7 +619,7 @@ export const taxMyths: TaxMyth[] = [
     id: 'voluntary-disclosure-trap',
     myth: 'Coming forward voluntarily about past errors will make things worse',
     truth: 'Voluntary disclosure programs offer REDUCED penalties and protection from prosecution.',
-    explanation: 'FIRS and state tax authorities offer voluntary disclosure programs. Coming forward before an audit typically results in: waived or reduced penalties, no criminal prosecution, payment plans for back taxes, and a clean slate going forward. Waiting for an audit is much worse.',
+    explanation: 'NRS and state tax authorities offer voluntary disclosure programs. Coming forward before an audit typically results in: waived or reduced penalties, no criminal prosecution, payment plans for back taxes, and a clean slate going forward. Waiting for an audit is much worse.',
     category: 'penalties',
     severity: 'medium',
     tier: 'basic',

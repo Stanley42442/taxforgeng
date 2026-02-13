@@ -58,7 +58,7 @@ export const generateTaxFormPDF = (formType: string, business: BusinessInfo | nu
   doc.setTextColor(BRAND_COLORS.nigerianGreen[0], BRAND_COLORS.nigerianGreen[1], BRAND_COLORS.nigerianGreen[2]);
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
-  doc.text('FIRS Form Reference', margin + 10, y + 12);
+  doc.text('NRS Form Reference', margin + 10, y + 12);
   
   doc.setTextColor(BRAND_COLORS.text[0], BRAND_COLORS.text[1], BRAND_COLORS.text[2]);
   doc.setFontSize(9);
@@ -70,7 +70,7 @@ export const generateTaxFormPDF = (formType: string, business: BusinessInfo | nu
     'PIT Return': 'Form A - Personal Income Tax Return',
   };
   doc.text(formRefs[formType] || 'Tax Return Form', margin + 10, y + 22);
-  doc.text('Submit via FIRS TaxProMax Portal: taxpromax.firs.gov.ng', margin + 10, y + 30);
+  doc.text('Submit via NRS TaxPro Max Portal: taxpromax.nrs.gov.ng', margin + 10, y + 30);
   
   y += 50;
 
@@ -89,13 +89,13 @@ export const generateTaxFormPDF = (formType: string, business: BusinessInfo | nu
   doc.setTextColor(BRAND_COLORS.text[0], BRAND_COLORS.text[1], BRAND_COLORS.text[2]);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  const notice = 'This is a prototype mock form for testing purposes. Live TaxProMax/FIRS submission is not enabled. Please use this form as a reference when filing through official FIRS channels.';
+  const notice = 'This is a prototype mock form for testing purposes. Live TaxPro Max/NRS submission is not enabled. Please use this form as a reference when filing through official NRS channels.';
   const lines = doc.splitTextToSize(notice, pageWidth - margin * 2 - 20);
   doc.text(lines, margin + 10, y + 18);
 
   // Footer
   addPDFFooter(doc, {
-    disclaimer: 'This document is for reference only. Official filing must be done through FIRS TaxProMax.',
+    disclaimer: 'This document is for reference only. Official filing must be done through NRS TaxPro Max.',
   });
 
   // Page numbers

@@ -627,9 +627,9 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
       planned: 'Direct Pension Fund Administrator data integration for verification',
     },
     {
-      title: 'Real-Time FIRS Updates',
+      title: 'Real-Time NRS Updates',
       current: 'Manually updated rates',
-      planned: 'API integration for automatic rate updates from FIRS',
+      planned: 'API integration for automatic rate updates from NRS',
     },
     {
       title: 'Advanced Loss Carry-Forward',
@@ -639,7 +639,7 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
     {
       title: 'Tax Credit Verification',
       current: 'Self-reported WHT credits',
-      planned: 'Integration with FIRS for automatic WHT credit verification',
+      planned: 'Integration with NRS for automatic WHT credit verification',
     },
     {
       title: 'Multi-Currency Support',
