@@ -11,20 +11,20 @@ const faqCategories = [
   {
     name: 'Personal Tax (PIT/PAYE)',
     faqs: [
-      { question: 'What is the tax-free threshold under the 2026 rules?', answer: <>Under the Nigeria Tax Act 2025 (effective 2026), the first ₦800,000 of annual income is exempt from personal income tax. This is a significant increase from the previous graduated relief system. Use our <Link to="/pit-paye-calculator" className="text-primary hover:underline">PIT/PAYE Calculator</Link> to see your exact breakdown.</> },
-      { question: 'How is PAYE calculated for employees in Nigeria?', answer: <>PAYE (Pay As You Earn) is deducted monthly by your employer based on the 2026 PIT bands: 0% on the first ₦800,000, then 15%, 18%, 21%, 23%, and 25% on higher income brackets. Use our <Link to="/pit-paye-calculator" className="text-primary hover:underline">PIT/PAYE Calculator</Link> to see your exact breakdown.</> },
-      { question: 'What reliefs can I claim under the 2026 rules?', answer: <>The main relief is Rent Relief — 20% of your annual rent, capped at ₦500,000. The old Consolidated Relief Allowance (CRA) of ₦200,000 + 20% has been replaced by this simpler system. Check your entitlement with our <Link to="/rent-relief-2026" className="text-primary hover:underline">Rent Relief Calculator</Link>.</> },
+      { question: 'What is the tax-free threshold under the 2026 rules?', answer: <>Under NTA Sec 33 of the Nigeria Tax Act 2025 (effective 2026), the first ₦800,000 of annual income is exempt from personal income tax. This replaces the old Consolidated Relief Allowance system. Use our <Link to="/pit-paye-calculator" className="text-primary hover:underline">PIT/PAYE Calculator</Link> to see your exact breakdown.</> },
+      { question: 'How is PAYE calculated for employees in Nigeria?', answer: <>PAYE (Pay As You Earn) is deducted monthly by your employer based on the 2026 PIT bands (NTA Sixth Schedule): 0% on the first ₦800,000, then 15%, 18%, 21%, 23%, and 25% on higher income brackets. Use our <Link to="/pit-paye-calculator" className="text-primary hover:underline">PIT/PAYE Calculator</Link> to see your exact breakdown.</> },
+      { question: 'What reliefs can I claim under the 2026 rules?', answer: <>The main relief is Rent Relief (NTA Sec 36) — 20% of your annual rent, capped at ₦500,000. The old Consolidated Relief Allowance (CRA) of ₦200,000 + 20% has been replaced by this simpler system. Check your entitlement with our <Link to="/rent-relief-2026" className="text-primary hover:underline">Rent Relief Calculator</Link>.</> },
       { question: 'Do I need to file a tax return if my employer handles PAYE?', answer: 'If your only income is employment income and PAYE is correctly deducted, you generally do not need to file separately. However, if you have additional income sources (rental, freelance, business), you must file with NRS.' },
-      { question: 'What is the maximum PIT rate in Nigeria?', answer: 'The maximum marginal rate is 25% under the 2026 rules, which applies to income above ₦50,000,000. This is lower than the previous maximum of 24% but applies at a much higher threshold.' },
-      { question: 'How does Rent Relief work under the 2026 rules?', answer: <>If you pay rent, you can deduct 20% of your annual rent from your taxable income, up to a maximum of ₦500,000. For example, if you pay ₦2,000,000 in rent, your relief is ₦400,000. Use our <Link to="/rent-relief-2026" className="text-primary hover:underline">Rent Relief Calculator</Link> to check your savings.</> },
+      { question: 'What is the maximum PIT rate in Nigeria?', answer: 'The maximum marginal rate is 25% under the 2026 rules (NTA Sixth Schedule), which applies to income above ₦50,000,000. This is lower than the previous maximum of 24% but applies at a much higher threshold.' },
+      { question: 'How does Rent Relief work under the 2026 rules?', answer: <>If you pay rent, you can deduct 20% of your annual rent from your taxable income, up to a maximum of ₦500,000 (NTA Sec 36). For example, if you pay ₦2,000,000 in rent, your relief is ₦400,000. Use our <Link to="/rent-relief-2026" className="text-primary hover:underline">Rent Relief Calculator</Link> to check your savings.</> },
     ],
   },
   {
     name: 'Company Tax (CIT)',
     faqs: [
-      { question: 'What is the CIT rate for Nigerian companies in 2026?', answer: <>The standard Company Income Tax rate is 30% of assessable profits for large companies. Small companies (turnover ≤ ₦50 million AND assets ≤ ₦250 million) pay 0% CIT under the Small Company Exemption. Use our <Link to="/cit-calculator" className="text-primary hover:underline">CIT Calculator</Link> for details.</> },
-      { question: 'How do I qualify for the Small Company Exemption (0% CIT)?', answer: <>Your company must have annual turnover of ₦50 million or less AND total assets of ₦250 million or less. Both criteria must be met. Use our <Link to="/small-company-exemption" className="text-primary hover:underline">Small Company Exemption Checker</Link> to verify. Read the full guide: <Link to="/blog/small-company-cit-exemption" className="text-primary hover:underline">0% CIT for Small Companies</Link>.</> },
-      { question: 'What is the Development Levy?', answer: 'The Development Levy replaces the old Tertiary Education Tax (TET). It is 4% of assessable profits, compared to the previous 3% TET rate. Small companies qualifying for the 0% CIT exemption are also exempt from the Development Levy. It applies only to non-small (large) companies.' },
+      { question: 'What is the CIT rate for Nigerian companies in 2026?', answer: <>The standard Company Income Tax rate is 30% of assessable profits for large companies. Small companies (turnover ≤ ₦50 million AND assets ≤ ₦250 million) pay 0% CIT under the Small Company Exemption (NTA Sec 40). Use our <Link to="/cit-calculator" className="text-primary hover:underline">CIT Calculator</Link> for details.</> },
+      { question: 'How do I qualify for the Small Company Exemption (0% CIT)?', answer: <>Your company must have annual turnover of ₦50 million or less AND total assets of ₦250 million or less (NTA Sec 40). Both criteria must be met. Professional service firms are excluded (NTA Sec 40(3)). Use our <Link to="/small-company-exemption" className="text-primary hover:underline">Small Company Exemption Checker</Link> to verify.</> },
+      { question: 'What is the Development Levy?', answer: 'The Development Levy (NTA Sec 58) replaces the old Tertiary Education Tax (TET). It is 4% of assessable profits, compared to the previous 3% TET rate. Small companies qualifying for the 0% CIT exemption are also exempt from the Development Levy.' },
       { question: 'When is CIT due for Nigerian companies?', answer: 'CIT returns must be filed within 6 months after the end of the accounting year for companies that have been in operation for more than 18 months. New companies get 18 months from the date of incorporation.' },
       { question: 'Can I carry forward business losses?', answer: 'Yes, business losses can be carried forward indefinitely under the 2026 rules to offset against future profits. However, the amount that can be offset in any given year is limited to 50% of assessable profits.' },
     ],
@@ -32,10 +32,10 @@ const faqCategories = [
   {
     name: 'VAT',
     faqs: [
-      { question: 'What is the VAT rate in Nigeria in 2026?', answer: <>The standard VAT rate remains 7.5% in 2026. Companies with turnover of ₦25 million or less are exempt from VAT registration. Use our <Link to="/vat-calculator" className="text-primary hover:underline">VAT Calculator</Link> for quick computations.</> },
+      { question: 'What is the VAT rate in Nigeria in 2026?', answer: <>The standard VAT rate remains 7.5% in 2026 (NTA Sec 19). Companies with turnover of ₦25 million or less are exempt from VAT registration. Use our <Link to="/vat-calculator" className="text-primary hover:underline">VAT Calculator</Link> for quick computations.</> },
       { question: 'Which goods and services are VAT-exempt?', answer: 'Exempt items include basic food items, medical supplies, educational materials, books, baby products, agricultural equipment, and locally manufactured sanitary products. The full list is maintained by NRS.' },
       { question: 'When must I register for VAT?', answer: 'You must register for VAT if your annual turnover exceeds ₦25 million. Registration should be done within 6 months of reaching this threshold. Below this amount, VAT registration is optional.' },
-      { question: 'How often must I file VAT returns?', answer: 'VAT returns must be filed monthly, by the 21st of the following month. For example, January VAT is due by February 21st. Late filing attracts penalties of ₦100,000 for the first month and ₦50,000 for each subsequent month (NTA 2025).' },
+      { question: 'How often must I file VAT returns?', answer: 'VAT returns must be filed monthly, by the 21st of the following month. Late filing attracts penalties of ₦100,000 for the first month and ₦50,000 for each subsequent month (NTA Sec 23).' },
       { question: 'Can I claim input VAT on business purchases?', answer: 'Yes, registered companies can claim input VAT paid on business purchases against output VAT collected. This must be supported by valid tax invoices from VAT-registered suppliers.' },
     ],
   },
@@ -52,10 +52,20 @@ const faqCategories = [
     name: '2026 Tax Reforms',
     faqs: [
       { question: 'When did the 2026 tax reforms take effect?', answer: <>The Nigeria Tax Act 2025 was signed into law in late 2025 and took effect from January 1, 2026. Read our complete summary: <Link to="/blog/tax-reforms-2026-summary" className="text-primary hover:underline">Nigeria Tax Reforms 2026</Link>.</> },
-      { question: 'What are the biggest changes in the 2026 reforms?', answer: <>Key changes include: new PIT bands starting with ₦800,000 tax-free threshold, increased Small Company Exemption to ₦50M turnover, Rent Relief replacing CRA, Development Levy (4%) replacing TET (3%), and WHT serving as final tax in more cases. See the full guide: <Link to="/tax-reforms-2026" className="text-primary hover:underline">2026 Tax Reforms</Link>.</> },
-      { question: 'Did VAT rates change in 2026?', answer: 'No, the VAT rate remains at 7.5%. However, the VAT registration threshold was clarified at ₦25 million annual turnover, and more items were added to the exempt list.' },
-      { question: 'How does the 2026 reform affect small businesses?', answer: <>Small businesses benefit significantly — the Small Company Exemption threshold doubled from ₦25 million to ₦50 million turnover, meaning many more businesses pay 0% CIT. Read our detailed guide: <Link to="/blog/small-company-cit-exemption" className="text-primary hover:underline">Small Company CIT Exemption</Link>.</> },
+      { question: 'What are the biggest changes in the 2026 reforms?', answer: <>Key changes include: new PIT bands with ₦800,000 tax-free threshold (NTA Sec 33), increased Small Company Exemption to ₦50M turnover (NTA Sec 40), Rent Relief replacing CRA (NTA Sec 36), Development Levy 4% replacing TET 3% (NTA Sec 58), and WHT serving as final tax in more cases. See the full guide: <Link to="/tax-reforms-2026" className="text-primary hover:underline">2026 Tax Reforms</Link>.</> },
+      { question: 'Did VAT rates change in 2026?', answer: 'No, the VAT rate remains at 7.5% (NTA Sec 19). However, the VAT registration threshold was clarified at ₦25 million annual turnover, and more items were added to the exempt list.' },
+      { question: 'How does the 2026 reform affect small businesses?', answer: <>Small businesses benefit significantly — the Small Company Exemption threshold doubled from ₦25 million to ₦50 million turnover (NTA Sec 40), meaning many more businesses pay 0% CIT. Read our detailed guide: <Link to="/blog/small-company-cit-exemption" className="text-primary hover:underline">Small Company CIT Exemption</Link>.</> },
       { question: 'Where can I read the full Nigeria Tax Act 2025?', answer: <>The official text is available from the Federal Government Gazette and NRS website. TaxForge provides a plain-English summary on our <Link to="/tax-reforms-2026" className="text-primary hover:underline">Tax Reforms 2026</Link> page and in our <Link to="/blog" className="text-primary hover:underline">blog articles</Link>.</> },
+    ],
+  },
+  {
+    name: 'Remote Work & Foreign Income',
+    faqs: [
+      { question: 'Do I pay Nigerian tax on remote work income from abroad?', answer: 'Yes. Nigerian residents are taxed on worldwide income (NTA Sec 3). If you work remotely for a foreign client or employer while living in Nigeria, that income is taxable. WHT may also apply if payments are routed through Nigerian entities.' },
+      { question: 'How is cryptocurrency income taxed in Nigeria?', answer: 'Crypto gains are treated as capital gains under the Capital Gains Tax Act. The 10% CGT rate applies on disposal. A small investor exemption may apply if your total gains are up to ₦10 million and total proceeds are under ₦150 million in a year.' },
+      { question: 'Can I claim double taxation relief on foreign income?', answer: 'Yes, if Nigeria has a tax treaty (DTA) with the country where tax was paid. You can claim a credit for foreign tax paid against your Nigerian PIT liability (NTA Sec 43). Keep proof of foreign tax paid.' },
+      { question: 'Do freelancers on Upwork/Fiverr need to file taxes?', answer: 'Yes. Freelance income is taxable as personal or business income. If you earn above the ₦800,000 threshold, you owe PIT. Professional service freelancers (developers, designers, consultants) also face 10% WHT on payments from Nigerian clients.' },
+      { question: 'What if my employer is abroad but I work from Nigeria?', answer: 'You are still a Nigerian tax resident and must file. Your foreign employer is not required to deduct PAYE, so you must self-assess and file directly with NRS via the TaxPro Max portal.' },
     ],
   },
   {
@@ -94,9 +104,9 @@ const FAQ = () => {
     <>
       <SEOHead
         title="Nigerian Tax FAQ 2026 - Questions Answered | TaxForge"
-        description="Get answers to 30+ frequently asked questions about Nigerian taxes in 2026. PIT, CIT, VAT, WHT, Rent Relief, and the Nigeria Tax Act 2025 explained."
+        description="Get answers to 35+ frequently asked questions about Nigerian taxes in 2026. PIT, CIT, VAT, WHT, remote work, foreign income, and the Nigeria Tax Act 2025 explained."
         canonicalPath="/faq"
-        keywords="Nigeria tax FAQ, PIT FAQ Nigeria, CIT questions, VAT Nigeria FAQ, 2026 tax reform questions"
+        keywords="Nigeria tax FAQ, PIT FAQ Nigeria, CIT questions, VAT Nigeria FAQ, 2026 tax reform questions, remote work tax Nigeria, foreign income tax Nigeria"
         schema={schema}
       />
 
@@ -118,7 +128,7 @@ const FAQ = () => {
                   badge="FAQ"
                   title="Nigerian Tax Questions"
                   titleHighlight="Answered"
-                  subtitle="Everything you need to know about Nigerian taxes under the 2026 rules. 30+ questions across PIT, CIT, VAT, WHT, and the new reforms."
+                  subtitle="Everything you need to know about Nigerian taxes under the 2026 rules. 35+ questions across PIT, CIT, VAT, WHT, remote work, and the new reforms."
                 />
               </header>
 

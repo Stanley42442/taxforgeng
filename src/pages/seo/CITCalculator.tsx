@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema, createSpeakableSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createCalculatorSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema, createSpeakableSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -25,15 +25,15 @@ const CITCalculator = () => {
   const faqs = [
     {
       question: 'What is Company Income Tax (CIT) in Nigeria?',
-      answer: 'Company Income Tax is a tax on the profits of incorporated companies operating in Nigeria. Under the 2026 rules, small companies (turnover ≤₦50M AND assets ≤₦250M) pay 0%, and large companies pay 30%.',
+      answer: 'Company Income Tax is a tax on the profits of incorporated companies operating in Nigeria. Under the 2026 rules (NTA Sec 40), small companies (turnover ≤₦50M AND assets ≤₦250M) pay 0%, and large companies pay 30%.',
     },
     {
       question: 'How do I know if my company qualifies as small or large under 2026 rules?',
-      answer: 'Under the 2026 rules, companies are classified as either Small or Large. Small: ≤₦50M turnover AND ≤₦250M assets (0% CIT). Large: above these thresholds (30% CIT). Professional service providers (law, accounting, medical, engineering) cannot qualify as small companies.',
+      answer: 'Under NTA Sec 40, companies are classified as either Small or Large. Small: ≤₦50M turnover AND ≤₦250M assets (0% CIT). Large: above these thresholds (30% CIT). Professional service providers (law, accounting, medical, engineering) are excluded from the small company definition (NTA Sec 40(3)).',
     },
     {
       question: 'What is the Development Levy?',
-      answer: 'The Development Levy is 4% of company profits, replacing the old Tertiary Education Tax (TET). It applies to all companies except those qualifying for the small company exemption.',
+      answer: 'The Development Levy (NTA Sec 58) is 4% of assessable profits, replacing the old Tertiary Education Tax (TET). It applies to all companies except those qualifying for the small company exemption.',
     },
     {
       question: 'When is CIT due?',
@@ -79,9 +79,10 @@ const CITCalculator = () => {
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
-      createWebApplicationSchema(
+      createCalculatorSchema(
         'Company Income Tax (CIT) Calculator Nigeria 2026',
-        'Calculate Nigerian CIT with 2026 rates. 0% for small companies, 30% for large. Includes Development Levy.'
+        'Calculate Nigerian CIT with 2026 rates. 0% for small companies, 30% for large. Includes Development Levy.',
+        'Corporate Tax Calculator'
       ),
       createFAQSchema(faqs),
       createHowToSchema(

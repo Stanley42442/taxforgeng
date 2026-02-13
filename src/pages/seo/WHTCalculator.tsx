@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema, createSpeakableSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createCalculatorSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema, createSpeakableSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -77,9 +77,10 @@ const WHTCalculator = () => {
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
-      createWebApplicationSchema(
+      createCalculatorSchema(
         'Withholding Tax (WHT) Calculator Nigeria 2026',
-        'Nigerian WHT rates: 5% contracts, 10% rent/dividends/professional fees. Learn about WHT credits and how to offset against income tax.'
+        'Nigerian WHT rates: 5% contracts, 10% rent/dividends/professional fees. Learn about WHT credits and how to offset against income tax.',
+        'Withholding Tax Calculator'
       ),
       createFAQSchema(faqs),
       createHowToSchema(
