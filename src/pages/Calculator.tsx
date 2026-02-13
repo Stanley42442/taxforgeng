@@ -427,7 +427,7 @@ const CalculatorPage = () => {
         <div className="text-center mb-8 animate-slide-up">
           <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-2 text-sm font-medium mb-4">
             <Sparkles className="h-4 w-4 text-accent animate-pulse-soft" />
-            FIRS Compliant
+            NRS Compliant
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
             Business Tax Calculator

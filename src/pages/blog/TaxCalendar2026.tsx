@@ -68,8 +68,8 @@ const TaxCalendar2026 = () => {
               <thead><tr className="border-b border-border"><th className="text-left py-2 text-foreground font-semibold">Obligation</th><th className="text-left py-2 text-foreground font-semibold">Due Date</th><th className="text-left py-2 text-foreground font-semibold">Authority</th></tr></thead>
               <tbody className="text-muted-foreground">
                 <tr className="border-b border-border/50"><td className="py-2">PAYE remittance</td><td>10th of following month</td><td>State IRS</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2">VAT returns & payment</td><td>21st of following month</td><td>FIRS</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2">WHT remittance</td><td>21 days from deduction</td><td>FIRS</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">VAT returns & payment</td><td>21st of following month</td><td>NRS</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">WHT remittance</td><td>21 days from deduction</td><td>NRS</td></tr>
                 <tr className="border-b border-border/50"><td className="py-2">Pension contributions</td><td>7 working days after salary</td><td>PFA</td></tr>
                 <tr><td className="py-2">NHF remittance</td><td>Monthly</td><td>FMBN</td></tr>
               </tbody>
@@ -164,7 +164,7 @@ const TaxCalendar2026 = () => {
           {[
             { title: 'Set up automated reminders', tip: 'Use our Tax Calendar tool to receive email and push notifications before each deadline.' },
             { title: 'File early, not on the deadline', tip: 'The TaxPro Max portal can be slow near deadlines. File at least 3 days early to avoid technical issues.' },
-            { title: 'Keep records for 6 years', tip: 'FIRS can audit tax returns going back 6 years. Maintain organised digital records of all invoices, receipts, and returns.' },
+            { title: 'Keep records for 6 years', tip: 'NRS can audit tax returns going back 6 years. Maintain organised digital records of all invoices, receipts, and returns.' },
             { title: 'Reconcile monthly', tip: 'Don\'t wait until year-end. Reconcile your VAT, WHT, and PAYE records monthly to catch errors early.' },
           ].map((item, i) => (
             <div key={i} className="glass-frosted rounded-xl p-5">
