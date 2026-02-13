@@ -267,6 +267,7 @@ const IndividualCalculatorPage = () => {
   const [lifeInsurance, setLifeInsurance] = useState(savedState?.lifeInsurance ?? '');
   const [healthInsurance, setHealthInsurance] = useState(savedState?.healthInsurance ?? '');
   const [rentPaid, setRentPaid] = useState(savedState?.rentPaid ?? '');
+  const [mortgageInterest, setMortgageInterest] = useState(savedState?.mortgageInterest ?? '');
   
   // Crypto inputs
   const [cryptoIncome, setCryptoIncome] = useState(savedState?.cryptoIncome ?? '');
@@ -341,6 +342,7 @@ const IndividualCalculatorPage = () => {
         lifeInsurance,
         healthInsurance,
         rentPaid,
+        mortgageInterest,
         cryptoIncome,
         cryptoGains,
         cryptoLosses,
@@ -360,7 +362,7 @@ const IndividualCalculatorPage = () => {
     return () => clearTimeout(saveTimeout);
   }, [
     use2026Rules, calculationType, employmentIncome, pensionContribution,
-    nhfContribution, lifeInsurance, healthInsurance, rentPaid,
+    nhfContribution, lifeInsurance, healthInsurance, rentPaid, mortgageInterest,
     cryptoIncome, cryptoGains, cryptoLosses, dividendIncome,
     interestIncome, capitalGains, estimatedTurnover, location
   ]);
@@ -499,6 +501,7 @@ const IndividualCalculatorPage = () => {
     nhisContribution: parseNumber(healthInsurance), // NHIS/Health Insurance
     lifeInsurancePremium: parseNumber(lifeInsurance),
     annualRentPaid: parseNumber(rentPaid), // For 2026 Rent Relief
+    mortgageInterest: parseNumber(mortgageInterest),
     cryptoIncome: parseNumber(cryptoIncome),
     cryptoGains: parseNumber(cryptoGains),
     cryptoLosses: parseNumber(cryptoLosses),
@@ -924,6 +927,14 @@ const IndividualCalculatorPage = () => {
                   importedValue={loadFromExpenses ? importedValues?.lifeInsurance : undefined}
                   onReset={() => setLifeInsurance(importedValues?.lifeInsurance || '')}
                 />
+                {use2026Rules && (
+                  <InputField
+                    label="Mortgage Interest"
+                    value={formatInput(mortgageInterest)}
+                    onChange={(v) => setMortgageInterest(v)}
+                    tooltip="Interest on loan for BUILDING (not buying) an owner-occupied residential home. Only the interest portion qualifies, not principal repayments."
+                  />
+                )}
               </div>
               
               {use2026Rules && (

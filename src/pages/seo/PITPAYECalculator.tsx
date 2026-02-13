@@ -28,7 +28,7 @@ const PITPAYECalculator = () => {
   const howToSteps = [
     { name: 'Enter Your Gross Annual Salary', text: 'Input your total annual salary before deductions. Include all allowances, bonuses, and benefits in kind.' },
     { name: 'Deduct Pension (8%) and NHF (2.5%)', text: 'Your employee pension contribution of 8% and NHF of 2.5% are automatically deducted from your gross income.' },
-    { name: 'Apply Rent Relief', text: 'If you pay rent, enter your annual rent. You get 20% of rent as a deduction, capped at ₦500,000.' },
+    { name: 'Apply Rent Relief & Mortgage Interest', text: 'If you pay rent, enter your annual rent for 20% relief (max ₦500k). If you have a mortgage for building your own home, the interest portion is also deductible.' },
     { name: 'Apply Progressive Tax Bands', text: 'Tax is calculated progressively: first ₦800k is tax-free, then 15% on ₦800k-₦3M, 18% on ₦3M-₦12M, and so on.' },
     { name: 'View Monthly PAYE Amount', text: 'Your annual tax is divided by 12 to show your monthly PAYE deduction — the amount your employer withholds each month.' },
   ];
@@ -57,6 +57,14 @@ const PITPAYECalculator = () => {
     {
       question: 'What about salary arrears from previous years?',
       answer: 'Salary arrears are taxed in the year they are received. However, if the arrears relate to a prior tax year, you may be able to apply for tax relief to avoid being pushed into a higher bracket unfairly.',
+    },
+    {
+      question: 'Can I deduct mortgage interest from my tax?',
+      answer: 'Yes, but only interest on loans used to BUILD (not buy) an owner-occupied residential home. The property must be self-occupied (not rental/investment). Only the interest portion is deductible, not the principal repayment.',
+    },
+    {
+      question: 'Are minimum wage earners exempt from PIT?',
+      answer: 'Effectively yes. Under 2026 rules, the ₦800,000 tax-free threshold means workers earning the national minimum wage of ₦70,000/month (₦840,000/year) pay minimal tax — only ₦6,000 annually.',
     },
   ];
 

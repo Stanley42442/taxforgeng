@@ -82,6 +82,15 @@
 | Rent Relief | 20% of rent | ₦500,000/year |
 | Life Insurance Premium | 100% | None |
 | NHIS Contribution | Actual | None |
+| Mortgage Interest (building owner-occupied home) | Actual interest | None |
+
+### Exemptions
+
+| Exemption | Details |
+|-----------|---------|
+| National minimum wage | ₦70,000/month earners pay near-zero tax under ₦800k threshold |
+| Military/armed forces salary | Exempt from PIT |
+| Compensation for loss of office | First ₦50,000,000 exempt |
 
 ---
 
