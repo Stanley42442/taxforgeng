@@ -378,13 +378,13 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
   addTable(
     ['Company Type', 'CIT Rate', 'Education Levy'],
     [
-      ['All Companies', '30%', '2%'],
+      ['All Companies', '30%', '3%'],
     ],
     [60, 55, 55]
   );
 
   addParagraph(
-    'The 2026 rules introduce the Development Levy (4%) replacing the Education Levy (2%) for large companies, ' +
+    'The 2026 rules introduce the Development Levy (4%) replacing the Education Levy (3%) for large companies, ' +
     'while providing complete exemption for qualifying small companies.'
   );
 

@@ -204,14 +204,14 @@ describe('Company Income Tax (CIT) - 2026 Rules', () => {
       expect(result.appliedRate).toBe(30);
     });
 
-    it('should apply 2% Education Levy for pre-2026 rules', () => {
+    it('should apply 3% Education Levy for pre-2026 rules', () => {
       const result = calculateCompanyTax(
         100000000,
         500000000,
         400000000,
         false
       );
-      expect(result.devLevy).toBe(2000000); // 100M * 2%
+      expect(result.devLevy).toBe(3000000); // 100M * 3%
     });
   });
 
