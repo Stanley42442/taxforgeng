@@ -434,7 +434,7 @@ export function calculateInformalTax(inputs: IndividualTaxInputs): IndividualTax
     const bands = inputs.use2026Rules ? PIT_BANDS_2026 : PIT_BANDS_PRE2026;
     const { tax, breakdown: pitBreakdown } = calculateProgressiveTax(taxableIncome, bands);
 
-    // WHT credit for professional services (10%)
+    // WHT credit for professional services (10%) - assumes all revenue has WHT deducted at source
     const whtCredit = turnover * 0.10;
     const netTax = Math.max(0, tax - whtCredit);
 
@@ -442,7 +442,7 @@ export function calculateInformalTax(inputs: IndividualTaxInputs): IndividualTax
     breakdown.push({ label: 'Less: Deductions', amount: -totalDeductions });
     breakdown.push({ label: 'Taxable Income', amount: taxableIncome });
     breakdown.push(...pitBreakdown);
-    breakdown.push({ label: 'Less: WHT Credit (10%)', amount: -whtCredit, description: 'WHT deducted by clients' });
+    breakdown.push({ label: 'Less: WHT Credit (10%)', amount: -whtCredit, description: 'Assumes all revenue has WHT deducted at source by clients' });
     breakdown.push({ label: 'Net Tax Payable', amount: netTax });
 
     if (turnover > 25000000) {
@@ -527,7 +527,7 @@ export function calculateRentalTax(inputs: IndividualTaxInputs): IndividualTaxRe
   const taxableRentalIncome = Math.max(0, rentalIncome - totalDeductions);
 
   if (totalDeductions > 0) {
-    reliefs.push({ name: 'Maintenance Costs', amount: maintenance, description: 'Repairs and maintenance' });
+    if (maintenance > 0) reliefs.push({ name: 'Maintenance Costs', amount: maintenance, description: 'Repairs and maintenance' });
     if (insurance > 0) reliefs.push({ name: 'Property Insurance', amount: insurance, description: 'Insurance premiums' });
     if (managementFees > 0) reliefs.push({ name: 'Management Fees', amount: managementFees, description: 'Property management costs' });
   }
@@ -619,7 +619,7 @@ export function calculateInvestmentTax(inputs: IndividualTaxInputs): IndividualT
   if (capitalGains > 0) {
     if (inputs.use2026Rules) {
       // Small investor exemption: gains ≤ ₦10M AND proceeds < ₦150M are exempt
-      if (capitalGains <= 10000000) {
+      if (capitalGains <= 10000000 && (!inputs.cgtDisposalProceeds || inputs.cgtDisposalProceeds < 150000000)) {
         breakdown.push({
           label: 'Capital Gains Tax',
           amount: 0,
