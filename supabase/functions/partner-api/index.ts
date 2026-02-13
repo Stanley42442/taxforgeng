@@ -135,7 +135,7 @@ const getTaxRates = (use2026Rules: boolean = true) => {
   }
   
   return {
-    rulesVersion: 'Pre-2026 Rules',
+    rulesVersion: 'Pre-2026 (Historical)',
     pit: {
       exemption: 300000,
       bands: [
@@ -151,8 +151,11 @@ const getTaxRates = (use2026Rules: boolean = true) => {
       standardRate: 0.30,
       smallCompanyRate: 0,
       smallCompanyTurnoverLimit: 25000000,
-      mediumCompanyRate: 0.20,
-      mediumCompanyTurnoverLimit: 100000000
+      historical: {
+        mediumCompanyRate: 0.20,
+        mediumCompanyTurnoverLimit: 100000000,
+        note: 'Medium company tier abolished under 2026 Nigeria Tax Act'
+      }
     },
     vat: {
       rate: 0.075,
