@@ -73,9 +73,27 @@ const PITPAYEGuide2026 = () => {
             </table>
           </div>
         </div>
-        <p className="text-muted-foreground leading-relaxed">
+        <p className="text-muted-foreground leading-relaxed mb-4">
           This means anyone earning ₦800,000 or less per year (approximately ₦66,667/month) pays <strong className="text-foreground">zero income tax</strong>. For reference, the national minimum wage of ₦70,000/month (₦840,000/year) results in only ₦6,000 annual tax — a dramatic reduction from the old system.
         </p>
+        <h3 className="text-lg font-semibold text-foreground mb-2">All Six Statutory Deductions (2026)</h3>
+        <p className="text-muted-foreground leading-relaxed mb-3">
+          Under the NTA 2025, the old CRA is abolished and replaced with six specific deductions:
+        </p>
+        <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground mb-4">
+          <li><strong className="text-foreground">Pension Contribution</strong> — 8% of gross income</li>
+          <li><strong className="text-foreground">NHF (National Housing Fund)</strong> — 2.5% of basic salary</li>
+          <li><strong className="text-foreground">NHIS/Health Insurance</strong> — actual premium paid</li>
+          <li><strong className="text-foreground">Life Insurance Premium</strong> — premium on own life</li>
+          <li><strong className="text-foreground">Rent Relief</strong> — 20% of annual rent paid (max ₦500,000)</li>
+          <li><strong className="text-foreground">Mortgage Interest</strong> — interest on loan for building owner-occupied home</li>
+        </ol>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Key Exemptions</h3>
+        <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+          <li>National minimum wage earners (₦70,000/month) pay near-zero tax</li>
+          <li>Military and armed forces salaries are exempt from PIT</li>
+          <li>Compensation for loss of office up to ₦50,000,000 is exempt</li>
+        </ul>
       </section>
 
       <section id="old-vs-new">

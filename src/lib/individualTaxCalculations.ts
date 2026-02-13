@@ -14,6 +14,7 @@ export interface IndividualTaxInputs {
   nhisContribution?: number; // Health insurance (NHIS)
   lifeInsurancePremium?: number;
   annualRentPaid?: number; // For 2026 Rent Relief (replaces CRA)
+  mortgageInterest?: number; // Interest on loan for building owner-occupied home
   
   // Foreign income inputs
   foreignIncome?: number;
@@ -146,6 +147,16 @@ export function calculatePersonalIncomeTax(inputs: IndividualTaxInputs): Individ
       });
       totalReliefs += rentRelief;
     }
+
+    // Mortgage Interest: interest on loan for building owner-occupied home (NTA 2025)
+    if (inputs.mortgageInterest && inputs.mortgageInterest > 0) {
+      reliefs.push({
+        name: 'Mortgage Interest (Owner-Occupied)',
+        amount: inputs.mortgageInterest,
+        description: 'Interest on loan for building owner-occupied home'
+      });
+      totalReliefs += inputs.mortgageInterest;
+    }
   } else {
     // Pre-2026: Old CRA still applies
     const cra = Math.max(200000, grossIncome * 0.01) + (grossIncome * 0.20);
@@ -220,12 +231,25 @@ export function calculatePersonalIncomeTax(inputs: IndividualTaxInputs): Individ
     });
   }
 
+  // Minimum wage exemption alert
+  if (inputs.use2026Rules && grossIncome > 0 && grossIncome <= 840000) {
+    alerts.push({
+      type: 'info',
+      message: 'National minimum wage earners (₦70,000/month) are exempt from income tax under 2026 rules.'
+    });
+  }
+
   // 2026 Rules: Alert about CRA abolition
   if (inputs.use2026Rules && (!inputs.annualRentPaid || inputs.annualRentPaid === 0)) {
     alerts.push({
       type: 'info',
       message: '2026 Rules: The old CRA is abolished. Enter your annual rent to claim Rent Relief (20%, max ₦500k).'
     });
+  }
+
+  // Mortgage interest info
+  if (inputs.use2026Rules && (!inputs.mortgageInterest || inputs.mortgageInterest === 0)) {
+    recommendations.push('If you have a mortgage for building your own home, the interest portion is tax-deductible under 2026 rules');
   }
 
   if (!inputs.pensionContribution || inputs.pensionContribution === 0) {
@@ -240,6 +264,14 @@ export function calculatePersonalIncomeTax(inputs: IndividualTaxInputs): Individ
     alerts.push({
       type: 'info',
       message: 'High-income earners (>₦50M) are subject to the maximum 25% rate'
+    });
+  }
+
+  // Exemption info alerts
+  if (inputs.use2026Rules) {
+    alerts.push({
+      type: 'info',
+      message: 'Note: Military/armed forces salaries and compensation for loss of office ≤₦50M are exempt from PIT.'
     });
   }
 

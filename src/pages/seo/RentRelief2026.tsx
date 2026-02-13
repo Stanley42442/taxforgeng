@@ -173,8 +173,8 @@ const RentRelief2026 = () => {
                       fix: 'Even if 20% of your rent is higher, the maximum relief is ₦500,000. For rent above ₦2.5M/year, the cap applies automatically.',
                     },
                     {
-                      mistake: 'Homeowners trying to claim',
-                      fix: 'Rent Relief is exclusively for renters. If you live in your own property, you do not qualify — even if you have a mortgage.',
+                      mistake: 'Homeowners trying to claim Rent Relief',
+                      fix: 'Rent Relief is exclusively for renters. Homeowners don\'t qualify. However, if you have a mortgage for building your own home, you can claim a separate Mortgage Interest deduction on the interest portion of your loan.',
                     },
                     {
                       mistake: 'Not obtaining landlord\'s TIN for large claims',

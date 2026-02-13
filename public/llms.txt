@@ -19,6 +19,7 @@
 - Withholding Tax (WHT) credits
 - Small company exemption eligibility (0% CIT)
 - Rent Relief (20% of rent, max ₦500,000)
+- Mortgage Interest (building owner-occupied home)
 - Development Levy (4%)
 
 ## 2026 Tax Rules Implemented
