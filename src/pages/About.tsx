@@ -3,6 +3,8 @@ import { SEOHead, createBreadcrumbSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
+import { ContentMeta } from '@/components/seo/ContentMeta';
 import { MapPin, Target, Zap, Shield, Users, Calculator, BarChart3, CheckCircle2, ArrowRight } from 'lucide-react';
 
 const About = () => {
@@ -57,15 +59,21 @@ const About = () => {
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="max-w-4xl mx-auto">
-              <SEOHero
-                badge="About Us"
-                title="Making Nigerian Taxes"
-                titleHighlight="Simple & Accurate"
-                subtitle="TaxForge NG is a free, FIRS-compliant tax calculator built by Gillespie Benjamin Mclee (OptiSolve Labs) in Port Harcourt, Rivers State — for every Nigerian business and individual."
-              />
+            <article className="max-w-4xl mx-auto">
+              <PageBreadcrumbs items={[
+                { label: 'Home', href: '/' },
+                { label: 'About' },
+              ]} />
+              <ContentMeta published="2025-06-01" publishedLabel="June 1, 2025" updated="2026-02-13" updatedLabel="February 13, 2026" />
 
-              {/* Stats */}
+              <header>
+                <SEOHero
+                  badge="About Us"
+                  title="Making Nigerian Taxes"
+                  titleHighlight="Simple & Accurate"
+                  subtitle="TaxForge NG is a free, FIRS-compliant tax calculator built by Gillespie Benjamin Mclee (OptiSolve Labs) in Port Harcourt, Rivers State — for every Nigerian business and individual."
+                />
+              </header>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
                 {stats.map((stat, i) => (
                   <div key={i} className="glass-frosted rounded-2xl p-5 text-center">
@@ -196,7 +204,7 @@ const About = () => {
               />
 
               <SEODisclaimer />
-            </div>
+            </article>
           </div>
         </main>
       </div>

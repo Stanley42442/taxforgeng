@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema, createSpeakableSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -96,6 +96,11 @@ const WHTCalculator = () => {
         'Nigeria Withholding Tax Rates 2026',
         'Withholding Tax rates by payment type under the Nigeria Tax Act 2025, effective January 2026',
         whtTerms
+      ),
+      createSpeakableSchema(
+        'WHT Calculator Nigeria 2026',
+        'https://taxforgeng.com/wht-calculator',
+        ['#wht-rates', '#faq', '#how-it-works']
       ),
     ],
   };

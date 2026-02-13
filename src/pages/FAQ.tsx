@@ -2,6 +2,8 @@ import { SEOHead, createFAQSchema, createBreadcrumbSchema } from '@/components/s
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
+import { ContentMeta } from '@/components/seo/ContentMeta';
 import { Link } from 'react-router-dom';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
@@ -104,13 +106,21 @@ const FAQ = () => {
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="max-w-4xl mx-auto">
-              <SEOHero
-                badge="FAQ"
-                title="Nigerian Tax Questions"
-                titleHighlight="Answered"
-                subtitle="Everything you need to know about Nigerian taxes under the 2026 rules. 30+ questions across PIT, CIT, VAT, WHT, and the new reforms."
-              />
+            <article className="max-w-4xl mx-auto">
+              <PageBreadcrumbs items={[
+                { label: 'Home', href: '/' },
+                { label: 'FAQ' },
+              ]} />
+              <ContentMeta published="2026-01-15" publishedLabel="January 15, 2026" updated="2026-02-13" updatedLabel="February 13, 2026" />
+
+              <header>
+                <SEOHero
+                  badge="FAQ"
+                  title="Nigerian Tax Questions"
+                  titleHighlight="Answered"
+                  subtitle="Everything you need to know about Nigerian taxes under the 2026 rules. 30+ questions across PIT, CIT, VAT, WHT, and the new reforms."
+                />
+              </header>
 
               {faqCategories.map((category) => (
                 <section key={category.name} className="mb-10">
@@ -169,7 +179,7 @@ const FAQ = () => {
               <CTASection variant="gradient" headline="Still Have Questions?" subtext="Try our AI Tax Assistant for instant answers about Nigerian tax rules." primaryText="Ask the Tax Bot" primaryLink="/advisory" secondaryText="Calculate Now" secondaryLink="/individual-calculator" />
 
               <SEODisclaimer />
-            </div>
+            </article>
           </div>
         </main>
       </div>

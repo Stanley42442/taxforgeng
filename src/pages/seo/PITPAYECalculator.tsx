@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema, createSpeakableSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -91,6 +91,11 @@ const PITPAYECalculator = () => {
         'Nigeria PIT Tax Bands 2026',
         'Personal Income Tax progressive bands under the Nigeria Tax Act 2025, effective January 2026',
         pitTerms
+      ),
+      createSpeakableSchema(
+        'PIT/PAYE Calculator Nigeria 2026',
+        'https://taxforgeng.com/pit-paye-calculator',
+        ['#tax-bands', '#faq', '#how-it-works']
       ),
     ],
   };
