@@ -79,7 +79,7 @@ const Index = () => {
         title="TaxForge NG | Free Nigerian Tax Calculator 2026 - CIT, VAT, WHT, PIT"
         description="TaxForge NG: Free Nigerian tax calculator for CIT, VAT, WHT, PIT with 2026 reforms. Business advisory, sector guides, and small company tools. No signup needed."
         canonicalPath="/"
-        keywords="Nigeria tax calculator, CIT calculator Nigeria, VAT calculator Nigeria, PIT PAYE calculator, 2026 tax reforms Nigeria, FIRS compliant"
+        keywords="Nigeria tax calculator, CIT calculator Nigeria, VAT calculator Nigeria, PIT PAYE calculator, 2026 tax reforms Nigeria, NRS compliant, FIRS compliant"
         schema={homepageSchema}
       />
 
@@ -198,7 +198,7 @@ const Index = () => {
           {/* Trust Badges */}
           <div className="mt-16 flex flex-wrap items-center justify-center gap-4 md:gap-8 animate-slide-up-delay-2">
             {[
-              { icon: CheckCircle2, text: "FIRS Compliant" },
+              { icon: CheckCircle2, text: "NRS Compliant" },
               { icon: CheckCircle2, text: "2026 Rules Preview" },
               { icon: CheckCircle2, text: "Free to Use" },
             ].map((badge, index) => (
@@ -307,7 +307,7 @@ const Index = () => {
             Ready to Optimize Your Taxes?
           </h2>
           <p className="mx-auto mb-10 max-w-xl text-primary-foreground/90 text-lg">
-            Start calculating your taxes with FIRS-compliant 2026 rules today.
+            Start calculating your taxes with NRS-compliant 2026 rules today.
           </p>
           <Link to="/advisory">
             <Button variant="glowAccent" size="xl" className="shadow-2xl">
@@ -331,7 +331,7 @@ const Index = () => {
                 <span className="font-bold text-lg text-foreground">TaxForge NG</span>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
-                Free Nigerian tax calculator with FIRS-compliant 2026 rules.
+                Free Nigerian tax calculator with NRS-compliant 2026 rules.
               </p>
               <div className="text-xs text-muted-foreground space-y-1">
                 <p>Port Harcourt, Rivers State, Nigeria</p>

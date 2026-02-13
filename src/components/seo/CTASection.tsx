@@ -19,7 +19,7 @@ interface CTASectionProps {
  */
 export const CTASection = ({
   headline = 'Ready to Calculate Your Tax?',
-  subtext = 'Get accurate, FIRS-compliant results in seconds.',
+  subtext = 'Get accurate, NRS-compliant results in seconds.',
   primaryText = 'Calculate Now',
   primaryLink = '/individual-calculator',
   secondaryText = 'Learn More',
