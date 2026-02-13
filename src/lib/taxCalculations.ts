@@ -334,7 +334,7 @@ export function calculateTax(inputs: TaxInputs): TaxResult {
       breakdown.push({
         label: inputs.use2026Rules ? 'Development Levy' : 'Education Levy',
         amount: developmentLevy,
-        description: inputs.use2026Rules ? '4% of profits' : '2% of profits',
+        description: inputs.use2026Rules ? '4% of profits' : '3% of profits',
       });
     }
   } else {

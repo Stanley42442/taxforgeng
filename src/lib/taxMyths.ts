@@ -270,8 +270,8 @@ export const taxMyths: TaxMyth[] = [
       question: 'A company has ₦45m turnover and ₦300m fixed assets. Under 2026 rules, what CIT rate applies?',
       options: [
         '0% - qualifies as small company',
-        '25% - exceeds asset threshold',
-        '20% - medium company rate',
+        '30% - exceeds asset threshold',
+        '15% - reduced rate applies',
         '30% - old rate still applies'
       ],
       correctIndex: 1,
@@ -943,7 +943,7 @@ The 2025 reforms changed treatment of domestic sales:
 To estimate your tax position:
 1. Calculate export revenue percentage
 2. Export portion: 0% CIT
-3. Domestic portion: 25% CIT
+3. Domestic portion: 30% CIT
 4. Factor in duty savings on imports
 5. Consider WHT savings on repatriation
 
