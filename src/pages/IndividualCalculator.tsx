@@ -59,7 +59,7 @@ import { TaxBandVisualization } from "@/components/TaxBandVisualization";
 import { calculateReverseSalary, type ReverseSalaryResult } from "@/lib/reverseSalaryCalculation";
 import { CurrencyInput } from "@/components/ui/currency-input";
 
-type CalculationType = 'pit' | 'crypto' | 'investment' | 'informal' | 'foreign_income' | 'reverse';
+type CalculationType = 'pit' | 'crypto' | 'investment' | 'informal' | 'foreign_income' | 'reverse' | 'rental';
 
 interface SavedCalculation {
   id: string;
@@ -285,6 +285,23 @@ const IndividualCalculatorPage = () => {
   // Informal inputs
   const [estimatedTurnover, setEstimatedTurnover] = useState(savedState?.estimatedTurnover ?? '');
   const [location, setLocation] = useState(savedState?.location ?? 'other_urban');
+  const [freelancerServiceType, setFreelancerServiceType] = useState(savedState?.freelancerServiceType ?? '');
+  const [freelancerExpenses, setFreelancerExpenses] = useState(savedState?.freelancerExpenses ?? '');
+  const [freelancerHomeOffice, setFreelancerHomeOffice] = useState(savedState?.freelancerHomeOffice ?? '10');
+  const [freelancerUseFormal, setFreelancerUseFormal] = useState(savedState?.freelancerUseFormal ?? false);
+
+  // Rental income inputs
+  const [rentalIncome, setRentalIncome] = useState(savedState?.rentalIncome ?? '');
+  const [rentalMaintenance, setRentalMaintenance] = useState(savedState?.rentalMaintenance ?? '');
+  const [rentalInsurance, setRentalInsurance] = useState(savedState?.rentalInsurance ?? '');
+  const [rentalManagement, setRentalManagement] = useState(savedState?.rentalManagement ?? '');
+  const [rentalWHTDeducted, setRentalWHTDeducted] = useState(savedState?.rentalWHTDeducted ?? '');
+
+  // Enhanced investment inputs (CGT)
+  const [cgtAssetType, setCgtAssetType] = useState(savedState?.cgtAssetType ?? 'property');
+  const [cgtAcquisitionCost, setCgtAcquisitionCost] = useState(savedState?.cgtAcquisitionCost ?? '');
+  const [cgtImprovementCost, setCgtImprovementCost] = useState(savedState?.cgtImprovementCost ?? '');
+  const [cgtDisposalProceeds, setCgtDisposalProceeds] = useState(savedState?.cgtDisposalProceeds ?? '');
 
   const [result, setResult] = useState<ReturnType<typeof calculateIndividualTax> | null>(null);
   const [comparisonResult, setComparisonResult] = useState<ReturnType<typeof calculateIndividualTax> | null>(null);
@@ -365,6 +382,19 @@ const IndividualCalculatorPage = () => {
         capitalGains,
         estimatedTurnover,
         location,
+        freelancerServiceType,
+        freelancerExpenses,
+        freelancerHomeOffice,
+        freelancerUseFormal,
+        rentalIncome,
+        rentalMaintenance,
+        rentalInsurance,
+        rentalManagement,
+        rentalWHTDeducted,
+        cgtAssetType,
+        cgtAcquisitionCost,
+        cgtImprovementCost,
+        cgtDisposalProceeds,
       };
       
       safeLocalStorage.setJSON(STORAGE_KEY, {
@@ -378,7 +408,10 @@ const IndividualCalculatorPage = () => {
     use2026Rules, calculationType, employmentIncome, pensionContribution,
     nhfContribution, lifeInsurance, healthInsurance, rentPaid, mortgageInterest,
     cryptoIncome, cryptoGains, cryptoLosses, dividendIncome,
-    interestIncome, capitalGains, estimatedTurnover, location
+    interestIncome, capitalGains, estimatedTurnover, location,
+    freelancerServiceType, freelancerExpenses, freelancerHomeOffice, freelancerUseFormal,
+    rentalIncome, rentalMaintenance, rentalInsurance, rentalManagement, rentalWHTDeducted,
+    cgtAssetType, cgtAcquisitionCost, cgtImprovementCost, cgtDisposalProceeds
   ]);
 
   // Populate fields from expenses
@@ -506,25 +539,50 @@ const IndividualCalculatorPage = () => {
     }
   };
 
-  const getInputs = (rules2026: boolean): IndividualTaxInputs => ({
-    calculationType: calculationType === 'reverse' ? 'pit' : calculationType,
-    use2026Rules: rules2026,
-    employmentIncome: parseNumber(employmentIncome),
-    pensionContribution: parseNumber(pensionContribution),
-    nhfContribution: parseNumber(nhfContribution),
-    nhisContribution: parseNumber(healthInsurance),
-    lifeInsurancePremium: parseNumber(lifeInsurance),
-    annualRentPaid: parseNumber(rentPaid),
-    mortgageInterest: parseNumber(mortgageInterest),
-    cryptoIncome: parseNumber(cryptoIncome),
-    cryptoGains: parseNumber(cryptoGains),
-    cryptoLosses: parseNumber(cryptoLosses),
-    dividendIncome: parseNumber(dividendIncome),
-    interestIncome: parseNumber(interestIncome),
-    capitalGains: parseNumber(capitalGains),
-    estimatedTurnover: parseNumber(estimatedTurnover),
-    location,
-  });
+  const getInputs = (rules2026: boolean): IndividualTaxInputs => {
+    // For CGT enhanced investment, calculate capital gains from CGT fields
+    let effectiveCapitalGains = parseNumber(capitalGains);
+    if (calculationType === 'investment' && parseNumber(cgtDisposalProceeds) > 0) {
+      effectiveCapitalGains = Math.max(0, parseNumber(cgtDisposalProceeds) - parseNumber(cgtAcquisitionCost) - parseNumber(cgtImprovementCost));
+    }
+
+    // For rental tab, pass rental income as employment income for PIT band calculation
+    const effectiveCalcType = calculationType === 'reverse' ? 'pit' : calculationType === 'rental' ? 'rental' : calculationType;
+
+    return {
+      calculationType: effectiveCalcType as IndividualTaxInputs['calculationType'],
+      use2026Rules: rules2026,
+      employmentIncome: parseNumber(employmentIncome),
+      pensionContribution: parseNumber(pensionContribution),
+      nhfContribution: parseNumber(nhfContribution),
+      nhisContribution: parseNumber(healthInsurance),
+      lifeInsurancePremium: parseNumber(lifeInsurance),
+      annualRentPaid: parseNumber(rentPaid),
+      mortgageInterest: parseNumber(mortgageInterest),
+      cryptoIncome: parseNumber(cryptoIncome),
+      cryptoGains: parseNumber(cryptoGains),
+      cryptoLosses: parseNumber(cryptoLosses),
+      dividendIncome: parseNumber(dividendIncome),
+      interestIncome: parseNumber(interestIncome),
+      capitalGains: effectiveCapitalGains,
+      estimatedTurnover: parseNumber(estimatedTurnover),
+      location,
+      // Rental inputs
+      rentalIncome: parseNumber(rentalIncome),
+      rentalMaintenance: parseNumber(rentalMaintenance),
+      rentalInsurance: parseNumber(rentalInsurance),
+      rentalManagementFees: parseNumber(rentalManagement),
+      rentalWHTDeducted: parseNumber(rentalWHTDeducted),
+      // Freelancer inputs
+      freelancerServiceType,
+      freelancerExpenses: parseNumber(freelancerExpenses),
+      freelancerHomeOfficePercent: parseNumber(freelancerHomeOffice),
+      freelancerUseFormalPIT: freelancerUseFormal,
+      // CGT
+      cgtAssetType,
+      cgtDisposalProceeds: parseNumber(cgtDisposalProceeds),
+    };
+  };
 
   const handleCalculate = () => {
     if (calculationType === 'reverse') {
@@ -641,6 +699,7 @@ const IndividualCalculatorPage = () => {
       informal: 'Informal Tax',
       foreign_income: 'Foreign Income',
       reverse: 'Reverse Salary',
+      rental: 'Rental Income',
     };
     return labels[type] || type;
   };
@@ -652,9 +711,11 @@ const IndividualCalculatorPage = () => {
       case 'crypto':
         return parseNumber(cryptoIncome) > 0 || parseNumber(cryptoGains) > 0;
       case 'investment':
-        return parseNumber(dividendIncome) > 0 || parseNumber(interestIncome) > 0 || parseNumber(capitalGains) > 0;
+        return parseNumber(dividendIncome) > 0 || parseNumber(interestIncome) > 0 || parseNumber(capitalGains) > 0 || parseNumber(cgtDisposalProceeds) > 0;
       case 'informal':
         return parseNumber(estimatedTurnover) > 0;
+      case 'rental':
+        return parseNumber(rentalIncome) > 0;
       case 'reverse':
         return desiredNetPay > 0;
       case 'foreign_income':
@@ -757,9 +818,9 @@ const IndividualCalculatorPage = () => {
           all: 'mb-6 animate-slide-up'
         })}
       >
-        <TabsList className={getResponsiveClasses(device, {
-          mobile: 'grid w-full grid-cols-3 h-auto p-1 glass-premium rounded-xl gap-1',
-          all: 'grid w-full grid-cols-3 md:grid-cols-6 h-auto p-1.5 glass-frosted rounded-2xl'
+         <TabsList className={getResponsiveClasses(device, {
+          mobile: 'grid w-full grid-cols-4 h-auto p-1 glass-premium rounded-xl gap-1',
+          all: 'grid w-full grid-cols-4 md:grid-cols-7 h-auto p-1.5 glass-frosted rounded-2xl'
         })}>
           <TabsTrigger 
             value="pit"
@@ -816,6 +877,16 @@ const IndividualCalculatorPage = () => {
           >
             <Store className="h-4 w-4" />
             <span className={isMobile ? 'text-xs font-medium' : 'text-sm font-medium'}>Informal</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            value="rental"
+            className={getResponsiveClasses(device, {
+              mobile: 'flex items-center justify-center gap-1 py-2.5 rounded-lg data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all touch-feedback',
+              all: 'flex items-center gap-2 py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all duration-300'
+            })}
+          >
+            <Wallet className="h-4 w-4" />
+            <span className={isMobile ? 'text-xs font-medium' : 'text-sm font-medium'}>Rental</span>
           </TabsTrigger>
           <TabsTrigger 
             value="reverse"
@@ -1080,8 +1151,8 @@ const IndividualCalculatorPage = () => {
           </Card>
         </TabsContent>
 
-        {/* Investment Calculator */}
-        <TabsContent value="investment" className="mt-6">
+        {/* Investment Calculator (Enhanced with CGT) */}
+        <TabsContent value="investment" className="mt-6 space-y-4">
           <Card className="glass-frosted border-0 shadow-futuristic">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -1106,12 +1177,6 @@ const IndividualCalculatorPage = () => {
                   onChange={(v) => setInterestIncome(v)}
                   tooltip="Income from savings and fixed deposits"
                 />
-                <InputField
-                  label="Capital Gains"
-                  value={formatInput(capitalGains)}
-                  onChange={(v) => setCapitalGains(v)}
-                  tooltip="Profit from selling assets"
-                />
               </div>
               
               <div className="p-4 rounded-xl bg-success/10 border border-success/20">
@@ -1127,21 +1192,106 @@ const IndividualCalculatorPage = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Capital Gains Tax Section */}
+          <Card className="glass-frosted border-0 shadow-futuristic">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-accent" />
+                Capital Gains Tax (CGT)
+                <Badge variant="secondary" className="text-xs">Enhanced</Badge>
+              </CardTitle>
+              <CardDescription>
+                Detailed CGT calculation with asset type, acquisition cost, and exemptions
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Asset Type</Label>
+                <Select value={cgtAssetType} onValueChange={setCgtAssetType}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="property">Real Property (Land/Building)</SelectItem>
+                    <SelectItem value="shares">Shares & Securities</SelectItem>
+                    <SelectItem value="other">Other Assets</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <InputField
+                  label="Acquisition Cost"
+                  value={formatInput(cgtAcquisitionCost)}
+                  onChange={(v) => setCgtAcquisitionCost(v)}
+                  tooltip="Original purchase price of the asset"
+                />
+                <InputField
+                  label="Improvement Costs"
+                  value={formatInput(cgtImprovementCost)}
+                  onChange={(v) => setCgtImprovementCost(v)}
+                  tooltip="Cost of improvements made to the asset"
+                />
+                <InputField
+                  label="Disposal Proceeds"
+                  value={formatInput(cgtDisposalProceeds)}
+                  onChange={(v) => setCgtDisposalProceeds(v)}
+                  tooltip="Amount received from selling the asset"
+                  required
+                />
+                <InputField
+                  label="Simple Capital Gains (override)"
+                  value={formatInput(capitalGains)}
+                  onChange={(v) => setCapitalGains(v)}
+                  tooltip="Or enter gains directly if you already know the amount"
+                />
+              </div>
+
+              {parseNumber(cgtDisposalProceeds) > 0 && (
+                <div className="p-3 rounded-lg bg-secondary">
+                  <p className="text-sm font-medium">Calculated Gain: <span className="text-primary">
+                    ₦{Math.max(0, parseNumber(cgtDisposalProceeds) - parseNumber(cgtAcquisitionCost) - parseNumber(cgtImprovementCost)).toLocaleString()}
+                  </span></p>
+                </div>
+              )}
+
+              {use2026Rules && (
+                <div className="p-4 rounded-xl bg-info/10 border border-info/20">
+                  <div className="flex items-center gap-2 text-info">
+                    <Info className="h-4 w-4" />
+                    <span className="font-medium text-sm">2026 CGT Rules</span>
+                  </div>
+                  <ul className="text-sm text-muted-foreground mt-2 space-y-1">
+                    <li>• <strong>Small investor exemption:</strong> Gains ≤ ₦10M AND proceeds &lt; ₦150M = exempt</li>
+                    <li>• Gains above exemption use progressive PIT rates (0-25%)</li>
+                    <li>• Property sales may attract additional state levies</li>
+                  </ul>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
-        {/* Informal Calculator */}
-        <TabsContent value="informal" className="mt-6">
+        {/* Informal / Freelancer Calculator (Enhanced) */}
+        <TabsContent value="informal" className="mt-6 space-y-4">
           <Card className="glass-frosted border-0 shadow-futuristic">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Store className="h-5 w-5 text-primary" />
-                Informal Sector Tax
+                Informal & Freelancer Tax
               </CardTitle>
               <CardDescription>
-                Presumptive tax for small traders and informal businesses
+                Presumptive tax for traders, or formal PIT for freelancers and self-employed professionals
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-secondary">
+                <div>
+                  <Label className="text-sm font-medium">Use Formal PIT Path</Label>
+                  <p className="text-xs text-muted-foreground">Toggle for professional/freelance services taxed at PIT rates</p>
+                </div>
+                <Switch checked={freelancerUseFormal} onCheckedChange={setFreelancerUseFormal} />
+              </div>
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <InputField
                   label="Estimated Annual Turnover"
@@ -1150,16 +1300,14 @@ const IndividualCalculatorPage = () => {
                     setEstimatedTurnover(v);
                     clearValidationError('estimatedTurnover');
                   }}
-                  tooltip="Your estimated annual sales"
+                  tooltip="Your estimated annual sales/revenue"
                   required
                   error={validationErrors.estimatedTurnover}
                 />
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Location</Label>
                   <Select value={location} onValueChange={setLocation}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="lagos">Lagos</SelectItem>
                       <SelectItem value="abuja">Abuja (FCT)</SelectItem>
@@ -1170,15 +1318,139 @@ const IndividualCalculatorPage = () => {
                   </Select>
                 </div>
               </div>
+
+              {freelancerUseFormal && (
+                <>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Service Type</Label>
+                      <Select value={freelancerServiceType} onValueChange={setFreelancerServiceType}>
+                        <SelectTrigger><SelectValue placeholder="Select service type" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="consulting">Consulting</SelectItem>
+                          <SelectItem value="legal">Legal Services</SelectItem>
+                          <SelectItem value="medical">Medical/Health</SelectItem>
+                          <SelectItem value="tech">Technology/IT</SelectItem>
+                          <SelectItem value="creative">Creative/Design</SelectItem>
+                          <SelectItem value="accounting">Accounting/Tax</SelectItem>
+                          <SelectItem value="other">Other Professional</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <InputField
+                      label="Business Expenses"
+                      value={formatInput(freelancerExpenses)}
+                      onChange={(v) => setFreelancerExpenses(v)}
+                      tooltip="Deductible business expenses (equipment, subscriptions, etc.)"
+                    />
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Home Office (%)</Label>
+                      <Select value={freelancerHomeOffice} onValueChange={setFreelancerHomeOffice}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="0">0% - No home office</SelectItem>
+                          <SelectItem value="10">10%</SelectItem>
+                          <SelectItem value="20">20%</SelectItem>
+                          <SelectItem value="30">30%</SelectItem>
+                          <SelectItem value="50">50%</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">% of rent/utilities claimed as business expense</p>
+                    </div>
+                  </div>
+                </>
+              )}
               
               <div className="p-4 rounded-xl bg-warning/10 border border-warning/20">
                 <div className="flex items-center gap-2 text-warning">
                   <AlertCircle className="h-4 w-4" />
-                  <span className="font-medium text-sm">Presumptive Tax Notice</span>
+                  <span className="font-medium text-sm">{freelancerUseFormal ? 'Professional Services Notice' : 'Presumptive Tax Notice'}</span>
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Presumptive tax is a simplified flat-rate tax for informal businesses based on turnover and location.
-                </p>
+                <ul className="text-sm text-muted-foreground mt-2 space-y-1">
+                  {freelancerUseFormal ? (
+                    <>
+                      <li>• Professional services attract 10% WHT deducted at source by clients</li>
+                      <li>• WHT can be offset against your final PIT liability</li>
+                      {parseNumber(estimatedTurnover) > 25000000 && (
+                        <li className="text-warning font-medium">• ⚠️ Turnover &gt; ₦25M: VAT registration required</li>
+                      )}
+                      <li>• Professional service providers are excluded from CIT small company exemption</li>
+                    </>
+                  ) : (
+                    <>
+                      <li>• Presumptive tax is a simplified flat-rate tax for informal businesses</li>
+                      <li>• Based on turnover bracket and location</li>
+                    </>
+                  )}
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Rental Income Calculator */}
+        <TabsContent value="rental" className="mt-6">
+          <Card className="glass-frosted border-0 shadow-futuristic">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wallet className="h-5 w-5 text-primary" />
+                Rental Income Tax
+              </CardTitle>
+              <CardDescription>
+                Calculate tax on rental income with WHT credits and allowable deductions
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <InputField
+                  label="Annual Rental Income"
+                  value={formatInput(rentalIncome)}
+                  onChange={(v) => setRentalIncome(v)}
+                  tooltip="Total annual rental income received"
+                  required
+                />
+                <InputField
+                  label="WHT Already Deducted (10%)"
+                  value={formatInput(rentalWHTDeducted)}
+                  onChange={(v) => setRentalWHTDeducted(v)}
+                  tooltip="10% WHT deducted at source by tenant (if applicable)"
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                <InputField
+                  label="Maintenance Costs"
+                  value={formatInput(rentalMaintenance)}
+                  onChange={(v) => setRentalMaintenance(v)}
+                  tooltip="Repairs and maintenance expenses"
+                />
+                <InputField
+                  label="Property Insurance"
+                  value={formatInput(rentalInsurance)}
+                  onChange={(v) => setRentalInsurance(v)}
+                  tooltip="Insurance premiums on the rental property"
+                />
+                <InputField
+                  label="Management Fees"
+                  value={formatInput(rentalManagement)}
+                  onChange={(v) => setRentalManagement(v)}
+                  tooltip="Property management agent fees"
+                />
+              </div>
+
+              <div className="p-4 rounded-xl bg-info/10 border border-info/20">
+                <div className="flex items-center gap-2 text-info">
+                  <Info className="h-4 w-4" />
+                  <span className="font-medium text-sm">Rental Income Tax Rules</span>
+                </div>
+                <ul className="text-sm text-muted-foreground mt-2 space-y-1">
+                  <li>• 10% WHT is deducted at source on rent payments to individuals</li>
+                  <li>• WHT paid can be credited against your final PIT liability</li>
+                  <li>• Allowable deductions: maintenance, insurance, management fees</li>
+                  <li>• Net rental income is added to total taxable income for PIT bands</li>
+                </ul>
               </div>
             </CardContent>
           </Card>
@@ -1613,7 +1885,7 @@ const IndividualCalculatorPage = () => {
             </div>
 
             {/* Tax Band Visualization */}
-            {(calculationType === 'pit' || calculationType === 'investment') && result.taxableIncome > 0 && (
+            {(calculationType === 'pit' || calculationType === 'investment' || calculationType === 'rental') && result.taxableIncome > 0 && (
               <TaxBandVisualization
                 taxableIncome={result.taxableIncome}
                 use2026Rules={use2026Rules}
