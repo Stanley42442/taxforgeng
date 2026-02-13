@@ -1,67 +1,61 @@
 
 
-# SEO/AEO Phase 23: Add Professional Services Exclusion and Abolished Medium Tier to Comparison Data and FAQ Schema
+# SEO/AEO Phase 24: Fix Incorrect Small Company Threshold on Results Page
 
 ## Summary
 
-Two factual gaps remain in high-visibility SEO content:
+The Results page (`src/pages/Results.tsx`) displays the wrong turnover threshold for the small company exemption. When a user completes a tax calculation and sees their results, the label reads:
 
-1. **CIT Comparison Table** (`ComparisonTable.tsx`) -- used on 3 SEO landing pages -- omits the abolished medium company tier and the professional services exclusion from the 2026 small company rule. These are the two most significant CIT changes under NTA 2025, and their absence from the comparison table is a content gap for both search engines and AI engines.
+> "0% CIT for small companies (≤₦25M turnover)"
 
-2. **Small Company Exemption FAQ** (`SmallCompanyExemption.tsx`) -- the first FAQ answer (indexed via FAQPage schema) omits the professional services exclusion. While the body text (line 169) correctly mentions it, the structured data FAQ does not -- and schema markup is what AI engines and Google rich results consume.
+This is the pre-2026 threshold. Under 2026 rules (NTA 2025), the correct threshold is ₦50M turnover AND ₦250M assets. The `inputs` object -- which contains `use2026Rules` -- is already available on this page, so the fix is to conditionally display the correct threshold.
 
-**Source:** NTA 2025 Section 202 excludes professional service providers from the small company definition. Baker Tilly and AO2 Law confirm the medium tier abolition.
+This is particularly high-impact because the Results page is seen by every user who completes a calculation. Displaying outdated thresholds undermines trust and contradicts the "Accuracy Verified" badge shown on the same page.
 
-## Changes
+**All other ₦25M references in the codebase were audited and are correctly used in pre-2026 contexts** (comparison tables showing "Pre-2026" columns, historical blog references, pre-2026 test cases).
 
-### Change 1: CIT_COMPARISON_ROWS -- Add abolished medium tier row and professional services note
+## Change
 
-**File:** `src/components/seo/ComparisonTable.tsx` (lines 104-111)
+**File:** `src/pages/Results.tsx` (line 379)
 
-Add a row showing the abolished medium tier, and update the small company row to note the professional services exclusion in the 2026 column.
-
-```
-From:
-  { feature: 'Standard Rate', pre2026: '30%', post2026: '30%' },
-  { feature: 'Small Company Exemption', pre2026: '₦25M turnover', post2026: '₦50M turnover + ₦250M assets', highlight: true },
-  { feature: 'Small Company Rate', pre2026: '0%', post2026: '0%' },
-  
-  { feature: 'TET (Tertiary Education Tax)', pre2026: '3%', post2026: 'Replaced by Dev Levy' },
-  { feature: 'Development Levy', pre2026: false, post2026: '4%', highlight: true },
-
-To:
-  { feature: 'Standard Rate', pre2026: '30%', post2026: '30%' },
-  { feature: 'Small Company Exemption', pre2026: '₦25M turnover', post2026: '₦50M turnover + ₦250M assets (excl. professional services)', highlight: true },
-  { feature: 'Small Company Rate', pre2026: '0%', post2026: '0%' },
-  { feature: 'Medium Company Tier (20%)', pre2026: '₦25M-₦100M turnover', post2026: 'ABOLISHED', highlight: true },
-  { feature: 'TET (Tertiary Education Tax)', pre2026: '3%', post2026: 'Replaced by Dev Levy' },
-  { feature: 'Development Levy', pre2026: false, post2026: '4%', highlight: true },
-```
-
-### Change 2: SmallCompanyExemption FAQ -- Add professional services exclusion
-
-**File:** `src/pages/seo/SmallCompanyExemption.tsx` (line 28)
+Update the small company label to reflect whichever tax rules the user selected:
 
 ```
 From:
-  'Your company must have annual turnover of ₦50 million or less AND total fixed assets of ₦250 million or less. Both criteria must be met simultaneously.'
+  '0% CIT for small companies (≤₦25M turnover)'
 
-To:
-  'Your company must have annual turnover of ₦50 million or less AND total fixed assets of ₦250 million or less. Both criteria must be met simultaneously. Professional service providers (law, accounting, medical, engineering firms) are excluded from the small company definition regardless of turnover or assets.'
+To (conditional):
+  inputs?.use2026Rules
+    ? '0% CIT for small companies (turnover ≤₦50M, assets ≤₦250M)'
+    : '0% CIT for small companies (≤₦25M turnover)'
 ```
 
-## Files to Modify
+## Technical Details
 
-| File | Changes |
-|------|---------|
-| `src/components/seo/ComparisonTable.tsx` | Add medium tier abolished row, add professional services note to small company row |
-| `src/pages/seo/SmallCompanyExemption.tsx` | Add professional services exclusion to FAQ answer (line 28) |
+The `inputs` variable is already destructured from `location.state` on line 60 and typed as `TaxInputs`, which includes the `use2026Rules` boolean. No new imports or data are needed.
 
-## Impact
+### Exact edit (line 378-381)
 
-- The CIT comparison table is rendered on 3 high-traffic SEO pages (SmallCompanyExemption, CITCalculator, and any page importing CIT_COMPARISON_ROWS)
-- The FAQ schema is consumed by Google rich results and AI engines for the /small-company-exemption page
-- Both changes add factual completeness required for AEO accuracy
+```typescript
+// From:
+{companyResult.isSmallCompany 
+  ? '0% CIT for small companies (≤₦25M turnover)'
+  : 'Company Income Tax (CIT) at applicable rate'
+}
 
-**Total: 2 files modified, 0 new files created**
+// To:
+{companyResult.isSmallCompany 
+  ? inputs?.use2026Rules
+    ? '0% CIT for small companies (turnover ≤₦50M, assets ≤₦250M)'
+    : '0% CIT for small companies (≤₦25M turnover)'
+  : 'Company Income Tax (CIT) at applicable rate'
+}
+```
+
+## What This Addresses
+
+- 1 user-facing label showing the wrong (pre-2026) small company threshold on the most-viewed results page
+- Ensures the "Accuracy Verified" badge is not contradicted by stale content on the same page
+
+**Total: 1 file modified, 0 new files created**
 
