@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createCalculatorSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -29,7 +29,7 @@ const FreeCalculator = () => {
     },
     {
       question: 'How accurate are the results?',
-      answer: 'Our calculator uses the official Nigeria Tax Act 2025 (effective 2026) tax bands and rules. Results are verified against NRS guidelines and Big 4 accounting firm publications.',
+      answer: 'Our calculator uses the official Nigeria Tax Act 2025 (effective 2026) tax bands and rules, including the NTA Sixth Schedule PIT bands and NTA Sec 33 tax-free threshold. Results are verified against NRS guidelines and Big 4 accounting firm publications.',
     },
     {
       question: 'Do I need to create an account?',
@@ -60,9 +60,10 @@ const FreeCalculator = () => {
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
-      createWebApplicationSchema(
+      createCalculatorSchema(
         'Free Nigerian Tax Calculator 2026',
-        'Calculate your Nigerian personal income tax instantly with 2026 rules. Free PIT, PAYE calculator - no signup required.'
+        'Calculate your Nigerian personal income tax instantly with 2026 rules. Free PIT, PAYE calculator - no signup required.',
+        'Personal Tax Calculator'
       ),
       createFAQSchema(faqs),
       createHowToSchema(

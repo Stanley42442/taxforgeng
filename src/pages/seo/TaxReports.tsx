@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createBreadcrumbSchema, createFAQSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createCalculatorSchema, createBreadcrumbSchema, createFAQSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -43,9 +43,10 @@ const TaxReports = () => {
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
-      createWebApplicationSchema(
+      createCalculatorSchema(
         'Nigerian Tax Reports & Invoices Generator',
-        'Generate professional tax reports and invoices with QR verification. NRS-compliant format. Download PDF instantly.'
+        'Generate professional tax reports and invoices with QR verification. NRS-compliant format. Download PDF instantly.',
+        'Tax Report Generator'
       ),
       createFAQSchema(faqs),
       createBreadcrumbSchema([

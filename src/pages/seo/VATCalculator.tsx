@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema, createSpeakableSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createCalculatorSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema, createSpeakableSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -25,11 +25,11 @@ const VATCalculator = () => {
   const faqs = [
     {
       question: 'What is the current VAT rate in Nigeria?',
-      answer: 'The current VAT rate in Nigeria is 7.5%. This rate applies to most goods and services, with some exemptions for essential items.',
+      answer: 'The current VAT rate in Nigeria is 7.5% (NTA Sec 19). This rate applies to most goods and services, with some exemptions for essential items.',
     },
     {
       question: 'Who must register for VAT?',
-      answer: 'Businesses with annual turnover exceeding ₦25 million are required to register for VAT. Smaller businesses may voluntarily register.',
+      answer: 'Businesses with annual turnover exceeding ₦25 million are required to register for VAT. Businesses below ₦100 million turnover qualify for the small business exemption (NTAA Sec 22). Smaller businesses may voluntarily register.',
     },
     {
       question: 'What is Input VAT vs Output VAT?',
@@ -49,7 +49,7 @@ const VATCalculator = () => {
     },
     {
       question: 'What are the penalties for late VAT filing?',
-      answer: 'Late filing attracts a penalty of ₦100,000 for the first month and ₦50,000 for each subsequent month of default (NTA 2025). Additionally, interest accrues on the unpaid VAT at the prevailing commercial rate.',
+      answer: 'Late filing attracts a penalty of ₦100,000 for the first month and ₦50,000 for each subsequent month of default (NTA Sec 23). Additionally, interest accrues on the unpaid VAT at the prevailing commercial rate.',
     },
   ];
 
@@ -83,9 +83,10 @@ const VATCalculator = () => {
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
-      createWebApplicationSchema(
+      createCalculatorSchema(
         'VAT Calculator Nigeria 2026 - 7.5% Rate',
-        'Calculate Nigerian VAT at 7.5%. Know exempt items, registration thresholds, and filing deadlines. Free instant calculator.'
+        'Calculate Nigerian VAT at 7.5%. Know exempt items, registration thresholds, and filing deadlines. Free instant calculator.',
+        'VAT Calculator'
       ),
       createFAQSchema(faqs),
       createHowToSchema(

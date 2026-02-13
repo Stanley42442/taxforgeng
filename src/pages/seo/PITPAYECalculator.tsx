@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema, createSpeakableSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createCalculatorSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema, createSpeakableSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -36,11 +36,11 @@ const PITPAYECalculator = () => {
   const faqs = [
     {
       question: 'What is the 2026 tax-free threshold?',
-      answer: 'Under the Nigeria Tax Act 2025 (effective 2026), the first ₦800,000 of your annual income is completely tax-free. This is a significant increase from the previous threshold.',
+      answer: 'Under NTA Sec 33 of the Nigeria Tax Act 2025 (effective 2026), the first ₦800,000 of your annual income is completely tax-free. This replaces the old Consolidated Relief Allowance system.',
     },
     {
       question: 'What is the maximum PIT rate in 2026?',
-      answer: 'The maximum Personal Income Tax rate is 25%, applicable to income above ₦50 million. This is slightly higher than the previous 24% but only affects the highest earners.',
+      answer: 'The maximum Personal Income Tax rate is 25%, applicable to income above ₦50 million (NTA Sixth Schedule). This is slightly higher than the previous 24% but only affects the highest earners.',
     },
     {
       question: 'How is PAYE different from PIT?',
@@ -60,7 +60,7 @@ const PITPAYECalculator = () => {
     },
     {
       question: 'Can I deduct mortgage interest from my tax?',
-      answer: 'Yes, but only interest on loans used to BUILD (not buy) an owner-occupied residential home. The property must be self-occupied (not rental/investment). Only the interest portion is deductible, not the principal repayment.',
+      answer: 'Yes, but only interest on loans used to BUILD (not buy) an owner-occupied residential home (NTA Sec 36). The property must be self-occupied (not rental/investment). Only the interest portion is deductible, not the principal repayment.',
     },
     {
       question: 'Are minimum wage earners exempt from PIT?',
@@ -80,9 +80,10 @@ const PITPAYECalculator = () => {
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
-      createWebApplicationSchema(
+      createCalculatorSchema(
         'PIT/PAYE Calculator Nigeria 2026',
-        'Calculate Nigerian Personal Income Tax with 2026 rules. First ₦800,000 tax-free. Progressive rates from 15% to 25%.'
+        'Calculate Nigerian Personal Income Tax with 2026 rules. First ₦800,000 tax-free. Progressive rates from 15% to 25%.',
+        'Personal Income Tax Calculator'
       ),
       createFAQSchema(faqs),
       createHowToSchema(

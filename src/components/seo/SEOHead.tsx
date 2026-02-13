@@ -102,6 +102,39 @@ export const SEOHead = ({
   return null;
 };
 
+// Calculator-specific SoftwareApplication schema for SEO landing pages
+export const createCalculatorSchema = (
+  name: string,
+  description: string,
+  subcategory: string
+) => ({
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name,
+  description,
+  applicationCategory: 'FinanceApplication',
+  applicationSubCategory: subcategory,
+  operatingSystem: 'Web Browser',
+  isAccessibleForFree: true,
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'NGN',
+    description: 'Free tax calculator — no signup required',
+  },
+  provider: {
+    '@type': 'Organization',
+    name: 'TaxForge NG',
+    url: 'https://taxforgeng.com',
+    logo: 'https://taxforgeng.com/icon-512.png',
+  },
+  inLanguage: 'en-NG',
+  areaServed: {
+    '@type': 'Country',
+    name: 'Nigeria',
+  },
+});
+
 // Pre-built schema generators for common page types
 export const createWebApplicationSchema = (name: string, description: string) => ({
   '@context': 'https://schema.org',
