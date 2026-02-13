@@ -124,7 +124,7 @@ Complete educational guide to all changes under Nigeria Tax Act 2025.
 ### CIT Calculator Guide
 **URL**: https://taxforgeng.com/cit-calculator
 
-Company Income Tax rates explained with examples for small, medium, and large companies.
+Company Income Tax rates explained. 0% for small companies, 30% for large. Professional services exclusion.
 
 ### VAT Calculator
 **URL**: https://taxforgeng.com/vat-calculator

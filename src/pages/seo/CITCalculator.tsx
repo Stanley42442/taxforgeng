@@ -28,7 +28,7 @@ const CITCalculator = () => {
       answer: 'Company Income Tax is a tax on the profits of incorporated companies operating in Nigeria. Under the 2026 rules, small companies (turnover ≤₦50M AND assets ≤₦250M) pay 0%, and large companies pay 30%.',
     },
     {
-      question: 'How do I know if my company is small, medium, or large?',
+      question: 'How do I know if my company qualifies as small or large under 2026 rules?',
       answer: 'Under the 2026 rules, companies are classified as either Small or Large. Small: ≤₦50M turnover AND ≤₦250M assets (0% CIT). Large: above these thresholds (30% CIT). Professional service providers (law, accounting, medical, engineering) cannot qualify as small companies.',
     },
     {
