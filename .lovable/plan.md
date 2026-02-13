@@ -1,104 +1,85 @@
 
 
-# SEO/AEO Phase 17: Remaining Pioneer Status References, PDF Export, and Tax Myths Without EDI Context
+# SEO/AEO Phase 18: Duplicate Data Source, Blog Excerpt, and CRA Language Errors
 
 ## Summary
 
-Five files still present Pioneer Status as the current incentive regime without mentioning the Economic Development Incentive (EDI) replacement under NTA 2025. These are user-facing SEO pages, a PDF export module, an AI assistant system prompt, and an educational tax myths module.
+Four files contain factual inaccuracies: the primary sector data source (`sectorConfig.ts`) still has old Pioneer Status text that was only fixed in the duplicate `SectorPresets.tsx`, the blog listing excerpt references "pioneer status" without EDI, and the multilingual translations incorrectly state that "Consolidated Relief Allowance applies" under 2026 rules when CRA was abolished.
 
 ## Errors Found
 
-### Error 1: SmallCompanyCITExemption.tsx -- FAQ Describes Pioneer Status as Current (line 21)
+### Error 1: sectorConfig.ts -- Manufacturing Myth Still Uses Old Pioneer Status Text (line 129)
 
-The FAQ answer says: "No. Pioneer Status is a separate incentive for specific industries that provides a tax holiday for up to 5 years."
+This is the **primary data source** used by `EnhancedSectorPresets`. Phase 16 updated the duplicate in `SectorPresets.tsx` but missed this file.
 
-This describes Pioneer Status as active law without noting its replacement by EDI under 2026 rules.
+- Current: `'Pioneer status requires NIPC approval and specific conditions'`
+- Should be: `'Under 2026 rules, Pioneer Status is replaced by EDI (5% annual tax credit for 5 years). Existing approvals continue under original terms'`
 
-**Fix:** Update to: "No. Pioneer Status (now replaced by EDI under 2026 rules) was a separate incentive. The EDI provides a 5% annual tax credit for 5 years on qualifying capex, rather than a full tax holiday. The Small Company Exemption is automatic based on turnover."
+### Error 2: sectorConfig.ts -- Healthcare Benefits Still Says "Pioneer Status" (line 249)
 
-### Error 2: PortHarcourtGuide.tsx -- FAQ Mentions Pioneer Status Without EDI (line 18)
+Same issue -- Phase 16 fixed `SectorPresets.tsx` line 201 but not the source data file.
 
-The FAQ says: "Yes, Pioneer Status incentives may apply. Also, companies in designated Free Trade Zones enjoy tax holidays."
+- Current: `'Pioneer Status'` in the benefits array
+- Should be: `'EDI tax credit (formerly Pioneer Status)'`
 
-This is vague and doesn't mention the EDI transition.
+### Error 3: Blog.tsx -- Excerpt Mentions "pioneer status" Without EDI (line 71)
 
-**Fix:** Update to: "Under 2026 rules, Pioneer Status is replaced by the Economic Development Incentive (EDI), providing a 5% annual tax credit for 5 years. Free Trade Zone benefits (Onne Oil & Gas FTZ) continue. Consult a tax professional for current eligibility."
+The blog card excerpt for the Tech Startup Guide says: "...covering the Small Company Exemption, pioneer status, and payroll." This is the blog listing page visible to all visitors and search engines.
 
-### Error 3: pdfExport.ts -- PDF Shows "Pioneer Status: Tax Holiday Eligible" (line 352)
+- Current: `'...pioneer status, and payroll.'`
+- Should be: `'...EDI incentives (formerly Pioneer Status), and payroll.'`
 
-When generating PDFs for sectors with `pioneerStatus: true`, the export says "Pioneer Status: Tax Holiday Eligible" without any EDI context. This is a downloadable document users may share with accountants.
+### Error 4: LanguageContext.tsx -- "Consolidated Relief Allowance applies" in 2026 Context (lines 3393 and 3409)
 
-**Fix:** Change to conditionally show EDI context: "EDI Tax Credit (replaces Pioneer Status)" when the result uses 2026 rules, keeping "Pioneer Status: Tax Holiday Eligible" for pre-2026 reports.
+Two translation keys for the individual calculator say "Consolidated Relief Allowance applies" alongside the ₦800,000 tax-free threshold. Under 2026 rules, CRA was abolished and replaced by Rent Relief and specific deductions. This text appears in English, Pidgin, Yoruba, Hausa, and Igbo -- all five languages contain the error.
 
-### Error 4: taxMyths.ts -- Pioneer Status Myth Without EDI Update (lines 366-384)
+- `individual.exemptionNote` (line 3393): Says "Consolidated Relief Allowance applies"
+- `individual.2026BenefitsInfo` (line 3409): Same incorrect text
 
-The "pioneer-easy" myth entry explains Pioneer Status mechanics (NIPC application, 5-year holiday) without mentioning that NTA 2025 replaced it with EDI. Users reading this educational content would believe Pioneer Status is still the active regime.
-
-**Fix:** Update the `truth` and `explanation` fields to note that Pioneer Status is replaced by EDI under 2026 rules, while preserving the educational content about the application process.
-
-### Error 5: tax-assistant/index.ts -- System Prompt Lists "Pioneer Status incentives" (line 74)
-
-The AI assistant's system prompt lists "Pioneer Status incentives" as a topic without EDI context. When users ask the assistant about tax incentives, it may describe Pioneer Status as current law.
-
-**Fix:** Update the system prompt line to "Pioneer Status / EDI incentives (EDI replaces Pioneer Status under 2026 rules)" and add an EDI section to the key tax rules.
+Both should say "Rent Relief and specific deductions apply (CRA abolished)" in all five languages.
 
 ## Files to Modify
 
 | File | Changes |
 |------|---------|
-| `src/pages/blog/SmallCompanyCITExemption.tsx` | Update FAQ answer about Pioneer Status (line 21) |
-| `src/pages/seo/PortHarcourtGuide.tsx` | Update oil & gas FAQ to reference EDI (line 18) |
-| `src/lib/pdfExport.ts` | Update Pioneer Status label to show EDI context (line 352) |
-| `src/lib/taxMyths.ts` | Update pioneer-easy myth with EDI replacement info (lines 366-384) |
-| `supabase/functions/tax-assistant/index.ts` | Update system prompt to reference EDI (line 74, add EDI section) |
+| `src/lib/sectorConfig.ts` | Update manufacturing myth (line 129) and healthcare benefits (line 249) |
+| `src/pages/Blog.tsx` | Update tech startup excerpt to mention EDI (line 71) |
+| `src/contexts/LanguageContext.tsx` | Fix CRA references in 2 translation keys across 5 languages (lines 3393, 3409) |
 
 ## Technical Details
 
-### SmallCompanyCITExemption.tsx (line 21)
-
-- From: `'No. Pioneer Status is a separate incentive for specific industries that provides a tax holiday for up to 5 years. The Small Company Exemption is automatic based on turnover and available to all sectors.'`
-- To: `'No. Pioneer Status (replaced by EDI under 2026 rules) was a separate incentive. The Economic Development Incentive (EDI) now provides a 5% annual tax credit for 5 years on qualifying capex. The Small Company Exemption is automatic based on turnover and available to all sectors.'`
-
-### PortHarcourtGuide.tsx (line 18)
-
-- From: `'Yes, Pioneer Status incentives may apply. Also, companies in designated Free Trade Zones enjoy tax holidays. However, the 2026 rules have modified some incentives - consult a tax professional for current eligibility.'`
-- To: `'Under 2026 rules, Pioneer Status is replaced by the Economic Development Incentive (EDI), providing a 5% annual tax credit for 5 years on qualifying capex. Free Trade Zone benefits (e.g., Onne Oil & Gas FTZ) continue to apply. Consult a tax professional for current eligibility.'`
-
-### pdfExport.ts (line 352)
-
-- From: `ruleItems.push('Pioneer Status: Tax Holiday Eligible');`
-- To: `ruleItems.push('EDI Tax Credit (replaces Pioneer Status): 5% annual credit for 5 years');`
-
-### taxMyths.ts (lines 366-384)
-
-Update the myth entry:
-- `myth`: Keep as-is (still a valid myth to debunk)
-- `truth`: Change to `'Pioneer Status required formal application to NIPC. Under 2026 rules, it is replaced by EDI (5% annual tax credit for 5 years on qualifying capex).'`
-- `explanation`: Add a sentence noting that existing Pioneer Status approvals continue but new applicants should apply for EDI
-- `quiz.explanation`: Update to mention EDI replacement
-
-### tax-assistant/index.ts (line 74)
-
-- From: `- Pioneer Status incentives`
-- To: `- Pioneer Status / EDI incentives (EDI replaces Pioneer Status under 2026 rules: 5% annual tax credit for 5 years on qualifying capex)`
-
-Add after the CIT section (around line 103):
-
+### sectorConfig.ts (line 129)
 ```
-ECONOMIC DEVELOPMENT INCENTIVE (EDI):
-- Replaces Pioneer Status under NTA 2025
-- 5% annual tax credit for 5 years on qualifying capital expenditure
-- Applies to designated sectors (tech, manufacturing, agriculture, etc.)
-- Existing Pioneer Status approvals continue under original terms
+From: { myth: 'Manufacturing always qualifies for pioneer status', truth: 'Pioneer status requires NIPC approval and specific conditions' }
+To:   { myth: 'Manufacturing always qualifies for pioneer status', truth: 'Under 2026 rules, Pioneer Status is replaced by EDI (5% annual tax credit for 5 years). Existing approvals continue under original terms' }
 ```
+
+### sectorConfig.ts (line 249)
+```
+From: benefits: ['VAT-exempt services', 'Equipment duty waiver', 'Pioneer Status'],
+To:   benefits: ['VAT-exempt services', 'Equipment duty waiver', 'EDI tax credit (formerly Pioneer Status)'],
+```
+
+### Blog.tsx (line 71)
+```
+From: excerpt: '...covering the Small Company Exemption, pioneer status, and payroll.',
+To:   excerpt: '...covering the Small Company Exemption, EDI incentives (formerly Pioneer Status), and payroll.',
+```
+
+### LanguageContext.tsx (line 3393)
+Update `individual.exemptionNote` -- all 5 languages:
+- English: "First ₦800,000 is tax-exempt. Rent Relief and specific deductions apply (CRA abolished)."
+- Pidgin: "First ₦800,000 no get tax. Rent Relief and specific deductions dey apply (CRA don cancel)."
+- Yoruba, Hausa, Igbo: Corresponding translations with CRA removal noted
+
+### LanguageContext.tsx (line 3409)
+Update `individual.2026BenefitsInfo` -- same correction across all 5 languages.
 
 ## What This Addresses
 
-- 1 SEO blog FAQ presenting Pioneer Status as current law
-- 1 SEO state guide FAQ omitting EDI in oil & gas incentives context
-- 1 PDF export labeling Pioneer Status without EDI transition
-- 1 educational myth module describing Pioneer Status mechanics without noting its replacement
-- 1 AI assistant system prompt that could cause incorrect responses about incentives
+- 2 data source entries in `sectorConfig.ts` that were missed when their duplicates in `SectorPresets.tsx` were updated in Phase 16
+- 1 blog listing excerpt visible to search engines presenting Pioneer Status without EDI context
+- 2 multilingual translation keys (10 language strings total) incorrectly stating CRA still applies under 2026 rules
 
-**Total: 5 files modified, 0 new files created**
+**Total: 4 files modified, 0 new files created**
 
