@@ -25,7 +25,7 @@ const SmallCompanyExemption = () => {
   const faqs = [
     {
       question: 'What are the criteria for the small company exemption?',
-      answer: 'Your company must have annual turnover of ₦50 million or less AND total fixed assets of ₦250 million or less. Both criteria must be met simultaneously.',
+      answer: 'Your company must have annual turnover of ₦50 million or less AND total fixed assets of ₦250 million or less. Both criteria must be met simultaneously. Professional service providers (law, accounting, medical, engineering firms) are excluded from the small company definition regardless of turnover or assets.',
     },
     {
       question: 'Do I still need to file returns at 0% CIT?',
