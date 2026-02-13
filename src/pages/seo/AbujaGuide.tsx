@@ -29,7 +29,7 @@ const AbujaGuide = () => {
 
   const keySectors = [
     { icon: Landmark, name: 'Government & Public Sector', description: 'Abuja hosts all federal ministries, agencies, and departments.', tips: ['WHT on government contracts (5%)', 'Prompt payment compliance', 'Tax clearance certificate requirement'] },
-    { icon: Briefcase, name: 'Consulting & Professional Services', description: 'Large consulting firms serve government and private sector clients.', tips: ['10% WHT on professional fees', 'VAT on services above ₦25M', 'CIT on net profits'] },
+    { icon: Briefcase, name: 'Consulting & Professional Services', description: 'Large consulting firms serve government and private sector clients.', tips: ['10% WHT on professional fees', 'VAT registration mandatory above ₦25M turnover', 'CIT on net profits'] },
     { icon: Globe, name: 'International Organisations', description: 'Embassies, NGOs, and multilateral agencies are concentrated in Abuja.', tips: ['Diplomatic exemptions', 'Local staff PAYE obligations', 'Specific bilateral agreements'] },
     { icon: Building2, name: 'Real Estate & Construction', description: 'Active construction and property market driven by government spending.', tips: ['10% WHT on rent', '5% WHT on construction contracts', 'FCT Land Use Charge'] },
   ];

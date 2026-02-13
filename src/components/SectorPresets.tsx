@@ -119,7 +119,7 @@ const SECTOR_PRESETS: SectorPreset[] = [
       specialIncentives: ['Investment Tax Credit 10%', 'Local raw material bonus 10%', 'Job creation 10% deduction']
     },
     myths: [
-      { myth: 'Manufacturing always qualifies for pioneer status', truth: 'Pioneer status requires NIPC approval and specific conditions' }
+      { myth: 'Manufacturing always qualifies for pioneer status', truth: 'Under 2026 rules, Pioneer Status is replaced by EDI (5% annual tax credit for 5 years). Existing approvals continue under original terms' }
     ],
     formFields: ['turnover', 'expenses', 'fixedAssets', 'vatableSales', 'vatablePurchases']
   },
@@ -198,7 +198,7 @@ const SECTOR_PRESETS: SectorPreset[] = [
     name: 'Healthcare',
     icon: Stethoscope,
     description: 'Medical services exemptions',
-    benefits: ['VAT-exempt services', 'Equipment duty waiver', 'Pioneer Status'],
+    benefits: ['VAT-exempt services', 'Equipment duty waiver', 'EDI tax credit (formerly Pioneer Status)'],
     taxRules: {
       citRate: 30,
       vatStatus: 'exempt',
