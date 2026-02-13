@@ -103,9 +103,9 @@ export const PIT_COMPARISON_ROWS: ComparisonRow[] = [
 
 export const CIT_COMPARISON_ROWS: ComparisonRow[] = [
   { feature: 'Standard Rate', pre2026: '30%', post2026: '30%' },
-  { feature: 'Small Company Exemption', pre2026: '₦25M turnover', post2026: '₦50M turnover + ₦250M assets', highlight: true },
+  { feature: 'Small Company Exemption', pre2026: '₦25M turnover', post2026: '₦50M turnover + ₦250M assets (excl. professional services)', highlight: true },
   { feature: 'Small Company Rate', pre2026: '0%', post2026: '0%' },
-  
+  { feature: 'Medium Company Tier (20%)', pre2026: '₦25M-₦100M turnover', post2026: 'ABOLISHED', highlight: true },
   { feature: 'TET (Tertiary Education Tax)', pre2026: '3%', post2026: 'Replaced by Dev Levy' },
   { feature: 'Development Levy', pre2026: false, post2026: '4%', highlight: true },
 ];
