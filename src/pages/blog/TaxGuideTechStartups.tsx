@@ -116,9 +116,9 @@ const TaxGuideTechStartups = () => {
       </section>
 
       <section id="pioneer-status">
-        <h2 className="text-2xl font-bold text-foreground mb-4">Pioneer Status & Tax Holidays</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-4">Pioneer Status, EDI & Tax Holidays</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">
-          Pioneer Status provides a tax holiday of up to 5 years (initial 3 years + 2-year extension) for companies in designated industries. Tech startups may qualify if they operate in areas like:
+          Under the pre-2026 regime, Pioneer Status provided a tax holiday of up to 5 years (initial 3 years + 2-year extension) for companies in designated industries. Tech startups could qualify if they operated in areas like:
         </p>
         <ul className="space-y-2 text-sm text-muted-foreground mb-4">
           <li className="flex items-start gap-2"><span className="text-primary">•</span>Software development and IT services</li>
@@ -127,11 +127,17 @@ const TaxGuideTechStartups = () => {
           <li className="flex items-start gap-2"><span className="text-primary">•</span>Renewable energy technology</li>
           <li className="flex items-start gap-2"><span className="text-primary">•</span>Manufacturing (including hardware)</li>
         </ul>
-        <p className="text-muted-foreground leading-relaxed mb-4">
-          Pioneer Status is administered by the Nigerian Investment Promotion Commission (NIPC). The application process can take 3-6 months. Note that this is <strong className="text-foreground">separate from</strong> the Small Company Exemption — you can potentially benefit from both at different stages of your company's growth.
-        </p>
+        <div className="glass-frosted rounded-xl p-5 border-l-4 border-primary mb-4">
+          <h3 className="font-semibold text-foreground mb-2">2026 Update: Economic Development Incentive (EDI)</h3>
+          <p className="text-sm text-muted-foreground mb-2">
+            Under the Nigeria Tax Act 2025 (effective 2026), Pioneer Status is replaced by the <strong className="text-foreground">Economic Development Incentive (EDI)</strong>. Instead of a full tax holiday, EDI provides a <strong className="text-foreground">5% annual tax credit for 5 years</strong> on qualifying capital expenditure in designated sectors.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Companies with existing Pioneer Status approvals continue under their original terms until expiry. New applicants should apply for EDI through the relevant government channels.
+          </p>
+        </div>
         <p className="text-muted-foreground leading-relaxed">
-          <strong className="text-foreground">Important:</strong> During the pioneer period, profits are exempt from CIT but the Development Levy may still apply. Consult a tax professional for the specifics of your situation.
+          <strong className="text-foreground">Important:</strong> The EDI tax credit is separate from the Small Company Exemption — you can potentially benefit from both at different stages of your company's growth. Consult a tax professional for the specifics of your situation.
         </p>
       </section>
 
