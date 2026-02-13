@@ -1,108 +1,96 @@
 
 
-# AEO Deep Optimization: Machine-Readable Tax Data
+# SEO/AEO Refinements: Lessons from TaxFoundation.org
 
-## Overview
+## Research Summary
 
-This plan addresses the genuine gaps identified: making tax data directly extractable by AI crawlers and search bots that cannot execute JavaScript. The goal is to move from "tool-first" (humans click calculators) to "data-first" (bots can read tax rates directly).
+I fetched and analyzed TaxFoundation.org's actual HTML source (their 2026 Tax Brackets page) and compared it against the current TaxForge implementation. Here's what the leading tax authority sites do that TaxForge doesn't yet:
+
+## Genuine Remaining Gaps
+
+### 1. Visible Breadcrumb Navigation (High Impact)
+
+**What TaxFoundation does:** Renders a clickable breadcrumb trail in the UI (e.g., "Home > Data > Federal > 2026 Tax Brackets") alongside their BreadcrumbList schema.
+
+**TaxForge status:** The `breadcrumb.tsx` UI component exists but is never rendered on any page. Only the JSON-LD `createBreadcrumbSchema()` is used (invisible to users). Google values breadcrumbs that are BOTH in the HTML and in schema -- having schema alone without visible breadcrumbs is less effective.
+
+**Fix:** Add a reusable `<PageBreadcrumbs>` component and render it on all SEO landing pages. This improves both UX (users can navigate up the hierarchy) and SEO (Google shows breadcrumb trails in search results).
+
+### 2. Semantic `<time>` Elements with `datetime` Attributes (Medium Impact)
+
+**What TaxFoundation does:** Uses `<time datetime="2026-01-01T17:08:57-05:00">January 1, 2026</time>` and `<time class="updated" datetime="2026-02-11">` directly in the visible page body.
+
+**TaxForge status:** Zero `<time>` elements anywhere in the SEO pages. Dates only exist in JSON-LD schema (invisible to non-JS crawlers). Google uses `<time>` elements to determine content freshness -- critical for "2026 tax" queries where recency matters.
+
+**Fix:** Add visible "Published" and "Last Updated" dates with `<time datetime="...">` on all SEO landing pages and blog posts.
+
+### 3. Source Citations on Data Tables (Medium Impact)
+
+**What TaxFoundation does:** Every data table has a visible source citation: "Source: Internal Revenue Service, Revenue Procedure 2025-32."
+
+**TaxForge status:** Tax band tables have no source citations. Adding "Source: Nigeria Tax Act 2025 (Official Gazette)" beneath data tables signals E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness) to both search engines and AI crawlers.
+
+**Fix:** Add a standardized citation line beneath all tax data tables on SEO pages.
+
+### 4. Table of Contents on Long SEO Pages (Low-Medium Impact)
+
+**What TaxFoundation does:** Every long article has a collapsible Table of Contents with anchor links to each H2 section.
+
+**TaxForge status:** `TableOfContents` component exists and is used on blog posts, but NOT on the 10 SEO landing pages (which are 400-500 lines each with 8+ sections). A ToC generates intra-page anchor links that Google can show as "jump-to" sitelinks in search results.
+
+**Fix:** Add `<TableOfContents>` to the longer SEO landing pages (TaxReforms2026, PITPAYECalculator, FreeCalculator, CITCalculator).
 
 ## Changes
-
-### 1. Add Static Tax Data + FAQ Schema to index.html
-
-Add a static `noscript` block and JSON-LD to `index.html` so non-JS crawlers can access core tax information:
-
-- **Static FAQPage schema** with the 5 most-searched Nigerian tax questions (pulled from the FAQ page)
-- **Dataset-style structured data** exposing PIT bands, CIT rates, and VAT rate as machine-readable JSON-LD
-- A `<noscript>` HTML block containing a plain-text summary of key tax rates (visible to crawlers that don't run JS)
-
-### 2. Add DefinedTermSet Schema to SEOHead
-
-Create a new schema generator `createTaxRateSchema()` that outputs structured tax rate data using Schema.org `DefinedTermSet` markup. This tells AI bots "here are the exact tax rates" in a format they can directly extract.
-
-Apply it to:
-- `/pit-paye-calculator` (PIT bands)
-- `/cit-calculator` (CIT tiers)
-- `/vat-calculator` (VAT rate + exemptions)
-
-### 3. Convert Tax Definitions to Semantic dl Elements
-
-Replace paragraph-based tax term explanations with HTML `<dl>` (definition list) elements on key SEO pages. This is the semantic markup that answer engines prioritize for "What is X?" queries.
-
-Pages to update:
-- `/pit-paye-calculator` -- tax band descriptions
-- `/cit-calculator` -- company size definitions
-- `/vat-calculator` -- exempt items list
-- `/wht-calculator` -- WHT rate categories
-
-### 4. Add aria-label and Descriptive Alt Text
-
-Add `alt` attributes to images and `aria-label` to icon-heavy UI components across SEO-facing pages. This improves both accessibility and Google Images discoverability.
-
-## Technical Details
 
 ### Files to Modify
 
 | File | Change |
 |------|--------|
-| `index.html` | Add static FAQPage JSON-LD, noscript tax summary block |
-| `src/components/seo/SEOHead.tsx` | Add `createTaxRateSchema()` generator |
-| `src/pages/seo/PITPAYECalculator.tsx` | Add DefinedTermSet schema, convert to `dl` elements |
-| `src/pages/seo/CITCalculator.tsx` | Add DefinedTermSet schema, convert to `dl` elements |
-| `src/pages/seo/VATCalculator.tsx` | Add DefinedTermSet schema, convert to `dl` elements |
-| `src/pages/seo/WHTCalculator.tsx` | Add DefinedTermSet schema, convert to `dl` elements |
+| `src/components/seo/PageBreadcrumbs.tsx` | **NEW** -- Reusable visible breadcrumb component using existing `breadcrumb.tsx` UI primitives |
+| `src/components/seo/DataSourceCitation.tsx` | **NEW** -- Standardized source citation component for tax data tables |
+| `src/pages/seo/PITPAYECalculator.tsx` | Add visible breadcrumbs, `<time>` elements, source citation, Table of Contents |
+| `src/pages/seo/CITCalculator.tsx` | Add visible breadcrumbs, `<time>` elements, source citation |
+| `src/pages/seo/VATCalculator.tsx` | Add visible breadcrumbs, `<time>` elements, source citation |
+| `src/pages/seo/WHTCalculator.tsx` | Add visible breadcrumbs, `<time>` elements, source citation |
+| `src/pages/seo/TaxReforms2026.tsx` | Add visible breadcrumbs, `<time>` elements, Table of Contents |
+| `src/pages/seo/FreeCalculator.tsx` | Add visible breadcrumbs, `<time>` elements |
+| `src/pages/seo/SmallCompanyExemption.tsx` | Add visible breadcrumbs, `<time>` elements, source citation |
+| `src/pages/seo/RentRelief2026.tsx` | Add visible breadcrumbs, `<time>` elements |
 
-### New Schema Example (DefinedTermSet)
+### Technical Details
 
+**PageBreadcrumbs component:**
 ```text
-{
-  "@type": "DefinedTermSet",
-  "name": "Nigeria PIT Tax Bands 2026",
-  "definedTerm": [
-    {
-      "@type": "DefinedTerm",
-      "name": "Tax-Free Threshold",
-      "description": "First NGN 800,000 of annual income: 0% tax rate"
-    },
-    {
-      "@type": "DefinedTerm",
-      "name": "First Taxable Band",
-      "description": "NGN 800,001 to NGN 3,000,000: 15% tax rate"
-    }
-  ]
-}
+<nav aria-label="Breadcrumb" class="mb-6">
+  <ol>
+    <li><a href="/">Home</a></li>
+    <li><a href="/free-tax-calculator">Tax Tools</a></li>
+    <li aria-current="page">PIT/PAYE Calculator</li>
+  </ol>
+</nav>
+```
+Uses the existing `@/components/ui/breadcrumb` primitives (Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage).
+
+**Time elements:**
+```text
+<div class="text-sm text-muted-foreground">
+  Published: <time datetime="2026-01-15">January 15, 2026</time>
+  | Updated: <time datetime="2026-02-13">February 13, 2026</time>
+</div>
 ```
 
-### noscript Block Example
-
+**Source citation:**
 ```text
-<noscript>
-  <div>
-    <h1>TaxForge NG - Nigerian Tax Calculator 2026</h1>
-    <h2>PIT Tax Bands (Nigeria Tax Act 2025)</h2>
-    <dl>
-      <dt>First NGN 800,000</dt><dd>0% (Tax-free)</dd>
-      <dt>NGN 800,001 - NGN 3,000,000</dt><dd>15%</dd>
-      <dt>NGN 3,000,001 - NGN 12,000,000</dt><dd>18%</dd>
-      <dt>NGN 12,000,001 - NGN 25,000,000</dt><dd>21%</dd>
-      <dt>NGN 25,000,001 - NGN 50,000,000</dt><dd>23%</dd>
-      <dt>Above NGN 50,000,000</dt><dd>25%</dd>
-    </dl>
-    <h2>CIT Rates</h2>
-    <dl>
-      <dt>Small Company (turnover up to NGN 50M)</dt><dd>0%</dd>
-      <dt>Medium Company (NGN 50M - NGN 200M)</dt><dd>20%</dd>
-      <dt>Large Company (above NGN 200M)</dt><dd>30%</dd>
-    </dl>
-    <p>VAT: 7.5% | Development Levy: 4%</p>
-  </div>
-</noscript>
+<p class="text-xs text-muted-foreground mt-3 italic">
+  Source: Nigeria Tax Act 2025 (Official Gazette, Federal Republic of Nigeria)
+</p>
 ```
 
 ### What This Does NOT Address
 
-- **Off-page SEO** (backlinks, domain authority) -- cannot be fixed with code
-- **Content siloing** -- the existing internal link structure across SEO pages is already solid with contextual cross-links in FAQ answers
-- **Server-side rendering** -- would require architecture migration to Next.js/Remix, out of scope
+- **Off-page SEO** (backlinks, domain authority) -- requires external outreach, not code
+- **Glossary tooltips** -- TaxFoundation uses these but they require significant content authoring effort; lower priority
+- **Data download buttons** (CSV/Excel/PDF on tables) -- nice-to-have but already available for authenticated users
 
-**Total: 7 files modified, 0 new files created**
+**Total: 2 new files, 8 files modified**
+
