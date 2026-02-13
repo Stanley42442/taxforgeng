@@ -126,7 +126,7 @@ const VATCalculator = () => {
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="max-w-4xl mx-auto">
+            <article className="max-w-4xl mx-auto">
               <PageBreadcrumbs items={[
                 { label: 'Home', href: '/' },
                 { label: 'Tax Tools', href: '/free-tax-calculator' },
@@ -134,23 +134,25 @@ const VATCalculator = () => {
               ]} />
               <ContentMeta published="2026-01-15" publishedLabel="January 15, 2026" updated="2026-02-13" updatedLabel="February 13, 2026" />
 
-              {/* Hero */}
-              <SEOHero
-                title="Nigerian VAT Calculator"
-                titleHighlight="7.5% Rate Explained"
-                subtitle="Calculate Value Added Tax instantly. Understand which items are exempt, when to register, and how to file your monthly returns."
-              />
-
-              {/* Trust Badges */}
-              <div className="mb-10 animate-slide-up-delay-2">
-                <TrustBadges
-                  badges={[
-                    { icon: 'check', text: '7.5% Standard Rate' },
-                    { icon: 'shield', text: 'FIRS Compliant' },
-                    { icon: 'clock', text: 'Monthly Filing' },
-                  ]}
+              <header>
+                {/* Hero */}
+                <SEOHero
+                  title="Nigerian VAT Calculator"
+                  titleHighlight="7.5% Rate Explained"
+                  subtitle="Calculate Value Added Tax instantly. Understand which items are exempt, when to register, and how to file your monthly returns."
                 />
-              </div>
+
+                {/* Trust Badges */}
+                <div className="mb-10 animate-slide-up-delay-2">
+                  <TrustBadges
+                    badges={[
+                      { icon: 'check', text: '7.5% Standard Rate' },
+                      { icon: 'shield', text: 'FIRS Compliant' },
+                      { icon: 'clock', text: 'Monthly Filing' },
+                    ]}
+                  />
+                </div>
+              </header>
 
               {/* VAT Calculator Widget */}
               <div className="mb-12">
@@ -444,7 +446,7 @@ const VATCalculator = () => {
 
               {/* Disclaimer */}
               <SEODisclaimer />
-            </div>
+            </article>
           </div>
         </main>
       </div>

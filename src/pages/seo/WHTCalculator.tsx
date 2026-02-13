@@ -120,7 +120,7 @@ const WHTCalculator = () => {
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="max-w-4xl mx-auto">
+            <article className="max-w-4xl mx-auto">
               <PageBreadcrumbs items={[
                 { label: 'Home', href: '/' },
                 { label: 'Tax Tools', href: '/free-tax-calculator' },
@@ -128,23 +128,25 @@ const WHTCalculator = () => {
               ]} />
               <ContentMeta published="2026-01-15" publishedLabel="January 15, 2026" updated="2026-02-13" updatedLabel="February 13, 2026" />
 
-              {/* Hero */}
-              <SEOHero
-                title="Nigerian Withholding Tax"
-                titleHighlight="2026 WHT Rates Guide"
-                subtitle="Understand Withholding Tax rates for contracts, rent, dividends, and professional fees. Learn how to use WHT as a credit against your income tax."
-              />
-
-              {/* Trust Badges */}
-              <div className="mb-10 animate-slide-up-delay-2">
-                <TrustBadges
-                  badges={[
-                    { icon: 'check', text: '5% Contracts' },
-                    { icon: 'shield', text: '10% Professional Fees' },
-                    { icon: 'clock', text: 'WHT Credits Explained' },
-                  ]}
+              <header>
+                {/* Hero */}
+                <SEOHero
+                  title="Nigerian Withholding Tax"
+                  titleHighlight="2026 WHT Rates Guide"
+                  subtitle="Understand Withholding Tax rates for contracts, rent, dividends, and professional fees. Learn how to use WHT as a credit against your income tax."
                 />
-              </div>
+
+                {/* Trust Badges */}
+                <div className="mb-10 animate-slide-up-delay-2">
+                  <TrustBadges
+                    badges={[
+                      { icon: 'check', text: '5% Contracts' },
+                      { icon: 'shield', text: '10% Professional Fees' },
+                      { icon: 'clock', text: 'WHT Credits Explained' },
+                    ]}
+                  />
+                </div>
+              </header>
 
               {/* WHT Rates Table */}
               <section className="mb-12">
@@ -456,7 +458,7 @@ const WHTCalculator = () => {
 
               {/* Disclaimer */}
               <SEODisclaimer />
-            </div>
+            </article>
           </div>
         </main>
       </div>

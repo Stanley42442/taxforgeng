@@ -4,6 +4,9 @@ import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
+import { ContentMeta } from '@/components/seo/ContentMeta';
+import { DataSourceCitation } from '@/components/seo/DataSourceCitation';
 import { MapPin, Wheat, ShoppingBag, Factory, Truck, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
@@ -60,10 +63,19 @@ const KanoGuide = () => {
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="max-w-4xl mx-auto">
-              <SEOHero badge="State Guide" title="Kano Tax Guide" titleHighlight="Northern Nigeria's Trade Hub" subtitle="KIRS obligations, agricultural exemptions, and cross-border trade advice for businesses in Kano State." />
+            <article className="max-w-4xl mx-auto">
+              <PageBreadcrumbs items={[
+                { label: 'Home', href: '/' },
+                { label: 'State Guides', href: '/state-guides' },
+                { label: 'Kano' },
+              ]} />
+              <ContentMeta published="2026-02-09" publishedLabel="February 9, 2026" updated="2026-02-13" updatedLabel="February 13, 2026" />
 
-              <div className="mb-10"><TrustBadges badges={[{ icon: 'check', text: 'KIRS Compliant' }, { icon: 'shield', text: 'Kano Focus' }, { icon: 'clock', text: '2026 Rules' }]} /></div>
+              <header>
+                <SEOHero badge="State Guide" title="Kano Tax Guide" titleHighlight="Northern Nigeria's Trade Hub" subtitle="KIRS obligations, agricultural exemptions, and cross-border trade advice for businesses in Kano State." />
+
+                <div className="mb-10"><TrustBadges badges={[{ icon: 'check', text: 'KIRS Compliant' }, { icon: 'shield', text: 'Kano Focus' }, { icon: 'clock', text: '2026 Rules' }]} /></div>
+              </header>
 
               <section className="mb-12">
                 <div className="glass-frosted rounded-2xl p-6 md:p-8 border-l-4 border-primary">
@@ -118,8 +130,9 @@ const KanoGuide = () => {
               </section>
 
               <CTASection variant="gradient" headline="Calculate Your Kano Taxes" subtext="Free 2026-compliant calculator for all states." primaryText="Calculate Now" primaryLink="/individual-calculator" secondaryText="View All Tools" secondaryLink="/free-tax-calculator" />
+              <DataSourceCitation />
               <SEODisclaimer />
-            </div>
+            </article>
           </div>
         </main>
       </div>

@@ -161,7 +161,7 @@ const TaxReforms2026 = () => {
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="max-w-5xl mx-auto">
+            <article className="max-w-5xl mx-auto">
               <PageBreadcrumbs items={[
                 { label: 'Home', href: '/' },
                 { label: 'Tax Tools', href: '/free-tax-calculator' },
@@ -178,24 +178,26 @@ const TaxReforms2026 = () => {
                 { id: 'faq', label: 'Frequently Asked Questions' },
               ]} />
 
-              {/* Hero */}
-              <SEOHero
-                badge="Nigeria Tax Act 2025"
-                title="Everything Changing in"
-                titleHighlight="Nigerian Tax from 2026"
-                subtitle="The most significant tax reform in years. Understand how the new rules affect your personal income and business taxes."
-              />
-
-              {/* Trust Badges */}
-              <div className="mb-12 animate-slide-up-delay-2">
-                <TrustBadges
-                  badges={[
-                    { icon: 'check', text: 'Official FIRS Rules' },
-                    { icon: 'shield', text: 'Nigeria Tax Act 2025' },
-                    { icon: 'clock', text: 'Effective January 2026' },
-                  ]}
+              <header>
+                {/* Hero */}
+                <SEOHero
+                  badge="Nigeria Tax Act 2025"
+                  title="Everything Changing in"
+                  titleHighlight="Nigerian Tax from 2026"
+                  subtitle="The most significant tax reform in years. Understand how the new rules affect your personal income and business taxes."
                 />
-              </div>
+
+                {/* Trust Badges */}
+                <div className="mb-12 animate-slide-up-delay-2">
+                  <TrustBadges
+                    badges={[
+                      { icon: 'check', text: 'Official FIRS Rules' },
+                      { icon: 'shield', text: 'Nigeria Tax Act 2025' },
+                      { icon: 'clock', text: 'Effective January 2026' },
+                    ]}
+                  />
+                </div>
+              </header>
 
               {/* Key Reforms Grid */}
               <section id="key-reforms" className="mb-14">
@@ -440,7 +442,7 @@ const TaxReforms2026 = () => {
 
               {/* Disclaimer */}
               <SEODisclaimer />
-            </div>
+            </article>
           </div>
         </main>
       </div>

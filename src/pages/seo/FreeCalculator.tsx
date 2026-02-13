@@ -97,24 +97,26 @@ const FreeCalculator = () => {
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="max-w-4xl mx-auto">
+            <article className="max-w-4xl mx-auto">
               <PageBreadcrumbs items={[
                 { label: 'Home', href: '/' },
                 { label: 'Free Tax Calculator' },
               ]} />
               <ContentMeta published="2026-01-15" publishedLabel="January 15, 2026" updated="2026-02-13" updatedLabel="February 13, 2026" />
 
-              {/* Hero */}
-              <SEOHero
-                title="Calculate Your Nigerian Tax"
-                titleHighlight="In 30 Seconds - Free"
-                subtitle="Get instant, accurate tax calculations with 2026 rules. No signup required. See how much you save under the new tax regime."
-              />
+              <header>
+                {/* Hero */}
+                <SEOHero
+                  title="Calculate Your Nigerian Tax"
+                  titleHighlight="In 30 Seconds - Free"
+                  subtitle="Get instant, accurate tax calculations with 2026 rules. No signup required. See how much you save under the new tax regime."
+                />
 
-              {/* Trust Badges */}
-              <div className="mb-10 animate-slide-up-delay-2">
-                <TrustBadges />
-              </div>
+                {/* Trust Badges */}
+                <div className="mb-10 animate-slide-up-delay-2">
+                  <TrustBadges />
+                </div>
+              </header>
 
               {/* Quick Calculator */}
               <div className="mb-12">
@@ -358,7 +360,7 @@ const FreeCalculator = () => {
 
               {/* Disclaimer */}
               <SEODisclaimer />
-            </div>
+            </article>
           </div>
         </main>
       </div>

@@ -104,7 +104,7 @@ const RentRelief2026 = () => {
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="max-w-4xl mx-auto">
+            <article className="max-w-4xl mx-auto">
               <PageBreadcrumbs items={[
                 { label: 'Home', href: '/' },
                 { label: 'Tax Tools', href: '/free-tax-calculator' },
@@ -112,23 +112,25 @@ const RentRelief2026 = () => {
               ]} />
               <ContentMeta published="2026-01-01" publishedLabel="January 1, 2026" updated="2026-02-13" updatedLabel="February 13, 2026" />
 
-              {/* Hero */}
-              <SEOHero
-                title="Claim Up to ₦500,000"
-                titleHighlight="Tax Relief on Your Rent"
-                subtitle="The 2026 tax rules introduce Rent Relief - a new way to reduce your tax by 20% of your annual rent paid. Calculate your savings now."
-              />
-
-              {/* Trust Badges */}
-              <div className="mb-10 animate-slide-up-delay-2">
-                <TrustBadges
-                  badges={[
-                    { icon: 'check', text: '20% of Annual Rent' },
-                    { icon: 'shield', text: 'Max ₦500,000' },
-                    { icon: 'clock', text: 'Replaces CRA' },
-                  ]}
+              <header>
+                {/* Hero */}
+                <SEOHero
+                  title="Claim Up to ₦500,000"
+                  titleHighlight="Tax Relief on Your Rent"
+                  subtitle="The 2026 tax rules introduce Rent Relief - a new way to reduce your tax by 20% of your annual rent paid. Calculate your savings now."
                 />
-              </div>
+
+                {/* Trust Badges */}
+                <div className="mb-10 animate-slide-up-delay-2">
+                  <TrustBadges
+                    badges={[
+                      { icon: 'check', text: '20% of Annual Rent' },
+                      { icon: 'shield', text: 'Max ₦500,000' },
+                      { icon: 'clock', text: 'Replaces CRA' },
+                    ]}
+                  />
+                </div>
+              </header>
 
               {/* Rent Relief Calculator */}
               <div className="mb-12">
@@ -389,7 +391,7 @@ const RentRelief2026 = () => {
 
               {/* Disclaimer */}
               <SEODisclaimer />
-            </div>
+            </article>
           </div>
         </main>
       </div>
