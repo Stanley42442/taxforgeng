@@ -1,96 +1,102 @@
 
 
-# SEO/AEO Accuracy Audit: Fix Content-Code Discrepancies
+# AEO Enhancement: NTA Citations, Remote Work FAQ, and Schema Upgrade
 
-Gemini's analysis identified that while the technical foundation is strong, **content-code contradictions** are actively harming AEO citations and YMYL trust signals. This plan addresses every discrepancy found in the codebase.
-
----
-
-## Issues Found (7 Total)
-
-### Critical: Content contradicts 2026 rules (actively harmful to AEO)
-
-**1. Partner API returns obsolete pre-2026 CIT tiers**
-`supabase/functions/partner-api/index.ts` (lines 150-155) returns `mediumCompanyRate: 0.20` and `mediumCompanyTurnoverLimit: 100000000` for the **pre-2026** rules section. While the 2026 section is correct, the pre-2026 data includes the medium tier which is fine historically -- however the structure naming is misleading for AI parsers.
-
-**2. `llms-full.txt` references "medium" companies**
-Line 127: *"Company Income Tax rates explained with examples for small, medium, and large companies."* -- This is the AI-facing file. Mentioning "medium" when 2026 abolished it sends mixed signals to LLMs.
-
-**3. CIT Calculator FAQ mentions "small, medium, or large"**
-`src/pages/seo/CITCalculator.tsx` line 31: FAQ question text says "small, medium, or large?" -- The answer correctly explains the 2026 two-tier system, but the question itself plants "medium" as a concept.
-
-**4. `MultiYearProjection.tsx` uses 3-tier type system**
-Line 26: `companySize: 'small' | 'medium' | 'large'` -- The "medium" value is only used for pre-2026 projections (lines 80-84), which is historically correct. However, this type leaks into labels/charts visible to users and crawlers.
-
-### Moderate: Pre-2026 PIT band (19%) in user-facing content
-
-**5. Pre-2026 bands displayed without clear labeling**
-Three files show the old 19% band in content that could confuse AI crawlers if they miss the context switch:
-- `src/pages/TaxBreakdown.tsx` (lines 100-106) -- properly wrapped in conditional `inputs.use2026Rules` check
-- `src/lib/taxLogicDocumentPdf.ts` (line 297) -- in a "Pre-2026" labeled section
-- `src/lib/individualPdfExport.ts` (line 153) -- in a "Pre-2026" labeled section
-
-These are **correctly labeled** as pre-2026. No fix needed, but adding explicit "HISTORICAL" markers improves AEO clarity.
-
-### Minor: Missing trust signals
-
-**6. ComparisonTable correctly shows "ABOLISHED" for medium tier**
-`src/components/seo/ComparisonTable.tsx` line 108 -- This is actually correct and helpful. No change needed.
-
-**7. Blog post references old 20% rate correctly in historical context**
-`src/pages/blog/SmallCompanyCITExemption.tsx` lines 139, 151 -- Says "Under old rules: would have paid 20% CIT". This is correct historical comparison.
+Three targeted enhancements to strengthen E-E-A-T signals and improve AI citation likelihood.
 
 ---
 
-## Fixes Required (4 files)
+## Enhancement 1: NTA Section Citations in Content
 
-### Fix 1: `public/llms-full.txt` -- Remove "medium" reference
-Change line 127 from:
-> "Company Income Tax rates explained with examples for small, medium, and large companies."
+Add specific Nigeria Tax Act 2025 section references inline to boost authority. This tells both human readers and AI crawlers that the content is sourced from specific legislation, not guesswork.
 
-To:
-> "Company Income Tax rates explained. 0% for small companies, 30% for large. Professional services exclusion."
+### Files to update:
 
-### Fix 2: `src/pages/seo/CITCalculator.tsx` -- Fix FAQ question wording
-Change FAQ question (line 31) from:
-> "How do I know if my company is small, medium, or large?"
+**`src/pages/seo/CITCalculator.tsx`** -- Add NTA section numbers to FAQ answers:
+- Small Company Exemption: cite "NTA Sec 40"
+- Development Levy: cite "NTA Sec 58"
+- Professional services exclusion: cite "NTA Sec 40(3)"
 
-To:
-> "How do I know if my company qualifies as small or large under 2026 rules?"
+**`src/pages/seo/PITPAYECalculator.tsx`** -- Add section references:
+- Tax-free threshold: cite "NTA Sec 33"
+- Rent Relief: cite "NTA Sec 36"
+- PIT bands: cite "NTA Sixth Schedule"
 
-### Fix 3: `supabase/functions/partner-api/index.ts` -- Clean pre-2026 CIT structure
-The pre-2026 section (lines 150-155) currently returns `mediumCompanyRate` as a distinct field. Change the structure to clearly label it as historical context and ensure AI parsers understand this is the old regime:
-- Add a `rulesVersion: 'Pre-2026 (Historical)'` label
-- Rename `mediumCompanyRate` to `historicalMediumRate` or nest under a `historical` key
+**`src/pages/seo/VATCalculator.tsx`** -- Add references:
+- VAT rate: cite "NTA Sec 19"
+- Small business exemption: cite "NTAA Sec 22"
+- Filing penalties: cite "NTA Sec 23"
 
-### Fix 4: `public/llms.txt` -- Already correct, minor enhancement
-Add explicit "Professional service firms excluded from small company definition" to the CIT section for AEO completeness.
+**`src/pages/FAQ.tsx`** -- Add NTA section citations to key answers across all categories (PIT, CIT, VAT, WHT, Reforms). This is the highest-impact file since it feeds FAQSchema to Google directly.
 
----
-
-## What Does NOT Need Fixing
-
-These were flagged by Gemini but are already correct in the codebase:
-
-- CIT rates in calculation logic: correctly 0%/30% (not 25%)
-- 2026 PIT bands: correctly 0/15/18/21/23/25 everywhere
-- Professional services exclusion: mentioned in 6+ pages
-- ComparisonTable: correctly shows medium tier as "ABOLISHED"
-- Dev Levy: correctly stated as 4% replacing 3% TET
-- Disclaimers: present on all pages and PDFs
-- Date stamps: ContentMeta component used across SEO pages
-- FAQSchema: already implemented on all SEO landing pages
+**`src/pages/seo/FreeCalculator.tsx`** -- Add citations to FAQ answers for accuracy and "How It Works" step descriptions.
 
 ---
 
-## Technical Details
+## Enhancement 2: Remote Work / Foreign Income FAQ Section
 
-| File | Change | Impact |
-|------|--------|--------|
-| `public/llms-full.txt` line 127 | Remove "medium" from CIT description | High -- direct AI-facing file |
-| `src/pages/seo/CITCalculator.tsx` line 31 | Fix FAQ question wording | Medium -- FAQ schema feeds to Google |
-| `supabase/functions/partner-api/index.ts` lines 150-155 | Restructure pre-2026 CIT to avoid confusion | Medium -- API responses consumed externally |
-| `public/llms.txt` line 15-20 area | Add professional services exclusion note | Medium -- AI-facing file |
+Add a new FAQ category targeting high-intent Gen Z queries about remote work taxes, crypto, and foreign income. This fills a gap identified in the AEO analysis.
 
-All changes are text-only content corrections. No logic, schema, or architecture changes needed. The calculation engine is already correct.
+### File: `src/pages/FAQ.tsx`
+
+Add a new category "Remote Work & Foreign Income" with 5 FAQs:
+
+1. **"Do I pay Nigerian tax on remote work income from abroad?"**
+   Answer: Yes, Nigerian residents are taxed on worldwide income (NTA Sec 3). Remote work for foreign clients is taxable. WHT may apply if paid through Nigerian entities.
+
+2. **"How is cryptocurrency income taxed in Nigeria?"**
+   Answer: Crypto gains are treated as capital gains under the Capital Gains Tax Act. The 10% CGT rate applies. Small investor exemption (gains up to 10M and proceeds under 150M) may apply.
+
+3. **"Can I claim double taxation relief on foreign income?"**
+   Answer: Yes, if Nigeria has a tax treaty with the country where tax was paid. You can claim credit for foreign tax paid against your Nigerian liability (NTA Sec 43).
+
+4. **"Do freelancers on Upwork/Fiverr need to file taxes?"**
+   Answer: Yes. Freelance income is taxable as personal or business income. If you earn above the ₦800k threshold, you owe PIT. Professional service freelancers also face 10% WHT.
+
+5. **"What if my employer is abroad but I work from Nigeria?"**
+   Answer: You are still a Nigerian tax resident and must file. Your foreign employer is not required to deduct PAYE, so you must self-assess and file directly with NRS.
+
+These will automatically be included in the FAQSchema via the existing `allFaqsForSchema` extraction logic.
+
+---
+
+## Enhancement 3: Upgrade Calculator Schema Markup
+
+Replace `createWebApplicationSchema` (generic) with `createSoftwareApplicationSchema` (richer, includes features, pricing, and metadata) on the 6 SEO landing pages that currently use the simpler schema.
+
+### Current state:
+- `Index.tsx`: Already uses `createSoftwareApplicationSchema` -- no change needed
+- 6 SEO calculator pages use `createWebApplicationSchema` -- needs upgrade
+
+### Approach:
+Rather than replacing with the global `createSoftwareApplicationSchema()` (which is homepage-specific with all features), create a new **`createCalculatorSchema`** helper in `SEOHead.tsx` that generates a `SoftwareApplication` schema with:
+- Page-specific name and description (passed as params)
+- `applicationCategory: 'FinanceApplication'`
+- `applicationSubCategory` specific to each calculator type
+- `operatingSystem: 'Web Browser'`
+- `offers` with free tier info
+- `isAccessibleForFree: true`
+- `inLanguage: 'en-NG'`
+- `areaServed: Nigeria`
+
+### Files to update:
+- **`src/components/seo/SEOHead.tsx`**: Add `createCalculatorSchema(name, description, subcategory)` helper
+- **`src/pages/seo/FreeCalculator.tsx`**: Replace `createWebApplicationSchema` with `createCalculatorSchema`
+- **`src/pages/seo/PITPAYECalculator.tsx`**: Same
+- **`src/pages/seo/CITCalculator.tsx`**: Same
+- **`src/pages/seo/VATCalculator.tsx`**: Same
+- **`src/pages/seo/WHTCalculator.tsx`**: Same
+- **`src/pages/seo/TaxReports.tsx`**: Same
+
+---
+
+## Summary
+
+| Enhancement | Files Changed | AEO Impact |
+|---|---|---|
+| NTA section citations | 5 SEO/FAQ pages | High -- proves legislative sourcing to AI crawlers |
+| Remote work FAQ section | `FAQ.tsx` | High -- targets unserved Gen Z queries, feeds FAQSchema |
+| Calculator schema upgrade | `SEOHead.tsx` + 6 calculator pages | Medium -- richer structured data for AI indexing |
+
+All changes are content and schema additions. No calculation logic is modified.
 
