@@ -1,78 +1,100 @@
 
-# Phase 34: New Calculators, Visual Tax Breakdown, and Tax Professional Directory
 
-This phase integrates new features into existing pages where they fit naturally, and only creates new pages where truly necessary.
+# Phase 34 Verification: Issues Found and Fixes Required
+
+After thorough code review of all files created/modified across the 3 sub-phases, here are the findings organized by severity.
 
 ---
 
-## Where Each Feature Lives
+## Critical Issues (2)
 
-```text
-+------------------------------------------+-----------------------------------+
-| Feature                                  | Destination                       |
-+------------------------------------------+-----------------------------------+
-| Reverse Salary Calculator                | IndividualCalculator - new tab    |
-| Capital Gains Tax Calculator             | IndividualCalculator - enhance    |
-|                                          | existing "investment" tab         |
-| Rental Income Calculator                 | IndividualCalculator - new tab    |
-| Freelancer/Self-Employment Calculator    | IndividualCalculator - enhance    |
-|                                          | existing "informal" tab           |
-| Employer Cost Calculator                 | Payroll page - new tab            |
-| Visual Tax Band Breakdown               | IndividualCalculator - results    |
-| Tax Professional Directory               | New standalone page (no fit)      |
-+------------------------------------------+-----------------------------------+
+### 1. Employer Cost Calculator: Net pay estimate is too low
+**File:** `src/pages/Payroll.tsx` (lines 43-62)
+
+The simplified PIT calculation in the Employer Cost tab deducts only pension and NHF before applying PIT bands. It does NOT account for:
+- **2026 rules:** Rent Relief, NHIS, Life Insurance, or the first 800k exemption band (0% rate is present but no reliefs reduce the taxable base)
+- **Pre-2026 rules:** Consolidated Relief Allowance (CRA)
+
+Since no reliefs are applied, the taxable income is inflated and the estimated PAYE/net pay shown to users will be **significantly inaccurate** (overtaxed).
+
+**Fix:** Apply CRA (pre-2026) or at minimum the pension relief to the taxable income calculation. Since this is labeled as an "estimate", adding a clear "(simplified estimate)" disclaimer and applying the 2026 bands correctly (which already include the 0% on first 800k) is acceptable. The 0% band IS already applied, so the issue is smaller than it appears -- the main missing piece is the CRA for pre-2026 mode.
+
+### 2. Investment CGT: Small investor exemption is incomplete
+**File:** `src/lib/individualTaxCalculations.ts` (line 622)
+
+The 2026 NTA small investor exemption requires **two conditions**:
+- Gains <= 10M **AND**
+- Disposal proceeds < 150M
+
+Current code only checks `capitalGains <= 10000000`. The `cgtDisposalProceeds` is available in the inputs interface but NOT checked.
+
+**Fix:** Update the condition at line 622 to:
+```
+if (capitalGains <= 10000000 && (!inputs.cgtDisposalProceeds || inputs.cgtDisposalProceeds < 150000000))
 ```
 
 ---
 
-## ✅ COMPLETED - Sub-phase A
+## Minor Issues (2)
 
-### Reverse Salary Calculator (new tab in IndividualCalculator)
-- Created `src/lib/reverseSalaryCalculation.ts` with iterative binary search solver
-- Added "Reverse" tab to IndividualCalculator with monthly net pay input, pension rate, NHF/NHIS toggles, rent relief, life insurance, mortgage interest
-- Results show required gross salary, take-home, effective rate, deduction breakdown
+### 3. Freelancer WHT credit assumes 100% WHT coverage
+**File:** `src/lib/individualTaxCalculations.ts` (line 438)
 
-### Tax Band Visualization
-- Created `src/components/TaxBandVisualization.tsx` with Framer Motion animated bars
-- 6 bands with green-to-red color gradient, fill animations
-- Integrated into IndividualCalculator results (PIT + Investment) and Reverse Salary results
+The freelancer formal PIT path calculates `whtCredit = turnover * 0.10`, assuming all turnover has 10% WHT deducted. In reality, only invoiced professional services to corporate clients have WHT withheld.
 
----
+**Fix:** Add a WHT percentage input field to the freelancer section, or add a disclaimer note: "Assumes all revenue has WHT deducted at source. Adjust if some clients do not withhold."
 
-## ✅ COMPLETED - Sub-phase B: Enhanced Tabs + Employer Cost
+### 4. Rental income: Maintenance relief shown even when zero
+**File:** `src/lib/individualTaxCalculations.ts` (line 530)
 
-### Rental Income Tab (IndividualCalculator)
-- Added "Rental" tab with annual rental income, WHT deducted, maintenance/insurance/management fee inputs
-- New `calculateRentalTax()` function with WHT credit logic and PIT band integration
-- Shows net tax payable after WHT credits with detailed breakdown
+`reliefs.push` for maintenance happens when `totalDeductions > 0`, but maintenance itself could be 0 while insurance or management fees are non-zero. The maintenance entry with amount 0 would still be pushed.
 
-### Enhanced Investment Tab (CGT)
-- Added dedicated Capital Gains Tax section with asset type selector (property/shares/other)
-- Acquisition cost, improvement costs, disposal proceeds inputs with auto-calculated gains
-- Existing simple capital gains input preserved as override option
-
-### Enhanced Informal Tab (Freelancer)
-- Added "Use Formal PIT Path" toggle for professional/freelance services
-- Service type selector, business expenses, home office % deduction
-- 10% WHT credit calculation for professional services
-- VAT registration threshold warning (>₦25M)
-
-### Employer Cost Calculator (Payroll page)
-- New "Cost to Co." tab at Basic tier
-- Calculates employer pension (10%), NSITF (1%), ITF (1%), employee take-home
-- Bulk mode: add multiple salary levels with aggregate totals
+**Fix:** Add individual checks: `if (maintenance > 0) reliefs.push(...)`.
 
 ---
 
-## ✅ COMPLETED - Sub-phase C: Tax Professional Directory + Nav Updates
+## Code Quality / Maintenance Observations (non-blocking)
 
-### Tax Professional Directory (New Page)
-- Created `src/lib/taxProfessionals.ts` with 12 sample firms across 7 states
-- Created `src/pages/TaxProfessionalDirectory.tsx` with search, state/specialty/body filters
-- LocalBusiness structured data for SEO
-- Verification portal links for CITN, ICAN, ACCA, ANAN
-- Disclaimer about non-endorsement
+### 5. PIT bands duplicated in 3 files
+The same PIT band constants exist in:
+- `src/lib/individualTaxCalculations.ts`
+- `src/lib/reverseSalaryCalculation.ts`
+- `src/components/TaxBandVisualization.tsx`
 
-### Navigation & Routes
-- Added `/tax-professionals` route in App.tsx
-- Added "Find a Tax Pro" link in NavMenu Resources group
+**Recommendation:** Extract to a shared `src/lib/taxBands.ts` constant and import everywhere. This prevents future drift if bands are updated.
+
+### 6. Existing tests may need updates
+The test file `src/__tests__/lib/individualTaxCalculations.test.ts` tests the `calculateInvestmentTax` function but does not test the new `calculateRentalTax` function. Additionally, tests for the CGT small investor exemption (line 620-645) don't validate the proceeds condition since it was missing.
+
+**Recommendation:** Add test cases for:
+- `calculateRentalTax` function
+- CGT exemption with proceeds >= 150M (should NOT be exempt)
+- Freelancer formal PIT path
+- Reverse salary convergence edge cases
+
+---
+
+## Security Verification: All Clear
+
+| Check | Status |
+|-------|--------|
+| No user input flows to `dangerouslySetInnerHTML` | Passed -- only static data from `taxProfessionals.ts` |
+| Search input sanitized | Passed -- only used in `.includes()` comparison, never as HTML or SQL |
+| External links use `rel="noopener noreferrer"` | Passed |
+| No Supabase queries without auth checks | Passed -- `handleSaveCalculation` checks `user` before inserting |
+| Database save uses parameterized queries via Supabase SDK | Passed |
+| `safeLocalStorage` used for all storage access | Passed |
+| No console.log of sensitive data | Passed -- uses `logger` throughout |
+
+---
+
+## Summary of Required Changes
+
+| File | Change | Severity |
+|------|--------|----------|
+| `src/lib/individualTaxCalculations.ts` (line 622) | Add `cgtDisposalProceeds < 150M` to exemption check | Critical |
+| `src/lib/individualTaxCalculations.ts` (line 530) | Add `if (maintenance > 0)` guard | Minor |
+| `src/lib/individualTaxCalculations.ts` (line 438) | Add disclaimer about WHT credit assumption | Minor |
+| `src/pages/Payroll.tsx` (line 43) | Add note that net pay is simplified estimate, or apply basic reliefs | Critical |
+
+All fixes are small, targeted changes. No architectural refactoring needed.
