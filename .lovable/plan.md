@@ -1,70 +1,58 @@
 
-# SEO/AEO Phase 26: Update FIRS References to NRS on Homepage
+
+# SEO/AEO Phase 27: Update Remaining FIRS to NRS Across SEO Components and Landing Pages
 
 ## Summary
 
-Under the Nigeria Revenue Service Act 2025 (effective January 1, 2026), the Federal Inland Revenue Service (FIRS) was renamed to the **Nigeria Revenue Service (NRS)**. The homepage -- the most-visited page -- still displays "FIRS Compliant" in three prominent locations while internal pages (Tax Logic Reference, Verification Badge, Rent Relief Tooltip) already correctly use "NRS".
+Following Phase 26 (homepage), there are still prominent "FIRS" references in **shared SEO components** that appear on every page, plus the highest-traffic SEO landing pages. Since the Nigeria Revenue Service (Establishment) Act 2025 renamed FIRS to NRS effective January 2026, these references are factually outdated.
 
-This creates a factual inconsistency on the highest-traffic page and undermines AEO accuracy. AI engines indexing the homepage would extract outdated agency names.
-
-**Source:** Nigeria Revenue Service (Establishment) Act 2025, confirmed by PwC, EY, and Rephic Legal.
-
-**SEO consideration:** Users still search "FIRS" more than "NRS", so the keywords meta tag retains both terms for discoverability.
+This phase targets the **shared components first** (maximum impact per edit) then the top SEO landing pages. Filing-related references (e.g., "file returns with FIRS") are updated to "NRS (formerly FIRS)" for user recognition during the transition period.
 
 ## Changes
 
-### File: `src/pages/Index.tsx`
+### File 1: `src/components/seo/SEOHead.tsx` (shared schema markup on every page)
 
-**Change 1 -- SEO keywords (line 82):** Add "NRS compliant" alongside existing "FIRS compliant" for dual discoverability.
+- **Line 130:** Schema description: "FIRS-compliant" to "NRS-compliant"
+- **Line 231:** knowsAbout array: "FIRS Compliance" to "NRS Compliance"
 
-```
-From:
-  keywords="Nigeria tax calculator, CIT calculator Nigeria, VAT calculator Nigeria, PIT PAYE calculator, 2026 tax reforms Nigeria, FIRS compliant"
+### File 2: `src/components/seo/SEODisclaimer.tsx` (shared disclaimer on all SEO pages)
 
-To:
-  keywords="Nigeria tax calculator, CIT calculator Nigeria, VAT calculator Nigeria, PIT PAYE calculator, 2026 tax reforms Nigeria, NRS compliant, FIRS compliant"
-```
+- **Line 37:** "FIRS filing assistance" to "NRS filing assistance"
 
-**Change 2 -- Trust badge (line 201):** Update the visible badge text while keeping both names for user recognition.
+### File 3: `src/pages/seo/FreeCalculator.tsx` (highest-traffic free tool page)
 
-```
-From:
-  { icon: CheckCircle2, text: "FIRS Compliant" },
+- **Line 32:** FAQ answer: "verified against FIRS guidelines" to "verified against NRS guidelines"
+- **Line 84:** Meta description: "FIRS-compliant results" to "NRS-compliant results"
+- **Line 203:** Feature badge: "FIRS Compliant" to "NRS Compliant"
+- **Line 204:** Feature description: "FIRS guidelines" to "NRS guidelines"
 
-To:
-  { icon: CheckCircle2, text: "NRS Compliant" },
-```
+### File 4: `src/pages/seo/TaxReforms2026.tsx` (2026 reforms overview page)
 
-**Change 3 -- CTA section (line 310):** Update the call-to-action text.
+- **Line 149:** Keywords: "FIRS 2026" to "NRS 2026, FIRS 2026" (dual discoverability)
+- **Line 194:** Trust badge: "Official FIRS Rules" to "Official NRS Rules"
+- **Line 412:** Link description: "FIRS requirements" to "NRS requirements"
 
-```
-From:
-  Start calculating your taxes with FIRS-compliant 2026 rules today.
+### File 5: `src/pages/seo/SmallCompanyExemption.tsx` (small company checker)
 
-To:
-  Start calculating your taxes with NRS-compliant 2026 rules today.
-```
+- **Line 22:** HowTo step: "file annual returns with FIRS" to "file annual returns with NRS (formerly FIRS)"
+- **Line 32:** FAQ: "file annual returns with FIRS" to "file annual returns with NRS"
+- **Line 40:** FAQ: "FIRS may apply" to "NRS may apply"
+- **Line 44:** FAQ: "file nil returns with FIRS" to "file nil returns with NRS"
+- **Line 116:** Trust badge: "Official FIRS Rules" to "Official NRS Rules"
+- **Line 236:** Mistake fix: "file annual returns with FIRS" to "file annual returns with NRS"
+- **Line 325:** Filing section: "file returns with FIRS" to "file returns with NRS"
+- **Line 331:** Form reference: "Fill out FIRS Form C" to "Fill out NRS Form C"
 
-**Change 4 -- Footer description (line 334):** Update the footer brand description.
+### File 6: `src/pages/Index.tsx` (one remaining reference)
 
-```
-From:
-  Free Nigerian tax calculator with FIRS-compliant 2026 rules.
-
-To:
-  Free Nigerian tax calculator with NRS-compliant 2026 rules.
-```
-
-## Files to Modify
-
-| File | Lines | Changes |
-|------|-------|---------|
-| `src/pages/Index.tsx` | 82, 201, 310, 334 | Update 4 FIRS references to NRS |
+- **Line 466:** Feature description: "seamless FIRS filing" to "seamless NRS filing"
 
 ## What This Addresses
 
-- 4 outdated "FIRS" references on the highest-traffic page, contradicting the site's own internal pages that already use "NRS"
-- Aligns the homepage with the Nigeria Revenue Service Act 2025 (effective 2026)
-- Retains "FIRS compliant" in keywords meta tag for search discoverability during the transition period
+- 20+ outdated "FIRS" references across 6 files, including 2 shared components that affect every page
+- Schema markup (SEOHead) crawled by Google and AI engines currently reports the wrong agency name
+- Aligns all SEO landing pages with the Nigeria Revenue Service Act 2025
+- Retains "FIRS" in keywords meta tags for search discoverability during transition
 
-**Total: 1 file modified, 0 new files created**
+**Total: 6 files modified, 0 new files created**
+
