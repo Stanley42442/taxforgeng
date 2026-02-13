@@ -4,6 +4,8 @@ import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
+import { ContentMeta } from '@/components/seo/ContentMeta';
 import { FileText, QrCode, Download, Mail, Shield, Printer, CheckCircle2, ArrowRight, Star, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -73,20 +75,29 @@ const TaxReports = () => {
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="max-w-4xl mx-auto">
-              <SEOHero
-                title="Professional Nigerian"
-                titleHighlight="Tax Reports & Invoices"
-                subtitle="Generate FIRS-compliant tax documents with QR code verification. Download professional PDF reports instantly."
-              />
+            <article className="max-w-4xl mx-auto">
+              <PageBreadcrumbs items={[
+                { label: 'Home', href: '/' },
+                { label: 'Features', href: '/pricing' },
+                { label: 'Tax Reports' },
+              ]} />
+              <ContentMeta published="2026-01-15" publishedLabel="January 15, 2026" updated="2026-02-13" updatedLabel="February 13, 2026" />
 
-              <div className="mb-10 animate-slide-up-delay-2">
-                <TrustBadges badges={[
-                  { icon: 'shield', text: 'QR Verified' },
-                  { icon: 'check', text: 'FIRS Compliant' },
-                  { icon: 'clock', text: 'Instant Download' },
-                ]} />
-              </div>
+              <header>
+                <SEOHero
+                  title="Professional Nigerian"
+                  titleHighlight="Tax Reports & Invoices"
+                  subtitle="Generate FIRS-compliant tax documents with QR code verification. Download professional PDF reports instantly."
+                />
+
+                <div className="mb-10 animate-slide-up-delay-2">
+                  <TrustBadges badges={[
+                    { icon: 'shield', text: 'QR Verified' },
+                    { icon: 'check', text: 'FIRS Compliant' },
+                    { icon: 'clock', text: 'Instant Download' },
+                  ]} />
+                </div>
+              </header>
 
               {/* Key Features */}
               <section className="mb-12">
@@ -293,7 +304,7 @@ const TaxReports = () => {
               />
 
               <SEODisclaimer />
-            </div>
+            </article>
           </div>
         </main>
       </div>

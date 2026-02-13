@@ -4,6 +4,9 @@ import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
+import { ContentMeta } from '@/components/seo/ContentMeta';
+import { DataSourceCitation } from '@/components/seo/DataSourceCitation';
 import { MapPin, Building2, Laptop, Banknote, Ship, Clock, CheckCircle2, ArrowRight, AlertTriangle } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
@@ -66,10 +69,19 @@ const LagosGuide = () => {
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="max-w-4xl mx-auto">
-              <SEOHero badge="State Guide" title="Lagos Tax Guide" titleHighlight="Nigeria's Commercial Capital" subtitle="LIRS obligations, tech & finance sector tips, and compliance advice for businesses in Lagos State." />
+            <article className="max-w-4xl mx-auto">
+              <PageBreadcrumbs items={[
+                { label: 'Home', href: '/' },
+                { label: 'State Guides', href: '/state-guides' },
+                { label: 'Lagos' },
+              ]} />
+              <ContentMeta published="2026-02-09" publishedLabel="February 9, 2026" updated="2026-02-13" updatedLabel="February 13, 2026" />
 
-              <div className="mb-10"><TrustBadges badges={[{ icon: 'check', text: 'LIRS Compliant' }, { icon: 'shield', text: 'Lagos Focus' }, { icon: 'clock', text: '2026 Rules' }]} /></div>
+              <header>
+                <SEOHero badge="State Guide" title="Lagos Tax Guide" titleHighlight="Nigeria's Commercial Capital" subtitle="LIRS obligations, tech & finance sector tips, and compliance advice for businesses in Lagos State." />
+
+                <div className="mb-10"><TrustBadges badges={[{ icon: 'check', text: 'LIRS Compliant' }, { icon: 'shield', text: 'Lagos Focus' }, { icon: 'clock', text: '2026 Rules' }]} /></div>
+              </header>
 
               {/* About Lagos Taxation */}
               <section className="mb-12">
@@ -156,8 +168,9 @@ const LagosGuide = () => {
               </section>
 
               <CTASection variant="gradient" headline="Calculate Your Lagos Taxes" subtext="Free 2026-compliant calculator — works for all states." primaryText="Calculate Now" primaryLink="/individual-calculator" secondaryText="View All Tools" secondaryLink="/free-tax-calculator" />
+              <DataSourceCitation />
               <SEODisclaimer />
-            </div>
+            </article>
           </div>
         </main>
       </div>

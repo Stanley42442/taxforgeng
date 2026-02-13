@@ -4,6 +4,9 @@ import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
+import { ContentMeta } from '@/components/seo/ContentMeta';
+import { DataSourceCitation } from '@/components/seo/DataSourceCitation';
 import { MapPin, Building2, Ship, Fuel, Factory, Clock, CheckCircle2, ArrowRight, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -92,21 +95,30 @@ const PortHarcourtGuide = () => {
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="max-w-4xl mx-auto">
-              <SEOHero
-                badge="Built in Port Harcourt"
-                title="Port Harcourt Tax Guide"
-                titleHighlight="Rivers State SME Tips"
-                subtitle="Local tax compliance guide for businesses in Nigeria's oil capital. Sector-specific advice for Port Harcourt entrepreneurs."
-              />
+            <article className="max-w-4xl mx-auto">
+              <PageBreadcrumbs items={[
+                { label: 'Home', href: '/' },
+                { label: 'State Guides', href: '/state-guides' },
+                { label: 'Port Harcourt' },
+              ]} />
+              <ContentMeta published="2026-01-01" publishedLabel="January 1, 2026" updated="2026-02-09" updatedLabel="February 9, 2026" />
 
-              <div className="mb-10 animate-slide-up-delay-2">
-                <TrustBadges badges={[
-                  { icon: 'check', text: 'Local Developer' },
-                  { icon: 'shield', text: 'Rivers State Focus' },
-                  { icon: 'clock', text: '2026 Rules' },
-                ]} />
-              </div>
+              <header>
+                <SEOHero
+                  badge="Built in Port Harcourt"
+                  title="Port Harcourt Tax Guide"
+                  titleHighlight="Rivers State SME Tips"
+                  subtitle="Local tax compliance guide for businesses in Nigeria's oil capital. Sector-specific advice for Port Harcourt entrepreneurs."
+                />
+
+                <div className="mb-10 animate-slide-up-delay-2">
+                  <TrustBadges badges={[
+                    { icon: 'check', text: 'Local Developer' },
+                    { icon: 'shield', text: 'Rivers State Focus' },
+                    { icon: 'clock', text: '2026 Rules' },
+                  ]} />
+                </div>
+              </header>
 
               {/* About Section */}
               <section className="mb-12">
@@ -285,8 +297,9 @@ const PortHarcourtGuide = () => {
                 secondaryLink="/calculator"
               />
 
+              <DataSourceCitation />
               <SEODisclaimer />
-            </div>
+            </article>
           </div>
         </main>
       </div>

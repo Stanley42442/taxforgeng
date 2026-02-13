@@ -3,6 +3,8 @@ import { SEOHead, createBreadcrumbSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
+import { ContentMeta } from '@/components/seo/ContentMeta';
 import { MapPin, ArrowRight } from 'lucide-react';
 
 const states = [
@@ -45,13 +47,21 @@ const StateGuidesHub = () => {
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="max-w-4xl mx-auto">
-              <SEOHero
-                badge="State Guides"
-                title="Tax Guides by State"
-                titleHighlight="Local Compliance Tips"
-                subtitle="Federal taxes are the same nationwide, but state obligations differ. Choose your state for local IRS info, sector advice, and common mistakes to avoid."
-              />
+            <article className="max-w-4xl mx-auto">
+              <PageBreadcrumbs items={[
+                { label: 'Home', href: '/' },
+                { label: 'State Guides' },
+              ]} />
+              <ContentMeta published="2026-02-09" publishedLabel="February 9, 2026" updated="2026-02-13" updatedLabel="February 13, 2026" />
+
+              <header>
+                <SEOHero
+                  badge="State Guides"
+                  title="Tax Guides by State"
+                  titleHighlight="Local Compliance Tips"
+                  subtitle="Federal taxes are the same nationwide, but state obligations differ. Choose your state for local IRS info, sector advice, and common mistakes to avoid."
+                />
+              </header>
 
               <div className="grid gap-6 md:grid-cols-2 mb-12">
                 {states.map((s) => (
@@ -92,7 +102,7 @@ const StateGuidesHub = () => {
               />
 
               <SEODisclaimer />
-            </div>
+            </article>
           </div>
         </main>
       </div>

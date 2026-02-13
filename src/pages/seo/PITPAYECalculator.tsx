@@ -115,7 +115,7 @@ const PITPAYECalculator = () => {
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="max-w-4xl mx-auto">
+            <article className="max-w-4xl mx-auto">
               <PageBreadcrumbs items={[
                 { label: 'Home', href: '/' },
                 { label: 'Tax Tools', href: '/free-tax-calculator' },
@@ -133,23 +133,25 @@ const PITPAYECalculator = () => {
                 { id: 'faq', label: 'Frequently Asked Questions' },
               ]} />
 
-              {/* Hero */}
-              <SEOHero
-                title="Nigerian PIT & PAYE Calculator"
-                titleHighlight="2026 Tax Bands"
-                subtitle="Calculate your Personal Income Tax with the new 2026 rules. First ₦800,000 is tax-free. See how the new progressive rates affect you."
-              />
-
-              {/* Trust Badges */}
-              <div className="mb-10 animate-slide-up-delay-2">
-                <TrustBadges
-                  badges={[
-                    { icon: 'check', text: 'First ₦800K Tax-Free' },
-                    { icon: 'shield', text: 'Nigeria Tax Act 2025' },
-                    { icon: 'clock', text: 'Updated Feb 2026' },
-                  ]}
+              <header>
+                {/* Hero */}
+                <SEOHero
+                  title="Nigerian PIT & PAYE Calculator"
+                  titleHighlight="2026 Tax Bands"
+                  subtitle="Calculate your Personal Income Tax with the new 2026 rules. First ₦800,000 is tax-free. See how the new progressive rates affect you."
                 />
-              </div>
+
+                {/* Trust Badges */}
+                <div className="mb-10 animate-slide-up-delay-2">
+                  <TrustBadges
+                    badges={[
+                      { icon: 'check', text: 'First ₦800K Tax-Free' },
+                      { icon: 'shield', text: 'Nigeria Tax Act 2025' },
+                      { icon: 'clock', text: 'Updated Feb 2026' },
+                    ]}
+                  />
+                </div>
+              </header>
 
               {/* Quick Calculator */}
               <div className="mb-12">
@@ -524,7 +526,7 @@ const PITPAYECalculator = () => {
 
               {/* Disclaimer */}
               <SEODisclaimer />
-            </div>
+            </article>
           </div>
         </main>
       </div>

@@ -92,7 +92,7 @@ const SmallCompanyExemption = () => {
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="max-w-4xl mx-auto">
+            <article className="max-w-4xl mx-auto">
               <PageBreadcrumbs items={[
                 { label: 'Home', href: '/' },
                 { label: 'Tax Tools', href: '/free-tax-calculator' },
@@ -100,23 +100,25 @@ const SmallCompanyExemption = () => {
               ]} />
               <ContentMeta published="2026-01-01" publishedLabel="January 1, 2026" updated="2026-02-13" updatedLabel="February 13, 2026" />
 
-              {/* Hero */}
-              <SEOHero
-                title="Does Your Company Qualify for"
-                titleHighlight="0% Company Income Tax?"
-                subtitle="Under the 2026 tax rules, small companies in Nigeria can pay zero CIT. Check if your business meets the criteria instantly."
-              />
-
-              {/* Trust Badges */}
-              <div className="mb-10 animate-slide-up-delay-2">
-                <TrustBadges
-                  badges={[
-                    { icon: 'check', text: 'Nigeria Tax Act 2025' },
-                    { icon: 'shield', text: 'Official FIRS Rules' },
-                    { icon: 'clock', text: 'Effective 2026' },
-                  ]}
+              <header>
+                {/* Hero */}
+                <SEOHero
+                  title="Does Your Company Qualify for"
+                  titleHighlight="0% Company Income Tax?"
+                  subtitle="Under the 2026 tax rules, small companies in Nigeria can pay zero CIT. Check if your business meets the criteria instantly."
                 />
-              </div>
+
+                {/* Trust Badges */}
+                <div className="mb-10 animate-slide-up-delay-2">
+                  <TrustBadges
+                    badges={[
+                      { icon: 'check', text: 'Nigeria Tax Act 2025' },
+                      { icon: 'shield', text: 'Official FIRS Rules' },
+                      { icon: 'clock', text: 'Effective 2026' },
+                    ]}
+                  />
+                </div>
+              </header>
 
               {/* Eligibility Checker */}
               <div className="mb-12">
@@ -403,7 +405,7 @@ const SmallCompanyExemption = () => {
 
               {/* Disclaimer */}
               <SEODisclaimer />
-            </div>
+            </article>
           </div>
         </main>
       </div>
