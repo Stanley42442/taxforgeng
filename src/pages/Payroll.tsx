@@ -38,9 +38,10 @@ const EmployerCostCalculator = () => {
     const nhf = gross * 0.025;
     const totalEmployerCost = gross + pensionEmployer + nsitf + itf;
     
-    // Simple net pay estimate (PIT + pension + NHF)
-    // Using simplified progressive tax for display
-    const taxableIncome = gross - pensionEmployee - nhf;
+    // Simplified net pay estimate (PIT + pension + NHF + CRA)
+    // Applies CRA (higher of ₦200k or 1% of gross + 20% of gross) for a more accurate estimate
+    const cra = Math.max(200000, gross * 0.01) + (gross * 0.20);
+    const taxableIncome = Math.max(0, gross - pensionEmployee - nhf - cra);
     let pit = 0;
     const bands = [
       { limit: 800000, rate: 0 },
@@ -141,8 +142,9 @@ const EmployerCostCalculator = () => {
                       <p className="text-lg font-bold text-accent">₦{r.result.totalEmployerCost.toLocaleString()}</p>
                     </div>
                     <div className="p-3 rounded-lg bg-success/5 border border-success/20">
-                      <p className="text-xs text-muted-foreground">Employee Take-Home</p>
+                      <p className="text-xs text-muted-foreground">Employee Take-Home (estimate)</p>
                       <p className="text-lg font-bold text-success">₦{Math.round(r.result.netPay).toLocaleString()}</p>
+                      <p className="text-[10px] text-muted-foreground mt-1">Simplified estimate using CRA. Use Payroll Calculator for exact figures.</p>
                     </div>
                     <div className="p-3 rounded-lg bg-secondary">
                       <p className="text-xs text-muted-foreground">Cost Ratio</p>
