@@ -149,8 +149,10 @@ const getTaxRates = (use2026Rules: boolean = true) => {
     },
     cit: {
       standardRate: 0.30,
-      smallCompanyRate: 0.20,
-      smallCompanyTurnoverLimit: 25000000
+      smallCompanyRate: 0,
+      smallCompanyTurnoverLimit: 25000000,
+      mediumCompanyRate: 0.20,
+      mediumCompanyTurnoverLimit: 100000000
     },
     vat: {
       rate: 0.075,

@@ -69,12 +69,10 @@ export const MultiYearProjection = () => {
 
       if (entityType === 'company') {
         if (use2026Rules) {
-          // 2026 rules: Small company threshold is ₦50M (per Nigeria Tax Act 2025 Section 56)
+          // 2026: Two-tier system only (small or standard). Medium tier abolished by NTA 2025.
           if (turnover < 50000000) {
             companySize = 'small';
             isExempt = true; // 0% CIT for small companies
-          } else if (turnover < 100000000) {
-            companySize = 'medium';
           } else {
             companySize = 'large';
           }
