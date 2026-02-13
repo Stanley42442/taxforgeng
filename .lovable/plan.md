@@ -64,13 +64,15 @@ This phase integrates new features into existing pages where they fit naturally,
 
 ---
 
-## TODO - Sub-phase C: Tax Professional Directory + Nav Updates
+## ✅ COMPLETED - Sub-phase C: Tax Professional Directory + Nav Updates
 
 ### Tax Professional Directory (New Page)
-- `src/pages/TaxProfessionalDirectory.tsx` + `src/lib/taxProfessionals.ts`
-- Searchable directory by state, specialty, professional body
-- SEO schema: LocalBusiness structured data
+- Created `src/lib/taxProfessionals.ts` with 12 sample firms across 7 states
+- Created `src/pages/TaxProfessionalDirectory.tsx` with search, state/specialty/body filters
+- LocalBusiness structured data for SEO
+- Verification portal links for CITN, ICAN, ACCA, ANAN
+- Disclaimer about non-endorsement
 
 ### Navigation & Routes
-- Add route in App.tsx
-- Add "Find a Tax Pro" link in NavMenu Resources group
+- Added `/tax-professionals` route in App.tsx
+- Added "Find a Tax Pro" link in NavMenu Resources group

@@ -94,6 +94,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const TaxLogicReference = lazy(() => import("./pages/TaxLogicReference"));
 const VerifyDocument = lazy(() => import("./pages/VerifyDocument"));
 const ErrorDashboard = lazy(() => import("./pages/ErrorDashboard"));
+const TaxProfessionalDirectory = lazy(() => import("./pages/TaxProfessionalDirectory"));
 
 // SEO Landing Pages
 const FreeCalculator = lazy(() => import("./pages/seo/FreeCalculator"));
@@ -226,6 +227,7 @@ const AnimatedRoutes = () => {
           <Route path="/offline" element={<OfflineDashboard />} />
           <Route path="/verify/:documentId" element={<VerifyDocument />} />
           <Route path="/tax-logic" element={<TaxLogicReference />} />
+          <Route path="/tax-professionals" element={<TaxProfessionalDirectory />} />
           {/* SEO Landing Pages */}
           <Route path="/free-tax-calculator" element={<FreeCalculator />} />
           <Route path="/small-company-exemption" element={<SmallCompanyExemption />} />
