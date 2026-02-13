@@ -1,34 +1,70 @@
 
-
-# SEO/AEO Phase 25: Fix Stale "Medium Company" Reference in CIT Calculator SEO Page
+# SEO/AEO Phase 26: Update FIRS References to NRS on Homepage
 
 ## Summary
 
-The CIT Calculator SEO landing page (`src/pages/seo/CITCalculator.tsx`) contains one remaining reference to the abolished "medium" company tier. In the "Common Mistakes to Avoid" section (line 260), the text reads:
+Under the Nigeria Revenue Service Act 2025 (effective January 1, 2026), the Federal Inland Revenue Service (FIRS) was renamed to the **Nigeria Revenue Service (NRS)**. The homepage -- the most-visited page -- still displays "FIRS Compliant" in three prominent locations while internal pages (Tax Logic Reference, Verification Badge, Rent Relief Tooltip) already correctly use "NRS".
 
-> "applies to medium and large companies on top of CIT"
+This creates a factual inconsistency on the highest-traffic page and undermines AEO accuracy. AI engines indexing the homepage would extract outdated agency names.
 
-Under 2026 rules, there is no "medium" tier. The Development Levy applies to **all companies not qualifying as small**. This contradicts the comparison table on the same page (which correctly shows the medium tier as ABOLISHED) and creates an inconsistency that damages AEO accuracy.
+**Source:** Nigeria Revenue Service (Establishment) Act 2025, confirmed by PwC, EY, and Rephic Legal.
 
-All other files in the codebase were audited -- this is the only remaining incorrect "medium company" reference in a 2026 context.
+**SEO consideration:** Users still search "FIRS" more than "NRS", so the keywords meta tag retains both terms for discoverability.
 
-## Change
+## Changes
 
-**File:** `src/pages/seo/CITCalculator.tsx` (line 260)
+### File: `src/pages/Index.tsx`
+
+**Change 1 -- SEO keywords (line 82):** Add "NRS compliant" alongside existing "FIRS compliant" for dual discoverability.
 
 ```
 From:
-  'The Development Levy (replacing TET) is 4% of assessable profits and applies to medium and large companies on top of CIT. Budget for it separately.'
+  keywords="Nigeria tax calculator, CIT calculator Nigeria, VAT calculator Nigeria, PIT PAYE calculator, 2026 tax reforms Nigeria, FIRS compliant"
 
 To:
-  'The Development Levy (replacing TET) is 4% of assessable profits and applies to all companies that do not qualify for the small company exemption. Budget for it separately.'
+  keywords="Nigeria tax calculator, CIT calculator Nigeria, VAT calculator Nigeria, PIT PAYE calculator, 2026 tax reforms Nigeria, NRS compliant, FIRS compliant"
 ```
+
+**Change 2 -- Trust badge (line 201):** Update the visible badge text while keeping both names for user recognition.
+
+```
+From:
+  { icon: CheckCircle2, text: "FIRS Compliant" },
+
+To:
+  { icon: CheckCircle2, text: "NRS Compliant" },
+```
+
+**Change 3 -- CTA section (line 310):** Update the call-to-action text.
+
+```
+From:
+  Start calculating your taxes with FIRS-compliant 2026 rules today.
+
+To:
+  Start calculating your taxes with NRS-compliant 2026 rules today.
+```
+
+**Change 4 -- Footer description (line 334):** Update the footer brand description.
+
+```
+From:
+  Free Nigerian tax calculator with FIRS-compliant 2026 rules.
+
+To:
+  Free Nigerian tax calculator with NRS-compliant 2026 rules.
+```
+
+## Files to Modify
+
+| File | Lines | Changes |
+|------|-------|---------|
+| `src/pages/Index.tsx` | 82, 201, 310, 334 | Update 4 FIRS references to NRS |
 
 ## What This Addresses
 
-- 1 stale reference to the abolished "medium" company tier on a high-traffic SEO landing page
-- Eliminates contradiction with the CIT comparison table rendered on the same page
-- Aligns "Common Mistakes" FAQ content with NTA 2025 two-tier classification
+- 4 outdated "FIRS" references on the highest-traffic page, contradicting the site's own internal pages that already use "NRS"
+- Aligns the homepage with the Nigeria Revenue Service Act 2025 (effective 2026)
+- Retains "FIRS compliant" in keywords meta tag for search discoverability during the transition period
 
 **Total: 1 file modified, 0 new files created**
-
