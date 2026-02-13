@@ -471,9 +471,8 @@ The following projections are **hypothetical scenarios only**. They are not pred
 
 | Company Classification | Turnover | CIT Rate |
 |----------------------|----------|----------|
-| Small Company | ≤ ₦50M AND Assets ≤ ₦250M | 0% |
-| Medium Company | > ₦50M to ₦200M | 20% |
-| Large Company | > ₦200M | 30% |
+| Small Company | ≤ ₦50M AND Assets ≤ ₦250M (excl. professional services) | 0% |
+| All Other Companies | Above small thresholds | 30% |
 
 #### Other Key Rates - 2026
 
