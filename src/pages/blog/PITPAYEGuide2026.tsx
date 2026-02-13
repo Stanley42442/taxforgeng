@@ -64,9 +64,10 @@ const PITPAYEGuide2026 = () => {
               </thead>
               <tbody className="text-muted-foreground">
                 <tr className="border-b border-border/50"><td className="py-2">First ₦800,000</td><td>0%</td><td>₦0</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2">Next ₦2,000,000</td><td>15%</td><td>₦300,000</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2">Next ₦8,000,000</td><td>19%</td><td>₦1,820,000</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2">Next ₦39,200,000</td><td>21%</td><td>₦10,052,000</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">Next ₦2,200,000</td><td>15%</td><td>₦330,000</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">Next ₦9,000,000</td><td>18%</td><td>₦1,950,000</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">Next ₦13,000,000</td><td>21%</td><td>₦4,680,000</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">Next ₦25,000,000</td><td>23%</td><td>₦10,430,000</td></tr>
                 <tr><td className="py-2">Above ₦50,000,000</td><td>25%</td><td>—</td></tr>
               </tbody>
             </table>
@@ -92,16 +93,16 @@ const PITPAYEGuide2026 = () => {
               </thead>
               <tbody className="text-muted-foreground">
                 <tr className="border-b border-border/50"><td className="py-2">₦1,200,000</td><td>~₦68,000</td><td>₦60,000</td><td className="text-success">₦8,000</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2">₦3,000,000</td><td>~₦308,000</td><td>₦270,000</td><td className="text-success">₦38,000</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2">₦5,000,000</td><td>~₦620,000</td><td>₦518,000</td><td className="text-success">₦102,000</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2">₦10,000,000</td><td>~₦1,540,000</td><td>₦1,468,000</td><td className="text-success">₦72,000</td></tr>
-                <tr><td className="py-2">₦25,000,000</td><td>~₦4,210,000</td><td>₦4,618,000</td><td className="text-destructive">-₦408,000</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">₦3,000,000</td><td>~₦308,000</td><td>₦330,000</td><td className="text-destructive">-₦22,000</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">₦5,000,000</td><td>~₦620,000</td><td>₦690,000</td><td className="text-destructive">-₦70,000</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">₦10,000,000</td><td>~₦1,540,000</td><td>₦1,590,000</td><td className="text-destructive">-₦50,000</td></tr>
+                <tr><td className="py-2">₦25,000,000</td><td>~₦4,210,000</td><td>₦4,680,000</td><td className="text-destructive">-₦470,000</td></tr>
               </tbody>
             </table>
           </div>
         </div>
         <p className="text-muted-foreground leading-relaxed">
-          Most earners below ₦10 million benefit from the new system. Higher earners (above ₦15-20 million) may see slightly higher taxes due to the expanded 21% and 25% brackets, but the Rent Relief can offset some of this increase.
+          Note: These 2026 figures are calculated on gross salary without Rent Relief or pension deductions. In practice, deductions will reduce taxable income and therefore the tax payable. The Rent Relief can significantly offset any increase for higher earners.
         </p>
       </section>
 
@@ -115,8 +116,8 @@ const PITPAYEGuide2026 = () => {
             { step: '1', title: 'Calculate Pension Contribution', desc: 'Employee contribution: 8% of basic (assumed 60% of gross) = 8% × ₦3,600,000 = ₦288,000' },
             { step: '2', title: 'Calculate Taxable Income', desc: 'Gross ₦6,000,000 − Pension ₦288,000 = ₦5,712,000 taxable income' },
             { step: '3', title: 'Apply Rent Relief', desc: '20% of ₦1,800,000 rent = ₦360,000 relief. Taxable income becomes ₦5,712,000 − ₦360,000 = ₦5,352,000' },
-            { step: '4', title: 'Apply Tax Bands', desc: 'First ₦800,000: ₦0 | Next ₦2,000,000 @ 15%: ₦300,000 | Remaining ₦2,552,000 @ 19%: ₦484,880' },
-            { step: '5', title: 'Total Annual Tax', desc: '₦0 + ₦300,000 + ₦484,880 = ₦784,880. Monthly PAYE: ₦65,407' },
+            { step: '4', title: 'Apply Tax Bands', desc: 'First ₦800,000: ₦0 | Next ₦2,200,000 @ 15%: ₦330,000 | Remaining ₦2,352,000 @ 18%: ₦423,360' },
+            { step: '5', title: 'Total Annual Tax', desc: '₦0 + ₦330,000 + ₦423,360 = ₦753,360. Monthly PAYE: ₦62,780' },
           ].map((item) => (
             <div key={item.step} className="flex gap-4 items-start">
               <div className="h-8 w-8 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-sm font-bold shrink-0">{item.step}</div>

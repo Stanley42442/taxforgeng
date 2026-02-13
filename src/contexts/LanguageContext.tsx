@@ -3796,7 +3796,7 @@ export const translations: Translations = {
   'businessReport.deductibleExpenses': { en: 'Deductible Expenses', pcm: 'Deductible Expenses', yo: 'Inawo Tí A Lè Yọkúrò', ha: 'Kashewa da Za A Cire', ig: 'Mmefu Nke A Nwere Ike Iwepu' },
   'businessReport.taxableIncome': { en: 'Taxable Income', pcm: 'Taxable Income', yo: 'Owó-wíwọlé Tí A Lè Gba Owó-orí Lé', ha: 'Kudin Shiga da Za A Iya Haraji', ig: 'Ego Nnata Nke A Ga-Atụ Ụtụ' },
   'businessReport.taxType': { en: 'Tax Type', pcm: 'Tax Type', yo: 'Irú Owó-orí', ha: 'Nau\'in Haraji', ig: 'Ụdị Ụtụ' },
-  'businessReport.citRate': { en: 'CIT (25% + 4% Levy)', pcm: 'CIT (25% + 4% Levy)', yo: 'CIT (25% + 4% Owó)', ha: 'CIT (25% + 4% Haraji)', ig: 'CIT (25% + 4% Ụtụ)' },
+  'businessReport.citRate': { en: 'CIT (30% + 4% Levy)', pcm: 'CIT (30% + 4% Levy)', yo: 'CIT (30% + 4% Owó)', ha: 'CIT (30% + 4% Haraji)', ig: 'CIT (30% + 4% Ụtụ)' },
   'businessReport.pitProgressive': { en: 'PIT (Progressive)', pcm: 'PIT (Progressive)', yo: 'PIT (Ìtẹ̀síwájú)', ha: 'PIT (Ci gaba)', ig: 'PIT (Ọganihu)' },
   'businessReport.smallCompanyExemption': { en: 'Small Company Exemption Applied', pcm: 'Small Company Exemption Applied', yo: 'A Ti Lo Ìyọ̀kúrò Ilé-iṣẹ́ Kékeré', ha: 'An Yi Amfani da Keɓewar Ƙaramin Kamfani', ig: 'Etinyela Mpụnarị Ụlọ Ọrụ Obere' },
   'businessReport.smallCompanyDesc': { en: 'Companies with ≤₦50M turnover pay 0% CIT under 2026 rules.', pcm: 'Companies with ≤₦50M turnover pay 0% CIT under 2026 rules.', yo: 'Àwọn ilé-iṣẹ́ pẹ̀lú ≤₦50M owó wọlé san 0% CIT lábẹ́ àwọn òfin 2026.', ha: 'Kamfanoni da ≤₦50M jujjuyawa suna biyan 0% CIT ƙarƙashin dokokin 2026.', ig: 'Ụlọ ọrụ nwere ≤₦50M mmegharị na-akwụ 0% CIT n\'okpuru iwu 2026.' },

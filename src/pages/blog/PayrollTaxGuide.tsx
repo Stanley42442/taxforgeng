@@ -85,9 +85,10 @@ const PayrollTaxGuide = () => {
               <thead><tr className="border-b border-border"><th className="text-left py-2 text-foreground font-semibold">Band</th><th className="text-left py-2 text-foreground font-semibold">Rate</th></tr></thead>
               <tbody className="text-muted-foreground">
                 <tr className="border-b border-border/50"><td className="py-2">First ₦800,000</td><td>0%</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2">₦800,001 – ₦2,800,000</td><td>15%</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2">₦2,800,001 – ₦10,800,000</td><td>19%</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2">₦10,800,001 – ₦50,000,000</td><td>21%</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">₦800,001 – ₦3,000,000</td><td>15%</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">₦3,000,001 – ₦12,000,000</td><td>18%</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">₦12,000,001 – ₦25,000,000</td><td>21%</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">₦25,000,001 – ₦50,000,000</td><td>23%</td></tr>
                 <tr><td className="py-2">Above ₦50,000,000</td><td>25%</td></tr>
               </tbody>
             </table>
@@ -100,7 +101,7 @@ const PayrollTaxGuide = () => {
             <p>Less: Pension (8%): ₦384,000</p>
             <p>Less: Rent Relief (assume ₦300,000)</p>
             <p>Taxable income: ₦4,116,000</p>
-            <p>Tax: ₦0 (first ₦800k) + ₦300,000 (15% × ₦2M) + ₦250,040 (19% × ₦1,316,000) = <strong className="text-foreground">₦550,040 annual / ₦45,837 monthly PAYE</strong></p>
+            <p>Tax: ₦0 (first ₦800k) + ₦330,000 (15% × ₦2.2M) + ₦200,880 (18% × ₦1,116,000) = <strong className="text-foreground">₦530,880 annual / ₦44,240 monthly PAYE</strong></p>
           </div>
         </div>
         <p className="text-muted-foreground leading-relaxed">
