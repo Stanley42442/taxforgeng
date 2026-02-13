@@ -183,7 +183,7 @@ const TaxGuideTechStartups = () => {
           ))}
         </div>
         <p className="text-muted-foreground leading-relaxed">
-          Late filing penalties start at ₦50,000 for the first month. TaxForge's <Link to="/tax-calendar" className="text-primary hover:underline">Tax Calendar</Link> helps you track all deadlines with automated reminders.
+          Late filing penalties start at ₦100,000 for the first month. TaxForge's <Link to="/tax-calendar" className="text-primary hover:underline">Tax Calendar</Link> helps you track all deadlines with automated reminders.
         </p>
       </section>
 

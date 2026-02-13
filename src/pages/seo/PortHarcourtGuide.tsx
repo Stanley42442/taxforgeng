@@ -19,7 +19,7 @@ const PortHarcourtGuide = () => {
     { question: 'How do I register my Port Harcourt business for taxes?', answer: 'Visit the NRS office with your CAC registration documents, utility bill, and ID. You can also start registration online via the NRS TaxPro Max portal. TIN processing typically takes 2-5 working days.' },
     { question: 'What Free Trade Zone benefits apply in Rivers State?', answer: 'Businesses in the Onne Oil & Gas Free Zone and other designated zones enjoy tax holidays on profits, exemption from customs duties on imported equipment, and freedom from foreign exchange regulations. However, sales to the domestic market attract standard duties and taxes.' },
     { question: 'Can I e-file my taxes from Port Harcourt?', answer: 'Yes. NRS operates the TaxPro Max e-filing portal which is accessible nationwide. You can file CIT, VAT, and WHT returns online without visiting the physical office.' },
-    { question: 'What is the penalty for late filing in Rivers State?', answer: 'Federal tax penalties are the same nationwide: ₦50,000 for the first month of late filing, plus ₦25,000 for each subsequent month. Late payment of tax attracts 10% per annum interest on the unpaid amount.' },
+    { question: 'What is the penalty for late filing in Rivers State?', answer: 'Federal tax penalties are the same nationwide: ₦100,000 for the first month of late filing, plus ₦50,000 for each subsequent month. Late payment of tax attracts 10% per annum interest on the unpaid amount.' },
   ];
 
   const commonMistakes = [
