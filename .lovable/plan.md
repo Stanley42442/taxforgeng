@@ -1,115 +1,67 @@
 
 
-# SEO/AEO Phase 22: Remove Abolished Medium Company Tier from Projection Tool and Partner API
+# SEO/AEO Phase 23: Add Professional Services Exclusion and Abolished Medium Tier to Comparison Data and FAQ Schema
 
 ## Summary
 
-The MultiYearProjection component -- a user-facing financial planning tool -- still classifies companies into a "medium" tier under 2026 rules. This tier was abolished by the Nigeria Tax Act 2025. The partner API edge function also mislabels the pre-2026 medium company rate as "smallCompanyRate."
+Two factual gaps remain in high-visibility SEO content:
 
-## Errors Found
+1. **CIT Comparison Table** (`ComparisonTable.tsx`) -- used on 3 SEO landing pages -- omits the abolished medium company tier and the professional services exclusion from the 2026 small company rule. These are the two most significant CIT changes under NTA 2025, and their absence from the comparison table is a content gap for both search engines and AI engines.
 
-### Error 1: MultiYearProjection.tsx -- 2026 Branch Still Uses "Medium" Tier (lines 76-79)
+2. **Small Company Exemption FAQ** (`SmallCompanyExemption.tsx`) -- the first FAQ answer (indexed via FAQPage schema) omits the professional services exclusion. While the body text (line 169) correctly mentions it, the structured data FAQ does not -- and schema markup is what AI engines and Google rich results consume.
 
-Under 2026 rules, when turnover is between 50M and 100M, the component labels the company as "medium." This classification no longer exists. Any company above the small thresholds is simply "large" (standard rate 30%).
+**Source:** NTA 2025 Section 202 excludes professional service providers from the small company definition. Baker Tilly and AO2 Law confirm the medium tier abolition.
 
-The UI renders "M" badges (line 330) with warning colors for this non-existent tier, misleading users into thinking there's a transitional rate.
+## Changes
 
-- **Current (line 76-79):** Companies with turnover 50M-100M classified as `'medium'`
-- **Fix:** Under 2026 rules, any company above small threshold is `'large'` (standard). Remove the medium branch entirely for the 2026 path.
+### Change 1: CIT_COMPARISON_ROWS -- Add abolished medium tier row and professional services note
 
-### Error 2: MultiYearProjection.tsx -- Type Definition Includes "Medium" (line 26)
+**File:** `src/components/seo/ComparisonTable.tsx` (lines 104-111)
 
-The TypeScript type `'small' | 'medium' | 'large'` should be updated to `'small' | 'standard'` for 2026 rules, but since the same type is shared with pre-2026 (where medium existed), the simplest fix is to keep the type but change the 2026 logic to use `'large'` for all non-small companies.
+Add a row showing the abolished medium tier, and update the small company row to note the professional services exclusion in the 2026 column.
 
-### Error 3: partner-api/index.ts -- Pre-2026 Config Mislabels Medium Rate as "smallCompanyRate" (lines 150-153)
+```
+From:
+  { feature: 'Standard Rate', pre2026: '30%', post2026: '30%' },
+  { feature: 'Small Company Exemption', pre2026: '₦25M turnover', post2026: '₦50M turnover + ₦250M assets', highlight: true },
+  { feature: 'Small Company Rate', pre2026: '0%', post2026: '0%' },
+  
+  { feature: 'TET (Tertiary Education Tax)', pre2026: '3%', post2026: 'Replaced by Dev Levy' },
+  { feature: 'Development Levy', pre2026: false, post2026: '4%', highlight: true },
 
-The pre-2026 config object uses `smallCompanyRate: 0.20` and `smallCompanyTurnoverLimit: 25000000`. Under pre-2026 CITA, the small company rate was 0% (turnover below 25M). The 20% was the medium company rate (25M-100M turnover). This data is returned via the partner API's `/rates` endpoint.
+To:
+  { feature: 'Standard Rate', pre2026: '30%', post2026: '30%' },
+  { feature: 'Small Company Exemption', pre2026: '₦25M turnover', post2026: '₦50M turnover + ₦250M assets (excl. professional services)', highlight: true },
+  { feature: 'Small Company Rate', pre2026: '0%', post2026: '0%' },
+  { feature: 'Medium Company Tier (20%)', pre2026: '₦25M-₦100M turnover', post2026: 'ABOLISHED', highlight: true },
+  { feature: 'TET (Tertiary Education Tax)', pre2026: '3%', post2026: 'Replaced by Dev Levy' },
+  { feature: 'Development Levy', pre2026: false, post2026: '4%', highlight: true },
+```
 
-- **Current:** `smallCompanyRate: 0.20, smallCompanyTurnoverLimit: 25000000`
-- **Fix:** Add proper medium company fields: `mediumCompanyRate: 0.20, mediumCompanyTurnoverLimit: 100000000` and set `smallCompanyRate: 0`
+### Change 2: SmallCompanyExemption FAQ -- Add professional services exclusion
+
+**File:** `src/pages/seo/SmallCompanyExemption.tsx` (line 28)
+
+```
+From:
+  'Your company must have annual turnover of ₦50 million or less AND total fixed assets of ₦250 million or less. Both criteria must be met simultaneously.'
+
+To:
+  'Your company must have annual turnover of ₦50 million or less AND total fixed assets of ₦250 million or less. Both criteria must be met simultaneously. Professional service providers (law, accounting, medical, engineering firms) are excluded from the small company definition regardless of turnover or assets.'
+```
 
 ## Files to Modify
 
 | File | Changes |
 |------|---------|
-| `src/components/MultiYearProjection.tsx` | Remove medium tier from 2026 branch (lines 76-79) |
-| `supabase/functions/partner-api/index.ts` | Fix pre-2026 CIT rate labels (lines 150-153) |
+| `src/components/seo/ComparisonTable.tsx` | Add medium tier abolished row, add professional services note to small company row |
+| `src/pages/seo/SmallCompanyExemption.tsx` | Add professional services exclusion to FAQ answer (line 28) |
 
-## Technical Details
+## Impact
 
-### MultiYearProjection.tsx (lines 70-89)
-
-```
-From:
-      if (entityType === 'company') {
-        if (use2026Rules) {
-          if (turnover < 50000000) {
-            companySize = 'small';
-            isExempt = true;
-          } else if (turnover < 100000000) {
-            companySize = 'medium';
-          } else {
-            companySize = 'large';
-          }
-        } else {
-          if (turnover < 25000000) {
-            companySize = 'small';
-          } else if (turnover < 100000000) {
-            companySize = 'medium';
-          } else {
-            companySize = 'large';
-          }
-        }
-      }
-
-To:
-      if (entityType === 'company') {
-        if (use2026Rules) {
-          // 2026: Two-tier system only (small or standard). Medium tier abolished.
-          if (turnover < 50000000) {
-            companySize = 'small';
-            isExempt = true;
-          } else {
-            companySize = 'large';
-          }
-        } else {
-          // Pre-2026: Three-tier system (small/medium/large)
-          if (turnover < 25000000) {
-            companySize = 'small';
-          } else if (turnover < 100000000) {
-            companySize = 'medium';
-          } else {
-            companySize = 'large';
-          }
-        }
-      }
-```
-
-### partner-api/index.ts (lines 150-153)
-
-```
-From:
-    cit: {
-      standardRate: 0.30,
-      smallCompanyRate: 0.20,
-      smallCompanyTurnoverLimit: 25000000
-    },
-
-To:
-    cit: {
-      standardRate: 0.30,
-      smallCompanyRate: 0,
-      smallCompanyTurnoverLimit: 25000000,
-      mediumCompanyRate: 0.20,
-      mediumCompanyTurnoverLimit: 100000000
-    },
-```
-
-## What This Addresses
-
-- 1 user-facing projection tool displaying a non-existent "Medium" company tier under 2026 rules
-- 1 partner API endpoint returning mislabeled pre-2026 CIT rates
-- UI badges showing "M" for a tier that no longer exists under current law
+- The CIT comparison table is rendered on 3 high-traffic SEO pages (SmallCompanyExemption, CITCalculator, and any page importing CIT_COMPARISON_ROWS)
+- The FAQ schema is consumed by Google rich results and AI engines for the /small-company-exemption page
+- Both changes add factual completeness required for AEO accuracy
 
 **Total: 2 files modified, 0 new files created**
 
