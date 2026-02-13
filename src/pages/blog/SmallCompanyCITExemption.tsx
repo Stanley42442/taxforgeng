@@ -109,7 +109,7 @@ const SmallCompanyCITExemption = () => {
         <div className="space-y-4">
           {[
             { step: '1', title: 'Verify Eligibility', desc: 'Confirm your annual turnover is ≤ ₦50M and total assets are ≤ ₦250M. Use our Small Company Exemption Checker for instant verification.' },
-            { step: '2', title: 'File Your CIT Return', desc: 'You must still file an annual CIT return with FIRS even though your liability is ₦0. Non-filing attracts penalties.' },
+            { step: '2', title: 'File Your CIT Return', desc: 'You must still file an annual CIT return with NRS even though your liability is ₦0. Non-filing attracts penalties.' },
             { step: '3', title: 'Declare Small Company Status', desc: 'Indicate your small company status on the CIT return form. Provide audited financial statements as evidence.' },
             { step: '4', title: 'Confirm Exemptions Apply', desc: 'As a qualifying small company, you are exempt from CIT, CGT, and the 4% Development Levy. Ensure your records clearly demonstrate eligibility.' },
           ].map((item) => (
@@ -157,7 +157,7 @@ const SmallCompanyCITExemption = () => {
         <div className="space-y-3">
           {[
             { mistake: 'Confusing turnover with profit', fix: 'The ₦50M threshold applies to gross turnover (revenue), not profit. A company with ₦48M turnover and ₦2M profit still qualifies.' },
-            { mistake: 'Forgetting to file CIT returns', fix: 'Even with 0% CIT, you must file annual returns. FIRS penalties apply for non-filing regardless of your tax liability.' },
+            { mistake: 'Forgetting to file CIT returns', fix: 'Even with 0% CIT, you must file annual returns. NRS penalties apply for non-filing regardless of your tax liability.' },
             { mistake: 'Assuming the Development Levy applies to small companies', fix: 'Small companies qualifying for 0% CIT are also exempt from the 4% Development Levy. The levy only applies to large companies.' },
             { mistake: 'Not tracking the asset threshold', fix: 'The ₦250M asset limit is new. If your business holds significant property, equipment, or IP, verify you\'re below this threshold.' },
           ].map((item, i) => (

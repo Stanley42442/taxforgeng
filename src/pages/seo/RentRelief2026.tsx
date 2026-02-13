@@ -178,7 +178,7 @@ const RentRelief2026 = () => {
                     },
                     {
                       mistake: 'Not obtaining landlord\'s TIN for large claims',
-                      fix: 'For larger rent claims, FIRS may require your landlord\'s Tax Identification Number. Obtain this upfront to avoid delays in processing your claim.',
+                      fix: 'For larger rent claims, NRS may require your landlord\'s Tax Identification Number. Obtain this upfront to avoid delays in processing your claim.',
                     },
                   ].map((item, index) => (
                     <div key={index} className="glass-frosted rounded-xl p-5">

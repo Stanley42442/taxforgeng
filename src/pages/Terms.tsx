@@ -231,7 +231,7 @@ const Terms = () => {
                 <ul className="space-y-1">
                   <li>• Use the service only for lawful purposes</li>
                   <li>• Provide accurate financial and tax information</li>
-                  <li>• Verify all calculations before filing with FIRS</li>
+                  <li>• Verify all calculations before filing with NRS</li>
                   <li>• Not reverse-engineer or redistribute our software</li>
                 </ul>
               </div>

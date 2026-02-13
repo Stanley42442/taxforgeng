@@ -17,14 +17,14 @@ const WHTCalculator = () => {
     { name: 'Identify the Payment Type', text: 'Determine the nature of the payment: contract, rent, dividend, interest, royalty, professional fee, or technical fee. Each has a different WHT rate.' },
     { name: 'Look Up the Applicable WHT Rate', text: 'Contracts attract 5% WHT. Most other payments (rent, dividends, professional fees, royalties) attract 10%. Check the rate table for your specific case.' },
     { name: 'Deduct WHT Before Making Payment', text: 'Calculate the WHT amount and deduct it from the gross payment. Pay the net amount to the recipient.' },
-    { name: 'Issue WHT Credit Note', text: 'After remitting to FIRS, obtain and issue a WHT credit note to the recipient. They need this to claim the WHT as a credit against their own tax.' },
-    { name: 'Remit WHT to FIRS Within 21 Days', text: 'Pay the deducted WHT to FIRS within 21 days after the month the deduction was made. Late remittance attracts penalties.' },
+    { name: 'Issue WHT Credit Note', text: 'After remitting to NRS, obtain and issue a WHT credit note to the recipient. They need this to claim the WHT as a credit against their own tax.' },
+    { name: 'Remit WHT to NRS Within 21 Days', text: 'Pay the deducted WHT to NRS within 21 days after the month the deduction was made. Late remittance attracts penalties.' },
   ];
 
   const faqs = [
     {
       question: 'What is Withholding Tax (WHT)?',
-      answer: 'Withholding Tax is an advance payment of income tax. When you make certain payments (contracts, rent, dividends), you deduct a percentage and remit it to FIRS on behalf of the recipient.',
+      answer: 'Withholding Tax is an advance payment of income tax. When you make certain payments (contracts, rent, dividends), you deduct a percentage and remit it to NRS on behalf of the recipient.',
     },
     {
       question: 'Can I use WHT as a tax credit?',
@@ -36,7 +36,7 @@ const WHTCalculator = () => {
     },
     {
       question: 'When must I remit WHT?',
-      answer: 'WHT must be remitted to FIRS within 21 days after the month in which the deduction was made. Late remittance attracts penalties.',
+      answer: 'WHT must be remitted to NRS within 21 days after the month in which the deduction was made. Late remittance attracts penalties.',
     },
     {
       question: 'What WHT rate applies to payments to non-residents?',

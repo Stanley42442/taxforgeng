@@ -185,7 +185,7 @@ const TaxReforms2026Summary = () => {
             { date: 'January 1, 2026', event: 'All provisions take effect — new PIT bands, CIT thresholds, Rent Relief' },
             { date: 'Q1 2026', event: 'Employers begin withholding PAYE under new bands' },
             { date: 'June 2026', event: 'First CIT returns under new rules due (for Dec 2025 year-end companies)' },
-            { date: 'Throughout 2026', event: 'FIRS rolling out updated e-filing systems and guidance circulars' },
+            { date: 'Throughout 2026', event: 'NRS rolling out updated e-filing systems and guidance circulars' },
           ].map((item, i) => (
             <div key={i} className="flex gap-4 items-start">
               <div className="h-3 w-3 rounded-full bg-primary mt-1.5 shrink-0" />

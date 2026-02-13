@@ -36,7 +36,7 @@ const About = () => {
   ];
 
   const values = [
-    { icon: Target, title: 'Accuracy First', description: 'Every calculation is built on FIRS-compliant formulas verified against the Nigeria Tax Act 2025. We cross-reference with Big 4 publications to ensure correctness.' },
+    { icon: Target, title: 'Accuracy First', description: 'Every calculation is built on NRS-compliant formulas verified against the Nigeria Tax Act 2025. We cross-reference with Big 4 publications to ensure correctness.' },
     { icon: Zap, title: 'Simplicity', description: 'Tax doesn\'t have to be complicated. We translate complex tax legislation into plain language and intuitive tools that anyone can use — no accounting degree required.' },
     { icon: Shield, title: 'Transparency', description: 'We show you exactly how every number is calculated. Our Tax Logic Reference page documents every formula, rate, and threshold used across the platform.' },
     { icon: Users, title: 'Accessibility', description: 'Core tax calculations are free forever. We believe every Nigerian — from a market trader in Kano to a tech startup in Lagos — deserves accurate tax information.' },
@@ -71,7 +71,7 @@ const About = () => {
                   badge="About Us"
                   title="Making Nigerian Taxes"
                   titleHighlight="Simple & Accurate"
-                  subtitle="TaxForge NG is a free, FIRS-compliant tax calculator built by Gillespie Benjamin Mclee (OptiSolve Labs) in Port Harcourt, Rivers State — for every Nigerian business and individual."
+                  subtitle="TaxForge NG is a free, NRS-compliant tax calculator built by Gillespie Benjamin Mclee (OptiSolve Labs) in Port Harcourt, Rivers State — for every Nigerian business and individual."
                 />
               </header>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">

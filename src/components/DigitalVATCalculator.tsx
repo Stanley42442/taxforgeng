@@ -73,7 +73,7 @@ export const DigitalVATCalculator = () => {
     if (sepThresholdMet && !hasLocalEntity) {
       registrationRequired = true;
       vatLiability = revenue * (DIGITAL_VAT_CONFIG.vatRate / 100);
-      recommendations.push('Register for VAT with FIRS as a Non-Resident Person (NRP)');
+      recommendations.push('Register for VAT with NRS as a Non-Resident Person (NRP)');
       recommendations.push('Appoint a tax representative in Nigeria');
       recommendations.push('File monthly VAT returns electronically');
     } else if (revenue > 0 && !sepThresholdMet) {

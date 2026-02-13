@@ -62,7 +62,7 @@ export const DisclaimerModal = ({ onAccept }: DisclaimerModalProps) => {
               <div className="text-xs min-w-0">
                 <p className="font-medium text-foreground">Not Official Tax Service</p>
                 <p className="text-muted-foreground leading-tight">
-                  Always consult a qualified tax professional or FIRS for official guidance.
+                  Always consult a qualified tax professional or NRS for official guidance.
                 </p>
               </div>
             </div>

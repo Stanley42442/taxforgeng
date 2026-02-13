@@ -44,7 +44,7 @@ const PITPAYECalculator = () => {
     },
     {
       question: 'How is PAYE different from PIT?',
-      answer: 'PAYE (Pay As You Earn) is the system used to collect PIT (Personal Income Tax) from employees. Your employer deducts PIT from your salary each month and remits it to FIRS on your behalf.',
+      answer: 'PAYE (Pay As You Earn) is the system used to collect PIT (Personal Income Tax) from employees. Your employer deducts PIT from your salary each month and remits it to NRS on your behalf.',
     },
     {
       question: 'What happens if I have two jobs?',

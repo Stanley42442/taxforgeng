@@ -93,7 +93,7 @@ export function getRecommendation(answers: AdvisoryAnswers): Recommendation {
         'Annual returns filing with CAC required',
         'May require audited financial statements',
       ],
-      taxAuthority: 'FIRS (Federal)',
+      taxAuthority: 'NRS (Federal)',
       estimatedCosts: {
         registration: '₦50,000 - ₦150,000',
         annual: '₦100,000+',

@@ -344,7 +344,7 @@ export const TierUpgradeRequirements = ({
                     placeholder="Enter your 10-11 digit TIN"
                   />
                   <p className="text-xs text-muted-foreground mt-1">
-                    Get your TIN from the Federal Inland Revenue Service (FIRS)
+                    Get your TIN from the Nigeria Revenue Service (NRS)
                   </p>
                 </div>
               )}

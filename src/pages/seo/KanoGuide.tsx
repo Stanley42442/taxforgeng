@@ -12,17 +12,17 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 
 const KanoGuide = () => {
   const faqs = [
-    { question: 'What is KIRS and what taxes does it collect?', answer: 'KIRS (Kano State Internal Revenue Service) collects Personal Income Tax (PAYE) for Kano residents, business premises levies, market stall fees, and other state-imposed levies. Federal taxes (CIT, VAT, WHT) are handled by FIRS.' },
+    { question: 'What is KIRS and what taxes does it collect?', answer: 'KIRS (Kano State Internal Revenue Service) collects Personal Income Tax (PAYE) for Kano residents, business premises levies, market stall fees, and other state-imposed levies. Federal taxes (CIT, VAT, WHT) are handled by NRS.' },
     { question: 'Are agricultural businesses exempt from CIT in Kano?', answer: 'Yes, under federal law. Agricultural businesses engaged in primary production (farming, livestock, fishing) are exempt from CIT. However, agro-processing and value-added activities may attract CIT. The Small Company Exemption (₦50M) also applies.' },
-    { question: 'How does cross-border trade taxation work in Kano?', answer: 'Kano\'s proximity to Niger Republic means significant cross-border trade. Import duties are collected by Nigeria Customs Service, not FIRS. However, imported goods for resale attract VAT, and WHT applies to payments for cross-border services.' },
-    { question: 'Do I need to register with both FIRS and KIRS?', answer: 'Yes. FIRS handles federal taxes (CIT, VAT, WHT), while KIRS handles state taxes (PAYE, state levies). All Kano businesses should register with both to remain compliant.' },
+    { question: 'How does cross-border trade taxation work in Kano?', answer: 'Kano\'s proximity to Niger Republic means significant cross-border trade. Import duties are collected by Nigeria Customs Service, not NRS. However, imported goods for resale attract VAT, and WHT applies to payments for cross-border services.' },
+    { question: 'Do I need to register with both NRS and KIRS?', answer: 'Yes. NRS handles federal taxes (CIT, VAT, WHT), while KIRS handles state taxes (PAYE, state levies). All Kano businesses should register with both to remain compliant.' },
     { question: 'What are the textile industry tax incentives?', answer: 'Under 2026 rules, the textile industry may qualify for the Economic Development Incentive (EDI), which replaces Pioneer Status and provides a 5% annual tax credit for 5 years on qualifying capital expenditure. Companies with existing Pioneer Status approvals continue under their original terms. Additionally, the Small Company Exemption applies if turnover is below ₦50M. Import duty waivers on raw materials may also apply through specific government programmes.' },
-    { question: 'Where are the tax offices in Kano?', answer: 'FIRS Kano office is at Federal Inland Revenue Service, Zoo Road, Kano. KIRS headquarters is at Revenue House, Audu Bako Way, Kano. Both have satellite offices across the metropolitan area.' },
+    { question: 'Where are the tax offices in Kano?', answer: 'NRS Kano office is at Nigeria Revenue Service, Zoo Road, Kano. KIRS headquarters is at Revenue House, Audu Bako Way, Kano. Both have satellite offices across the metropolitan area.' },
   ];
 
   const commonMistakes = [
     { mistake: 'Assuming agricultural income is fully exempt', fix: 'Only primary agricultural production is CIT-exempt. Processing, packaging, and distribution may attract CIT. Agribusinesses should clearly separate qualifying and non-qualifying income.' },
-    { mistake: 'Not registering with KIRS for state obligations', fix: 'Many Kano businesses only register with FIRS and miss KIRS. State PAYE, business premises levies, and market fees must be paid to KIRS.' },
+    { mistake: 'Not registering with KIRS for state obligations', fix: 'Many Kano businesses only register with NRS and miss KIRS. State PAYE, business premises levies, and market fees must be paid to KIRS.' },
     { mistake: 'Ignoring informal sector formalisation benefits', fix: 'Kano has a large informal sector. Formalising your business (CAC registration + TIN) unlocks the Small Company Exemption and makes you eligible for government contracts and bank facilities.' },
     { mistake: 'Missing customs duties on cross-border goods', fix: 'Cross-border traders must clear goods through Nigeria Customs. Under-declaring or smuggling goods leads to seizure, fines, and criminal prosecution. Proper documentation saves money long-term.' },
   ];
@@ -41,7 +41,7 @@ const KanoGuide = () => {
       createFAQSchema(faqs),
       createHowToSchema('How to Register Your Kano Business for Taxes', 'Step-by-step tax registration for Kano businesses.', [
         { name: 'Register with CAC', text: 'Complete CAC registration at the Kano CAC office or online.' },
-        { name: 'Get TIN from FIRS', text: 'Visit FIRS Kano (Zoo Road) or use TaxPro Max portal.' },
+        { name: 'Get TIN from NRS', text: 'Visit NRS Kano (Zoo Road) or use TaxPro Max portal.' },
         { name: 'Register with KIRS', text: 'Register at KIRS Revenue House for state tax obligations.' },
         { name: 'Obtain market registration', text: 'If trading in Kano markets, register with the relevant market association and pay applicable fees.' },
       ]),

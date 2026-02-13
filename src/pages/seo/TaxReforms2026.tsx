@@ -55,7 +55,7 @@ const TaxReforms2026 = () => {
     },
     {
       question: 'How do state taxes interact with the new federal rules?',
-      answer: 'Personal Income Tax for employees is collected at the state level (where the employee resides). The 2026 PIT bands apply federally but are administered by State Internal Revenue Services (SIRS). Company Income Tax remains fully federal under FIRS.',
+      answer: 'Personal Income Tax for employees is collected at the state level (where the employee resides). The 2026 PIT bands apply federally but are administered by State Internal Revenue Services (SIRS). Company Income Tax remains fully federal under NRS (formerly FIRS).',
     },
     {
       question: 'What happens to tax assessments that straddle the transition?',

@@ -18,7 +18,7 @@ const WHTExplained = () => {
     { question: 'What is the WHT rate for professional services?', answer: 'For companies paying other companies: 5%. For companies paying individuals: 5%. For individuals paying individuals: 5%. However, consultancy and management fees attract 10% for company-to-company payments.' },
     { question: 'Is WHT a final tax or a credit?', answer: 'It depends. For individuals receiving dividends, interest, or rent, WHT is now treated as final tax under the 2026 rules. For companies, WHT on trading transactions is a credit against CIT. Non-resident WHT is always final.' },
     { question: 'How do I get a WHT credit note?', answer: 'The payer should provide a WHT credit note within 30 days of deduction. If not received, follow up in writing. The credit note is essential for offsetting WHT against your CIT liability.' },
-    { question: 'What happens if I don\'t deduct WHT?', answer: 'Failure to deduct WHT makes the payer liable for the tax plus 10% per annum interest. FIRS can also impose penalties. It\'s always safer to deduct and remit.' },
+    { question: 'What happens if I don\'t deduct WHT?', answer: 'Failure to deduct WHT makes the payer liable for the tax plus 10% per annum interest. NRS can also impose penalties. It\'s always safer to deduct and remit.' },
     { question: 'Does WHT apply to all payments?', answer: 'No. WHT applies to specific payment types including rent, dividends, interest, royalties, contracts, consultancy fees, professional services, and commissions. Salary payments are subject to PAYE, not WHT.' },
   ];
 
@@ -53,7 +53,7 @@ const WHTExplained = () => {
       <section id="what-is-wht">
         <h2 className="text-2xl font-bold text-foreground mb-4">What Is Withholding Tax?</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">
-          Withholding Tax (WHT) is a method of collecting income tax at source. When you make certain payments — such as rent, dividends, professional fees, or contract payments — you are required to deduct a percentage and remit it directly to FIRS on behalf of the recipient.
+          Withholding Tax (WHT) is a method of collecting income tax at source. When you make certain payments — such as rent, dividends, professional fees, or contract payments — you are required to deduct a percentage and remit it directly to NRS on behalf of the recipient.
         </p>
         <p className="text-muted-foreground leading-relaxed mb-4">
           WHT serves two purposes: it ensures the government receives tax revenue promptly, and it reduces the risk of non-compliance by the income recipient. For the recipient, WHT either represents a credit against their final tax liability or constitutes the final tax on that income.
@@ -104,7 +104,7 @@ const WHTExplained = () => {
             <p>WHT deducted (10%): ₦200,000</p>
             <p>Amount paid to Company B: ₦1,800,000</p>
             <p>VAT (7.5%): ₦150,000</p>
-            <p className="font-semibold text-foreground">Total invoice: ₦2,150,000 (Company A pays ₦1,950,000 to B + ₦200,000 WHT to FIRS + ₦150,000 VAT to FIRS)</p>
+            <p className="font-semibold text-foreground">Total invoice: ₦2,150,000 (Company A pays ₦1,950,000 to B + ₦200,000 WHT to NRS + ₦150,000 VAT to NRS)</p>
           </div>
           <p className="text-xs text-muted-foreground mt-3">Note: WHT is calculated on the gross amount before VAT.</p>
         </div>
@@ -140,15 +140,15 @@ const WHTExplained = () => {
       <section id="remittance">
         <h2 className="text-2xl font-bold text-foreground mb-4">Remittance & Filing</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">
-          WHT must be remitted to FIRS within <strong className="text-foreground">21 days</strong> from the date of deduction. Late remittance attracts 10% per annum interest on the unremitted amount.
+          WHT must be remitted to NRS within <strong className="text-foreground">21 days</strong> from the date of deduction. Late remittance attracts 10% per annum interest on the unremitted amount.
         </p>
         <div className="glass-frosted rounded-xl p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Remittance Steps</h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
             {[
               'Deduct WHT at the correct rate when making payment',
-              'Complete FIRS WHT remittance schedule',
-              'Pay via bank transfer using FIRS-designated bank accounts',
+              'Complete NRS WHT remittance schedule',
+              'Pay via bank transfer using NRS-designated bank accounts',
               'File WHT return on TaxPro Max portal',
               'Issue credit note to the recipient within 30 days',
               'Retain records for minimum 6 years',
