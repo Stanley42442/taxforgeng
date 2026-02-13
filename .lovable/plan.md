@@ -1,115 +1,94 @@
 
-# SEO/AEO Phase 29: Add Missing NTA 2025 Deduction (Mortgage Interest) and Exemption Rules
+
+# SEO/AEO Phase 30: Fix R&D Deduction Error, Update VAT Penalties, Fix Remaining FIRS References, and Add Missing NTA 2025 Content
 
 ## Research Findings
 
-Competitor analysis of SME Payroll (smepayroll.com.ng), NairaTax (nairatax.com), PwC Tax Summaries, and Giddaa reveals that TaxForge NG is missing one of the **six eligible deductions** under the Nigeria Tax Act 2025, plus three exemption rules that competitors prominently feature.
+Cross-referencing the signed Nigeria Tax Act 2025 (via PwC, EY, KPMG, AO2LAW, and Baker Tilly) against our site reveals three categories of issues: a factual calculation error, outdated penalty figures, and missed FIRS-to-NRS updates.
 
-**Our site vs competitors:**
+### Verified: Our CIT threshold is CORRECT
 
-| Feature | TaxForge | SME Payroll | PwC |
-|---------|----------|-------------|-----|
-| 6 PIT bands (correct) | Yes | Yes | Yes |
-| Pension deduction | Yes | Yes | Yes |
-| NHF deduction | Yes | Yes | Yes |
-| NHIS deduction | Yes | Yes | Yes |
-| Rent Relief | Yes | Yes | Yes |
-| Life Insurance | Yes | Yes | Yes |
-| **Mortgage Interest** | **No** | **Yes** | **Yes** |
-| Min wage exemption note | No | Yes | -- |
-| Military salary exemption | No | Yes | -- |
-| Employment comp exemption | No | Yes | -- |
+Multiple sources (PwC, Baker Tilly, SMB Law) cite NGN 100M as the small company threshold, but this is the **NTAA "small business" definition for VAT administration** (Section 147, NTAA). The actual **NTA "small company" definition for CIT** (Section 56, NTA) is NGN 50M, confirmed by:
+- EY (Section 56 reference): NGN 50M
+- AO2LAW (direct quote from the Act): "gross turnover of N50,000,000 or less"
+- The distinction is explicitly documented by AO2LAW: NTAA "small business" (N100M) is for VAT only; NTA "small company" (N50M) is for CIT
 
-Note: NairaTax has **incorrect** data (still shows old CIT at 20% for small companies at N25M threshold, and only 4 PIT bands topping at 24%). Our calculations are verified correct.
+Our N50M CIT threshold is correct. No change needed.
 
-## What Needs to Change
+### Issue 1: R&D Deduction Error (FACTUAL INACCURACY)
 
-### 1. Add Mortgage Interest Deduction to Calculator Engine
+Our site references "R&D 120% super deduction" in multiple places. The NTA 2025 **changed this**:
+- **Old rule**: 120% deduction of qualifying R&D costs (or 10% of profit)
+- **New rule (NTA 2025, Section 165)**: Capped at **5% of turnover** (KPMG confirms: "reduced from 10% of profit")
 
-**File: `src/lib/individualTaxCalculations.ts`**
+This is displayed to users in sector config, tax myths, and PDF exports. It is factually wrong under 2026 rules.
 
-Add a new input field `mortgageInterest` to `IndividualTaxInputs` interface and include it in the deduction logic alongside the existing 5 deductions. Per PwC and Giddaa (citing NTA 2025 directly):
-- Only interest on loans used to **build** (not buy) an owner-occupied residential house qualifies
-- Only the **interest portion** is deductible, not principal
-- Property must be self-occupied (not rental/investment)
+**Files affected:**
+- `src/lib/sectorConfig.ts` (line 76)
+- `src/components/SectorPresets.tsx` (line 85)
+- `src/lib/taxMyths.ts` (lines 692, 706, 1049, 1076)
+- `src/lib/taxLogicDocumentPdf.ts` (line 580)
 
-Add the field after `annualRentPaid`:
-```typescript
-mortgageInterest?: number; // Interest on loan for building owner-occupied home
-```
+**Fix:** Change all "R&D 120% deduction" references to "R&D deduction (5% of turnover)" under 2026 rules.
 
-Add deduction logic in the `calculatePersonalIncomeTax` function (2026 rules block only, after rent relief):
-```typescript
-if (inputs.mortgageInterest && inputs.mortgageInterest > 0) {
-  reliefs.push({
-    name: 'Mortgage Interest (Owner-Occupied)',
-    amount: inputs.mortgageInterest,
-    description: 'Interest on loan for building owner-occupied home'
-  });
-  totalReliefs += inputs.mortgageInterest;
-}
-```
+### Issue 2: VAT Penalties Are Outdated
 
-### 2. Add Mortgage Interest Input to Calculator UI
+PwC confirms the NTA 2025 increased non-compliance penalties:
+- **Old**: N50,000 first month + N25,000/month thereafter
+- **New (NTA 2025)**: **N100,000 first month + N50,000/month** thereafter
 
-**File: `src/pages/IndividualCalculator.tsx`**
+Our site shows the old figures in at least 5 places.
 
-Add a new input field for mortgage interest in the PIT calculator form, near the existing rent/housing fields. Include a tooltip explaining the narrow qualification criteria.
+**Files affected:**
+- `src/pages/blog/VATGuideNigeria.tsx` (lines 21, 182-185)
+- `src/pages/blog/TaxCalendar2026.tsx` (lines 20, 150-151)
+- `src/pages/FAQ.tsx` (line 38)
+- `src/components/PenaltyEstimator.tsx` (needs verification)
 
-### 3. Add Exemption Alerts to Calculator
+**Fix:** Update all penalty amounts to the 2026 figures.
 
-**File: `src/lib/individualTaxCalculations.ts`**
+### Issue 3: VAT Guide Still Has FIRS References
 
-Add three new alerts in the `calculatePersonalIncomeTax` function:
+The VATGuideNigeria.tsx blog post was missed in the Phase 27-28 FIRS-to-NRS updates. It contains approximately 8 "FIRS" references.
 
-- When gross income equals national minimum wage (~N840,000/year): "National minimum wage earners (N70,000/month) are exempt from income tax under 2026 rules"
-- A general info alert about military salary exemption
-- A general info alert about employment compensation <= N50M exemption
+**Files affected:**
+- `src/pages/blog/VATGuideNigeria.tsx` (lines 19, 56, 85, 102, 137, 156)
 
-### 4. Update Educational Content
+**Fix:** Replace all "FIRS" with "NRS" (or "NRS (formerly FIRS)" for filing references).
 
-**File: `src/pages/seo/PITPAYECalculator.tsx`**
+### Issue 4: TaxCalendar2026 Blog Has FIRS Reference
 
-Add mortgage interest to the "How It Works" steps and FAQ section. Add a new FAQ:
-- "Can I deduct mortgage interest from my tax?" with the answer explaining the build-only, owner-occupied restriction.
+**Files affected:**
+- `src/pages/blog/TaxCalendar2026.tsx` (line 21: "FIRS operates the TaxPro Max e-filing portal")
 
-**File: `src/pages/blog/PITPAYEGuide2026.tsx`**
+**Fix:** Update to "NRS operates the TaxPro Max e-filing portal (taxpromax.nrs.gov.ng)"
 
-Add a mention of the 6th deduction (mortgage interest) and the minimum wage exemption in the content body.
+### Issue 5: FAQ Still Has FIRS Reference
 
-### 5. Update AEO Documentation
+**Files affected:**
+- `src/pages/FAQ.tsx` (line 36: "maintained by FIRS")
 
-**File: `public/llms-full.txt`**
+**Fix:** Update to "maintained by NRS"
 
-Add "Mortgage Interest (building owner-occupied home)" to the Statutory Deductions table. Add a new "Exemptions" section listing minimum wage, military salary, and employment compensation exemptions.
+## Changes Summary
 
-**File: `public/llms.txt`**
-
-Add mortgage interest to the deductions list.
-
-### 6. Update SEO Landing Page Content
-
-**File: `src/pages/seo/RentRelief2026.tsx`**
-
-Update the "Common Mistakes" section: the current text says homeowners with mortgages don't qualify for Rent Relief. This is correct but should now cross-reference the separate mortgage interest deduction so users know there IS a deduction available for building their own home.
-
-## Files to Modify
-
-| File | Changes |
-|------|---------|
-| `src/lib/individualTaxCalculations.ts` | Add `mortgageInterest` field, deduction logic, and exemption alerts |
-| `src/pages/IndividualCalculator.tsx` | Add mortgage interest input field to PIT form |
-| `src/pages/seo/PITPAYECalculator.tsx` | Add FAQ and How-To step for mortgage interest |
-| `src/pages/blog/PITPAYEGuide2026.tsx` | Add deduction and exemption content |
-| `src/pages/seo/RentRelief2026.tsx` | Cross-reference mortgage interest deduction |
-| `public/llms-full.txt` | Add mortgage interest deduction and exemptions section |
-| `public/llms.txt` | Add mortgage interest to deductions list |
+| File | Issue | Change |
+|------|-------|--------|
+| `src/lib/sectorConfig.ts` | R&D error | "R&D 120% deduction" to "R&D deduction (5% of turnover)" |
+| `src/components/SectorPresets.tsx` | R&D error | Same update |
+| `src/lib/taxMyths.ts` | R&D error | Update all 120% references to 5% of turnover |
+| `src/lib/taxLogicDocumentPdf.ts` | R&D error | Update table entry |
+| `src/pages/blog/VATGuideNigeria.tsx` | FIRS + penalties | Replace FIRS with NRS; update penalty amounts to N100k/N50k |
+| `src/pages/blog/TaxCalendar2026.tsx` | FIRS + penalties | Replace FIRS with NRS; update penalty amounts |
+| `src/pages/FAQ.tsx` | FIRS + penalties | Replace FIRS with NRS; update penalty amounts |
+| `src/components/PenaltyEstimator.tsx` | Penalties | Update penalty calculation logic if applicable |
 
 ## What This Addresses
 
-- Closes the only factual gap in our calculator vs competitors (6th eligible deduction)
-- Adds three exemption rules that SME Payroll features but we do not
-- Strengthens AEO accuracy: AI engines will now find complete deduction coverage
-- Maintains our advantage over NairaTax (which has incorrect CIT/PIT data)
+- Fixes a factual inaccuracy (R&D 120% is pre-2026; 5% of turnover is the 2026 rule)
+- Corrects outdated penalty figures that could mislead users on compliance costs
+- Catches 10+ remaining FIRS references missed in Phase 27-28
+- Aligns all educational content with the signed Nigeria Tax Act 2025
 
-**Total: 7 files modified, 0 new files created**
+**Total: 8 files modified, 0 new files created**
+
