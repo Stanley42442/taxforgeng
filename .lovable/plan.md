@@ -1,148 +1,125 @@
 
 
-# SEO/AEO Phase 8: Critical Factual Corrections — Alignment with Nigeria Tax Act 2025
+# SEO/AEO Phase 9: Remaining Factual Errors in Blog Posts, Comparison Table, and Translations
 
 ## Summary
 
-A thorough cross-reference of the site's content against the Nigeria Tax Act 2025 (NTA) and authoritative sources (PwC, KPMG, EY, AO2LAW, SOW Professional) has uncovered **multiple factual errors** that contradict both the NTA and the site's own calculator logic. These errors are concentrated in blog posts, FAQ answers, and the Tax Breakdown page.
-
-The calculator engine (`taxCalculations.ts`) is correct. The errors are in the **content layer** — the human-readable descriptions that Google, AI crawlers, and users read.
-
-## Verified Reference Data (Nigeria Tax Act 2025, Section 56, Fourth Schedule)
-
-Sources: KPMG Flash Alert 2025-168, PwC Top 20 Changes PDF (June 2025), AO2LAW legal analysis (November 2025), SOW Professional compliance guide (January 2026), Finance in Africa analysis (January 2026).
-
-| Item | Correct Value |
-|------|--------------|
-| PIT Bands | 0-800k: 0%, 800k-3M: 15%, 3M-12M: 18%, 12M-25M: 21%, 25M-50M: 23%, 50M+: 25% |
-| Small Company CIT | Turnover up to 50M AND assets up to 250M = 0% CIT, 0% CGT, 0% Development Levy |
-| Large Company CIT | 30% (not 25%) |
-| Development Levy | 4% — applies to non-small companies ONLY |
-| Professional Services | Excluded from small company definition (law, accounting, medical, engineering) |
-| CGT (Companies) | 30% (increased from 10%) |
-| CGT (Individuals) | Progressive PIT rates (replaces flat 10%) |
-| Medium Company Category | Eliminated under NTA — companies are either Small or Large |
+After Phases 7 and 8 corrected errors in the SEO landing pages, FAQ, and Tax Breakdown, several blog posts, the ComparisonTable component, and a translation string still contain factual errors that contradict the Nigeria Tax Act 2025 (effective 2026) and the site's own calculator engine.
 
 ## Errors Found
 
-### Error 1: CIT Rate Stated as 25% (Should be 30%)
+### Error 1: Wrong PIT Bands in PITPAYEGuide2026.tsx (Blog Post)
 
-The standard CIT rate for large companies is 30%, not 25%. This error appears in three places:
+Lines 66-70 show a 4-band structure with a **19%** rate, missing the **18%** and **23%** bands entirely. The thresholds are also wrong (uses ₦2M/₦8M increments instead of ₦2.2M/₦9M).
 
-| File | Line | Wrong Text |
-|------|------|-----------|
-| `src/pages/FAQ.tsx` | 25 | "standard Company Income Tax rate is 25%" |
-| `src/pages/TaxBreakdown.tsx` | 86 | "Under 2026 rules, CIT is 25%." |
-| `src/pages/blog/SmallCompanyCITExemption.tsx` | 20 | "liable for CIT at the standard 25% rate" |
+**Currently shows:**
+| Band | Rate |
+|------|------|
+| First 800k | 0% |
+| Next 2,000,000 | 15% |
+| Next 8,000,000 | 19% |
+| Next 39,200,000 | 21% |
+| Above 50,000,000 | 25% |
 
-**Fix:** Change all instances to 30%.
+**Should be (per NTA 2025, Fourth Schedule):**
+| Band | Rate |
+|------|------|
+| First 800,000 | 0% |
+| Next 2,200,000 (800k-3M) | 15% |
+| Next 9,000,000 (3M-12M) | 18% |
+| Next 13,000,000 (12M-25M) | 21% |
+| Next 25,000,000 (25M-50M) | 23% |
+| Above 50,000,000 | 25% |
 
-### Error 2: Development Levy Incorrectly Applied to Small Companies
+The worked example on lines 114-119 also uses the wrong 19% rate, producing an incorrect tax figure. The comparison table on lines 93-99 with "Old vs New" tax amounts will also need recalculation to match correct bands.
 
-Per NTA Section 56 and confirmed by PwC, AO2LAW, and SOW Professional: small companies are **exempt** from the Development Levy. The site's own calculator (`taxCalculations.ts` line 154) correctly returns `devLevy: 0` for small companies. But the content pages claim the opposite.
+### Error 2: Wrong PIT Bands in PayrollTaxGuide.tsx (Blog Post)
 
-| File | Lines | Wrong Text |
-|------|-------|-----------|
-| `src/pages/blog/SmallCompanyCITExemption.tsx` | 18 | FAQ: "applies to all companies regardless of size" |
-| `src/pages/blog/SmallCompanyCITExemption.tsx` | 114 | Step 4: "4% Development Levy still applies" |
-| `src/pages/blog/SmallCompanyCITExemption.tsx` | 138 | Example 1 calculates Dev Levy of 320,000 for small company |
-| `src/pages/blog/SmallCompanyCITExemption.tsx` | 150 | Example 2 calculates Dev Levy of 480,000 for small company |
-| `src/pages/blog/SmallCompanyCITExemption.tsx` | 161 | "applies to all companies" |
-| `src/pages/blog/SmallCompanyCITExemption.tsx` | 172-179 | Entire section "Development Levy Still Applies" |
-| `src/pages/FAQ.tsx` | 27 | "applies to all companies regardless of size" |
-| `src/pages/blog/TaxReforms2026Summary.tsx` | 157 | "This applies to all companies" |
-| `src/pages/blog/TaxGuideTechStartups.tsx` | 18 | "The Development Levy applies once you have assessable profits" |
+Lines 87-91 show the same wrong 4-band structure with 19% rate and wrong thresholds (₦2,800,000 and ₦10,800,000 instead of ₦3,000,000 and ₦12,000,000).
 
-**Fix:** Correct all to state that small companies are exempt from the Development Levy. Update worked examples to show Dev Levy = 0 for qualifying small companies. Rewrite the "Development Levy Still Applies" section to clarify it only applies to non-small companies.
+The worked example on line 103 calculates tax using the wrong 19% rate, producing "₦550,040" which is incorrect.
 
-### Error 3: PIT Bands Wrong in TaxBreakdown.tsx
+### Error 3: "Medium Company Rate: 20%" in ComparisonTable.tsx
 
-The Tax Breakdown page displays incorrect PIT bands for 2026:
+Line 108 still shows a "Medium Company Rate" row with "20%" for both pre-2026 and post-2026. The medium company category is eliminated under the NTA 2025. This component is used across multiple pages via the ComparisonTable component.
 
-| Shown (Wrong) | Correct |
-|---------------|---------|
-| 800k - 3m: 15% | 800k - 3m: 15% (OK) |
-| 3m - 10m: 19% | 3m - 12m: 18% |
-| 10m - 50m: 21% | 12m - 25m: 21%, 25m - 50m: 23% |
-| Above 50m: 25% | Above 50m: 25% (OK) |
+### Error 4: "CIT (25% + 4% Levy)" in LanguageContext.tsx
 
-The 18% and 23% bands are completely missing, and the 19% rate does not exist in the NTA.
-
-**Fix:** Replace with the correct six-band structure.
-
-### Error 4: Professional Services Exclusion Missing
-
-The NTA explicitly states: "any business providing professional services shall not be classified as a small company." This applies to law firms, accounting firms, medical practices, engineering consultancies, and other licensed professions. This critical exclusion is entirely absent from the site.
-
-**Fix:** Add a note about the professional services exclusion to the SmallCompanyCITExemption blog post, the SmallCompanyExemption SEO page, and the FAQ.
-
-### Error 5: "Medium Company" Category References
-
-The NTA 2025 eliminates the old medium company category. Per Finance in Africa: "This change scraps the regular medium-sized firms category." Companies are now classified as Small (0%) or Large (30%). The calculator already implements this correctly (no 20% rate exists in the code). But multiple content pages reference "medium companies (50M-200M) at 20%."
-
-| File | Lines |
-|------|-------|
-| `src/pages/seo/CITCalculator.tsx` | 18, 20, 32, 65-68, 82 |
-| `src/pages/seo/TaxReforms2026.tsx` | 29 |
-| `src/pages/Learn.tsx` | 361 |
-| `src/pages/seo/SmallCompanyExemption.tsx` | 36, 169 |
-
-**Fix:** Remove medium company references. State that companies are either Small (0%) or Large (30%). Note in CITCalculator that this is a simplification and professional advice should be sought for companies near the threshold.
+Line 3799 contains the translation key `businessReport.citRate` with value "CIT (25% + 4% Levy)" across all 4 languages (en, pcm, yo, ha, ig). The CIT rate is 30%, not 25%.
 
 ## Files to Modify
 
 | File | Changes |
 |------|---------|
-| `src/pages/TaxBreakdown.tsx` | Fix PIT bands (lines 93-99), fix CIT rate 25% to 30% (line 86) |
-| `src/pages/FAQ.tsx` | Fix CIT rate (line 25), fix Dev Levy for small companies (line 27) |
-| `src/pages/blog/SmallCompanyCITExemption.tsx` | Fix Dev Levy exemption (FAQ, step 4, examples, common mistakes, dedicated section), fix CIT rate, add professional services exclusion, remove medium company reference |
-| `src/pages/blog/TaxReforms2026Summary.tsx` | Fix Dev Levy scope (line 157) |
-| `src/pages/blog/TaxGuideTechStartups.tsx` | Fix Dev Levy for small companies (line 18) |
-| `src/pages/seo/CITCalculator.tsx` | Remove medium company references, update to Small/Large only, add professional services note |
-| `src/pages/seo/TaxReforms2026.tsx` | Remove medium company reference (line 29), add professional services note |
-| `src/pages/Learn.tsx` | Remove medium company reference (line 361) |
-| `src/pages/seo/SmallCompanyExemption.tsx` | Remove medium company references, add professional services exclusion note |
+| `src/pages/blog/PITPAYEGuide2026.tsx` | Fix PIT band table (lines 66-70) to 6 bands with correct rates/thresholds; fix worked example (lines 114-119) to use 18% rate; recalculate comparison table amounts (lines 93-99) |
+| `src/pages/blog/PayrollTaxGuide.tsx` | Fix PIT band table (lines 87-91) to 6 bands; fix worked example (line 103) to use 18% rate and recalculate |
+| `src/components/seo/ComparisonTable.tsx` | Remove "Medium Company Rate" row (line 108); add note about Dev Levy exemption for small companies |
+| `src/contexts/LanguageContext.tsx` | Change "CIT (25% + 4% Levy)" to "CIT (30% + 4% Levy)" across all language variants (line 3799) |
 
 ## Technical Details
 
-**TaxBreakdown.tsx PIT bands fix (lines 93-99):**
-```text
-From:
-- 800k - 3m: 15%
-- 3m - 10m: 19%
-- 10m - 50m: 21%
-- Above 50m: 25%
+### PITPAYEGuide2026.tsx PIT table fix (lines 66-70)
 
-To:
-- 800k - 3m: 15%
-- 3m - 12m: 18%
-- 12m - 25m: 21%
-- 25m - 50m: 23%
-- Above 50m: 25%
+Replace 5-row table with correct 6-band NTA structure:
+```text
+First ₦800,000         | 0%  | ₦0
+Next ₦2,200,000        | 15% | ₦330,000
+Next ₦9,000,000        | 18% | ₦1,950,000
+Next ₦13,000,000       | 21% | ₦4,680,000
+Next ₦25,000,000       | 23% | ₦10,430,000
+Above ₦50,000,000      | 25% | --
 ```
 
-**TaxBreakdown.tsx CIT fix (line 86):**
-- From: "Under 2026 rules, CIT is 25%."
-- To: "Under 2026 rules, CIT is 30% for large companies. Small companies (turnover up to 50M, assets up to 250M) pay 0%."
+### PITPAYEGuide2026.tsx worked example fix (lines 114-119)
 
-**SmallCompanyCITExemption.tsx worked example fix (line 138):**
-- From: "Development Levy = 4% x 8,000,000 = 320,000"
-- To: "Development Levy = 0 (small companies are exempt)"
-- Savings recalculated accordingly
+For ₦5,352,000 taxable income:
+- First ₦800,000 at 0%: ₦0
+- Next ₦2,200,000 at 15%: ₦330,000
+- Remaining ₦2,352,000 at 18%: ₦423,360
+- Total: ₦753,360 annual / ₦62,780 monthly PAYE
 
-**CITCalculator.tsx rate table fix:**
-- Remove "Medium Company" row entirely
-- Update to show only Small (0%) and Large (30%)
+### PITPAYEGuide2026.tsx comparison table recalculation (lines 93-99)
 
-**Professional services exclusion text (to add):**
-"Important: Professional service providers (law firms, accounting firms, medical practices, engineering consultancies) are excluded from the small company definition regardless of their turnover or asset size."
+Recalculate all "2026 Tax" column values using correct bands:
+- ₦1,200,000: First 800k = ₦0, next 400k at 15% = ₦60,000
+- ₦3,000,000: First 800k = ₦0, next 2,200,000 at 15% = ₦330,000
+- ₦5,000,000: ₦330,000 + 2,000,000 at 18% = ₦690,000
+- ₦10,000,000: ₦330,000 + 7,000,000 at 18% = ₦1,590,000
+- ₦25,000,000: ₦330,000 + 9,000,000 at 18% + 13,000,000 at 21% = ₦4,680,000
+
+### PayrollTaxGuide.tsx worked example fix (line 103)
+
+For ₦4,116,000 taxable income:
+- First ₦800,000 at 0%: ₦0
+- Next ₦2,200,000 at 15%: ₦330,000
+- Remaining ₦1,116,000 at 18%: ₦200,880
+- Total: ₦530,880 annual / ₦44,240 monthly PAYE
+
+### ComparisonTable.tsx fix (line 108)
+
+Remove the entire row: `{ feature: 'Medium Company Rate', pre2026: '20%', post2026: '20%' }`
+
+The NTA 2025 eliminates the medium company category. Companies are either Small (0% CIT) or Large (30% CIT).
+
+### LanguageContext.tsx fix (line 3799)
+
+Change all 5 language variants from "25%" to "30%":
+- en: "CIT (30% + 4% Levy)"
+- pcm: "CIT (30% + 4% Levy)"
+- yo: "CIT (30% + 4% Owó)"
+- ha: "CIT (30% + 4% Haraji)"
+- ig: "CIT (30% + 4% Ụtụ)"
+
+## What This Addresses
+
+- 2 blog posts with wrong PIT bands and worked examples (high-traffic educational content)
+- 1 reusable comparison component with a non-existent "Medium Company" category
+- 1 translation file with wrong CIT rate visible in business reports across 5 languages
 
 ## What This Does NOT Address
 
-- FIRS vs NRS naming: Many authoritative sources still use "FIRS" during the transition period. This is a cosmetic issue and both names are currently in use.
-- The `verification.ts` constants file correctly has all values and does not need changes.
-- The calculator engine (`taxCalculations.ts`, `individualTaxCalculations.ts`) is correct and does not need changes.
-- Off-page SEO, backlinks, pre-rendering.
+- The NASENI Levy reference in TaxGuideTechStartups.tsx is factually correct (0.25% for companies above ₦100M turnover) and does not need changes
+- Off-page SEO, backlinks, pre-rendering
 
-**Total: 9 files modified, 0 new files created**
+**Total: 4 files modified, 0 new files created**
 
