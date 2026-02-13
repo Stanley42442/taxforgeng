@@ -132,25 +132,18 @@ const getCategoryColor = (category: Expense['category']) => {
 const estimateTax = (income: number): number => {
   if (income <= 800000) return 0;
   let tax = 0;
-  let remaining = income;
   
-  if (remaining > 800000) {
-    const band = Math.min(remaining - 800000, 2200000);
-    tax += band * 0.15;
-    remaining -= 800000 + band;
-  }
-  if (remaining > 0) {
-    const band = Math.min(remaining, 7000000);
-    tax += band * 0.19;
-    remaining -= band;
-  }
-  if (remaining > 0) {
-    const band = Math.min(remaining, 40000000);
-    tax += band * 0.21;
-    remaining -= band;
-  }
-  if (remaining > 0) {
-    tax += remaining * 0.25;
+  const taxableAmount = income - 800000;
+  if (taxableAmount <= 2200000) {
+    tax = taxableAmount * 0.15;
+  } else if (taxableAmount <= 11200000) {
+    tax = 2200000 * 0.15 + (taxableAmount - 2200000) * 0.18;
+  } else if (taxableAmount <= 24200000) {
+    tax = 2200000 * 0.15 + 9000000 * 0.18 + (taxableAmount - 11200000) * 0.21;
+  } else if (taxableAmount <= 49200000) {
+    tax = 2200000 * 0.15 + 9000000 * 0.18 + 13000000 * 0.21 + (taxableAmount - 24200000) * 0.23;
+  } else {
+    tax = 2200000 * 0.15 + 9000000 * 0.18 + 13000000 * 0.21 + 25000000 * 0.23 + (taxableAmount - 49200000) * 0.25;
   }
   
   return tax;
