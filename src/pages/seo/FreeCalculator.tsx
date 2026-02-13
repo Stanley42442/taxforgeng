@@ -124,7 +124,7 @@ const FreeCalculator = () => {
               </div>
 
               {/* How It Works */}
-              <section className="mb-12">
+              <section id="how-it-works" className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   How to Calculate Your Tax
                 </h2>
@@ -286,7 +286,7 @@ const FreeCalculator = () => {
               </section>
 
               {/* FAQ Section - Accordion */}
-              <section className="mb-12">
+              <section id="faq" className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Frequently Asked Questions
                 </h2>

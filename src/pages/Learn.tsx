@@ -354,11 +354,11 @@ const Learn = () => {
             <div className="space-y-3 text-sm">
               <div className="p-3 rounded-lg bg-secondary/50">
                 <strong className="text-foreground">Personal Income Tax (PIT):</strong>
-                <p className="text-muted-foreground mt-1">First ₦800,000 now exempt. New rates: 15%, 19%, 21%, 25%.</p>
+                <p className="text-muted-foreground mt-1">First ₦800,000 now exempt. New rates: 15%, 18%, 21%, 23%, 25%.</p>
               </div>
               <div className="p-3 rounded-lg bg-secondary/50">
                 <strong className="text-foreground">Company Income Tax (CIT):</strong>
-                <p className="text-muted-foreground mt-1">Standard rate reduced to 25%. Small companies (≤₦50m): 0% CIT.</p>
+                <p className="text-muted-foreground mt-1">Large companies: 30%. Medium (₦50M–₦200M): 20%. Small (turnover ≤₦50M AND assets ≤₦250M): 0% CIT.</p>
               </div>
               <div className="p-3 rounded-lg bg-secondary/50">
                 <strong className="text-foreground">VAT:</strong>
