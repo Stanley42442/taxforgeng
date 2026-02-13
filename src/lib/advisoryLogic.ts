@@ -84,7 +84,7 @@ export function getRecommendation(answers: AdvisoryAnswers): Recommendation {
         'Limited personal liability - your personal assets are protected',
         'Enhanced business credibility with clients and partners',
         'Easier to raise capital and attract investors',
-        'Lower corporate income tax rate (30% vs up to 24% PIT)',
+        'Lower corporate income tax rate (30% vs up to 25% PIT)',
         'Perpetual existence - business continues regardless of ownership changes',
       ],
       cons: [
@@ -110,7 +110,7 @@ export function getRecommendation(answers: AdvisoryAnswers): Recommendation {
         'Simpler tax filing and compliance',
         'Full control over business decisions',
         'Quick and easy setup process',
-        'Lower tax rates for income under ₦25M',
+        'Lower tax rates for income under ₦50M (2026 small company threshold)',
       ],
       cons: [
         'Unlimited personal liability - your personal assets are at risk',
