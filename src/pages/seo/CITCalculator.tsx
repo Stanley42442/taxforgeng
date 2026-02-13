@@ -257,7 +257,7 @@ const CITCalculator = () => {
                     },
                     {
                       mistake: 'Ignoring the 4% Development Levy',
-                      fix: 'The Development Levy (replacing TET) is 4% of assessable profits and applies to medium and large companies on top of CIT. Budget for it separately.',
+                      fix: 'The Development Levy (replacing TET) is 4% of assessable profits and applies to all companies that do not qualify for the small company exemption. Budget for it separately.',
                     },
                   ].map((item, index) => (
                     <div key={index} className="glass-frosted rounded-xl p-5">
