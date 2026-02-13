@@ -1,85 +1,82 @@
 
 
-# SEO/AEO Phase 18: Duplicate Data Source, Blog Excerpt, and CRA Language Errors
+# SEO/AEO Phase 19: Tax Logic PDF, Tax Myths, and Remaining Pioneer Status Without EDI Context
 
 ## Summary
 
-Four files contain factual inaccuracies: the primary sector data source (`sectorConfig.ts`) still has old Pioneer Status text that was only fixed in the duplicate `SectorPresets.tsx`, the blog listing excerpt references "pioneer status" without EDI, and the multilingual translations incorrectly state that "Consolidated Relief Allowance applies" under 2026 rules when CRA was abolished.
+Three files still contain Pioneer Status references without EDI context. These are in user-facing downloadable PDFs and educational content that could mislead users about current law.
 
 ## Errors Found
 
-### Error 1: sectorConfig.ts -- Manufacturing Myth Still Uses Old Pioneer Status Text (line 129)
+### Error 1: taxLogicDocumentPdf.ts -- Healthcare Row Says "Pioneer status eligible" (line 583)
 
-This is the **primary data source** used by `EnhancedSectorPresets`. Phase 16 updated the duplicate in `SectorPresets.tsx` but missed this file.
+The downloadable Tax Logic Reference PDF contains a sector comparison table where the Healthcare row lists "Pioneer status eligible" as the special incentive. This PDF is shared with accountants and professionals.
 
-- Current: `'Pioneer status requires NIPC approval and specific conditions'`
-- Should be: `'Under 2026 rules, Pioneer Status is replaced by EDI (5% annual tax credit for 5 years). Existing approvals continue under original terms'`
+- Current: `'Pioneer status eligible'`
+- Fix: `'EDI tax credit eligible'`
 
-### Error 2: sectorConfig.ts -- Healthcare Benefits Still Says "Pioneer Status" (line 249)
+### Error 2: taxMyths.ts -- "startup-grace-period" Myth References Pioneer Status Without EDI (line 75)
 
-Same issue -- Phase 16 fixed `SectorPresets.tsx` line 201 but not the source data file.
+The explanation for the startup grace period myth says "While certain incentives exist (like Pioneer Status requiring application)" without noting that Pioneer Status is replaced by EDI under 2026 rules.
 
-- Current: `'Pioneer Status'` in the benefits array
-- Should be: `'EDI tax credit (formerly Pioneer Status)'`
+- Current: `'...like Pioneer Status requiring application...'`
+- Fix: `'...like the Economic Development Incentive (EDI, formerly Pioneer Status)...'`
 
-### Error 3: Blog.tsx -- Excerpt Mentions "pioneer status" Without EDI (line 71)
+Also, the `relatedTopics` array on line 79 lists `'Pioneer Status'` without EDI.
 
-The blog card excerpt for the Tech Startup Guide says: "...covering the Small Company Exemption, pioneer status, and payroll." This is the blog listing page visible to all visitors and search engines.
+- Current: `['startup compliance', 'first-year taxes', 'Pioneer Status']`
+- Fix: `['startup compliance', 'first-year taxes', 'Pioneer Status', 'EDI']`
 
-- Current: `'...pioneer status, and payroll.'`
-- Should be: `'...EDI incentives (formerly Pioneer Status), and payroll.'`
+### Error 3: taxLogicDocumentPdf.ts -- Agriculture Row Says "5-year CIT holiday" (line 581)
 
-### Error 4: LanguageContext.tsx -- "Consolidated Relief Allowance applies" in 2026 Context (lines 3393 and 3409)
+While agriculture does have a CIT exemption period, presenting it as "5-year CIT holiday" in a 2026-context document without noting that this is for primary production only could mislead agro-processing businesses into assuming they qualify.
 
-Two translation keys for the individual calculator say "Consolidated Relief Allowance applies" alongside the ₦800,000 tax-free threshold. Under 2026 rules, CRA was abolished and replaced by Rent Relief and specific deductions. This text appears in English, Pidgin, Yoruba, Hausa, and Igbo -- all five languages contain the error.
-
-- `individual.exemptionNote` (line 3393): Says "Consolidated Relief Allowance applies"
-- `individual.2026BenefitsInfo` (line 3409): Same incorrect text
-
-Both should say "Rent Relief and specific deductions apply (CRA abolished)" in all five languages.
+- Current: `'5-year CIT holiday'`
+- Fix: `'CIT holiday (primary production)'`
 
 ## Files to Modify
 
 | File | Changes |
 |------|---------|
-| `src/lib/sectorConfig.ts` | Update manufacturing myth (line 129) and healthcare benefits (line 249) |
-| `src/pages/Blog.tsx` | Update tech startup excerpt to mention EDI (line 71) |
-| `src/contexts/LanguageContext.tsx` | Fix CRA references in 2 translation keys across 5 languages (lines 3393, 3409) |
+| `src/lib/taxLogicDocumentPdf.ts` | Update Healthcare incentive (line 583) and Agriculture incentive (line 581) |
+| `src/lib/taxMyths.ts` | Update startup myth explanation (line 75) and relatedTopics (line 79) |
 
 ## Technical Details
 
-### sectorConfig.ts (line 129)
+### taxLogicDocumentPdf.ts (lines 581-583)
+
 ```
-From: { myth: 'Manufacturing always qualifies for pioneer status', truth: 'Pioneer status requires NIPC approval and specific conditions' }
-To:   { myth: 'Manufacturing always qualifies for pioneer status', truth: 'Under 2026 rules, Pioneer Status is replaced by EDI (5% annual tax credit for 5 years). Existing approvals continue under original terms' }
+From:
+  ['Agriculture', '0%', 'Zero-rated', '5-year CIT holiday'],
+  ['Manufacturing', '30%', 'Standard', '10% investment credit'],
+  ['Healthcare', '30%', 'Exempt', 'Pioneer status eligible'],
+
+To:
+  ['Agriculture', '0%', 'Zero-rated', 'CIT holiday (primary production)'],
+  ['Manufacturing', '30%', 'Standard', '10% investment credit'],
+  ['Healthcare', '30%', 'Exempt', 'EDI tax credit eligible'],
 ```
 
-### sectorConfig.ts (line 249)
+### taxMyths.ts (line 75)
+
 ```
-From: benefits: ['VAT-exempt services', 'Equipment duty waiver', 'Pioneer Status'],
-To:   benefits: ['VAT-exempt services', 'Equipment duty waiver', 'EDI tax credit (formerly Pioneer Status)'],
+From: 'This is one of the most dangerous tax myths. While certain incentives exist (like Pioneer Status requiring application), there\'s no blanket exemption for new businesses.'
+To:   'This is one of the most dangerous tax myths. While certain incentives exist (like the Economic Development Incentive (EDI, formerly Pioneer Status)), there\'s no blanket exemption for new businesses.'
 ```
 
-### Blog.tsx (line 71)
-```
-From: excerpt: '...covering the Small Company Exemption, pioneer status, and payroll.',
-To:   excerpt: '...covering the Small Company Exemption, EDI incentives (formerly Pioneer Status), and payroll.',
-```
+### taxMyths.ts (line 79)
 
-### LanguageContext.tsx (line 3393)
-Update `individual.exemptionNote` -- all 5 languages:
-- English: "First ₦800,000 is tax-exempt. Rent Relief and specific deductions apply (CRA abolished)."
-- Pidgin: "First ₦800,000 no get tax. Rent Relief and specific deductions dey apply (CRA don cancel)."
-- Yoruba, Hausa, Igbo: Corresponding translations with CRA removal noted
-
-### LanguageContext.tsx (line 3409)
-Update `individual.2026BenefitsInfo` -- same correction across all 5 languages.
+```
+From: relatedTopics: ['startup compliance', 'first-year taxes', 'Pioneer Status'],
+To:   relatedTopics: ['startup compliance', 'first-year taxes', 'Pioneer Status', 'EDI'],
+```
 
 ## What This Addresses
 
-- 2 data source entries in `sectorConfig.ts` that were missed when their duplicates in `SectorPresets.tsx` were updated in Phase 16
-- 1 blog listing excerpt visible to search engines presenting Pioneer Status without EDI context
-- 2 multilingual translation keys (10 language strings total) incorrectly stating CRA still applies under 2026 rules
+- 1 downloadable PDF table presenting Pioneer Status as current Healthcare incentive
+- 1 agriculture incentive label that could mislead agro-processing businesses
+- 1 educational myth explanation referencing Pioneer Status without EDI context
+- 1 related topics array missing EDI keyword
 
-**Total: 4 files modified, 0 new files created**
+**Total: 2 files modified, 0 new files created**
 
