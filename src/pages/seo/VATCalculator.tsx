@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema, createSpeakableSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -102,6 +102,11 @@ const VATCalculator = () => {
         'Nigeria VAT Rates and Rules 2026',
         'Value Added Tax rates and registration rules in Nigeria, effective 2026',
         vatTerms
+      ),
+      createSpeakableSchema(
+        'VAT Calculator Nigeria 2026',
+        'https://taxforgeng.com/vat-calculator',
+        ['#vat-rates', '#faq', '#how-it-works']
       ),
     ],
   };

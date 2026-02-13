@@ -2,6 +2,8 @@ import { SEOHead, createBreadcrumbSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
+import { ContentMeta } from '@/components/seo/ContentMeta';
 import { BlogCard, type BlogPostMeta } from '@/components/blog/BlogCard';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -107,13 +109,21 @@ const Blog = () => {
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="max-w-4xl mx-auto">
-              <SEOHero
-                badge="Blog"
-                title="Nigerian Tax Insights"
-                titleHighlight="Expert Guides"
-                subtitle="In-depth articles on the 2026 tax reforms, practical guides, and worked examples to help you navigate Nigerian taxes."
-              />
+            <article className="max-w-4xl mx-auto">
+              <PageBreadcrumbs items={[
+                { label: 'Home', href: '/' },
+                { label: 'Blog' },
+              ]} />
+              <ContentMeta published="2026-01-25" publishedLabel="January 25, 2026" updated="2026-02-13" updatedLabel="February 13, 2026" />
+
+              <header>
+                <SEOHero
+                  badge="Blog"
+                  title="Nigerian Tax Insights"
+                  titleHighlight="Expert Guides"
+                  subtitle="In-depth articles on the 2026 tax reforms, practical guides, and worked examples to help you navigate Nigerian taxes."
+                />
+              </header>
 
               {/* Category filter */}
               <div className="flex gap-2 mb-8 flex-wrap justify-center">
@@ -147,7 +157,7 @@ const Blog = () => {
               />
 
               <SEODisclaimer />
-            </div>
+            </article>
           </div>
         </main>
       </div>

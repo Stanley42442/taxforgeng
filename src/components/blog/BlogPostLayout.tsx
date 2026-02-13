@@ -3,6 +3,8 @@ import { SEOHead, createArticleSchema, createFAQSchema, createBreadcrumbSchema }
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
+import { ContentMeta } from '@/components/seo/ContentMeta';
 import { AuthorBox } from './AuthorBox';
 import { TableOfContents } from './TableOfContents';
 import { Link } from 'react-router-dom';
@@ -95,17 +97,26 @@ export const BlogPostLayout = ({
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="max-w-4xl mx-auto">
-              <SEOHero badge={badge} title={title} titleHighlight={titleHighlight} subtitle={subtitle} />
+            <article className="max-w-4xl mx-auto">
+              <PageBreadcrumbs items={[
+                { label: 'Home', href: '/' },
+                { label: 'Blog', href: '/blog' },
+                { label: title },
+              ]} />
+              <ContentMeta published={datePublished} publishedLabel={datePublished} updated={dateModified} updatedLabel={dateModified} />
+
+              <header>
+                <SEOHero badge={badge} title={title} titleHighlight={titleHighlight} subtitle={subtitle} />
+              </header>
 
               <AuthorBox date={datePublished} updated={dateModified} />
 
               <TableOfContents items={toc} />
 
               {/* Article content */}
-              <article className="prose-custom space-y-8 mb-12">
+              <div className="prose-custom space-y-8 mb-12">
                 {children}
-              </article>
+              </div>
 
               {/* FAQ Section */}
               {faqs.length > 0 && (
@@ -175,7 +186,7 @@ export const BlogPostLayout = ({
               />
 
               <SEODisclaimer />
-            </div>
+            </article>
           </div>
         </main>
       </div>
