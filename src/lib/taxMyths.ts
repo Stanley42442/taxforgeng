@@ -688,7 +688,7 @@ export const sectorGuides: SectorGuide[] = [
     description: 'Tax benefits for technology companies under the Nigerian Startup Act and NITDA guidelines',
     benefits: [
       'EDTI (Expenditure on Domestic Technology Investment) 5% tax credits',
-      'Pioneer Status eligibility for software development',
+      'EDI tax credit eligibility for software development (replaces Pioneer Status)',
       'R&D expense deductions at 120%',
       'Export service income exemptions',
       'Foreign talent visa facilitation'
@@ -702,7 +702,7 @@ export const sectorGuides: SectorGuide[] = [
     ],
     taxIncentives: [
       { name: 'EDTI Credit', value: '5% of qualifying technology spend', duration: 'Annual' },
-      { name: 'Pioneer Status', value: '0% CIT', duration: 'Up to 5 years' },
+      { name: 'EDI Tax Credit', value: '5% annual credit on qualifying capex', duration: '5 years' },
       { name: 'R&D Super Deduction', value: '120% of qualifying R&D costs', duration: 'Ongoing' },
       { name: 'Export Services', value: 'Reduced WHT on export earnings', duration: 'Ongoing' }
     ],
@@ -1035,7 +1035,7 @@ Access to financing for:
       'CBN sandbox participation',
       'R&D deductions on platform development',
       'EDTI credits for technology investment',
-      'Potential Pioneer Status for innovative services'
+      'EDI tax credit for innovative services (replaces Pioneer Status)'
     ],
     requirements: [
       'CBN licensing or registration',
@@ -1072,7 +1072,7 @@ Access to financing for:
 
 **NSA Labeling:**
 Qualifying fintechs can benefit from:
-- Tax holidays via Pioneer Status
+- EDI tax credits (replaces Pioneer Status)
 - R&D super deductions
 - EDTI credits
 - Simplified forex access
@@ -1092,7 +1092,7 @@ Qualifying fintechs can benefit from:
     benefits: [
       'VAT exemption on medical services',
       'Import duty waivers on medical equipment',
-      'Pioneer Status for local drug manufacturing',
+      'EDI tax credit for local drug manufacturing (replaces Pioneer Status)',
       'Accelerated depreciation on medical equipment',
       'Reduced WHT on pharmaceutical exports'
     ],
@@ -1106,7 +1106,7 @@ Qualifying fintechs can benefit from:
     taxIncentives: [
       { name: 'Medical Services', value: 'VAT-exempt', duration: 'Ongoing' },
       { name: 'Equipment Import', value: 'Reduced/waived duties', duration: 'For medical equipment' },
-      { name: 'Drug Manufacturing', value: 'Pioneer Status available', duration: 'Up to 5 years' }
+      { name: 'Drug Manufacturing', value: 'EDI tax credit available', duration: '5 years' }
     ],
     content: `Healthcare sector enjoys various tax benefits:
 
@@ -1125,7 +1125,7 @@ Medical equipment qualifies for:
 
 **Local Manufacturing:**
 Pharmaceutical companies manufacturing locally can apply for:
-- Pioneer Status (0% CIT for 3-5 years)
+- EDI tax credit (5% annual credit for 5 years, replaces Pioneer Status)
 - Additional capital allowances
 - Local content bonuses
 
