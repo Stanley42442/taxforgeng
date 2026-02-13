@@ -1,66 +1,86 @@
 
 
-# SEO/AEO Phase 10: Pre-2026 TET Rate Inconsistency and Tax Quiz Errors
+# SEO/AEO Phase 11: Partner API Calculation Errors and PDF Export Band Mismatch
 
 ## Summary
 
-After Phases 7-9 corrected all 2026-era content, a cross-file audit reveals a **pre-2026 Tertiary Education Tax (TET) rate inconsistency** and **two quiz/content errors** in the tax myths database. The calculator engine correctly uses 3% (per Finance Act 2021), but the display label, PDF export, and test file all say 2%.
+After Phases 7-10 corrected all user-facing content pages, two backend/export files still contain calculation errors that produce **incorrect tax figures** for API consumers and PDF downloads.
 
-All values verified against the Finance Act 2021 (which raised TET from 2% to 2.5%, then Finance Act 2023 further confirmed 3% for assessable profits).
+The most critical is the **partner API edge function**, which is a live endpoint returning wrong tax amounts to third-party integrators. The second is the individual tax PDF export, which hardcodes pre-2026 PIT bands and displays them even when 2026 rules are selected.
 
 ## Errors Found
 
-### Error 1: Pre-2026 TET Display Says "2%" but Code Calculates 3%
+### Error 1: Partner API — Wrong CIT Rate (25% instead of 30%)
 
-In `taxCalculations.ts` line 166, the pre-2026 TET is correctly calculated as `profit * 0.03` (3%). But line 337 displays it as `'2% of profits'` in the breakdown. This means the number shown to the user is correct but the percentage label is wrong.
+`supabase/functions/partner-api/index.ts` line 34 uses `0.25` for the 2026 CIT rate. The correct rate is `0.30` per NTA 2025. This means every API call for a large company under 2026 rules returns a CIT figure that is **16.7% too low**.
 
-**Files affected:**
-| File | Line | Issue |
-|------|------|-------|
-| `src/lib/taxCalculations.ts` | 337 | Description says "2% of profits", should say "3% of profits" |
-| `src/lib/taxLogicDocumentPdf.ts` | 381 | Table shows "2%", should be "3%" |
-| `src/lib/taxLogicDocumentPdf.ts` | 387-388 | Text says "Education Levy (2%)", should say "3%" |
-| `src/__tests__/lib/taxCalculations.test.ts` | 207, 214 | Test name says "2%" and expects 2,000,000 instead of 3,000,000 |
+### Error 2: Partner API — Wrong Pre-2026 TET Rate (2% instead of 3%)
 
-### Error 2: Quiz Answer Shows "25%" and "20% medium company rate" (taxMyths.ts)
+Line 39 uses `0.02` for the pre-2026 Education Levy. The correct rate is `0.03` per Finance Act 2023. This matches the same error fixed in Phase 10 for the main calculator.
 
-The quiz for the "small-company-automatic" myth (line 270-278) has two wrong answer options:
-- `'25% - exceeds asset threshold'` -- should be `'30% - exceeds asset threshold'` (correct answer, index 1)
-- `'20% - medium company rate'` -- medium company category does not exist under NTA 2025
+### Error 3: Partner API — Wrong 2026 PIT Bands
 
-### Error 3: Free Zone Content Says "Domestic portion: 25% CIT" (taxMyths.ts)
+Lines 42-54 implement only 4 PIT bands with a **19%** rate and wrong thresholds. The correct 2026 structure has 6 bands (15%, 18%, 21%, 23%, 25%) with the ₦800,000 exemption applied differently. The current code also starts the first band at ₦300,000 width instead of ₦2,200,000.
 
-Line 946 states "Domestic portion: 25% CIT" in the free zone sector guide. The standard CIT rate is 30%.
+**Current (wrong):**
+```text
+Band 1: Next 300,000 at 15%
+Band 2: Next 300,000 at 19%
+Band 3: Next 500,000 at 21%
+Band 4: Above at 25%
+```
+
+**Correct (NTA 2025):**
+```text
+Band 1: Next 2,200,000 (800k-3M) at 15%
+Band 2: Next 9,000,000 (3M-12M) at 18%
+Band 3: Next 13,000,000 (12M-25M) at 21%
+Band 4: Next 25,000,000 (25M-50M) at 23%
+Band 5: Above 50,000,000 at 25%
+```
+
+### Error 4: Individual PDF Export — Hardcoded Pre-2026 Bands
+
+`src/lib/individualPdfExport.ts` lines 142-149 hardcode the pre-2026 PIT band table (7%, 11%, 15%, 19%, 21%, 24%) and display it regardless of whether the user selected 2026 rules. When a user generates a PDF with 2026 rules, they see pre-2026 rates in the "Progressive Tax Bands Applied" section, contradicting the actual calculated amounts.
 
 ## Files to Modify
 
 | File | Changes |
 |------|---------|
-| `src/lib/taxCalculations.ts` | Fix description "2% of profits" to "3% of profits" (line 337) |
-| `src/lib/taxLogicDocumentPdf.ts` | Fix "2%" to "3%" in table and text (lines 381, 387-388) |
-| `src/__tests__/lib/taxCalculations.test.ts` | Fix test name and expected value: "3% Education Levy", expect 3,000,000 (lines 207, 214) |
-| `src/lib/taxMyths.ts` | Fix quiz options: "30%" instead of "25%", remove "20% medium company" option (lines 273-274); fix "25% CIT" to "30% CIT" (line 946) |
+| `supabase/functions/partner-api/index.ts` | Fix CIT rate 0.25 to 0.30 (line 34); fix TET 0.02 to 0.03 (line 39); rewrite 2026 PIT bands to 6-band structure (lines 42-54) |
+| `src/lib/individualPdfExport.ts` | Make PIT band table conditional on `inputs.use2026Rules`, showing correct 2026 bands (0%, 15%, 18%, 21%, 23%, 25%) or pre-2026 bands (7%, 11%, 15%, 19%, 21%, 24%) |
 
 ## Technical Details
 
-**taxCalculations.ts line 337:**
-- From: `'2% of profits'`
-- To: `'3% of profits'`
+### partner-api/index.ts CIT fix (line 34)
+- From: `const citRate = use2026Rules ? 0.25 : 0.30;`
+- To: `const citRate = 0.30;` (30% for both regimes; small companies already handled above)
 
-**taxLogicDocumentPdf.ts lines 381, 387-388:**
-- From: `['All Companies', '30%', '2%']` and `"Education Levy (2%)"`
-- To: `['All Companies', '30%', '3%']` and `"Education Levy (3%)"`
+### partner-api/index.ts TET fix (line 39)
+- From: `developmentLevy = use2026Rules ? taxableIncome * 0.04 : taxableIncome * 0.02;`
+- To: `developmentLevy = use2026Rules ? taxableIncome * 0.04 : taxableIncome * 0.03;`
+- Additionally: small companies should get 0 Development Levy under 2026 rules (needs check)
 
-**taxCalculations.test.ts lines 207, 214:**
-- From: `'should apply 2% Education Levy'`, `expect(result.devLevy).toBe(2000000)`
-- To: `'should apply 3% Education Levy'`, `expect(result.devLevy).toBe(3000000)`
+### partner-api/index.ts 2026 PIT bands rewrite (lines 42-54)
+Replace the 4-band structure with the correct 6-band NTA 2025 structure:
+```text
+Exemption: First 800,000 at 0%
+Band 1: 800,001 - 3,000,000 at 15%
+Band 2: 3,000,001 - 12,000,000 at 18%
+Band 3: 12,000,001 - 25,000,000 at 21%
+Band 4: 25,000,001 - 50,000,000 at 23%
+Band 5: Above 50,000,000 at 25%
+```
 
-**taxMyths.ts lines 273-274:**
-- From: `'25% - exceeds asset threshold'`, `'20% - medium company rate'`
-- To: `'30% - standard large company rate'`, `'15% - reduced rate applies'` (plausible wrong answer)
+### individualPdfExport.ts conditional bands (lines 142-149)
+Add a condition based on `inputs.use2026Rules`:
+- **2026 bands:** First 800,000 (0%), Next 2,200,000 (15%), Next 9,000,000 (18%), Next 13,000,000 (21%), Next 25,000,000 (23%), Above 50,000,000 (25%)
+- **Pre-2026 bands:** Keep existing (7%, 11%, 15%, 19%, 21%, 24%)
 
-**taxMyths.ts line 946:**
-- From: `Domestic portion: 25% CIT`
-- To: `Domestic portion: 30% CIT`
+## What This Addresses
 
-**Total: 4 files modified, 0 new files created**
+- 1 live API endpoint returning incorrect tax calculations to third-party consumers
+- 1 PDF export showing wrong tax bands when 2026 rules are selected
+- Synchronization of all calculation paths with the verified main engine in `taxCalculations.ts`
+
+**Total: 2 files modified (1 edge function + 1 lib file), 0 new files created**
