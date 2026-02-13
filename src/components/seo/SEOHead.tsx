@@ -127,7 +127,7 @@ export const createSoftwareApplicationSchema = () => ({
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
   name: 'TaxForge NG',
-  description: 'Nigeria tax calculator with 2026 rules. Free PIT, PAYE, CIT, VAT calculations. FIRS-compliant.',
+  description: 'Nigeria tax calculator with 2026 rules. Free PIT, PAYE, CIT, VAT calculations. NRS-compliant.',
   url: 'https://taxforgeng.com',
   applicationCategory: 'FinanceApplication',
   operatingSystem: 'Web Browser',
@@ -228,7 +228,7 @@ export const createOrganizationSchema = () => ({
     'PAYE Nigeria',
     'Company Income Tax Nigeria',
     'VAT Nigeria',
-    'FIRS Compliance',
+    'NRS Compliance',
     'Small Company Exemption',
     'Rent Relief Nigeria',
     'Development Levy'

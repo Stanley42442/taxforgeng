@@ -34,7 +34,7 @@ export const SEODisclaimer = ({
             <h3 className="font-semibold text-foreground mb-2">Educational Tool Disclaimer</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
               All calculations are estimates based on the Nigeria Tax Act 2025 (effective January 2026). 
-              This is not official tax advice or FIRS filing assistance. Results should be verified by 
+              This is not official tax advice or NRS filing assistance. Results should be verified by 
               a certified tax professional before making financial decisions. TaxForge NG is operated 
               as an individual project by Gillespie / OptiSolve Labs in Port Harcourt, Nigeria.
             </p>

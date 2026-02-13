@@ -19,7 +19,7 @@ const SmallCompanyExemption = () => {
     { name: 'Check Your Turnover', text: 'Verify your annual gross revenue is ₦50 million or less.' },
     { name: 'Calculate Fixed Assets', text: 'Add up land, buildings, machinery, vehicles, and equipment. Must be ₦250 million or less.' },
     { name: 'Meet Both Criteria', text: 'You must satisfy BOTH conditions to qualify for the 0% CIT exemption.' },
-    { name: 'File Your Returns', text: 'Even with 0% CIT, you must file annual returns with FIRS to claim the exemption.' },
+    { name: 'File Your Returns', text: 'Even with 0% CIT, you must file annual returns with NRS (formerly FIRS) to claim the exemption.' },
   ];
 
   const faqs = [
@@ -29,7 +29,7 @@ const SmallCompanyExemption = () => {
     },
     {
       question: 'Do I still need to file returns at 0% CIT?',
-      answer: 'Yes! Even though you pay zero CIT, you are legally required to file annual returns with FIRS. Failure to file attracts penalties regardless of your tax rate.',
+      answer: 'Yes! Even though you pay zero CIT, you are legally required to file annual returns with NRS. Failure to file attracts penalties regardless of your tax rate.',
     },
     {
       question: 'What happens if I exceed the thresholds mid-year?',
@@ -37,11 +37,11 @@ const SmallCompanyExemption = () => {
     },
     {
       question: 'Can group companies each claim the exemption separately?',
-      answer: 'Each legal entity is assessed independently. However, FIRS may apply anti-avoidance rules if they determine that a group has artificially split operations to create multiple small companies qualifying for the exemption.',
+      answer: 'Each legal entity is assessed independently. However, NRS may apply anti-avoidance rules if they determine that a group has artificially split operations to create multiple small companies qualifying for the exemption.',
     },
     {
       question: 'Does a dormant company qualify for the exemption?',
-      answer: 'A dormant company with zero turnover and minimal assets would technically meet the criteria. However, you must still file nil returns with FIRS to maintain your status and avoid penalties.',
+      answer: 'A dormant company with zero turnover and minimal assets would technically meet the criteria. However, you must still file nil returns with NRS to maintain your status and avoid penalties.',
     },
     {
       question: 'How is the transition year handled for companies previously taxed?',
@@ -113,7 +113,7 @@ const SmallCompanyExemption = () => {
                   <TrustBadges
                     badges={[
                       { icon: 'check', text: 'Nigeria Tax Act 2025' },
-                      { icon: 'shield', text: 'Official FIRS Rules' },
+                      { icon: 'shield', text: 'Official NRS Rules' },
                       { icon: 'clock', text: 'Effective 2026' },
                     ]}
                   />
@@ -233,7 +233,7 @@ const SmallCompanyExemption = () => {
                     },
                     {
                       mistake: 'Not filing returns (still required at 0%)',
-                      solution: 'Even with 0% CIT, you must file annual returns with FIRS. Non-filing attracts penalties and may trigger an audit.',
+                      solution: 'Even with 0% CIT, you must file annual returns with NRS. Non-filing attracts penalties and may trigger an audit.',
                     },
                     {
                       mistake: 'Assuming exemption is automatic without documentation',
@@ -322,15 +322,15 @@ const SmallCompanyExemption = () => {
                 </h2>
                 <div className="glass-frosted rounded-2xl p-6 md:p-8">
                   <p className="text-muted-foreground mb-6 text-center">
-                    Even though you pay 0% CIT, you must still file returns with FIRS to claim the exemption. 
+                    Even though you pay 0% CIT, you must still file returns with NRS to claim the exemption. 
                     Here's what you need to do:
                   </p>
                   <div className="space-y-4">
                     {[
                       { step: 1, title: 'Prepare Audited Accounts', desc: 'Have your annual accounts audited by a registered accountant showing turnover ≤₦50M and fixed assets ≤₦250M.' },
-                      { step: 2, title: 'Complete Self-Assessment Form', desc: 'Fill out FIRS Form C for Company Income Tax, declaring your small company status.' },
-                      { step: 3, title: 'Submit to FIRS', desc: 'File electronically via TaxPro Max portal or submit physically at your local FIRS office within 6 months of year-end.' },
-                      { step: 4, title: 'Keep Records', desc: 'Maintain supporting documents for 6 years - FIRS may audit your small company claim at any time.' },
+                      { step: 2, title: 'Complete Self-Assessment Form', desc: 'Fill out NRS Form C for Company Income Tax, declaring your small company status.' },
+                      { step: 3, title: 'Submit to NRS', desc: 'File electronically via TaxPro Max portal or submit physically at your local NRS office within 6 months of year-end.' },
+                      { step: 4, title: 'Keep Records', desc: 'Maintain supporting documents for 6 years - NRS may audit your small company claim at any time.' },
                     ].map((item) => (
                       <div key={item.step} className="flex items-start gap-4 p-4 glass rounded-xl">
                         <div className="h-10 w-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold shrink-0">

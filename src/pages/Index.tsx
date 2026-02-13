@@ -463,7 +463,7 @@ const FeaturesSection = () => {
     { icon: <Shield className="h-6 w-6" />, title: "Liability Protection", description: "Understand how different structures protect your personal assets" },
     { icon: <TrendingUp className="h-6 w-6" />, title: "Small Company Benefits", description: "See if you qualify for reduced CIT rates and other incentives" },
     { icon: <FileText className="h-6 w-6" />, title: "Export Reports", description: "Download professional PDF and CSV reports for your records", badge: "Basic+" },
-    { icon: <Users className="h-6 w-6" />, title: "Tax Filing Preparation", description: "Get your documents ready for seamless FIRS filing", badge: "Business+" },
+    { icon: <Users className="h-6 w-6" />, title: "Tax Filing Preparation", description: "Get your documents ready for seamless NRS filing", badge: "Business+" },
   ];
 
   return (
