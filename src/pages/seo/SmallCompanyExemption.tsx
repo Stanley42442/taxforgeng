@@ -6,6 +6,9 @@ import { TrustBadges } from '@/components/seo/TrustBadges';
 import { EligibilityChecker } from '@/components/seo/EligibilityChecker';
 import { ComparisonTable, CIT_COMPARISON_ROWS } from '@/components/seo/ComparisonTable';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
+import { ContentMeta } from '@/components/seo/ContentMeta';
+import { DataSourceCitation } from '@/components/seo/DataSourceCitation';
 import { CheckCircle2, AlertTriangle, Building2, FileText, ArrowRight, Landmark, Car, Monitor, Factory } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/taxCalculations';
@@ -90,6 +93,13 @@ const SmallCompanyExemption = () => {
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
             <div className="max-w-4xl mx-auto">
+              <PageBreadcrumbs items={[
+                { label: 'Home', href: '/' },
+                { label: 'Tax Tools', href: '/free-tax-calculator' },
+                { label: 'Small Company Exemption' },
+              ]} />
+              <ContentMeta published="2026-01-01" publishedLabel="January 1, 2026" updated="2026-02-13" updatedLabel="February 13, 2026" />
+
               {/* Hero */}
               <SEOHero
                 title="Does Your Company Qualify for"
@@ -260,6 +270,7 @@ const SmallCompanyExemption = () => {
                   title="Company Income Tax: 2026 vs Pre-2026"
                   rows={CIT_COMPARISON_ROWS}
                 />
+                <DataSourceCitation />
               </section>
 
               {/* What Counts as Fixed Assets */}

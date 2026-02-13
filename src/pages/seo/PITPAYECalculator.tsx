@@ -6,6 +6,10 @@ import { TrustBadges } from '@/components/seo/TrustBadges';
 import { QuickTaxCalculator } from '@/components/seo/QuickTaxCalculator';
 import { ComparisonTable, PIT_COMPARISON_ROWS } from '@/components/seo/ComparisonTable';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
+import { ContentMeta } from '@/components/seo/ContentMeta';
+import { DataSourceCitation } from '@/components/seo/DataSourceCitation';
+import { TableOfContents } from '@/components/blog/TableOfContents';
 import { TrendingDown, CheckCircle2, Wallet, ArrowRight, Building2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/taxCalculations';
@@ -112,6 +116,23 @@ const PITPAYECalculator = () => {
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
             <div className="max-w-4xl mx-auto">
+              <PageBreadcrumbs items={[
+                { label: 'Home', href: '/' },
+                { label: 'Tax Tools', href: '/free-tax-calculator' },
+                { label: 'PIT/PAYE Calculator' },
+              ]} />
+              <ContentMeta published="2026-01-15" publishedLabel="January 15, 2026" updated="2026-02-13" updatedLabel="February 13, 2026" />
+
+              {/* Table of Contents */}
+              <TableOfContents items={[
+                { id: 'how-it-works', label: 'How to Calculate Your PIT/PAYE' },
+                { id: 'tax-bands', label: '2026 Tax Bands' },
+                { id: 'common-mistakes', label: 'Common Mistakes' },
+                { id: 'visualization', label: 'Tax Band Visualization' },
+                { id: 'salary-examples', label: 'Monthly Salary Examples' },
+                { id: 'faq', label: 'Frequently Asked Questions' },
+              ]} />
+
               {/* Hero */}
               <SEOHero
                 title="Nigerian PIT & PAYE Calculator"
@@ -136,7 +157,7 @@ const PITPAYECalculator = () => {
               </div>
 
               {/* How It Works */}
-              <section className="mb-12">
+              <section id="how-it-works" className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   How to Calculate Your 2026 PIT/PAYE
                 </h2>
@@ -156,7 +177,7 @@ const PITPAYECalculator = () => {
               </section>
 
               {/* 2026 Tax Bands */}
-              <section className="mb-12">
+              <section id="tax-bands" className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   2026 Personal Income Tax Bands
                 </h2>
@@ -194,11 +215,12 @@ const PITPAYECalculator = () => {
                       </tbody>
                     </table>
                   </div>
+                  <DataSourceCitation />
                 </div>
               </section>
 
               {/* Common Mistakes */}
-              <section className="mb-12">
+              <section id="common-mistakes" className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Common PIT/PAYE Mistakes to Avoid
                 </h2>
@@ -236,7 +258,7 @@ const PITPAYECalculator = () => {
               </section>
 
               {/* Visual Tax Band Chart */}
-              <section className="mb-12">
+              <section id="visualization" className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Progressive Tax Visualization
                 </h2>
@@ -274,7 +296,7 @@ const PITPAYECalculator = () => {
               </section>
 
               {/* Monthly Salary Examples */}
-              <section className="mb-12">
+              <section id="salary-examples" className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Monthly Salary Tax Examples
                 </h2>
@@ -444,7 +466,7 @@ const PITPAYECalculator = () => {
               </section>
 
               {/* FAQ Section - Accordion */}
-              <section className="mb-12">
+              <section id="faq" className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Frequently Asked Questions
                 </h2>

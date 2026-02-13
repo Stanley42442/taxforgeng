@@ -5,6 +5,9 @@ import { CTASection } from '@/components/seo/CTASection';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
 import { TrustBadges } from '@/components/seo/TrustBadges';
 import { StatsCounter } from '@/components/seo/StatsCounter';
+import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
+import { ContentMeta } from '@/components/seo/ContentMeta';
+import { TableOfContents } from '@/components/blog/TableOfContents';
 import { 
   Building2, 
   Home, 
@@ -159,6 +162,22 @@ const TaxReforms2026 = () => {
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
             <div className="max-w-5xl mx-auto">
+              <PageBreadcrumbs items={[
+                { label: 'Home', href: '/' },
+                { label: 'Tax Tools', href: '/free-tax-calculator' },
+                { label: '2026 Tax Reforms' },
+              ]} />
+              <ContentMeta published="2026-01-01" publishedLabel="January 1, 2026" updated="2026-02-13" updatedLabel="February 13, 2026" />
+
+              <TableOfContents items={[
+                { id: 'key-reforms', label: '5 Key Reforms You Need to Know' },
+                { id: 'how-affects-you', label: 'How These Reforms Affect You' },
+                { id: 'common-mistakes', label: 'Common Transition Mistakes' },
+                { id: 'who-benefits', label: 'Who Benefits Most?' },
+                { id: 'timeline', label: 'Implementation Timeline' },
+                { id: 'faq', label: 'Frequently Asked Questions' },
+              ]} />
+
               {/* Hero */}
               <SEOHero
                 badge="Nigeria Tax Act 2025"
@@ -179,7 +198,7 @@ const TaxReforms2026 = () => {
               </div>
 
               {/* Key Reforms Grid */}
-              <section className="mb-14">
+              <section id="key-reforms" className="mb-14">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   5 Key Reforms You Need to Know
                 </h2>
@@ -210,7 +229,7 @@ const TaxReforms2026 = () => {
               </section>
 
               {/* How These Reforms Affect You */}
-              <section className="mb-14">
+              <section id="how-affects-you" className="mb-14">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   How These Reforms Affect You
                 </h2>
@@ -230,7 +249,7 @@ const TaxReforms2026 = () => {
               </section>
 
               {/* Common Mistakes */}
-              <section className="mb-14">
+              <section id="common-mistakes" className="mb-14">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Common Mistakes During the Transition
                 </h2>
@@ -273,7 +292,7 @@ const TaxReforms2026 = () => {
               </section>
 
               {/* Who Benefits Most */}
-              <section className="mb-14">
+              <section id="who-benefits" className="mb-14">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Who Benefits Most?
                 </h2>
@@ -293,7 +312,7 @@ const TaxReforms2026 = () => {
               </section>
 
               {/* Timeline */}
-              <section className="mb-14">
+              <section id="timeline" className="mb-14">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Implementation Timeline
                 </h2>
@@ -324,7 +343,7 @@ const TaxReforms2026 = () => {
               </section>
 
               {/* FAQ Section - Accordion */}
-              <section className="mb-14">
+              <section id="faq" className="mb-14">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Frequently Asked Questions
                 </h2>

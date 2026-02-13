@@ -7,6 +7,8 @@ import { QuickTaxCalculator } from '@/components/seo/QuickTaxCalculator';
 import { StatsCounter } from '@/components/seo/StatsCounter';
 import { ComparisonTable, PIT_COMPARISON_ROWS } from '@/components/seo/ComparisonTable';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
+import { ContentMeta } from '@/components/seo/ContentMeta';
 import { CheckCircle2, Zap, Lock, ArrowRight, FileText, Calculator, Star, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
@@ -96,6 +98,12 @@ const FreeCalculator = () => {
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
             <div className="max-w-4xl mx-auto">
+              <PageBreadcrumbs items={[
+                { label: 'Home', href: '/' },
+                { label: 'Free Tax Calculator' },
+              ]} />
+              <ContentMeta published="2026-01-15" publishedLabel="January 15, 2026" updated="2026-02-13" updatedLabel="February 13, 2026" />
+
               {/* Hero */}
               <SEOHero
                 title="Calculate Your Nigerian Tax"
