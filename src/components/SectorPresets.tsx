@@ -82,7 +82,7 @@ const SECTOR_PRESETS: SectorPreset[] = [
       vatRate: 7.5,
       edtiRate: 5,
       pioneerStatus: true,
-      specialIncentives: ['NSA labeling (<₦1.5B)', 'EDTI 5% credit', 'R&D 120% deduction']
+      specialIncentives: ['NSA labeling (<₦1.5B)', 'EDTI 5% credit', 'R&D deduction (5% of turnover)']
     },
     myths: [
       { myth: 'All tech companies are tax-free', truth: 'Only NSA-approved software companies qualify for reduced rates' }

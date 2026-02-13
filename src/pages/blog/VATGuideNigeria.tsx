@@ -16,9 +16,9 @@ const VATGuideNigeria = () => {
 
   const faqs = [
     { question: 'What is the VAT rate in Nigeria in 2026?', answer: 'The VAT rate remains at 7.5% under the 2026 rules (Nigeria Tax Act 2025). There is no planned increase.' },
-    { question: 'Who must register for VAT?', answer: 'Any business with annual turnover exceeding ₦25 million must register for VAT with FIRS. Below this threshold, registration is optional but recommended for input VAT recovery.' },
+    { question: 'Who must register for VAT?', answer: 'Any business with annual turnover exceeding ₦25 million must register for VAT with NRS (formerly FIRS). Below this threshold, registration is optional but recommended for input VAT recovery.' },
     { question: 'What items are exempt from VAT?', answer: 'Basic food items (unprocessed agricultural produce, raw meat, fish), medical services, educational materials, baby products, and agricultural equipment are exempt. Exported goods are zero-rated.' },
-    { question: 'How often must VAT returns be filed?', answer: 'VAT returns are filed monthly, due by the 21st of the following month. Late filing attracts ₦50,000 for the first month plus ₦25,000 per additional month.' },
+    { question: 'How often must VAT returns be filed?', answer: 'VAT returns are filed monthly, due by the 21st of the following month. Late filing attracts ₦100,000 for the first month plus ₦50,000 per additional month (NTA 2025).' },
     { question: 'Can I recover input VAT?', answer: 'Yes. Registered businesses can offset input VAT (VAT paid on purchases) against output VAT (VAT collected on sales). If input exceeds output, you can carry the credit forward or apply for a refund.' },
   ];
 
@@ -53,7 +53,7 @@ const VATGuideNigeria = () => {
       <section id="what-is-vat">
         <h2 className="text-2xl font-bold text-foreground mb-4">What Is VAT?</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">
-          Value Added Tax (VAT) is an indirect, consumption-based tax charged at each stage of the supply chain. In Nigeria, VAT is administered by the Federal Inland Revenue Service (FIRS) under the Value Added Tax Act, now consolidated into the Nigeria Tax Act 2025.
+          Value Added Tax (VAT) is an indirect, consumption-based tax charged at each stage of the supply chain. In Nigeria, VAT is administered by the Nigeria Revenue Service (NRS, formerly FIRS) under the Nigeria Tax Act 2025.
         </p>
         <p className="text-muted-foreground leading-relaxed mb-4">
           Unlike income tax, which is levied on profits, VAT is charged on the value added at each production and distribution stage. The end consumer ultimately bears the tax, but businesses act as collection agents — charging VAT on sales (output VAT) and recovering VAT on purchases (input VAT).
@@ -82,7 +82,7 @@ const VATGuideNigeria = () => {
           </div>
         </div>
         <p className="text-muted-foreground leading-relaxed">
-          To register, apply at your local FIRS office or through the TaxPro Max online portal. You'll need your Tax Identification Number (TIN), CAC registration documents, and a completed VAT registration form.
+          To register, apply at your local NRS office or through the TaxPro Max online portal. You'll need your Tax Identification Number (TIN), CAC registration documents, and a completed VAT registration form.
         </p>
       </section>
 
@@ -99,7 +99,7 @@ const VATGuideNigeria = () => {
             <p>VAT (7.5%): ₦75,000</p>
             <p className="font-semibold text-foreground">Total invoice: ₦1,075,000</p>
           </div>
-          <p className="text-xs text-muted-foreground mt-3">The firm collects ₦75,000 as output VAT and remits it to FIRS (minus any input VAT credits).</p>
+          <p className="text-xs text-muted-foreground mt-3">The firm collects ₦75,000 as output VAT and remits it to NRS (minus any input VAT credits).</p>
         </div>
         <p className="text-muted-foreground leading-relaxed">
           Use our <Link to="/vat-calculator" className="text-primary hover:underline">VAT Calculator</Link> for instant computations.
@@ -134,7 +134,7 @@ const VATGuideNigeria = () => {
       <section id="input-vs-output">
         <h2 className="text-2xl font-bold text-foreground mb-4">Input vs Output VAT</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">
-          <strong className="text-foreground">Output VAT</strong> is the VAT you charge on your sales. <strong className="text-foreground">Input VAT</strong> is the VAT you pay on your business purchases. The difference is what you remit to FIRS.
+          <strong className="text-foreground">Output VAT</strong> is the VAT you charge on your sales. <strong className="text-foreground">Input VAT</strong> is the VAT you pay on your business purchases. The difference is what you remit to NRS.
         </p>
         <div className="glass-frosted rounded-xl p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Monthly VAT Calculation</h3>
@@ -153,7 +153,7 @@ const VATGuideNigeria = () => {
       <section id="filing">
         <h2 className="text-2xl font-bold text-foreground mb-4">Filing & Remittance</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">
-          VAT returns must be filed <strong className="text-foreground">monthly</strong>, due by the <strong className="text-foreground">21st of the following month</strong>. Filing is done through the FIRS TaxPro Max portal or at your local FIRS office.
+          VAT returns must be filed <strong className="text-foreground">monthly</strong>, due by the <strong className="text-foreground">21st of the following month</strong>. Filing is done through the NRS TaxPro Max portal or at your local NRS office.
         </p>
         <div className="glass-frosted rounded-xl p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Filing Checklist</h3>
@@ -179,10 +179,10 @@ const VATGuideNigeria = () => {
             <table className="w-full text-sm">
               <thead><tr className="border-b border-border"><th className="text-left py-2 text-foreground font-semibold">Offence</th><th className="text-left py-2 text-foreground font-semibold">Penalty</th></tr></thead>
               <tbody className="text-muted-foreground">
-                <tr className="border-b border-border/50"><td className="py-2">Late filing (first month)</td><td>₦50,000</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2">Late filing (each subsequent month)</td><td>₦25,000</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">Late filing (first month)</td><td>₦100,000</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">Late filing (each subsequent month)</td><td>₦50,000</td></tr>
                 <tr className="border-b border-border/50"><td className="py-2">Late payment</td><td>10% per annum interest</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2">Failure to register</td><td>₦50,000 first month + ₦25,000/month</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">Failure to register</td><td>₦100,000 first month + ₦50,000/month</td></tr>
                 <tr><td className="py-2">Failure to issue tax invoice</td><td>50% of invoice value</td></tr>
               </tbody>
             </table>

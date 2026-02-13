@@ -689,7 +689,7 @@ export const sectorGuides: SectorGuide[] = [
     benefits: [
       'EDTI (Expenditure on Domestic Technology Investment) 5% tax credits',
       'EDI tax credit eligibility for software development (replaces Pioneer Status)',
-      'R&D expense deductions at 120%',
+      'R&D expense deductions (capped at 5% of turnover)',
       'Export service income exemptions',
       'Foreign talent visa facilitation'
     ],
@@ -703,7 +703,7 @@ export const sectorGuides: SectorGuide[] = [
     taxIncentives: [
       { name: 'EDTI Credit', value: '5% of qualifying technology spend', duration: 'Annual' },
       { name: 'EDI Tax Credit', value: '5% annual credit on qualifying capex', duration: '5 years' },
-      { name: 'R&D Super Deduction', value: '120% of qualifying R&D costs', duration: 'Ongoing' },
+      { name: 'R&D Deduction', value: 'Up to 5% of turnover (NTA 2025, Sec 165)', duration: 'Ongoing' },
       { name: 'Export Services', value: 'Reduced WHT on export earnings', duration: 'Ongoing' }
     ],
     content: `The Nigerian Startup Act (NSA) provides significant benefits for qualifying tech companies:
@@ -1046,7 +1046,7 @@ Access to financing for:
     ],
     taxIncentives: [
       { name: 'NSA Benefits', value: 'Various tax credits', duration: 'For qualifying startups' },
-      { name: 'R&D Deduction', value: '120% of platform development costs', duration: 'Ongoing' },
+      { name: 'R&D Deduction', value: 'Up to 5% of turnover (NTA 2025, Sec 165)', duration: 'Ongoing' },
       { name: 'EDTI Credit', value: '5% on domestic tech spend', duration: 'Annual' }
     ],
     content: `Fintech companies have unique tax considerations:
@@ -1073,7 +1073,7 @@ Access to financing for:
 **NSA Labeling:**
 Qualifying fintechs can benefit from:
 - EDI tax credits (replaces Pioneer Status)
-- R&D super deductions
+- R&D deductions (5% of turnover cap)
 - EDTI credits
 - Simplified forex access
 
@@ -1300,10 +1300,11 @@ export const calculatePenalty = (
       description = '10% penalty on tax due + interest at CBN rate';
       break;
     case 'vat':
-      lateFiling = taxDue * 0.05; // 5% of tax due
-      monthlyPenalty = 5000 * monthsLate; // ₦5,000 per month
-      lateFiling += monthlyPenalty;
-      description = '5% penalty + ₦5,000 per month + interest';
+      lateFiling = 100000; // ₦100,000 first month (NTA 2025)
+      if (monthsLate > 1) {
+        lateFiling += 50000 * (monthsLate - 1); // ₦50,000 per subsequent month
+      }
+      description = '₦100,000 first month + ₦50,000/month thereafter + interest (NTA 2025)';
       break;
     case 'pit':
     case 'paye':

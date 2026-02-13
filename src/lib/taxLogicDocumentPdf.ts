@@ -577,7 +577,7 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
   addTable(
     ['Sector', 'CIT Rate', 'VAT Status', 'Special Incentives'],
     [
-      ['Technology/NSA', '0%', 'Standard', 'EDTI 5%, R&D 120% deduction'],
+      ['Technology/NSA', '0%', 'Standard', 'EDTI 5%, R&D deduction (5% turnover)'],
       ['Agriculture', '0%', 'Zero-rated', 'CIT holiday (primary production)'],
       ['Manufacturing', '30%', 'Standard', '10% investment credit'],
       ['Healthcare', '30%', 'Exempt', 'EDI tax credit eligible'],

@@ -17,8 +17,8 @@ const TaxCalendar2026 = () => {
     { question: 'When is the CIT filing deadline for 2026?', answer: 'Companies with a December year-end must file their 2025 CIT returns by June 30, 2026. For other year-ends, the deadline is 6 months after the financial year-end.' },
     { question: 'How often must VAT returns be filed?', answer: 'VAT returns are filed monthly, due by the 21st of the following month. For example, January VAT returns are due by February 21st.' },
     { question: 'When is the PAYE annual return deadline?', answer: 'Annual PAYE returns (Form H1) must be filed by January 31st of the following year. So the 2026 PAYE annual return is due by January 31, 2027.' },
-    { question: 'What happens if I miss a filing deadline?', answer: 'Penalties vary by tax type but generally include ₦50,000 for the first month of late filing, plus ₦25,000 for each subsequent month. Late payment attracts 10% per annum interest.' },
-    { question: 'Can I file taxes online in Nigeria?', answer: 'Yes. FIRS operates the TaxPro Max e-filing portal (tax.firs.gov.ng) for CIT, VAT, WHT, and other federal taxes. State taxes are filed with the respective state IRS portals.' },
+    { question: 'What happens if I miss a filing deadline?', answer: 'Penalties vary by tax type but generally include ₦100,000 for the first month of late filing, plus ₦50,000 for each subsequent month (NTA 2025). Late payment attracts 10% per annum interest.' },
+    { question: 'Can I file taxes online in Nigeria?', answer: 'Yes. NRS (formerly FIRS) operates the TaxPro Max e-filing portal for CIT, VAT, WHT, and other federal taxes. State taxes are filed with the respective state IRS portals.' },
   ];
 
   return (
@@ -147,8 +147,8 @@ const TaxCalendar2026 = () => {
             <table className="w-full text-sm">
               <thead><tr className="border-b border-border"><th className="text-left py-2 text-foreground font-semibold">Tax Type</th><th className="text-left py-2 text-foreground font-semibold">Late Filing Penalty</th><th className="text-left py-2 text-foreground font-semibold">Late Payment Interest</th></tr></thead>
               <tbody className="text-muted-foreground">
-                <tr className="border-b border-border/50"><td className="py-2">CIT</td><td>₦50,000 first month + ₦25,000/month</td><td>10% p.a.</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2">VAT</td><td>₦50,000 first month + ₦25,000/month</td><td>10% p.a.</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">CIT</td><td>₦100,000 first month + ₦50,000/month</td><td>10% p.a.</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">VAT</td><td>₦100,000 first month + ₦50,000/month</td><td>10% p.a.</td></tr>
                 <tr className="border-b border-border/50"><td className="py-2">PAYE (monthly)</td><td>10% p.a. interest</td><td>10% p.a.</td></tr>
                 <tr className="border-b border-border/50"><td className="py-2">PAYE (annual return)</td><td>₦500,000 + ₦50,000/day</td><td>—</td></tr>
                 <tr><td className="py-2">Pension</td><td>2% per month</td><td>Additional penalties per PenCom</td></tr>
