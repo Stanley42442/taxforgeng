@@ -33,7 +33,7 @@ const SmallCompanyExemption = () => {
     },
     {
       question: 'What happens if I exceed the thresholds mid-year?',
-      answer: 'If your turnover or assets exceed the limits during the year, you lose the small company status for that assessment year. You would be reclassified as medium or large and taxed accordingly.',
+      answer: 'If your turnover or assets exceed the limits during the year, you lose the small company status for that assessment year. You would be reclassified as a large company and taxed at 30%.',
     },
     {
       question: 'Can group companies each claim the exemption separately?',
@@ -166,7 +166,7 @@ const SmallCompanyExemption = () => {
                   <AlertTriangle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
                   <p className="text-sm text-muted-foreground">
                     <strong className="text-foreground">Important:</strong> You must meet BOTH conditions to qualify. 
-                    Exceeding either limit means standard CIT rates apply (30% for large, 20% for medium companies).
+                    Exceeding either limit means the standard 30% CIT rate applies as a large company. <strong className="text-foreground">Note:</strong> Professional service providers (law, accounting, medical, engineering firms) are excluded from the small company definition regardless of their turnover or asset size.
                   </p>
                 </div>
               </section>

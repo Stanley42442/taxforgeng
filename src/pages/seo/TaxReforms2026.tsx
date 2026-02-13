@@ -26,7 +26,7 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/
 const TaxReforms2026 = () => {
   const howToSteps = [
     { name: 'Check Your Income Against New PIT Bands', text: 'Compare your annual income to the new 2026 bands. The first ₦800,000 is now tax-free, with progressive rates of 15%, 18%, 21%, 23%, and 25%.' },
-    { name: 'Review Your Company\'s CIT Eligibility', text: 'If your company has turnover ≤₦50M AND assets ≤₦250M, you qualify for 0% CIT. Medium companies (₦50M-₦200M) pay 20%, large companies pay 30%.' },
+    { name: 'Review Your Company\'s CIT Eligibility', text: 'If your company has turnover ≤₦50M AND assets ≤₦250M, you qualify for 0% CIT. All other companies pay 30%. Professional service firms cannot qualify as small companies.' },
     { name: 'Calculate Your Rent Relief Entitlement', text: 'If you pay rent, you can now claim 20% of annual rent (max ₦500,000) as a deduction. This replaces the old Consolidated Relief Allowance.' },
     { name: 'Understand the Development Levy Impact', text: 'Companies (except small) now pay a 4% Development Levy on profits, replacing the old 3% Tertiary Education Tax. Budget accordingly.' },
     { name: 'Update Your Compliance Calendar', text: 'Review filing deadlines: PAYE remitted by the 10th monthly, CIT within 6 months of year-end, VAT by the 21st monthly.' },

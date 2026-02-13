@@ -15,7 +15,7 @@ const TaxGuideTechStartups = () => {
 
   const faqs = [
     { question: 'Do I need to register for tax as a startup?', answer: 'Yes. All Nigerian companies must register with FIRS within 6 months of incorporation, regardless of revenue. You\'ll receive a Tax Identification Number (TIN) which is required for banking and contracts.' },
-    { question: 'My startup has no revenue yet. Do I still pay tax?', answer: 'If you have no turnover, you qualify for the Small Company Exemption (0% CIT). However, you must still file annual returns with FIRS. The Development Levy applies once you have assessable profits.' },
+    { question: 'My startup has no revenue yet. Do I still pay tax?', answer: 'If you have no turnover, you qualify for the Small Company Exemption (0% CIT). You are also exempt from the Development Levy. However, you must still file annual returns with FIRS.' },
     { question: 'Does my SaaS revenue count for VAT purposes?', answer: 'Yes. SaaS subscriptions are vatable services. If your total turnover (including SaaS revenue) exceeds ₦25 million, you must register for VAT and charge 7.5% on vatable services.' },
     { question: 'Can I deduct staff salaries before calculating CIT?', answer: 'Yes. Salaries, wages, and employee benefits are deductible business expenses. They reduce your assessable profits and therefore your CIT and Development Levy.' },
     { question: 'What about foreign investors in my startup?', answer: 'Dividends paid to foreign investors are subject to 10% Withholding Tax (WHT) as final tax. Double Tax Treaties (DTAs) may reduce this rate for investors from treaty countries.' },
@@ -56,7 +56,7 @@ const TaxGuideTechStartups = () => {
         </p>
         <div className="grid gap-4 sm:grid-cols-2 mb-4">
           {[
-            { tax: 'CIT', rate: '0% or 25%', desc: 'Company Income Tax on profits. Small companies (≤₦50M turnover) pay 0%.' },
+            { tax: 'CIT', rate: '0% or 30%', desc: 'Company Income Tax on profits. Small companies (≤₦50M turnover AND ≤₦250M assets) pay 0%. Large companies pay 30%.' },
             { tax: 'VAT', rate: '7.5%', desc: 'On vatable goods and services. Only if turnover exceeds ₦25M.' },
             { tax: 'WHT', rate: '5-10%', desc: 'Deducted on payments for services, dividends, interest, and rent.' },
             { tax: 'PAYE', rate: '0-25%', desc: 'Personal income tax on employee salaries, deducted monthly.' },
@@ -71,7 +71,7 @@ const TaxGuideTechStartups = () => {
           ))}
         </div>
         <p className="text-muted-foreground leading-relaxed">
-          Additionally, all companies must pay the <strong className="text-foreground">Development Levy</strong> (4% of assessable profits). There is also the <strong className="text-foreground">NASENI Levy</strong> (0.25% of profit before tax) for companies with turnover above ₦100 million, but most startups fall below this.
+          Additionally, large companies must pay the <strong className="text-foreground">Development Levy</strong> (4% of assessable profits). Small companies qualifying for 0% CIT are exempt from the Development Levy. There is also the <strong className="text-foreground">NASENI Levy</strong> (0.25% of profit before tax) for companies with turnover above ₦100 million, but most startups fall below this.
         </p>
       </section>
 
