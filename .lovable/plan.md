@@ -1,94 +1,80 @@
 
 
-# SEO/AEO Phase 30: Fix R&D Deduction Error, Update VAT Penalties, Fix Remaining FIRS References, and Add Missing NTA 2025 Content
+# SEO/AEO Phase 31: Complete FIRS-to-NRS Migration (100+ Remaining References)
 
-## Research Findings
+## Problem
 
-Cross-referencing the signed Nigeria Tax Act 2025 (via PwC, EY, KPMG, AO2LAW, and Baker Tilly) against our site reveals three categories of issues: a factual calculation error, outdated penalty figures, and missed FIRS-to-NRS updates.
+Despite Phases 27-28 claiming full FIRS-to-NRS migration, **100+ "FIRS" references remain** across 16 files. This undermines our 2026 compliance positioning and creates inconsistency -- some pages say "NRS" while others still say "FIRS".
 
-### Verified: Our CIT threshold is CORRECT
+Additionally, `taxpromax.firs.gov.ng` URLs appear in 2 files and need updating to `taxpromax.nrs.gov.ng`.
 
-Multiple sources (PwC, Baker Tilly, SMB Law) cite NGN 100M as the small company threshold, but this is the **NTAA "small business" definition for VAT administration** (Section 147, NTAA). The actual **NTA "small company" definition for CIT** (Section 56, NTA) is NGN 50M, confirmed by:
-- EY (Section 56 reference): NGN 50M
-- AO2LAW (direct quote from the Act): "gross turnover of N50,000,000 or less"
-- The distinction is explicitly documented by AO2LAW: NTAA "small business" (N100M) is for VAT only; NTA "small company" (N50M) is for CIT
+## Verified: No New Factual Errors Found
 
-Our N50M CIT threshold is correct. No change needed.
+Cross-referencing PwC's "Top 20 Changes" (June 2025), AO2LAW's Section 56 analysis, and Andersen's stamp duty article against our site:
 
-### Issue 1: R&D Deduction Error (FACTUAL INACCURACY)
+- **CIT threshold (N50M)**: Confirmed correct per AO2LAW's direct quote of NTA Section 56. PwC cites N100M but that is the NTAA "small business" definition for VAT (Section 147), not the NTA "small company" definition for CIT.
+- **PIT bands**: Correct (6 bands, 0-25%)
+- **Development Levy (4%)**: Correct
+- **R&D cap (5% of turnover)**: Fixed in Phase 30
+- **VAT penalties (N100k/N50k)**: Fixed in Phase 30
+- **Mortgage Interest deduction**: Added in Phase 29
+- **CGT rates (30% companies, progressive for individuals)**: Correct
+- **EDI replacing Pioneer Status**: Correct
 
-Our site references "R&D 120% super deduction" in multiple places. The NTA 2025 **changed this**:
-- **Old rule**: 120% deduction of qualifying R&D costs (or 10% of profit)
-- **New rule (NTA 2025, Section 165)**: Capped at **5% of turnover** (KPMG confirms: "reduced from 10% of profit")
+No new factual calculation errors found. The only remaining issue is the incomplete FIRS-to-NRS migration.
 
-This is displayed to users in sector config, tax myths, and PDF exports. It is factually wrong under 2026 rules.
+## Files to Update (16 files, grouped by priority)
 
-**Files affected:**
-- `src/lib/sectorConfig.ts` (line 76)
-- `src/components/SectorPresets.tsx` (line 85)
-- `src/lib/taxMyths.ts` (lines 692, 706, 1049, 1076)
-- `src/lib/taxLogicDocumentPdf.ts` (line 580)
+### Group A: SEO Pages (highest impact -- public-facing, indexed by search engines)
 
-**Fix:** Change all "R&D 120% deduction" references to "R&D deduction (5% of turnover)" under 2026 rules.
+| File | FIRS Count | Key Changes |
+|------|-----------|-------------|
+| `src/pages/seo/TaxReports.tsx` | ~8 | "FIRS Compliant" badges to "NRS Compliant", FAQ answers, SEO meta, descriptions |
+| `src/pages/seo/VATCalculator.tsx` | ~4 | Badge text, filing instructions ("FIRS TaxPro Max" to "NRS TaxPro Max") |
+| `src/pages/seo/WHTCalculator.tsx` | ~3 | FAQ answers about remitting to FIRS, credit notes |
+| `src/pages/seo/CITCalculator.tsx` | ~2 | Badge text, common mistakes section |
+| `src/pages/seo/TaxReforms2026.tsx` | ~2 | SEO keywords, FAQ answer |
+| `src/pages/seo/PortHarcourtGuide.tsx` | ~5 | Schema markup, how-to steps, section headers, keywords |
+| `src/pages/seo/KanoGuide.tsx` | ~1 | Body text |
 
-### Issue 2: VAT Penalties Are Outdated
+### Group B: Main Pages
 
-PwC confirms the NTA 2025 increased non-compliance penalties:
-- **Old**: N50,000 first month + N25,000/month thereafter
-- **New (NTA 2025)**: **N100,000 first month + N50,000/month** thereafter
+| File | FIRS Count | Key Changes |
+|------|-----------|-------------|
+| `src/pages/FAQ.tsx` | ~4 | Lines 17, 47, 48, 58 -- filing references and "FIRS website" |
+| `src/pages/TaxFiling.tsx` | ~10 | Filing steps, portal links, descriptions, toast messages, `taxpromax.firs.gov.ng` URLs |
+| `src/pages/Roadmap.tsx` | ~1 | SEO keywords |
 
-Our site shows the old figures in at least 5 places.
+### Group C: Library/PDF Files
 
-**Files affected:**
-- `src/pages/blog/VATGuideNigeria.tsx` (lines 21, 182-185)
-- `src/pages/blog/TaxCalendar2026.tsx` (lines 20, 150-151)
-- `src/pages/FAQ.tsx` (line 38)
-- `src/components/PenaltyEstimator.tsx` (needs verification)
+| File | FIRS Count | Key Changes |
+|------|-----------|-------------|
+| `src/lib/taxFormsPdf.ts` | ~5 | PDF form headers, portal URLs, disclaimer text |
+| `src/lib/taxLogicDocumentPdf.ts` | ~3 | "Real-Time FIRS Updates" roadmap section |
+| `src/lib/taxMyths.ts` | ~8 | Remaining myth explanations and quiz explanations |
 
-**Fix:** Update all penalty amounts to the 2026 figures.
+### Group D: Edge Functions
 
-### Issue 3: VAT Guide Still Has FIRS References
+| File | FIRS Count | Key Changes |
+|------|-----------|-------------|
+| `supabase/functions/send-welcome-email/index.ts` | 1 | "pre-filled FIRS forms" |
+| `supabase/functions/send-trial-final-reminder/index.ts` | 1 | "Tax filing preparation for FIRS" |
 
-The VATGuideNigeria.tsx blog post was missed in the Phase 27-28 FIRS-to-NRS updates. It contains approximately 8 "FIRS" references.
+## Replacement Rules
 
-**Files affected:**
-- `src/pages/blog/VATGuideNigeria.tsx` (lines 19, 56, 85, 102, 137, 156)
+All replacements follow these consistent patterns:
+- "FIRS" in general references becomes "NRS" or "NRS (formerly FIRS)" on first mention per page
+- "FIRS Compliant" badge text becomes "NRS Compliant"
+- "FIRS TaxProMax" becomes "NRS TaxPro Max"
+- `taxpromax.firs.gov.ng` URLs become `taxpromax.nrs.gov.ng`
+- "Federal Taxes (FIRS)" section headers become "Federal Taxes (NRS)"
+- "file with FIRS" becomes "file with NRS"
+- SEO keywords keep both "NRS" and "FIRS" for search coverage (e.g., "NRS 2026, FIRS renamed")
 
-**Fix:** Replace all "FIRS" with "NRS" (or "NRS (formerly FIRS)" for filing references).
+## Technical Details
 
-### Issue 4: TaxCalendar2026 Blog Has FIRS Reference
-
-**Files affected:**
-- `src/pages/blog/TaxCalendar2026.tsx` (line 21: "FIRS operates the TaxPro Max e-filing portal")
-
-**Fix:** Update to "NRS operates the TaxPro Max e-filing portal (taxpromax.nrs.gov.ng)"
-
-### Issue 5: FAQ Still Has FIRS Reference
-
-**Files affected:**
-- `src/pages/FAQ.tsx` (line 36: "maintained by FIRS")
-
-**Fix:** Update to "maintained by NRS"
-
-## Changes Summary
-
-| File | Issue | Change |
-|------|-------|--------|
-| `src/lib/sectorConfig.ts` | R&D error | "R&D 120% deduction" to "R&D deduction (5% of turnover)" |
-| `src/components/SectorPresets.tsx` | R&D error | Same update |
-| `src/lib/taxMyths.ts` | R&D error | Update all 120% references to 5% of turnover |
-| `src/lib/taxLogicDocumentPdf.ts` | R&D error | Update table entry |
-| `src/pages/blog/VATGuideNigeria.tsx` | FIRS + penalties | Replace FIRS with NRS; update penalty amounts to N100k/N50k |
-| `src/pages/blog/TaxCalendar2026.tsx` | FIRS + penalties | Replace FIRS with NRS; update penalty amounts |
-| `src/pages/FAQ.tsx` | FIRS + penalties | Replace FIRS with NRS; update penalty amounts |
-| `src/components/PenaltyEstimator.tsx` | Penalties | Update penalty calculation logic if applicable |
-
-## What This Addresses
-
-- Fixes a factual inaccuracy (R&D 120% is pre-2026; 5% of turnover is the 2026 rule)
-- Corrects outdated penalty figures that could mislead users on compliance costs
-- Catches 10+ remaining FIRS references missed in Phase 27-28
-- Aligns all educational content with the signed Nigeria Tax Act 2025
-
-**Total: 8 files modified, 0 new files created**
+- 16 files modified, 0 new files created
+- Approximately 55 individual text replacements
+- No logic changes -- purely text/branding updates
+- Edge functions will auto-deploy after changes
 
