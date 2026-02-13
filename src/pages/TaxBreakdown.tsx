@@ -75,15 +75,15 @@ CIT Payable = ₦0`,
           explanation: "Small companies are exempt from CIT to support business growth."
         });
       } else {
-        const citRate = inputs.use2026Rules ? 0.25 : 0.30;
-        steps.push({
-          title: `Step ${stepNumber}: Company Income Tax (CIT)`,
-          content: `Calculating CIT on your taxable profit:
+      const citRate = 0.30;
+      steps.push({
+        title: `Step ${stepNumber}: Company Income Tax (CIT)`,
+        content: `Calculating CIT on your taxable profit:
 • Taxable Profit: ${formatCurrency(result.taxableIncome)}
-• CIT Rate: ${inputs.use2026Rules ? '25%' : '30%'}
+• CIT Rate: 30%
 
-CIT = ${formatCurrency(result.taxableIncome)} × ${citRate * 100}% = ${formatCurrency(result.incomeTax)}`,
-          explanation: inputs.use2026Rules ? "Under 2026 rules, CIT is 25%." : "Current CIT rate is 30%."
+CIT = ${formatCurrency(result.taxableIncome)} × 30% = ${formatCurrency(result.incomeTax)}`,
+          explanation: inputs.use2026Rules ? "Under 2026 rules, CIT is 30% for large companies. Small companies (turnover up to ₦50M, assets up to ₦250M) pay 0%." : "Current CIT rate is 30%."
         });
       }
       stepNumber++;
@@ -94,8 +94,9 @@ CIT = ${formatCurrency(result.taxableIncome)} × ${citRate * 100}% = ${formatCur
 ${inputs.use2026Rules ? `
 • First ₦800,000: 0% (Exempt)
 • ₦800k - ₦3m: 15%
-• ₦3m - ₦10m: 19%
-• ₦10m - ₦50m: 21%
+• ₦3m - ₦12m: 18%
+• ₦12m - ₦25m: 21%
+• ₦25m - ₦50m: 23%
 • Above ₦50m: 25%` : `
 • First ₦300,000: 7%
 • ₦300k - ₦600k: 11%

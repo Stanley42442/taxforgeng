@@ -19,7 +19,7 @@ const TaxReforms2026Summary = () => {
     { question: 'Did the VAT rate increase?', answer: 'No. The VAT rate remains at 7.5%. The reforms clarified the registration threshold (₦25M turnover) and expanded exemptions.' },
     { question: 'Are employees affected by the reforms?', answer: 'Yes. The new PIT bands with ₦800,000 tax-free threshold reduce taxes for most employees earning below ₦5 million annually.' },
     { question: 'What happened to the Consolidated Relief Allowance?', answer: 'The CRA (₦200,000 + 20% of income) has been replaced by the simpler Rent Relief system (20% of rent, max ₦500,000).' },
-    { question: 'How does the Development Levy affect my company?', answer: 'The Development Levy is 4% of assessable profits, replacing the 3% Tertiary Education Tax. It applies to all companies.' },
+    { question: 'How does the Development Levy affect my company?', answer: 'The Development Levy is 4% of assessable profits, replacing the 3% Tertiary Education Tax. It applies to large companies only — small companies qualifying for 0% CIT are exempt.' },
   ];
 
   return (
@@ -85,7 +85,7 @@ const TaxReforms2026Summary = () => {
       <section id="pit-bands">
         <h2 className="text-2xl font-bold text-foreground mb-4">New Personal Income Tax Bands</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">
-          The 2026 PIT structure introduces a generous ₦800,000 tax-free threshold, which means most minimum-wage earners and many lower-income workers pay zero income tax. Above this threshold, four progressive bands apply:
+          The 2026 PIT structure introduces a generous ₦800,000 tax-free threshold, which means most minimum-wage earners and many lower-income workers pay zero income tax. Above this threshold, five progressive bands apply:
         </p>
         <div className="glass-frosted rounded-xl p-5 mb-4">
           <div className="overflow-x-auto">
@@ -98,16 +98,17 @@ const TaxReforms2026Summary = () => {
               </thead>
               <tbody className="text-muted-foreground">
                 <tr className="border-b border-border/50"><td className="py-2">First ₦800,000</td><td>0%</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2">₦800,001 – ₦2,800,000</td><td>15%</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2">₦2,800,001 – ₦10,800,000</td><td>19%</td></tr>
-                <tr className="border-b border-border/50"><td className="py-2">₦10,800,001 – ₦50,000,000</td><td>21%</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">₦800,001 – ₦3,000,000</td><td>15%</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">₦3,000,001 – ₦12,000,000</td><td>18%</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">₦12,000,001 – ₦25,000,000</td><td>21%</td></tr>
+                <tr className="border-b border-border/50"><td className="py-2">₦25,000,001 – ₦50,000,000</td><td>23%</td></tr>
                 <tr><td className="py-2">Above ₦50,000,000</td><td>25%</td></tr>
               </tbody>
             </table>
           </div>
         </div>
         <p className="text-muted-foreground leading-relaxed mb-4">
-          <strong className="text-foreground">Worked Example:</strong> An employee earning ₦5,000,000 annually pays: ₦0 on the first ₦800,000 + ₦300,000 (15% × ₦2,000,000) + ₦418,000 (19% × ₦2,200,000) = <strong className="text-foreground">₦718,000 total tax</strong>. Under the old rules, this same employee would have paid approximately ₦860,000 — a saving of over ₦140,000.
+          <strong className="text-foreground">Worked Example:</strong> An employee earning ₦5,000,000 annually pays: ₦0 on the first ₦800,000 + ₦330,000 (15% × ₦2,200,000) + ₦360,000 (18% × ₦2,000,000) = <strong className="text-foreground">₦690,000 total tax</strong>. Under the old rules, this same employee would have paid approximately ₦860,000 — a saving of over ₦170,000.
         </p>
         <p className="text-muted-foreground leading-relaxed">
           Try our <Link to="/pit-paye-calculator" className="text-primary hover:underline">PIT/PAYE Calculator</Link> to see your exact breakdown.
@@ -118,7 +119,7 @@ const TaxReforms2026Summary = () => {
       <section id="cit-changes">
         <h2 className="text-2xl font-bold text-foreground mb-4">Company Income Tax Changes</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">
-          The standard CIT rate remains at 25%, but the major change is the doubling of the Small Company Exemption threshold. Previously, companies with turnover up to ₦25 million paid 0% CIT. Under the 2026 rules, this threshold has been raised to ₦50 million, with an additional asset threshold of ₦250 million.
+          The standard CIT rate for large companies is 30%. The major change is the doubling of the Small Company Exemption threshold. Previously, companies with turnover up to ₦25 million paid 0% CIT. Under the 2026 rules, this threshold has been raised to ₦50 million, with an additional asset threshold of ₦250 million.
         </p>
         <p className="text-muted-foreground leading-relaxed mb-4">
           This means thousands of additional Nigerian businesses — particularly tech startups, small retailers, and service providers — now pay zero company income tax. According to estimates, this could save qualifying businesses up to ₦12.5 million annually in CIT alone.
@@ -154,7 +155,7 @@ const TaxReforms2026Summary = () => {
       <section id="dev-levy">
         <h2 className="text-2xl font-bold text-foreground mb-4">Development Levy (Replacing TET)</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">
-          The Tertiary Education Tax (TET) of 3% has been replaced by the Development Levy at 4% of assessable profits. This applies to all companies and is payable in addition to CIT. The increase from 3% to 4% represents a marginal cost increase, but the broader reform benefits (particularly the Small Company Exemption) more than offset this for qualifying businesses.
+          The Tertiary Education Tax (TET) of 3% has been replaced by the Development Levy at 4% of assessable profits. This applies to large companies only — small companies qualifying for 0% CIT are also exempt from the Development Levy. The increase from 3% to 4% represents a marginal cost increase for large companies, but the broader reform benefits (particularly the Small Company Exemption) more than offset this for qualifying businesses.
         </p>
         <p className="text-muted-foreground leading-relaxed">
           For a company with ₦100 million in assessable profits, the Development Levy would be ₦4 million — up from ₦3 million under the old TET.

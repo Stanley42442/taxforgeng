@@ -9,15 +9,15 @@ const SmallCompanyCITExemption = () => {
     { id: 'how-to-claim', label: 'How to Claim the Exemption' },
     { id: 'worked-examples', label: 'Worked Examples' },
     { id: 'common-mistakes', label: 'Common Mistakes' },
-    { id: 'dev-levy', label: 'Development Levy Still Applies' },
+    { id: 'dev-levy', label: 'Development Levy: Who Pays?' },
     { id: 'faq', label: 'FAQ' },
   ];
 
   const faqs = [
     { question: 'What is the turnover threshold for 0% CIT in 2026?', answer: 'The threshold is ₦50 million annual turnover, doubled from the previous ₦25 million. Additionally, your total assets must be ₦250 million or less.' },
-    { question: 'Do I still pay the Development Levy if I qualify for 0% CIT?', answer: 'Yes. The Development Levy (4% of assessable profits) applies to all companies regardless of size. The 0% CIT exemption only covers Company Income Tax itself.' },
-    { question: 'Can a tech startup qualify for the Small Company Exemption?', answer: 'Absolutely. Many early-stage tech startups in Nigeria have turnover below ₦50 million and qualify. The exemption is sector-agnostic — it applies to all industries.' },
-    { question: 'What happens when my turnover exceeds ₦50 million?', answer: 'You lose the Small Company Exemption for that year and become liable for CIT at the standard 25% rate (or a reduced rate for medium companies). Plan ahead as you approach the threshold.' },
+    { question: 'Do I still pay the Development Levy if I qualify for 0% CIT?', answer: 'No. Small companies qualifying for 0% CIT are also exempt from the Development Levy (4% of assessable profits). The exemption covers CIT, CGT, and the Development Levy.' },
+    { question: 'Can a tech startup qualify for the Small Company Exemption?', answer: 'Yes, provided it is not a professional services firm (law, accounting, medical, engineering). Many early-stage tech startups in Nigeria have turnover below ₦50 million and qualify. The exemption is sector-agnostic for non-professional-service businesses.' },
+    { question: 'What happens when my turnover exceeds ₦50 million?', answer: 'You lose the Small Company Exemption for that year and become liable for CIT at the standard 30% rate for large companies. Plan ahead as you approach the threshold.' },
     { question: 'Is this the same as Pioneer Status tax holiday?', answer: 'No. Pioneer Status is a separate incentive for specific industries that provides a tax holiday for up to 5 years. The Small Company Exemption is automatic based on turnover and available to all sectors.' },
   ];
 
@@ -111,7 +111,7 @@ const SmallCompanyCITExemption = () => {
             { step: '1', title: 'Verify Eligibility', desc: 'Confirm your annual turnover is ≤ ₦50M and total assets are ≤ ₦250M. Use our Small Company Exemption Checker for instant verification.' },
             { step: '2', title: 'File Your CIT Return', desc: 'You must still file an annual CIT return with FIRS even though your liability is ₦0. Non-filing attracts penalties.' },
             { step: '3', title: 'Declare Small Company Status', desc: 'Indicate your small company status on the CIT return form. Provide audited financial statements as evidence.' },
-            { step: '4', title: 'Pay Development Levy', desc: 'Remember that the 4% Development Levy still applies. Calculate it on your assessable profits and pay separately.' },
+            { step: '4', title: 'Confirm Exemptions Apply', desc: 'As a qualifying small company, you are exempt from CIT, CGT, and the 4% Development Levy. Ensure your records clearly demonstrate eligibility.' },
           ].map((item) => (
             <div key={item.step} className="flex gap-4 items-start">
               <div className="h-8 w-8 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground text-sm font-bold shrink-0">{item.step}</div>
@@ -135,8 +135,8 @@ const SmallCompanyCITExemption = () => {
             <li>• Assessable profits: ₦8,000,000</li>
             <li>• Total assets: ₦45,000,000</li>
           </ul>
-          <p className="text-sm text-muted-foreground"><strong className="text-foreground">Result:</strong> Qualifies for 0% CIT. CIT payable = ₦0. Development Levy = 4% × ₦8,000,000 = <strong className="text-foreground">₦320,000</strong>.</p>
-          <p className="text-sm text-muted-foreground mt-1">Under old rules: would have paid 20% CIT (₦1,600,000) + 3% TET (₦240,000) = ₦1,840,000. <strong className="text-success">Saving: ₦1,520,000</strong>.</p>
+          <p className="text-sm text-muted-foreground"><strong className="text-foreground">Result:</strong> Qualifies for 0% CIT. CIT payable = ₦0. Development Levy = ₦0 (small companies are exempt).</p>
+          <p className="text-sm text-muted-foreground mt-1">Under old rules: would have paid 20% CIT (₦1,600,000) + 3% TET (₦240,000) = ₦1,840,000. <strong className="text-success">Saving: ₦1,840,000</strong>.</p>
         </div>
 
         <div className="glass-frosted rounded-xl p-5 mb-4">
@@ -147,8 +147,8 @@ const SmallCompanyCITExemption = () => {
             <li>• Assessable profits: ₦12,000,000</li>
             <li>• Total assets: ₦180,000,000 (including software IP)</li>
           </ul>
-          <p className="text-sm text-muted-foreground"><strong className="text-foreground">Result:</strong> Qualifies (turnover ≤ ₦50M, assets ≤ ₦250M). CIT = ₦0. Dev. Levy = <strong className="text-foreground">₦480,000</strong>.</p>
-          <p className="text-sm text-muted-foreground mt-1">Under old rules (turnover {'>'} ₦25M): would have paid 20% CIT (₦2,400,000) + TET (₦360,000) = ₦2,760,000. <strong className="text-success">Saving: ₦2,280,000</strong>.</p>
+          <p className="text-sm text-muted-foreground"><strong className="text-foreground">Result:</strong> Qualifies (turnover ≤ ₦50M, assets ≤ ₦250M). CIT = ₦0. Dev. Levy = ₦0 (exempt).</p>
+          <p className="text-sm text-muted-foreground mt-1">Under old rules (turnover {'>'} ₦25M): would have paid 20% CIT (₦2,400,000) + TET (₦360,000) = ₦2,760,000. <strong className="text-success">Saving: ₦2,760,000</strong>.</p>
         </div>
       </section>
 
@@ -158,7 +158,7 @@ const SmallCompanyCITExemption = () => {
           {[
             { mistake: 'Confusing turnover with profit', fix: 'The ₦50M threshold applies to gross turnover (revenue), not profit. A company with ₦48M turnover and ₦2M profit still qualifies.' },
             { mistake: 'Forgetting to file CIT returns', fix: 'Even with 0% CIT, you must file annual returns. FIRS penalties apply for non-filing regardless of your tax liability.' },
-            { mistake: 'Ignoring the Development Levy', fix: 'The 4% Development Levy applies to all companies. Budget for it even when CIT is ₦0.' },
+            { mistake: 'Assuming the Development Levy applies to small companies', fix: 'Small companies qualifying for 0% CIT are also exempt from the 4% Development Levy. The levy only applies to large companies.' },
             { mistake: 'Not tracking the asset threshold', fix: 'The ₦250M asset limit is new. If your business holds significant property, equipment, or IP, verify you\'re below this threshold.' },
           ].map((item, i) => (
             <div key={i} className="glass-frosted rounded-xl p-5 border-l-4 border-warning/60">
@@ -170,12 +170,18 @@ const SmallCompanyCITExemption = () => {
       </section>
 
       <section id="dev-levy">
-        <h2 className="text-2xl font-bold text-foreground mb-4">Development Levy Still Applies</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-4">Development Levy: Who Pays?</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">
-          It is important to understand that the 0% CIT exemption only covers Company Income Tax. The Development Levy — which replaced the Tertiary Education Tax — is a separate obligation at 4% of assessable profits and applies to <strong className="text-foreground">all companies</strong>, including those qualifying for the Small Company Exemption.
+          The Development Levy (4% of assessable profits) replaced the Tertiary Education Tax (TET) under the 2026 rules. However, small companies qualifying for the 0% CIT exemption are <strong className="text-foreground">also exempt</strong> from the Development Levy. This means qualifying small companies pay 0% CIT, 0% CGT, and 0% Development Levy.
+        </p>
+        <p className="text-muted-foreground leading-relaxed mb-4">
+          The Development Levy applies only to <strong className="text-foreground">large companies</strong> (turnover above ₦50M or assets above ₦250M). For a large company with ₦100 million in assessable profits, the Development Levy would be ₦4 million — in addition to the 30% CIT.
+        </p>
+        <p className="text-muted-foreground leading-relaxed mb-4">
+          <strong className="text-foreground">Important:</strong> Professional service providers (law firms, accounting firms, medical practices, engineering consultancies) are excluded from the small company definition regardless of their turnover or asset size, and are therefore subject to the Development Levy.
         </p>
         <p className="text-muted-foreground leading-relaxed">
-          For a small company with ₦10 million in assessable profits, the Development Levy is ₦400,000. While the CIT saving is significant, don't overlook this additional payment. Use our <Link to="/cit-calculator" className="text-primary hover:underline">CIT Calculator</Link> to compute both CIT and the Development Levy simultaneously.
+          Use our <Link to="/cit-calculator" className="text-primary hover:underline">CIT Calculator</Link> to compute both CIT and the Development Levy simultaneously.
         </p>
       </section>
     </BlogPostLayout>

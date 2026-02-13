@@ -358,7 +358,7 @@ const Learn = () => {
               </div>
               <div className="p-3 rounded-lg bg-secondary/50">
                 <strong className="text-foreground">Company Income Tax (CIT):</strong>
-                <p className="text-muted-foreground mt-1">Large companies: 30%. Medium (₦50M–₦200M): 20%. Small (turnover ≤₦50M AND assets ≤₦250M): 0% CIT.</p>
+                <p className="text-muted-foreground mt-1">Large companies (turnover above ₦50M or assets above ₦250M): 30%. Small companies (turnover ≤₦50M AND assets ≤₦250M): 0% CIT. Professional service firms are excluded from the small company definition.</p>
               </div>
               <div className="p-3 rounded-lg bg-secondary/50">
                 <strong className="text-foreground">VAT:</strong>

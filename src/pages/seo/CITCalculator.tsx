@@ -15,21 +15,21 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/
 
 const CITCalculator = () => {
   const howToSteps = [
-    { name: 'Determine Your Annual Turnover', text: 'Calculate your company\'s total gross revenue for the year. This determines which CIT category you fall into: small (≤₦50M), medium (₦50M-₦200M), or large (>₦200M).' },
+    { name: 'Determine Your Annual Turnover', text: 'Calculate your company\'s total gross revenue for the year. This determines which CIT category you fall into: small (≤₦50M turnover AND ≤₦250M assets) or large (above these thresholds).' },
     { name: 'Calculate Total Fixed Assets', text: 'Add up all fixed assets — land, buildings, machinery, vehicles, equipment. For small company status, total must be ≤₦250M.' },
-    { name: 'Check Your CIT Category', text: 'Small companies (turnover ≤₦50M AND assets ≤₦250M) pay 0%. Medium companies pay 20%. Large companies pay 30%.' },
-    { name: 'Calculate CIT and Development Levy', text: 'Apply your CIT rate to assessable profits. Then add the 4% Development Levy (replaces TET) for medium and large companies.' },
+    { name: 'Check Your CIT Category', text: 'Small companies (turnover ≤₦50M AND assets ≤₦250M) pay 0%. All other companies pay 30%. Professional service firms cannot qualify as small companies.' },
+    { name: 'Calculate CIT and Development Levy', text: 'Apply your CIT rate to assessable profits. Large companies also pay the 4% Development Levy (replaces TET). Small companies are exempt from both.' },
     { name: 'Subtract WHT Credits', text: 'Deduct any Withholding Tax credits you\'ve accumulated during the year to determine your net CIT payable.' },
   ];
 
   const faqs = [
     {
       question: 'What is Company Income Tax (CIT) in Nigeria?',
-      answer: 'Company Income Tax is a tax on the profits of incorporated companies operating in Nigeria. Under the 2026 rules, rates range from 0% for small companies to 30% for large companies.',
+      answer: 'Company Income Tax is a tax on the profits of incorporated companies operating in Nigeria. Under the 2026 rules, small companies (turnover ≤₦50M AND assets ≤₦250M) pay 0%, and large companies pay 30%.',
     },
     {
       question: 'How do I know if my company is small, medium, or large?',
-      answer: 'Company size is determined by annual turnover. Small: ≤₦50M turnover AND ≤₦250M assets. Medium: ₦50M-₦200M turnover. Large: >₦200M turnover.',
+      answer: 'Under the 2026 rules, companies are classified as either Small or Large. Small: ≤₦50M turnover AND ≤₦250M assets (0% CIT). Large: above these thresholds (30% CIT). Professional service providers (law, accounting, medical, engineering) cannot qualify as small companies.',
     },
     {
       question: 'What is the Development Levy?',
@@ -62,26 +62,18 @@ const CITCalculator = () => {
       highlight: true,
     },
     { 
-      category: 'Medium Company', 
-      rate: '20%', 
-      criteria: 'Turnover ₦50M - ₦200M',
-      example: { turnover: 100_000_000, profit: 15_000_000, tax: 3_000_000, levy: 600_000 },
-      highlight: false,
-    },
-    { 
       category: 'Large Company', 
       rate: '30%', 
-      criteria: 'Turnover >₦200M',
+      criteria: 'Turnover >₦50M OR Assets >₦250M',
       example: { turnover: 500_000_000, profit: 75_000_000, tax: 22_500_000, levy: 3_000_000 },
       highlight: false,
     },
   ];
 
   const citTerms = [
-    { name: 'Small Company', description: 'Annual turnover up to NGN 50M and fixed assets up to NGN 250M: 0% CIT rate' },
-    { name: 'Medium Company', description: 'Annual turnover NGN 50M to NGN 200M: 20% CIT rate' },
-    { name: 'Large Company', description: 'Annual turnover above NGN 200M: 30% CIT rate' },
-    { name: 'Development Levy', description: '4% of assessable profits, replaces Tertiary Education Tax. Applies to medium and large companies.' },
+    { name: 'Small Company', description: 'Annual turnover up to NGN 50M and fixed assets up to NGN 250M: 0% CIT rate. Professional service firms are excluded.' },
+    { name: 'Large Company', description: 'Annual turnover above NGN 50M or fixed assets above NGN 250M: 30% CIT rate' },
+    { name: 'Development Levy', description: '4% of assessable profits, replaces Tertiary Education Tax. Applies to large companies only — small companies are exempt.' },
   ];
 
   const schema = {
@@ -89,7 +81,7 @@ const CITCalculator = () => {
     '@graph': [
       createWebApplicationSchema(
         'Company Income Tax (CIT) Calculator Nigeria 2026',
-        'Calculate Nigerian CIT with 2026 rates. 0% for small companies, 20% medium, 30% large. Includes Development Levy.'
+        'Calculate Nigerian CIT with 2026 rates. 0% for small companies, 30% for large. Includes Development Levy.'
       ),
       createFAQSchema(faqs),
       createHowToSchema(
@@ -119,7 +111,7 @@ const CITCalculator = () => {
     <>
       <SEOHead
         title="Company Income Tax (CIT) Calculator Nigeria 2026 | TaxForge"
-        description="Nigerian CIT rates 2026: 0% small, 20% medium, 30% large companies. Calculate your company tax with Development Levy. Free guide."
+        description="Nigerian CIT rates 2026: 0% small companies, 30% large companies. Calculate your company tax with Development Levy. Free guide."
         canonicalPath="/cit-calculator"
         keywords="company income tax Nigeria, CIT calculator 2026, corporate tax Nigeria, small company exemption, Development Levy Nigeria"
         schema={schema}
