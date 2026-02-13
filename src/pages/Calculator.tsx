@@ -694,7 +694,7 @@ const CalculatorPage = () => {
                     value={inputs.fixedAssets}
                     onChange={(v) => updateInput('fixedAssets', v)}
                     placeholder="0"
-                    tooltip="Used to determine small company status (≤₦100M for 0% CIT under 2026 rules)"
+                    tooltip="Used to determine small company status (≤₦250M for 0% CIT under 2026 rules)"
                   />
                   <NeumorphicInput
                     label="Rent Paid"

@@ -424,7 +424,7 @@ const VATCalculator = () => {
                       Company Income Tax Calculator
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Calculate CIT at 0%, 20%, or 30%
+                      Calculate CIT at 0% or 30% under 2026 rules
                     </p>
                   </Link>
                   <Link to="/wht-calculator" className="glass-frosted rounded-xl p-5 hover-lift transition-all group">
