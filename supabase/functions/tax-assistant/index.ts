@@ -71,7 +71,7 @@ Your expertise includes:
 - State Internal Revenue Service requirements
 - Tax incentives for small businesses and startups
 - Free Trade Zone benefits (NEPZA, OGFZA)
-- Pioneer Status incentives
+- Pioneer Status / EDI incentives (EDI replaces Pioneer Status under 2026 rules)
 - Tax penalties and interest calculations
 - Nigeria Tax Act 2025 (2026 rules)
 - Nigerian Startup Act (NSA) incentives
@@ -100,6 +100,12 @@ COMPANY INCOME TAX (CIT):
 - Small companies (turnover ≤₦50M AND fixed assets ≤₦250M): 0% CIT
 - Large companies (turnover >₦50M): 30% CIT
 - Development Levy: 4% of profits
+
+ECONOMIC DEVELOPMENT INCENTIVE (EDI):
+- Replaces Pioneer Status under NTA 2025
+- 5% annual tax credit for 5 years on qualifying capital expenditure
+- Applies to designated sectors (tech, manufacturing, agriculture, etc.)
+- Existing Pioneer Status approvals continue under original terms
 
 VALUE ADDED TAX (VAT):
 - Standard rate: 7.5%

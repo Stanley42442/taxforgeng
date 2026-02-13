@@ -18,7 +18,7 @@ const SmallCompanyCITExemption = () => {
     { question: 'Do I still pay the Development Levy if I qualify for 0% CIT?', answer: 'No. Small companies qualifying for 0% CIT are also exempt from the Development Levy (4% of assessable profits). The exemption covers CIT, CGT, and the Development Levy.' },
     { question: 'Can a tech startup qualify for the Small Company Exemption?', answer: 'Yes, provided it is not a professional services firm (law, accounting, medical, engineering). Many early-stage tech startups in Nigeria have turnover below ₦50 million and qualify. The exemption is sector-agnostic for non-professional-service businesses.' },
     { question: 'What happens when my turnover exceeds ₦50 million?', answer: 'You lose the Small Company Exemption for that year and become liable for CIT at the standard 30% rate for large companies. Plan ahead as you approach the threshold.' },
-    { question: 'Is this the same as Pioneer Status tax holiday?', answer: 'No. Pioneer Status is a separate incentive for specific industries that provides a tax holiday for up to 5 years. The Small Company Exemption is automatic based on turnover and available to all sectors.' },
+    { question: 'Is this the same as Pioneer Status tax holiday?', answer: 'No. Pioneer Status (replaced by EDI under 2026 rules) was a separate incentive. The Economic Development Incentive (EDI) now provides a 5% annual tax credit for 5 years on qualifying capex. The Small Company Exemption is automatic based on turnover and available to all sectors.' },
   ];
 
   return (

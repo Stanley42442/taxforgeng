@@ -15,7 +15,7 @@ const PortHarcourtGuide = () => {
   const faqs = [
     { question: 'Do Rivers State businesses pay different taxes than other states?', answer: 'No, federal taxes (CIT, VAT, WHT) are the same nationwide. However, Rivers State has specific state levies and the Rivers State Internal Revenue Service (RIRS) handles state taxes like PAYE for state employees.' },
     { question: 'Where is the FIRS office in Port Harcourt?', answer: 'The main FIRS office in Port Harcourt is located at Federal Inland Revenue Service, Plot 6, Olu Obasanjo Road, Port Harcourt. There are also satellite offices in Trans-Amadi and GRA.' },
-    { question: 'Are there special tax incentives for oil and gas companies?', answer: 'Yes, Pioneer Status incentives may apply. Also, companies in designated Free Trade Zones enjoy tax holidays. However, the 2026 rules have modified some incentives - consult a tax professional for current eligibility.' },
+    { question: 'Are there special tax incentives for oil and gas companies?', answer: 'Under 2026 rules, Pioneer Status is replaced by the Economic Development Incentive (EDI), providing a 5% annual tax credit for 5 years on qualifying capex. Free Trade Zone benefits (e.g., Onne Oil & Gas FTZ) continue to apply. Consult a tax professional for current eligibility.' },
     { question: 'How do I register my Port Harcourt business for taxes?', answer: 'Visit the FIRS office with your CAC registration documents, utility bill, and ID. You can also start registration online via the FIRS TaxPro Max portal. TIN processing typically takes 2-5 working days.' },
     { question: 'What Free Trade Zone benefits apply in Rivers State?', answer: 'Businesses in the Onne Oil & Gas Free Zone and other designated zones enjoy tax holidays on profits, exemption from customs duties on imported equipment, and freedom from foreign exchange regulations. However, sales to the domestic market attract standard duties and taxes.' },
     { question: 'Can I e-file my taxes from Port Harcourt?', answer: 'Yes. FIRS operates the TaxPro Max e-filing portal (tax.firs.gov.ng) which is accessible nationwide. You can file CIT, VAT, and WHT returns online without visiting the physical office.' },
@@ -30,9 +30,9 @@ const PortHarcourtGuide = () => {
   ];
 
   const keySectors = [
-    { icon: Fuel, name: 'Oil & Gas', description: 'Nigeria\'s oil hub. Special petroleum profit tax rules apply alongside CIT.', tips: ['Petroleum Profits Tax (PPT) applies', 'Pioneer status available for deep offshore', 'Gas utilization incentives'] },
+    { icon: Fuel, name: 'Oil & Gas', description: 'Nigeria\'s oil hub. Special petroleum profit tax rules apply alongside CIT.', tips: ['Petroleum Profits Tax (PPT) applies', 'EDI tax credit for deep offshore (replaces Pioneer Status)', 'Gas utilization incentives'] },
     { icon: Ship, name: 'Maritime & Shipping', description: 'Major port city with significant shipping activity.', tips: ['Cabotage rules apply to local shipping', 'Port handling services subject to VAT', 'WHT on charter payments'] },
-    { icon: Factory, name: 'Manufacturing', description: 'Growing industrial zone with manufacturing incentives.', tips: ['Pioneer status for qualifying industries', 'Accelerated capital allowances', 'Free Trade Zone benefits'] },
+    { icon: Factory, name: 'Manufacturing', description: 'Growing industrial zone with manufacturing incentives.', tips: ['EDI tax credit for qualifying industries (replaces Pioneer Status)', 'Accelerated capital allowances', 'Free Trade Zone benefits'] },
     { icon: Building2, name: 'Construction & Real Estate', description: 'Active construction sector serving oil industry.', tips: ['5% WHT on contracts', '10% WHT on rent', 'Capital gains tax on property sales'] },
   ];
 

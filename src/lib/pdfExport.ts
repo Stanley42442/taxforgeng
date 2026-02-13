@@ -349,7 +349,7 @@ export const generateProfessionalPDF = (
       ruleItems.push(`EDTI Credit: ${rules.edtiRate}%`);
     }
     if (rules.pioneerStatus) {
-      ruleItems.push('Pioneer Status: Tax Holiday Eligible');
+      ruleItems.push('EDI Tax Credit (replaces Pioneer Status): 5% annual credit for 5 years');
     }
     if (rules.greenHireDeduction && rules.greenHireDeduction > 0) {
       ruleItems.push(`Green Hire Deduction: ${rules.greenHireDeduction}%`);

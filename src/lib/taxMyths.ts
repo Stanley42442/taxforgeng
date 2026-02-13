@@ -365,22 +365,22 @@ export const taxMyths: TaxMyth[] = [
   {
     id: 'pioneer-easy',
     myth: 'Getting Pioneer Status is easy and automatic for qualifying industries',
-    truth: 'Pioneer Status requires formal APPLICATION, approval process, and ongoing compliance.',
-    explanation: 'Pioneer Status (up to 5 years CIT holiday) requires: application to NIPC, investment/employment commitments, approval process (can take months), periodic reporting, and can be revoked for non-compliance. It\'s not automatic even for qualifying industries.',
+    truth: 'Pioneer Status required formal application to NIPC. Under 2026 rules, it is replaced by EDI (5% annual tax credit for 5 years on qualifying capex).',
+    explanation: 'Pioneer Status (up to 5 years CIT holiday) required: application to NIPC, investment/employment commitments, and ongoing compliance. Under the Nigeria Tax Act 2025, it is replaced by the Economic Development Incentive (EDI), which provides a 5% annual tax credit for 5 years on qualifying capital expenditure. Existing Pioneer Status approvals continue under their original terms, but new applicants should apply for EDI.',
     category: 'exemptions',
     severity: 'medium',
     tier: 'business',
-    relatedTopics: ['Pioneer Status', 'NIPC', 'tax holidays', 'investment incentives'],
+    relatedTopics: ['Pioneer Status', 'EDI', 'NIPC', 'tax credits', 'investment incentives'],
     quiz: {
-      question: 'How do you obtain Pioneer Status tax holiday?',
+      question: 'Under 2026 rules, what replaced the Pioneer Status tax holiday?',
       options: [
-        'Automatic for listed industries',
-        'Register with CAC in pioneer category',
-        'Formal application to NIPC with requirements',
+        'Automatic exemption for listed industries',
+        'Economic Development Incentive (EDI) — 5% annual tax credit',
+        'Extended CIT holiday of 10 years',
         'Simply claim it when filing taxes'
       ],
-      correctIndex: 2,
-      explanation: 'Pioneer Status requires formal application to NIPC, meeting investment criteria, and ongoing compliance reporting.'
+      correctIndex: 1,
+      explanation: 'Pioneer Status is replaced by EDI under the Nigeria Tax Act 2025, providing a 5% annual tax credit for 5 years on qualifying capex.'
     }
   },
   {
