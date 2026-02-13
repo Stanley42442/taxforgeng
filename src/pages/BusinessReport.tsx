@@ -144,27 +144,22 @@ const BusinessReport = () => {
   const estimateTax = (income: number, isCompany: boolean, turnover: number): number => {
     if (isCompany) {
       if (turnover <= 50000000) return 0;
-      return income * 0.25 + income * 0.04;
+      return income * 0.30 + income * 0.04;
     } else {
       if (income <= 800000) return 0;
-      let tax = 0;
-      let remaining = income - 800000;
+      const taxableAmount = income - 800000;
       
-      if (remaining > 0) {
-        const band = Math.min(remaining, 2200000);
-        tax += band * 0.15;
-        remaining -= band;
+      if (taxableAmount <= 2200000) {
+        return taxableAmount * 0.15;
+      } else if (taxableAmount <= 11200000) {
+        return 2200000 * 0.15 + (taxableAmount - 2200000) * 0.18;
+      } else if (taxableAmount <= 24200000) {
+        return 2200000 * 0.15 + 9000000 * 0.18 + (taxableAmount - 11200000) * 0.21;
+      } else if (taxableAmount <= 49200000) {
+        return 2200000 * 0.15 + 9000000 * 0.18 + 13000000 * 0.21 + (taxableAmount - 24200000) * 0.23;
+      } else {
+        return 2200000 * 0.15 + 9000000 * 0.18 + 13000000 * 0.21 + 25000000 * 0.23 + (taxableAmount - 49200000) * 0.25;
       }
-      if (remaining > 0) {
-        const band = Math.min(remaining, 7000000);
-        tax += band * 0.19;
-        remaining -= band;
-      }
-      if (remaining > 0) {
-        tax += remaining * 0.21;
-      }
-      
-      return tax;
     }
   };
 

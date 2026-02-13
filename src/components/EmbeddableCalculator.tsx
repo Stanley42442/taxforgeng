@@ -232,21 +232,23 @@ export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate }: Embe
         if (isSmallCompany) {
           cit = 0;
         } else {
-          cit = taxableIncome * 0.25;
+          cit = taxableIncome * 0.30;
         }
         developmentLevy = taxableIncome * 0.04;
       } else {
         const exemption = 800000;
         const taxableAmount = Math.max(0, taxableIncome - exemption);
         
-        if (taxableAmount <= 300000) {
+        if (taxableAmount <= 2200000) {
           pit = taxableAmount * 0.15;
-        } else if (taxableAmount <= 600000) {
-          pit = 300000 * 0.15 + (taxableAmount - 300000) * 0.19;
-        } else if (taxableAmount <= 1100000) {
-          pit = 300000 * 0.15 + 300000 * 0.19 + (taxableAmount - 600000) * 0.21;
+        } else if (taxableAmount <= 11200000) {
+          pit = 2200000 * 0.15 + (taxableAmount - 2200000) * 0.18;
+        } else if (taxableAmount <= 24200000) {
+          pit = 2200000 * 0.15 + 9000000 * 0.18 + (taxableAmount - 11200000) * 0.21;
+        } else if (taxableAmount <= 49200000) {
+          pit = 2200000 * 0.15 + 9000000 * 0.18 + 13000000 * 0.21 + (taxableAmount - 24200000) * 0.23;
         } else {
-          pit = 300000 * 0.15 + 300000 * 0.19 + 500000 * 0.21 + (taxableAmount - 1100000) * 0.25;
+          pit = 2200000 * 0.15 + 9000000 * 0.18 + 13000000 * 0.21 + 25000000 * 0.23 + (taxableAmount - 49200000) * 0.25;
         }
       }
 

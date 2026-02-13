@@ -190,10 +190,19 @@ const ApiDocs = () => {
         
         let tax = 0;
         if (demoInput.entityType === 'company') {
-          tax = taxableIncome <= 50000000 ? 0 : taxableIncome * 0.25;
+          tax = taxableIncome <= 50000000 ? 0 : taxableIncome * 0.30 + taxableIncome * 0.04;
         } else {
-          if (taxableIncome > 800000) {
-            tax = (taxableIncome - 800000) * 0.18;
+          const taxableAmount = Math.max(0, taxableIncome - 800000);
+          if (taxableAmount <= 2200000) {
+            tax = taxableAmount * 0.15;
+          } else if (taxableAmount <= 11200000) {
+            tax = 2200000 * 0.15 + (taxableAmount - 2200000) * 0.18;
+          } else if (taxableAmount <= 24200000) {
+            tax = 2200000 * 0.15 + 9000000 * 0.18 + (taxableAmount - 11200000) * 0.21;
+          } else if (taxableAmount <= 49200000) {
+            tax = 2200000 * 0.15 + 9000000 * 0.18 + 13000000 * 0.21 + (taxableAmount - 24200000) * 0.23;
+          } else {
+            tax = 2200000 * 0.15 + 9000000 * 0.18 + 13000000 * 0.21 + 25000000 * 0.23 + (taxableAmount - 49200000) * 0.25;
           }
         }
 
