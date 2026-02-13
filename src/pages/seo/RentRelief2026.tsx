@@ -138,7 +138,7 @@ const RentRelief2026 = () => {
               </div>
 
               {/* How It Works - Step by Step */}
-              <section className="mb-12">
+              <section id="how-it-works" className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   How to Claim Rent Relief
                 </h2>
@@ -333,7 +333,7 @@ const RentRelief2026 = () => {
               </section>
 
               {/* FAQ Section - Accordion */}
-              <section className="mb-12">
+              <section id="faq" className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Frequently Asked Questions
                 </h2>

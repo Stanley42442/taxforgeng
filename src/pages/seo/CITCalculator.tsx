@@ -164,7 +164,7 @@ const CITCalculator = () => {
               </header>
 
               {/* CIT Rates Overview */}
-              <section className="mb-12">
+              <section id="cit-rates" className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   2026 Company Income Tax Rates
                 </h2>
@@ -225,7 +225,7 @@ const CITCalculator = () => {
               </section>
 
               {/* How It Works */}
-              <section className="mb-12">
+              <section id="how-it-works" className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   How to Calculate Your CIT
                 </h2>
@@ -422,7 +422,7 @@ const CITCalculator = () => {
               </section>
 
               {/* FAQ Section - Accordion */}
-              <section className="mb-12">
+              <section id="faq" className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Frequently Asked Questions
                 </h2>

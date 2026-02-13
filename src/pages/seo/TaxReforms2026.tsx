@@ -171,7 +171,7 @@ const TaxReforms2026 = () => {
 
               <TableOfContents items={[
                 { id: 'key-reforms', label: '5 Key Reforms You Need to Know' },
-                { id: 'how-affects-you', label: 'How These Reforms Affect You' },
+                { id: 'how-it-works', label: 'How These Reforms Affect You' },
                 { id: 'common-mistakes', label: 'Common Transition Mistakes' },
                 { id: 'who-benefits', label: 'Who Benefits Most?' },
                 { id: 'timeline', label: 'Implementation Timeline' },
@@ -231,7 +231,7 @@ const TaxReforms2026 = () => {
               </section>
 
               {/* How These Reforms Affect You */}
-              <section id="how-affects-you" className="mb-14">
+              <section id="how-it-works" className="mb-14">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   How These Reforms Affect You
                 </h2>

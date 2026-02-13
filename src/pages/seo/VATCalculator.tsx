@@ -165,7 +165,7 @@ const VATCalculator = () => {
               </div>
 
               {/* How VAT Works */}
-              <section className="mb-12">
+              <section id="how-it-works" className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   How to Calculate Nigerian VAT
                 </h2>
@@ -265,7 +265,7 @@ const VATCalculator = () => {
               </section>
 
               {/* Exempt vs Taxable */}
-              <section className="mb-12" aria-label="VAT exempt and taxable items">
+              <section id="vat-rates" className="mb-12" aria-label="VAT exempt and taxable items">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   VAT-Exempt vs VATable Items
                 </h2>
@@ -393,7 +393,7 @@ const VATCalculator = () => {
               </section>
 
               {/* FAQ Section - Accordion */}
-              <section className="mb-12">
+              <section id="faq" className="mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   Frequently Asked Questions
                 </h2>
