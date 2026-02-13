@@ -39,25 +39,28 @@ This phase integrates new features into existing pages where they fit naturally,
 
 ---
 
-## TODO - Sub-phase B: Enhanced Tabs + Employer Cost
+## ✅ COMPLETED - Sub-phase B: Enhanced Tabs + Employer Cost
 
-### 1b. New Tab: "Rental Income" (`rental`) in IndividualCalculator
-- Inputs: annual rental income, maintenance costs, insurance, management fees, WHT already deducted (10%)
-- Calculates net rental tax position after WHT credits
-- Integration with PIT bands for total tax liability
+### Rental Income Tab (IndividualCalculator)
+- Added "Rental" tab with annual rental income, WHT deducted, maintenance/insurance/management fee inputs
+- New `calculateRentalTax()` function with WHT credit logic and PIT band integration
+- Shows net tax payable after WHT credits with detailed breakdown
 
-### 1c. Enhanced "Investment" Tab
-- Add dedicated Capital Gains Tax section with asset type selector, acquisition/disposal costs, holding period
-- 2026 small investor exemption logic (gains <= N10M AND proceeds < N150M)
+### Enhanced Investment Tab (CGT)
+- Added dedicated Capital Gains Tax section with asset type selector (property/shares/other)
+- Acquisition cost, improvement costs, disposal proceeds inputs with auto-calculated gains
+- Existing simple capital gains input preserved as override option
 
-### 1d. Enhanced "Informal" Tab (Freelancer)
-- Add professional services distinction, WHT implications, VAT threshold check
-- Toggle between presumptive and formal PIT paths, home office deduction
+### Enhanced Informal Tab (Freelancer)
+- Added "Use Formal PIT Path" toggle for professional/freelance services
+- Service type selector, business expenses, home office % deduction
+- 10% WHT credit calculation for professional services
+- VAT registration threshold warning (>₦25M)
 
-### Employer Cost Calculator (Payroll page new tab)
-- Inputs: employee gross salary
-- Auto-calculates employer contributions: Pension (10%), NSITF (1%), ITF (1%)
-- Shows total cost-to-company vs employee take-home
+### Employer Cost Calculator (Payroll page)
+- New "Cost to Co." tab at Basic tier
+- Calculates employer pension (10%), NSITF (1%), ITF (1%), employee take-home
+- Bulk mode: add multiple salary levels with aggregate totals
 
 ---
 

@@ -4,17 +4,17 @@ import { formatCurrency, formatNumber } from './taxCalculations';
 import { CRYPTO_TAX_CONFIG, PRESUMPTIVE_TAX_RATES } from './sectorConfig';
 
 export interface IndividualTaxInputs {
-  calculationType: 'pit' | 'foreign_income' | 'crypto' | 'investment' | 'informal';
+  calculationType: 'pit' | 'foreign_income' | 'crypto' | 'investment' | 'informal' | 'rental';
   use2026Rules: boolean;
   
   // PIT inputs
   employmentIncome?: number;
   pensionContribution?: number;
   nhfContribution?: number;
-  nhisContribution?: number; // Health insurance (NHIS)
+  nhisContribution?: number;
   lifeInsurancePremium?: number;
-  annualRentPaid?: number; // For 2026 Rent Relief (replaces CRA)
-  mortgageInterest?: number; // Interest on loan for building owner-occupied home
+  annualRentPaid?: number;
+  mortgageInterest?: number;
   
   // Foreign income inputs
   foreignIncome?: number;
@@ -38,6 +38,23 @@ export interface IndividualTaxInputs {
   estimatedTurnover?: number;
   location?: string;
   businessActivity?: string;
+
+  // Rental income inputs
+  rentalIncome?: number;
+  rentalMaintenance?: number;
+  rentalInsurance?: number;
+  rentalManagementFees?: number;
+  rentalWHTDeducted?: number;
+
+  // Freelancer enhancements
+  freelancerServiceType?: string;
+  freelancerExpenses?: number;
+  freelancerHomeOfficePercent?: number;
+  freelancerUseFormalPIT?: boolean;
+
+  // CGT enhancements
+  cgtAssetType?: string;
+  cgtDisposalProceeds?: number;
 }
 
 export interface IndividualTaxResult {
@@ -391,7 +408,68 @@ export function calculateInformalTax(inputs: IndividualTaxInputs): IndividualTax
   const alerts: TaxAlert[] = [];
   const recommendations: string[] = [];
 
-  // Calculate presumptive tax based on turnover bracket
+  // If freelancer uses formal PIT path
+  if (inputs.freelancerUseFormalPIT) {
+    const expenses = inputs.freelancerExpenses || 0;
+    const homeOfficePercent = (inputs.freelancerHomeOfficePercent || 0) / 100;
+    const homeOfficeDeduction = turnover * homeOfficePercent * 0.1; // rough estimate
+    const totalDeductions = expenses + homeOfficeDeduction;
+    const taxableIncome = Math.max(0, turnover - totalDeductions);
+
+    if (totalDeductions > 0) {
+      reliefs.push({
+        name: 'Business Expenses',
+        amount: expenses,
+        description: 'Allowable business expenses'
+      });
+      if (homeOfficeDeduction > 0) {
+        reliefs.push({
+          name: 'Home Office Deduction',
+          amount: homeOfficeDeduction,
+          description: `${inputs.freelancerHomeOfficePercent}% of estimated rent/utilities`
+        });
+      }
+    }
+
+    const bands = inputs.use2026Rules ? PIT_BANDS_2026 : PIT_BANDS_PRE2026;
+    const { tax, breakdown: pitBreakdown } = calculateProgressiveTax(taxableIncome, bands);
+
+    // WHT credit for professional services (10%)
+    const whtCredit = turnover * 0.10;
+    const netTax = Math.max(0, tax - whtCredit);
+
+    breakdown.push({ label: 'Gross Revenue', amount: turnover });
+    breakdown.push({ label: 'Less: Deductions', amount: -totalDeductions });
+    breakdown.push({ label: 'Taxable Income', amount: taxableIncome });
+    breakdown.push(...pitBreakdown);
+    breakdown.push({ label: 'Less: WHT Credit (10%)', amount: -whtCredit, description: 'WHT deducted by clients' });
+    breakdown.push({ label: 'Net Tax Payable', amount: netTax });
+
+    if (turnover > 25000000) {
+      alerts.push({ type: 'warning', message: 'Turnover exceeds ₦25M - VAT registration is required' });
+    }
+
+    if (inputs.freelancerServiceType) {
+      alerts.push({ type: 'info', message: `Service type: ${inputs.freelancerServiceType} - Professional services attract 10% WHT at source` });
+    }
+
+    alerts.push({ type: 'info', message: 'Professional service providers are excluded from CIT small company exemption regardless of size' });
+
+    recommendations.push('Keep detailed records of all business expenses for tax deduction');
+    recommendations.push('Issue proper invoices to clients for WHT credit documentation');
+
+    return {
+      taxableIncome,
+      reliefs,
+      taxPayable: netTax,
+      effectiveRate: turnover > 0 ? (netTax / turnover) * 100 : 0,
+      breakdown,
+      alerts,
+      recommendations
+    };
+  }
+
+  // Standard presumptive tax path
   let presumptiveTax = rates.min;
   if (turnover > 5000000) {
     presumptiveTax = rates.max;
@@ -407,35 +485,84 @@ export function calculateInformalTax(inputs: IndividualTaxInputs): IndividualTax
 
   const effectiveRate = turnover > 0 ? (presumptiveTax / turnover) * 100 : 0;
 
-  // Alerts
   if (turnover > 25000000) {
-    alerts.push({
-      type: 'warning',
-      message: 'Turnover exceeds ₦25M - VAT registration may be required'
-    });
+    alerts.push({ type: 'warning', message: 'Turnover exceeds ₦25M - VAT registration may be required' });
     recommendations.push('Consider formalizing as a registered business for better tax planning');
   }
 
   if (turnover > 50000000) {
-    alerts.push({
-      type: 'warning',
-      message: 'High turnover detected - formal business registration strongly recommended'
-    });
+    alerts.push({ type: 'warning', message: 'High turnover detected - formal business registration strongly recommended' });
   }
 
   recommendations.push('Register with CAC to access formal business benefits');
   recommendations.push('Open a dedicated business bank account for better record-keeping');
 
-  alerts.push({
-    type: 'info',
-    message: `Location: ${rates.description} - Tax range: ₦${formatNumber(rates.min)} - ₦${formatNumber(rates.max)}`
-  });
+  alerts.push({ type: 'info', message: `Location: ${rates.description} - Tax range: ₦${formatNumber(rates.min)} - ₦${formatNumber(rates.max)}` });
 
   return {
     taxableIncome: turnover,
     reliefs,
     taxPayable: presumptiveTax,
     effectiveRate,
+    breakdown,
+    alerts,
+    recommendations
+  };
+}
+
+// Calculate Rental Income Tax
+export function calculateRentalTax(inputs: IndividualTaxInputs): IndividualTaxResult {
+  const rentalIncome = inputs.rentalIncome || 0;
+  const maintenance = inputs.rentalMaintenance || 0;
+  const insurance = inputs.rentalInsurance || 0;
+  const managementFees = inputs.rentalManagementFees || 0;
+  const whtDeducted = inputs.rentalWHTDeducted || 0;
+
+  const reliefs: TaxReliefItem[] = [];
+  const breakdown: TaxBreakdownItem[] = [];
+  const alerts: TaxAlert[] = [];
+  const recommendations: string[] = [];
+
+  const totalDeductions = maintenance + insurance + managementFees;
+  const taxableRentalIncome = Math.max(0, rentalIncome - totalDeductions);
+
+  if (totalDeductions > 0) {
+    reliefs.push({ name: 'Maintenance Costs', amount: maintenance, description: 'Repairs and maintenance' });
+    if (insurance > 0) reliefs.push({ name: 'Property Insurance', amount: insurance, description: 'Insurance premiums' });
+    if (managementFees > 0) reliefs.push({ name: 'Management Fees', amount: managementFees, description: 'Property management costs' });
+  }
+
+  // Apply PIT bands to taxable rental income
+  const bands = inputs.use2026Rules ? PIT_BANDS_2026 : PIT_BANDS_PRE2026;
+  const { tax, breakdown: pitBreakdown } = calculateProgressiveTax(taxableRentalIncome, bands);
+
+  // WHT credit
+  const netTax = Math.max(0, tax - whtDeducted);
+
+  breakdown.push({ label: 'Gross Rental Income', amount: rentalIncome });
+  if (totalDeductions > 0) breakdown.push({ label: 'Less: Allowable Deductions', amount: -totalDeductions });
+  breakdown.push({ label: 'Taxable Rental Income', amount: taxableRentalIncome });
+  breakdown.push(...pitBreakdown);
+  if (whtDeducted > 0) {
+    breakdown.push({ label: 'Less: WHT Credit', amount: -whtDeducted, description: '10% WHT deducted at source' });
+    reliefs.push({ name: 'WHT Credit', amount: whtDeducted, description: '10% WHT already deducted by tenant' });
+  }
+  breakdown.push({ label: 'Net Tax Payable', amount: netTax });
+
+  alerts.push({ type: 'info', message: '10% WHT on rent is deducted at source and can be credited against your PIT liability' });
+
+  if (whtDeducted > 0 && whtDeducted >= tax) {
+    alerts.push({ type: 'success', message: 'WHT already covers your full tax liability - no additional tax payable!' });
+  }
+
+  recommendations.push('Keep receipts for all maintenance and improvement costs');
+  recommendations.push('Ensure tenants provide WHT certificates for credit claims');
+
+  return {
+    taxableIncome: taxableRentalIncome,
+    reliefs,
+    taxPayable: netTax,
+    effectiveRate: rentalIncome > 0 ? (netTax / rentalIncome) * 100 : 0,
     breakdown,
     alerts,
     recommendations
@@ -557,8 +684,9 @@ export function calculateIndividualTax(inputs: IndividualTaxInputs): IndividualT
       return calculateInformalTax(inputs);
     case 'investment':
       return calculateInvestmentTax(inputs);
+    case 'rental':
+      return calculateRentalTax(inputs);
     case 'foreign_income':
-      // Use foreign income calculator component
       return calculatePersonalIncomeTax({
         ...inputs,
         employmentIncome: inputs.foreignIncome
