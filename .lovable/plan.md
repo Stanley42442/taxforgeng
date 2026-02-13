@@ -1,70 +1,109 @@
 
 
-# SEO/AEO Phase 20: Sector Guide Data -- Remaining Pioneer Status References Without EDI Context
+# SEO/AEO Phase 21: Remove Abolished Medium Company CIT Tier from Schema, AI Files, and Docs
 
 ## Summary
 
-The sector guide data in `src/lib/taxMyths.ts` contains 7 references to "Pioneer Status" as a current incentive without mentioning its replacement by the Economic Development Incentive (EDI) under NTA 2025. These appear in the tech, fintech, and healthcare sector guides -- user-facing educational content indexed by search engines.
+The Nigeria Tax Act 2025 **abolished the medium-sized company classification entirely** (confirmed by Baker Tilly: "Elimination of Medium-Sized Company Classification"). Under 2026 rules, companies are either **small (0% CIT)** or **standard/large (30% CIT)**. The old 20% medium tier was part of the pre-2026 CITA regime.
+
+The calculator code and Tax Logic Reference page already correctly implement only two tiers. However, three files still present a three-tier CIT system as 2026 law -- including the homepage structured data (FAQPage schema), the AI-facing llms-full.txt, and the internal business plan.
+
+**Source:** Baker Tilly Nigeria (Aug 2025), "Elimination of Medium-Sized Company Classification -- The medium-sized company category has been removed entirely. Taxpayers are now either small (exempt) or standard (fully liable)." Also confirmed by AO2 Law citing NTA 2025 Section 56.
 
 ## Errors Found
 
-### Error 1: Tech Sector -- benefits array (line 691)
-- Current: `'Pioneer Status eligibility for software development'`
-- Fix: `'EDI tax credit eligibility for software development (replaces Pioneer Status)'`
+### Error 1: index.html -- FAQPage Schema Answer (line 145)
 
-### Error 2: Tech Sector -- taxIncentives array (line 705)
-- Current: `{ name: 'Pioneer Status', value: '0% CIT', duration: 'Up to 5 years' }`
-- Fix: `{ name: 'EDI Tax Credit', value: '5% annual credit on qualifying capex', duration: '5 years' }`
+The structured data FAQ answer for "What is the company income tax rate in Nigeria?" states: "Medium companies (₦50M-₦200M turnover) pay 20%." This is indexed by Google and AI engines as a factual claim about 2026 law.
 
-### Error 3: Fintech Sector -- benefits array (line 1038)
-- Current: `'Potential Pioneer Status for innovative services'`
-- Fix: `'EDI tax credit for innovative services (replaces Pioneer Status)'`
+- **Fix:** Remove medium company reference. State: "Companies not qualifying as small pay 30% CIT."
 
-### Error 4: Fintech Sector -- content string (line 1075)
-- Current: `'- Tax holidays via Pioneer Status'`
-- Fix: `'- EDI tax credits (replaces Pioneer Status)'`
+### Error 2: index.html -- DefinedTerm "CIT Medium Company" (line 213)
 
-### Error 5: Healthcare Sector -- benefits array (line 1095)
-- Current: `'Pioneer Status for local drug manufacturing'`
-- Fix: `'EDI tax credit for local drug manufacturing (replaces Pioneer Status)'`
+A DefinedTerm in the DefinedTermSet schema markup declares a medium company tier at 20%.
 
-### Error 6: Healthcare Sector -- taxIncentives array (line 1109)
-- Current: `{ name: 'Drug Manufacturing', value: 'Pioneer Status available', duration: 'Up to 5 years' }`
-- Fix: `{ name: 'Drug Manufacturing', value: 'EDI tax credit available', duration: '5 years' }`
+- **Fix:** Remove this DefinedTerm entirely.
 
-### Error 7: Healthcare Sector -- content string (line 1128)
-- Current: `'- Pioneer Status (0% CIT for 3-5 years)'`
-- Fix: `'- EDI tax credit (5% annual credit for 5 years, replaces Pioneer Status)'`
+### Error 3: index.html -- Noscript Fallback CIT Table (line 242)
 
-## File to Modify
+The noscript section lists "Medium Company (turnover ₦50M - ₦200M): 20% CIT" for non-JS users and crawlers.
+
+- **Fix:** Remove the medium company row. Show only small (0%) and large/standard (30%).
+
+### Error 4: public/llms-full.txt -- CIT Rates Table (line 56)
+
+The AI-facing file lists "Medium (turnover ₦50M-₦200M): 20%" as a 2026 rate.
+
+- **Fix:** Remove the medium row. Add note about professional services exclusion.
+
+### Error 5: docs/BUSINESS_PLAN.md -- CIT Table (line 475)
+
+Internal documentation lists the same incorrect medium tier.
+
+- **Fix:** Remove medium company row. Update to two-tier system.
+
+## Files to Modify
 
 | File | Changes |
 |------|---------|
-| `src/lib/taxMyths.ts` | Update 7 Pioneer Status references across tech, fintech, and healthcare sector guides |
+| `index.html` | Fix FAQPage answer (line 145), remove DefinedTerm (line 213), fix noscript table (line 242) |
+| `public/llms-full.txt` | Remove medium company row from CIT table (line 56) |
+| `docs/BUSINESS_PLAN.md` | Remove medium company row from CIT table (line 475) |
 
 ## Technical Details
 
-All changes are in `src/lib/taxMyths.ts`:
+### index.html (line 145)
+```
+From: "CIT rates for 2026: Small companies (turnover ≤₦50M and assets ≤₦250M) pay 0%. Medium companies (₦50M-₦200M turnover) pay 20%. Large companies (above ₦200M) pay 30%. A 4% Development Levy also applies to medium and large companies."
+To:   "CIT rates for 2026: Small companies (turnover ≤₦50M and assets ≤₦250M, excluding professional services) pay 0% CIT, 0% CGT, and 0% Development Levy. All other companies pay 30% CIT plus 4% Development Levy. The medium company tier (20%) has been abolished under NTA 2025."
+```
 
-**Line 691:** `'Pioneer Status eligibility for software development'` to `'EDI tax credit eligibility for software development (replaces Pioneer Status)'`
+### index.html (line 213) -- Remove this line:
+```
+{"@type": "DefinedTerm", "name": "CIT Medium Company", "description": "Turnover NGN 50M to NGN 200M: 20% CIT"},
+```
 
-**Line 705:** `{ name: 'Pioneer Status', value: '0% CIT', duration: 'Up to 5 years' }` to `{ name: 'EDI Tax Credit', value: '5% annual credit on qualifying capex', duration: '5 years' }`
+### index.html (lines 241-243) -- Noscript CIT table
+```
+From:
+  <dt>Small Company (turnover ≤ ₦50M, assets ≤ ₦250M)</dt><dd>0% CIT</dd>
+  <dt>Medium Company (turnover ₦50M – ₦200M)</dt><dd>20% CIT</dd>
+  <dt>Large Company (turnover > ₦200M)</dt><dd>30% CIT</dd>
+To:
+  <dt>Small Company (turnover ≤ ₦50M, assets ≤ ₦250M, excl. professional services)</dt><dd>0% CIT</dd>
+  <dt>All Other Companies</dt><dd>30% CIT + 4% Development Levy</dd>
+```
 
-**Line 1038:** `'Potential Pioneer Status for innovative services'` to `'EDI tax credit for innovative services (replaces Pioneer Status)'`
+### public/llms-full.txt (lines 55-57)
+```
+From:
+  | Small (turnover ≤₦50M AND assets ≤₦250M) | 0% |
+  | Medium (turnover ₦50M-₦200M) | 20% |
+  | Large (turnover >₦200M) | 30% |
+To:
+  | Small (turnover ≤₦50M AND assets ≤₦250M, excl. professional services) | 0% |
+  | All other companies | 30% |
+```
 
-**Line 1075:** `'- Tax holidays via Pioneer Status'` to `'- EDI tax credits (replaces Pioneer Status)'`
-
-**Line 1095:** `'Pioneer Status for local drug manufacturing'` to `'EDI tax credit for local drug manufacturing (replaces Pioneer Status)'`
-
-**Line 1109:** `{ name: 'Drug Manufacturing', value: 'Pioneer Status available', duration: 'Up to 5 years' }` to `{ name: 'Drug Manufacturing', value: 'EDI tax credit available', duration: '5 years' }`
-
-**Line 1128:** `'- Pioneer Status (0% CIT for 3-5 years)'` to `'- EDI tax credit (5% annual credit for 5 years, replaces Pioneer Status)'`
+### docs/BUSINESS_PLAN.md (lines 474-476)
+```
+From:
+  | Small Company | ≤ ₦50M AND Assets ≤ ₦250M | 0% |
+  | Medium Company | > ₦50M to ₦200M | 20% |
+  | Large Company | > ₦200M | 30% |
+To:
+  | Small Company | ≤ ₦50M AND Assets ≤ ₦250M (excl. professional services) | 0% |
+  | All Other Companies | Above small thresholds | 30% |
+```
 
 ## What This Addresses
 
-- 3 sector benefit arrays presenting Pioneer Status as current law
-- 2 taxIncentives arrays with outdated Pioneer Status values
-- 2 long-form content strings describing Pioneer Status tax holidays without EDI
+- 1 FAQPage schema answer presenting an abolished CIT tier as 2026 law (highest SEO/AEO impact)
+- 1 DefinedTerm schema entry for a non-existent tax classification
+- 1 noscript fallback table with incorrect CIT tiers
+- 1 AI-facing file (llms-full.txt) providing wrong data to LLM crawlers
+- 1 internal doc with outdated CIT tiers
+- Also adds professional services exclusion note (per NTA 2025 Section 202) where missing
 
-**Total: 1 file modified, 7 individual text corrections, 0 new files created**
+**Total: 3 files modified, 0 new files created**
 
