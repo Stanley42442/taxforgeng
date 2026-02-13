@@ -1,77 +1,105 @@
 
 
-# SEO/AEO Phase 15: Advisory Logic Wrong PIT Rate and Blog Pioneer Status Without EDI Update
+# SEO/AEO Phase 16: State Guides and SectorPresets Still Reference Pioneer Status as Current Law
 
 ## Summary
 
-Two files contain factual inaccuracies about the 2026 tax regime. The advisory recommendation engine quotes the wrong top PIT rate and the old small company threshold. The tech startup blog post presents Pioneer Status as the current incentive regime without mentioning that NTA 2025 replaced it with the Economic Development Incentive (EDI).
+Four files reference Pioneer Status as the current incentive regime without mentioning that NTA 2025 replaced it with the Economic Development Incentive (EDI). The blog post was updated in Phase 15, but the state-level SEO guides and the legacy SectorPresets component still present Pioneer Status as active law.
 
 ## Errors Found
 
-### Error 1: advisoryLogic.ts -- Wrong Top PIT Rate (24% instead of 25%)
+### Error 1: LagosGuide.tsx — Pioneer Status as Current Incentive (2 references)
 
-**File:** `src/lib/advisoryLogic.ts`, line 87
+**File:** `src/pages/seo/LagosGuide.tsx`
 
-The LLC recommendation pros list says:
+- Line 19 FAQ answer: "Pioneer status may also apply to qualifying tech companies" — no EDI mention
+- Line 31 sector tip: "Pioneer status for qualifying tech" — presents as current
 
-> "Lower corporate income tax rate (30% vs up to 24% PIT)"
+**Fix:** Add "(now replaced by EDI under 2026 rules)" context to both references.
 
-The top PIT rate under 2026 rules is **25%** (above N50M), not 24%. The 24% rate was the pre-2026 top band. This is a user-facing recommendation that directly compares entity types.
+### Error 2: KanoGuide.tsx — Pioneer Status Tax Holiday Described as Current (3 references)
 
-**Fix:** Change "up to 24% PIT" to "up to 25% PIT"
+**File:** `src/pages/seo/KanoGuide.tsx`
 
-### Error 2: advisoryLogic.ts -- Stale Small Company Threshold Reference
+- Line 19 FAQ answer: "may qualify for Pioneer Status incentives, providing a tax holiday of up to 5 years" — describes the old regime as current
+- Line 31 sector tip: "Pioneer status for value-addition"
+- Line 33 sector tip: "Pioneer status incentives"
 
-**File:** `src/lib/advisoryLogic.ts`, line 113
+**Fix:** Update the FAQ answer to explain that Pioneer Status is replaced by EDI (5% annual credit for 5 years). Update sector tips to reference "EDI/Pioneer Status".
 
-The Business Name pros list says:
+### Error 3: SectorPresets.tsx — Pioneer Status in Myths and Benefits (2 references)
 
-> "Lower tax rates for income under N25M"
+**File:** `src/components/SectorPresets.tsx`
 
-Under 2026 rules, the small company CIT exemption threshold is N50M (turnover) not N25M. The N25M figure was the pre-2026 threshold. This advisory recommendation feeds directly into entity-type decisions.
+- Line 122: Manufacturing myth says "Pioneer status requires NIPC approval" — should note EDI replacement
+- Line 201: Healthcare benefits list includes "Pioneer Status" — should say "EDI (formerly Pioneer Status)"
 
-**Fix:** Change to "Lower tax rates for income under N50M (2026 small company threshold)"
+**Fix:** Update myth truth text and benefits label to reflect EDI transition.
 
-### Error 3: TaxGuideTechStartups.tsx -- Pioneer Status Without EDI Context
+### Error 4: AbujaGuide.tsx — Misleading VAT Phrasing
 
-**File:** `src/pages/blog/TaxGuideTechStartups.tsx`, lines 118-135
+**File:** `src/pages/seo/AbujaGuide.tsx`, line 32
 
-The blog post presents Pioneer Status (via NIPC) as the current incentive regime. However, the NTA 2025 replaced Pioneer Status with the **Economic Development Incentive (EDI)**: a 5% annual tax credit for 5 years on qualifying capital expenditure. The calculation engine already handles this distinction (taxCalculations.ts lines 214-224), but the blog does not.
+The consulting sector tip says "VAT on services above ₦25M" which implies VAT only applies above ₦25M turnover. In reality, ₦25M is the mandatory registration threshold — VAT applies to all vatable supplies once registered. This could mislead businesses into thinking they don't need to charge VAT.
 
-This is an authoritative SEO article targeting "Nigeria tech startup tax guide" -- it must reflect the 2026 law.
-
-**Fix:** Add a paragraph noting that under 2026 rules, Pioneer Status is replaced by EDI, while preserving the existing Pioneer Status information as context for companies with existing approvals.
+**Fix:** Change to "VAT registration mandatory above ₦25M turnover"
 
 ## Files to Modify
 
 | File | Changes |
 |------|---------|
-| `src/lib/advisoryLogic.ts` | Fix "24% PIT" to "25% PIT" (line 87); update "under N25M" to "under N50M" (line 113) |
-| `src/pages/blog/TaxGuideTechStartups.tsx` | Add EDI context to Pioneer Status section (lines 118-135) |
+| `src/pages/seo/LagosGuide.tsx` | Add EDI context to 2 Pioneer Status references (lines 19, 31) |
+| `src/pages/seo/KanoGuide.tsx` | Update Pioneer Status to EDI in FAQ answer and 2 sector tips (lines 19, 31, 33) |
+| `src/components/SectorPresets.tsx` | Update myth text (line 122) and benefits label (line 201) to reference EDI |
+| `src/pages/seo/AbujaGuide.tsx` | Fix misleading VAT phrasing in consulting sector tip (line 32) |
 
 ## Technical Details
 
-### advisoryLogic.ts (line 87)
-- From: `'Lower corporate income tax rate (30% vs up to 24% PIT)',`
-- To: `'Lower corporate income tax rate (30% vs up to 25% PIT)',`
+### LagosGuide.tsx
 
-### advisoryLogic.ts (line 113)
-- From: `'Lower tax rates for income under ₦25M',`
-- To: `'Lower tax rates for income under ₦50M (2026 small company threshold)',`
+Line 19 (FAQ answer):
+- From: `Pioneer status may also apply to qualifying tech companies.`
+- To: `Pioneer Status (now replaced by EDI under 2026 rules) may also apply to qualifying tech companies, providing a 5% annual tax credit for 5 years on qualifying capex.`
 
-### TaxGuideTechStartups.tsx (lines 118-135)
+Line 31 (sector tip):
+- From: `Pioneer status for qualifying tech`
+- To: `EDI tax credit for qualifying tech (replaces Pioneer Status)`
 
-Update the section heading to "Pioneer Status, EDI & Tax Holidays" and add a paragraph after line 121 explaining:
-- Under 2026 rules, the Economic Development Incentive (EDI) replaces Pioneer Status
-- EDI provides a 5% annual tax credit for 5 years on qualifying capital expenditure
-- Companies with existing Pioneer Status approvals continue under the old terms
-- New applicants should apply for EDI through the relevant channels
+### KanoGuide.tsx
+
+Line 19 (FAQ answer):
+- From: `The textile industry may qualify for Pioneer Status incentives, providing a tax holiday of up to 5 years.`
+- To: `Under 2026 rules, the textile industry may qualify for the Economic Development Incentive (EDI), which replaces Pioneer Status and provides a 5% annual tax credit for 5 years on qualifying capital expenditure. Companies with existing Pioneer Status approvals continue under their original terms.`
+
+Line 31 (sector tip):
+- From: `Pioneer status for value-addition`
+- To: `EDI tax credit for value-addition (replaces Pioneer Status)`
+
+Line 33 (sector tip):
+- From: `Pioneer status incentives`
+- To: `EDI incentives (replaces Pioneer Status)`
+
+### SectorPresets.tsx
+
+Line 122 (Manufacturing myth):
+- From: `truth: 'Pioneer status requires NIPC approval and specific conditions'`
+- To: `truth: 'Under 2026 rules, Pioneer Status is replaced by EDI (5% annual tax credit for 5 years). Existing approvals continue under original terms'`
+
+Line 201 (Healthcare benefits):
+- From: `'Pioneer Status'`
+- To: `'EDI tax credit (formerly Pioneer Status)'`
+
+### AbujaGuide.tsx
+
+Line 32 (consulting sector tip):
+- From: `'VAT on services above ₦25M'`
+- To: `'VAT registration mandatory above ₦25M turnover'`
 
 ## What This Addresses
 
-- 1 advisory engine quoting the wrong top PIT rate (24% vs 25%), affecting entity-type recommendations
-- 1 advisory engine using a stale N25M small company threshold (should be N50M)
-- 1 authoritative blog post presenting an abolished incentive as current law without mentioning its EDI replacement
+- 7 references across 3 SEO pages presenting Pioneer Status as current law without EDI context
+- 2 references in the legacy SectorPresets component using outdated incentive terminology
+- 1 misleading VAT phrasing that could cause businesses to incorrectly believe VAT doesn't apply below ₦25M
 
-**Total: 2 files modified, 0 new files created**
+**Total: 4 files modified, 0 new files created**
 
