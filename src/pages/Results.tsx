@@ -375,8 +375,10 @@ const Results = () => {
               </div>
               <div className="mt-4 pt-4 border-t border-border">
                 <p className="text-xs text-muted-foreground">
-                  {companyResult.isSmallCompany 
-                    ? '0% CIT for small companies (≤₦25M turnover)'
+                {companyResult.isSmallCompany 
+                    ? inputs?.use2026Rules
+                      ? '0% CIT for small companies (turnover ≤₦50M, assets ≤₦250M)'
+                      : '0% CIT for small companies (≤₦25M turnover)'
                     : 'Company Income Tax (CIT) at applicable rate'
                   }
                 </p>
