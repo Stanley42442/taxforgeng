@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -68,6 +68,15 @@ const VATCalculator = () => {
     'Construction services',
   ];
 
+  const vatTerms = [
+    { name: 'VAT Standard Rate', description: '7.5% on all taxable goods and services in Nigeria' },
+    { name: 'VAT Registration Threshold', description: 'Businesses with annual turnover above NGN 25 million must register for VAT' },
+    { name: 'VAT-Exempt Items', description: 'Basic food, medical supplies, educational materials, baby products, agricultural equipment, and exports' },
+    { name: 'VAT Filing Deadline', description: 'Monthly returns due by the 21st day of the following month' },
+    { name: 'Input VAT', description: 'VAT paid on business purchases, deductible from Output VAT' },
+    { name: 'Output VAT', description: 'VAT charged to customers on sales of taxable goods and services' },
+  ];
+
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -86,6 +95,11 @@ const VATCalculator = () => {
         { name: 'Tax Tools', url: 'https://taxforgeng.com/free-tax-calculator' },
         { name: 'VAT Calculator', url: 'https://taxforgeng.com/vat-calculator' },
       ]),
+      createTaxRateSchema(
+        'Nigeria VAT Rates and Rules 2026',
+        'Value Added Tax rates and registration rules in Nigeria, effective 2026',
+        vatTerms
+      ),
     ],
   };
 
@@ -234,38 +248,38 @@ const VATCalculator = () => {
               </section>
 
               {/* Exempt vs Taxable */}
-              <section className="mb-12">
+              <section className="mb-12" aria-label="VAT exempt and taxable items">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
                   VAT-Exempt vs VATable Items
                 </h2>
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="glass-frosted rounded-2xl p-6 border-l-4 border-success">
                     <div className="flex items-center gap-3 mb-4">
-                      <XCircle className="h-6 w-6 text-success" />
+                      <XCircle className="h-6 w-6 text-success" aria-hidden="true" />
                       <h3 className="text-xl font-bold text-foreground">VAT Exempt (0%)</h3>
                     </div>
-                    <ul className="space-y-2">
+                    <dl className="space-y-2">
                       {exemptItems.map((item, index) => (
-                        <li key={index} className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
-                          <span>{item}</span>
-                        </li>
+                        <div key={index} className="flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-success shrink-0" aria-hidden="true" />
+                          <dt className="text-sm text-muted-foreground">{item}</dt>
+                        </div>
                       ))}
-                    </ul>
+                    </dl>
                   </div>
                   <div className="glass-frosted rounded-2xl p-6 border-l-4 border-primary">
                     <div className="flex items-center gap-3 mb-4">
-                      <ShoppingCart className="h-6 w-6 text-primary" />
+                      <ShoppingCart className="h-6 w-6 text-primary" aria-hidden="true" />
                       <h3 className="text-xl font-bold text-foreground">VATable (7.5%)</h3>
                     </div>
-                    <ul className="space-y-2">
+                    <dl className="space-y-2">
                       {vatableItems.map((item, index) => (
-                        <li key={index} className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
-                          <span>{item}</span>
-                        </li>
+                        <div key={index} className="flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />
+                          <dt className="text-sm text-muted-foreground">{item}</dt>
+                        </div>
                       ))}
-                    </ul>
+                    </dl>
                   </div>
                 </div>
               </section>
@@ -340,6 +354,23 @@ const VATCalculator = () => {
                       </ul>
                     </div>
                   </div>
+                </div>
+              </section>
+
+              {/* Machine-Readable VAT Definitions */}
+              <section className="mb-12" aria-label="VAT rate definitions">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  VAT Rate Definitions
+                </h2>
+                <div className="glass-frosted rounded-2xl p-6">
+                  <dl className="space-y-4">
+                    {vatTerms.map((term, index) => (
+                      <div key={index} className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3 border-b border-border/30 pb-3 last:border-0 last:pb-0">
+                        <dt className="font-semibold text-foreground min-w-[220px]">{term.name}</dt>
+                        <dd className="text-sm text-muted-foreground">{term.description}</dd>
+                      </div>
+                    ))}
+                  </dl>
                 </div>
               </section>
 

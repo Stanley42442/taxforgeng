@@ -328,6 +328,23 @@ export const createHowToSchema = (
   })),
 });
 
+// DefinedTermSet schema for machine-readable tax rate data (AEO optimization)
+export const createTaxRateSchema = (
+  name: string,
+  description: string,
+  terms: { name: string; description: string }[]
+) => ({
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTermSet',
+  name,
+  description,
+  definedTerm: terms.map((term) => ({
+    '@type': 'DefinedTerm',
+    name: term.name,
+    description: term.description,
+  })),
+});
+
 // BreadcrumbList schema for site hierarchy (SEO + AI discoverability)
 export const createBreadcrumbSchema = (items: { name: string; url: string }[]) => ({
   '@context': 'https://schema.org',

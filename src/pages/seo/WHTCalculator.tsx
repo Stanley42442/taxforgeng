@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -60,6 +60,17 @@ const WHTCalculator = () => {
     { type: 'Directors Fees', rate: '10%', example: { payment: 400_000, wht: 40_000 }, description: 'Payments to company directors' },
   ];
 
+  const whtTerms = [
+    { name: 'WHT on Contracts', description: '5% withholding tax on contracts, commissions, and agency fees' },
+    { name: 'WHT on Rent', description: '10% withholding tax on rent payments to corporate landlords' },
+    { name: 'WHT on Dividends', description: '10% withholding tax on dividend distributions to shareholders' },
+    { name: 'WHT on Interest', description: '10% withholding tax on interest payments on loans and deposits' },
+    { name: 'WHT on Royalties', description: '10% withholding tax on payments for intellectual property use' },
+    { name: 'WHT on Professional Fees', description: '10% withholding tax on fees to lawyers, accountants, consultants' },
+    { name: 'WHT on Technical Fees', description: '10% withholding tax on technical services and management fees' },
+    { name: 'WHT on Directors Fees', description: '10% withholding tax on payments to company directors' },
+  ];
+
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -78,6 +89,11 @@ const WHTCalculator = () => {
         { name: 'Tax Tools', url: 'https://taxforgeng.com/free-tax-calculator' },
         { name: 'WHT Calculator', url: 'https://taxforgeng.com/wht-calculator' },
       ]),
+      createTaxRateSchema(
+        'Nigeria Withholding Tax Rates 2026',
+        'Withholding Tax rates by payment type under the Nigeria Tax Act 2025, effective January 2026',
+        whtTerms
+      ),
     ],
   };
 
@@ -350,6 +366,23 @@ const WHTCalculator = () => {
                       </div>
                     </div>
                   </div>
+                </div>
+              </section>
+
+              {/* Machine-Readable WHT Definitions */}
+              <section className="mb-12" aria-label="WHT rate definitions">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  WHT Rate Definitions
+                </h2>
+                <div className="glass-frosted rounded-2xl p-6">
+                  <dl className="space-y-4">
+                    {whtTerms.map((term, index) => (
+                      <div key={index} className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3 border-b border-border/30 pb-3 last:border-0 last:pb-0">
+                        <dt className="font-semibold text-foreground min-w-[220px]">{term.name}</dt>
+                        <dd className="text-sm text-muted-foreground">{term.description}</dd>
+                      </div>
+                    ))}
+                  </dl>
                 </div>
               </section>
 

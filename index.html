@@ -124,10 +124,111 @@
       "knowsAbout": ["Nigerian Personal Income Tax", "Nigeria Tax Act 2025", "PAYE Nigeria", "Company Income Tax Nigeria", "VAT Nigeria", "FIRS Compliance", "Small Company Exemption", "Rent Relief Nigeria"]
     }
     </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the personal income tax rate in Nigeria for 2026?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Under the Nigeria Tax Act 2025 (effective 2026), PIT uses progressive bands: first ₦800,000 is tax-free, then 15% (₦800K-₦3M), 18% (₦3M-₦12M), 21% (₦12M-₦25M), 23% (₦25M-₦50M), and 25% (above ₦50M). The old Consolidated Relief Allowance is abolished."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the company income tax rate in Nigeria?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "CIT rates for 2026: Small companies (turnover ≤₦50M and assets ≤₦250M) pay 0%. Medium companies (₦50M-₦200M turnover) pay 20%. Large companies (above ₦200M) pay 30%. A 4% Development Levy also applies to medium and large companies."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the VAT rate in Nigeria?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Nigeria's VAT rate is 7.5%. It applies to most goods and services. Exempt items include basic food, medical supplies, educational materials, baby products, and agricultural equipment. Businesses with turnover above ₦25M must register for VAT."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are the withholding tax rates in Nigeria?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "WHT rates: 5% on contracts and agency fees. 10% on rent, dividends, interest, royalties, professional fees, technical fees, and directors fees. WHT is an advance payment that can be credited against your final income tax liability."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the small company exemption in Nigeria?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Companies with annual turnover of ₦50 million or less AND total fixed assets of ₦250 million or less qualify for 0% CIT. They are also exempt from the 4% Development Levy. They must still file annual returns with FIRS."
+          }
+        }
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "DefinedTermSet",
+      "name": "Nigeria Tax Rates 2026 (Nigeria Tax Act 2025)",
+      "description": "Official Nigerian tax rates effective January 2026 under the Nigeria Tax Act 2025",
+      "definedTerm": [
+        {"@type": "DefinedTerm", "name": "PIT Band 1 (Tax-Free)", "description": "First NGN 800,000 of annual income: 0% tax rate"},
+        {"@type": "DefinedTerm", "name": "PIT Band 2", "description": "NGN 800,001 to NGN 3,000,000: 15% tax rate"},
+        {"@type": "DefinedTerm", "name": "PIT Band 3", "description": "NGN 3,000,001 to NGN 12,000,000: 18% tax rate"},
+        {"@type": "DefinedTerm", "name": "PIT Band 4", "description": "NGN 12,000,001 to NGN 25,000,000: 21% tax rate"},
+        {"@type": "DefinedTerm", "name": "PIT Band 5", "description": "NGN 25,000,001 to NGN 50,000,000: 23% tax rate"},
+        {"@type": "DefinedTerm", "name": "PIT Band 6 (Maximum)", "description": "Above NGN 50,000,000: 25% tax rate"},
+        {"@type": "DefinedTerm", "name": "CIT Small Company", "description": "Turnover up to NGN 50M and assets up to NGN 250M: 0% CIT"},
+        {"@type": "DefinedTerm", "name": "CIT Medium Company", "description": "Turnover NGN 50M to NGN 200M: 20% CIT"},
+        {"@type": "DefinedTerm", "name": "CIT Large Company", "description": "Turnover above NGN 200M: 30% CIT"},
+        {"@type": "DefinedTerm", "name": "VAT Standard Rate", "description": "7.5% on taxable goods and services"},
+        {"@type": "DefinedTerm", "name": "Development Levy", "description": "4% of assessable profits, replaces Tertiary Education Tax"},
+        {"@type": "DefinedTerm", "name": "WHT on Contracts", "description": "5% withholding tax on contracts and agency fees"},
+        {"@type": "DefinedTerm", "name": "WHT on Professional Fees", "description": "10% withholding tax on rent, dividends, interest, royalties, professional and technical fees"}
+      ]
+    }
+    </script>
 
   </head>
 
   <body>
+    <noscript>
+      <div style="max-width:800px;margin:0 auto;padding:40px 20px;font-family:system-ui,sans-serif;">
+        <h1>TaxForge NG — Nigerian Tax Calculator 2026</h1>
+        <p>Free Nigerian tax calculator with 2026 rules under the Nigeria Tax Act 2025. Calculate PIT, PAYE, CIT, VAT, and WHT instantly.</p>
+        <h2>Personal Income Tax (PIT) Bands — 2026</h2>
+        <dl>
+          <dt>First ₦800,000</dt><dd>0% (Tax-free threshold)</dd>
+          <dt>₦800,001 – ₦3,000,000</dt><dd>15%</dd>
+          <dt>₦3,000,001 – ₦12,000,000</dt><dd>18%</dd>
+          <dt>₦12,000,001 – ₦25,000,000</dt><dd>21%</dd>
+          <dt>₦25,000,001 – ₦50,000,000</dt><dd>23%</dd>
+          <dt>Above ₦50,000,000</dt><dd>25%</dd>
+        </dl>
+        <h2>Company Income Tax (CIT) Rates</h2>
+        <dl>
+          <dt>Small Company (turnover ≤ ₦50M, assets ≤ ₦250M)</dt><dd>0% CIT</dd>
+          <dt>Medium Company (turnover ₦50M – ₦200M)</dt><dd>20% CIT</dd>
+          <dt>Large Company (turnover &gt; ₦200M)</dt><dd>30% CIT</dd>
+        </dl>
+        <h2>Other Key Rates</h2>
+        <dl>
+          <dt>VAT</dt><dd>7.5% on taxable goods and services</dd>
+          <dt>Development Levy</dt><dd>4% of assessable profits (replaces TET)</dd>
+          <dt>WHT on Contracts</dt><dd>5%</dd>
+          <dt>WHT on Professional Fees, Rent, Dividends</dt><dd>10%</dd>
+          <dt>Rent Relief</dt><dd>20% of annual rent paid, capped at ₦500,000</dd>
+        </dl>
+        <p>Visit <a href="https://taxforgeng.com">taxforgeng.com</a> with JavaScript enabled for the full interactive calculator.</p>
+      </div>
+    </noscript>
     <div id="root">
       <!-- Initial loading state - replaced when React mounts -->
       <div id="initial-loader" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f8faf9;">
