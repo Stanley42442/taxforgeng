@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { SEOHead, createBreadcrumbSchema } from "@/components/seo/SEOHead";
+import { PageBreadcrumbs } from "@/components/seo/PageBreadcrumbs";
+import { ContentMeta } from "@/components/seo/ContentMeta";
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/PageLayout";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -326,6 +328,13 @@ const Pricing = () => {
       ])}
     />
     <PageLayout maxWidth="7xl" showBackground={true}>
+      <article>
+      <PageBreadcrumbs items={[
+        { label: 'Home', href: '/' },
+        { label: 'Pricing' },
+      ]} />
+      <ContentMeta published="2026-02-09" publishedLabel="9 February 2026" updated="2026-02-13" updatedLabel="13 February 2026" />
+
       {/* Connection Status Warning */}
       {connectionStatus === 'slow' && (
         <Alert variant="default" className="mb-4 border-yellow-500/50 bg-yellow-500/10">
@@ -612,6 +621,7 @@ const Pricing = () => {
           © 2026 TaxForge NG. All prices include VAT. For educational purposes.
         </p>
       </div>
+      </article>
     </PageLayout>
 
     {/* Downgrade Confirmation Dialog */}

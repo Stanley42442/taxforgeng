@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { SEOHead, createBreadcrumbSchema } from "@/components/seo/SEOHead";
 import { PageLayout } from "@/components/PageLayout";
+import { PageBreadcrumbs } from "@/components/seo/PageBreadcrumbs";
+import { ContentMeta } from "@/components/seo/ContentMeta";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -92,6 +94,13 @@ const Roadmap = () => {
       ])}
     />
     <PageLayout title="Roadmap & Coming Soon" description="See what we're building next for TaxForge NG" icon={Map}>
+      <article>
+      <PageBreadcrumbs items={[
+        { label: 'Home', href: '/' },
+        { label: 'Roadmap' },
+      ]} />
+      <ContentMeta published="2026-02-09" publishedLabel="9 February 2026" updated="2026-02-13" updatedLabel="13 February 2026" />
+
       {/* Waitlist Signup */}
       <div className="neon-border p-8 mb-12 animate-slide-up">
         <div className="text-center mb-6">
@@ -209,6 +218,7 @@ const Roadmap = () => {
       <p className="text-sm text-muted-foreground text-center mt-10">
         Roadmap items are subject to change. Timelines are estimates only.
       </p>
+      </article>
     </PageLayout>
     </>
   );
