@@ -67,7 +67,7 @@ Your expertise includes:
 - Withholding Tax (WHT) - rates and compliance
 - Capital Gains Tax (CGT)
 - Stamp Duties
-- Federal Inland Revenue Service (FIRS) regulations
+- Nigeria Revenue Service (NRS, formerly FIRS) regulations
 - State Internal Revenue Service requirements
 - Tax incentives for small businesses and startups
 - Free Trade Zone benefits (NEPZA, OGFZA)

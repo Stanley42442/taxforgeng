@@ -201,7 +201,7 @@ You can deduct 20% of your annual rent from taxable income, up to a maximum of â
 
 ## Important Disclaimer
 
-All calculations provided by TaxForge NG are estimates for educational and planning purposes only. This platform does not constitute official tax advice, FIRS filing assistance, or professional accounting services.
+All calculations provided by TaxForge NG are estimates for educational and planning purposes only. This platform does not constitute official tax advice, NRS filing assistance, or professional accounting services.
 
 Results should be verified by a certified tax professional before making financial decisions or filing tax returns.
 
@@ -222,7 +222,7 @@ TaxForge NG is operated as an individual project by Gillespie / OptiSolve Labs i
 
 Tax rules implemented are based on:
 - Nigeria Tax Act 2025 (Official Gazette)
-- FIRS Guidelines and Circulars
+- NRS (formerly FIRS) Guidelines and Circulars
 - PwC Nigeria Tax Alert publications
 - KPMG Nigeria Tax Insights
 - EY Nigeria Tax Updates

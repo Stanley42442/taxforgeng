@@ -1925,11 +1925,11 @@ export const translations: Translations = {
     ig: 'Ngwa Mgbako Ụtụ' 
   },
   'home.firsCompliant': { 
-    en: 'FIRS Compliant', 
-    pcm: 'FIRS Approved', 
-    yo: 'Ó Bá FIRS Mu', 
-    ha: 'Ya Dace da FIRS', 
-    ig: 'Kwekọrọ na FIRS' 
+    en: 'NRS Compliant', 
+    pcm: 'NRS Approved', 
+    yo: 'Ó Bá NRS Mu', 
+    ha: 'Ya Dace da NRS', 
+    ig: 'Kwekọrọ na NRS' 
   },
   'home.pre2026Rules': { 
     en: 'Pre-2026 & 2026 Rules', 
@@ -2044,11 +2044,11 @@ export const translations: Translations = {
     ig: 'Nkwadebe Ntinye Ụtụ' 
   },
   'home.taxFilingPreparationDesc': { 
-    en: 'Generate pre-filled FIRS forms ready for TaxProMax submission.', 
-    pcm: 'Generate FIRS forms wey don ready for TaxProMax.', 
-    yo: 'Ṣe àwọn fọ́ọ̀mù FIRS tí a ti kún tẹ́lẹ̀ tí wọ́n ti ṣetán fún fífi sí TaxProMax.', 
-    ha: 'Ƙirƙiri fom ɗin FIRS da aka riga aka cika shirye don miƙa TaxProMax.', 
-    ig: 'Mepụta fọm FIRS ejiri edebere akwadebere maka ntinye TaxProMax.' 
+    en: 'Generate pre-filled NRS forms ready for TaxProMax submission.', 
+    pcm: 'Generate NRS forms wey don ready for TaxProMax.', 
+    yo: 'Ṣe àwọn fọ́ọ̀mù NRS tí a ti kún tẹ́lẹ̀ tí wọ́n ti ṣetán fún fífi sí TaxProMax.', 
+    ha: 'Ƙirƙiri fom ɗin NRS da aka riga aka cika shirye don miƙa TaxProMax.', 
+    ig: 'Mepụta fọm NRS ejiri edebere akwadebere maka ntinye TaxProMax.' 
   },
   'home.plansForEveryBusiness': { 
     en: 'Plans for Every Business', 
@@ -2079,7 +2079,7 @@ export const translations: Translations = {
     ig: 'Ọ Dị Njikere Ịkwalite Ụtụ Gị?' 
   },
   'home.joinThousands': { 
-    en: 'Start calculating your taxes with FIRS-compliant 2026 rules today.', 
+    en: 'Start calculating your taxes with NRS-compliant 2026 rules today.', 
     pcm: 'Start calculate your tax with 2026 rules today.', 
     yo: 'Bẹ̀rẹ̀ láti ṣe ìṣirò owó-orí rẹ pẹ̀lú àwọn òfin 2026 lónìí.', 
     ha: 'Fara ƙididdige harajin ku tare da dokokin 2026 yau.', 
