@@ -16,7 +16,7 @@ const LagosGuide = () => {
     { question: 'Do I need to register with both FIRS and LIRS?', answer: 'Yes. FIRS handles federal taxes (CIT, VAT, WHT), while LIRS handles state taxes (PAYE for state residents, state development levy). All Lagos businesses must register with both.' },
     { question: 'Is there a Lagos-specific business levy?', answer: 'Yes. Lagos imposes a Business Premises Levy based on business size and location. There are also signage/advertisement fees and environmental levies. These are in addition to federal taxes.' },
     { question: 'How does PAYE work for Lagos employees?', answer: 'Employers in Lagos withhold PAYE using the 2026 PIT bands and remit to LIRS monthly by the 10th of the following month. The new ₦800,000 tax-free threshold means many junior employees pay zero PAYE.' },
-    { question: 'Are there incentives for tech startups in Lagos?', answer: 'While there is no Lagos-specific tech tax break, the federal Small Company Exemption (₦50M turnover, 0% CIT) benefits most early-stage startups. Pioneer status may also apply to qualifying tech companies.' },
+    { question: 'Are there incentives for tech startups in Lagos?', answer: 'While there is no Lagos-specific tech tax break, the federal Small Company Exemption (₦50M turnover, 0% CIT) benefits most early-stage startups. Pioneer Status (now replaced by EDI under 2026 rules) may also apply to qualifying tech companies, providing a 5% annual tax credit for 5 years on qualifying capex.' },
     { question: 'Where are the LIRS offices in Lagos?', answer: 'LIRS headquarters is at Block 1, The Secretariat, Alausa, Ikeja. There are district offices in Ikeja, Lagos Island, Victoria Island, Lekki, Surulere, and other areas.' },
   ];
 
@@ -28,7 +28,7 @@ const LagosGuide = () => {
   ];
 
   const keySectors = [
-    { icon: Laptop, name: 'Technology & Fintech', description: 'Lagos is Nigeria\'s tech hub. Yaba, Lekki, and VI host hundreds of startups.', tips: ['Small Company Exemption applies (₦50M)', 'Digital services VAT for B2C', 'Pioneer status for qualifying tech'] },
+    { icon: Laptop, name: 'Technology & Fintech', description: 'Lagos is Nigeria\'s tech hub. Yaba, Lekki, and VI host hundreds of startups.', tips: ['Small Company Exemption applies (₦50M)', 'Digital services VAT for B2C', 'EDI tax credit for qualifying tech (replaces Pioneer Status)'] },
     { icon: Banknote, name: 'Finance & Banking', description: 'Most Nigerian banks and financial institutions are headquartered in Lagos.', tips: ['WHT on interest payments', 'Specific banking sector CIT rules', 'CBN regulatory compliance'] },
     { icon: Ship, name: 'Import & Export', description: 'Apapa and Tin Can ports handle most of Nigeria\'s trade volume.', tips: ['Customs duties separate from CIT/VAT', 'WHT on shipping payments', 'Free Trade Zone benefits'] },
     { icon: Building2, name: 'Real Estate & Construction', description: 'Lagos has Nigeria\'s most active property market.', tips: ['10% WHT on rent', 'Capital gains tax on property sales', 'Land Use Charge obligations'] },

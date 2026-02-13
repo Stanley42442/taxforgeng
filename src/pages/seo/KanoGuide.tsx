@@ -16,7 +16,7 @@ const KanoGuide = () => {
     { question: 'Are agricultural businesses exempt from CIT in Kano?', answer: 'Yes, under federal law. Agricultural businesses engaged in primary production (farming, livestock, fishing) are exempt from CIT. However, agro-processing and value-added activities may attract CIT. The Small Company Exemption (₦50M) also applies.' },
     { question: 'How does cross-border trade taxation work in Kano?', answer: 'Kano\'s proximity to Niger Republic means significant cross-border trade. Import duties are collected by Nigeria Customs Service, not FIRS. However, imported goods for resale attract VAT, and WHT applies to payments for cross-border services.' },
     { question: 'Do I need to register with both FIRS and KIRS?', answer: 'Yes. FIRS handles federal taxes (CIT, VAT, WHT), while KIRS handles state taxes (PAYE, state levies). All Kano businesses should register with both to remain compliant.' },
-    { question: 'What are the textile industry tax incentives?', answer: 'The textile industry may qualify for Pioneer Status incentives, providing a tax holiday of up to 5 years. Additionally, the Small Company Exemption applies if turnover is below ₦50M. Import duty waivers on raw materials may also apply through specific government programmes.' },
+    { question: 'What are the textile industry tax incentives?', answer: 'Under 2026 rules, the textile industry may qualify for the Economic Development Incentive (EDI), which replaces Pioneer Status and provides a 5% annual tax credit for 5 years on qualifying capital expenditure. Companies with existing Pioneer Status approvals continue under their original terms. Additionally, the Small Company Exemption applies if turnover is below ₦50M. Import duty waivers on raw materials may also apply through specific government programmes.' },
     { question: 'Where are the tax offices in Kano?', answer: 'FIRS Kano office is at Federal Inland Revenue Service, Zoo Road, Kano. KIRS headquarters is at Revenue House, Audu Bako Way, Kano. Both have satellite offices across the metropolitan area.' },
   ];
 
@@ -28,9 +28,9 @@ const KanoGuide = () => {
   ];
 
   const keySectors = [
-    { icon: Wheat, name: 'Agriculture & Agribusiness', description: 'Kano is a major agricultural hub for groundnuts, grains, and livestock.', tips: ['Primary production CIT-exempt', 'Agro-processing may attract CIT', 'Pioneer status for value-addition'] },
+    { icon: Wheat, name: 'Agriculture & Agribusiness', description: 'Kano is a major agricultural hub for groundnuts, grains, and livestock.', tips: ['Primary production CIT-exempt', 'Agro-processing may attract CIT', 'EDI tax credit for value-addition (replaces Pioneer Status)'] },
     { icon: ShoppingBag, name: 'Trade & Commerce', description: 'Kano\'s markets (Kurmi, Sabon Gari) are among Nigeria\'s largest.', tips: ['VAT on goods above ₦25M turnover', 'WHT on large purchases', 'Market stall fees to KIRS'] },
-    { icon: Factory, name: 'Textiles & Manufacturing', description: 'Historic textile industry with government revival programmes.', tips: ['Pioneer status incentives', 'Import duty waivers on materials', 'Small Company Exemption'] },
+    { icon: Factory, name: 'Textiles & Manufacturing', description: 'Historic textile industry with government revival programmes.', tips: ['EDI incentives (replaces Pioneer Status)', 'Import duty waivers on materials', 'Small Company Exemption'] },
     { icon: Truck, name: 'Transport & Logistics', description: 'Key transit hub connecting northern Nigeria to ports and borders.', tips: ['Road transport VAT exemption', 'WHT on haulage contracts', 'Vehicle licensing fees'] },
   ];
 
