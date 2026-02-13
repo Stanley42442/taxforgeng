@@ -91,7 +91,7 @@ const LagosGuide = () => {
                     <div>
                       <h2 className="text-xl font-bold text-foreground mb-2">Tax Compliance in Lagos</h2>
                       <p className="text-muted-foreground leading-relaxed mb-3">Lagos State generates the highest internally generated revenue (IGR) of any Nigerian state, driven by its massive PAYE collections and business levies. The Lagos State Internal Revenue Service (LIRS) is one of the most active and technologically advanced state revenue agencies in Nigeria.</p>
-                      <p className="text-muted-foreground leading-relaxed">Whether you're running a fintech in Lekki, importing goods through Apapa port, or managing a construction firm on the mainland, understanding both your federal (FIRS) and state (LIRS) obligations is critical to avoiding penalties.</p>
+                      <p className="text-muted-foreground leading-relaxed">Whether you're running a fintech in Lekki, importing goods through Apapa port, or managing a construction firm on the mainland, understanding both your federal (NRS) and state (LIRS) obligations is critical to avoiding penalties.</p>
                     </div>
                   </div>
                 </div>
@@ -123,7 +123,7 @@ const LagosGuide = () => {
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">State vs Federal Taxes in Lagos</h2>
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="glass-frosted rounded-2xl p-6 border-l-4 border-primary">
-                    <h3 className="text-xl font-bold text-foreground mb-4">Federal (FIRS)</h3>
+                    <h3 className="text-xl font-bold text-foreground mb-4">Federal (NRS)</h3>
                     <ul className="space-y-2">{['Company Income Tax (CIT)', 'Value Added Tax (VAT)', 'Withholding Tax (WHT)', 'Capital Gains Tax (companies)', 'Development Levy (4%)'].map((t, i) => (<li key={i} className="flex items-center gap-2 text-sm text-muted-foreground"><CheckCircle2 className="h-4 w-4 text-primary shrink-0" />{t}</li>))}</ul>
                   </div>
                   <div className="glass-frosted rounded-2xl p-6 border-l-4 border-success">
