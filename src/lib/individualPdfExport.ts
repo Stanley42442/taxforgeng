@@ -139,7 +139,14 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
     y = checkPageBreak(doc, y, 80, () => margin + 20);
     y = addSectionTitle(doc, 'Progressive Tax Bands Applied', y);
     
-    const taxBands = [
+    const taxBands = inputs.use2026Rules ? [
+      { band: 'First NGN 800,000', rate: '0%' },
+      { band: 'Next NGN 2,200,000', rate: '15%' },
+      { band: 'Next NGN 9,000,000', rate: '18%' },
+      { band: 'Next NGN 13,000,000', rate: '21%' },
+      { band: 'Next NGN 25,000,000', rate: '23%' },
+      { band: 'Above NGN 50,000,000', rate: '25%' },
+    ] : [
       { band: 'First NGN 300,000', rate: '7%' },
       { band: 'Next NGN 300,000', rate: '11%' },
       { band: 'Next NGN 500,000', rate: '15%' },

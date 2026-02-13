@@ -30,28 +30,33 @@ const calculateTax = (params: {
     if (isSmallCompany) {
       cit = 0;
     } else {
-      // CIT at 25% (2026) or 30% (old)
-      const citRate = use2026Rules ? 0.25 : 0.30;
-      cit = taxableIncome * citRate;
+    // CIT at 30% (standard rate for both regimes)
+      cit = taxableIncome * 0.30;
     }
     
-    // Development Levy (replaces Education Levy)
-    developmentLevy = use2026Rules ? taxableIncome * 0.04 : taxableIncome * 0.02;
+    // Development Levy (2026) / Education Levy (pre-2026)
+    if (use2026Rules) {
+      developmentLevy = isSmallCompany ? 0 : taxableIncome * 0.04;
+    } else {
+      developmentLevy = taxableIncome * 0.03;
+    }
   } else {
     // Personal Income Tax (Business Name / Sole Prop)
     if (use2026Rules) {
-      // 2026 PIT bands
+      // 2026 PIT bands (NTA 2025)
       const exemption = 800000;
       const taxableAmount = Math.max(0, taxableIncome - exemption);
       
-      if (taxableAmount <= 300000) {
+      if (taxableAmount <= 2200000) {
         pit = taxableAmount * 0.15;
-      } else if (taxableAmount <= 600000) {
-        pit = 300000 * 0.15 + (taxableAmount - 300000) * 0.19;
-      } else if (taxableAmount <= 1100000) {
-        pit = 300000 * 0.15 + 300000 * 0.19 + (taxableAmount - 600000) * 0.21;
+      } else if (taxableAmount <= 11200000) {
+        pit = 2200000 * 0.15 + (taxableAmount - 2200000) * 0.18;
+      } else if (taxableAmount <= 24200000) {
+        pit = 2200000 * 0.15 + 9000000 * 0.18 + (taxableAmount - 11200000) * 0.21;
+      } else if (taxableAmount <= 49200000) {
+        pit = 2200000 * 0.15 + 9000000 * 0.18 + 13000000 * 0.21 + (taxableAmount - 24200000) * 0.23;
       } else {
-        pit = 300000 * 0.15 + 300000 * 0.19 + 500000 * 0.21 + (taxableAmount - 1100000) * 0.25;
+        pit = 2200000 * 0.15 + 9000000 * 0.18 + 13000000 * 0.21 + 25000000 * 0.23 + (taxableAmount - 49200000) * 0.25;
       }
     } else {
       // Old PIT bands
@@ -105,14 +110,15 @@ const getTaxRates = (use2026Rules: boolean = true) => {
       pit: {
         exemption: 800000,
         bands: [
-          { from: 0, to: 300000, rate: 0.15 },
-          { from: 300000, to: 600000, rate: 0.19 },
-          { from: 600000, to: 1100000, rate: 0.21 },
-          { from: 1100000, to: null, rate: 0.25 }
+          { from: 0, to: 2200000, rate: 0.15 },
+          { from: 2200000, to: 11200000, rate: 0.18 },
+          { from: 11200000, to: 24200000, rate: 0.21 },
+          { from: 24200000, to: 49200000, rate: 0.23 },
+          { from: 49200000, to: null, rate: 0.25 }
         ]
       },
       cit: {
-        standardRate: 0.25,
+        standardRate: 0.30,
         smallCompanyRate: 0,
         smallCompanyTurnoverLimit: 50000000,
         smallCompanyAssetLimit: 250000000
@@ -151,7 +157,7 @@ const getTaxRates = (use2026Rules: boolean = true) => {
       registrationThreshold: 25000000
     },
     educationLevy: {
-      rate: 0.02
+      rate: 0.03
     }
   };
 };
