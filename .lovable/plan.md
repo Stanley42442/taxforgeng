@@ -1,86 +1,77 @@
 
 
-# SEO/AEO Phase 11: Partner API Calculation Errors and PDF Export Band Mismatch
+# SEO/AEO Phase 12: Inline Calculator Engines with Wrong 2026 PIT Bands and CIT Rates
 
 ## Summary
 
-After Phases 7-10 corrected all user-facing content pages, two backend/export files still contain calculation errors that produce **incorrect tax figures** for API consumers and PDF downloads.
-
-The most critical is the **partner API edge function**, which is a live endpoint returning wrong tax amounts to third-party integrators. The second is the individual tax PDF export, which hardcodes pre-2026 PIT bands and displays them even when 2026 rules are selected.
+Four components contain their own "quick estimate" tax calculators that bypass the main verified engine in `taxCalculations.ts`. All four have the same two errors: wrong 2026 PIT bands (using 19% instead of 18%, missing the 23% band, wrong thresholds) and wrong CIT rate (25% instead of 30%).
 
 ## Errors Found
 
-### Error 1: Partner API — Wrong CIT Rate (25% instead of 30%)
+### Error 1: EmbeddableCalculator.tsx — Wrong CIT (25%) and Wrong PIT Bands
 
-`supabase/functions/partner-api/index.ts` line 34 uses `0.25` for the 2026 CIT rate. The correct rate is `0.30` per NTA 2025. This means every API call for a large company under 2026 rules returns a CIT figure that is **16.7% too low**.
+Lines 235 and 242-249: The embeddable widget (used on external sites) calculates CIT at `0.25` and uses a 4-band PIT structure with 19% rate and wrong thresholds (300k/600k/1.1M).
 
-### Error 2: Partner API — Wrong Pre-2026 TET Rate (2% instead of 3%)
+### Error 2: ApiDocs.tsx — Wrong CIT (25%) and Flat PIT
 
-Line 39 uses `0.02` for the pre-2026 Education Levy. The correct rate is `0.03` per Finance Act 2023. This matches the same error fixed in Phase 10 for the main calculator.
+Line 193: The API documentation demo calculator uses `taxableIncome * 0.25` for companies and a flat 18% for all PIT (no progressive bands at all).
 
-### Error 3: Partner API — Wrong 2026 PIT Bands
+### Error 3: Expenses.tsx — Wrong PIT Bands (19% instead of 18%, missing 23%)
 
-Lines 42-54 implement only 4 PIT bands with a **19%** rate and wrong thresholds. The correct 2026 structure has 6 bands (15%, 18%, 21%, 23%, 25%) with the ₦800,000 exemption applied differently. The current code also starts the first band at ₦300,000 width instead of ₦2,200,000.
+Lines 132-156: The expense tracker's inline tax estimator uses 4 bands with 19% rate and a wrong ₦7M second band width (should be ₦9M at 18%). Missing the 23% band entirely.
 
-**Current (wrong):**
-```text
-Band 1: Next 300,000 at 15%
-Band 2: Next 300,000 at 19%
-Band 3: Next 500,000 at 21%
-Band 4: Above at 25%
-```
+### Error 4: BusinessReport.tsx — Wrong CIT (25%) and Wrong PIT Bands
 
-**Correct (NTA 2025):**
-```text
-Band 1: Next 2,200,000 (800k-3M) at 15%
-Band 2: Next 9,000,000 (3M-12M) at 18%
-Band 3: Next 13,000,000 (12M-25M) at 21%
-Band 4: Next 25,000,000 (25M-50M) at 23%
-Band 5: Above 50,000,000 at 25%
-```
-
-### Error 4: Individual PDF Export — Hardcoded Pre-2026 Bands
-
-`src/lib/individualPdfExport.ts` lines 142-149 hardcode the pre-2026 PIT band table (7%, 11%, 15%, 19%, 21%, 24%) and display it regardless of whether the user selected 2026 rules. When a user generates a PDF with 2026 rules, they see pre-2026 rates in the "Progressive Tax Bands Applied" section, contradicting the actual calculated amounts.
+Lines 145-167: The business report's inline estimator uses `0.25` for CIT and the same wrong 4-band PIT structure with 19% and wrong thresholds.
 
 ## Files to Modify
 
 | File | Changes |
 |------|---------|
-| `supabase/functions/partner-api/index.ts` | Fix CIT rate 0.25 to 0.30 (line 34); fix TET 0.02 to 0.03 (line 39); rewrite 2026 PIT bands to 6-band structure (lines 42-54) |
-| `src/lib/individualPdfExport.ts` | Make PIT band table conditional on `inputs.use2026Rules`, showing correct 2026 bands (0%, 15%, 18%, 21%, 23%, 25%) or pre-2026 bands (7%, 11%, 15%, 19%, 21%, 24%) |
+| `src/components/EmbeddableCalculator.tsx` | Fix CIT 0.25 to 0.30 (line 235); rewrite PIT to 6 correct bands (lines 242-249) |
+| `src/pages/ApiDocs.tsx` | Fix CIT 0.25 to 0.30 (line 193); add progressive PIT bands (lines 195-197) |
+| `src/pages/Expenses.tsx` | Rewrite PIT bands: 15%/18%/21%/23%/25% with correct thresholds (lines 138-154) |
+| `src/pages/BusinessReport.tsx` | Fix CIT 0.25 to 0.30 (line 147); rewrite PIT bands to correct 5-band structure (lines 153-165) |
 
 ## Technical Details
 
-### partner-api/index.ts CIT fix (line 34)
-- From: `const citRate = use2026Rules ? 0.25 : 0.30;`
-- To: `const citRate = 0.30;` (30% for both regimes; small companies already handled above)
+### Correct 2026 PIT band logic (to apply in all 4 files)
 
-### partner-api/index.ts TET fix (line 39)
-- From: `developmentLevy = use2026Rules ? taxableIncome * 0.04 : taxableIncome * 0.02;`
-- To: `developmentLevy = use2026Rules ? taxableIncome * 0.04 : taxableIncome * 0.03;`
-- Additionally: small companies should get 0 Development Levy under 2026 rules (needs check)
-
-### partner-api/index.ts 2026 PIT bands rewrite (lines 42-54)
-Replace the 4-band structure with the correct 6-band NTA 2025 structure:
 ```text
-Exemption: First 800,000 at 0%
-Band 1: 800,001 - 3,000,000 at 15%
-Band 2: 3,000,001 - 12,000,000 at 18%
-Band 3: 12,000,001 - 25,000,000 at 21%
-Band 4: 25,000,001 - 50,000,000 at 23%
-Band 5: Above 50,000,000 at 25%
+After ₦800,000 exemption:
+Band 1: Next ₦2,200,000 at 15%
+Band 2: Next ₦9,000,000 at 18%
+Band 3: Next ₦13,000,000 at 21%
+Band 4: Next ₦25,000,000 at 23%
+Band 5: Above ₦50,000,000 at 25%
 ```
 
-### individualPdfExport.ts conditional bands (lines 142-149)
-Add a condition based on `inputs.use2026Rules`:
-- **2026 bands:** First 800,000 (0%), Next 2,200,000 (15%), Next 9,000,000 (18%), Next 13,000,000 (21%), Next 25,000,000 (23%), Above 50,000,000 (25%)
-- **Pre-2026 bands:** Keep existing (7%, 11%, 15%, 19%, 21%, 24%)
+### EmbeddableCalculator.tsx (lines 235, 242-249)
+
+- Line 235: `cit = taxableIncome * 0.25` changes to `cit = taxableIncome * 0.30`
+- Lines 242-249: Replace 4-band structure with correct 5-band logic using thresholds 2200000, 11200000, 24200000, 49200000
+
+### ApiDocs.tsx (lines 193, 195-197)
+
+- Line 193: `taxableIncome * 0.25` changes to `taxableIncome * 0.30`
+- Lines 195-197: Replace flat `(taxableIncome - 800000) * 0.18` with progressive 5-band calculation
+
+### Expenses.tsx (lines 138-154)
+
+Replace 4 bands with correct 5 bands:
+- Band widths: 2200000 (15%), 9000000 (18%), 13000000 (21%), 25000000 (23%), remainder (25%)
+
+### BusinessReport.tsx (lines 147, 153-165)
+
+- Line 147: `income * 0.25 + income * 0.04` changes to `income * 0.30 + income * 0.04`
+- Lines 153-165: Replace 3-band structure (15%/19%/21%) with correct 5-band structure (15%/18%/21%/23%/25%)
 
 ## What This Addresses
 
-- 1 live API endpoint returning incorrect tax calculations to third-party consumers
-- 1 PDF export showing wrong tax bands when 2026 rules are selected
-- Synchronization of all calculation paths with the verified main engine in `taxCalculations.ts`
+- 4 inline calculator engines producing incorrect tax estimates
+- The embeddable widget (shared on external sites) returning wrong figures
+- The API docs demo misleading potential API consumers
+- Expense and business report pages showing wrong tax projections
 
-**Total: 2 files modified (1 edge function + 1 lib file), 0 new files created**
+**Total: 4 files modified, 0 new files created**
+
