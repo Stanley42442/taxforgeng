@@ -6,6 +6,8 @@ import { TrustBadges } from '@/components/seo/TrustBadges';
 import { RentReliefCalculator } from '@/components/seo/RentReliefCalculator';
 import { ComparisonTable } from '@/components/seo/ComparisonTable';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
+import { ContentMeta } from '@/components/seo/ContentMeta';
 import { CheckCircle2, Home, FileText, AlertCircle, ArrowRight, XCircle, MapPin, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/taxCalculations';
@@ -103,6 +105,13 @@ const RentRelief2026 = () => {
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
             <div className="max-w-4xl mx-auto">
+              <PageBreadcrumbs items={[
+                { label: 'Home', href: '/' },
+                { label: 'Tax Tools', href: '/free-tax-calculator' },
+                { label: 'Rent Relief 2026' },
+              ]} />
+              <ContentMeta published="2026-01-01" publishedLabel="January 1, 2026" updated="2026-02-13" updatedLabel="February 13, 2026" />
+
               {/* Hero */}
               <SEOHero
                 title="Claim Up to ₦500,000"

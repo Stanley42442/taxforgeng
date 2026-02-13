@@ -4,6 +4,9 @@ import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
+import { ContentMeta } from '@/components/seo/ContentMeta';
+import { DataSourceCitation } from '@/components/seo/DataSourceCitation';
 import { Receipt, Building2, CreditCard, CheckCircle2, ArrowRight, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/taxCalculations';
@@ -118,6 +121,13 @@ const WHTCalculator = () => {
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
             <div className="max-w-4xl mx-auto">
+              <PageBreadcrumbs items={[
+                { label: 'Home', href: '/' },
+                { label: 'Tax Tools', href: '/free-tax-calculator' },
+                { label: 'WHT Calculator' },
+              ]} />
+              <ContentMeta published="2026-01-15" publishedLabel="January 15, 2026" updated="2026-02-13" updatedLabel="February 13, 2026" />
+
               {/* Hero */}
               <SEOHero
                 title="Nigerian Withholding Tax"
@@ -175,6 +185,7 @@ const WHTCalculator = () => {
                       </tbody>
                     </table>
                   </div>
+                  <DataSourceCitation />
                 </div>
               </section>
 
