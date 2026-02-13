@@ -1,82 +1,70 @@
 
 
-# SEO/AEO Phase 19: Tax Logic PDF, Tax Myths, and Remaining Pioneer Status Without EDI Context
+# SEO/AEO Phase 20: Sector Guide Data -- Remaining Pioneer Status References Without EDI Context
 
 ## Summary
 
-Three files still contain Pioneer Status references without EDI context. These are in user-facing downloadable PDFs and educational content that could mislead users about current law.
+The sector guide data in `src/lib/taxMyths.ts` contains 7 references to "Pioneer Status" as a current incentive without mentioning its replacement by the Economic Development Incentive (EDI) under NTA 2025. These appear in the tech, fintech, and healthcare sector guides -- user-facing educational content indexed by search engines.
 
 ## Errors Found
 
-### Error 1: taxLogicDocumentPdf.ts -- Healthcare Row Says "Pioneer status eligible" (line 583)
+### Error 1: Tech Sector -- benefits array (line 691)
+- Current: `'Pioneer Status eligibility for software development'`
+- Fix: `'EDI tax credit eligibility for software development (replaces Pioneer Status)'`
 
-The downloadable Tax Logic Reference PDF contains a sector comparison table where the Healthcare row lists "Pioneer status eligible" as the special incentive. This PDF is shared with accountants and professionals.
+### Error 2: Tech Sector -- taxIncentives array (line 705)
+- Current: `{ name: 'Pioneer Status', value: '0% CIT', duration: 'Up to 5 years' }`
+- Fix: `{ name: 'EDI Tax Credit', value: '5% annual credit on qualifying capex', duration: '5 years' }`
 
-- Current: `'Pioneer status eligible'`
-- Fix: `'EDI tax credit eligible'`
+### Error 3: Fintech Sector -- benefits array (line 1038)
+- Current: `'Potential Pioneer Status for innovative services'`
+- Fix: `'EDI tax credit for innovative services (replaces Pioneer Status)'`
 
-### Error 2: taxMyths.ts -- "startup-grace-period" Myth References Pioneer Status Without EDI (line 75)
+### Error 4: Fintech Sector -- content string (line 1075)
+- Current: `'- Tax holidays via Pioneer Status'`
+- Fix: `'- EDI tax credits (replaces Pioneer Status)'`
 
-The explanation for the startup grace period myth says "While certain incentives exist (like Pioneer Status requiring application)" without noting that Pioneer Status is replaced by EDI under 2026 rules.
+### Error 5: Healthcare Sector -- benefits array (line 1095)
+- Current: `'Pioneer Status for local drug manufacturing'`
+- Fix: `'EDI tax credit for local drug manufacturing (replaces Pioneer Status)'`
 
-- Current: `'...like Pioneer Status requiring application...'`
-- Fix: `'...like the Economic Development Incentive (EDI, formerly Pioneer Status)...'`
+### Error 6: Healthcare Sector -- taxIncentives array (line 1109)
+- Current: `{ name: 'Drug Manufacturing', value: 'Pioneer Status available', duration: 'Up to 5 years' }`
+- Fix: `{ name: 'Drug Manufacturing', value: 'EDI tax credit available', duration: '5 years' }`
 
-Also, the `relatedTopics` array on line 79 lists `'Pioneer Status'` without EDI.
+### Error 7: Healthcare Sector -- content string (line 1128)
+- Current: `'- Pioneer Status (0% CIT for 3-5 years)'`
+- Fix: `'- EDI tax credit (5% annual credit for 5 years, replaces Pioneer Status)'`
 
-- Current: `['startup compliance', 'first-year taxes', 'Pioneer Status']`
-- Fix: `['startup compliance', 'first-year taxes', 'Pioneer Status', 'EDI']`
-
-### Error 3: taxLogicDocumentPdf.ts -- Agriculture Row Says "5-year CIT holiday" (line 581)
-
-While agriculture does have a CIT exemption period, presenting it as "5-year CIT holiday" in a 2026-context document without noting that this is for primary production only could mislead agro-processing businesses into assuming they qualify.
-
-- Current: `'5-year CIT holiday'`
-- Fix: `'CIT holiday (primary production)'`
-
-## Files to Modify
+## File to Modify
 
 | File | Changes |
 |------|---------|
-| `src/lib/taxLogicDocumentPdf.ts` | Update Healthcare incentive (line 583) and Agriculture incentive (line 581) |
-| `src/lib/taxMyths.ts` | Update startup myth explanation (line 75) and relatedTopics (line 79) |
+| `src/lib/taxMyths.ts` | Update 7 Pioneer Status references across tech, fintech, and healthcare sector guides |
 
 ## Technical Details
 
-### taxLogicDocumentPdf.ts (lines 581-583)
+All changes are in `src/lib/taxMyths.ts`:
 
-```
-From:
-  ['Agriculture', '0%', 'Zero-rated', '5-year CIT holiday'],
-  ['Manufacturing', '30%', 'Standard', '10% investment credit'],
-  ['Healthcare', '30%', 'Exempt', 'Pioneer status eligible'],
+**Line 691:** `'Pioneer Status eligibility for software development'` to `'EDI tax credit eligibility for software development (replaces Pioneer Status)'`
 
-To:
-  ['Agriculture', '0%', 'Zero-rated', 'CIT holiday (primary production)'],
-  ['Manufacturing', '30%', 'Standard', '10% investment credit'],
-  ['Healthcare', '30%', 'Exempt', 'EDI tax credit eligible'],
-```
+**Line 705:** `{ name: 'Pioneer Status', value: '0% CIT', duration: 'Up to 5 years' }` to `{ name: 'EDI Tax Credit', value: '5% annual credit on qualifying capex', duration: '5 years' }`
 
-### taxMyths.ts (line 75)
+**Line 1038:** `'Potential Pioneer Status for innovative services'` to `'EDI tax credit for innovative services (replaces Pioneer Status)'`
 
-```
-From: 'This is one of the most dangerous tax myths. While certain incentives exist (like Pioneer Status requiring application), there\'s no blanket exemption for new businesses.'
-To:   'This is one of the most dangerous tax myths. While certain incentives exist (like the Economic Development Incentive (EDI, formerly Pioneer Status)), there\'s no blanket exemption for new businesses.'
-```
+**Line 1075:** `'- Tax holidays via Pioneer Status'` to `'- EDI tax credits (replaces Pioneer Status)'`
 
-### taxMyths.ts (line 79)
+**Line 1095:** `'Pioneer Status for local drug manufacturing'` to `'EDI tax credit for local drug manufacturing (replaces Pioneer Status)'`
 
-```
-From: relatedTopics: ['startup compliance', 'first-year taxes', 'Pioneer Status'],
-To:   relatedTopics: ['startup compliance', 'first-year taxes', 'Pioneer Status', 'EDI'],
-```
+**Line 1109:** `{ name: 'Drug Manufacturing', value: 'Pioneer Status available', duration: 'Up to 5 years' }` to `{ name: 'Drug Manufacturing', value: 'EDI tax credit available', duration: '5 years' }`
+
+**Line 1128:** `'- Pioneer Status (0% CIT for 3-5 years)'` to `'- EDI tax credit (5% annual credit for 5 years, replaces Pioneer Status)'`
 
 ## What This Addresses
 
-- 1 downloadable PDF table presenting Pioneer Status as current Healthcare incentive
-- 1 agriculture incentive label that could mislead agro-processing businesses
-- 1 educational myth explanation referencing Pioneer Status without EDI context
-- 1 related topics array missing EDI keyword
+- 3 sector benefit arrays presenting Pioneer Status as current law
+- 2 taxIncentives arrays with outdated Pioneer Status values
+- 2 long-form content strings describing Pioneer Status tax holidays without EDI
 
-**Total: 2 files modified, 0 new files created**
+**Total: 1 file modified, 7 individual text corrections, 0 new files created**
 
