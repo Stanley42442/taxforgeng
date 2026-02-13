@@ -1,105 +1,104 @@
 
 
-# SEO/AEO Phase 16: State Guides and SectorPresets Still Reference Pioneer Status as Current Law
+# SEO/AEO Phase 17: Remaining Pioneer Status References, PDF Export, and Tax Myths Without EDI Context
 
 ## Summary
 
-Four files reference Pioneer Status as the current incentive regime without mentioning that NTA 2025 replaced it with the Economic Development Incentive (EDI). The blog post was updated in Phase 15, but the state-level SEO guides and the legacy SectorPresets component still present Pioneer Status as active law.
+Five files still present Pioneer Status as the current incentive regime without mentioning the Economic Development Incentive (EDI) replacement under NTA 2025. These are user-facing SEO pages, a PDF export module, an AI assistant system prompt, and an educational tax myths module.
 
 ## Errors Found
 
-### Error 1: LagosGuide.tsx — Pioneer Status as Current Incentive (2 references)
+### Error 1: SmallCompanyCITExemption.tsx -- FAQ Describes Pioneer Status as Current (line 21)
 
-**File:** `src/pages/seo/LagosGuide.tsx`
+The FAQ answer says: "No. Pioneer Status is a separate incentive for specific industries that provides a tax holiday for up to 5 years."
 
-- Line 19 FAQ answer: "Pioneer status may also apply to qualifying tech companies" — no EDI mention
-- Line 31 sector tip: "Pioneer status for qualifying tech" — presents as current
+This describes Pioneer Status as active law without noting its replacement by EDI under 2026 rules.
 
-**Fix:** Add "(now replaced by EDI under 2026 rules)" context to both references.
+**Fix:** Update to: "No. Pioneer Status (now replaced by EDI under 2026 rules) was a separate incentive. The EDI provides a 5% annual tax credit for 5 years on qualifying capex, rather than a full tax holiday. The Small Company Exemption is automatic based on turnover."
 
-### Error 2: KanoGuide.tsx — Pioneer Status Tax Holiday Described as Current (3 references)
+### Error 2: PortHarcourtGuide.tsx -- FAQ Mentions Pioneer Status Without EDI (line 18)
 
-**File:** `src/pages/seo/KanoGuide.tsx`
+The FAQ says: "Yes, Pioneer Status incentives may apply. Also, companies in designated Free Trade Zones enjoy tax holidays."
 
-- Line 19 FAQ answer: "may qualify for Pioneer Status incentives, providing a tax holiday of up to 5 years" — describes the old regime as current
-- Line 31 sector tip: "Pioneer status for value-addition"
-- Line 33 sector tip: "Pioneer status incentives"
+This is vague and doesn't mention the EDI transition.
 
-**Fix:** Update the FAQ answer to explain that Pioneer Status is replaced by EDI (5% annual credit for 5 years). Update sector tips to reference "EDI/Pioneer Status".
+**Fix:** Update to: "Under 2026 rules, Pioneer Status is replaced by the Economic Development Incentive (EDI), providing a 5% annual tax credit for 5 years. Free Trade Zone benefits (Onne Oil & Gas FTZ) continue. Consult a tax professional for current eligibility."
 
-### Error 3: SectorPresets.tsx — Pioneer Status in Myths and Benefits (2 references)
+### Error 3: pdfExport.ts -- PDF Shows "Pioneer Status: Tax Holiday Eligible" (line 352)
 
-**File:** `src/components/SectorPresets.tsx`
+When generating PDFs for sectors with `pioneerStatus: true`, the export says "Pioneer Status: Tax Holiday Eligible" without any EDI context. This is a downloadable document users may share with accountants.
 
-- Line 122: Manufacturing myth says "Pioneer status requires NIPC approval" — should note EDI replacement
-- Line 201: Healthcare benefits list includes "Pioneer Status" — should say "EDI (formerly Pioneer Status)"
+**Fix:** Change to conditionally show EDI context: "EDI Tax Credit (replaces Pioneer Status)" when the result uses 2026 rules, keeping "Pioneer Status: Tax Holiday Eligible" for pre-2026 reports.
 
-**Fix:** Update myth truth text and benefits label to reflect EDI transition.
+### Error 4: taxMyths.ts -- Pioneer Status Myth Without EDI Update (lines 366-384)
 
-### Error 4: AbujaGuide.tsx — Misleading VAT Phrasing
+The "pioneer-easy" myth entry explains Pioneer Status mechanics (NIPC application, 5-year holiday) without mentioning that NTA 2025 replaced it with EDI. Users reading this educational content would believe Pioneer Status is still the active regime.
 
-**File:** `src/pages/seo/AbujaGuide.tsx`, line 32
+**Fix:** Update the `truth` and `explanation` fields to note that Pioneer Status is replaced by EDI under 2026 rules, while preserving the educational content about the application process.
 
-The consulting sector tip says "VAT on services above ₦25M" which implies VAT only applies above ₦25M turnover. In reality, ₦25M is the mandatory registration threshold — VAT applies to all vatable supplies once registered. This could mislead businesses into thinking they don't need to charge VAT.
+### Error 5: tax-assistant/index.ts -- System Prompt Lists "Pioneer Status incentives" (line 74)
 
-**Fix:** Change to "VAT registration mandatory above ₦25M turnover"
+The AI assistant's system prompt lists "Pioneer Status incentives" as a topic without EDI context. When users ask the assistant about tax incentives, it may describe Pioneer Status as current law.
+
+**Fix:** Update the system prompt line to "Pioneer Status / EDI incentives (EDI replaces Pioneer Status under 2026 rules)" and add an EDI section to the key tax rules.
 
 ## Files to Modify
 
 | File | Changes |
 |------|---------|
-| `src/pages/seo/LagosGuide.tsx` | Add EDI context to 2 Pioneer Status references (lines 19, 31) |
-| `src/pages/seo/KanoGuide.tsx` | Update Pioneer Status to EDI in FAQ answer and 2 sector tips (lines 19, 31, 33) |
-| `src/components/SectorPresets.tsx` | Update myth text (line 122) and benefits label (line 201) to reference EDI |
-| `src/pages/seo/AbujaGuide.tsx` | Fix misleading VAT phrasing in consulting sector tip (line 32) |
+| `src/pages/blog/SmallCompanyCITExemption.tsx` | Update FAQ answer about Pioneer Status (line 21) |
+| `src/pages/seo/PortHarcourtGuide.tsx` | Update oil & gas FAQ to reference EDI (line 18) |
+| `src/lib/pdfExport.ts` | Update Pioneer Status label to show EDI context (line 352) |
+| `src/lib/taxMyths.ts` | Update pioneer-easy myth with EDI replacement info (lines 366-384) |
+| `supabase/functions/tax-assistant/index.ts` | Update system prompt to reference EDI (line 74, add EDI section) |
 
 ## Technical Details
 
-### LagosGuide.tsx
+### SmallCompanyCITExemption.tsx (line 21)
 
-Line 19 (FAQ answer):
-- From: `Pioneer status may also apply to qualifying tech companies.`
-- To: `Pioneer Status (now replaced by EDI under 2026 rules) may also apply to qualifying tech companies, providing a 5% annual tax credit for 5 years on qualifying capex.`
+- From: `'No. Pioneer Status is a separate incentive for specific industries that provides a tax holiday for up to 5 years. The Small Company Exemption is automatic based on turnover and available to all sectors.'`
+- To: `'No. Pioneer Status (replaced by EDI under 2026 rules) was a separate incentive. The Economic Development Incentive (EDI) now provides a 5% annual tax credit for 5 years on qualifying capex. The Small Company Exemption is automatic based on turnover and available to all sectors.'`
 
-Line 31 (sector tip):
-- From: `Pioneer status for qualifying tech`
-- To: `EDI tax credit for qualifying tech (replaces Pioneer Status)`
+### PortHarcourtGuide.tsx (line 18)
 
-### KanoGuide.tsx
+- From: `'Yes, Pioneer Status incentives may apply. Also, companies in designated Free Trade Zones enjoy tax holidays. However, the 2026 rules have modified some incentives - consult a tax professional for current eligibility.'`
+- To: `'Under 2026 rules, Pioneer Status is replaced by the Economic Development Incentive (EDI), providing a 5% annual tax credit for 5 years on qualifying capex. Free Trade Zone benefits (e.g., Onne Oil & Gas FTZ) continue to apply. Consult a tax professional for current eligibility.'`
 
-Line 19 (FAQ answer):
-- From: `The textile industry may qualify for Pioneer Status incentives, providing a tax holiday of up to 5 years.`
-- To: `Under 2026 rules, the textile industry may qualify for the Economic Development Incentive (EDI), which replaces Pioneer Status and provides a 5% annual tax credit for 5 years on qualifying capital expenditure. Companies with existing Pioneer Status approvals continue under their original terms.`
+### pdfExport.ts (line 352)
 
-Line 31 (sector tip):
-- From: `Pioneer status for value-addition`
-- To: `EDI tax credit for value-addition (replaces Pioneer Status)`
+- From: `ruleItems.push('Pioneer Status: Tax Holiday Eligible');`
+- To: `ruleItems.push('EDI Tax Credit (replaces Pioneer Status): 5% annual credit for 5 years');`
 
-Line 33 (sector tip):
-- From: `Pioneer status incentives`
-- To: `EDI incentives (replaces Pioneer Status)`
+### taxMyths.ts (lines 366-384)
 
-### SectorPresets.tsx
+Update the myth entry:
+- `myth`: Keep as-is (still a valid myth to debunk)
+- `truth`: Change to `'Pioneer Status required formal application to NIPC. Under 2026 rules, it is replaced by EDI (5% annual tax credit for 5 years on qualifying capex).'`
+- `explanation`: Add a sentence noting that existing Pioneer Status approvals continue but new applicants should apply for EDI
+- `quiz.explanation`: Update to mention EDI replacement
 
-Line 122 (Manufacturing myth):
-- From: `truth: 'Pioneer status requires NIPC approval and specific conditions'`
-- To: `truth: 'Under 2026 rules, Pioneer Status is replaced by EDI (5% annual tax credit for 5 years). Existing approvals continue under original terms'`
+### tax-assistant/index.ts (line 74)
 
-Line 201 (Healthcare benefits):
-- From: `'Pioneer Status'`
-- To: `'EDI tax credit (formerly Pioneer Status)'`
+- From: `- Pioneer Status incentives`
+- To: `- Pioneer Status / EDI incentives (EDI replaces Pioneer Status under 2026 rules: 5% annual tax credit for 5 years on qualifying capex)`
 
-### AbujaGuide.tsx
+Add after the CIT section (around line 103):
 
-Line 32 (consulting sector tip):
-- From: `'VAT on services above ₦25M'`
-- To: `'VAT registration mandatory above ₦25M turnover'`
+```
+ECONOMIC DEVELOPMENT INCENTIVE (EDI):
+- Replaces Pioneer Status under NTA 2025
+- 5% annual tax credit for 5 years on qualifying capital expenditure
+- Applies to designated sectors (tech, manufacturing, agriculture, etc.)
+- Existing Pioneer Status approvals continue under original terms
+```
 
 ## What This Addresses
 
-- 7 references across 3 SEO pages presenting Pioneer Status as current law without EDI context
-- 2 references in the legacy SectorPresets component using outdated incentive terminology
-- 1 misleading VAT phrasing that could cause businesses to incorrectly believe VAT doesn't apply below ₦25M
+- 1 SEO blog FAQ presenting Pioneer Status as current law
+- 1 SEO state guide FAQ omitting EDI in oil & gas incentives context
+- 1 PDF export labeling Pioneer Status without EDI transition
+- 1 educational myth module describing Pioneer Status mechanics without noting its replacement
+- 1 AI assistant system prompt that could cause incorrect responses about incentives
 
-**Total: 4 files modified, 0 new files created**
+**Total: 5 files modified, 0 new files created**
 
