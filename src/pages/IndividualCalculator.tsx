@@ -55,8 +55,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { useDeviceCSS, getResponsiveClasses } from "@/hooks/useDeviceCSS";
 import { TaxOptimizationTips } from "@/components/TaxOptimizationTips";
+import { TaxBandVisualization } from "@/components/TaxBandVisualization";
+import { calculateReverseSalary, type ReverseSalaryResult } from "@/lib/reverseSalaryCalculation";
+import { CurrencyInput } from "@/components/ui/currency-input";
 
-type CalculationType = 'pit' | 'crypto' | 'investment' | 'informal' | 'foreign_income';
+type CalculationType = 'pit' | 'crypto' | 'investment' | 'informal' | 'foreign_income' | 'reverse';
 
 interface SavedCalculation {
   id: string;
@@ -291,6 +294,17 @@ const IndividualCalculatorPage = () => {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
 
+  // Reverse salary state
+  const [desiredNetPay, setDesiredNetPay] = useState(0);
+  const [reversePensionRate, setReversePensionRate] = useState(0.08);
+  const [reverseIncludeNHF, setReverseIncludeNHF] = useState(true);
+  const [reverseIncludeNHIS, setReverseIncludeNHIS] = useState(false);
+  const [reverseNHISAmount, setReverseNHISAmount] = useState(0);
+  const [reverseAnnualRent, setReverseAnnualRent] = useState(0);
+  const [reverseLifeInsurance, setReverseLifeInsurance] = useState(0);
+  const [reverseMortgageInterest, setReverseMortgageInterest] = useState(0);
+  const [reverseResult, setReverseResult] = useState<ReverseSalaryResult | null>(null);
+
   // Track if we need to populate (using ref to avoid re-triggers)
   const shouldPopulateRef = useRef(false);
   const lastPopulatedRef = useRef<string | null>(null);
@@ -493,14 +507,14 @@ const IndividualCalculatorPage = () => {
   };
 
   const getInputs = (rules2026: boolean): IndividualTaxInputs => ({
-    calculationType,
+    calculationType: calculationType === 'reverse' ? 'pit' : calculationType,
     use2026Rules: rules2026,
     employmentIncome: parseNumber(employmentIncome),
     pensionContribution: parseNumber(pensionContribution),
     nhfContribution: parseNumber(nhfContribution),
-    nhisContribution: parseNumber(healthInsurance), // NHIS/Health Insurance
+    nhisContribution: parseNumber(healthInsurance),
     lifeInsurancePremium: parseNumber(lifeInsurance),
-    annualRentPaid: parseNumber(rentPaid), // For 2026 Rent Relief
+    annualRentPaid: parseNumber(rentPaid),
     mortgageInterest: parseNumber(mortgageInterest),
     cryptoIncome: parseNumber(cryptoIncome),
     cryptoGains: parseNumber(cryptoGains),
@@ -513,6 +527,23 @@ const IndividualCalculatorPage = () => {
   });
 
   const handleCalculate = () => {
+    if (calculationType === 'reverse') {
+      const res = calculateReverseSalary({
+        desiredNetPay,
+        use2026Rules,
+        pensionRate: reversePensionRate,
+        includeNHF: reverseIncludeNHF,
+        includeNHIS: reverseIncludeNHIS,
+        nhisAmount: reverseNHISAmount,
+        annualRent: reverseAnnualRent,
+        lifeInsurance: reverseLifeInsurance,
+        mortgageInterest: reverseMortgageInterest,
+      });
+      setReverseResult(res);
+      setResult(null);
+      return;
+    }
+
     if (!validateFields()) {
       toast.error('Please fix the errors before calculating');
       return;
@@ -521,8 +552,8 @@ const IndividualCalculatorPage = () => {
     const inputs = getInputs(use2026Rules);
     const calcResult = calculateIndividualTax(inputs);
     setResult(calcResult);
+    setReverseResult(null);
 
-    // Calculate comparison with opposite rules
     const comparisonInputs = getInputs(!use2026Rules);
     const compResult = calculateIndividualTax(comparisonInputs);
     setComparisonResult(compResult);
@@ -608,7 +639,8 @@ const IndividualCalculatorPage = () => {
       crypto: 'Crypto Tax',
       investment: 'Investment Tax',
       informal: 'Informal Tax',
-      foreign_income: 'Foreign Income'
+      foreign_income: 'Foreign Income',
+      reverse: 'Reverse Salary',
     };
     return labels[type] || type;
   };
@@ -623,6 +655,8 @@ const IndividualCalculatorPage = () => {
         return parseNumber(dividendIncome) > 0 || parseNumber(interestIncome) > 0 || parseNumber(capitalGains) > 0;
       case 'informal':
         return parseNumber(estimatedTurnover) > 0;
+      case 'reverse':
+        return desiredNetPay > 0;
       case 'foreign_income':
         return true;
       default:
@@ -725,7 +759,7 @@ const IndividualCalculatorPage = () => {
       >
         <TabsList className={getResponsiveClasses(device, {
           mobile: 'grid w-full grid-cols-3 h-auto p-1 glass-premium rounded-xl gap-1',
-          all: 'grid w-full grid-cols-3 md:grid-cols-5 h-auto p-1.5 glass-frosted rounded-2xl'
+          all: 'grid w-full grid-cols-3 md:grid-cols-6 h-auto p-1.5 glass-frosted rounded-2xl'
         })}>
           <TabsTrigger 
             value="pit"
@@ -782,6 +816,16 @@ const IndividualCalculatorPage = () => {
           >
             <Store className="h-4 w-4" />
             <span className={isMobile ? 'text-xs font-medium' : 'text-sm font-medium'}>Informal</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            value="reverse"
+            className={getResponsiveClasses(device, {
+              mobile: 'flex items-center justify-center gap-1 py-2.5 rounded-lg data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all touch-feedback',
+              all: 'flex items-center gap-2 py-3 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground transition-all duration-300'
+            })}
+          >
+            <ArrowLeftRight className="h-4 w-4" />
+            <span className={isMobile ? 'text-xs font-medium' : 'text-sm font-medium'}>Reverse</span>
           </TabsTrigger>
         </TabsList>
 
@@ -1139,7 +1183,152 @@ const IndividualCalculatorPage = () => {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* Reverse Salary Calculator */}
+        <TabsContent value="reverse" className="mt-6">
+          <Card className="glass-frosted border-0 shadow-futuristic">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ArrowLeftRight className="h-5 w-5 text-primary" />
+                Reverse Salary Calculator
+              </CardTitle>
+              <CardDescription>
+                Enter your desired take-home pay to find the required gross salary
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">
+                    Desired Monthly Take-Home Pay <span className="text-destructive">*</span>
+                  </Label>
+                  <CurrencyInput
+                    value={Math.round(desiredNetPay / 12)}
+                    onChange={(v) => setDesiredNetPay(v * 12)}
+                    placeholder="Enter monthly net pay"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Annual: {desiredNetPay > 0 ? `₦${desiredNetPay.toLocaleString()}` : '—'}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Pension Rate (%)</Label>
+                  <Select value={String(reversePensionRate)} onValueChange={(v) => setReversePensionRate(Number(v))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0">0% (No pension)</SelectItem>
+                      <SelectItem value="0.08">8% (Standard)</SelectItem>
+                      <SelectItem value="0.10">10%</SelectItem>
+                      <SelectItem value="0.15">15%</SelectItem>
+                      <SelectItem value="0.20">20% (Max voluntary)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-secondary">
+                  <Label className="text-sm">Include NHF (2.5%)</Label>
+                  <Switch checked={reverseIncludeNHF} onCheckedChange={setReverseIncludeNHF} />
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-secondary">
+                  <Label className="text-sm">Include NHIS</Label>
+                  <Switch checked={reverseIncludeNHIS} onCheckedChange={setReverseIncludeNHIS} />
+                </div>
+              </div>
+
+              {reverseIncludeNHIS && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Annual NHIS Premium</Label>
+                  <CurrencyInput value={reverseNHISAmount} onChange={setReverseNHISAmount} />
+                </div>
+              )}
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Annual Rent Paid</Label>
+                  <CurrencyInput value={reverseAnnualRent} onChange={setReverseAnnualRent} />
+                  <p className="text-xs text-muted-foreground">For Rent Relief (20%, max ₦500k)</p>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Life Insurance Premium</Label>
+                  <CurrencyInput value={reverseLifeInsurance} onChange={setReverseLifeInsurance} />
+                </div>
+              </div>
+
+              {use2026Rules && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Mortgage Interest (Owner-Occupied)</Label>
+                  <CurrencyInput value={reverseMortgageInterest} onChange={setReverseMortgageInterest} />
+                </div>
+              )}
+
+              <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
+                <div className="flex items-center gap-2 text-primary">
+                  <Info className="h-4 w-4" />
+                  <span className="font-medium text-sm">How it works</span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Enter your desired monthly take-home pay and we'll calculate the gross salary you need to negotiate,
+                  accounting for all statutory deductions and {use2026Rules ? '2026' : 'current'} PIT bands.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
+
+      {/* Reverse Salary Results */}
+      {reverseResult && reverseResult.grossSalary > 0 && calculationType === 'reverse' && (
+        <Card className="glass-frosted border-0 shadow-futuristic animate-slide-up mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calculator className="h-5 w-5 text-primary" />
+              Reverse Salary Results
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 sm:grid-cols-3 mb-6">
+              <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
+                <p className="text-xs text-muted-foreground">Required Gross Salary</p>
+                <p className="text-2xl font-bold text-primary">₦{reverseResult.grossSalary.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">₦{Math.round(reverseResult.grossSalary / 12).toLocaleString()}/month</p>
+              </div>
+              <div className="p-4 rounded-xl bg-success/5 border border-success/20">
+                <p className="text-xs text-muted-foreground">Your Take-Home</p>
+                <p className="text-2xl font-bold text-success">₦{Math.round(reverseResult.netPay).toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">₦{Math.round(reverseResult.netPay / 12).toLocaleString()}/month</p>
+              </div>
+              <div className="p-4 rounded-xl bg-secondary">
+                <p className="text-xs text-muted-foreground">Effective Tax Rate</p>
+                <p className="text-2xl font-bold">{reverseResult.effectiveRate.toFixed(1)}%</p>
+                <p className="text-xs text-muted-foreground">Total deductions: ₦{reverseResult.totalDeductions.toLocaleString()}</p>
+              </div>
+            </div>
+
+            <h4 className="font-medium text-foreground mb-3">Deduction Breakdown</h4>
+            <div className="space-y-2">
+              {reverseResult.deductions.map((d, i) => (
+                <div key={i} className="flex justify-between text-sm py-2 border-b border-border last:border-0">
+                  <div>
+                    <span className="text-foreground">{d.name}</span>
+                    <p className="text-xs text-muted-foreground">{d.description}</p>
+                  </div>
+                  <span className="font-medium text-destructive whitespace-nowrap">-₦{d.amount.toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+
+            {reverseResult.taxBands.length > 0 && (
+              <TaxBandVisualization
+                taxableIncome={reverseResult.taxBands.reduce((sum, b) => sum + b.taxableAmount, 0)}
+                use2026Rules={use2026Rules}
+                className="mt-6"
+              />
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Calculate Button and History */}
       {calculationType !== 'foreign_income' && (
@@ -1422,6 +1611,15 @@ const IndividualCalculatorPage = () => {
                 ))}
               </div>
             </div>
+
+            {/* Tax Band Visualization */}
+            {(calculationType === 'pit' || calculationType === 'investment') && result.taxableIncome > 0 && (
+              <TaxBandVisualization
+                taxableIncome={result.taxableIncome}
+                use2026Rules={use2026Rules}
+                className="mt-6"
+              />
+            )}
 
             {/* Reliefs Section */}
             {result.reliefs && result.reliefs.length > 0 && (
