@@ -204,7 +204,7 @@ function generateEmailHtml(params: {
               ` : ''}
 
               <p style="color: #52525b; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0;">
-                Don't forget to file on time to avoid penalties and interest charges from the Federal Inland Revenue Service (FIRS).
+                Don't forget to file on time to avoid penalties and interest charges from the Nigeria Revenue Service (NRS).
               </p>
 
               <!-- CTA Button -->

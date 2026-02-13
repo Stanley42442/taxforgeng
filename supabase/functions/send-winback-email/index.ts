@@ -120,7 +120,7 @@ const handler = async (req: Request): Promise<Response> => {
                 ${[
                   { icon: '💼', title: 'Multi-Business Management', desc: 'Save and track up to 10 businesses' },
                   { icon: '📊', title: 'Professional Reports', desc: 'Export beautiful PDF & CSV reports' },
-                  { icon: '📝', title: 'Tax Filing Made Easy', desc: 'Pre-filled FIRS forms for TaxProMax' },
+                  { icon: '📝', title: 'Tax Filing Made Easy', desc: 'Pre-filled NRS forms for TaxProMax' },
                   { icon: '✅', title: 'CAC Verification', desc: 'Instantly verify RC/BN numbers' },
                   { icon: '🤖', title: 'AI Tax Assistant', desc: 'Get instant answers to tax questions' },
                 ].map(feature => `

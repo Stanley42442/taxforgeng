@@ -50,12 +50,12 @@ export const taxMyths: TaxMyth[] = [
   {
     id: 'gift-narration',
     myth: 'Labeling money transfers as "gifts" or "birthday money" means they\'re tax-free',
-    truth: 'FIRS assesses income based on SUBSTANCE, not labels. Regular "gifts" from clients are income.',
-    explanation: 'The tax authorities look at the economic substance of transactions, not what you call them. If you regularly receive money from the same sources as payment for services, calling it a "gift" won\'t change its tax treatment. FIRS can reclassify transactions based on patterns, frequency, and business relationships.',
+    truth: 'NRS (formerly FIRS) assesses income based on SUBSTANCE, not labels. Regular "gifts" from clients are income.',
+    explanation: 'The tax authorities look at the economic substance of transactions, not what you call them. If you regularly receive money from the same sources as payment for services, calling it a "gift" won\'t change its tax treatment. NRS can reclassify transactions based on patterns, frequency, and business relationships.',
     category: 'gifts',
     severity: 'high',
     tier: 'free',
-    relatedTopics: ['income classification', 'tax evasion', 'FIRS audits'],
+    relatedTopics: ['income classification', 'tax evasion', 'NRS audits'],
     quiz: {
       question: 'A freelancer receives ₦500,000 monthly labeled as "support" from a client. How is this treated?',
       options: [
@@ -65,7 +65,7 @@ export const taxMyths: TaxMyth[] = [
         'Tax-free if under ₦1 million'
       ],
       correctIndex: 1,
-      explanation: 'Regular payments from business relationships are taxable income regardless of the label. FIRS looks at substance over form.'
+      explanation: 'Regular payments from business relationships are taxable income regardless of the label. NRS looks at substance over form.'
     }
   },
   {
@@ -135,7 +135,7 @@ export const taxMyths: TaxMyth[] = [
     id: 'penalties-jail',
     myth: 'Tax filing errors automatically lead to criminal prosecution and jail time',
     truth: 'Penalties are graduated and often waivable. Criminal prosecution is reserved for deliberate fraud.',
-    explanation: 'Nigeria\'s tax system uses progressive penalties: late filing (5-10%), late payment (interest at CBN rate), and underreporting (additional assessments). Criminal prosecution requires proof of willful fraud. FIRS often offers voluntary disclosure programs with reduced penalties.',
+    explanation: 'Nigeria\'s tax system uses progressive penalties: late filing (5-10%), late payment (interest at CBN rate), and underreporting (additional assessments). Criminal prosecution requires proof of willful fraud. NRS (formerly FIRS) often offers voluntary disclosure programs with reduced penalties.',
     category: 'penalties',
     severity: 'high',
     tier: 'free',
@@ -156,13 +156,13 @@ export const taxMyths: TaxMyth[] = [
     id: 'audits-random',
     myth: 'Tax audits are completely random - anyone can be targeted anytime',
     truth: 'Audits are RISK-BASED, triggered by red flags like inconsistent filings or large refund claims.',
-    explanation: 'FIRS uses data analytics to identify audit targets. Common triggers include: large VAT refund claims, inconsistent filings across periods, lifestyle inconsistent with declared income, industry-specific reviews, and anonymous tips. Good record-keeping reduces audit risk.',
+    explanation: 'NRS (formerly FIRS) uses data analytics to identify audit targets. Common triggers include: large VAT refund claims, inconsistent filings across periods, lifestyle inconsistent with declared income, industry-specific reviews, and anonymous tips. Good record-keeping reduces audit risk.',
     category: 'audits',
     severity: 'medium',
     tier: 'basic',
-    relatedTopics: ['audit triggers', 'risk assessment', 'FIRS investigations'],
+    relatedTopics: ['audit triggers', 'risk assessment', 'NRS investigations'],
     quiz: {
-      question: 'What typically triggers a FIRS tax audit?',
+      question: 'What typically triggers an NRS tax audit?',
       options: [
         'Random computer selection only',
         'Being in a specific industry',
@@ -170,7 +170,7 @@ export const taxMyths: TaxMyth[] = [
         'Earning above ₦50 million'
       ],
       correctIndex: 2,
-      explanation: 'FIRS uses risk-based targeting. Red flags like large refunds, inconsistent filings, or lifestyle-income mismatches trigger audits.'
+      explanation: 'NRS uses risk-based targeting. Red flags like large refunds, inconsistent filings, or lifestyle-income mismatches trigger audits.'
     }
   },
   {

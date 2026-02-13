@@ -125,7 +125,7 @@ export const PDF_SETTINGS = {
 /**
  * Format amount as Nigerian Naira with "NGN" prefix
  * Uses "NGN" text prefix for reliable PDF rendering (jsPDF's Helvetica doesn't support ₦)
- * This matches Nigerian banking standards (Access Bank, GTBank, Paystack, FIRS)
+ * This matches Nigerian banking standards (Access Bank, GTBank, Paystack, NRS)
  */
 export function formatNaira(
   amount: number,
