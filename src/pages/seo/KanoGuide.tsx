@@ -83,7 +83,7 @@ const KanoGuide = () => {
                     <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center shrink-0"><MapPin className="h-6 w-6 text-primary" /></div>
                     <div>
                       <h2 className="text-xl font-bold text-foreground mb-2">Tax Compliance in Kano</h2>
-                      <p className="text-muted-foreground leading-relaxed mb-3">Kano State is the commercial heart of northern Nigeria, with a diverse economy spanning agriculture, textiles, trade, and transport. The Kano State Internal Revenue Service (KIRS) manages state-level tax collection, while FIRS handles federal taxes.</p>
+                      <p className="text-muted-foreground leading-relaxed mb-3">Kano State is the commercial heart of northern Nigeria, with a diverse economy spanning agriculture, textiles, trade, and transport. The Kano State Internal Revenue Service (KIRS) manages state-level tax collection, while NRS handles federal taxes.</p>
                       <p className="text-muted-foreground leading-relaxed">With one of Nigeria's largest informal economies, Kano presents unique tax compliance challenges. Understanding the distinction between state and federal obligations — and the agricultural exemptions available — is key to efficient tax planning.</p>
                     </div>
                   </div>

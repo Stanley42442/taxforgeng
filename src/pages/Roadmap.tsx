@@ -87,7 +87,7 @@ const Roadmap = () => {
       title="TaxForge NG Product Roadmap - Coming Soon Features"
       description="See what's next for TaxForge NG: CAC API integration, bank feeds, AI tax assistant, direct NRS e-filing, and mobile app. Join the waitlist for early access."
       canonicalPath="/roadmap"
-      keywords="TaxForge roadmap, Nigerian tax software features, NRS e-filing, FIRS e-filing, tax app Nigeria"
+      keywords="TaxForge roadmap, Nigerian tax software features, NRS e-filing, tax app Nigeria"
       schema={createBreadcrumbSchema([
         { name: 'Home', url: 'https://taxforgeng.com/' },
         { name: 'Roadmap', url: 'https://taxforgeng.com/roadmap' },

@@ -49,7 +49,7 @@ const VATCalculator = () => {
     },
     {
       question: 'What are the penalties for late VAT filing?',
-      answer: 'Late filing attracts a penalty of ₦50,000 for the first month and ₦25,000 for each subsequent month of default. Additionally, interest accrues on the unpaid VAT at the prevailing commercial rate.',
+      answer: 'Late filing attracts a penalty of ₦100,000 for the first month and ₦50,000 for each subsequent month of default (NTA 2025). Additionally, interest accrues on the unpaid VAT at the prevailing commercial rate.',
     },
   ];
 
@@ -152,7 +152,7 @@ const VATCalculator = () => {
                   <TrustBadges
                     badges={[
                       { icon: 'check', text: '7.5% Standard Rate' },
-                      { icon: 'shield', text: 'FIRS Compliant' },
+                      { icon: 'shield', text: 'NRS Compliant' },
                       { icon: 'clock', text: 'Monthly Filing' },
                     ]}
                   />
@@ -201,7 +201,7 @@ const VATCalculator = () => {
                     },
                     {
                       mistake: 'Late monthly filing (due by 21st)',
-                      fix: 'VAT returns are due by the 21st of the following month. Late filing attracts ₦50,000 penalty for the first month plus ₦25,000 each subsequent month.',
+                      fix: 'VAT returns are due by the 21st of the following month. Late filing attracts ₦100,000 penalty for the first month plus ₦50,000 each subsequent month (NTA 2025).',
                     },
                     {
                       mistake: 'Not keeping proper VAT invoices',
@@ -358,15 +358,15 @@ const VATCalculator = () => {
                     <div className="glass rounded-xl p-4">
                       <h4 className="font-semibold text-foreground mb-2">Late Filing Penalties</h4>
                       <ul className="space-y-1 text-sm text-muted-foreground">
-                        <li>• ₦50,000 first month</li>
-                        <li>• ₦25,000 each subsequent month</li>
+                        <li>• ₦100,000 first month (NTA 2025)</li>
+                        <li>• ₦50,000 each subsequent month</li>
                         <li>• Plus interest on unpaid tax</li>
                       </ul>
                     </div>
                     <div className="glass rounded-xl p-4">
                       <h4 className="font-semibold text-foreground mb-2">How to File</h4>
                       <ul className="space-y-1 text-sm text-muted-foreground">
-                        <li>• Online via FIRS TaxPro Max portal</li>
+                        <li>• Online via NRS TaxPro Max portal</li>
                         <li>• Complete VAT Form 002</li>
                         <li>• Attach supporting schedules</li>
                       </ul>

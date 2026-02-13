@@ -48,7 +48,7 @@ const WHTCalculator = () => {
     },
     {
       question: 'How do I recover excess WHT credits?',
-      answer: 'If your WHT credits exceed your tax liability, you can carry the excess forward to offset future tax or apply for a refund from FIRS. The refund process requires submitting a formal application with supporting documentation.',
+      answer: 'If your WHT credits exceed your tax liability, you can carry the excess forward to offset future tax or apply for a refund from NRS. The refund process requires submitting a formal application with supporting documentation.',
     },
   ];
 
@@ -229,7 +229,7 @@ const WHTCalculator = () => {
                     },
                     {
                       mistake: 'Not issuing credit notes to recipients',
-                      fix: 'After remitting WHT to FIRS, you must obtain and issue credit notes to the recipient. Without credit notes, they cannot claim the WHT as a credit against their own tax.',
+                      fix: 'After remitting WHT to NRS, you must obtain and issue credit notes to the recipient. Without credit notes, they cannot claim the WHT as a credit against their own tax.',
                     },
                     {
                       mistake: 'Applying wrong WHT rate',
@@ -237,7 +237,7 @@ const WHTCalculator = () => {
                     },
                     {
                       mistake: 'Missing the 21-day remittance deadline',
-                      fix: 'WHT must be remitted to FIRS within 21 days after the month of deduction. Late remittance attracts penalties of 10% plus interest at CBN rate.',
+                      fix: 'WHT must be remitted to NRS within 21 days after the month of deduction. Late remittance attracts penalties of 10% plus interest at CBN rate.',
                     },
                   ].map((item, index) => (
                     <div key={index} className="glass-frosted rounded-xl p-5">

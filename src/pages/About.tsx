@@ -137,7 +137,7 @@ const About = () => {
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">What We Offer</h2>
                 <div className="grid gap-4 md:grid-cols-3">
                   {[
-                    { icon: Calculator, title: 'Tax Calculators', desc: 'PIT, CIT, VAT, WHT — all FIRS-compliant for 2026', link: '/free-tax-calculator' },
+                    { icon: Calculator, title: 'Tax Calculators', desc: 'PIT, CIT, VAT, WHT — all NRS-compliant for 2026', link: '/free-tax-calculator' },
                     { icon: Users, title: 'Payroll Management', desc: 'Bulk PAYE, pension, NHF, payslip generation', link: '/payroll' },
                     { icon: BarChart3, title: 'Reports & Filing', desc: 'PDF exports, P&L statements, e-filing prep', link: '/business-report' },
                   ].map((item, i) => (

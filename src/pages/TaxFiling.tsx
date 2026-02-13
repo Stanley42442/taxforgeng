@@ -50,7 +50,7 @@ const TaxFiling = () => {
 
   const handleMockSubmit = () => {
     toast.success('Filing prepared successfully!', {
-      description: 'In future, we\'ll submit directly to FIRS. A copy has been sent to your email.',
+      description: 'In future, we\'ll submit directly to NRS. A copy has been sent to your email.',
       duration: 5000
     });
   };
@@ -67,7 +67,7 @@ const TaxFiling = () => {
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
             Upgrade to Business or Corporate tier to access tax filing preparation tools, 
-            including pre-filled FIRS forms and step-by-step filing guides.
+            including pre-filled NRS forms and step-by-step filing guides.
           </p>
           
           <div className="glass-frosted rounded-2xl border border-primary/20 p-6 mb-8 glow-sm">
@@ -76,7 +76,7 @@ const TaxFiling = () => {
             <ul className="text-sm text-muted-foreground space-y-2">
               <li>✓ Auto-generate pre-filled CIT, PIT, VAT forms</li>
               <li>✓ Step-by-step TaxProMax filing guide</li>
-              <li>✓ Download forms matching FIRS templates</li>
+              <li>✓ Download forms matching NRS templates</li>
               <li>✓ Email copies of all filings</li>
             </ul>
           </div>
@@ -103,7 +103,7 @@ const TaxFiling = () => {
     <PageLayout 
       title="Prepare & File Taxes" 
       icon={FileText}
-      description="Generate pre-filled forms ready for FIRS TaxProMax submission"
+      description="Generate pre-filled forms ready for NRS TaxPro Max submission"
       maxWidth="4xl"
     >
       {/* Advisory Banner */}
@@ -112,7 +112,7 @@ const TaxFiling = () => {
         <div>
           <p className="text-sm text-foreground font-medium">Coming Soon: Direct Filing</p>
           <p className="text-sm text-muted-foreground">
-            Automated direct filing to FIRS via partnerships is in development. Stay subscribed for early access!
+            Automated direct filing to NRS via partnerships is in development. Stay subscribed for early access!
           </p>
         </div>
       </div>
@@ -210,9 +210,9 @@ const TaxFiling = () => {
             />
             <StepCard
               step={2}
-              title="Log into FIRS TaxProMax"
-              description="Visit taxpromax.firs.gov.ng and log in with your Tax Identification Number (TIN)."
-              link="https://taxpromax.firs.gov.ng"
+              title="Log into NRS TaxPro Max"
+              description="Visit taxpromax.nrs.gov.ng and log in with your Tax Identification Number (TIN)."
+              link="https://taxpromax.nrs.gov.ng"
             />
             <StepCard
               step={3}
@@ -222,7 +222,7 @@ const TaxFiling = () => {
             <StepCard
               step={4}
               title="Make Payment"
-              description="Complete any tax payments through the FIRS payment portal or your bank."
+              description="Complete any tax payments through the NRS payment portal or your bank."
             />
           </div>
         )}
@@ -242,9 +242,9 @@ const TaxFiling = () => {
               Prepare Filing Package
             </Button>
             <Button variant="outline" asChild>
-              <a href="https://taxpromax.firs.gov.ng" target="_blank" rel="noopener noreferrer">
+              <a href="https://taxpromax.nrs.gov.ng" target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="h-4 w-4" />
-                Open FIRS TaxProMax
+                Open NRS TaxPro Max
               </a>
             </Button>
           </div>
