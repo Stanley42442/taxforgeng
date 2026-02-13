@@ -1,100 +1,96 @@
 
 
-# Phase 34 Verification: Issues Found and Fixes Required
+# SEO/AEO Accuracy Audit: Fix Content-Code Discrepancies
 
-After thorough code review of all files created/modified across the 3 sub-phases, here are the findings organized by severity.
-
----
-
-## Critical Issues (2)
-
-### 1. Employer Cost Calculator: Net pay estimate is too low
-**File:** `src/pages/Payroll.tsx` (lines 43-62)
-
-The simplified PIT calculation in the Employer Cost tab deducts only pension and NHF before applying PIT bands. It does NOT account for:
-- **2026 rules:** Rent Relief, NHIS, Life Insurance, or the first 800k exemption band (0% rate is present but no reliefs reduce the taxable base)
-- **Pre-2026 rules:** Consolidated Relief Allowance (CRA)
-
-Since no reliefs are applied, the taxable income is inflated and the estimated PAYE/net pay shown to users will be **significantly inaccurate** (overtaxed).
-
-**Fix:** Apply CRA (pre-2026) or at minimum the pension relief to the taxable income calculation. Since this is labeled as an "estimate", adding a clear "(simplified estimate)" disclaimer and applying the 2026 bands correctly (which already include the 0% on first 800k) is acceptable. The 0% band IS already applied, so the issue is smaller than it appears -- the main missing piece is the CRA for pre-2026 mode.
-
-### 2. Investment CGT: Small investor exemption is incomplete
-**File:** `src/lib/individualTaxCalculations.ts` (line 622)
-
-The 2026 NTA small investor exemption requires **two conditions**:
-- Gains <= 10M **AND**
-- Disposal proceeds < 150M
-
-Current code only checks `capitalGains <= 10000000`. The `cgtDisposalProceeds` is available in the inputs interface but NOT checked.
-
-**Fix:** Update the condition at line 622 to:
-```
-if (capitalGains <= 10000000 && (!inputs.cgtDisposalProceeds || inputs.cgtDisposalProceeds < 150000000))
-```
+Gemini's analysis identified that while the technical foundation is strong, **content-code contradictions** are actively harming AEO citations and YMYL trust signals. This plan addresses every discrepancy found in the codebase.
 
 ---
 
-## Minor Issues (2)
+## Issues Found (7 Total)
 
-### 3. Freelancer WHT credit assumes 100% WHT coverage
-**File:** `src/lib/individualTaxCalculations.ts` (line 438)
+### Critical: Content contradicts 2026 rules (actively harmful to AEO)
 
-The freelancer formal PIT path calculates `whtCredit = turnover * 0.10`, assuming all turnover has 10% WHT deducted. In reality, only invoiced professional services to corporate clients have WHT withheld.
+**1. Partner API returns obsolete pre-2026 CIT tiers**
+`supabase/functions/partner-api/index.ts` (lines 150-155) returns `mediumCompanyRate: 0.20` and `mediumCompanyTurnoverLimit: 100000000` for the **pre-2026** rules section. While the 2026 section is correct, the pre-2026 data includes the medium tier which is fine historically -- however the structure naming is misleading for AI parsers.
 
-**Fix:** Add a WHT percentage input field to the freelancer section, or add a disclaimer note: "Assumes all revenue has WHT deducted at source. Adjust if some clients do not withhold."
+**2. `llms-full.txt` references "medium" companies**
+Line 127: *"Company Income Tax rates explained with examples for small, medium, and large companies."* -- This is the AI-facing file. Mentioning "medium" when 2026 abolished it sends mixed signals to LLMs.
 
-### 4. Rental income: Maintenance relief shown even when zero
-**File:** `src/lib/individualTaxCalculations.ts` (line 530)
+**3. CIT Calculator FAQ mentions "small, medium, or large"**
+`src/pages/seo/CITCalculator.tsx` line 31: FAQ question text says "small, medium, or large?" -- The answer correctly explains the 2026 two-tier system, but the question itself plants "medium" as a concept.
 
-`reliefs.push` for maintenance happens when `totalDeductions > 0`, but maintenance itself could be 0 while insurance or management fees are non-zero. The maintenance entry with amount 0 would still be pushed.
+**4. `MultiYearProjection.tsx` uses 3-tier type system**
+Line 26: `companySize: 'small' | 'medium' | 'large'` -- The "medium" value is only used for pre-2026 projections (lines 80-84), which is historically correct. However, this type leaks into labels/charts visible to users and crawlers.
 
-**Fix:** Add individual checks: `if (maintenance > 0) reliefs.push(...)`.
+### Moderate: Pre-2026 PIT band (19%) in user-facing content
 
----
+**5. Pre-2026 bands displayed without clear labeling**
+Three files show the old 19% band in content that could confuse AI crawlers if they miss the context switch:
+- `src/pages/TaxBreakdown.tsx` (lines 100-106) -- properly wrapped in conditional `inputs.use2026Rules` check
+- `src/lib/taxLogicDocumentPdf.ts` (line 297) -- in a "Pre-2026" labeled section
+- `src/lib/individualPdfExport.ts` (line 153) -- in a "Pre-2026" labeled section
 
-## Code Quality / Maintenance Observations (non-blocking)
+These are **correctly labeled** as pre-2026. No fix needed, but adding explicit "HISTORICAL" markers improves AEO clarity.
 
-### 5. PIT bands duplicated in 3 files
-The same PIT band constants exist in:
-- `src/lib/individualTaxCalculations.ts`
-- `src/lib/reverseSalaryCalculation.ts`
-- `src/components/TaxBandVisualization.tsx`
+### Minor: Missing trust signals
 
-**Recommendation:** Extract to a shared `src/lib/taxBands.ts` constant and import everywhere. This prevents future drift if bands are updated.
+**6. ComparisonTable correctly shows "ABOLISHED" for medium tier**
+`src/components/seo/ComparisonTable.tsx` line 108 -- This is actually correct and helpful. No change needed.
 
-### 6. Existing tests may need updates
-The test file `src/__tests__/lib/individualTaxCalculations.test.ts` tests the `calculateInvestmentTax` function but does not test the new `calculateRentalTax` function. Additionally, tests for the CGT small investor exemption (line 620-645) don't validate the proceeds condition since it was missing.
-
-**Recommendation:** Add test cases for:
-- `calculateRentalTax` function
-- CGT exemption with proceeds >= 150M (should NOT be exempt)
-- Freelancer formal PIT path
-- Reverse salary convergence edge cases
+**7. Blog post references old 20% rate correctly in historical context**
+`src/pages/blog/SmallCompanyCITExemption.tsx` lines 139, 151 -- Says "Under old rules: would have paid 20% CIT". This is correct historical comparison.
 
 ---
 
-## Security Verification: All Clear
+## Fixes Required (4 files)
 
-| Check | Status |
-|-------|--------|
-| No user input flows to `dangerouslySetInnerHTML` | Passed -- only static data from `taxProfessionals.ts` |
-| Search input sanitized | Passed -- only used in `.includes()` comparison, never as HTML or SQL |
-| External links use `rel="noopener noreferrer"` | Passed |
-| No Supabase queries without auth checks | Passed -- `handleSaveCalculation` checks `user` before inserting |
-| Database save uses parameterized queries via Supabase SDK | Passed |
-| `safeLocalStorage` used for all storage access | Passed |
-| No console.log of sensitive data | Passed -- uses `logger` throughout |
+### Fix 1: `public/llms-full.txt` -- Remove "medium" reference
+Change line 127 from:
+> "Company Income Tax rates explained with examples for small, medium, and large companies."
+
+To:
+> "Company Income Tax rates explained. 0% for small companies, 30% for large. Professional services exclusion."
+
+### Fix 2: `src/pages/seo/CITCalculator.tsx` -- Fix FAQ question wording
+Change FAQ question (line 31) from:
+> "How do I know if my company is small, medium, or large?"
+
+To:
+> "How do I know if my company qualifies as small or large under 2026 rules?"
+
+### Fix 3: `supabase/functions/partner-api/index.ts` -- Clean pre-2026 CIT structure
+The pre-2026 section (lines 150-155) currently returns `mediumCompanyRate` as a distinct field. Change the structure to clearly label it as historical context and ensure AI parsers understand this is the old regime:
+- Add a `rulesVersion: 'Pre-2026 (Historical)'` label
+- Rename `mediumCompanyRate` to `historicalMediumRate` or nest under a `historical` key
+
+### Fix 4: `public/llms.txt` -- Already correct, minor enhancement
+Add explicit "Professional service firms excluded from small company definition" to the CIT section for AEO completeness.
 
 ---
 
-## Summary of Required Changes
+## What Does NOT Need Fixing
 
-| File | Change | Severity |
-|------|--------|----------|
-| `src/lib/individualTaxCalculations.ts` (line 622) | Add `cgtDisposalProceeds < 150M` to exemption check | Critical |
-| `src/lib/individualTaxCalculations.ts` (line 530) | Add `if (maintenance > 0)` guard | Minor |
-| `src/lib/individualTaxCalculations.ts` (line 438) | Add disclaimer about WHT credit assumption | Minor |
-| `src/pages/Payroll.tsx` (line 43) | Add note that net pay is simplified estimate, or apply basic reliefs | Critical |
+These were flagged by Gemini but are already correct in the codebase:
 
-All fixes are small, targeted changes. No architectural refactoring needed.
+- CIT rates in calculation logic: correctly 0%/30% (not 25%)
+- 2026 PIT bands: correctly 0/15/18/21/23/25 everywhere
+- Professional services exclusion: mentioned in 6+ pages
+- ComparisonTable: correctly shows medium tier as "ABOLISHED"
+- Dev Levy: correctly stated as 4% replacing 3% TET
+- Disclaimers: present on all pages and PDFs
+- Date stamps: ContentMeta component used across SEO pages
+- FAQSchema: already implemented on all SEO landing pages
+
+---
+
+## Technical Details
+
+| File | Change | Impact |
+|------|--------|--------|
+| `public/llms-full.txt` line 127 | Remove "medium" from CIT description | High -- direct AI-facing file |
+| `src/pages/seo/CITCalculator.tsx` line 31 | Fix FAQ question wording | Medium -- FAQ schema feeds to Google |
+| `supabase/functions/partner-api/index.ts` lines 150-155 | Restructure pre-2026 CIT to avoid confusion | Medium -- API responses consumed externally |
+| `public/llms.txt` line 15-20 area | Add professional services exclusion note | Medium -- AI-facing file |
+
+All changes are text-only content corrections. No logic, schema, or architecture changes needed. The calculation engine is already correct.
+
