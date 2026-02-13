@@ -8,14 +8,14 @@ const TaxGuideTechStartups = () => {
     { id: 'vat-registration', label: 'VAT Registration Threshold' },
     { id: 'pioneer-status', label: 'Pioneer Status & Tax Holidays' },
     { id: 'payroll-remote', label: 'Payroll for Remote Teams' },
-    { id: 'firs-efiling', label: 'FIRS E-Filing Requirements' },
+    { id: 'firs-efiling', label: 'NRS E-Filing Requirements' },
     { id: 'common-mistakes', label: 'Common Mistakes' },
     { id: 'faq', label: 'FAQ' },
   ];
 
   const faqs = [
-    { question: 'Do I need to register for tax as a startup?', answer: 'Yes. All Nigerian companies must register with FIRS within 6 months of incorporation, regardless of revenue. You\'ll receive a Tax Identification Number (TIN) which is required for banking and contracts.' },
-    { question: 'My startup has no revenue yet. Do I still pay tax?', answer: 'If you have no turnover, you qualify for the Small Company Exemption (0% CIT). You are also exempt from the Development Levy. However, you must still file annual returns with FIRS.' },
+    { question: 'Do I need to register for tax as a startup?', answer: 'Yes. All Nigerian companies must register with NRS within 6 months of incorporation, regardless of revenue. You\'ll receive a Tax Identification Number (TIN) which is required for banking and contracts.' },
+    { question: 'My startup has no revenue yet. Do I still pay tax?', answer: 'If you have no turnover, you qualify for the Small Company Exemption (0% CIT). You are also exempt from the Development Levy. However, you must still file annual returns with NRS.' },
     { question: 'Does my SaaS revenue count for VAT purposes?', answer: 'Yes. SaaS subscriptions are vatable services. If your total turnover (including SaaS revenue) exceeds ₦25 million, you must register for VAT and charge 7.5% on vatable services.' },
     { question: 'Can I deduct staff salaries before calculating CIT?', answer: 'Yes. Salaries, wages, and employee benefits are deductible business expenses. They reduce your assessable profits and therefore your CIT and Development Levy.' },
     { question: 'What about foreign investors in my startup?', answer: 'Dividends paid to foreign investors are subject to 10% Withholding Tax (WHT) as final tax. Double Tax Treaties (DTAs) may reduce this rate for investors from treaty countries.' },
@@ -25,9 +25,9 @@ const TaxGuideTechStartups = () => {
     <BlogPostLayout
       title="Tax Guide for Tech Startups"
       titleHighlight="in Nigeria"
-      subtitle="CIT, VAT, WHT, PAYE — which taxes apply to your startup? A practical guide covering the Small Company Exemption, pioneer status, payroll obligations, and FIRS e-filing."
+      subtitle="CIT, VAT, WHT, PAYE — which taxes apply to your startup? A practical guide covering the Small Company Exemption, pioneer status, payroll obligations, and NRS e-filing."
       seoTitle="Tax Guide for Tech Startups in Nigeria 2026 | TaxForge Blog"
-      seoDescription="Complete tax guide for Nigerian tech startups. Learn about CIT exemptions, VAT thresholds, pioneer status, payroll tax, and FIRS e-filing requirements under the 2026 rules."
+      seoDescription="Complete tax guide for Nigerian tech startups. Learn about CIT exemptions, VAT thresholds, pioneer status, payroll tax, and NRS e-filing requirements under the 2026 rules."
       canonicalPath="/blog/tax-guide-tech-startups"
       keywords="tech startup tax Nigeria, startup tax guide, CIT exemption startups, VAT registration Nigeria, pioneer status Nigeria, payroll tax Nigeria"
       badge="Guides"
@@ -162,9 +162,9 @@ const TaxGuideTechStartups = () => {
       </section>
 
       <section id="firs-efiling">
-        <h2 className="text-2xl font-bold text-foreground mb-4">FIRS E-Filing Requirements</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-4">NRS E-Filing Requirements</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">
-          All Nigerian companies must file annual tax returns with FIRS, regardless of whether they owe any tax. The e-filing portal is accessible at <strong className="text-foreground">tax.firs.gov.ng</strong>. Key deadlines include:
+          All Nigerian companies must file annual tax returns with NRS, regardless of whether they owe any tax. The e-filing portal is accessible at <strong className="text-foreground">taxpromax.nrs.gov.ng</strong>. Key deadlines include:
         </p>
         <div className="space-y-3 mb-4">
           {[
@@ -191,11 +191,11 @@ const TaxGuideTechStartups = () => {
         <h2 className="text-2xl font-bold text-foreground mb-4">Common Mistakes</h2>
         <div className="space-y-3">
           {[
-            { mistake: 'Assuming "no revenue = no obligations"', fix: 'You must still register with FIRS and file annual returns, even with zero revenue.' },
+            { mistake: 'Assuming "no revenue = no obligations"', fix: 'You must still register with NRS and file annual returns, even with zero revenue.' },
             { mistake: 'Not separating business and personal finances', fix: 'Use a dedicated business bank account. Co-mingling funds creates audit risks.' },
             { mistake: 'Ignoring contractor WHT obligations', fix: 'If you pay contractors > ₦50,000, you should deduct 5% WHT (companies) or 10% (individuals).' },
             { mistake: 'Missing the VAT registration trigger', fix: 'Monitor your rolling 12-month turnover. Register for VAT within 6 months of crossing ₦25M.' },
-            { mistake: 'Not documenting expenses properly', fix: 'Keep receipts and invoices for all business expenses. Unsubstantiated deductions can be disallowed by FIRS.' },
+            { mistake: 'Not documenting expenses properly', fix: 'Keep receipts and invoices for all business expenses. Unsubstantiated deductions can be disallowed by NRS.' },
           ].map((item, i) => (
             <div key={i} className="glass-frosted rounded-xl p-5 border-l-4 border-warning/60">
               <h3 className="font-semibold text-foreground text-sm mb-1">❌ {item.mistake}</h3>

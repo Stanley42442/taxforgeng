@@ -12,16 +12,16 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 
 const AbujaGuide = () => {
   const faqs = [
-    { question: 'What is FCT-IRS and how does it differ from FIRS?', answer: 'FCT-IRS (Federal Capital Territory Internal Revenue Service) is the state-equivalent tax authority for Abuja. Since Abuja is not a state, it has its own IRS that collects PAYE for FCT residents, development levies, and business premises fees. FIRS handles federal taxes nationwide.' },
+    { question: 'What is FCT-IRS and how does it differ from NRS?', answer: 'FCT-IRS (Federal Capital Territory Internal Revenue Service) is the state-equivalent tax authority for Abuja. Since Abuja is not a state, it has its own IRS that collects PAYE for FCT residents, development levies, and business premises fees. NRS handles federal taxes nationwide.' },
     { question: 'Do government contractors in Abuja have special tax obligations?', answer: 'Yes. Government contractors must ensure WHT is properly deducted at source — typically 5% for contracts and 10% for professional services. The procuring government agency deducts and remits. Contractors should obtain WHT credit notes for CIT offset.' },
     { question: 'Are embassies and international organisations exempt from tax?', answer: 'Diplomatic missions enjoy tax exemptions under the Vienna Convention. However, local Nigerian staff employed by embassies are subject to PAYE. International organisations may have specific agreements with the Nigerian government.' },
     { question: 'Where is the FCT-IRS office?', answer: 'FCT-IRS headquarters is at Plot 737, Cadastral Zone B6, Mabushi, Abuja. District offices are located in Garki, Wuse, and Gwagwalada.' },
     { question: 'Is the Land Use Charge different in Abuja?', answer: 'Yes. Abuja operates under the FCT Land Use Act with its own charging framework. The Federal Capital Development Authority (FCDA) manages land allocation and charges, which differ from state-based systems.' },
-    { question: 'How do I file PAYE for Abuja employees?', answer: 'Employers in Abuja remit PAYE to FCT-IRS (not FIRS). Filing is monthly by the 10th of the following month. The 2026 PIT bands apply with the ₦800,000 tax-free threshold.' },
+    { question: 'How do I file PAYE for Abuja employees?', answer: 'Employers in Abuja remit PAYE to FCT-IRS (not NRS). Filing is monthly by the 10th of the following month. The 2026 PIT bands apply with the ₦800,000 tax-free threshold.' },
   ];
 
   const commonMistakes = [
-    { mistake: 'Confusing FCT-IRS with FIRS', fix: 'They are separate. FCT-IRS handles state-level taxes for Abuja (PAYE, levies). FIRS handles federal taxes (CIT, VAT, WHT). Register with both.' },
+    { mistake: 'Confusing FCT-IRS with NRS', fix: 'They are separate. FCT-IRS handles state-level taxes for Abuja (PAYE, levies). NRS handles federal taxes (CIT, VAT, WHT). Register with both.' },
     { mistake: 'Not claiming WHT credit notes on government contracts', fix: 'When a government ministry deducts WHT from your payment, request the credit note immediately. These credits offset your CIT liability — losing them means paying tax twice.' },
     { mistake: 'Ignoring FCT tenement rates', fix: 'Property occupiers in Abuja must pay tenement rates to AMAC or the relevant area council. These are separate from Land Use Charge and must be paid annually.' },
     { mistake: 'Assuming diplomatic employer exemption covers local staff', fix: 'Only diplomatic personnel enjoy tax exemption. Nigerian nationals working for embassies are subject to PAYE under normal rules. Employers must deduct and remit.' },
@@ -41,7 +41,7 @@ const AbujaGuide = () => {
       createFAQSchema(faqs),
       createHowToSchema('How to Register Your Abuja Business for Taxes', 'Step-by-step tax registration for FCT businesses.', [
         { name: 'Register with CAC', text: 'Complete CAC registration to obtain your RC number.' },
-        { name: 'Get TIN from FIRS', text: 'Visit FIRS Abuja or use TaxPro Max portal.' },
+        { name: 'Get TIN from NRS', text: 'Visit NRS Abuja or use TaxPro Max portal.' },
         { name: 'Register with FCT-IRS', text: 'Register at FCT-IRS Mabushi for state-level tax obligations.' },
         { name: 'Obtain Tax Clearance Certificate', text: 'Essential for government contracts — apply after filing returns.' },
       ]),
@@ -83,7 +83,7 @@ const AbujaGuide = () => {
                     <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center shrink-0"><MapPin className="h-6 w-6 text-primary" /></div>
                     <div>
                       <h2 className="text-xl font-bold text-foreground mb-2">Tax Compliance in Abuja</h2>
-                      <p className="text-muted-foreground leading-relaxed mb-3">As the Federal Capital Territory, Abuja has a unique tax structure. Unlike the 36 states, Abuja is administered directly by the federal government through the FCT Administration. Tax collection at the state level is handled by FCT-IRS, while federal taxes are managed by FIRS as in all other locations.</p>
+                      <p className="text-muted-foreground leading-relaxed mb-3">As the Federal Capital Territory, Abuja has a unique tax structure. Unlike the 36 states, Abuja is administered directly by the federal government through the FCT Administration. Tax collection at the state level is handled by FCT-IRS, while federal taxes are managed by NRS as in all other locations.</p>
                       <p className="text-muted-foreground leading-relaxed">Abuja's economy is dominated by government spending, professional services, real estate, and international organisations. Understanding the WHT obligations on government contracts and the FCT-IRS registration requirements is essential for businesses operating in the capital.</p>
                     </div>
                   </div>

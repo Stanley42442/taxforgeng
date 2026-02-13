@@ -19,7 +19,7 @@ const VATCalculator = () => {
     { name: 'Check if Item is VAT-Exempt', text: 'Some items are VAT-exempt: basic food, medical supplies, educational materials, baby products, agricultural equipment, and exports.' },
     { name: 'Apply 7.5% Standard Rate', text: 'For taxable goods and services, calculate 7.5% of the VAT-exclusive price. This is your Output VAT to charge customers.' },
     { name: 'Calculate Input vs Output VAT', text: 'Track VAT paid on business purchases (Input VAT). Subtract Input VAT from Output VAT to find your net VAT liability.' },
-    { name: 'Determine Net VAT Payable', text: 'Remit the difference (Output VAT minus Input VAT) to FIRS by the 21st of each month.' },
+    { name: 'Determine Net VAT Payable', text: 'Remit the difference (Output VAT minus Input VAT) to NRS by the 21st of each month.' },
   ];
 
   const faqs = [
@@ -33,7 +33,7 @@ const VATCalculator = () => {
     },
     {
       question: 'What is Input VAT vs Output VAT?',
-      answer: 'Output VAT is the VAT you charge customers on sales. Input VAT is the VAT you pay on business purchases. You remit the difference (Output - Input) to FIRS.',
+      answer: 'Output VAT is the VAT you charge customers on sales. Input VAT is the VAT you pay on business purchases. You remit the difference (Output - Input) to NRS.',
     },
     {
       question: 'When are VAT returns due?',

@@ -129,7 +129,7 @@ export const PenaltyEstimator = () => {
             </div>
 
             <p className="text-xs text-muted-foreground text-center">
-              * Estimates only. Actual penalties may vary based on FIRS assessment.
+              * Estimates only. Actual penalties may vary based on NRS assessment.
             </p>
           </div>
         )}

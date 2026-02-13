@@ -12,8 +12,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 
 const LagosGuide = () => {
   const faqs = [
-    { question: 'What taxes does LIRS collect?', answer: 'LIRS collects Personal Income Tax (PAYE) for Lagos residents, withholding tax on state contracts, development levy, business premises levy, and other state-imposed levies. Federal taxes (CIT, VAT, WHT on federal matters) are handled by FIRS.' },
-    { question: 'Do I need to register with both FIRS and LIRS?', answer: 'Yes. FIRS handles federal taxes (CIT, VAT, WHT), while LIRS handles state taxes (PAYE for state residents, state development levy). All Lagos businesses must register with both.' },
+    { question: 'What taxes does LIRS collect?', answer: 'LIRS collects Personal Income Tax (PAYE) for Lagos residents, withholding tax on state contracts, development levy, business premises levy, and other state-imposed levies. Federal taxes (CIT, VAT, WHT on federal matters) are handled by NRS.' },
+    { question: 'Do I need to register with both NRS and LIRS?', answer: 'Yes. NRS handles federal taxes (CIT, VAT, WHT), while LIRS handles state taxes (PAYE for state residents, state development levy). All Lagos businesses must register with both.' },
     { question: 'Is there a Lagos-specific business levy?', answer: 'Yes. Lagos imposes a Business Premises Levy based on business size and location. There are also signage/advertisement fees and environmental levies. These are in addition to federal taxes.' },
     { question: 'How does PAYE work for Lagos employees?', answer: 'Employers in Lagos withhold PAYE using the 2026 PIT bands and remit to LIRS monthly by the 10th of the following month. The new ₦800,000 tax-free threshold means many junior employees pay zero PAYE.' },
     { question: 'Are there incentives for tech startups in Lagos?', answer: 'While there is no Lagos-specific tech tax break, the federal Small Company Exemption (₦50M turnover, 0% CIT) benefits most early-stage startups. Pioneer Status (now replaced by EDI under 2026 rules) may also apply to qualifying tech companies, providing a 5% annual tax credit for 5 years on qualifying capex.' },
@@ -21,7 +21,7 @@ const LagosGuide = () => {
   ];
 
   const commonMistakes = [
-    { mistake: 'Only registering with FIRS, not LIRS', fix: 'Lagos businesses must register with both. LIRS handles PAYE for state residents and various state levies. Non-registration leads to back-assessments and penalties.' },
+    { mistake: 'Only registering with NRS, not LIRS', fix: 'Lagos businesses must register with both. LIRS handles PAYE for state residents and various state levies. Non-registration leads to back-assessments and penalties.' },
     { mistake: 'Missing Lagos State development levy', fix: 'Lagos imposes an annual development levy on businesses. This is separate from the federal Development Levy (4% of profits). Budget for both.' },
     { mistake: 'Late PAYE remittance', fix: 'PAYE must be remitted to LIRS by the 10th of the following month. Late payment attracts 10% penalty plus interest. Set up automated reminders.' },
     { mistake: 'Ignoring Land Use Charge', fix: 'Property owners and tenants in Lagos must pay the Land Use Charge annually. Rates vary by location and property type. Check the Lagos State LUC calculator.' },
@@ -41,7 +41,7 @@ const LagosGuide = () => {
       createFAQSchema(faqs),
       createHowToSchema('How to Register Your Lagos Business for Taxes', 'Step-by-step tax registration for Lagos businesses.', [
         { name: 'Register with CAC', text: 'Complete your CAC registration to obtain your RC number.' },
-        { name: 'Get TIN from FIRS', text: 'Visit FIRS Lagos or use TaxPro Max portal for your Tax Identification Number.' },
+        { name: 'Get TIN from NRS', text: 'Visit NRS Lagos or use TaxPro Max portal for your Tax Identification Number.' },
         { name: 'Register with LIRS', text: 'Register at LIRS Alausa or online at lirs.gov.ng for state tax obligations.' },
         { name: 'Pay business premises levy', text: 'Register your business premises and pay the annual levy to LIRS.' },
       ]),

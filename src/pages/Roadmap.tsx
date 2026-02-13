@@ -38,7 +38,7 @@ const ROADMAP_ITEMS = [
   { title: "Real CAC API Integration", description: "Direct verification with Corporate Affairs Commission.", icon: Building2, progress: 35, status: "in-progress", quarter: "Q1 2026", tier: "Business+" },
   { title: "Bank Feed Integration", description: "Connect your Nigerian bank accounts for automatic import.", icon: Landmark, progress: 20, status: "in-progress", quarter: "Q2 2026", tier: "Business+" },
   { title: "AI Tax Assistant", description: "Chat with an AI that understands Nigerian tax law.", icon: Bot, progress: 45, status: "in-progress", quarter: "Q1 2026", tier: "All Tiers" },
-  { title: "Direct FIRS E-Filing", description: "Submit your tax returns directly to FIRS.", icon: FileText, progress: 15, status: "planned", quarter: "Q2 2026", tier: "Business+" },
+  { title: "Direct NRS E-Filing", description: "Submit your tax returns directly to NRS.", icon: FileText, progress: 15, status: "planned", quarter: "Q2 2026", tier: "Business+" },
   { title: "Multi-User Team Access", description: "Invite accountants and staff with role-based permissions.", icon: Users, progress: 60, status: "in-progress", quarter: "Q1 2026", tier: "Business+" },
   { title: "Audit Trail & Compliance Reports", description: "Comprehensive logs for tax audits.", icon: Shield, progress: 75, status: "testing", quarter: "Q4 2025", tier: "Corporate" },
   { title: "Bulk Operations", description: "Process multiple businesses in batch operations.", icon: Zap, progress: 40, status: "in-progress", quarter: "Q1 2026", tier: "Corporate" },
@@ -85,9 +85,9 @@ const Roadmap = () => {
     <>
     <SEOHead
       title="TaxForge NG Product Roadmap - Coming Soon Features"
-      description="See what's next for TaxForge NG: CAC API integration, bank feeds, AI tax assistant, direct FIRS e-filing, and mobile app. Join the waitlist for early access."
+      description="See what's next for TaxForge NG: CAC API integration, bank feeds, AI tax assistant, direct NRS e-filing, and mobile app. Join the waitlist for early access."
       canonicalPath="/roadmap"
-      keywords="TaxForge roadmap, Nigerian tax software features, FIRS e-filing, tax app Nigeria"
+      keywords="TaxForge roadmap, Nigerian tax software features, NRS e-filing, FIRS e-filing, tax app Nigeria"
       schema={createBreadcrumbSchema([
         { name: 'Home', url: 'https://taxforgeng.com/' },
         { name: 'Roadmap', url: 'https://taxforgeng.com/roadmap' },

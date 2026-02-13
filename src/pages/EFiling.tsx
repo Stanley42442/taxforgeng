@@ -181,7 +181,7 @@ const EFiling = () => {
                 <div>
                   <p className="text-sm font-medium text-warning">Mock E-Filing</p>
                   <p className="text-xs text-warning/80">
-                    This is a demonstration. Real FIRS integration coming soon!
+                    This is a demonstration. Real NRS integration coming soon!
                   </p>
                 </div>
               </div>
@@ -242,7 +242,7 @@ const EFiling = () => {
               </Button>
               <Button variant="hero" className="flex-1" onClick={handleSubmitFiling}>
                 <Upload className="h-4 w-4" />
-                Submit to FIRS (Mock)
+                Submit to NRS (Mock)
               </Button>
             </div>
           </div>
@@ -256,7 +256,7 @@ const EFiling = () => {
               Processing Your Return
             </h2>
             <p className="text-muted-foreground">
-              Submitting to FIRS... Please wait.
+              Submitting to NRS... Please wait.
             </p>
           </div>
         );
@@ -272,7 +272,7 @@ const EFiling = () => {
                 Return Submitted Successfully!
               </h2>
               <p className="text-muted-foreground">
-                Reference: FIRS-2025-{crypto.randomUUID().slice(0, 8).toUpperCase()}
+                Reference: NRS-2026-{crypto.randomUUID().slice(0, 8).toUpperCase()}
               </p>
             </div>
 
@@ -318,7 +318,7 @@ const EFiling = () => {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-muted-foreground">Filing Reference</p>
-                  <p className="font-medium">FIRS-2025-{crypto.randomUUID().slice(0, 6).toUpperCase()}</p>
+                  <p className="font-medium">NRS-2026-{crypto.randomUUID().slice(0, 6).toUpperCase()}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Payment Reference</p>
@@ -379,7 +379,7 @@ const EFiling = () => {
       {renderStep()}
 
       <p className="text-xs text-muted-foreground text-center mt-6">
-        Mock e-filing for demonstration. Real FIRS/State IRS integration coming soon.
+        Mock e-filing for demonstration. Real NRS/State IRS integration coming soon.
       </p>
 
       {/* Payment Dialog */}
@@ -399,7 +399,7 @@ const EFiling = () => {
               </div>
             </div>
             <p className="text-xs text-muted-foreground text-center">
-              Payment will be forwarded to FIRS (Mock demonstration)
+              Payment will be forwarded to NRS (Mock demonstration)
             </p>
           </div>
           <DialogFooter>

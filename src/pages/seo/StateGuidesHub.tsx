@@ -8,7 +8,7 @@ import { ContentMeta } from '@/components/seo/ContentMeta';
 import { MapPin, ArrowRight } from 'lucide-react';
 
 const states = [
-  { name: 'Port Harcourt', region: 'Rivers State', to: '/port-harcourt-tax-guide', tagline: 'Nigeria\'s oil capital — oil & gas, maritime, manufacturing sector focus.', highlights: ['FIRS & RIRS dual registration', 'Oil & gas sector incentives', 'Free Trade Zone benefits'] },
+  { name: 'Port Harcourt', region: 'Rivers State', to: '/port-harcourt-tax-guide', tagline: 'Nigeria\'s oil capital — oil & gas, maritime, manufacturing sector focus.', highlights: ['NRS & RIRS dual registration', 'Oil & gas sector incentives', 'Free Trade Zone benefits'] },
   { name: 'Lagos', region: 'Lagos State', to: '/state-guides/lagos', tagline: 'Nigeria\'s commercial capital — tech, finance, and trade hub.', highlights: ['LIRS state obligations', 'Tech startup incentives', 'Highest PAYE volume in Nigeria'] },
   { name: 'Abuja', region: 'FCT', to: '/state-guides/abuja', tagline: 'Federal Capital Territory — government contracts and diplomatic sector.', highlights: ['FCT-IRS unique structure', 'Government contractor WHT', 'Diplomatic exemptions'] },
   { name: 'Kano', region: 'Kano State', to: '/state-guides/kano', tagline: 'Northern Nigeria\'s commercial centre — trade, agriculture, and textiles.', highlights: ['KIRS registration', 'Agricultural exemptions', 'Cross-border trade taxes'] },

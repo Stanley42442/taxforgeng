@@ -14,16 +14,16 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 const PortHarcourtGuide = () => {
   const faqs = [
     { question: 'Do Rivers State businesses pay different taxes than other states?', answer: 'No, federal taxes (CIT, VAT, WHT) are the same nationwide. However, Rivers State has specific state levies and the Rivers State Internal Revenue Service (RIRS) handles state taxes like PAYE for state employees.' },
-    { question: 'Where is the FIRS office in Port Harcourt?', answer: 'The main FIRS office in Port Harcourt is located at Federal Inland Revenue Service, Plot 6, Olu Obasanjo Road, Port Harcourt. There are also satellite offices in Trans-Amadi and GRA.' },
+    { question: 'Where is the NRS office in Port Harcourt?', answer: 'The main NRS office (formerly FIRS) in Port Harcourt is located at Nigeria Revenue Service, Plot 6, Olu Obasanjo Road, Port Harcourt. There are also satellite offices in Trans-Amadi and GRA.' },
     { question: 'Are there special tax incentives for oil and gas companies?', answer: 'Under 2026 rules, Pioneer Status is replaced by the Economic Development Incentive (EDI), providing a 5% annual tax credit for 5 years on qualifying capex. Free Trade Zone benefits (e.g., Onne Oil & Gas FTZ) continue to apply. Consult a tax professional for current eligibility.' },
-    { question: 'How do I register my Port Harcourt business for taxes?', answer: 'Visit the FIRS office with your CAC registration documents, utility bill, and ID. You can also start registration online via the FIRS TaxPro Max portal. TIN processing typically takes 2-5 working days.' },
+    { question: 'How do I register my Port Harcourt business for taxes?', answer: 'Visit the NRS office with your CAC registration documents, utility bill, and ID. You can also start registration online via the NRS TaxPro Max portal. TIN processing typically takes 2-5 working days.' },
     { question: 'What Free Trade Zone benefits apply in Rivers State?', answer: 'Businesses in the Onne Oil & Gas Free Zone and other designated zones enjoy tax holidays on profits, exemption from customs duties on imported equipment, and freedom from foreign exchange regulations. However, sales to the domestic market attract standard duties and taxes.' },
-    { question: 'Can I e-file my taxes from Port Harcourt?', answer: 'Yes. FIRS operates the TaxPro Max e-filing portal (tax.firs.gov.ng) which is accessible nationwide. You can file CIT, VAT, and WHT returns online without visiting the physical office.' },
+    { question: 'Can I e-file my taxes from Port Harcourt?', answer: 'Yes. NRS operates the TaxPro Max e-filing portal which is accessible nationwide. You can file CIT, VAT, and WHT returns online without visiting the physical office.' },
     { question: 'What is the penalty for late filing in Rivers State?', answer: 'Federal tax penalties are the same nationwide: ₦50,000 for the first month of late filing, plus ₦25,000 for each subsequent month. Late payment of tax attracts 10% per annum interest on the unpaid amount.' },
   ];
 
   const commonMistakes = [
-    { mistake: 'Not registering with both FIRS and RIRS', fix: 'Rivers State businesses must register separately with FIRS (federal taxes) and the Rivers State Internal Revenue Service (state taxes like PAYE). Missing either creates compliance gaps.' },
+    { mistake: 'Not registering with both NRS and RIRS', fix: 'Rivers State businesses must register separately with NRS (federal taxes) and the Rivers State Internal Revenue Service (state taxes like PAYE). Missing either creates compliance gaps.' },
     { mistake: 'Ignoring state levies and fees', fix: 'Beyond federal taxes, Rivers State imposes business premises registration fees, signage levies, and development charges. Budget for these to avoid surprise penalties from RIRS.' },
     { mistake: 'Applying wrong WHT rates for oil services', fix: 'Oil and gas services have specific WHT rates. Professional and technical services to oil companies attract 10% WHT for individuals and 5% for companies. Double-check rates before deducting.' },
     { mistake: 'Missing business premises registration', fix: 'All businesses operating in Port Harcourt must register their premises with the Rivers State government. This is separate from CAC registration and must be renewed annually.' },
@@ -37,7 +37,7 @@ const PortHarcourtGuide = () => {
   ];
 
   const localResources = [
-    { name: 'FIRS Port Harcourt', address: 'Plot 6, Olu Obasanjo Road, Port Harcourt', hours: 'Mon-Fri: 8AM - 4PM' },
+    { name: 'NRS Port Harcourt', address: 'Plot 6, Olu Obasanjo Road, Port Harcourt', hours: 'Mon-Fri: 8AM - 4PM' },
     { name: 'Rivers State IRS (RIRS)', address: 'Revenue House, Moscow Road, Port Harcourt', hours: 'Mon-Fri: 8AM - 4PM' },
   ];
 
@@ -82,7 +82,7 @@ const PortHarcourtGuide = () => {
         title="Port Harcourt Tax Guide 2026 - Rivers State SME Tips | TaxForge"
         description="Tax guide for Port Harcourt businesses. Rivers State SME compliance tips, oil & gas sector advice. Built by a local Port Harcourt developer."
         canonicalPath="/port-harcourt-tax-guide"
-        keywords="Port Harcourt tax guide, Rivers State tax, oil and gas tax Nigeria, FIRS Port Harcourt, tax compliance Rivers State"
+        keywords="Port Harcourt tax guide, Rivers State tax, oil and gas tax Nigeria, NRS Port Harcourt, FIRS Port Harcourt, tax compliance Rivers State"
         schema={schema}
       />
 
