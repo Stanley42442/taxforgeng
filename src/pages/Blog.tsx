@@ -68,7 +68,7 @@ const POSTS: BlogPostMeta[] = [
   {
     slug: 'tax-guide-tech-startups',
     title: 'Tax Guide for Tech Startups in Nigeria',
-    excerpt: 'CIT, VAT, WHT, PAYE — which taxes apply to your startup? A practical guide covering the Small Company Exemption, pioneer status, and payroll.',
+    excerpt: 'CIT, VAT, WHT, PAYE — which taxes apply to your startup? A practical guide covering the Small Company Exemption, EDI incentives (formerly Pioneer Status), and payroll.',
     date: 'January 25, 2026',
     category: 'Guides',
     readTime: '8 min read',
