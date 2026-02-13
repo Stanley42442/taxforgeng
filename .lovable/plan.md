@@ -1,36 +1,38 @@
 
-
-# SEO/AEO Phase 6: Content Accuracy Fix, Schema Date, and Remaining Page Consistency
+# SEO/AEO Phase 7: Broken Speakable Selectors, Factual Errors, and Section ID Gaps
 
 ## Summary
 
-After five optimization phases, the site's SEO foundation is strong. This final phase addresses a factual error, a stale schema date, and brings the remaining public sitemap pages up to the same standard as the SEO landing pages.
+This phase fixes one structural bug (Speakable schemas pointing to non-existent DOM elements), two factual errors on the Learn page, and adds missing section IDs for anchor navigation across SEO pages.
 
-## Issue 1: Factual Error on Homepage (Critical - E-E-A-T)
+All tax figures have been verified against the Nigeria Tax Act 2025 (effective January 2026). The correct values used site-wide are:
+- PIT bands: First NGN 800,000 tax-free, then 15%, 18%, 21%, 23%, 25%
+- CIT: Small (turnover up to NGN 50M AND assets up to NGN 250M) = 0%; Medium (NGN 50M-200M) = 20%; Large (above NGN 200M) = 30%
+- VAT: 7.5% standard rate; NGN 25M registration threshold
+- WHT: 5% contracts; 10% rent, dividends, interest, royalties, professional/technical/directors fees
+- Development Levy: 4% (replaces 3% TET)
+- Rent Relief: 20% of annual rent, capped at NGN 500,000
+- Loss of Office exemption: NGN 50,000,000
 
-The homepage snippet-bait card "Is My Small Company Exempt From CIT?" states the threshold as **"₦25 million"** (line 240 of Index.tsx). Every other page on the site correctly says **₦50 million** (the actual 2026 threshold under the Nigeria Tax Act 2025). Google's Helpful Content system penalizes sites with internally contradictory facts, and AI systems may pick up the wrong figure.
+## Issue 1: Speakable Schemas Reference Non-Existent IDs (Bug)
 
-**Fix:** Change "₦25 million" to "₦50 million" and update the description to mention both criteria (turnover AND assets).
+CIT, VAT, and WHT calculator pages declare `createSpeakableSchema()` targeting CSS selectors `#cit-rates`/`#vat-rates`/`#wht-rates`, `#faq`, and `#how-it-works` -- but none of these IDs exist in the DOM on those pages. Google Search Console will flag these as errors. Only PITPAYECalculator.tsx correctly has matching IDs.
 
-## Issue 2: Static Schema dateModified Stale (Low Priority)
+**Fix:** Add `id` attributes to the matching sections on all three pages.
 
-The SoftwareApplication schema in `index.html` line 107 still shows `"dateModified": "2026-02-11"`. After five phases of changes, this should be `2026-02-13`.
+## Issue 2: Factual Errors on Learn Page
 
-**Fix:** Update to `2026-02-13`.
+Line 357 of Learn.tsx states PIT rates as "15%, 19%, 21%, 25%" -- should be "15%, 18%, 21%, 23%, 25%".
 
-## Issue 3: Remaining Public Pages Missing Enhancements (Low Priority)
+Line 361 states CIT "Standard rate reduced to 25%" -- the large company CIT rate is 30%, not 25%. Medium is 20%. Small is 0%.
 
-Five public pages in the sitemap still lack `PageBreadcrumbs`, `ContentMeta`, and `<article>` wrappers that all SEO/blog/state-guide pages now have:
+**Fix:** Correct both values.
 
-- `/resources` - Has schema but no breadcrumbs/time/article
-- `/learn` - Has schema but no breadcrumbs/time/article
-- `/success-stories` - Has schema but no breadcrumbs/time/article
-- `/roadmap` - Has schema but no breadcrumbs/time/article
-- `/pricing` - Has schema but no breadcrumbs/time/article
+## Issue 3: Missing Section IDs on Other SEO Pages
 
-These are secondary pages but they appear in the sitemap and benefit from consistent semantic markup.
+Six additional SEO pages have FAQ and/or How-It-Works sections without `id` attributes. Adding IDs enables anchor navigation and improves crawlability.
 
-**Fix:** Add `PageBreadcrumbs`, `ContentMeta`, and wrap content in `<article>` on all five pages.
+Pages affected: FreeCalculator, SmallCompanyExemption, RentRelief2026, TaxReforms2026 (already has `id="faq"` but no `id="how-it-works"`).
 
 ## Changes
 
@@ -38,35 +40,35 @@ These are secondary pages but they appear in the sitemap and benefit from consis
 
 | File | Change |
 |------|--------|
-| `src/pages/Index.tsx` | Fix factual error: ₦25M to ₦50M, add assets criterion |
-| `index.html` | Update dateModified from 2026-02-11 to 2026-02-13 |
-| `src/pages/Resources.tsx` | Add PageBreadcrumbs, ContentMeta, article wrapper |
-| `src/pages/Learn.tsx` | Add PageBreadcrumbs, ContentMeta, article wrapper |
-| `src/pages/SuccessStoriesPage.tsx` | Add PageBreadcrumbs, ContentMeta, article wrapper |
-| `src/pages/Roadmap.tsx` | Add PageBreadcrumbs, ContentMeta, article wrapper |
-| `src/pages/Pricing.tsx` | Add PageBreadcrumbs, ContentMeta, article wrapper |
+| `src/pages/seo/CITCalculator.tsx` | Add `id="cit-rates"` (line 167), `id="how-it-works"` (line 228), `id="faq"` (line 425) |
+| `src/pages/seo/VATCalculator.tsx` | Add `id="vat-rates"` (line 268), `id="how-it-works"` (line 168), `id="faq"` (line 396) |
+| `src/pages/seo/WHTCalculator.tsx` | Add `id="wht-rates"` (line 157), `id="how-it-works"` (line 200), `id="faq"` (line 408) |
+| `src/pages/Learn.tsx` | Fix PIT rates (line 357) and CIT description (line 361) |
+| `src/pages/seo/FreeCalculator.tsx` | Add `id="how-it-works"` (line 127), `id="faq"` (line 288) |
+| `src/pages/seo/SmallCompanyExemption.tsx` | Add `id="how-it-works"` (line 204), `id="faq"` (line 350) |
+| `src/pages/seo/RentRelief2026.tsx` | Add `id="how-it-works"` (line 141), `id="faq"` (line 336) |
+| `src/pages/seo/TaxReforms2026.tsx` | Add `id="how-it-works"` to the how-to section (already has `id="faq"`) |
 
 ### Technical Details
 
-**Homepage factual fix (Index.tsx line 240):**
-Change from:
-"Yes -- if your company's gross turnover is ₦25 million or less, you pay 0% Company Income Tax under the 2026 rules."
+**Speakable fix pattern (CIT example):**
 
-Change to:
-"Yes -- if your company's turnover is ₦50 million or less AND fixed assets are ₦250 million or less, you pay 0% Company Income Tax under the 2026 rules."
+The existing Speakable schema declares selectors `['#cit-rates', '#faq', '#how-it-works']`. The fix adds matching IDs:
 
-**Schema date fix (index.html line 107):**
-`"dateModified": "2026-02-11"` becomes `"dateModified": "2026-02-13"`
+```text
+<section id="cit-rates" className="mb-12">   // CIT Rates Overview section
+<section id="how-it-works" className="mb-12"> // How to Calculate section
+<section id="faq" className="mb-12">          // FAQ accordion section
+```
 
-**Secondary page pattern (same as previous phases):**
-Each page gets PageBreadcrumbs, ContentMeta, and an article wrapper around the main content area.
+Same pattern for VAT (`#vat-rates`) and WHT (`#wht-rates`).
 
-### What This Does NOT Address
+**Learn page PIT fix (line 357):**
+- From: `New rates: 15%, 19%, 21%, 25%.`
+- To: `New rates: 15%, 18%, 21%, 23%, 25%. First ₦800,000 is tax-free.`
 
-- Off-page SEO (backlinks, domain authority) -- requires external outreach
-- Pre-rendering/SSR -- architecture migration, out of scope
-- Internal cross-linking between content clusters -- would be a larger content strategy project
-- The Learn page's Articles tab has slightly outdated PIT rates ("15%, 19%, 21%, 25%" instead of "15%, 18%, 21%, 23%, 25%") -- this is a content accuracy issue but is inside the app behind tabs, not a high-priority SEO surface
+**Learn page CIT fix (line 361):**
+- From: `Standard rate reduced to 25%. Small companies (≤₦50m): 0% CIT.`
+- To: `Large companies: 30%. Medium (₦50M-₦200M): 20%. Small (turnover ≤₦50M AND assets ≤₦250M): 0% CIT.`
 
-**Total: 7 files modified, 0 new files created**
-
+**Total: 8 files modified, 0 new files created**
