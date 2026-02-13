@@ -7,24 +7,18 @@ import { describe, it, expect } from 'vitest';
 import { calculateVAT } from '@/lib/taxCalculations';
 
 describe('Tax Calculator E2E Flow', () => {
-  describe('CIT Calculation Logic', () => {
-    it('should apply 0% rate for small companies (under 25M)', () => {
-      const turnover = 20_000_000;
-      const threshold = 25_000_000;
-      const isSmallCompany = turnover < threshold;
+  describe('CIT Calculation Logic — 2026 Rules (NTA 2025)', () => {
+    it('should apply 0% rate for small companies (turnover ≤ ₦50M AND assets ≤ ₦250M)', () => {
+      const turnover = 40_000_000;
+      const fixedAssets = 200_000_000;
+      const turnoverThreshold = 50_000_000;
+      const assetThreshold = 250_000_000;
+      const isSmallCompany = turnover <= turnoverThreshold && fixedAssets <= assetThreshold;
 
       expect(isSmallCompany).toBe(true);
     });
 
-    it('should apply 20% rate for medium companies (25M-100M)', () => {
-      const turnover = 50_000_000;
-      const mediumRate = 0.2;
-      const expectedCIT = turnover * mediumRate;
-
-      expect(expectedCIT).toBe(10_000_000);
-    });
-
-    it('should apply 30% rate for large companies (over 100M)', () => {
+    it('should apply 30% rate for large companies (turnover > ₦50M)', () => {
       const turnover = 500_000_000;
       const largeRate = 0.3;
       const expectedCIT = turnover * largeRate;
@@ -37,6 +31,32 @@ describe('Tax Calculator E2E Flow', () => {
       const isProfitable = profit > 0;
 
       expect(isProfitable).toBe(false);
+    });
+  });
+
+  describe('CIT Calculation Logic — Pre-2026 Rules (Legacy CITA)', () => {
+    it('should apply 0% rate for small companies (turnover < ₦25M)', () => {
+      const turnover = 20_000_000;
+      const threshold = 25_000_000;
+      const isSmallCompany = turnover < threshold;
+
+      expect(isSmallCompany).toBe(true);
+    });
+
+    it('should apply 20% rate for medium companies (₦25M–₦100M)', () => {
+      const turnover = 50_000_000;
+      const mediumRate = 0.2;
+      const expectedCIT = turnover * mediumRate;
+
+      expect(expectedCIT).toBe(10_000_000);
+    });
+
+    it('should apply 30% rate for large companies (turnover > ₦100M)', () => {
+      const turnover = 500_000_000;
+      const largeRate = 0.3;
+      const expectedCIT = turnover * largeRate;
+
+      expect(expectedCIT).toBe(150_000_000);
     });
   });
 
@@ -100,8 +120,8 @@ describe('Tax Calculator E2E Flow', () => {
     });
   });
 
-  describe('Minimum Tax Calculation', () => {
-    it('should calculate minimum tax as 0.5% of turnover', () => {
+  describe('Minimum Tax Calculation — Pre-2026 Rules (small companies exempt under NTA 2025)', () => {
+    it('should calculate minimum tax as 0.5% of turnover (pre-2026)', () => {
       const turnover = 100_000_000;
       const minTaxRate = 0.005;
       const minTax = turnover * minTaxRate;
@@ -109,7 +129,7 @@ describe('Tax Calculator E2E Flow', () => {
       expect(minTax).toBe(500_000);
     });
 
-    it('should apply minimum tax when CIT is zero', () => {
+    it('should apply minimum tax when CIT is zero (pre-2026)', () => {
       const turnover = 100_000_000;
       const citAmount = 0; // Loss-making company
       const minTaxRate = 0.005;
