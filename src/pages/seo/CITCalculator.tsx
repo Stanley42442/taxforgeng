@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -74,6 +74,13 @@ const CITCalculator = () => {
     },
   ];
 
+  const citTerms = [
+    { name: 'Small Company', description: 'Annual turnover up to NGN 50M and fixed assets up to NGN 250M: 0% CIT rate' },
+    { name: 'Medium Company', description: 'Annual turnover NGN 50M to NGN 200M: 20% CIT rate' },
+    { name: 'Large Company', description: 'Annual turnover above NGN 200M: 30% CIT rate' },
+    { name: 'Development Levy', description: '4% of assessable profits, replaces Tertiary Education Tax. Applies to medium and large companies.' },
+  ];
+
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -92,6 +99,11 @@ const CITCalculator = () => {
         { name: 'Tax Tools', url: 'https://taxforgeng.com/free-tax-calculator' },
         { name: 'CIT Calculator', url: 'https://taxforgeng.com/cit-calculator' },
       ]),
+      createTaxRateSchema(
+        'Nigeria CIT Rates 2026',
+        'Company Income Tax rates under the Nigeria Tax Act 2025, effective January 2026',
+        citTerms
+      ),
     ],
   };
 
@@ -372,6 +384,23 @@ const CITCalculator = () => {
                   title="CIT: 2026 vs Pre-2026 Rules"
                   rows={CIT_COMPARISON_ROWS}
                 />
+              </section>
+
+              {/* Machine-Readable CIT Definitions */}
+              <section className="mb-12" aria-label="CIT rate definitions">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  2026 CIT Rate Definitions
+                </h2>
+                <div className="glass-frosted rounded-2xl p-6">
+                  <dl className="space-y-4">
+                    {citTerms.map((term, index) => (
+                      <div key={index} className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3 border-b border-border/30 pb-3 last:border-0 last:pb-0">
+                        <dt className="font-semibold text-foreground min-w-[180px]">{term.name}</dt>
+                        <dd className="text-sm text-muted-foreground">{term.description}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
               </section>
 
               {/* FAQ Section - Accordion */}

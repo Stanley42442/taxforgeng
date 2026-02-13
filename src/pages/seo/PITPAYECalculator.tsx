@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema } from '@/components/seo/SEOHead';
+import { SEOHead, createWebApplicationSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { TrustBadges } from '@/components/seo/TrustBadges';
@@ -56,6 +56,15 @@ const PITPAYECalculator = () => {
     },
   ];
 
+  const pitTerms = [
+    { name: 'Tax-Free Threshold', description: 'First NGN 800,000 of annual income: 0% tax rate' },
+    { name: 'First Taxable Band', description: 'NGN 800,001 to NGN 3,000,000: 15% tax rate' },
+    { name: 'Second Band', description: 'NGN 3,000,001 to NGN 12,000,000: 18% tax rate' },
+    { name: 'Third Band', description: 'NGN 12,000,001 to NGN 25,000,000: 21% tax rate' },
+    { name: 'Fourth Band', description: 'NGN 25,000,001 to NGN 50,000,000: 23% tax rate' },
+    { name: 'Maximum Rate', description: 'Above NGN 50,000,000: 25% tax rate' },
+  ];
+
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -74,6 +83,11 @@ const PITPAYECalculator = () => {
         { name: 'Tax Tools', url: 'https://taxforgeng.com/free-tax-calculator' },
         { name: 'PIT/PAYE Calculator', url: 'https://taxforgeng.com/pit-paye-calculator' },
       ]),
+      createTaxRateSchema(
+        'Nigeria PIT Tax Bands 2026',
+        'Personal Income Tax progressive bands under the Nigeria Tax Act 2025, effective January 2026',
+        pitTerms
+      ),
     ],
   };
 
@@ -409,6 +423,23 @@ const PITPAYECalculator = () => {
                       )}
                     </div>
                   ))}
+                </div>
+              </section>
+
+              {/* Machine-Readable Tax Band Definitions */}
+              <section className="mb-12" aria-label="PIT tax band definitions">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+                  2026 PIT Tax Band Definitions
+                </h2>
+                <div className="glass-frosted rounded-2xl p-6">
+                  <dl className="space-y-4">
+                    {pitTerms.map((term, index) => (
+                      <div key={index} className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3 border-b border-border/30 pb-3 last:border-0 last:pb-0">
+                        <dt className="font-semibold text-foreground min-w-[180px]">{term.name}</dt>
+                        <dd className="text-sm text-muted-foreground">{term.description}</dd>
+                      </div>
+                    ))}
+                  </dl>
                 </div>
               </section>
 
