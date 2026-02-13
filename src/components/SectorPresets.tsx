@@ -113,7 +113,7 @@ const SECTOR_PRESETS: SectorPreset[] = [
     description: 'Asset investment & wage deductions',
     benefits: ['10% fixed asset credit', 'Wage deductions', 'Accelerated depreciation'],
     taxRules: {
-      citRate: 25,
+      citRate: 30,
       vatStatus: 'standard',
       vatRate: 7.5,
       specialIncentives: ['Investment Tax Credit 10%', 'Local raw material bonus 10%', 'Job creation 10% deduction']
@@ -164,7 +164,7 @@ const SECTOR_PRESETS: SectorPreset[] = [
     description: 'Export expansion grant benefits',
     benefits: ['VAT zero-rating', 'EEG eligibility', 'Forex retention'],
     taxRules: {
-      citRate: 25,
+      citRate: 30,
       vatStatus: 'zero',
       vatRate: 0,
       specialIncentives: ['EEG up to 30%', 'Duty drawback', 'Export Development Fund']
@@ -181,7 +181,7 @@ const SECTOR_PRESETS: SectorPreset[] = [
     description: 'Digital financial services taxation',
     benefits: ['NSA labeling eligible', 'R&D deductions', 'EDTI credits'],
     taxRules: {
-      citRate: 25,
+      citRate: 30,
       vatStatus: 'standard',
       vatRate: 7.5,
       edtiRate: 5,
@@ -200,7 +200,7 @@ const SECTOR_PRESETS: SectorPreset[] = [
     description: 'Medical services exemptions',
     benefits: ['VAT-exempt services', 'Equipment duty waiver', 'Pioneer Status'],
     taxRules: {
-      citRate: 25,
+      citRate: 30,
       vatStatus: 'exempt',
       vatRate: 0,
       pioneerStatus: true,
@@ -218,7 +218,7 @@ const SECTOR_PRESETS: SectorPreset[] = [
     description: 'Property development & rental income',
     benefits: ['Capital allowances', 'Interest deductions', 'CGT deferral'],
     taxRules: {
-      citRate: 25,
+      citRate: 30,
       vatStatus: 'standard',
       vatRate: 7.5,
       whtRate: 10,
@@ -236,7 +236,7 @@ const SECTOR_PRESETS: SectorPreset[] = [
     description: 'Transportation and warehousing',
     benefits: ['Vehicle depreciation', 'Fuel deductions', 'Export logistics incentives'],
     taxRules: {
-      citRate: 25,
+      citRate: 30,
       vatStatus: 'standard',
       vatRate: 7.5,
       specialIncentives: ['Accelerated vehicle depreciation', 'Export logistics zero-rated']
@@ -253,7 +253,7 @@ const SECTOR_PRESETS: SectorPreset[] = [
     description: 'Eco-investment incentives and green technology',
     benefits: ['5% EDTI on eco-investments', 'Zero VAT on EVs/solar', '50% green tech hire deduction'],
     taxRules: {
-      citRate: 25,
+      citRate: 30,
       vatStatus: 'zero',
       vatRate: 0,
       edtiRate: 5,
@@ -294,7 +294,7 @@ const SECTOR_PRESETS: SectorPreset[] = [
     description: 'Seasonal business incentives and presumptive options',
     benefits: ['Presumptive tax for small operators', 'VAT-exempt transport services', 'Seasonal wage deductions'],
     taxRules: {
-      citRate: 25,
+      citRate: 30,
       vatStatus: 'standard',
       vatRate: 7.5,
       specialIncentives: ['Tourism levy credits', 'Hotel equipment duty waivers', 'Local sourcing incentives']
@@ -331,7 +331,7 @@ const SECTOR_PRESETS: SectorPreset[] = [
     description: 'Property development and contract taxation',
     benefits: ['WHT 5-10% on contracts', 'Rent relief up to ₦500k', 'CGT home sale exemptions'],
     taxRules: {
-      citRate: 25,
+      citRate: 30,
       vatStatus: 'standard',
       vatRate: 7.5,
       whtRate: 5,

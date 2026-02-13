@@ -293,7 +293,7 @@ export function calculateTax(inputs: TaxInputs): TaxResult {
           ? 'Qualifies as Small Company - 0% CIT, 0% CGT, and 0% Development Levy applies!'
           : 'Qualifies as Small Company - 0% CIT rate applies!',
       });
-    } else if (sectorRules?.citRate !== undefined && sectorRules.citRate !== 25) {
+    } else if (sectorRules?.citRate !== undefined && sectorRules.citRate !== 30) {
       alerts.push({
         type: 'info',
         message: `Sector-specific CIT rate: ${companyResult.appliedRate}%`,
