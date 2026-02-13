@@ -18,7 +18,7 @@ const iconMap = {
 };
 
 const defaultBadges: TrustBadge[] = [
-  { icon: 'check', text: 'FIRS Compliant' },
+  { icon: 'check', text: 'NRS Compliant' },
   { icon: 'shield', text: 'Nigeria Tax Act 2025' },
   { icon: 'clock', text: 'Updated Feb 2026' },
 ];
