@@ -73,7 +73,7 @@ export const SECTOR_PRESETS: SectorPreset[] = [
       edtiRate: 5,
       pioneerStatus: true,
       ediEligible: true,
-      specialIncentives: ['NSA labeling (<₦1.5B)', 'EDTI 5% credit', 'R&D 120% deduction', 'EDI 5% annual credit (5 years)']
+      specialIncentives: ['NSA labeling (<₦1.5B)', 'EDTI 5% credit', 'R&D deduction (5% of turnover)', 'EDI 5% annual credit (5 years)']
     },
     myths: [
       { myth: 'All tech companies are tax-free', truth: 'Only NSA-approved software companies qualify for reduced rates' }

@@ -33,9 +33,9 @@ const faqCategories = [
     name: 'VAT',
     faqs: [
       { question: 'What is the VAT rate in Nigeria in 2026?', answer: <>The standard VAT rate remains 7.5% in 2026. Companies with turnover of ₦25 million or less are exempt from VAT registration. Use our <Link to="/vat-calculator" className="text-primary hover:underline">VAT Calculator</Link> for quick computations.</> },
-      { question: 'Which goods and services are VAT-exempt?', answer: 'Exempt items include basic food items, medical supplies, educational materials, books, baby products, agricultural equipment, and locally manufactured sanitary products. The full list is maintained by FIRS.' },
+      { question: 'Which goods and services are VAT-exempt?', answer: 'Exempt items include basic food items, medical supplies, educational materials, books, baby products, agricultural equipment, and locally manufactured sanitary products. The full list is maintained by NRS.' },
       { question: 'When must I register for VAT?', answer: 'You must register for VAT if your annual turnover exceeds ₦25 million. Registration should be done within 6 months of reaching this threshold. Below this amount, VAT registration is optional.' },
-      { question: 'How often must I file VAT returns?', answer: 'VAT returns must be filed monthly, by the 21st of the following month. For example, January VAT is due by February 21st. Late filing attracts penalties of ₦50,000 for the first month and ₦25,000 for each subsequent month.' },
+      { question: 'How often must I file VAT returns?', answer: 'VAT returns must be filed monthly, by the 21st of the following month. For example, January VAT is due by February 21st. Late filing attracts penalties of ₦100,000 for the first month and ₦50,000 for each subsequent month (NTA 2025).' },
       { question: 'Can I claim input VAT on business purchases?', answer: 'Yes, registered companies can claim input VAT paid on business purchases against output VAT collected. This must be supported by valid tax invoices from VAT-registered suppliers.' },
     ],
   },
