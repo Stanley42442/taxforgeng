@@ -146,7 +146,7 @@ const TaxReforms2026 = () => {
         title="Nigeria Tax Reforms 2026 - Complete Guide to Changes | TaxForge"
         description="Everything changing in Nigerian tax from 2026. Small company exemption, rent relief, new PIT bands, and more from Nigeria Tax Act 2025."
         canonicalPath="/tax-reforms-2026"
-        keywords="Nigeria tax reforms 2026, Nigeria Tax Act 2025, Nigerian tax changes, 2026 tax rules Nigeria, FIRS 2026"
+        keywords="Nigeria tax reforms 2026, Nigeria Tax Act 2025, Nigerian tax changes, 2026 tax rules Nigeria, NRS 2026, FIRS 2026"
         schema={schema}
       />
 
@@ -191,7 +191,7 @@ const TaxReforms2026 = () => {
                 <div className="mb-12 animate-slide-up-delay-2">
                   <TrustBadges
                     badges={[
-                      { icon: 'check', text: 'Official FIRS Rules' },
+                      { icon: 'check', text: 'Official NRS Rules' },
                       { icon: 'shield', text: 'Nigeria Tax Act 2025' },
                       { icon: 'clock', text: 'Effective January 2026' },
                     ]}
@@ -409,7 +409,7 @@ const TaxReforms2026 = () => {
                       Full Documentation
                     </h3>
                     <p className="text-muted-foreground mb-3">
-                      Comprehensive guide to all tax calculations, rules, and FIRS requirements
+                      Comprehensive guide to all tax calculations, rules, and NRS requirements
                     </p>
                     <span className="text-primary text-sm font-medium inline-flex items-center">
                       Read Documentation <ArrowRight className="h-4 w-4 ml-1" />

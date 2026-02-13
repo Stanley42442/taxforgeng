@@ -29,7 +29,7 @@ const FreeCalculator = () => {
     },
     {
       question: 'How accurate are the results?',
-      answer: 'Our calculator uses the official Nigeria Tax Act 2025 (effective 2026) tax bands and rules. Results are verified against FIRS guidelines and Big 4 accounting firm publications.',
+      answer: 'Our calculator uses the official Nigeria Tax Act 2025 (effective 2026) tax bands and rules. Results are verified against NRS guidelines and Big 4 accounting firm publications.',
     },
     {
       question: 'Do I need to create an account?',
@@ -81,7 +81,7 @@ const FreeCalculator = () => {
     <>
       <SEOHead
         title="Free Nigerian Tax Calculator 2026 - No Login Required | TaxForge"
-        description="Calculate your Nigerian taxes instantly. Free CIT, PIT, PAYE calculator with 2026 rules. No signup, no card. Accurate FIRS-compliant results."
+        description="Calculate your Nigerian taxes instantly. Free CIT, PIT, PAYE calculator with 2026 rules. No signup, no card. Accurate NRS-compliant results."
         canonicalPath="/free-tax-calculator"
         keywords="Nigerian tax calculator, free tax calculator Nigeria, PAYE calculator, PIT calculator Nigeria 2026, Nigeria Tax Act 2025"
         schema={schema}
@@ -200,8 +200,8 @@ const FreeCalculator = () => {
                     },
                     {
                       icon: CheckCircle2,
-                      title: 'FIRS Compliant',
-                      description: 'Calculations verified against Nigeria Tax Act 2025 and FIRS guidelines.',
+                      title: 'NRS Compliant',
+                      description: 'Calculations verified against Nigeria Tax Act 2025 and NRS guidelines.',
                     },
                   ].map((feature, index) => (
                     <div
