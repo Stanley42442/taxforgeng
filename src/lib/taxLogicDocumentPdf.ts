@@ -578,9 +578,9 @@ export const generateTaxLogicDocumentPDF = async (): Promise<jsPDF> => {
     ['Sector', 'CIT Rate', 'VAT Status', 'Special Incentives'],
     [
       ['Technology/NSA', '0%', 'Standard', 'EDTI 5%, R&D 120% deduction'],
-      ['Agriculture', '0%', 'Zero-rated', '5-year CIT holiday'],
+      ['Agriculture', '0%', 'Zero-rated', 'CIT holiday (primary production)'],
       ['Manufacturing', '30%', 'Standard', '10% investment credit'],
-      ['Healthcare', '30%', 'Exempt', 'Pioneer status eligible'],
+      ['Healthcare', '30%', 'Exempt', 'EDI tax credit eligible'],
       ['Oil & Gas', '30% + HT', 'Standard', '15-30% Hydrocarbon Tax'],
       ['Free Zone', '0%', 'Zero-rated', 'No WHT on dividends'],
       ['Renewables', '30%', 'Zero-rated', '5% EDTI, green hire 50%'],

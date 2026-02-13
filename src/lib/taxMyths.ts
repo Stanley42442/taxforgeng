@@ -72,11 +72,11 @@ export const taxMyths: TaxMyth[] = [
     id: 'startup-grace-period',
     myth: 'New startups get an automatic 2-year grace period before paying taxes',
     truth: 'There\'s NO automatic grace period. Taxes are due from day one of operations.',
-    explanation: 'This is one of the most dangerous tax myths. While certain incentives exist (like Pioneer Status requiring application), there\'s no blanket exemption for new businesses. CIT, VAT, and PAYE obligations begin immediately upon commencement of business activities.',
+    explanation: 'This is one of the most dangerous tax myths. While certain incentives exist (like the Economic Development Incentive (EDI, formerly Pioneer Status)), there\'s no blanket exemption for new businesses. CIT, VAT, and PAYE obligations begin immediately upon commencement of business activities.',
     category: 'exemptions',
     severity: 'high',
     tier: 'free',
-    relatedTopics: ['startup compliance', 'first-year taxes', 'Pioneer Status'],
+    relatedTopics: ['startup compliance', 'first-year taxes', 'Pioneer Status', 'EDI'],
     quiz: {
       question: 'When must a new Nigerian company start paying taxes?',
       options: [
