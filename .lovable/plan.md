@@ -1,74 +1,148 @@
 
-# SEO/AEO Phase 7: Broken Speakable Selectors, Factual Errors, and Section ID Gaps
+
+# SEO/AEO Phase 8: Critical Factual Corrections — Alignment with Nigeria Tax Act 2025
 
 ## Summary
 
-This phase fixes one structural bug (Speakable schemas pointing to non-existent DOM elements), two factual errors on the Learn page, and adds missing section IDs for anchor navigation across SEO pages.
+A thorough cross-reference of the site's content against the Nigeria Tax Act 2025 (NTA) and authoritative sources (PwC, KPMG, EY, AO2LAW, SOW Professional) has uncovered **multiple factual errors** that contradict both the NTA and the site's own calculator logic. These errors are concentrated in blog posts, FAQ answers, and the Tax Breakdown page.
 
-All tax figures have been verified against the Nigeria Tax Act 2025 (effective January 2026). The correct values used site-wide are:
-- PIT bands: First NGN 800,000 tax-free, then 15%, 18%, 21%, 23%, 25%
-- CIT: Small (turnover up to NGN 50M AND assets up to NGN 250M) = 0%; Medium (NGN 50M-200M) = 20%; Large (above NGN 200M) = 30%
-- VAT: 7.5% standard rate; NGN 25M registration threshold
-- WHT: 5% contracts; 10% rent, dividends, interest, royalties, professional/technical/directors fees
-- Development Levy: 4% (replaces 3% TET)
-- Rent Relief: 20% of annual rent, capped at NGN 500,000
-- Loss of Office exemption: NGN 50,000,000
+The calculator engine (`taxCalculations.ts`) is correct. The errors are in the **content layer** — the human-readable descriptions that Google, AI crawlers, and users read.
 
-## Issue 1: Speakable Schemas Reference Non-Existent IDs (Bug)
+## Verified Reference Data (Nigeria Tax Act 2025, Section 56, Fourth Schedule)
 
-CIT, VAT, and WHT calculator pages declare `createSpeakableSchema()` targeting CSS selectors `#cit-rates`/`#vat-rates`/`#wht-rates`, `#faq`, and `#how-it-works` -- but none of these IDs exist in the DOM on those pages. Google Search Console will flag these as errors. Only PITPAYECalculator.tsx correctly has matching IDs.
+Sources: KPMG Flash Alert 2025-168, PwC Top 20 Changes PDF (June 2025), AO2LAW legal analysis (November 2025), SOW Professional compliance guide (January 2026), Finance in Africa analysis (January 2026).
 
-**Fix:** Add `id` attributes to the matching sections on all three pages.
+| Item | Correct Value |
+|------|--------------|
+| PIT Bands | 0-800k: 0%, 800k-3M: 15%, 3M-12M: 18%, 12M-25M: 21%, 25M-50M: 23%, 50M+: 25% |
+| Small Company CIT | Turnover up to 50M AND assets up to 250M = 0% CIT, 0% CGT, 0% Development Levy |
+| Large Company CIT | 30% (not 25%) |
+| Development Levy | 4% — applies to non-small companies ONLY |
+| Professional Services | Excluded from small company definition (law, accounting, medical, engineering) |
+| CGT (Companies) | 30% (increased from 10%) |
+| CGT (Individuals) | Progressive PIT rates (replaces flat 10%) |
+| Medium Company Category | Eliminated under NTA — companies are either Small or Large |
 
-## Issue 2: Factual Errors on Learn Page
+## Errors Found
 
-Line 357 of Learn.tsx states PIT rates as "15%, 19%, 21%, 25%" -- should be "15%, 18%, 21%, 23%, 25%".
+### Error 1: CIT Rate Stated as 25% (Should be 30%)
 
-Line 361 states CIT "Standard rate reduced to 25%" -- the large company CIT rate is 30%, not 25%. Medium is 20%. Small is 0%.
+The standard CIT rate for large companies is 30%, not 25%. This error appears in three places:
 
-**Fix:** Correct both values.
+| File | Line | Wrong Text |
+|------|------|-----------|
+| `src/pages/FAQ.tsx` | 25 | "standard Company Income Tax rate is 25%" |
+| `src/pages/TaxBreakdown.tsx` | 86 | "Under 2026 rules, CIT is 25%." |
+| `src/pages/blog/SmallCompanyCITExemption.tsx` | 20 | "liable for CIT at the standard 25% rate" |
 
-## Issue 3: Missing Section IDs on Other SEO Pages
+**Fix:** Change all instances to 30%.
 
-Six additional SEO pages have FAQ and/or How-It-Works sections without `id` attributes. Adding IDs enables anchor navigation and improves crawlability.
+### Error 2: Development Levy Incorrectly Applied to Small Companies
 
-Pages affected: FreeCalculator, SmallCompanyExemption, RentRelief2026, TaxReforms2026 (already has `id="faq"` but no `id="how-it-works"`).
+Per NTA Section 56 and confirmed by PwC, AO2LAW, and SOW Professional: small companies are **exempt** from the Development Levy. The site's own calculator (`taxCalculations.ts` line 154) correctly returns `devLevy: 0` for small companies. But the content pages claim the opposite.
 
-## Changes
+| File | Lines | Wrong Text |
+|------|-------|-----------|
+| `src/pages/blog/SmallCompanyCITExemption.tsx` | 18 | FAQ: "applies to all companies regardless of size" |
+| `src/pages/blog/SmallCompanyCITExemption.tsx` | 114 | Step 4: "4% Development Levy still applies" |
+| `src/pages/blog/SmallCompanyCITExemption.tsx` | 138 | Example 1 calculates Dev Levy of 320,000 for small company |
+| `src/pages/blog/SmallCompanyCITExemption.tsx` | 150 | Example 2 calculates Dev Levy of 480,000 for small company |
+| `src/pages/blog/SmallCompanyCITExemption.tsx` | 161 | "applies to all companies" |
+| `src/pages/blog/SmallCompanyCITExemption.tsx` | 172-179 | Entire section "Development Levy Still Applies" |
+| `src/pages/FAQ.tsx` | 27 | "applies to all companies regardless of size" |
+| `src/pages/blog/TaxReforms2026Summary.tsx` | 157 | "This applies to all companies" |
+| `src/pages/blog/TaxGuideTechStartups.tsx` | 18 | "The Development Levy applies once you have assessable profits" |
 
-### Files to Modify
+**Fix:** Correct all to state that small companies are exempt from the Development Levy. Update worked examples to show Dev Levy = 0 for qualifying small companies. Rewrite the "Development Levy Still Applies" section to clarify it only applies to non-small companies.
 
-| File | Change |
-|------|--------|
-| `src/pages/seo/CITCalculator.tsx` | Add `id="cit-rates"` (line 167), `id="how-it-works"` (line 228), `id="faq"` (line 425) |
-| `src/pages/seo/VATCalculator.tsx` | Add `id="vat-rates"` (line 268), `id="how-it-works"` (line 168), `id="faq"` (line 396) |
-| `src/pages/seo/WHTCalculator.tsx` | Add `id="wht-rates"` (line 157), `id="how-it-works"` (line 200), `id="faq"` (line 408) |
-| `src/pages/Learn.tsx` | Fix PIT rates (line 357) and CIT description (line 361) |
-| `src/pages/seo/FreeCalculator.tsx` | Add `id="how-it-works"` (line 127), `id="faq"` (line 288) |
-| `src/pages/seo/SmallCompanyExemption.tsx` | Add `id="how-it-works"` (line 204), `id="faq"` (line 350) |
-| `src/pages/seo/RentRelief2026.tsx` | Add `id="how-it-works"` (line 141), `id="faq"` (line 336) |
-| `src/pages/seo/TaxReforms2026.tsx` | Add `id="how-it-works"` to the how-to section (already has `id="faq"`) |
+### Error 3: PIT Bands Wrong in TaxBreakdown.tsx
 
-### Technical Details
+The Tax Breakdown page displays incorrect PIT bands for 2026:
 
-**Speakable fix pattern (CIT example):**
+| Shown (Wrong) | Correct |
+|---------------|---------|
+| 800k - 3m: 15% | 800k - 3m: 15% (OK) |
+| 3m - 10m: 19% | 3m - 12m: 18% |
+| 10m - 50m: 21% | 12m - 25m: 21%, 25m - 50m: 23% |
+| Above 50m: 25% | Above 50m: 25% (OK) |
 
-The existing Speakable schema declares selectors `['#cit-rates', '#faq', '#how-it-works']`. The fix adds matching IDs:
+The 18% and 23% bands are completely missing, and the 19% rate does not exist in the NTA.
 
+**Fix:** Replace with the correct six-band structure.
+
+### Error 4: Professional Services Exclusion Missing
+
+The NTA explicitly states: "any business providing professional services shall not be classified as a small company." This applies to law firms, accounting firms, medical practices, engineering consultancies, and other licensed professions. This critical exclusion is entirely absent from the site.
+
+**Fix:** Add a note about the professional services exclusion to the SmallCompanyCITExemption blog post, the SmallCompanyExemption SEO page, and the FAQ.
+
+### Error 5: "Medium Company" Category References
+
+The NTA 2025 eliminates the old medium company category. Per Finance in Africa: "This change scraps the regular medium-sized firms category." Companies are now classified as Small (0%) or Large (30%). The calculator already implements this correctly (no 20% rate exists in the code). But multiple content pages reference "medium companies (50M-200M) at 20%."
+
+| File | Lines |
+|------|-------|
+| `src/pages/seo/CITCalculator.tsx` | 18, 20, 32, 65-68, 82 |
+| `src/pages/seo/TaxReforms2026.tsx` | 29 |
+| `src/pages/Learn.tsx` | 361 |
+| `src/pages/seo/SmallCompanyExemption.tsx` | 36, 169 |
+
+**Fix:** Remove medium company references. State that companies are either Small (0%) or Large (30%). Note in CITCalculator that this is a simplification and professional advice should be sought for companies near the threshold.
+
+## Files to Modify
+
+| File | Changes |
+|------|---------|
+| `src/pages/TaxBreakdown.tsx` | Fix PIT bands (lines 93-99), fix CIT rate 25% to 30% (line 86) |
+| `src/pages/FAQ.tsx` | Fix CIT rate (line 25), fix Dev Levy for small companies (line 27) |
+| `src/pages/blog/SmallCompanyCITExemption.tsx` | Fix Dev Levy exemption (FAQ, step 4, examples, common mistakes, dedicated section), fix CIT rate, add professional services exclusion, remove medium company reference |
+| `src/pages/blog/TaxReforms2026Summary.tsx` | Fix Dev Levy scope (line 157) |
+| `src/pages/blog/TaxGuideTechStartups.tsx` | Fix Dev Levy for small companies (line 18) |
+| `src/pages/seo/CITCalculator.tsx` | Remove medium company references, update to Small/Large only, add professional services note |
+| `src/pages/seo/TaxReforms2026.tsx` | Remove medium company reference (line 29), add professional services note |
+| `src/pages/Learn.tsx` | Remove medium company reference (line 361) |
+| `src/pages/seo/SmallCompanyExemption.tsx` | Remove medium company references, add professional services exclusion note |
+
+## Technical Details
+
+**TaxBreakdown.tsx PIT bands fix (lines 93-99):**
 ```text
-<section id="cit-rates" className="mb-12">   // CIT Rates Overview section
-<section id="how-it-works" className="mb-12"> // How to Calculate section
-<section id="faq" className="mb-12">          // FAQ accordion section
+From:
+- 800k - 3m: 15%
+- 3m - 10m: 19%
+- 10m - 50m: 21%
+- Above 50m: 25%
+
+To:
+- 800k - 3m: 15%
+- 3m - 12m: 18%
+- 12m - 25m: 21%
+- 25m - 50m: 23%
+- Above 50m: 25%
 ```
 
-Same pattern for VAT (`#vat-rates`) and WHT (`#wht-rates`).
+**TaxBreakdown.tsx CIT fix (line 86):**
+- From: "Under 2026 rules, CIT is 25%."
+- To: "Under 2026 rules, CIT is 30% for large companies. Small companies (turnover up to 50M, assets up to 250M) pay 0%."
 
-**Learn page PIT fix (line 357):**
-- From: `New rates: 15%, 19%, 21%, 25%.`
-- To: `New rates: 15%, 18%, 21%, 23%, 25%. First ₦800,000 is tax-free.`
+**SmallCompanyCITExemption.tsx worked example fix (line 138):**
+- From: "Development Levy = 4% x 8,000,000 = 320,000"
+- To: "Development Levy = 0 (small companies are exempt)"
+- Savings recalculated accordingly
 
-**Learn page CIT fix (line 361):**
-- From: `Standard rate reduced to 25%. Small companies (≤₦50m): 0% CIT.`
-- To: `Large companies: 30%. Medium (₦50M-₦200M): 20%. Small (turnover ≤₦50M AND assets ≤₦250M): 0% CIT.`
+**CITCalculator.tsx rate table fix:**
+- Remove "Medium Company" row entirely
+- Update to show only Small (0%) and Large (30%)
 
-**Total: 8 files modified, 0 new files created**
+**Professional services exclusion text (to add):**
+"Important: Professional service providers (law firms, accounting firms, medical practices, engineering consultancies) are excluded from the small company definition regardless of their turnover or asset size."
+
+## What This Does NOT Address
+
+- FIRS vs NRS naming: Many authoritative sources still use "FIRS" during the transition period. This is a cosmetic issue and both names are currently in use.
+- The `verification.ts` constants file correctly has all values and does not need changes.
+- The calculator engine (`taxCalculations.ts`, `individualTaxCalculations.ts`) is correct and does not need changes.
+- Off-page SEO, backlinks, pre-rendering.
+
+**Total: 9 files modified, 0 new files created**
+
