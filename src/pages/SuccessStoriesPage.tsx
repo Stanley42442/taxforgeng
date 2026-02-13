@@ -6,6 +6,8 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Star, LogIn } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { SEOHead, createBreadcrumbSchema } from "@/components/seo/SEOHead";
+import { PageBreadcrumbs } from "@/components/seo/PageBreadcrumbs";
+import { ContentMeta } from "@/components/seo/ContentMeta";
 
 const SuccessStoriesPage = () => {
   const { user } = useAuth();
@@ -22,6 +24,13 @@ const SuccessStoriesPage = () => {
           { name: 'Success Stories', url: 'https://taxforgeng.com/success-stories' },
         ])}
       />
+      <article>
+      <PageBreadcrumbs items={[
+        { label: 'Home', href: '/' },
+        { label: 'Success Stories' },
+      ]} />
+      <ContentMeta published="2026-02-09" publishedLabel="9 February 2026" updated="2026-02-13" updatedLabel="13 February 2026" />
+
       {/* Testimonials */}
       <SuccessStories showTitle={false} autoPlay={false} />
 
@@ -73,6 +82,7 @@ const SuccessStoriesPage = () => {
           </div>
         </div>
       </div>
+      </article>
     </PageLayout>
   );
 };

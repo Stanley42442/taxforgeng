@@ -237,7 +237,7 @@ const Index = () => {
                 Is My Small Company Exempt From CIT?
               </h2>
               <p className="text-muted-foreground mb-4">
-                Yes — if your company's gross turnover is ₦25 million or less, you pay 0% Company Income Tax under the 2026 rules. This applies to Nigerian-registered companies in their first four years or with qualifying turnover.
+                Yes — if your company's turnover is ₦50 million or less AND fixed assets are ₦250 million or less, you pay 0% Company Income Tax under the 2026 rules (Nigeria Tax Act 2025).
               </p>
               <Link to="/small-company-exemption">
                 <Button variant="link" className="p-0 gap-1 text-primary">

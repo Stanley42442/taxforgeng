@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { SEOHead, createBreadcrumbSchema } from "@/components/seo/SEOHead";
 import { PageLayout } from "@/components/PageLayout";
+import { PageBreadcrumbs } from "@/components/seo/PageBreadcrumbs";
+import { ContentMeta } from "@/components/seo/ContentMeta";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSubscription } from "@/contexts/SubscriptionContext";
@@ -191,6 +193,13 @@ const Learn = () => {
       icon={GraduationCap} 
       maxWidth="6xl"
     >
+      <article>
+      <PageBreadcrumbs items={[
+        { label: 'Home', href: '/' },
+        { label: 'Tax Learning Center' },
+      ]} />
+      <ContentMeta published="2026-02-09" publishedLabel="9 February 2026" updated="2026-02-13" updatedLabel="13 February 2026" />
+
       {/* Quiz Progress */}
       {answeredQuizzes > 0 && (
         <div className="glass-frosted rounded-2xl p-4 mb-6">
@@ -375,6 +384,7 @@ const Learn = () => {
           </Accordion>
         </TabsContent>
       </Tabs>
+      </article>
     </PageLayout>
     </>
   );

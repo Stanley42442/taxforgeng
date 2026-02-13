@@ -3,6 +3,8 @@ import { SEOHead, createBreadcrumbSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
 import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
+import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
+import { ContentMeta } from '@/components/seo/ContentMeta';
 import { Download, FileText, Calculator, Calendar, CheckCircle2, ArrowRight, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -70,14 +72,22 @@ const Resources = () => {
         <div className="fixed inset-0 bg-mesh pointer-events-none" />
 
         <main className="relative z-10 flex-grow">
-          <div className="container mx-auto px-4 py-8 md:py-12">
+          <article className="container mx-auto px-4 py-8 md:py-12">
             <div className="max-w-4xl mx-auto">
-              <SEOHero
-                badge="Resources"
-                title="Free Tax Templates"
-                titleHighlight="& Downloads"
-                subtitle="Checklists, worksheets, rate cards, and guides — everything you need for Nigerian tax compliance in 2026, completely free."
-              />
+              <PageBreadcrumbs items={[
+                { label: 'Home', href: '/' },
+                { label: 'Resources' },
+              ]} />
+              <ContentMeta published="2026-02-09" publishedLabel="9 February 2026" updated="2026-02-13" updatedLabel="13 February 2026" />
+
+              <header>
+                <SEOHero
+                  badge="Resources"
+                  title="Free Tax Templates"
+                  titleHighlight="& Downloads"
+                  subtitle="Checklists, worksheets, rate cards, and guides — everything you need for Nigerian tax compliance in 2026, completely free."
+                />
+              </header>
 
               {/* Downloadable Resources */}
               <section className="mb-12">
@@ -141,7 +151,7 @@ const Resources = () => {
 
               <SEODisclaimer />
             </div>
-          </div>
+          </article>
         </main>
       </div>
     </>
