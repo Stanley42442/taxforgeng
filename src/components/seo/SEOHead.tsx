@@ -135,28 +135,8 @@ export const createCalculatorSchema = (
   },
 });
 
-// Pre-built schema generators for common page types
-export const createWebApplicationSchema = (name: string, description: string) => ({
-  '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  name,
-  description,
-  applicationCategory: 'FinanceApplication',
-  operatingSystem: 'Web',
-  offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'NGN',
-  },
-  provider: {
-    '@type': 'Organization',
-    name: 'TaxForge NG',
-    url: 'https://taxforgeng.com',
-  },
-});
-
 // SoftwareApplication schema with full feature list and pricing tiers for AI discoverability
-export const createSoftwareApplicationSchema = () => ({
+export const createSoftwareApplicationSchema = (reviewStats?: { ratingValue: number; reviewCount: number }) => ({
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
   name: 'TaxForge NG',
@@ -235,7 +215,18 @@ export const createSoftwareApplicationSchema = () => ({
   areaServed: {
     '@type': 'Country',
     name: 'Nigeria'
-  }
+  },
+
+  // Only include aggregateRating when real review data exists (Google policy)
+  ...(reviewStats && reviewStats.reviewCount > 0 ? {
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: reviewStats.ratingValue.toFixed(1),
+      reviewCount: String(reviewStats.reviewCount),
+      bestRating: '5',
+      worstRating: '1',
+    },
+  } : {}),
 });
 
 // Organization schema for brand recognition by AI systems
