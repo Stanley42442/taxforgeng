@@ -21,10 +21,12 @@ import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { SEOHead, createSoftwareApplicationSchema, createOrganizationSchema, createLocalBusinessSchema } from "@/components/seo/SEOHead";
+import { useReviewStats } from "@/hooks/useReviewStats";
 
 const Index = () => {
   const [api, setApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const { data: reviewStats } = useReviewStats();
 
   const CAROUSEL_ITEMS = [
     {
@@ -68,7 +70,7 @@ const Index = () => {
   }, [api]);
 
   const homepageSchema = [
-    createSoftwareApplicationSchema(),
+    createSoftwareApplicationSchema(reviewStats),
     createOrganizationSchema(),
     createLocalBusinessSchema(),
   ];
