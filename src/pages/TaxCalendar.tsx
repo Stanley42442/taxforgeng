@@ -144,9 +144,9 @@ const TaxCalendar = () => {
     >
       <SEOHead
         title="Nigerian Tax Deadlines & Calendar 2026 - TaxForge NG"
-        description="Never miss a Nigerian tax deadline. 2026 tax calendar with FIRS filing dates for VAT, CIT, PAYE, WHT returns. Set reminders and download your schedule."
+        description="Never miss a Nigerian tax deadline. 2026 tax calendar with NRS filing dates for VAT, CIT, PAYE, WHT returns. Set reminders and download your schedule."
         canonicalPath="/tax-calendar"
-        keywords="Nigerian tax deadlines 2026, FIRS filing dates, VAT return deadline Nigeria, CIT annual return, PAYE remittance date"
+        keywords="Nigerian tax deadlines 2026, NRS filing dates, FIRS filing dates, VAT return deadline Nigeria, CIT annual return, PAYE remittance date"
         schema={createBreadcrumbSchema([
           { name: 'Home', url: 'https://taxforgeng.com/' },
           { name: 'Tax Calendar', url: 'https://taxforgeng.com/tax-calendar' },
