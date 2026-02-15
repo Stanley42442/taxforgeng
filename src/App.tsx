@@ -111,6 +111,7 @@ const StateGuidesHub = lazy(() => import("./pages/seo/StateGuidesHub"));
 const LagosGuide = lazy(() => import("./pages/seo/LagosGuide"));
 const AbujaGuide = lazy(() => import("./pages/seo/AbujaGuide"));
 const KanoGuide = lazy(() => import("./pages/seo/KanoGuide"));
+const SalaryAfterTax = lazy(() => import("./pages/seo/SalaryAfterTax"));
 
 // Standalone Pages
 const About = lazy(() => import("./pages/About"));
@@ -243,6 +244,7 @@ const AnimatedRoutes = () => {
           <Route path="/state-guides/lagos" element={<LagosGuide />} />
           <Route path="/state-guides/abuja" element={<AbujaGuide />} />
           <Route path="/state-guides/kano" element={<KanoGuide />} />
+          <Route path="/salary-after-tax-nigeria" element={<SalaryAfterTax />} />
           {/* Standalone Pages */}
           <Route path="/about" element={<About />} />
           <Route path="/resources" element={<Resources />} />
