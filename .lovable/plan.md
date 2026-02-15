@@ -1,50 +1,62 @@
 
 
-# Schema Warning Resolution: aggregateRating
+# Distribution Strategy: "Salary After Tax" Landing Page
 
-## What the Screenshot Shows
+## Context
 
-The screenshot displays **cached Google search history** from a previous Rich Results Test run. The warnings reference `WebApplication` type schema -- which we already replaced with `SoftwareApplication` in the last update. These warnings will clear on Google's next crawl.
+Both Gemini and Perplexity now agree: your technical SEO/AEO is effectively "done." The gap is **distribution and authority**. Two high-impact, code-implementable actions were identified:
 
-## Current State
+1. **"Salary After Tax" SEO landing page** -- captures the consumer search term HRPayHub dominates
+2. **Embeddable widget improvements** -- already built at `/embed/calculator` with full partner branding
 
-- The `aggregateRating` field is intentionally omitted (comment on line ~177 of SEOHead.tsx: "only add when real reviews exist")
-- A `user_reviews` table exists in the database but has **0 reviews** currently
-- Google's structured data guidelines explicitly prohibit adding `aggregateRating` without real user data -- doing so risks a manual penalty
-- The old `createWebApplicationSchema` export is now dead code (no imports)
+This plan focuses on **#1** since the embed infrastructure already exists. The widget route (`/embed/calculator`), the `EmbeddableCalculator` component, and the `PartnerBranding` dashboard are all fully functional.
 
-## What We Should Do
+## What We Will Build
 
-### 1. Clean up dead code
-Remove the unused `createWebApplicationSchema` export from `SEOHead.tsx` to prevent accidental future use that would re-trigger this warning.
+A new SEO landing page at `/salary-after-tax-nigeria` that reframes the existing `QuickTaxCalculator` component and `individualTaxCalculations` logic using consumer-friendly language ("take-home pay", "net salary", "salary after tax") instead of technical tax terminology.
 
-### 2. Add dynamic aggregateRating to homepage schema (conditional)
-Modify `createSoftwareApplicationSchema` to **optionally** accept review stats. When real reviews exist in the `user_reviews` table, the schema will automatically include:
-```
-"aggregateRating": {
-  "@type": "AggregateRating",
-  "ratingValue": "4.8",
-  "reviewCount": "12",
-  "bestRating": "5",
-  "worstRating": "1"
-}
-```
-When no reviews exist (current state), the field is omitted entirely -- which is the correct behavior per Google guidelines.
+## Page Structure
 
-### 3. Create a hook to fetch review stats
-Add a small `useReviewStats` hook that queries the `user_reviews` table for count and average rating. This will be used by Index.tsx to pass real data into the schema generator.
+| Section | Purpose |
+|---------|---------|
+| SEOHead with full schema | SoftwareApplication, FAQPage, HowTo, Breadcrumb, Speakable, DefinedTermSet |
+| Hero | H1: "Salary After Tax Calculator Nigeria (2026 Updates)" |
+| QuickTaxCalculator (reused) | Above-the-fold tool with "Monthly Take-Home Pay" framing |
+| "How It Works" steps | HowTo schema: 5 consumer-friendly steps |
+| Monthly breakdown table | Visual: Gross -> Pension -> Tax -> Net |
+| Salary comparison bands | Common salary levels (₦100k-₦2M/month) with net pay |
+| 8-10 FAQs | Consumer questions: "What is my take-home on ₦500k?", "Is minimum wage taxed?" etc. |
+| CTA | Links to full Individual Calculator and Reverse Salary tab |
+| Trust badges + disclaimer | Reused components |
+
+## Target Keywords
+
+- "salary after tax Nigeria"
+- "take home pay calculator Nigeria 2026"  
+- "net salary calculator Nigeria"
+- "how much tax do I pay on my salary Nigeria"
+- "PAYE calculator Nigeria 2026"
 
 ## Files Changed
 
 | File | Change |
 |------|--------|
-| `src/components/seo/SEOHead.tsx` | Remove dead `createWebApplicationSchema`, update `createSoftwareApplicationSchema` to accept optional rating params |
-| `src/pages/Index.tsx` | Pass review stats to schema generator |
-| `src/hooks/useReviewStats.ts` | New hook -- queries `user_reviews` for count + average |
+| `src/pages/seo/SalaryAfterTax.tsx` | New page (~400 lines, follows exact pattern of PITPAYECalculator.tsx) |
+| `src/App.tsx` | Add lazy import + route at `/salary-after-tax-nigeria` |
+| `public/sitemap.xml` | Add new URL entry |
+| `index.html` | Add noscript fallback content for the salary-after-tax keyword cluster |
+
+## Technical Details
+
+- Reuses `QuickTaxCalculator` component (already computes net pay, effective rate, and 2026 vs pre-2026 comparison)
+- Reuses `calculatePersonalIncomeTax` from `individualTaxCalculations.ts` for the salary band comparison table
+- Follows the exact SEO page architecture established in `PITPAYECalculator.tsx`: SEOHead with multi-schema `@graph`, breadcrumbs, content sections, accordion FAQs, trust badges, disclaimer
+- All schema helpers (`createCalculatorSchema`, `createFAQSchema`, `createHowToSchema`, `createSpeakableSchema`, `createTaxRateSchema`, `createBreadcrumbSchema`) already exist and will be reused
+- Consumer-language FAQs will complement (not duplicate) the existing PIT/PAYE FAQs
 
 ## What This Does NOT Do
 
-- Does NOT add fake ratings (Google policy violation)
-- Does NOT change any calculation logic
-- The warning will naturally disappear once Google re-crawls the updated schema
+- Does not duplicate calculator logic -- reuses existing components and functions
+- Does not change any existing pages or routes
+- Does not affect the embed widget (already fully functional)
 
