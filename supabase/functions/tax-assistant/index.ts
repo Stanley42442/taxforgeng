@@ -189,12 +189,39 @@ serve(async (req) => {
   }
 
   try {
+    // Require authentication
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Authentication required" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Authentication required" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const startTime = Date.now();
     const { messages, userContext } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+      console.error("LOVABLE_API_KEY is not configured");
+      return new Response(JSON.stringify({ error: "Service temporarily unavailable" }), {
+        status: 503,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // Get the last user message for categorization
@@ -224,20 +251,20 @@ serve(async (req) => {
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limits exceeded. Please try again in a moment." }), {
+        return new Response(JSON.stringify({ error: "Service is busy. Please try again in a moment." }), {
           status: 429,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted. Please try again later." }), {
+        return new Response(JSON.stringify({ error: "Service temporarily unavailable." }), {
           status: 402,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
-      return new Response(JSON.stringify({ error: "Failed to get AI response" }), {
+      return new Response(JSON.stringify({ error: "Service temporarily unavailable" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -247,27 +274,19 @@ serve(async (req) => {
 
     // Log query for analytics (fire and forget)
     try {
-      const supabaseUrl = Deno.env.get("SUPABASE_URL");
-      const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
       
-      if (supabaseUrl && supabaseKey && lastUserMessage) {
-        const supabase = createClient(supabaseUrl, supabaseKey);
+      if (supabaseUrl && supabaseServiceKey && lastUserMessage) {
+        const adminClient = createClient(supabaseUrl, supabaseServiceKey);
         
-        // Insert analytics data to ai_queries table
-        await supabase.from('ai_queries').insert({
+        await adminClient.from('ai_queries').insert({
           question: lastUserMessage.content.substring(0, 500),
           response: 'Streaming response - not captured',
           categories,
           response_time_ms: responseTime,
           sector: userContext?.sector || null,
           session_id: crypto.randomUUID(),
-        });
-        
-        console.log("Query analytics logged:", {
-          question: lastUserMessage.content.substring(0, 100),
-          categories,
-          responseTime,
-          sector: userContext?.sector
+          user_id: user.id,
         });
       }
     } catch (logError) {
@@ -279,7 +298,7 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("Tax assistant error:", error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
+    return new Response(JSON.stringify({ error: "Service temporarily unavailable" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
