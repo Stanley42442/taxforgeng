@@ -346,7 +346,7 @@ const Index = () => {
 
             {/* Navigation Links */}
             <div>
-              <h4 className="font-semibold text-foreground mb-4">Platform</h4>
+              <p className="font-semibold text-foreground mb-4">Platform</p>
               <div className="flex flex-col gap-2 text-sm">
                 {[
                   { to: "/advisory", label: "Get Advice" },
@@ -368,7 +368,7 @@ const Index = () => {
 
             {/* Free Tools Links */}
             <div>
-              <h4 className="font-semibold text-foreground mb-4">Free Tools</h4>
+              <p className="font-semibold text-foreground mb-4">Free Tools</p>
               <div className="flex flex-col gap-2 text-sm">
                 {[
                   { to: "/free-tax-calculator", label: "Tax Calculator" },
@@ -390,7 +390,7 @@ const Index = () => {
 
             {/* More Tools */}
             <div>
-              <h4 className="font-semibold text-foreground mb-4">More Tools</h4>
+              <p className="font-semibold text-foreground mb-4">More Tools</p>
               <div className="flex flex-col gap-2 text-sm">
                 {[
                   { to: "/cit-calculator", label: "CIT Calculator" },
@@ -412,7 +412,7 @@ const Index = () => {
 
             {/* Company Links */}
             <div>
-              <h4 className="font-semibold text-foreground mb-4">Company</h4>
+              <p className="font-semibold text-foreground mb-4">Company</p>
               <div className="flex flex-col gap-2 text-sm">
                 {[
                   { to: "/about", label: "About Us" },
