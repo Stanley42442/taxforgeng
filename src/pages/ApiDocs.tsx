@@ -26,7 +26,8 @@ import {
   Shield,
   Palette,
   Globe,
-  Users
+  Users,
+  Layout
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -517,6 +518,93 @@ console.log(data.data.totalTaxPayable);`;
                   </Button>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Embed Calculator Instructions */}
+          {isCorporate && user && (
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">
+              <h2 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                <Layout className="h-5 w-5 text-primary" />
+                Embed Calculator on Your Website
+              </h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Add a Nigerian tax calculator directly to your website. Users can calculate taxes without leaving your site.
+              </p>
+
+              <div className="space-y-5">
+                {/* Step-by-step instructions */}
+                <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+                  <h3 className="text-sm font-medium text-foreground mb-2">How it works</h3>
+                  <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside">
+                    <li>Create an API key above (if you haven't already)</li>
+                    <li>Copy one of the embed snippets below</li>
+                    <li>Paste it into your website's HTML where you want the calculator to appear</li>
+                    <li>Optionally <button onClick={() => navigate('/partner-branding')} className="text-primary underline">customize the branding</button> to match your site</li>
+                  </ol>
+                </div>
+
+                {/* Option 1: JavaScript SDK */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <Label className="text-sm font-medium">Option 1: JavaScript SDK (Recommended)</Label>
+                    <Button variant="ghost" size="sm" onClick={() => copyToClipboard(`<div id="taxforge-calculator"></div>\n<script src="${window.location.origin}/embed.js"></script>\n<script>\n  TaxForge.init({\n    container: '#taxforge-calculator',\n    apiKey: '${activeKey}'\n  });\n</script>`)}>
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <pre className="p-4 rounded-lg bg-secondary/80 overflow-x-auto text-xs font-mono text-foreground whitespace-pre-wrap break-all">
+{`<div id="taxforge-calculator"></div>
+<script src="${window.location.origin}/embed.js"></script>
+<script>
+  TaxForge.init({
+    container: '#taxforge-calculator',
+    apiKey: '${activeKey}'
+  });
+</script>`}
+                  </pre>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Paste this snippet in your HTML. The SDK auto-creates a responsive iframe.
+                  </p>
+                </div>
+
+                {/* Option 2: iFrame */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <Label className="text-sm font-medium">Option 2: Direct iFrame</Label>
+                    <Button variant="ghost" size="sm" onClick={() => copyToClipboard(`<iframe\n  src="${window.location.origin}/embed/calculator?key=${activeKey}"\n  width="100%"\n  height="600"\n  frameborder="0"\n  style="border-radius: 12px; max-width: 500px;"\n></iframe>`)}>
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <pre className="p-4 rounded-lg bg-secondary/80 overflow-x-auto text-xs font-mono text-foreground whitespace-pre-wrap break-all">
+{`<iframe
+  src="${window.location.origin}/embed/calculator?key=${activeKey}"
+  width="100%"
+  height="600"
+  frameborder="0"
+  style="border-radius: 12px; max-width: 500px;"
+></iframe>`}
+                  </pre>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Use this if you prefer a plain iframe without the SDK.
+                  </p>
+                </div>
+
+                {/* Listening for results */}
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">Listening for Calculation Results (Optional)</Label>
+                  <pre className="p-4 rounded-lg bg-secondary/80 overflow-x-auto text-xs font-mono text-foreground whitespace-pre-wrap break-all">
+{`window.addEventListener('message', (event) => {
+  if (event.data?.type === 'taxforge-calculation') {
+    console.log('Tax result:', event.data.data);
+    // { totalTaxPayable, taxableIncome, effectiveRate, ... }
+  }
+});`}
+                  </pre>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    The embedded calculator posts results via <code>postMessage</code> so your page can react to calculations.
+                  </p>
+                </div>
+              </div>
             </div>
           )}
 

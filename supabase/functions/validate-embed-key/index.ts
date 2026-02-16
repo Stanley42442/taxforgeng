@@ -152,7 +152,7 @@ serve(async (req) => {
         textColor: partner.text_color || '#1f2937',
         borderRadius: partner.border_radius || '12',
         fontFamily: partner.font_family || 'Inter',
-        showPoweredBy: partner.show_powered_by ?? true,
+        showPoweredBy: true,
       },
     }), {
       status: 200,
