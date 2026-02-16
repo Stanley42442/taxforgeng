@@ -112,7 +112,7 @@ const ApiDocs = () => {
           api_key: apiKey,
           api_secret_hash: apiSecretHash,
           tier: tier === 'corporate' ? 'pro' : 'basic',
-          rate_limit_daily: tier === 'corporate' ? 10000 : 10000,
+          rate_limit_daily: tier === 'corporate' ? 100000 : 10000,
           allowed_origins: domains.length > 0 ? domains : null,
         })
         .select()
@@ -669,9 +669,9 @@ console.log(data.data.totalTaxPayable);`;
           <div className="mt-6 p-4 rounded-lg bg-secondary/50 border border-border">
             <h3 className="font-medium text-foreground mb-2">Rate Limits</h3>
             <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• 10,000 requests/day (Basic tier)</li>
-              <li>• 100,000 requests/day (Pro tier)</li>
-              <li>• Custom limits (Enterprise/Partner) - Contact sales</li>
+              <li>• 10,000 requests/day (Business plan)</li>
+              <li>• 100,000 requests/day (Corporate plan)</li>
+              <li>• Custom limits (Partner keys, admin-created)</li>
             </ul>
           </div>
 
