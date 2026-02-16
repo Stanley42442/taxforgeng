@@ -345,6 +345,7 @@ export const NavMenu = () => {
 
             <Link 
               to="/notifications" 
+              aria-label="Notifications"
               className="relative flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
             >
               {totalNotificationCount > 0 ? (
