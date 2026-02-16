@@ -296,14 +296,57 @@ const PartnerBranding = () => {
                         />
                       </div>
                       <div>
-                        <Label>Logo URL</Label>
-                        <Input
-                          placeholder="https://yoursite.com/logo.png"
-                          value={logoUrl}
-                          onChange={(e) => setLogoUrl(e.target.value)}
-                        />
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Recommended: 200x50px, transparent PNG
+                        <Label>Logo</Label>
+                        <div className="flex gap-2 mb-1">
+                          <Input
+                            placeholder="https://yoursite.com/logo.png"
+                            value={logoUrl}
+                            onChange={(e) => setLogoUrl(e.target.value)}
+                            className="flex-1"
+                          />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="shrink-0"
+                            onClick={() => document.getElementById('logo-upload-input')?.click()}
+                          >
+                            <Image className="h-4 w-4 mr-1" />
+                            Upload
+                          </Button>
+                          <input
+                            id="logo-upload-input"
+                            type="file"
+                            accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                            className="hidden"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file || !selectedPartner || !user) return;
+                              if (file.size > 2 * 1024 * 1024) {
+                                toast.error('Logo must be under 2MB');
+                                return;
+                              }
+                              try {
+                                const ext = file.name.split('.').pop();
+                                const path = `logos/${user.id}/${selectedPartner.id}.${ext}`;
+                                const { error: uploadError } = await supabase.storage
+                                  .from('partner-assets')
+                                  .upload(path, file, { upsert: true });
+                                if (uploadError) throw uploadError;
+                                const { data: urlData } = supabase.storage
+                                  .from('partner-assets')
+                                  .getPublicUrl(path);
+                                setLogoUrl(urlData.publicUrl);
+                                toast.success('Logo uploaded!');
+                              } catch (err) {
+                                logger.error('Logo upload error:', err);
+                                toast.error('Failed to upload logo');
+                              }
+                              e.target.value = '';
+                            }}
+                          />
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Recommended: 200x50px, transparent PNG. Max 2MB.
                         </p>
                       </div>
                       <div>
@@ -328,17 +371,10 @@ const PartnerBranding = () => {
                           onChange={(e) => setBorderRadius(e.target.value)}
                         />
                       </div>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label>Show "Powered by TaxForge"</Label>
-                          <p className="text-xs text-muted-foreground">
-                            Display attribution link
-                          </p>
-                        </div>
-                        <Switch
-                          checked={showPoweredBy}
-                          onCheckedChange={setShowPoweredBy}
-                        />
+                      <div className="p-3 rounded-lg bg-muted/50 border border-border">
+                        <p className="text-sm text-muted-foreground">
+                          <span className="font-medium text-foreground">"Powered by TaxForge"</span> attribution is always displayed on embedded calculators.
+                        </p>
                       </div>
                     </CardContent>
                   </Card>
@@ -455,7 +491,7 @@ const PartnerBranding = () => {
                             <Copy className="h-4 w-4" />
                           </Button>
                         </div>
-                        <pre className="p-4 rounded-lg bg-secondary/80 overflow-x-auto text-xs font-mono text-foreground">
+                        <pre className="p-4 rounded-lg bg-secondary/80 overflow-x-auto text-xs font-mono text-foreground whitespace-pre-wrap break-all">
                           {iframeCode}
                         </pre>
                       </div>
@@ -466,7 +502,7 @@ const PartnerBranding = () => {
                             <Copy className="h-4 w-4" />
                           </Button>
                         </div>
-                        <pre className="p-4 rounded-lg bg-secondary/80 overflow-x-auto text-xs font-mono text-foreground">
+                        <pre className="p-4 rounded-lg bg-secondary/80 overflow-x-auto text-xs font-mono text-foreground whitespace-pre-wrap break-all">
                           {embedCode}
                         </pre>
                       </div>

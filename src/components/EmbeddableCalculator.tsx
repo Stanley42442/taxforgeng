@@ -409,15 +409,13 @@ export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate }: Embe
         </div>
       )}
 
-      {/* Powered By */}
-      {theme.showPoweredBy && (
-        <div style={styles.poweredBy}>
-          Powered by{' '}
-          <a href="https://taxforgeng.com" target="_blank" rel="noopener noreferrer" style={styles.poweredByLink}>
-            TaxForge NG
-          </a>
-        </div>
-      )}
+      {/* Powered By - Always shown */}
+      <div style={styles.poweredBy}>
+        Powered by{' '}
+        <a href="https://taxforgeng.com" target="_blank" rel="noopener noreferrer" style={styles.poweredByLink}>
+          TaxForge NG
+        </a>
+      </div>
     </div>
   );
 };
