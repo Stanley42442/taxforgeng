@@ -1675,9 +1675,12 @@ export type Database = {
           is_active: boolean
           last_request_at: string | null
           logo_url: string | null
+          minute_window_start: string | null
           name: string
           primary_color: string | null
           rate_limit_daily: number
+          rate_limit_window_start: string | null
+          requests_this_minute: number | null
           requests_today: number
           requests_total: number
           secondary_color: string | null
@@ -1704,9 +1707,12 @@ export type Database = {
           is_active?: boolean
           last_request_at?: string | null
           logo_url?: string | null
+          minute_window_start?: string | null
           name: string
           primary_color?: string | null
           rate_limit_daily?: number
+          rate_limit_window_start?: string | null
+          requests_this_minute?: number | null
           requests_today?: number
           requests_total?: number
           secondary_color?: string | null
@@ -1733,9 +1739,12 @@ export type Database = {
           is_active?: boolean
           last_request_at?: string | null
           logo_url?: string | null
+          minute_window_start?: string | null
           name?: string
           primary_color?: string | null
           rate_limit_daily?: number
+          rate_limit_window_start?: string | null
+          requests_this_minute?: number | null
           requests_today?: number
           requests_total?: number
           secondary_color?: string | null
