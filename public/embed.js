@@ -67,8 +67,8 @@
     iframe.style.display = 'block';
     iframe.style.margin = '0 auto';
     iframe.loading = 'lazy';
-    iframe.allow = 'clipboard-write';
     iframe.title = 'TaxForge NG Calculator';
+    iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-same-origin');
 
     container.innerHTML = '';
     container.appendChild(iframe);

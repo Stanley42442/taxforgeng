@@ -30,6 +30,14 @@ serve(async (req) => {
       });
     }
 
+    // Validate key format before hitting the database
+    if (!apiKey.startsWith('txf_') || apiKey.length < 20 || apiKey.length > 50) {
+      return new Response(JSON.stringify({ error: 'Invalid API key format' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!

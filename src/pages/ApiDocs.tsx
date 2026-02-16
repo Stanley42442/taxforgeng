@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/taxCalculations";
@@ -23,7 +24,9 @@ import {
   RefreshCw,
   BarChart3,
   Shield,
-  Palette
+  Palette,
+  Globe,
+  Users
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -37,16 +40,24 @@ interface PartnerKey {
   requests_total: number;
   is_active: boolean;
   created_at: string;
+  allowed_origins?: string[];
 }
 
 const ApiDocs = () => {
   const { tier } = useSubscription();
   const { user } = useAuth();
+  const { isAdmin } = useAdminCheck();
   const navigate = useNavigate();
   const [partnerKeys, setPartnerKeys] = useState<PartnerKey[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
+  const [newKeyDomains, setNewKeyDomains] = useState("");
+  const [newKeyRateLimit, setNewKeyRateLimit] = useState("1000");
   const [showNewKeyForm, setShowNewKeyForm] = useState(false);
+  const [showAdminForm, setShowAdminForm] = useState(false);
+  const [adminPartnerName, setAdminPartnerName] = useState("");
+  const [adminDomains, setAdminDomains] = useState("");
+  const [adminRateLimit, setAdminRateLimit] = useState("10000");
   const [demoInput, setDemoInput] = useState({
     turnover: "15000000",
     expenses: "3000000",
@@ -87,7 +98,11 @@ const ApiDocs = () => {
     setIsLoading(true);
     try {
       const apiKey = `txf_${crypto.randomUUID().replace(/-/g, '').slice(0, 32)}`;
-      const apiSecretHash = crypto.randomUUID(); // In production, use proper hashing
+      const apiSecretHash = crypto.randomUUID();
+
+      const domains = newKeyDomains.trim()
+        ? newKeyDomains.split(',').map(d => d.trim()).filter(Boolean)
+        : [];
 
       const { data, error } = await supabase
         .from('partners')
@@ -97,7 +112,8 @@ const ApiDocs = () => {
           api_key: apiKey,
           api_secret_hash: apiSecretHash,
           tier: tier === 'corporate' ? 'pro' : 'basic',
-          rate_limit_daily: tier === 'corporate' ? 10000 : 1000
+          rate_limit_daily: tier === 'corporate' ? 10000 : 10000,
+          allowed_origins: domains.length > 0 ? domains : null,
         })
         .select()
         .single();
@@ -106,11 +122,59 @@ const ApiDocs = () => {
 
       setPartnerKeys(prev => [data, ...prev]);
       setNewKeyName("");
+      setNewKeyDomains("");
       setShowNewKeyForm(false);
       toast.success("API key created successfully! Copy it now - you won't see it again.");
     } catch (error) {
       logger.error('Error creating API key:', error);
       toast.error("Failed to create API key");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const generateAdminPartnerKey = async () => {
+    if (!adminPartnerName.trim()) {
+      toast.error("Please enter the partner's name");
+      return;
+    }
+    if (!adminDomains.trim()) {
+      toast.error("Please enter at least one domain for the partner");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const apiKey = `txf_${crypto.randomUUID().replace(/-/g, '').slice(0, 32)}`;
+      const apiSecretHash = crypto.randomUUID();
+      const domains = adminDomains.split(',').map(d => d.trim()).filter(Boolean);
+      const rateLimit = Math.min(Math.max(parseInt(adminRateLimit, 10) || 1000, 100), 100000);
+
+      const { data, error } = await supabase
+        .from('partners')
+        .insert({
+          user_id: user?.id,
+          name: `[Partner] ${adminPartnerName}`,
+          api_key: apiKey,
+          api_secret_hash: apiSecretHash,
+          tier: 'partner',
+          rate_limit_daily: rateLimit,
+          allowed_origins: domains,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setPartnerKeys(prev => [data, ...prev]);
+      setAdminPartnerName("");
+      setAdminDomains("");
+      setAdminRateLimit("10000");
+      setShowAdminForm(false);
+      toast.success(`Partner key created for ${adminPartnerName}. Copy and send them the embed snippet.`);
+    } catch (error) {
+      logger.error('Error creating partner key:', error);
+      toast.error("Failed to create partner key");
     } finally {
       setIsLoading(false);
     }
@@ -333,14 +397,27 @@ console.log(data.data.totalTaxPayable);`;
 
                 {/* New Key Form */}
                 {showNewKeyForm ? (
-                  <div className="p-4 rounded-lg border border-primary/20 bg-primary/5">
-                    <Label className="text-sm mb-2 block">Key Name</Label>
-                    <div className="flex gap-2">
+                  <div className="p-4 rounded-lg border border-primary/20 bg-primary/5 space-y-3">
+                    <div>
+                      <Label className="text-sm mb-1 block">Key Name</Label>
                       <Input 
                         placeholder="e.g., Production Key, Staging Key"
                         value={newKeyName}
                         onChange={(e) => setNewKeyName(e.target.value)}
                       />
+                    </div>
+                    <div>
+                      <Label className="text-sm mb-1 block">Allowed Domains <span className="text-muted-foreground">(optional, comma-separated)</span></Label>
+                      <Input 
+                        placeholder="e.g., https://example.com, https://app.example.com"
+                        value={newKeyDomains}
+                        onChange={(e) => setNewKeyDomains(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Restrict this key to specific domains. Leave empty to allow all origins.
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
                       <Button onClick={generateApiKey} disabled={isLoading}>
                         {isLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Create'}
                       </Button>
@@ -348,12 +425,9 @@ console.log(data.data.totalTaxPayable);`;
                         Cancel
                       </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Give your key a memorable name to identify it later.
-                    </p>
                   </div>
                 ) : (
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 flex-wrap">
                     <Button variant="hero" onClick={() => setShowNewKeyForm(true)}>
                       <Key className="h-4 w-4" />
                       Create New API Key
@@ -373,6 +447,85 @@ console.log(data.data.totalTaxPayable);`;
               </div>
             )}
           </div>
+
+          {/* Admin Partner Management - only visible to admins */}
+          {isAdmin && (
+            <div className="rounded-2xl border border-accent/30 bg-card p-6 shadow-card mb-6 animate-slide-up">
+              <h2 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                <Users className="h-5 w-5 text-accent" />
+                Admin: Create Partner Keys
+              </h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Generate API keys for external sites. Partners don't need a TaxForge account — you create the key, set their domain, and hand them the embed snippet.
+              </p>
+
+              {showAdminForm ? (
+                <div className="p-4 rounded-lg border border-accent/20 bg-accent/5 space-y-3">
+                  <div>
+                    <Label className="text-sm mb-1 block">Partner Name</Label>
+                    <Input 
+                      placeholder="e.g., Acme Financial Services"
+                      value={adminPartnerName}
+                      onChange={(e) => setAdminPartnerName(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm mb-1 block">Partner Domains <span className="text-destructive">*</span></Label>
+                    <Input 
+                      placeholder="e.g., https://acme.com, https://app.acme.com"
+                      value={adminDomains}
+                      onChange={(e) => setAdminDomains(e.target.value)}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Comma-separated. The key will only work from these domains.
+                    </p>
+                  </div>
+                  <div>
+                    <Label className="text-sm mb-1 block">Daily Rate Limit</Label>
+                    <Input 
+                      type="number"
+                      placeholder="10000"
+                      value={adminRateLimit}
+                      onChange={(e) => setAdminRateLimit(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button onClick={generateAdminPartnerKey} disabled={isLoading}>
+                      {isLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Create Partner Key'}
+                    </Button>
+                    <Button variant="outline" onClick={() => setShowAdminForm(false)}>
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button variant="accent" onClick={() => setShowAdminForm(true)}>
+                  <Globe className="h-4 w-4" />
+                  Create Key for External Partner
+                </Button>
+              )}
+
+              {/* Embed snippet helper */}
+              {partnerKeys.some(k => k.name.startsWith('[Partner]')) && (
+                <div className="mt-4 p-3 rounded-lg bg-secondary/50 border border-border">
+                  <Label className="text-sm mb-2 block">Embed Snippet (send to partner)</Label>
+                  <pre className="p-3 rounded bg-secondary text-xs font-mono overflow-x-auto text-foreground whitespace-pre-wrap">
+{`<div id="taxforge-calculator"></div>
+<script src="https://taxforgeng.com/embed.js"></script>
+<script>
+  TaxForge.init({
+    container: '#taxforge-calculator',
+    apiKey: '${partnerKeys.find(k => k.name.startsWith('[Partner]'))?.api_key || 'PARTNER_API_KEY'}'
+  });
+</script>`}
+                  </pre>
+                  <Button variant="ghost" size="sm" className="mt-2" onClick={() => copyToClipboard(`<div id="taxforge-calculator"></div>\n<script src="https://taxforgeng.com/embed.js"></script>\n<script>\n  TaxForge.init({\n    container: '#taxforge-calculator',\n    apiKey: '${partnerKeys.find(k => k.name.startsWith('[Partner]'))?.api_key || 'PARTNER_API_KEY'}'\n  });\n</script>`)}>
+                    <Copy className="h-4 w-4" /> Copy Snippet
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Endpoints */}
           <div className="rounded-2xl border border-border bg-card p-6 shadow-card mb-6 animate-slide-up">
