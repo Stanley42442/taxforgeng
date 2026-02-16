@@ -290,15 +290,17 @@ const AppShell = () => {
           </div>
         )}
         {!isEmbed && <TierSelectionWrapper />}
-        <Suspense fallback={<PageLoader />}>
-          <LazyRouteErrorBoundary>
-            <AnimatedRoutes />
-            {!isEmbed && <TaxAssistant />}
-          </LazyRouteErrorBoundary>
-          {!isEmbed && <OfflineIndicator />}
-          {!isEmbed && <InstallPWAPrompt />}
+        <main>
+          <Suspense fallback={<PageLoader />}>
+            <LazyRouteErrorBoundary>
+              <AnimatedRoutes />
+              {!isEmbed && <TaxAssistant />}
+            </LazyRouteErrorBoundary>
+            {!isEmbed && <OfflineIndicator />}
+            {!isEmbed && <InstallPWAPrompt />}
           {!isEmbed && <PWAUpdatePrompt />}
         </Suspense>
+        </main>
       </div>
     </>
   );
