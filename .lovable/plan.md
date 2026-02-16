@@ -1,78 +1,85 @@
 
 
-# Embed Security Fixes + Partner Distribution Strategy
+# Security Verification and Admin Access Hardening
 
-## Part 1: Remaining Security Fixes
+## Audit Results
 
-### Fix 1: Add `sandbox` attribute to embed.js iframe
-The iframe created by `embed.js` has no `sandbox` attribute. Adding `sandbox="allow-scripts allow-forms allow-same-origin"` prevents the embedded calculator from navigating the parent page, opening popups, or accessing parent cookies.
+### Fully Implemented (No Changes Needed)
+- Iframe sandbox attribute with `allow-scripts allow-forms allow-same-origin`
+- No `clipboard-write` permission
+- API key format validation (`txf_` prefix, 20-50 chars) in both client and edge function
+- `postMessage` uses specific origin from `document.referrer`, skips if unavailable (no wildcard)
+- Window-based daily rate limiting with auto-reset (no cron dependency)
+- Per-minute burst protection (60 req/min)
+- `Retry-After` headers on 429 responses
+- `requests_total` properly incremented
+- Origin enforcement against `allowed_origins`
+- Only theme/branding data returned to client
 
-### Fix 2: Validate API key format in edge function
-The edge function accepts any string as an API key and hits the database. Adding a format check (`txf_` prefix, correct length) rejects garbage input before it touches the database, reducing load from scanners and bots.
+### Issues to Fix
 
-### Fix 3: Remove `postMessage` wildcard fallback
-`EmbedCalculator.tsx` falls back to `'*'` when `document.referrer` is empty. Instead, it should silently skip sending the message. The calculation result is not sensitive (it's just tax numbers), but the wildcard is unnecessary -- if there's no referrer, there's no legitimate parent listening.
+#### 1. Admin partner creation has no server-side enforcement (HIGH)
+The admin partner management section is hidden with `{isAdmin && (...)}` in the UI, but the underlying function just inserts into the `partners` table using the standard RLS policy (`auth.uid() = user_id`). Any authenticated Business/Corporate user could replicate this insert by calling the database client directly. There is no server-side check that the user is an admin before allowing tier `'partner'` inserts.
 
-### Fix 4: Remove `clipboard-write` permission
-`embed.js` sets `iframe.allow = 'clipboard-write'` which is unnecessary for a calculator widget. Removing it reduces the iframe's capability surface.
+**Fix:** Create a backend function that validates admin role server-side before creating partner keys. The function will use the `has_role()` database function (already exists) to verify the caller is an admin.
 
-### Fix 5: Add API key length validation
-The `apiKey` parameter in `EmbedCalculator.tsx` should be checked for reasonable length before sending to the edge function, preventing excessively long payloads.
+#### 2. Rate limit display is outdated (LOW)
+The "Rate Limits" section at the bottom of ApiDocs still shows "1,000 requests/day (Basic)" but the actual database default is now 10,000.
 
-### Fix 6: Rate limit default for `business` tier
-`ApiDocs.tsx` line 100 sets `rate_limit_daily: 1000` for `business` tier (only `corporate` gets 10,000). This should be updated to use the new tiered defaults (10,000 for business).
+**Fix:** Update the displayed rate limit tiers to match the current defaults.
 
-## Part 2: Partner Distribution Strategy
+## Implementation
 
-Currently, only Business/Corporate tier users can generate API keys. This means if you want to distribute the embed widget to external sites, you have two realistic options:
+### Step 1: Create an edge function for admin partner key creation
+Create `supabase/functions/create-partner-key/index.ts` that:
+- Validates the caller's JWT
+- Checks `has_role(user_id, 'admin')` using the existing database function
+- Returns 403 if not admin
+- Creates the partner record server-side
+- Returns the new key
 
-### Option A: You generate keys for them (recommended to start)
-You keep one Business/Corporate account, generate API keys from your `/api-docs` page, set each key's `allowed_origins` to the partner's domain, and hand them the embed snippet. The partner never needs a TaxForge account. You control everything.
+### Step 2: Update ApiDocs.tsx
+- Replace the direct Supabase insert in `generateAdminPartnerKey` with a call to the new edge function
+- Update the rate limit display text (1,000 to 10,000 for Basic, add the actual tiers)
 
-### Option B: Add an admin function to create partner keys
-Create a simple admin-only edge function or page that lets you (as admin) generate API keys for any partner without them needing an account. You'd enter:
-- Partner name
-- Their website domain(s)  
-- Daily rate limit tier
+### Step 3: Add RLS policy to prevent non-admin partner-tier inserts
+Add a database check constraint or RLS policy that prevents inserting rows with `tier = 'partner'` unless the user has the admin role. This provides defense-in-depth even if someone bypasses the edge function.
 
-This gives you a clean management workflow without requiring partners to sign up at all.
+## Files to Create/Modify
 
-**We will implement Option B** -- an "Admin Partner Management" section on your existing API Docs page that lets you create keys for external partners with their domain restrictions pre-configured.
-
-## Files to Modify
-
-| File | Changes |
-|------|---------|
-| `public/embed.js` | Add `sandbox` attribute, remove `clipboard-write` |
-| `src/pages/EmbedCalculator.tsx` | Remove `'*'` fallback, add key length validation |
-| `supabase/functions/validate-embed-key/index.ts` | Add `txf_` prefix + length validation |
-| `src/pages/ApiDocs.tsx` | Fix business tier rate limit default, add admin partner creation section with domain input |
+| File | Action | Description |
+|------|--------|-------------|
+| `supabase/functions/create-partner-key/index.ts` | Create | Admin-only edge function for creating partner keys |
+| `src/pages/ApiDocs.tsx` | Modify | Use edge function for admin key creation; update rate limit display |
+| Database migration | Create | Add RLS policy restricting `tier = 'partner'` inserts to admins |
 
 ## Technical Details
 
-### embed.js sandbox attribute
-```javascript
-iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-same-origin');
+### Edge function: create-partner-key
+```text
+1. Validate JWT via getClaims()
+2. Query has_role(user_id, 'admin') -- returns boolean
+3. If not admin -> 403
+4. Validate input (partner name, domains, rate limit)
+5. Generate txf_ key
+6. Insert into partners with tier='partner'
+7. Return the new partner record
 ```
-`allow-same-origin` is needed so the iframe can call the edge function (cross-origin fetch). `allow-scripts` runs the React app. `allow-forms` allows the calculator input fields.
 
-### API key format validation (edge function)
-```typescript
-if (!apiKey.startsWith('txf_') || apiKey.length < 20 || apiKey.length > 50) {
-  return 401 "Invalid API key format"
-}
+### RLS policy addition
+```sql
+-- Prevent non-admins from creating partner-tier keys
+CREATE POLICY "Only admins can create partner keys"
+ON public.partners
+FOR INSERT
+TO authenticated
+WITH CHECK (
+  tier != 'partner' OR public.has_role(auth.uid(), 'admin')
+);
 ```
-This rejects random strings before they hit the database.
+This replaces the existing INSERT policy so that regular users can still create their own keys (non-partner tier), but only admins can create partner-tier keys.
 
-### Admin partner creation
-The existing API Docs page will get an additional form field for "Partner Domain(s)" so when you generate a key for an external site, you can set their allowed origins at creation time. The key is then ready to hand to the partner along with the embed code snippet.
-
-### postMessage fix
-```typescript
-const targetOrigin = getTargetOrigin();
-if (targetOrigin !== '*') {
-  window.parent.postMessage({ type: 'taxforge-calculation', data: result }, targetOrigin);
-}
-```
-If no referrer is available, skip the postMessage entirely rather than broadcasting to all origins.
-
+### Rate limit display update
+- Basic: 10,000 requests/day
+- Pro: 100,000 requests/day
+- Enterprise/Partner: Custom limits
