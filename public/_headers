@@ -1,3 +1,8 @@
+# Allow embed routes to be loaded in iframes on any domain
+/embed/*
+  X-Frame-Options: ALLOWALL
+  Content-Security-Policy: frame-ancestors *
+
 # Cache hashed assets for 1 year (filenames change on every build)
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
