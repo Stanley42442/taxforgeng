@@ -83,3 +83,6 @@ verify_jwt = false
 
 [functions.validate-embed-key]
 verify_jwt = false
+
+[functions.create-partner-key]
+verify_jwt = false

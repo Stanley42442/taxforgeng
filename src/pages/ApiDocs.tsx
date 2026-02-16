@@ -145,36 +145,29 @@ const ApiDocs = () => {
 
     setIsLoading(true);
     try {
-      const apiKey = `txf_${crypto.randomUUID().replace(/-/g, '').slice(0, 32)}`;
-      const apiSecretHash = crypto.randomUUID();
       const domains = adminDomains.split(',').map(d => d.trim()).filter(Boolean);
-      const rateLimit = Math.min(Math.max(parseInt(adminRateLimit, 10) || 1000, 100), 100000);
+      const rateLimit = Math.min(Math.max(parseInt(adminRateLimit, 10) || 10000, 100), 100000);
 
-      const { data, error } = await supabase
-        .from('partners')
-        .insert({
-          user_id: user?.id,
-          name: `[Partner] ${adminPartnerName}`,
-          api_key: apiKey,
-          api_secret_hash: apiSecretHash,
-          tier: 'partner',
-          rate_limit_daily: rateLimit,
-          allowed_origins: domains,
-        })
-        .select()
-        .single();
+      const { data, error } = await supabase.functions.invoke('create-partner-key', {
+        body: {
+          partnerName: adminPartnerName.trim(),
+          domains,
+          rateLimit,
+        },
+      });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
-      setPartnerKeys(prev => [data, ...prev]);
+      setPartnerKeys(prev => [data.data, ...prev]);
       setAdminPartnerName("");
       setAdminDomains("");
       setAdminRateLimit("10000");
       setShowAdminForm(false);
       toast.success(`Partner key created for ${adminPartnerName}. Copy and send them the embed snippet.`);
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Error creating partner key:', error);
-      toast.error("Failed to create partner key");
+      toast.error(error?.message || "Failed to create partner key");
     } finally {
       setIsLoading(false);
     }
@@ -676,9 +669,9 @@ console.log(data.data.totalTaxPayable);`;
           <div className="mt-6 p-4 rounded-lg bg-secondary/50 border border-border">
             <h3 className="font-medium text-foreground mb-2">Rate Limits</h3>
             <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• 1,000 requests/day (Basic tier)</li>
-              <li>• 10,000 requests/day (Pro tier)</li>
-              <li>• Custom limits (Enterprise) - Contact sales</li>
+              <li>• 10,000 requests/day (Basic tier)</li>
+              <li>• 100,000 requests/day (Pro tier)</li>
+              <li>• Custom limits (Enterprise/Partner) - Contact sales</li>
             </ul>
           </div>
 
