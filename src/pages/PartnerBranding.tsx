@@ -126,16 +126,59 @@ const PartnerBranding = () => {
     setAllowedDomains(partner.embed_allowed_domains?.join(', ') || '');
   };
 
+  // Validation helpers
+  const DOMAIN_REGEX = /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*(\.[a-zA-Z]{2,})(:\d{1,5})?$/;
+  const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'];
+  const ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg', 'svg', 'webp'];
+
+  const validateUrl = (url: string): boolean => {
+    if (!url) return true; // empty is OK
+    try {
+      const parsed = new URL(url);
+      return parsed.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  };
+
   const saveTheme = async () => {
     if (!selectedPartner) return;
-    
+
+    // Validate inputs
+    if (brandName.length > 100) {
+      toast.error('Brand name must be 100 characters or less');
+      return;
+    }
+    if (logoUrl && !validateUrl(logoUrl)) {
+      toast.error('Logo URL must be a valid HTTPS URL');
+      return;
+    }
+    if (logoUrl.length > 500) {
+      toast.error('Logo URL must be 500 characters or less');
+      return;
+    }
+    if (allowedDomains.trim()) {
+      const domains = allowedDomains.split(',').map(d => d.trim()).filter(Boolean);
+      for (const d of domains) {
+        if (!DOMAIN_REGEX.test(d)) {
+          toast.error(`Invalid domain format: "${d}". Use format: example.com`);
+          return;
+        }
+      }
+    }
+    const br = parseInt(borderRadius, 10);
+    if (isNaN(br) || br < 0 || br > 32) {
+      toast.error('Border radius must be between 0 and 32');
+      return;
+    }
+
     setSaving(true);
     try {
       const { error } = await supabase
         .from('partners')
         .update({
-          brand_name: brandName || null,
-          logo_url: logoUrl || null,
+          brand_name: brandName.trim() || null,
+          logo_url: logoUrl.trim() || null,
           primary_color: primaryColor,
           secondary_color: secondaryColor,
           accent_color: accentColor,
@@ -144,7 +187,7 @@ const PartnerBranding = () => {
           border_radius: borderRadius,
           font_family: fontFamily,
           show_powered_by: showPoweredBy,
-          embed_allowed_domains: allowedDomains ? allowedDomains.split(',').map(d => d.trim()) : null
+          embed_allowed_domains: allowedDomains ? allowedDomains.split(',').map(d => d.trim()).filter(Boolean) : null
         })
         .eq('id', selectedPartner.id);
 
@@ -293,6 +336,7 @@ const PartnerBranding = () => {
                           placeholder="Your Company Name"
                           value={brandName}
                           onChange={(e) => setBrandName(e.target.value)}
+                          maxLength={100}
                         />
                       </div>
                       <div>
@@ -303,6 +347,7 @@ const PartnerBranding = () => {
                             value={logoUrl}
                             onChange={(e) => setLogoUrl(e.target.value)}
                             className="flex-1"
+                            maxLength={500}
                           />
                           <Button
                             variant="outline"
@@ -321,12 +366,25 @@ const PartnerBranding = () => {
                             onChange={async (e) => {
                               const file = e.target.files?.[0];
                               if (!file || !selectedPartner || !user) return;
+                              // Validate MIME type
+                              if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+                                toast.error('Only PNG, JPEG, SVG, and WebP images are allowed');
+                                e.target.value = '';
+                                return;
+                              }
                               if (file.size > 2 * 1024 * 1024) {
                                 toast.error('Logo must be under 2MB');
+                                e.target.value = '';
+                                return;
+                              }
+                              // Validate file extension
+                              const ext = file.name.split('.').pop()?.toLowerCase();
+                              if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
+                                toast.error('Invalid file extension. Allowed: png, jpg, jpeg, svg, webp');
+                                e.target.value = '';
                                 return;
                               }
                               try {
-                                const ext = file.name.split('.').pop();
                                 const path = `logos/${user.id}/${selectedPartner.id}.${ext}`;
                                 const { error: uploadError } = await supabase.storage
                                   .from('partner-assets')
@@ -512,6 +570,7 @@ const PartnerBranding = () => {
                           placeholder="yoursite.com, app.yoursite.com"
                           value={allowedDomains}
                           onChange={(e) => setAllowedDomains(e.target.value)}
+                          maxLength={500}
                         />
                         <p className="text-xs text-muted-foreground mt-1">
                           Leave empty to allow all domains

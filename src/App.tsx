@@ -266,6 +266,44 @@ const AnimatedRoutes = () => {
   );
 };
 
+// Helper to detect embed routes
+const useIsEmbedRoute = () => {
+  const location = useLocation();
+  return location.pathname.startsWith('/embed/');
+};
+
+// App shell that hides nav/chrome on embed routes
+const AppShell = () => {
+  const isEmbed = useIsEmbedRoute();
+
+  return (
+    <>
+      <ScrollToTop />
+      <ReminderNotificationProvider />
+      {!isEmbed && <StorageWarningBanner />}
+      {!isEmbed && <OfflineBanner />}
+      <div className="min-h-screen">
+        {!isEmbed && (
+          <div className="sticky-header-wrapper">
+            <NavMenu />
+            <TrialBanner />
+          </div>
+        )}
+        {!isEmbed && <TierSelectionWrapper />}
+        <Suspense fallback={<PageLoader />}>
+          <LazyRouteErrorBoundary>
+            <AnimatedRoutes />
+            {!isEmbed && <TaxAssistant />}
+          </LazyRouteErrorBoundary>
+          {!isEmbed && <OfflineIndicator />}
+          {!isEmbed && <InstallPWAPrompt />}
+          {!isEmbed && <PWAUpdatePrompt />}
+        </Suspense>
+      </div>
+    </>
+  );
+};
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -282,26 +320,9 @@ const App = () => (
                     <Sonner />
                     <BrowserRouter>
                       <UpgradeCelebrationProvider>
-                        <ScrollToTop />
-                        <ReminderNotificationProvider />
-                        <StorageWarningBanner />
-                        <OfflineBanner />
-                        <div className="min-h-screen">
-                          <div className="sticky-header-wrapper">
-                            <NavMenu />
-                            <TrialBanner />
-                          </div>
-                          <TierSelectionWrapper />
-                          <Suspense fallback={<PageLoader />}>
-                            <LazyRouteErrorBoundary>
-                              <AnimatedRoutes />
-                              <TaxAssistant />
-                            </LazyRouteErrorBoundary>
-                            <OfflineIndicator />
-                            <InstallPWAPrompt />
-                            <PWAUpdatePrompt />
-                          </Suspense>
-                        </div>
+                        <SharedElementProvider>
+                          <AppShell />
+                        </SharedElementProvider>
                       </UpgradeCelebrationProvider>
                     </BrowserRouter>
                   </>

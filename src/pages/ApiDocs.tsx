@@ -90,45 +90,59 @@ const ApiDocs = () => {
     }
   };
 
+  // HTML-escape helper for code snippet sanitization
+  const escapeHtml = (str: string) =>
+    str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+  // Domain format validation
+  const DOMAIN_REGEX = /^https?:\/\/[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*(\.[a-zA-Z]{2,})(:\d{1,5})?(\/.*)?$/;
+
+  const validateDomains = (domainsStr: string): string | null => {
+    if (!domainsStr.trim()) return null;
+    const domains = domainsStr.split(',').map(d => d.trim()).filter(Boolean);
+    for (const d of domains) {
+      if (!DOMAIN_REGEX.test(d)) return `Invalid domain: "${d}". Use format: https://example.com`;
+    }
+    return null;
+  };
+
   const generateApiKey = async () => {
     if (!newKeyName.trim()) {
       toast.error("Please enter a name for your API key");
       return;
     }
+    if (newKeyName.trim().length > 100) {
+      toast.error("Key name must be 100 characters or less");
+      return;
+    }
+
+    const domainError = validateDomains(newKeyDomains);
+    if (domainError) {
+      toast.error(domainError);
+      return;
+    }
 
     setIsLoading(true);
     try {
-      const apiKey = `txf_${crypto.randomUUID().replace(/-/g, '').slice(0, 32)}`;
-      const apiSecretHash = crypto.randomUUID();
-
       const domains = newKeyDomains.trim()
         ? newKeyDomains.split(',').map(d => d.trim()).filter(Boolean)
         : [];
 
-      const { data, error } = await supabase
-        .from('partners')
-        .insert({
-          user_id: user?.id,
-          name: newKeyName,
-          api_key: apiKey,
-          api_secret_hash: apiSecretHash,
-          tier: tier === 'corporate' ? 'pro' : 'basic',
-          rate_limit_daily: tier === 'corporate' ? 100000 : 10000,
-          allowed_origins: domains.length > 0 ? domains : null,
-        })
-        .select()
-        .single();
+      const { data, error } = await supabase.functions.invoke('generate-api-key', {
+        body: { name: newKeyName.trim(), domains: domains.length > 0 ? domains : undefined },
+      });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
-      setPartnerKeys(prev => [data, ...prev]);
+      setPartnerKeys(prev => [data.data, ...prev]);
       setNewKeyName("");
       setNewKeyDomains("");
       setShowNewKeyForm(false);
       toast.success("API key created successfully! Copy it now - you won't see it again.");
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Error creating API key:', error);
-      toast.error("Failed to create API key");
+      toast.error(error?.message || "Failed to create API key");
     } finally {
       setIsLoading(false);
     }
@@ -139,8 +153,17 @@ const ApiDocs = () => {
       toast.error("Please enter the partner's name");
       return;
     }
+    if (adminPartnerName.trim().length > 100) {
+      toast.error("Partner name must be 100 characters or less");
+      return;
+    }
     if (!adminDomains.trim()) {
       toast.error("Please enter at least one domain for the partner");
+      return;
+    }
+    const domainError = validateDomains(adminDomains);
+    if (domainError) {
+      toast.error(domainError);
       return;
     }
 
@@ -284,7 +307,8 @@ const ApiDocs = () => {
     }
   };
 
-  const activeKey = partnerKeys.find(k => k.is_active)?.api_key || 'YOUR_API_KEY';
+  const rawActiveKey = partnerKeys.find(k => k.is_active)?.api_key || 'YOUR_API_KEY';
+  const activeKey = escapeHtml(rawActiveKey);
 
   const sampleCode = `// Node.js Example
 const response = await fetch('${import.meta.env.VITE_SUPABASE_URL}/functions/v1/partner-api/calculate', {
@@ -398,6 +422,7 @@ console.log(data.data.totalTaxPayable);`;
                         placeholder="e.g., Production Key, Staging Key"
                         value={newKeyName}
                         onChange={(e) => setNewKeyName(e.target.value)}
+                        maxLength={100}
                       />
                     </div>
                     <div>
@@ -406,6 +431,7 @@ console.log(data.data.totalTaxPayable);`;
                         placeholder="e.g., https://example.com, https://app.example.com"
                         value={newKeyDomains}
                         onChange={(e) => setNewKeyDomains(e.target.value)}
+                        maxLength={500}
                       />
                       <p className="text-xs text-muted-foreground mt-1">
                         Restrict this key to specific domains. Leave empty to allow all origins.
@@ -461,6 +487,7 @@ console.log(data.data.totalTaxPayable);`;
                       placeholder="e.g., Acme Financial Services"
                       value={adminPartnerName}
                       onChange={(e) => setAdminPartnerName(e.target.value)}
+                      maxLength={100}
                     />
                   </div>
                   <div>
@@ -469,6 +496,7 @@ console.log(data.data.totalTaxPayable);`;
                       placeholder="e.g., https://acme.com, https://app.acme.com"
                       value={adminDomains}
                       onChange={(e) => setAdminDomains(e.target.value)}
+                      maxLength={500}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
                       Comma-separated. The key will only work from these domains.
@@ -479,6 +507,8 @@ console.log(data.data.totalTaxPayable);`;
                     <Input 
                       type="number"
                       placeholder="10000"
+                      min="100"
+                      max="100000"
                       value={adminRateLimit}
                       onChange={(e) => setAdminRateLimit(e.target.value)}
                     />
