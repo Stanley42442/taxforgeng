@@ -147,18 +147,20 @@ const Index = () => {
 
               {/* Carousel Controls */}
               <div className="flex items-center justify-center mt-6">
-                <div className="flex gap-2">
+                <div className="flex gap-0">
                   {CAROUSEL_ITEMS.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => scrollTo(index)}
-                      className={`h-2 rounded-full transition-all duration-500 ${
+                      className="p-2 flex items-center justify-center"
+                      aria-label={`Go to slide ${index + 1}`}
+                    >
+                      <span className={`block h-2 rounded-full transition-all duration-500 ${
                         index === currentSlide 
                           ? 'w-8 bg-primary glow-primary' 
                           : 'w-2 bg-border hover:bg-muted-foreground'
-                      }`}
-                      aria-label={`Go to slide ${index + 1}`}
-                    />
+                      }`} />
+                    </button>
                   ))}
                 </div>
               </div>
