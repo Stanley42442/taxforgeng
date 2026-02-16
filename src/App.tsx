@@ -24,7 +24,7 @@ import { OfflineDataProvider } from "@/contexts/OfflineDataContext";
 import { StorageWarningBanner } from "@/components/StorageWarningBanner";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import "@/styles/print.css";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Navigate } from "react-router-dom";
 
@@ -272,9 +272,25 @@ const useIsEmbedRoute = () => {
   return location.pathname.startsWith('/embed/');
 };
 
+// Defer heavy components until browser is idle
+const useDeferredRender = (delay = 3000) => {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    if ('requestIdleCallback' in window) {
+      const id = (window as any).requestIdleCallback(() => setReady(true), { timeout: delay });
+      return () => (window as any).cancelIdleCallback(id);
+    } else {
+      const id = setTimeout(() => setReady(true), delay);
+      return () => clearTimeout(id);
+    }
+  }, [delay]);
+  return ready;
+};
+
 // App shell that hides nav/chrome on embed routes
 const AppShell = () => {
   const isEmbed = useIsEmbedRoute();
+  const showAssistant = useDeferredRender(3000);
 
   return (
     <>
@@ -294,7 +310,7 @@ const AppShell = () => {
           <Suspense fallback={<PageLoader />}>
             <LazyRouteErrorBoundary>
               <AnimatedRoutes />
-              {!isEmbed && <TaxAssistant />}
+              {!isEmbed && showAssistant && <TaxAssistant />}
             </LazyRouteErrorBoundary>
             {!isEmbed && <OfflineIndicator />}
             {!isEmbed && <InstallPWAPrompt />}
