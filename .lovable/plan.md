@@ -1,93 +1,149 @@
-# Fix API Docs, Admin Partner Keys, Mobile Embed, Logo Upload, and Powered By Link
 
-## Issues Identified
 
-1. **No embed instructions on the API page** -- The API Docs page shows endpoints and code examples but has no section explaining how to embed the calculator widget on a client website.
-2. **Admin "Create Partner Keys" is broken** -- The edge function uses `supabase.auth.getClaims(token)` which is not a valid Supabase JS method. This causes a runtime error every time.
-3. **Mobile layout issue on Embed tab** -- In the White-Label Branding page, the Embed tab content does not fit properly on mobile screens unlike the Branding and Colors tabs. The `pre` blocks with embed code overflow.
-4. **Logo should be uploadable** -- Currently the Logo field is a plain URL text input. Users should be able to upload an image file directly.
-5. **"Powered by TaxForge" must not be deactivatable** -- The `showPoweredBy` switch currently lets users turn off the attribution. This toggle should be removed; the link should always show.
+# Security Hardening and Mobile Verification Plan
+
+## Security Issues Found
+
+### 1. Client-Side API Key Generation is Insecure
+**File**: `src/pages/ApiDocs.tsx` (lines 93-135)
+
+Non-admin users generate API keys entirely client-side using `crypto.randomUUID()` and insert directly via Supabase client. This means:
+- The API key is generated in the browser (predictable environment)
+- The `api_secret_hash` is just a random UUID, not an actual hash
+- There is no server-side validation of the user's subscription tier
+
+**Fix**: Move non-admin key generation to a new edge function (`generate-api-key`) that validates the user's subscription tier server-side before creating the key. This mirrors the pattern already used for admin key creation.
+
+### 2. Missing Input Sanitization on Brand Name and Logo URL
+**File**: `src/pages/PartnerBranding.tsx`
+
+- `brandName` is saved directly without length limits or character restrictions
+- `logoUrl` accepts any string without URL validation
+- `borderRadius` has HTML min/max but no server-side bounds check
+- `allowedDomains` field has no validation for valid domain format
+
+**Fix**: Add client-side validation with length limits (brand name: 100 chars, logo URL: 500 chars), URL format validation for logo, and domain format validation. Add corresponding server-side checks in the `saveTheme` function.
+
+### 3. Missing Input Sanitization on API Docs Forms
+**File**: `src/pages/ApiDocs.tsx`
+
+- `newKeyName` has no length limit (lines 397-401)
+- `newKeyDomains` has no domain format validation
+- `adminPartnerName` has no length limit
+- `adminRateLimit` allows any numeric input (no bounds check on client)
+
+**Fix**: Add `maxLength` attributes and validation before submission. Validate domain formats with a regex pattern.
+
+### 4. Embed Calculator Route Shows Nav/Header
+**File**: `src/pages/EmbedCalculator.tsx`
+
+The embed route (`/embed/calculator`) renders inside the app shell with the TaxForge header and navigation visible. When embedded in an iframe on a third-party site, the full app chrome should not appear.
+
+**Fix**: The embed route should bypass `PageLayout` and render without the app shell. Check if `App.tsx` wraps it in a layout -- it currently renders at the route level without `PageLayout`, but the app shell (NavMenu, footer) still renders around it. Add a check in the app shell to hide chrome when on the embed route.
+
+### 5. Logo Upload Missing File Type Validation on Server Side
+**File**: `src/pages/PartnerBranding.tsx` (lines 316-345)
+
+The file input has `accept` attribute for client-side filtering, but the upload goes directly to storage without MIME type verification. A user could bypass the `accept` attribute and upload non-image files.
+
+**Fix**: Add MIME type validation before uploading (check `file.type` starts with `image/`). The file extension extraction is also naive (`file.name.split('.').pop()`) -- validate it against an allowlist.
+
+### 6. XSS Risk in Embed Code Display
+**File**: `src/pages/ApiDocs.tsx`, `src/pages/PartnerBranding.tsx`
+
+The API key is interpolated directly into embed code snippets that are displayed in `pre` tags. While `pre` tags don't execute scripts, the `copyToClipboard` function copies the raw string. If an API key were somehow manipulated to contain script tags, the copied snippet could be malicious when pasted into a third-party site.
+
+**Risk Level**: LOW (API keys are generated server-side with `txf_` prefix and UUID format), but defense-in-depth says we should HTML-encode the output.
+
+**Fix**: Ensure API key values are sanitized before interpolation into code snippets.
+
+### 7. Storage Policies are Correct
+The storage policies for `partner-assets` are properly scoped:
+- INSERT: scoped to `logos/{auth.uid()}/` path
+- DELETE: scoped to `logos/{auth.uid()}/` path
+- SELECT: public (required for iframe access)
+
+No changes needed.
+
+### 8. Partners RLS Policies are Correct
+- SELECT: `auth.uid() = user_id`
+- INSERT: `auth.uid() = user_id AND (tier != 'partner' OR has_role(admin))`
+- UPDATE/DELETE: `auth.uid() = user_id`
+
+No changes needed.
+
+## Mobile Issues Found
+
+### 9. API Docs Page -- Mobile Layout OK
+The API Docs page renders correctly on mobile (390px). Code blocks already have `whitespace-pre-wrap break-all`. No issues observed.
+
+### 10. Embed Calculator Shows App Shell in iframe
+When visiting `/embed/calculator`, the full app navigation bar and TaxForge header appear. This must be hidden for embedded usage.
+
+**Fix**: In `App.tsx` or the nav component, detect the `/embed/` path prefix and hide the navigation shell.
 
 ---
 
-## Changes
+## Implementation Steps
 
-### 1. Add Embed Instructions to API Docs Page (`src/pages/ApiDocs.tsx`)
+### Step 1: Create `generate-api-key` edge function
+Move API key generation to server-side for non-admin users:
+- Validate JWT authentication
+- Verify subscription tier (business/corporate) via database
+- Generate key server-side
+- Insert with correct tier-based rate limits
+- Return the created key
 
-Add a new "Embed Calculator" section between the API Keys and Endpoints sections. It will contain:
+### Step 2: Add input validation to `ApiDocs.tsx`
+- Add `maxLength={100}` to key name input
+- Add `maxLength={500}` to domains input
+- Validate domain format before submission
+- Replace client-side key generation with edge function call
 
-- A brief explanation of how the embeddable widget works
-- The iframe embed snippet (using the user's first active API key)
-- The JavaScript SDK embed snippet
-- A link to the White-Label Branding page for customization
-- Instructions on how to actually add the embeddable widget on the client website
+### Step 3: Add input validation to `PartnerBranding.tsx`
+- Add `maxLength={100}` to brand name input
+- Add `maxLength={500}` to logo URL input
+- Validate logo URL format (must be valid URL starting with `https://`)
+- Validate MIME type before logo upload (`image/png`, `image/jpeg`, `image/svg+xml`, `image/webp`)
+- Validate file extension against allowlist
+- Add `maxLength={500}` to allowed domains input
 
-### 2. Fix `create-partner-key` Edge Function (`supabase/functions/create-partner-key/index.ts`)
+### Step 4: Hide app shell on embed routes
+- In the navigation/layout component, detect when the current path starts with `/embed/` and hide the nav bar, header, and footer
+- This ensures the embedded calculator renders cleanly in iframes
 
-Replace the broken `getClaims` call with the standard `supabase.auth.getUser()` pattern:
+### Step 5: Sanitize API key interpolation
+- Create a helper function to escape special characters in API keys before interpolating into code snippets
 
-```typescript
-// Replace getClaims with getUser
-const { data: { user }, error: authError } = await supabase.auth.getUser();
-if (authError || !user) {
-  return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, ... });
-}
-const userId = user.id;
-```
-
-This follows the same pattern used successfully in other edge functions (tax-assistant, expense-insights, etc.).
-
-### 3. Fix Mobile Layout on Embed Tab (`src/pages/PartnerBranding.tsx`)
-
-Add responsive overflow handling to the `pre` blocks in the Embed tab:
-
-- Add `whitespace-pre-wrap break-all` classes to prevent horizontal overflow
-- Ensure the embed code blocks wrap properly on narrow screens, matching the behavior of the other two tabs
-
-### 4. Add Logo Upload (`src/pages/PartnerBranding.tsx`)
-
-- Create a `partner-assets` storage bucket via a database migration
-- Add a file input button next to the existing Logo URL field
-- On file selection, upload to the storage bucket under `logos/{partnerId}/{filename}`
-- Auto-populate the Logo URL field with the public URL after upload
-- Keep the manual URL input as a fallback option
-
-### 5. Remove "Powered by TaxForge" Toggle
-
-`**src/pages/PartnerBranding.tsx**`: Remove the Switch toggle and its surrounding `div` (lines 331-342). Replace with a static notice explaining the attribution is always shown.
-
-`**src/components/EmbeddableCalculator.tsx**`: Remove the `showPoweredBy` conditional (line 413). Always render the "Powered by TaxForge NG" link regardless of the theme setting.
-
-`**supabase/functions/validate-embed-key/index.ts**`: Always return `showPoweredBy: true` in the response, ignoring the database value.
-
-### 6. Database Migration
-
-```sql
--- Create storage bucket for partner logo uploads
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('partner-assets', 'partner-assets', true);
-
--- Allow authenticated users to upload to their own partner folder
-CREATE POLICY "Users can upload partner logos"
-ON storage.objects FOR INSERT TO authenticated
-WITH CHECK (bucket_id = 'partner-assets');
-
--- Allow public read access for logos
-CREATE POLICY "Public can view partner assets"
-ON storage.objects FOR SELECT TO public
-USING (bucket_id = 'partner-assets');
-
--- Allow authenticated users to update/delete their uploads
-CREATE POLICY "Users can manage their partner assets"
-ON storage.objects FOR DELETE TO authenticated
-USING (bucket_id = 'partner-assets');
-```
+### Step 6: Deploy and verify
+- Deploy the new `generate-api-key` edge function
+- Test mobile views for API Docs, Partner Branding (all 3 tabs), and Embed Calculator
+- Verify the embed route renders without app chrome
 
 ---
 
-## Technical Notes
+## Technical Details
 
-- The `getClaims` bug is the root cause of the admin partner key creation failure. No other endpoint uses this method.
-- The `showPoweredBy` column remains in the database but is effectively ignored -- no migration needed to remove it.
-- The storage bucket is set to public so logo URLs work in the embedded iframe on third-party sites without auth.
-- The embed instructions on the API page use the same snippet format already present in the admin section, just made visible to all Business/Corporate users.
+### New Edge Function: `supabase/functions/generate-api-key/index.ts`
+```text
+POST /generate-api-key
+Auth: Bearer JWT (required)
+Body: { name: string, domains?: string[] }
+Response: { data: PartnerRecord }
+
+Validation:
+- name: required, string, max 100 chars, trimmed
+- domains: optional array, each item must be valid URL or domain
+- Rate limit based on subscription tier lookup
+```
+
+### Files Modified
+1. `supabase/functions/generate-api-key/index.ts` -- NEW
+2. `src/pages/ApiDocs.tsx` -- input validation, server-side key generation
+3. `src/pages/PartnerBranding.tsx` -- input validation, MIME checks
+4. `src/components/NavMenu.tsx` (or equivalent layout) -- hide on embed routes
+5. `src/pages/EmbedCalculator.tsx` -- minor cleanup if needed
+
+### No Database Changes Required
+All existing RLS policies and storage policies are correctly configured.
+
