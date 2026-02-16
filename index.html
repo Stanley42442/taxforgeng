@@ -264,11 +264,23 @@
       </div>
     </noscript>
     <div id="root">
-      <!-- Initial loading state - replaced when React mounts -->
-      <div id="initial-loader" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f8faf9;">
-        <div style="text-align:center;">
-          <div id="loader-spinner" style="width:48px;height:48px;border:3px solid #e5e7eb;border-top-color:#16a34a;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
-          <p id="loader-text" style="color:#6b7280;font-family:system-ui;margin:0;">Loading TaxForge...</p>
+      <!-- Static shell matching NavMenu layout - paints LCP element ("TaxForge NG") instantly before React mounts -->
+      <div id="initial-loader" style="min-height:100vh;background:#f8faf9;">
+        <header style="border-bottom:1px solid #e5e7eb;background:#fff;">
+          <div style="max-width:80rem;margin:0 auto;padding:0 1rem;">
+            <nav style="display:flex;align-items:center;height:3.5rem;">
+              <a href="/" style="display:flex;align-items:center;gap:0.5rem;text-decoration:none;">
+                <div style="width:2rem;height:2rem;border-radius:0.5rem;background:linear-gradient(135deg,#16a34a,#15803d);"></div>
+                <span style="font-size:1rem;font-weight:700;color:#0a0a0b;font-family:system-ui,-apple-system,sans-serif;">TaxForge NG</span>
+              </a>
+            </nav>
+          </div>
+        </header>
+        <div style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 3.5rem);">
+          <div style="text-align:center;">
+            <div id="loader-spinner" style="width:48px;height:48px;border:3px solid #e5e7eb;border-top-color:#16a34a;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
+            <p id="loader-text" style="color:#6b7280;font-family:system-ui;margin:0;">Loading TaxForge...</p>
+          </div>
         </div>
       </div>
       <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
