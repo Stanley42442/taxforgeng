@@ -1,68 +1,51 @@
 
 
-# Fix: Take-Home Pay Accuracy + Noscript Corrections
+# Create `public/embed.js` — JavaScript SDK for Embeddable Calculator
 
-## Problem Found
+## Problem
 
-The "Salary After Tax" page has an accuracy bug: the take-home pay column in the salary comparison table and the QuickTaxCalculator "Net Pay" figure show **gross minus tax** but forget to subtract the **8% pension deduction**, which is a real paycheck deduction. This makes the numbers appear ~8% higher than reality and contradicts the hardcoded breakdown example on the same page.
+The Partner Branding page (`/partner-branding`) provides a "Script Embed" code snippet that references `public/embed.js`, but this file does not exist. Partners copying the snippet get a 404, making the JavaScript SDK integration method broken.
 
-Additionally, the noscript fallback has minor inaccuracies.
+## Solution
 
-## What Needs to Change
+Create a single file: `public/embed.js`
 
-### 1. Fix salary band table calculation (SalaryAfterTax.tsx line 37)
+This is a lightweight, zero-dependency vanilla JS script (~80 lines) that:
 
-Change:
-```
-monthlyNet: Math.round((annual - result.taxPayable) / 12)
-```
-To:
-```
-monthlyNet: Math.round((annual - pension - result.taxPayable) / 12)
-```
+1. Exposes a global `TaxForge.init()` method matching the snippet already shown on the Partner Branding page
+2. Dynamically creates an iframe pointing to `/embed/calculator?key=PARTNER_KEY`
+3. Listens for `postMessage` events from the iframe to relay calculation results via an optional `onCalculate` callback
+4. Auto-detects its own origin URL so the embed works from any domain
 
-This will produce correct take-home values:
-| Salary | Before Fix | After Fix |
-|--------|-----------|-----------|
-| 70,000 | 70,000 | 64,400 |
-| 500,000 | 434,700 | 394,700 |
-| 1,000,000 | 851,900 | 771,900 |
+## How Partners Use It
 
-### 2. Fix QuickTaxCalculator net pay (QuickTaxCalculator.tsx line 54)
-
-Change:
-```
-netPay2026: annual - result2026.taxPayable
-```
-To:
-```
-netPay2026: annual - pension - result2026.taxPayable
+```html
+<div id="taxforge-calculator"></div>
+<script src="https://taxforgeng.com/embed.js"></script>
+<script>
+  TaxForge.init({
+    container: '#taxforge-calculator',
+    apiKey: 'PARTNER_API_KEY',
+    onCalculate: function(result) {
+      console.log('Tax result:', result);
+    }
+  });
+</script>
 ```
 
-### 3. Update hardcoded breakdown example (SalaryAfterTax.tsx lines 226-245)
+This matches exactly what the Partner Branding page already generates.
 
-Update the PAYE Tax amount from the approximated -70,000 to -65,300 and take-home from 390,000 to 394,700 to match the corrected dynamic calculation.
+## File Created
 
-### 4. Fix noscript fallback (index.html lines 251-258)
+| File | Description |
+|------|-------------|
+| `public/embed.js` | ~80-line vanilla JS IIFE. No build step needed -- served as a static asset. |
 
-- Minimum wage: change "~69,500 (effective rate: ~0.7%)" to "~64,400 (effective rate: 0%)"
-- ₦200k: update take-home to match corrected calculation (~166,400)
-- ₦500k: confirm ~394,700
-- ₦1M: update to ~771,900
+## Technical Details
 
-### 5. Update FAQ answer (SalaryAfterTax.tsx line 55)
-
-The FAQ about ₦500k salary says "around 390,000-430,000" -- update to reflect the corrected range.
-
-## SEO/AEO Verification Summary
-
-Both Gemini and Perplexity's technical SEO criticisms were **factually wrong** -- all structured data, schemas, meta tags, and crawler fallbacks are already implemented. Their one valid observation -- that authority/backlinks are the real gap -- is a marketing problem, not a code problem. The embeddable widget and content clusters they recommended are already built.
-
-## Files Changed
-
-| File | Change |
-|------|--------|
-| `src/pages/seo/SalaryAfterTax.tsx` | Fix monthlyNet calculation, update hardcoded breakdown, update FAQ answer |
-| `src/components/seo/QuickTaxCalculator.tsx` | Fix netPay2026 to subtract pension |
-| `index.html` | Fix noscript salary/take-home approximations |
+- Uses an IIFE to avoid polluting the global scope (only `window.TaxForge` is exposed)
+- Auto-discovers the base URL from its own `<script>` tag src, with fallback to `https://taxforgeng.com`
+- Sets `loading="lazy"`, `border: none`, `colorScheme: light` on the iframe
+- Validates required options (`container`, `apiKey`) and logs clear console errors if missing
+- Filters `postMessage` events by `type === 'taxforge-calculation'` and verifies `event.source` matches the iframe to prevent spoofing
 
