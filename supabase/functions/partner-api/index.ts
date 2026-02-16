@@ -214,16 +214,52 @@ serve(async (req) => {
       });
     }
 
-    // Check rate limit
-    if (partner.requests_today >= partner.rate_limit_daily) {
+    // Window-based daily rate limiting (auto-reset after 24h)
+    const now = new Date();
+    const windowStart = partner.rate_limit_window_start ? new Date(partner.rate_limit_window_start) : new Date(0);
+    const hoursSinceWindowStart = (now.getTime() - windowStart.getTime()) / (1000 * 60 * 60);
+    
+    let currentRequestsToday = partner.requests_today || 0;
+    let newWindowStart = partner.rate_limit_window_start;
+
+    if (hoursSinceWindowStart >= 24) {
+      currentRequestsToday = 0;
+      newWindowStart = now.toISOString();
+    }
+
+    if (currentRequestsToday >= partner.rate_limit_daily) {
+      const retryAfterSeconds = Math.max(1, Math.ceil((24 - hoursSinceWindowStart) * 3600));
       return new Response(JSON.stringify({ 
         success: false, 
         error: 'Rate limit exceeded. Upgrade your plan for higher limits.',
         limit: partner.rate_limit_daily,
-        used: partner.requests_today
+        used: currentRequestsToday
       }), {
         status: 429,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Retry-After': retryAfterSeconds.toString() }
+      });
+    }
+
+    // Per-minute burst protection (60 req/min)
+    const minuteStart = partner.minute_window_start ? new Date(partner.minute_window_start) : new Date(0);
+    const secondsSinceMinuteStart = (now.getTime() - minuteStart.getTime()) / 1000;
+    
+    let currentRequestsThisMinute = partner.requests_this_minute || 0;
+    let newMinuteStart = partner.minute_window_start;
+
+    if (secondsSinceMinuteStart >= 60) {
+      currentRequestsThisMinute = 0;
+      newMinuteStart = now.toISOString();
+    }
+
+    if (currentRequestsThisMinute >= 60) {
+      const retryAfterSeconds = Math.max(1, Math.ceil(60 - secondsSinceMinuteStart));
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: 'Too many requests. Please slow down.'
+      }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Retry-After': retryAfterSeconds.toString() }
       });
     }
 
@@ -286,13 +322,16 @@ serve(async (req) => {
 
     const responseTime = Date.now() - startTime;
 
-    // Update partner usage stats
+    // Update partner usage stats with window-based counters
     await supabase
       .from('partners')
       .update({
-        requests_today: partner.requests_today + 1,
-        requests_total: partner.requests_total + 1,
-        last_request_at: new Date().toISOString()
+        requests_today: currentRequestsToday + 1,
+        requests_total: (partner.requests_total || 0) + 1,
+        rate_limit_window_start: newWindowStart,
+        requests_this_minute: currentRequestsThisMinute + 1,
+        minute_window_start: newMinuteStart,
+        last_request_at: now.toISOString()
       })
       .eq('id', partner.id);
 
@@ -313,7 +352,7 @@ serve(async (req) => {
         ...corsHeaders, 
         'Content-Type': 'application/json',
         'X-RateLimit-Limit': partner.rate_limit_daily.toString(),
-        'X-RateLimit-Remaining': (partner.rate_limit_daily - partner.requests_today - 1).toString()
+        'X-RateLimit-Remaining': (partner.rate_limit_daily - currentRequestsToday - 1).toString()
       }
     });
 
