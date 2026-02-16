@@ -1,41 +1,93 @@
+# Fix API Docs, Admin Partner Keys, Mobile Embed, Logo Upload, and Powered By Link
 
+## Issues Identified
 
-# Fix Rate Limit Tier Alignment and Clarify Model
+1. **No embed instructions on the API page** -- The API Docs page shows endpoints and code examples but has no section explaining how to embed the calculator widget on a client website.
+2. **Admin "Create Partner Keys" is broken** -- The edge function uses `supabase.auth.getClaims(token)` which is not a valid Supabase JS method. This causes a runtime error every time.
+3. **Mobile layout issue on Embed tab** -- In the White-Label Branding page, the Embed tab content does not fit properly on mobile screens unlike the Branding and Colors tabs. The `pre` blocks with embed code overflow.
+4. **Logo should be uploadable** -- Currently the Logo field is a plain URL text input. Users should be able to upload an image file directly.
+5. **"Powered by TaxForge" must not be deactivatable** -- The `showPoweredBy` switch currently lets users turn off the attribution. This toggle should be removed; the link should always show.
 
-## Problem
-The rate limit display shows three tiers (Basic 10k, Pro 100k, Enterprise custom) but the code assigns the same 10,000 limit to both Business and Corporate subscription users. There is no way for users to upgrade their API rate limit, and the "Pro: 100,000" tier is never actually assigned.
-
-## Solution
-Align the rate limits with the existing subscription tiers so the displayed numbers match reality, and give Corporate users their higher limit.
+---
 
 ## Changes
 
-### 1. Fix `src/pages/ApiDocs.tsx` -- Key creation logic (line 115)
-Update the `generateApiKey` function so Corporate tier users actually get a higher rate limit:
-- Business tier: creates `basic` keys with **10,000/day**
-- Corporate tier: creates `pro` keys with **100,000/day**
+### 1. Add Embed Instructions to API Docs Page (`src/pages/ApiDocs.tsx`)
 
-Change line 115 from:
+Add a new "Embed Calculator" section between the API Keys and Endpoints sections. It will contain:
+
+- A brief explanation of how the embeddable widget works
+- The iframe embed snippet (using the user's first active API key)
+- The JavaScript SDK embed snippet
+- A link to the White-Label Branding page for customization
+- Instructions on how to actually add the embeddable widget on the client website
+
+### 2. Fix `create-partner-key` Edge Function (`supabase/functions/create-partner-key/index.ts`)
+
+Replace the broken `getClaims` call with the standard `supabase.auth.getUser()` pattern:
+
+```typescript
+// Replace getClaims with getUser
+const { data: { user }, error: authError } = await supabase.auth.getUser();
+if (authError || !user) {
+  return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, ... });
+}
+const userId = user.id;
 ```
-rate_limit_daily: tier === 'corporate' ? 10000 : 10000,
+
+This follows the same pattern used successfully in other edge functions (tax-assistant, expense-insights, etc.).
+
+### 3. Fix Mobile Layout on Embed Tab (`src/pages/PartnerBranding.tsx`)
+
+Add responsive overflow handling to the `pre` blocks in the Embed tab:
+
+- Add `whitespace-pre-wrap break-all` classes to prevent horizontal overflow
+- Ensure the embed code blocks wrap properly on narrow screens, matching the behavior of the other two tabs
+
+### 4. Add Logo Upload (`src/pages/PartnerBranding.tsx`)
+
+- Create a `partner-assets` storage bucket via a database migration
+- Add a file input button next to the existing Logo URL field
+- On file selection, upload to the storage bucket under `logos/{partnerId}/{filename}`
+- Auto-populate the Logo URL field with the public URL after upload
+- Keep the manual URL input as a fallback option
+
+### 5. Remove "Powered by TaxForge" Toggle
+
+`**src/pages/PartnerBranding.tsx**`: Remove the Switch toggle and its surrounding `div` (lines 331-342). Replace with a static notice explaining the attribution is always shown.
+
+`**src/components/EmbeddableCalculator.tsx**`: Remove the `showPoweredBy` conditional (line 413). Always render the "Powered by TaxForge NG" link regardless of the theme setting.
+
+`**supabase/functions/validate-embed-key/index.ts**`: Always return `showPoweredBy: true` in the response, ignoring the database value.
+
+### 6. Database Migration
+
+```sql
+-- Create storage bucket for partner logo uploads
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('partner-assets', 'partner-assets', true);
+
+-- Allow authenticated users to upload to their own partner folder
+CREATE POLICY "Users can upload partner logos"
+ON storage.objects FOR INSERT TO authenticated
+WITH CHECK (bucket_id = 'partner-assets');
+
+-- Allow public read access for logos
+CREATE POLICY "Public can view partner assets"
+ON storage.objects FOR SELECT TO public
+USING (bucket_id = 'partner-assets');
+
+-- Allow authenticated users to update/delete their uploads
+CREATE POLICY "Users can manage their partner assets"
+ON storage.objects FOR DELETE TO authenticated
+USING (bucket_id = 'partner-assets');
 ```
-to:
-```
-rate_limit_daily: tier === 'corporate' ? 100000 : 10000,
-```
 
-### 2. Fix `src/pages/ApiDocs.tsx` -- Rate limit display (lines 671-675)
-Update the display to clearly tie rate limits to subscription tiers:
-- Business plan: 10,000 requests/day
-- Corporate plan: 100,000 requests/day  
-- Partner keys (admin-created): Custom limits
+---
 
-### 3. No other files need changes
-The `validate-embed-key` edge function already reads `rate_limit_daily` from the database per-key, so it will automatically enforce the correct limit once the keys are created with the right values.
+## Technical Notes
 
-## How the model works (for your reference)
-- Users pay for a Business or Corporate subscription
-- Their subscription tier determines the rate limit on any API keys they create
-- Admin-created partner keys have custom limits set at creation time
-- There is no separate "rate limit upgrade" -- upgrading your subscription is how you get higher limits
-
+- The `getClaims` bug is the root cause of the admin partner key creation failure. No other endpoint uses this method.
+- The `showPoweredBy` column remains in the database but is effectively ignored -- no migration needed to remove it.
+- The storage bucket is set to public so logo URLs work in the embedded iframe on third-party sites without auth.
+- The embed instructions on the API page use the same snippet format already present in the admin section, just made visible to all Business/Corporate users.
