@@ -53,7 +53,7 @@
       return;
     }
 
-    var height = options.height || '650';
+    var height = options.height || '800';
     var maxWidth = options.maxWidth || '520';
 
     var iframe = document.createElement('iframe');
