@@ -34,18 +34,21 @@ const Index = () => {
       description: "See how the new 0% CIT for small companies affects your business",
       gradient: "from-primary/20 to-accent/10",
       icon: Sparkles,
+      cta: "Preview 2026 Tax Reforms",
     },
     {
       title: "Smart Entity Comparison",
       description: "Compare Business Name vs Company structure to minimize tax",
       gradient: "from-success/20 to-primary/10",
       icon: TrendingUp,
+      cta: "Compare Entity Structures",
     },
     {
       title: "Sector-Specific Insights",
       description: "Get tax rules tailored to your industry - Tech, Oil & Gas, Agriculture & more",
       gradient: "from-accent/20 to-warning/10",
       icon: Shield,
+      cta: "Explore Sector Tax Rules",
     },
   ];
 
@@ -133,7 +136,7 @@ const Index = () => {
                         </div>
                         <Link to="/calculator" className="shrink-0">
                           <Button variant="glow" size="lg" className="w-full md:w-auto">
-                            Learn More <ArrowRight className="h-4 w-4" />
+                            {item.cta} <ArrowRight className="h-4 w-4" />
                           </Button>
                         </Link>
                       </div>
