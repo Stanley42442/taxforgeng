@@ -1,62 +1,68 @@
 
 
-# Distribution Strategy: "Salary After Tax" Landing Page
+# Fix: Take-Home Pay Accuracy + Noscript Corrections
 
-## Context
+## Problem Found
 
-Both Gemini and Perplexity now agree: your technical SEO/AEO is effectively "done." The gap is **distribution and authority**. Two high-impact, code-implementable actions were identified:
+The "Salary After Tax" page has an accuracy bug: the take-home pay column in the salary comparison table and the QuickTaxCalculator "Net Pay" figure show **gross minus tax** but forget to subtract the **8% pension deduction**, which is a real paycheck deduction. This makes the numbers appear ~8% higher than reality and contradicts the hardcoded breakdown example on the same page.
 
-1. **"Salary After Tax" SEO landing page** -- captures the consumer search term HRPayHub dominates
-2. **Embeddable widget improvements** -- already built at `/embed/calculator` with full partner branding
+Additionally, the noscript fallback has minor inaccuracies.
 
-This plan focuses on **#1** since the embed infrastructure already exists. The widget route (`/embed/calculator`), the `EmbeddableCalculator` component, and the `PartnerBranding` dashboard are all fully functional.
+## What Needs to Change
 
-## What We Will Build
+### 1. Fix salary band table calculation (SalaryAfterTax.tsx line 37)
 
-A new SEO landing page at `/salary-after-tax-nigeria` that reframes the existing `QuickTaxCalculator` component and `individualTaxCalculations` logic using consumer-friendly language ("take-home pay", "net salary", "salary after tax") instead of technical tax terminology.
+Change:
+```
+monthlyNet: Math.round((annual - result.taxPayable) / 12)
+```
+To:
+```
+monthlyNet: Math.round((annual - pension - result.taxPayable) / 12)
+```
 
-## Page Structure
+This will produce correct take-home values:
+| Salary | Before Fix | After Fix |
+|--------|-----------|-----------|
+| 70,000 | 70,000 | 64,400 |
+| 500,000 | 434,700 | 394,700 |
+| 1,000,000 | 851,900 | 771,900 |
 
-| Section | Purpose |
-|---------|---------|
-| SEOHead with full schema | SoftwareApplication, FAQPage, HowTo, Breadcrumb, Speakable, DefinedTermSet |
-| Hero | H1: "Salary After Tax Calculator Nigeria (2026 Updates)" |
-| QuickTaxCalculator (reused) | Above-the-fold tool with "Monthly Take-Home Pay" framing |
-| "How It Works" steps | HowTo schema: 5 consumer-friendly steps |
-| Monthly breakdown table | Visual: Gross -> Pension -> Tax -> Net |
-| Salary comparison bands | Common salary levels (₦100k-₦2M/month) with net pay |
-| 8-10 FAQs | Consumer questions: "What is my take-home on ₦500k?", "Is minimum wage taxed?" etc. |
-| CTA | Links to full Individual Calculator and Reverse Salary tab |
-| Trust badges + disclaimer | Reused components |
+### 2. Fix QuickTaxCalculator net pay (QuickTaxCalculator.tsx line 54)
 
-## Target Keywords
+Change:
+```
+netPay2026: annual - result2026.taxPayable
+```
+To:
+```
+netPay2026: annual - pension - result2026.taxPayable
+```
 
-- "salary after tax Nigeria"
-- "take home pay calculator Nigeria 2026"  
-- "net salary calculator Nigeria"
-- "how much tax do I pay on my salary Nigeria"
-- "PAYE calculator Nigeria 2026"
+### 3. Update hardcoded breakdown example (SalaryAfterTax.tsx lines 226-245)
+
+Update the PAYE Tax amount from the approximated -70,000 to -65,300 and take-home from 390,000 to 394,700 to match the corrected dynamic calculation.
+
+### 4. Fix noscript fallback (index.html lines 251-258)
+
+- Minimum wage: change "~69,500 (effective rate: ~0.7%)" to "~64,400 (effective rate: 0%)"
+- ₦200k: update take-home to match corrected calculation (~166,400)
+- ₦500k: confirm ~394,700
+- ₦1M: update to ~771,900
+
+### 5. Update FAQ answer (SalaryAfterTax.tsx line 55)
+
+The FAQ about ₦500k salary says "around 390,000-430,000" -- update to reflect the corrected range.
+
+## SEO/AEO Verification Summary
+
+Both Gemini and Perplexity's technical SEO criticisms were **factually wrong** -- all structured data, schemas, meta tags, and crawler fallbacks are already implemented. Their one valid observation -- that authority/backlinks are the real gap -- is a marketing problem, not a code problem. The embeddable widget and content clusters they recommended are already built.
 
 ## Files Changed
 
 | File | Change |
 |------|--------|
-| `src/pages/seo/SalaryAfterTax.tsx` | New page (~400 lines, follows exact pattern of PITPAYECalculator.tsx) |
-| `src/App.tsx` | Add lazy import + route at `/salary-after-tax-nigeria` |
-| `public/sitemap.xml` | Add new URL entry |
-| `index.html` | Add noscript fallback content for the salary-after-tax keyword cluster |
-
-## Technical Details
-
-- Reuses `QuickTaxCalculator` component (already computes net pay, effective rate, and 2026 vs pre-2026 comparison)
-- Reuses `calculatePersonalIncomeTax` from `individualTaxCalculations.ts` for the salary band comparison table
-- Follows the exact SEO page architecture established in `PITPAYECalculator.tsx`: SEOHead with multi-schema `@graph`, breadcrumbs, content sections, accordion FAQs, trust badges, disclaimer
-- All schema helpers (`createCalculatorSchema`, `createFAQSchema`, `createHowToSchema`, `createSpeakableSchema`, `createTaxRateSchema`, `createBreadcrumbSchema`) already exist and will be reused
-- Consumer-language FAQs will complement (not duplicate) the existing PIT/PAYE FAQs
-
-## What This Does NOT Do
-
-- Does not duplicate calculator logic -- reuses existing components and functions
-- Does not change any existing pages or routes
-- Does not affect the embed widget (already fully functional)
+| `src/pages/seo/SalaryAfterTax.tsx` | Fix monthlyNet calculation, update hardcoded breakdown, update FAQ answer |
+| `src/components/seo/QuickTaxCalculator.tsx` | Fix netPay2026 to subtract pension |
+| `index.html` | Fix noscript salary/take-home approximations |
 
