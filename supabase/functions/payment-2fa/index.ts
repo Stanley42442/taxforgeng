@@ -48,7 +48,10 @@ serve(async (req) => {
     // Get auth user
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      throw new Error("No authorization header");
+      return new Response(
+        JSON.stringify({ success: false, error: "Authentication required" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const token = authHeader.replace("Bearer ", "");
@@ -256,15 +259,30 @@ serve(async (req) => {
       }
 
       default:
-        throw new Error(`Unknown operation: ${operation}`);
+        return new Response(
+          JSON.stringify({ success: false, error: "Invalid operation" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
     }
 
   } catch (error: unknown) {
     console.error("Error in payment-2fa:", error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    // Map known user-facing errors, hide everything else
+    const msg = error instanceof Error ? error.message : '';
+    const safeErrors: Record<string, string> = {
+      'Unauthorized': 'Authentication required',
+      'Invalid verification request': 'Invalid verification request',
+      'Verification code has expired': 'Verification code has expired',
+      'Maximum verification attempts exceeded': 'Maximum verification attempts exceeded',
+      'Invalid verification code': 'Invalid verification code',
+      'Too many verification requests. Please wait 10 minutes.': 'Too many verification requests. Please wait 10 minutes.',
+      'Token ID and code are required': 'Verification code is required',
+    };
+    const safeMessage = safeErrors[msg] || 'Verification service temporarily unavailable';
+    const status = msg === 'Unauthorized' ? 401 : 400;
     return new Response(
-      JSON.stringify({ success: false, error: errorMessage }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ success: false, error: safeMessage }),
+      { status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

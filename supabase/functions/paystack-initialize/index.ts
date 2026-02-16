@@ -86,7 +86,10 @@ serve(async (req) => {
     // Get auth user
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      throw new Error("No authorization header");
+      return new Response(
+        JSON.stringify({ success: false, error: "Authentication required" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const token = authHeader.replace("Bearer ", "");
@@ -113,7 +116,10 @@ serve(async (req) => {
 
     // Validate tier
     if (!TIER_PRICING[tier]) {
-      throw new Error(`Invalid tier: ${tier}`);
+      return new Response(
+        JSON.stringify({ success: false, error: "Invalid subscription tier" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // Get base amount
@@ -209,7 +215,11 @@ serve(async (req) => {
         })
         .eq('reference', reference);
 
-      throw new Error(paystackData.message || 'Failed to initialize payment');
+      console.error('[paystack-init] Paystack rejection:', paystackData.message);
+      return new Response(
+        JSON.stringify({ success: false, error: "Payment initialization failed. Please try again." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // Log to audit trail (non-blocking for speed)
@@ -251,10 +261,9 @@ serve(async (req) => {
     );
   } catch (error: unknown) {
     console.error(`[paystack-init] ERROR after ${Date.now() - startTime}ms:`, error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ success: false, error: errorMessage }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ success: false, error: "Payment service temporarily unavailable" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
