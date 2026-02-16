@@ -34,7 +34,7 @@ const SalaryAfterTax = () => {
         monthly,
         annual,
         monthlyTax: Math.round(result.taxPayable / 12),
-        monthlyNet: Math.round((annual - result.taxPayable) / 12),
+        monthlyNet: Math.round((annual - pension - result.taxPayable) / 12),
         effectiveRate: result.effectiveRate,
         isMinWage: monthly === 70_000,
       };
@@ -52,7 +52,7 @@ const SalaryAfterTax = () => {
   const faqs = [
     {
       question: 'What is my take-home pay on a ₦500,000 monthly salary?',
-      answer: 'On a gross salary of ₦500,000/month (₦6M/year), after 8% pension (₦40,000) and applying the 2026 tax bands, your approximate monthly take-home pay is around ₦390,000–₦430,000 depending on other reliefs like rent. Use the calculator above for your exact figure.',
+      answer: 'On a gross salary of ₦500,000/month (₦6M/year), after 8% pension (₦40,000) and applying the 2026 tax bands, your approximate monthly take-home pay is around ₦395,000–₦430,000 depending on other reliefs like rent. Use the calculator above for your exact figure.',
     },
     {
       question: 'Is the minimum wage taxed in Nigeria?',
@@ -226,8 +226,8 @@ const SalaryAfterTax = () => {
                     {[
                       { label: 'Gross Monthly Salary', amount: 500_000, color: 'bg-foreground/80', icon: Banknote },
                       { label: 'Pension (8%)', amount: -40_000, color: 'bg-primary/60', icon: Wallet },
-                      { label: 'PAYE Tax', amount: -70_000, color: 'bg-destructive/60', icon: Calculator },
-                      { label: 'Your Take-Home Pay', amount: 390_000, color: 'bg-success/80', icon: CheckCircle2 },
+                      { label: 'PAYE Tax', amount: -65_300, color: 'bg-destructive/60', icon: Calculator },
+                      { label: 'Your Take-Home Pay', amount: 394_700, color: 'bg-success/80', icon: CheckCircle2 },
                     ].map((item, index) => (
                       <div key={index} className={`flex items-center justify-between p-4 rounded-xl ${index === 3 ? 'glass border-2 border-success/30' : 'glass-subtle'}`}>
                         <div className="flex items-center gap-3">

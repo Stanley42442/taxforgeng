@@ -51,7 +51,7 @@ export const QuickTaxCalculator = ({ showComparison = true }: QuickTaxCalculator
       tax2026: result2026.taxPayable,
       taxPre2026: resultPre2026.taxPayable,
       effectiveRate2026: result2026.effectiveRate,
-      netPay2026: annual - result2026.taxPayable,
+      netPay2026: annual - pension - result2026.taxPayable,
       savings: resultPre2026.taxPayable - result2026.taxPayable,
       grossIncome: annual,
     };
