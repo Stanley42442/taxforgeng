@@ -423,6 +423,7 @@ export function TaxAssistant() {
             handlePointerDown(touch.clientX, touch.clientY);
           }
         }}
+        aria-label="Open tax assistant chat"
         className="fixed h-14 w-14 rounded-full shadow-lg bg-gradient-primary hover:opacity-90 z-50 select-none flex items-center justify-center text-white"
         style={{
           right: `${position.x}px`,
