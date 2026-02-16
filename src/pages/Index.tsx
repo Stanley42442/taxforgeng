@@ -14,9 +14,10 @@ import {
 } from "lucide-react";
 
 import { FreeTrialCTA } from "@/components/FreeTrialCTA";
-import { SuccessStories } from "@/components/SuccessStories";
 import { FreeTaxToolsSection } from "@/components/FreeTaxToolsSection";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, lazy, Suspense } from "react";
+
+const SuccessStories = lazy(() => import("@/components/SuccessStories").then(m => ({ default: m.SuccessStories })));
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
@@ -297,7 +298,9 @@ const Index = () => {
       <BlogPromoSection />
 
       {/* Success Stories Section */}
-      <SuccessStories limit={3} />
+      <Suspense fallback={null}>
+        <SuccessStories limit={3} />
+      </Suspense>
 
       {/* Pricing Teaser */}
       <PricingTeaser />
