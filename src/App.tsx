@@ -158,7 +158,102 @@ const pageTransition = {
 // Animated Routes wrapper with shared elements support
 const AnimatedRoutes = () => {
   const location = useLocation();
-  
+  const isEmbed = location.pathname.startsWith('/embed/');
+
+  const routes = (
+    <Routes location={location}>
+      <Route path="/" element={<Index />} />
+      <Route path="/auth" element={<Auth />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/advisory" element={<Advisory />} />
+      <Route path="/calculator" element={<Calculator />} />
+      <Route path="/results" element={<Results />} />
+      <Route path="/tax-breakdown" element={<TaxBreakdown />} />
+      <Route path="/pricing" element={<Pricing />} />
+      <Route path="/tax-filing" element={<TaxFiling />} />
+      <Route path="/businesses" element={<SavedBusinesses />} />
+      <Route path="/reminders" element={<Reminders />} />
+      <Route path="/insights" element={<Insights />} />
+      <Route path="/team" element={<Team />} />
+      <Route path="/transactions" element={<Transactions />} />
+      <Route path="/audit-log" element={<AuditLog />} />
+      <Route path="/learn" element={<Learn />} />
+      <Route path="/expenses" element={<Expenses />} />
+      <Route path="/e-filing" element={<EFiling />} />
+      <Route path="/api-docs" element={<ApiDocs />} />
+      <Route path="/achievements" element={<Achievements />} />
+      <Route path="/business-report" element={<BusinessReport />} />
+      <Route path="/roadmap" element={<Roadmap />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/terms-and-conditions" element={<RedirectToTerms section="terms" />} />
+      <Route path="/privacy-policy" element={<RedirectToTerms section="privacy" />} />
+      <Route path="/refund-policy" element={<RedirectToTerms section="refund" />} />
+      <Route path="/admin-analytics" element={<AdminAnalytics />} />
+      <Route path="/ai-analytics" element={<AIQueryAnalytics />} />
+      <Route path="/notifications" element={<Notifications />} />
+      <Route path="/sector/:id" element={<SectorGuide />} />
+      <Route path="/partner-branding" element={<PartnerBranding />} />
+      <Route path="/embed/calculator" element={<EmbedCalculator />} />
+      <Route path="/individual-calculator" element={<IndividualCalculator />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/security" element={<SecurityDashboard />} />
+      <Route path="/referrals" element={<Referrals />} />
+      <Route path="/tax-calendar" element={<TaxCalendar />} />
+      <Route path="/success-stories" element={<SuccessStoriesPage />} />
+      <Route path="/accountant-portal" element={<AccountantPortal />} />
+      <Route path="/invoices" element={<Invoices />} />
+      <Route path="/payroll" element={<Payroll />} />
+      <Route path="/profit-loss" element={<ProfitLoss />} />
+      <Route path="/compliance" element={<Compliance />} />
+      <Route path="/personal-expenses" element={<PersonalExpenses />} />
+      <Route path="/calculation-history" element={<CalculationHistory />} />
+      <Route path="/documentation" element={<Documentation />} />
+      <Route path="/payment-callback" element={<PaymentCallback />} />
+      <Route path="/billing" element={<BillingHistory />} />
+      <Route path="/cancel-subscription" element={<CancelSubscription />} />
+      <Route path="/rewards" element={<LoyaltyRewards />} />
+      <Route path="/admin/webhooks" element={<WebhookTesting />} />
+      <Route path="/admin/promo-codes" element={<PromoCodeAdmin />} />
+      <Route path="/admin/security-tests" element={<SecurityTestResults />} />
+      <Route path="/admin/errors" element={<ErrorDashboard />} />
+      <Route path="/offline" element={<OfflineDashboard />} />
+      <Route path="/verify/:documentId" element={<VerifyDocument />} />
+      <Route path="/tax-logic" element={<TaxLogicReference />} />
+      <Route path="/tax-professionals" element={<TaxProfessionalDirectory />} />
+      <Route path="/free-tax-calculator" element={<FreeCalculator />} />
+      <Route path="/small-company-exemption" element={<SmallCompanyExemption />} />
+      <Route path="/rent-relief-2026" element={<RentRelief2026 />} />
+      <Route path="/pit-paye-calculator" element={<PITPAYECalculator />} />
+      <Route path="/tax-reforms-2026" element={<TaxReforms2026 />} />
+      <Route path="/cit-calculator" element={<CITCalculator />} />
+      <Route path="/vat-calculator" element={<VATCalculator />} />
+      <Route path="/wht-calculator" element={<WHTCalculator />} />
+      <Route path="/tax-reports" element={<TaxReports />} />
+      <Route path="/port-harcourt-tax-guide" element={<PortHarcourtGuide />} />
+      <Route path="/state-guides" element={<StateGuidesHub />} />
+      <Route path="/state-guides/lagos" element={<LagosGuide />} />
+      <Route path="/state-guides/abuja" element={<AbujaGuide />} />
+      <Route path="/state-guides/kano" element={<KanoGuide />} />
+      <Route path="/salary-after-tax-nigeria" element={<SalaryAfterTax />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/resources" element={<Resources />} />
+      <Route path="/blog" element={<Blog />} />
+      <Route path="/blog/tax-reforms-2026-summary" element={<BlogTaxReforms2026Summary />} />
+      <Route path="/blog/small-company-cit-exemption" element={<BlogSmallCompanyCITExemption />} />
+      <Route path="/blog/pit-paye-guide-2026" element={<BlogPITPAYEGuide2026 />} />
+      <Route path="/blog/tax-guide-tech-startups" element={<BlogTaxGuideTechStartups />} />
+      <Route path="/blog/vat-guide-nigeria" element={<BlogVATGuideNigeria />} />
+      <Route path="/blog/wht-explained" element={<BlogWHTExplained />} />
+      <Route path="/blog/payroll-tax-guide" element={<BlogPayrollTaxGuide />} />
+      <Route path="/blog/tax-calendar-2026" element={<BlogTaxCalendar2026 />} />
+      <Route path="/faq" element={<FAQ />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+
+  // Skip animations for embed routes to avoid opacity flash in iframes
+  if (isEmbed) return routes;
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -169,98 +264,7 @@ const AnimatedRoutes = () => {
         variants={pageVariants}
         transition={pageTransition}
       >
-        <Routes location={location}>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/advisory" element={<Advisory />} />
-          <Route path="/calculator" element={<Calculator />} />
-          <Route path="/results" element={<Results />} />
-          <Route path="/tax-breakdown" element={<TaxBreakdown />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/tax-filing" element={<TaxFiling />} />
-          <Route path="/businesses" element={<SavedBusinesses />} />
-          <Route path="/reminders" element={<Reminders />} />
-          <Route path="/insights" element={<Insights />} />
-          <Route path="/team" element={<Team />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/audit-log" element={<AuditLog />} />
-          <Route path="/learn" element={<Learn />} />
-          <Route path="/expenses" element={<Expenses />} />
-          <Route path="/e-filing" element={<EFiling />} />
-          <Route path="/api-docs" element={<ApiDocs />} />
-          <Route path="/achievements" element={<Achievements />} />
-          <Route path="/business-report" element={<BusinessReport />} />
-          <Route path="/roadmap" element={<Roadmap />} />
-          <Route path="/terms" element={<Terms />} />
-          {/* Redirects from old policy URLs to unified Terms page with hash */}
-          <Route path="/terms-and-conditions" element={<RedirectToTerms section="terms" />} />
-          <Route path="/privacy-policy" element={<RedirectToTerms section="privacy" />} />
-          <Route path="/refund-policy" element={<RedirectToTerms section="refund" />} />
-          <Route path="/admin-analytics" element={<AdminAnalytics />} />
-          <Route path="/ai-analytics" element={<AIQueryAnalytics />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/sector/:id" element={<SectorGuide />} />
-          <Route path="/partner-branding" element={<PartnerBranding />} />
-          <Route path="/embed/calculator" element={<EmbedCalculator />} />
-          <Route path="/individual-calculator" element={<IndividualCalculator />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/security" element={<SecurityDashboard />} />
-          <Route path="/referrals" element={<Referrals />} />
-          <Route path="/tax-calendar" element={<TaxCalendar />} />
-          <Route path="/success-stories" element={<SuccessStoriesPage />} />
-          <Route path="/accountant-portal" element={<AccountantPortal />} />
-          <Route path="/invoices" element={<Invoices />} />
-          <Route path="/payroll" element={<Payroll />} />
-          <Route path="/profit-loss" element={<ProfitLoss />} />
-          <Route path="/compliance" element={<Compliance />} />
-          <Route path="/personal-expenses" element={<PersonalExpenses />} />
-          <Route path="/calculation-history" element={<CalculationHistory />} />
-          <Route path="/documentation" element={<Documentation />} />
-          <Route path="/payment-callback" element={<PaymentCallback />} />
-          <Route path="/billing" element={<BillingHistory />} />
-          <Route path="/cancel-subscription" element={<CancelSubscription />} />
-          <Route path="/rewards" element={<LoyaltyRewards />} />
-          <Route path="/admin/webhooks" element={<WebhookTesting />} />
-          <Route path="/admin/promo-codes" element={<PromoCodeAdmin />} />
-          <Route path="/admin/security-tests" element={<SecurityTestResults />} />
-          <Route path="/admin/errors" element={<ErrorDashboard />} />
-          <Route path="/offline" element={<OfflineDashboard />} />
-          <Route path="/verify/:documentId" element={<VerifyDocument />} />
-          <Route path="/tax-logic" element={<TaxLogicReference />} />
-          <Route path="/tax-professionals" element={<TaxProfessionalDirectory />} />
-          {/* SEO Landing Pages */}
-          <Route path="/free-tax-calculator" element={<FreeCalculator />} />
-          <Route path="/small-company-exemption" element={<SmallCompanyExemption />} />
-          <Route path="/rent-relief-2026" element={<RentRelief2026 />} />
-          <Route path="/pit-paye-calculator" element={<PITPAYECalculator />} />
-          <Route path="/tax-reforms-2026" element={<TaxReforms2026 />} />
-          <Route path="/cit-calculator" element={<CITCalculator />} />
-          <Route path="/vat-calculator" element={<VATCalculator />} />
-          <Route path="/wht-calculator" element={<WHTCalculator />} />
-          <Route path="/tax-reports" element={<TaxReports />} />
-          <Route path="/port-harcourt-tax-guide" element={<PortHarcourtGuide />} />
-          <Route path="/state-guides" element={<StateGuidesHub />} />
-          <Route path="/state-guides/lagos" element={<LagosGuide />} />
-          <Route path="/state-guides/abuja" element={<AbujaGuide />} />
-          <Route path="/state-guides/kano" element={<KanoGuide />} />
-          <Route path="/salary-after-tax-nigeria" element={<SalaryAfterTax />} />
-          {/* Standalone Pages */}
-          <Route path="/about" element={<About />} />
-          <Route path="/resources" element={<Resources />} />
-          {/* Blog & FAQ */}
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/tax-reforms-2026-summary" element={<BlogTaxReforms2026Summary />} />
-          <Route path="/blog/small-company-cit-exemption" element={<BlogSmallCompanyCITExemption />} />
-          <Route path="/blog/pit-paye-guide-2026" element={<BlogPITPAYEGuide2026 />} />
-          <Route path="/blog/tax-guide-tech-startups" element={<BlogTaxGuideTechStartups />} />
-          <Route path="/blog/vat-guide-nigeria" element={<BlogVATGuideNigeria />} />
-          <Route path="/blog/wht-explained" element={<BlogWHTExplained />} />
-          <Route path="/blog/payroll-tax-guide" element={<BlogPayrollTaxGuide />} />
-          <Route path="/blog/tax-calendar-2026" element={<BlogTaxCalendar2026 />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        {routes}
       </motion.div>
     </AnimatePresence>
   );
