@@ -33,8 +33,8 @@ const RedirectToTerms = ({ section }: { section: 'terms' | 'privacy' | 'refund' 
   <Navigate to={`/terms#${section}`} replace />
 );
 
-// Eagerly load Index for fast initial render
-import Index from "./pages/Index";
+// Lazy load Index page to reduce main bundle size
+const Index = lazy(() => import("./pages/Index"));
 
 // Lazy load all other pages
 const Auth = lazy(() => import("./pages/Auth"));
