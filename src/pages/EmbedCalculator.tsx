@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { supabase } from "@/lib/supabaseClient";
 import { EmbeddableCalculator, PartnerTheme } from "@/components/EmbeddableCalculator";
 import { Loader2 } from "lucide-react";
 import logger from "@/lib/logger";
@@ -14,7 +13,7 @@ const EmbedCalculator = () => {
   const apiKey = searchParams.get('key');
 
   useEffect(() => {
-    const fetchPartnerTheme = async () => {
+    const validateKey = async () => {
       if (!apiKey) {
         setError('Missing API key');
         setLoading(false);
@@ -22,45 +21,43 @@ const EmbedCalculator = () => {
       }
 
       try {
-        const { data, error: fetchError } = await supabase
-          .from('partners')
-          .select('brand_name, logo_url, primary_color, secondary_color, accent_color, background_color, text_color, border_radius, font_family, show_powered_by, is_active')
-          .eq('api_key', apiKey)
-          .maybeSingle();
-
-        if (fetchError || !data) {
-          setError('Invalid API key');
-          setLoading(false);
-          return;
-        }
-
-        if (!data.is_active) {
-          setError('API key is inactive');
-          setLoading(false);
-          return;
-        }
-
-        setTheme({
-          brandName: data.brand_name || undefined,
-          logoUrl: data.logo_url || undefined,
-          primaryColor: data.primary_color || '#10b981',
-          secondaryColor: data.secondary_color || '#3b82f6',
-          accentColor: data.accent_color || '#f59e0b',
-          backgroundColor: data.background_color || '#ffffff',
-          textColor: data.text_color || '#1f2937',
-          borderRadius: data.border_radius || '12',
-          fontFamily: data.font_family || 'Inter',
-          showPoweredBy: data.show_powered_by ?? true
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const response = await fetch(`${supabaseUrl}/functions/v1/validate-embed-key`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ apiKey }),
         });
+
+        if (response.status === 429) {
+          setError('Rate limit exceeded. Please try again later.');
+          setLoading(false);
+          return;
+        }
+
+        if (response.status === 403) {
+          setError('This domain is not authorized to use this calculator.');
+          setLoading(false);
+          return;
+        }
+
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          setError(data.error || 'Invalid API key');
+          setLoading(false);
+          return;
+        }
+
+        const { theme: themeData } = await response.json();
+        setTheme(themeData);
       } catch (err) {
-        logger.error('Error fetching partner theme:', err);
+        logger.error('Error validating embed key:', err);
         setError('Failed to load calculator');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPartnerTheme();
+    validateKey();
   }, [apiKey]);
 
   // Embed-specific styles
@@ -77,6 +74,18 @@ const EmbedCalculator = () => {
       document.documentElement.style.background = '';
     };
   }, []);
+
+  // Determine postMessage target origin from referrer
+  const getTargetOrigin = (): string => {
+    try {
+      if (document.referrer) {
+        return new URL(document.referrer).origin;
+      }
+    } catch {
+      // Invalid referrer URL
+    }
+    return '*';
+  };
 
   if (loading) {
     return (
@@ -104,12 +113,11 @@ const EmbedCalculator = () => {
       <EmbeddableCalculator 
         theme={theme || undefined} 
         onCalculate={(result) => {
-          // Post message to parent window
           if (window.parent !== window) {
             window.parent.postMessage({
               type: 'taxforge-calculation',
               data: result
-            }, '*');
+            }, getTargetOrigin());
           }
         }}
       />

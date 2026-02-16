@@ -80,3 +80,6 @@ verify_jwt = false
 
 [functions.cleanup-logs]
 verify_jwt = false
+
+[functions.validate-embed-key]
+verify_jwt = false
