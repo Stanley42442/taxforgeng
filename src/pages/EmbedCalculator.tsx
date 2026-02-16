@@ -20,6 +20,13 @@ const EmbedCalculator = () => {
         return;
       }
 
+      // Validate key format before sending to server
+      if (apiKey.length > 50 || apiKey.length < 20 || !apiKey.startsWith('txf_')) {
+        setError('Invalid API key format');
+        setLoading(false);
+        return;
+      }
+
       try {
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
         const response = await fetch(`${supabaseUrl}/functions/v1/validate-embed-key`, {
@@ -76,7 +83,7 @@ const EmbedCalculator = () => {
   }, []);
 
   // Determine postMessage target origin from referrer
-  const getTargetOrigin = (): string => {
+  const getTargetOrigin = (): string | null => {
     try {
       if (document.referrer) {
         return new URL(document.referrer).origin;
@@ -84,7 +91,7 @@ const EmbedCalculator = () => {
     } catch {
       // Invalid referrer URL
     }
-    return '*';
+    return null;
   };
 
   if (loading) {
@@ -113,11 +120,12 @@ const EmbedCalculator = () => {
       <EmbeddableCalculator 
         theme={theme || undefined} 
         onCalculate={(result) => {
-          if (window.parent !== window) {
+          const targetOrigin = getTargetOrigin();
+          if (window.parent !== window && targetOrigin) {
             window.parent.postMessage({
               type: 'taxforge-calculation',
               data: result
-            }, getTargetOrigin());
+            }, targetOrigin);
           }
         }}
       />
