@@ -529,23 +529,108 @@ console.log(data.data.totalTaxPayable);`;
                 </Button>
               )}
 
-              {/* Embed snippet helper */}
-              {partnerKeys.some(k => k.name.startsWith('[Partner]')) && (
-                <div className="mt-4 p-3 rounded-lg bg-secondary/50 border border-border">
-                  <Label className="text-sm mb-2 block">Embed Snippet (send to partner)</Label>
-                  <pre className="p-3 rounded bg-secondary text-xs font-mono overflow-x-auto text-foreground whitespace-pre-wrap">
+              {/* Per-partner key cards */}
+              {partnerKeys.filter(k => k.name.startsWith('[Partner]')).length > 0 && (
+                <div className="mt-6 space-y-4">
+                  <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
+                    <Key className="h-4 w-4 text-accent" />
+                    Managed Partner Keys ({partnerKeys.filter(k => k.name.startsWith('[Partner]')).length})
+                  </h3>
+                  {partnerKeys.filter(k => k.name.startsWith('[Partner]')).map((key) => {
+                    const displayName = key.name.replace(/^\[Partner\]\s*/, '');
+                    const snippet = `<div id="taxforge-calculator"></div>\n<script src="https://taxforgeng.com/embed.js"></script>\n<script>\n  TaxForge.init({\n    container: '#taxforge-calculator',\n    apiKey: '${key.api_key}'\n  });\n</script>`;
+                    return (
+                      <div key={key.id} className="p-4 rounded-xl border border-accent/20 bg-accent/5 space-y-3">
+                        {/* Header */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-foreground">{displayName}</span>
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${key.is_active ? 'bg-success/20 text-success' : 'bg-muted text-muted-foreground'}`}>
+                              {key.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-accent/20 text-accent">
+                              PARTNER
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Standalone API Key */}
+                        <div>
+                          <Label className="text-xs text-muted-foreground mb-1 block">API Key</Label>
+                          <div className="flex gap-2">
+                            <Input value={key.api_key} readOnly className="font-mono text-sm" />
+                            <Button variant="outline" size="sm" onClick={() => copyToClipboard(key.api_key)}>
+                              <Copy className="h-4 w-4" /> Copy Key
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Domains */}
+                        {key.allowed_origins && key.allowed_origins.length > 0 && (
+                          <div>
+                            <Label className="text-xs text-muted-foreground mb-1 block">Allowed Domains</Label>
+                            <div className="flex flex-wrap gap-1">
+                              {key.allowed_origins.map((domain, i) => (
+                                <span key={i} className="text-xs px-2 py-1 rounded-full bg-secondary text-secondary-foreground">
+                                  {domain}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Embed Snippet */}
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                            <Label className="text-xs text-muted-foreground">Embed Snippet</Label>
+                            <Button variant="ghost" size="sm" onClick={() => copyToClipboard(snippet)}>
+                              <Copy className="h-4 w-4" /> Copy Snippet
+                            </Button>
+                          </div>
+                          <pre className="p-3 rounded-lg bg-secondary text-xs font-mono overflow-x-auto text-foreground whitespace-pre-wrap">
 {`<div id="taxforge-calculator"></div>
 <script src="https://taxforgeng.com/embed.js"></script>
 <script>
   TaxForge.init({
     container: '#taxforge-calculator',
-    apiKey: '${partnerKeys.find(k => k.name.startsWith('[Partner]'))?.api_key || 'PARTNER_API_KEY'}'
+    apiKey: '${key.api_key}'
   });
 </script>`}
-                  </pre>
-                  <Button variant="ghost" size="sm" className="mt-2" onClick={() => copyToClipboard(`<div id="taxforge-calculator"></div>\n<script src="https://taxforgeng.com/embed.js"></script>\n<script>\n  TaxForge.init({\n    container: '#taxforge-calculator',\n    apiKey: '${partnerKeys.find(k => k.name.startsWith('[Partner]'))?.api_key || 'PARTNER_API_KEY'}'\n  });\n</script>`)}>
-                    <Copy className="h-4 w-4" /> Copy Snippet
-                  </Button>
+                          </pre>
+                        </div>
+
+                        {/* Stats + Actions */}
+                        <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <BarChart3 className="h-3 w-3" />
+                              {key.requests_today}/{key.rate_limit_daily} today
+                            </span>
+                            <span>Total: {key.requests_total.toLocaleString()}</span>
+                            <span>Created: {new Date(key.created_at).toLocaleDateString()}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => toggleKeyStatus(key.id, key.is_active)}>
+                              <Shield className="h-4 w-4" />
+                              {key.is_active ? 'Deactivate' : 'Activate'}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => {
+                                if (window.confirm(`Delete partner key for "${displayName}"? This cannot be undone.`)) {
+                                  deleteApiKey(key.id);
+                                }
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" /> Delete
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
