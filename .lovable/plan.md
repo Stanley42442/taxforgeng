@@ -1,66 +1,46 @@
 
+## Add Google Analytics 4 (GA4) Tracking
 
-## Enhanced Embeddable Widget: Tabbed Multi-Calculator
+### What This Does
+Adds Google Analytics 4 to your site using your Measurement ID `G-04PEEW31NE`. This will let you see detailed traffic data including human vs bot filtering, demographics, page flows, and custom events.
 
-### Bug Fix
+### Changes
 
-**Redundant PIT display**: When entity type is "Business Name", the results show a "PIT" line item whose value is identical to "Total Tax Payable". This happens because for business names, PIT is the only tax component -- so displaying it separately is redundant. The fix is to replace the single "PIT" line with a **band-by-band breakdown** showing how income is taxed across the 6 progressive PIT bands (matching the main app's behavior).
+**1. Update Content Security Policy (index.html, line 8)**
+Add `https://www.googletagmanager.com` and `https://www.google-analytics.com` to the `script-src` and `connect-src` directives so the GA4 scripts are allowed to load and send data.
 
-### New Feature: Tabbed Interface
+**2. Add GA4 script tags (index.html, inside `<head>`)**
+Insert the standard Google Analytics `gtag.js` snippet right after the CSP meta tags:
+- An async script loading `https://www.googletagmanager.com/gtag/js?id=G-04PEEW31NE`
+- An inline script initializing `gtag()` with your Measurement ID
 
-Transform the single-calculator widget into a **three-tab layout**:
+### Technical Details
 
-| Tab | Purpose | Key Inputs |
-|-----|---------|------------|
-| **Business** | Current business/company calculator (enhanced) | Entity type, turnover, expenses, fixed assets, rent paid |
-| **Personal (PIT)** | Individual salary/income tax | Gross salary, pension, NHF, NHIS, rent relief, life insurance, mortgage interest |
-| **VAT** | Simple VAT calculator | Amount, direction (inclusive/exclusive), VAT rate |
+The CSP `script-src` directive will be updated from:
+```
+script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co https://api.ipify.org https://cdn.gpteng.co
+```
+to:
+```
+script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co https://api.ipify.org https://cdn.gpteng.co https://www.googletagmanager.com
+```
 
-### Tab Details
+The `connect-src` directive will add `https://www.google-analytics.com https://analytics.google.com` so GA4 can send tracking data.
 
-**Business Tab (enhanced from current)**
-- Keep existing entity type selector (Business Name / Company)
-- Add "Rent Paid" input for business names (enables rent relief calculation)
-- Replace redundant PIT line with progressive band breakdown
-- Show CIT + Development Levy breakdown for companies
-- Show small company exemption alert when applicable
+The GA4 snippet inserted will be:
+```html
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-04PEEW31NE"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-04PEEW31NE');
+</script>
+```
 
-**Personal (PIT) Tab**
-- Gross annual salary input
-- Optional deduction inputs: Pension (8% cap), NHF, NHIS, Life Insurance, Annual Rent (for rent relief), Mortgage Interest
-- Uses 2026 rules (6-band PIT with 800k exemption)
-- Shows: net taxable income, tax per band, total tax, effective rate, monthly take-home
-- Monthly take-home formula: `(gross - pension - annual_tax) / 12`
+### Files Modified
+- `index.html` -- CSP update + GA4 script tags (only file changed)
 
-**VAT Tab**
-- Amount input
-- Toggle: "Calculate VAT on amount" vs "Extract VAT from amount"
-- VAT rate: default 7.5%, editable
-- Shows: VAT amount, total (inclusive), net (exclusive)
-- Small business exemption note (turnover under 25M)
-
-### Technical Approach
-
-All changes are contained within `src/components/EmbeddableCalculator.tsx`:
-
-1. **Add tab state** and a simple custom tab bar styled with the partner's theme colors (no external UI library dependency -- the widget uses inline styles for iframe isolation)
-2. **Reuse the 2026 PIT band logic** directly in the component (same constants and progressive calculation already present, just needs band-level output)
-3. **Business tab**: Add rent paid input, replace PIT result line with band breakdown items
-4. **Personal tab**: New input section with salary + 6 optional deduction fields, calculate using the same progressive band logic with relief subtraction
-5. **VAT tab**: Simple two-field calculator with direction toggle
-6. **Results section**: Each tab renders its own result card with relevant breakdown items
-7. **CTA link**: Add a subtle "Get full features on TaxForge NG" link in results pointing to the main app (not just powered-by)
-8. **iframe height**: Update `embed.js` default height from 650 to ~750 to accommodate tabs
-
-### What stays out of the widget (conversion drivers)
-
-- No OCR receipt scanning
-- No PDF export
-- No save/history
-- No comparison mode (2026 vs pre-2026)
-- No sector presets
-- No reverse salary solver
-- No authentication or database calls
-
-Everything remains purely client-side with manual inputs.
-
+### What You'll See After
+Within 24-48 hours, data will start appearing in your GA4 dashboard at [analytics.google.com](https://analytics.google.com). You'll be able to see real-time visitors, traffic sources, page paths, and GA4's built-in bot filtering.
