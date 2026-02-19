@@ -76,6 +76,7 @@ export const useUpcomingReminders = () => {
           event: "*",
           schema: "public",
           table: "reminders",
+          filter: `user_id=eq.${user.id}`,
         },
         () => {
           fetchReminders();
