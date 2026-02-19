@@ -20,13 +20,14 @@ export const useUpcomingReminders = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!user) {
+      setReminders([]);
+      setUrgentCount(0);
+      setLoading(false);
+      return;
+    }
+
     const fetchReminders = async () => {
-      if (!user) {
-        setReminders([]);
-        setUrgentCount(0);
-        setLoading(false);
-        return;
-      }
 
       const { data, error } = await supabase
         .from("reminders")
