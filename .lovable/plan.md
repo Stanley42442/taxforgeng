@@ -1,79 +1,132 @@
 
-## Reduce Cloud Hosting Costs — Cron Job Optimisation
+## Additional Cost Reductions — Keeping Cloud Balance Under $25/month
 
-### Root Cause of Overspend
+This plan addresses every remaining cost driver found in the codebase, ranked from highest to lowest impact. No user-facing functionality changes at all.
 
-There are currently **two overlapping cron jobs** both calling the `check-reminders` edge function:
+---
 
-- `check-reminders-every-minute` — fires every 1 minute (`* * * * *`) = **1,440 invocations/day**
-- `daily-reminder-check` — fires once at 8am (`0 8 * * *`) = **1/day**
+### What Was Already Fixed
+The 1-minute cron job has been dropped and replaced with a 15-minute job. That alone cut ~1,344 daily invocations. The remaining issues below are the next biggest sources of waste.
 
-The 1-minute job is the primary cost driver. Tax deadlines do not change minute-to-minute — reminders only need to be checked a few times a day. The function already has a built-in duplicate-prevention guard (`last_notified_at` within the last hour), so high-frequency polling is completely wasted compute.
+---
 
-### All Changes (Zero User-Facing Impact)
+### Issue 1 — Client-Side Reminder Polling (HIGH IMPACT)
 
-#### 1. Drop the 1-minute cron job (SQL — no migration needed, data-only)
+**File:** `src/hooks/useReminderNotifications.ts`
 
-Delete the `check-reminders-every-minute` job from `cron.job`. The `daily-reminder-check` at 8am already covers tax deadline reminders (VAT, PAYE, PIT, CIT). This alone reduces invocations from **1,440/day → 1/day** for this function.
+This hook runs a `setInterval` that fires **every 60 seconds** for every logged-in user tab. Each tick makes **2 separate database queries** (upcoming reminders + overdue reminders). With even a modest number of active users, this is the biggest remaining cost driver after the cron job.
 
-For custom reminders (which fire at an exact time), we'll replace the 1-minute job with a smarter **every-15-minutes** job. This means a custom reminder fires within 15 minutes of the set time — imperceptible to users, but 96x cheaper (96 calls/day instead of 1,440).
-
-```sql
--- Drop the expensive every-minute job
-SELECT cron.unschedule('check-reminders-every-minute');
-
--- Add a replacement every-15-minutes job (covers custom reminders)
-SELECT cron.schedule(
-  'check-reminders-every-15-min',
-  '*/15 * * * *',
-  $$
-  SELECT net.http_post(
-    url := 'https://uhuxqrrtsiintcwpxxwy.supabase.co/functions/v1/check-reminders',
-    headers := '{"Content-Type": "application/json", "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVodXhxcnJ0c2lpbnRjd3B4eHd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwNzA1MDcsImV4cCI6MjA4MjY0NjUwN30.cRyLR7E_0o6jEsa4fEODCqo-LwccYEoXt01FtmunrUc"}'::jsonb,
-    body := '{}'::jsonb
-  ) AS request_id;
-  $$
-);
-```
-
-#### 2. Widen the custom-reminder time window in `check-reminders/index.ts`
-
-The current code only triggers a custom reminder if the due time is **within 5 minutes** of now. Since we're now checking every 15 minutes, we need to widen this window to **20 minutes** to ensure no custom reminder is ever missed.
+The fix: increase the polling interval from **1 minute to 5 minutes**. The 5-minute window check in the query logic is also widened to match. Users will still get in-browser toast and sound notifications — just with a maximum 5-minute delay, which is imperceptible for tax deadline reminders.
 
 ```typescript
-// BEFORE (index.ts line ~238)
-const isTimeToSend = timeDiff >= 0 && timeDiff <= 5 * 60 * 1000;
+// BEFORE
+const fiveMinutesFromNow = new Date(now.getTime() + 5 * 60 * 1000);
+// ...
+.lt("due_date", now.toISOString())
+.gte("due_date", new Date(now.getTime() - 5 * 60 * 1000).toISOString());
+// ...
+setInterval(checkDueReminders, 60 * 1000);
 
 // AFTER
-const isTimeToSend = timeDiff >= 0 && timeDiff <= 20 * 60 * 1000;
+const twentyMinutesFromNow = new Date(now.getTime() + 20 * 60 * 1000);
+// ...
+.lt("due_date", now.toISOString())
+.gte("due_date", new Date(now.getTime() - 20 * 60 * 1000).toISOString());
+// ...
+setInterval(checkDueReminders, 5 * 60 * 1000);
 ```
 
-The `last_notified_at` duplicate guard (already in place) ensures the email is only ever sent once even if the wider window causes multiple checks to "see" the reminder.
+**Estimated saving:** ~80% reduction in reminder-related DB queries per active session.
 
-### Projected Savings
+---
 
-| Job | Before | After | Reduction |
-|---|---|---|---|
-| check-reminders (1-min job) | 1,440/day | **deleted** | -1,440/day |
-| check-reminders (15-min job) | 0/day | 96/day | replacement |
-| check-reminders (daily 8am) | 1/day | 1/day | unchanged |
-| send-scheduled-reports (hourly) | 24/day | 24/day | unchanged |
-| All others | 3/day | 3/day | unchanged |
-| **Total** | **1,468/day** | **124/day** | **~91% reduction** |
+### Issue 2 — Documentation Stats Polling Every 30 Seconds (MEDIUM IMPACT)
+
+**File:** `src/hooks/useDocumentationStats.ts`
+
+The Documentation page polls 8 different database tables every **30 seconds** (`refetchInterval: 30000`). These are aggregate counts (total users, businesses, calculations, etc.) that change slowly. Polling this frequently is pure waste — the numbers shown are for informational purposes only.
+
+The fix: increase `refetchInterval` to **10 minutes** (`600000ms`) and `staleTime` to **5 minutes**. The stats still refresh automatically when the page is opened.
+
+```typescript
+// BEFORE
+refetchInterval: 30000,
+staleTime: 10000,
+
+// AFTER
+refetchInterval: 10 * 60 * 1000,  // 10 minutes
+staleTime: 5 * 60 * 1000,         // 5 minutes
+```
+
+**Estimated saving:** ~95% reduction in documentation stats queries (from 120/hour to 6/hour).
+
+---
+
+### Issue 3 — `send-scheduled-reports` Runs Every Hour Even When Nothing to Send (MEDIUM IMPACT)
+
+**File:** Cron schedule (database only, no code change)
+
+The hourly `send-scheduled-reports` cron invokes the edge function 24 times a day. Looking at the function code, it checks report schedules internally — running hourly is necessary for daily/weekly/monthly reports. However, it can be reduced to **every 2 hours** without any impact, since the function already filters by `currentHour` and `currentDayOfWeek`. A schedule that runs at `:00` and `:30` of each 2-hour block would still catch every report window.
+
+Actually, on review the function uses exact hour matching (`currentHour === schedule.send_hour`). Changing to every 2 hours would cause users to miss their exact scheduled hour. This one should **remain at hourly** — it is already correctly scoped.
+
+---
+
+### Issue 4 — Realtime Channels Open for Tables That Change Rarely (LOW IMPACT)
+
+**File:** `src/contexts/SubscriptionContext.tsx`
+
+The `SubscriptionContext` opens **2 realtime channels per logged-in user**:
+- `profile-changes-{userId}` — listens for profile updates (subscription tier changes)
+- `business-changes-{userId}` — listens for any business INSERT/UPDATE/DELETE
+
+The business changes channel calls `refreshBusinesses()` on every change, which re-fetches the entire business list. This is fine for correctness but the realtime connection itself adds to the compute bill. These channels are justified since tier changes must propagate in real time. No change recommended here — the benefit outweighs the cost.
+
+---
+
+### Issue 5 — `useUpcomingReminders` Realtime Channel Has No User Filter (LOW IMPACT)
+
+**File:** `src/hooks/useUpcomingReminders.ts`
+
+The realtime subscription listens to `reminders` changes with **no row-level filter**:
+```typescript
+// CURRENT — listens to ALL reminder changes for all users
+event: '*',
+schema: 'public',
+table: 'reminders',
+```
+
+This means Postgres sends the change event to every connected client whenever any user updates a reminder. The fix is to add a user filter so only that user's own changes trigger a re-fetch:
+```typescript
+filter: `user_id=eq.${user.id}`
+```
+
+**Estimated saving:** Reduces unnecessary client-side re-fetches for high-traffic scenarios.
+
+---
+
+### Summary of All Changes
+
+| File | Change | Impact |
+|---|---|---|
+| `src/hooks/useReminderNotifications.ts` | Poll every 5 min instead of 1 min; widen query window to 20 min | HIGH |
+| `src/hooks/useDocumentationStats.ts` | Refetch every 10 min instead of 30 sec | MEDIUM |
+| `src/hooks/useUpcomingReminders.ts` | Add `user_id` filter to realtime subscription | LOW |
 
 ### What Does NOT Change
 
-- Users still receive email reminders for VAT, PAYE, PIT, CIT deadlines
-- Custom reminders still fire — just within a 15-minute window instead of 5 minutes
-- The daily 8am check remains in place as the primary reminder sweep
-- No database schema changes
-- No UI or page changes
-- No authentication or subscription logic touched
-- `send-scheduled-reports`, trial reminders, and winback emails are all already on sensible daily/hourly schedules — no changes needed
+- Users still get in-browser toast notifications for due reminders (just up to 5 min later, same as the server-side check)
+- Documentation stats page still refreshes automatically (every 10 min instead of 30 sec)
+- All realtime channels remain open — no subscriptions removed
+- No cron schedules modified (the 15-min job already handles server-side reminders)
+- No authentication, payment, or subscription logic touched
+- No database schema changes required
+- No new files created
 
 ### Files to Modify
 
 | File | Change |
 |---|---|
-| `supabase/functions/check-reminders/index.ts` | Widen custom reminder window from 5 min to 20 min |
-| Database (SQL via insert tool) | Drop 1-min cron, add 15-min cron |
+| `src/hooks/useReminderNotifications.ts` | Increase polling from 1 min to 5 min; widen query time window |
+| `src/hooks/useDocumentationStats.ts` | Increase refetch from 30 sec to 10 min |
+| `src/hooks/useUpcomingReminders.ts` | Add `user_id` filter to realtime channel |
