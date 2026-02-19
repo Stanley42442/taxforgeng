@@ -1,136 +1,109 @@
 
-## Add a Public Partner/Embed Demo Page for Backlink Partnerships
+## Partnership Request Review System with Approval/Rejection Emails
 
-### What You're Building
-A polished, publicly accessible page at `/embed-partner` (also accessible as `/demo-widget`) that serves as the partnership landing page. It gives prospective partners everything they need to embed the TaxForge calculator on their site and link back to you:
+### What Needs to Change
 
-1. **Live sandbox demo** — an interactive, no-API-key version of the calculator they can play with right now
-2. **Ready-to-paste embed snippets** — both JS SDK and iframe options, with comments and a copy button
-3. **Integration guide** — a clear, step-by-step inline guide covering setup, customization, and troubleshooting (also exportable as PDF)
-4. **Partnership CTA** — a contact/request form to get an API key, driving the backlink partnership workflow
+The `partnership_requests` table is missing a partner **email** field — without it there's no way to email them when you approve or reject. The admin panel also has no UI to see or act on requests. Two new email-sending scenarios need backend functions.
 
----
+### Full Scope of Changes
 
-### Why This Is a Separate Page (Not Behind a Login)
-The current `/api-docs` page requires login and a Corporate/Business subscription. This new page is fully **public** — no login needed — so any blogger, fintech site, or accountancy firm can discover it via SEO, see the widget working, copy an embed snippet for testing, and then contact you for an official API key. That's how the backlink loop works.
-
----
-
-### Pages & Files to Create/Modify
-
-**1. New file: `src/pages/EmbedPartner.tsx`** (the main public page)
-
-Structure:
-```
-Hero Section
-  - Headline: "Embed Nigeria's Most Accurate Tax Calculator on Your Site"
-  - Subheadline: "Free for media, fintechs & accountancy firms. We provide the tool, you earn the backlink credit."
-  - Two CTAs: [Try the Demo ↓] [Request API Key →]
-
-Live Demo Section (/demo-widget anchor)
-  - Full EmbeddableCalculator rendered in sandbox mode (no API key required — uses a public demo mode)
-  - Label: "Sandbox — results are real, no key required"
-
-Embed Code Snippets Section
-  - Tab toggle: JS SDK | iFrame
-  - JS SDK snippet (commented):
-      <!-- Step 1: Add the container div -->
-      <div id="taxforge-calculator"></div>
-      <!-- Step 2: Load the SDK -->
-      <script src="https://taxforgeng.com/embed.js"></script>
-      <!-- Step 3: Initialize with your API key -->
-      <script>
-        TaxForge.init({
-          container: '#taxforge-calculator',
-          apiKey: 'YOUR_API_KEY_HERE'
-        });
-      </script>
-  - Copy button for each
-  - Note: "Replace YOUR_API_KEY_HERE with your partner key. Request one below."
-
-Integration Guide Section
-  - Step-by-step inline guide with numbered steps:
-    1. Request an API key (link to form below)
-    2. Add the snippet to your site's HTML
-    3. Optional: Customize colors, font and brand name
-    4. Troubleshooting: common issues (domain mismatch, key inactive, etc.)
-  - "Download as PDF" button (uses existing jspdf library)
-
-Partnership Request Form Section
-  - Fields: Name, Organization, Website URL, Monthly pageviews (select), Message
-  - On submit: saves to a new `partnership_requests` database table
-  - Auto-emails admin via existing `send-welcome-email` pattern (or a new simple edge function)
-
-Trust / Why Partner Section
-  - Stats: 10,000+ calculations/month, 2026 Nigeria Tax Act compliant, Mobile-friendly
-  - Logos / trust badges
-
-SEO
-  - Uses existing SEOHead component
-  - Schema: SoftwareApplication + HowTo
-  - Canonical: /embed-partner
-```
-
-**2. New database table: `partnership_requests`**
+#### 1. Database Migration — Add `email` and `reviewed_at` to `partnership_requests`
 ```sql
-id uuid PRIMARY KEY DEFAULT gen_random_uuid()
-name text NOT NULL
-organization text NOT NULL
-website_url text NOT NULL
-monthly_pageviews text
-message text
-status text DEFAULT 'pending'
-created_at timestamptz DEFAULT now()
+ALTER TABLE public.partnership_requests
+  ADD COLUMN email text,
+  ADD COLUMN reviewed_at timestamptz,
+  ADD COLUMN reviewer_note text;
 ```
-- RLS: insert-only for anon users (public form), select/update only for authenticated admins
+- `email`: The partner's contact email (so you can reply to them)
+- `reviewed_at`: Timestamp when the admin acted
+- `reviewer_note`: Optional private note the admin adds when rejecting/approving
 
-**3. New edge function: `send-partnership-inquiry`** (lightweight)
-- Called after form submit
-- Sends a simple notification email to the admin address using existing Resend setup
-- Returns 200 OK so the form can show success
+#### 2. Update `src/pages/EmbedPartner.tsx` — Add Email Field to the Request Form
+The existing form has: Name, Organization, Website URL, Monthly Pageviews, Message.
+A new **Email** field will be added (required) so the partner can receive your decision.
+The email will be sent to the backend along with the rest of the form data.
 
-**4. Modify `src/App.tsx`**
-- Add lazy import for `EmbedPartner`
-- Add two routes: `/embed-partner` and `/demo-widget` (alias redirect to `/embed-partner`)
+#### 3. New Backend Function: `send-partner-decision`
+A single new edge function that handles both Approve and Reject emails to the partner. It receives:
+```json
+{
+  "requestId": "uuid",
+  "decision": "approved" | "rejected",
+  "partnerEmail": "jane@example.com",
+  "partnerName": "Jane",
+  "organization": "Finance Hub",
+  "reviewerNote": "Optional private message"
+}
+```
 
-**5. Modify `src/components/EmbeddableCalculator.tsx`**
-- Add a `sandboxMode` prop (boolean, default `false`)
-- When `sandboxMode=true`, skip API key validation and render directly — this lets the demo page show the widget without requiring a real key
+**Approved email** to the partner includes:
+- Congratulations message
+- The embed snippet with their actual API key (fetched server-side from `partners` table by matching org name / admin-created key)
+- Integration guide link
+- Backlink attribution reminder
+- Link to `/embed-partner#guide`
 
-**6. Optionally modify `src/components/NavMenu.tsx` or footer**
-- Add "Partner with Us" link in the footer or nav under a "Developers" section for discoverability
+**Rejected email** to the partner includes:
+- Polite decline message  
+- Reviewer note if provided
+- Invitation to reapply in 3 months or try the free sandbox demo
+- Link back to `/embed-partner`
 
----
+The function uses the Resend API (same as existing functions, `RESEND_API_KEY` already configured).
 
-### The Demo Widget Flow
+#### 4. Add Partnership Requests Admin Panel to `src/pages/AdminAnalytics.tsx`
 
-The public demo uses the existing `EmbeddableCalculator` React component directly on the page (not via iframe), so it works without any API key or server call. This is purely client-side calculation — same as the embed component already is. The distinction is just that the full embed page (`/embed/calculator`) requires API key validation via the edge function, but the public demo page renders the component directly in React, which needs no key at all.
+A new **"Partnership Requests"** section is added at the bottom of the admin analytics page. It is only visible to admins (already gated). It includes:
 
----
+- A table/card list of all submitted `partnership_requests` rows
+- Columns: Name, Organization, Website, Monthly Pageviews, Submitted date, Status badge
+- **For pending requests**: two buttons — `Approve` (green) and `Reject` (destructive)
+- **For approved/rejected**: shows timestamp and a status badge, no action buttons
+- Clicking **Approve**:
+  1. Updates the `status` to `'approved'` and sets `reviewed_at = now()` in the database
+  2. Calls `send-partner-decision` edge function with `decision: 'approved'`
+  3. Shows a toast: "Partnership approved. Email sent to [partner]."
+- Clicking **Reject**:
+  1. Opens a small inline input for an optional reviewer note
+  2. Updates the `status` to `'rejected'` and sets `reviewed_at = now()`
+  3. Calls `send-partner-decision` edge function with `decision: 'rejected'` and the note
+  4. Shows a toast: "Partnership declined. Email sent to [partner]."
+- Real-time updates (the admin list refreshes after each action)
 
-### Integration Guide PDF Content (inline + downloadable)
+#### 5. Add a Summary Stat Card in Admin Analytics
+A small "Partnership Requests" count card added alongside the existing stats (pending count badge + total).
 
-The PDF will contain:
-1. Prerequisites (none — just a website with HTML)
-2. Step-by-step embed instructions (JS SDK method)
-3. Customization options (colors, font, brand name via white-label branding)
-4. Handling calculation results (postMessage API)
-5. Troubleshooting table:
-   | Problem | Cause | Fix |
-   |---------|-------|-----|
-   | Widget shows "Invalid API key" | Wrong key or key deleted | Check key in partner dashboard |
-   | Widget shows "Domain not authorized" | Your domain not in allowlist | Contact admin to add domain |
-   | Widget shows blank | Incorrect container selector | Ensure `#taxforge-calculator` div exists |
-6. Contact info / support email
+### Flow Diagram
 
----
+```text
+Partner fills form at /embed-partner
+        ↓
+Saved to partnership_requests table  ← admin notified via email (existing)
+        ↓
+Admin opens Admin Analytics → Partnership Requests section
+        ↓
+Admin clicks Approve or Reject
+        ↓
+DB updated (status + reviewed_at)
+        ↓
+send-partner-decision edge function called
+        ↓
+Partner receives "Approved" or "Rejected" email via Resend
+```
 
-### Technical Details
+### Technical Notes
 
-- **No SSR needed**: The demo calculator is already a client-side React component — renders instantly, no API calls
-- **Partnership form**: Saves to `partnership_requests` table with anon insert RLS. No auth required for visitors
-- **PDF generation**: Uses the already-installed `jspdf` library (same as other PDF exports in the codebase)
-- **Sandbox mode**: A simple boolean prop on `EmbeddableCalculator` — when true, hides the "Powered by" admin link and shows a "Sandbox" badge
-- **Routes**: `/demo-widget` redirects to `/embed-partner#demo` for clean URLs in pitches to partners
-- **Admin visibility**: Partnership requests will be viewable in the admin analytics area (or a simple new admin table view can be added later)
-- **Edge function**: `send-partnership-inquiry` follows the same pattern as `send-reminder-email` — receives name/org/website, sends a plain-text email to the admin, returns 200
+- The `send-partner-decision` function does NOT auto-generate an API key — you said you want to review first, and key creation remains manual via the existing `/api-docs` admin panel. The approval email instead instructs the partner that their key will follow separately within 24 hours.
+- If you later want to auto-generate the key on approval, the `create-partner-key` edge function is already in place and can be wired in with a single call.
+- No new secrets needed — `RESEND_API_KEY` is already configured.
+- The admin table fetches from `partnership_requests` using the existing admin RLS policy (`has_role('admin')`).
+- All email rendering follows the same HTML-table pattern as `send-welcome-email` and `send-partnership-inquiry` for visual consistency.
+
+### Files to Create/Modify
+
+| File | Action |
+|---|---|
+| `supabase/migrations/...sql` | ADD email, reviewed_at, reviewer_note columns |
+| `src/pages/EmbedPartner.tsx` | Add email field to form |
+| `supabase/functions/send-partner-decision/index.ts` | CREATE new edge function |
+| `src/pages/AdminAnalytics.tsx` | Add partnership requests section + approve/reject UI |
