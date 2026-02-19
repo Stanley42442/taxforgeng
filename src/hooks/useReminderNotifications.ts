@@ -49,7 +49,7 @@ export const useReminderNotifications = () => {
     if (!user) return;
 
     const now = new Date();
-    const fiveMinutesFromNow = new Date(now.getTime() + 5 * 60 * 1000);
+    const twentyMinutesFromNow = new Date(now.getTime() + 20 * 60 * 1000);
 
     const { data: reminders, error } = await supabase
       .from("reminders")
@@ -57,7 +57,7 @@ export const useReminderNotifications = () => {
       .eq("user_id", user.id)
       .eq("is_completed", false)
       .eq("notify_email", true)
-      .lte("due_date", fiveMinutesFromNow.toISOString())
+      .lte("due_date", twentyMinutesFromNow.toISOString())
       .gte("due_date", now.toISOString());
 
     if (error) {
@@ -107,7 +107,7 @@ export const useReminderNotifications = () => {
       .eq("is_completed", false)
       .eq("notify_email", true)
       .lt("due_date", now.toISOString())
-      .gte("due_date", new Date(now.getTime() - 5 * 60 * 1000).toISOString());
+      .gte("due_date", new Date(now.getTime() - 20 * 60 * 1000).toISOString());
 
     if (overdueError) {
       logger.error("Error checking overdue reminders:", overdueError);
@@ -158,7 +158,7 @@ export const useReminderNotifications = () => {
     checkDueReminders();
 
     // Check every minute
-    checkIntervalRef.current = setInterval(checkDueReminders, 60 * 1000);
+    checkIntervalRef.current = setInterval(checkDueReminders, 5 * 60 * 1000);
 
     return () => {
       if (checkIntervalRef.current) {

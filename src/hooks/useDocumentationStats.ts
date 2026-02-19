@@ -48,7 +48,7 @@ export const useDocumentationStats = () => {
         totalIndividualCalcs: individualCalcsResult.count ?? 0,
       };
     },
-    refetchInterval: 30000, // Refresh every 30 seconds
-    staleTime: 10000,
+    refetchInterval: 10 * 60 * 1000, // Refresh every 10 minutes
+    staleTime: 5 * 60 * 1000,
   });
 };
