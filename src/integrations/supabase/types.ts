@@ -1757,6 +1757,39 @@ export type Database = {
         }
         Relationships: []
       }
+      partnership_requests: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          monthly_pageviews: string | null
+          name: string
+          organization: string
+          status: string
+          website_url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          monthly_pageviews?: string | null
+          name: string
+          organization: string
+          status?: string
+          website_url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          monthly_pageviews?: string | null
+          name?: string
+          organization?: string
+          status?: string
+          website_url?: string
+        }
+        Relationships: []
+      }
       password_history: {
         Row: {
           created_at: string
