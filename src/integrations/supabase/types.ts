@@ -1760,31 +1760,40 @@ export type Database = {
       partnership_requests: {
         Row: {
           created_at: string
+          email: string | null
           id: string
           message: string | null
           monthly_pageviews: string | null
           name: string
           organization: string
+          reviewed_at: string | null
+          reviewer_note: string | null
           status: string
           website_url: string
         }
         Insert: {
           created_at?: string
+          email?: string | null
           id?: string
           message?: string | null
           monthly_pageviews?: string | null
           name: string
           organization: string
+          reviewed_at?: string | null
+          reviewer_note?: string | null
           status?: string
           website_url: string
         }
         Update: {
           created_at?: string
+          email?: string | null
           id?: string
           message?: string | null
           monthly_pageviews?: string | null
           name?: string
           organization?: string
+          reviewed_at?: string | null
+          reviewer_note?: string | null
           status?: string
           website_url?: string
         }

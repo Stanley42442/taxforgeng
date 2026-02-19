@@ -3,9 +3,11 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { supabase } from "@/lib/supabaseClient";
+import { toast } from "sonner";
 
 import { 
   BarChart3,
@@ -31,7 +33,13 @@ import {
   XCircle,
   Clock,
   Gift,
-  Percent
+  Percent,
+  Handshake,
+  ThumbsUp,
+  ThumbsDown,
+  ExternalLink,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import { format, subDays, startOfDay, endOfDay, subMonths, startOfMonth, endOfMonth, eachMonthOfInterval, eachDayOfInterval } from "date-fns";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
@@ -127,6 +135,20 @@ const TIER_COLORS: Record<string, string> = {
   corporate: 'hsl(var(--primary))'
 };
 
+interface PartnershipRequest {
+  id: string;
+  name: string;
+  organization: string;
+  website_url: string;
+  monthly_pageviews: string | null;
+  message: string | null;
+  email: string | null;
+  status: string;
+  created_at: string;
+  reviewed_at: string | null;
+  reviewer_note: string | null;
+}
+
 const AdminAnalytics = () => {
   const { user } = useAuth();
   const { isAdmin, loading: adminLoading } = useAdminCheck();
@@ -134,6 +156,13 @@ const AdminAnalytics = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  
+  // Partnership requests state
+  const [partnershipRequests, setPartnershipRequests] = useState<PartnershipRequest[]>([]);
+  const [partnershipLoading, setPartnershipLoading] = useState(false);
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
+  const [rejectNotes, setRejectNotes] = useState<Record<string, string>>({});
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
   
   // Date filter state
   const [datePreset, setDatePreset] = useState<DatePreset>('all');
@@ -485,6 +514,66 @@ const AdminAnalytics = () => {
     }
   }, [getDateRange]);
 
+  // Fetch partnership requests
+  const fetchPartnershipRequests = useCallback(async () => {
+    setPartnershipLoading(true);
+    try {
+      const { data, error } = await (supabase as any)
+        .from('partnership_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (!error && data) setPartnershipRequests(data);
+    } catch (err) {
+      console.error('Error fetching partnership requests:', err);
+    } finally {
+      setPartnershipLoading(false);
+    }
+  }, []);
+
+  const handlePartnerDecision = async (req: PartnershipRequest, decision: 'approved' | 'rejected') => {
+    if (!req.email) {
+      toast.error("This request has no email address — cannot send notification.");
+      return;
+    }
+    setActionLoading(req.id);
+    try {
+      const note = decision === 'rejected' ? (rejectNotes[req.id] || '') : '';
+
+      // Update DB
+      const { error: dbErr } = await (supabase as any)
+        .from('partnership_requests')
+        .update({ status: decision, reviewed_at: new Date().toISOString(), reviewer_note: note || null })
+        .eq('id', req.id);
+      if (dbErr) throw dbErr;
+
+      // Send email via edge function
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/send-partner-decision`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          requestId: req.id,
+          decision,
+          partnerEmail: req.email,
+          partnerName: req.name,
+          organization: req.organization,
+          reviewerNote: note,
+        }),
+      });
+      if (!res.ok) console.warn('Email send warning:', await res.text());
+
+      const verb = decision === 'approved' ? 'approved' : 'declined';
+      toast.success(`Partnership ${verb}. Email sent to ${req.email}.`);
+      setRejectingId(null);
+      setRejectNotes((n) => { const c = { ...n }; delete c[req.id]; return c; });
+      fetchPartnershipRequests();
+    } catch (err: any) {
+      toast.error('Action failed: ' + (err.message || 'Unknown error'));
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   // Initial fetch and real-time subscriptions
   useEffect(() => {
     if (adminLoading) return;
@@ -495,6 +584,7 @@ const AdminAnalytics = () => {
     }
 
     fetchAnalytics();
+    fetchPartnershipRequests();
 
     // Set up real-time subscriptions
     const channel = supabase
@@ -1175,6 +1265,157 @@ const AdminAnalytics = () => {
                   <div className="text-center py-8 text-muted-foreground">
                     <Clock className="h-10 w-10 mx-auto mb-2 opacity-50" />
                     <p>No transactions yet</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* ── Partnership Requests ── */}
+          <div className="mt-8 mb-6">
+            <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+              <Handshake className="h-6 w-6 text-primary" />
+              Partnership Requests
+              {partnershipRequests.filter(r => r.status === 'pending').length > 0 && (
+                <span className="inline-flex items-center justify-center h-6 min-w-6 px-1.5 rounded-full bg-warning text-warning-foreground text-xs font-bold">
+                  {partnershipRequests.filter(r => r.status === 'pending').length}
+                </span>
+              )}
+            </h2>
+
+            {/* Summary stat */}
+            <div className="grid gap-4 md:grid-cols-3 mb-6">
+              {[
+                { label: 'Total Requests', value: partnershipRequests.length, color: 'text-foreground' },
+                { label: 'Pending Review', value: partnershipRequests.filter(r => r.status === 'pending').length, color: 'text-warning' },
+                { label: 'Approved', value: partnershipRequests.filter(r => r.status === 'approved').length, color: 'text-success' },
+              ].map((s) => (
+                <Card key={s.label}>
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{s.label}</CardTitle>
+                    <Handshake className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <Card>
+              <CardContent className="pt-6">
+                {partnershipLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    <span className="ml-2 text-muted-foreground">Loading requests…</span>
+                  </div>
+                ) : partnershipRequests.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Handshake className="h-12 w-12 mx-auto mb-3 opacity-40" />
+                    <p className="font-medium">No partnership requests yet</p>
+                    <p className="text-xs mt-1">Requests submitted via /embed-partner will appear here</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {partnershipRequests.map((req) => (
+                      <div key={req.id} className={`rounded-xl border p-4 transition-colors ${
+                        req.status === 'pending' ? 'border-warning/40 bg-warning/5' :
+                        req.status === 'approved' ? 'border-success/40 bg-success/5' :
+                        'border-border bg-secondary/20'
+                      }`}>
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2 mb-1">
+                              <span className="font-semibold text-foreground">{req.name}</span>
+                              <span className="text-muted-foreground text-sm">·</span>
+                              <span className="text-sm font-medium text-primary">{req.organization}</span>
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${
+                                req.status === 'pending' ? 'bg-warning/20 text-warning-foreground border border-warning/40' :
+                                req.status === 'approved' ? 'bg-success/20 text-success border border-success/40' :
+                                'bg-muted text-muted-foreground border border-border'
+                              }`}>
+                                {req.status}
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mt-1">
+                              {req.email && (
+                                <span>📧 {req.email}</span>
+                              )}
+                              <a href={req.website_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-0.5 text-primary hover:underline">
+                                <ExternalLink className="h-3 w-3" /> {req.website_url.replace(/^https?:\/\//, '')}
+                              </a>
+                              {req.monthly_pageviews && <span>👁 {req.monthly_pageviews}/mo</span>}
+                              <span>Submitted {format(new Date(req.created_at), 'MMM d, yyyy')}</span>
+                              {req.reviewed_at && (
+                                <span>Reviewed {format(new Date(req.reviewed_at), 'MMM d, yyyy')}</span>
+                              )}
+                            </div>
+                            {req.message && (
+                              <p className="mt-2 text-xs text-muted-foreground italic bg-secondary/40 rounded-lg px-3 py-2 line-clamp-2">
+                                "{req.message}"
+                              </p>
+                            )}
+                            {req.reviewer_note && req.status !== 'pending' && (
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                <span className="font-medium">Note:</span> {req.reviewer_note}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Actions for pending */}
+                          {req.status === 'pending' && (
+                            <div className="flex flex-col gap-2 shrink-0">
+                              <Button
+                                size="sm"
+                                className="bg-success hover:bg-success/90 text-success-foreground gap-1.5"
+                                disabled={actionLoading === req.id}
+                                onClick={() => handlePartnerDecision(req, 'approved')}
+                              >
+                                {actionLoading === req.id ? (
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : (
+                                  <ThumbsUp className="h-3.5 w-3.5" />
+                                )}
+                                Approve
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                className="gap-1.5"
+                                disabled={actionLoading === req.id}
+                                onClick={() => setRejectingId(rejectingId === req.id ? null : req.id)}
+                              >
+                                <ThumbsDown className="h-3.5 w-3.5" />
+                                Reject
+                                {rejectingId === req.id ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Rejection note input */}
+                        {req.status === 'pending' && rejectingId === req.id && (
+                          <div className="mt-3 pt-3 border-t border-border flex flex-col sm:flex-row gap-2">
+                            <Input
+                              placeholder="Optional: reason for rejection (sent to partner)"
+                              value={rejectNotes[req.id] || ''}
+                              onChange={(e) => setRejectNotes((n) => ({ ...n, [req.id]: e.target.value }))}
+                              className="flex-1 text-sm h-9"
+                            />
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              disabled={actionLoading === req.id}
+                              onClick={() => handlePartnerDecision(req, 'rejected')}
+                              className="shrink-0"
+                            >
+                              {actionLoading === req.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                              Confirm Rejection
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
               </CardContent>

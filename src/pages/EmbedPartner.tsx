@@ -199,6 +199,7 @@ function downloadIntegrationGuide() {
 export default function EmbedPartner() {
   const [formState, setFormState] = useState({
     name: "",
+    email: "",
     organization: "",
     websiteUrl: "",
     monthlyPageviews: "",
@@ -231,7 +232,7 @@ export default function EmbedPartner() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formState.name || !formState.organization || !formState.websiteUrl) {
+    if (!formState.name || !formState.email || !formState.organization || !formState.websiteUrl) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -244,17 +245,18 @@ export default function EmbedPartner() {
 
     setSubmitting(true);
     try {
-      // Save to database
+      // Save to database (including email for decision notifications)
       const { error: dbError } = await supabase.from("partnership_requests").insert({
         name: formState.name,
         organization: formState.organization,
         website_url: formState.websiteUrl,
         monthly_pageviews: formState.monthlyPageviews || null,
         message: formState.message || null,
+        email: formState.email,
       });
       if (dbError) throw dbError;
 
-      // Send notification email (best-effort)
+      // Send admin notification email (best-effort)
       try {
         const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
         await fetch(`https://${projectId}.supabase.co/functions/v1/send-partnership-inquiry`, {
@@ -273,7 +275,7 @@ export default function EmbedPartner() {
       }
 
       setSubmitted(true);
-      toast.success("Request submitted! We'll be in touch within 24 hours.");
+      toast.success("Request submitted! We'll review and email you within 24 hours.");
     } catch (err: any) {
       toast.error("Failed to submit request. Please try again.");
       console.error(err);
@@ -588,6 +590,20 @@ export default function EmbedPartner() {
                         required
                       />
                     </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="pr-email">Email Address <span className="text-destructive">*</span></Label>
+                    <Input
+                      id="pr-email"
+                      type="email"
+                      placeholder="you@yoursite.com"
+                      value={formState.email}
+                      onChange={(e) => setFormState((s) => ({ ...s, email: e.target.value }))}
+                      maxLength={300}
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground">We'll send your approval decision and API key to this address.</p>
                   </div>
 
                   <div className="space-y-1.5">
