@@ -295,7 +295,7 @@ const handler = async (req: Request): Promise<Response> => {
       if (reminder.reminder_type === 'custom') {
         // Check if the reminder time has arrived (within 5 minutes of due time)
         const timeDiff = now.getTime() - dueDate.getTime();
-        const isTimeToSend = timeDiff >= 0 && timeDiff <= 5 * 60 * 1000; // 0 to 5 minutes after due time
+        const isTimeToSend = timeDiff >= 0 && timeDiff <= 20 * 60 * 1000; // 0 to 20 minutes after due time (matches 15-min cron cadence)
         
         if (!isTimeToSend) {
           continue;
