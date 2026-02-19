@@ -68,6 +68,7 @@ const Notifications = lazy(() => import("./pages/Notifications"));
 const SectorGuide = lazy(() => import("./pages/SectorGuide"));
 const PartnerBranding = lazy(() => import("./pages/PartnerBranding"));
 const EmbedCalculator = lazy(() => import("./pages/EmbedCalculator"));
+const EmbedPartner = lazy(() => import("./pages/EmbedPartner"));
 const IndividualCalculator = lazy(() => import("./pages/IndividualCalculator"));
 const Settings = lazy(() => import("./pages/Settings"));
 const SecurityDashboard = lazy(() => import("./pages/SecurityDashboard"));
@@ -194,6 +195,8 @@ const AnimatedRoutes = () => {
       <Route path="/sector/:id" element={<SectorGuide />} />
       <Route path="/partner-branding" element={<PartnerBranding />} />
       <Route path="/embed/calculator" element={<EmbedCalculator />} />
+      <Route path="/embed-partner" element={<EmbedPartner />} />
+      <Route path="/demo-widget" element={<Navigate to="/embed-partner#demo" replace />} />
       <Route path="/individual-calculator" element={<IndividualCalculator />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="/security" element={<SecurityDashboard />} />

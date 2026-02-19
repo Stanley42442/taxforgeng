@@ -169,6 +169,7 @@ const navGroups: NavGroup[] = [
       { to: "/roadmap", label: "Roadmap", icon: Map },
       { to: "/success-stories", label: "Success Stories", icon: Star },
       { to: "/tax-professionals", label: "Find a Tax Pro", icon: Users },
+      { to: "/embed-partner", label: "Partner with Us", icon: Code },
     ]
   },
   {

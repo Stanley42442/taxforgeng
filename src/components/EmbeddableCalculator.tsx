@@ -12,6 +12,8 @@ export type { PartnerTheme } from "./embed/types";
 interface EmbeddableCalculatorProps {
   theme?: PartnerTheme;
   onCalculate?: (result: any) => void;
+  /** When true, renders without API key validation (for public sandbox demos) */
+  sandboxMode?: boolean;
 }
 
 const TABS: { id: TabId; label: string }[] = [
@@ -20,7 +22,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'vat', label: 'VAT' },
 ];
 
-export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate }: EmbeddableCalculatorProps) => {
+export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate, sandboxMode = false }: EmbeddableCalculatorProps) => {
   const [activeTab, setActiveTab] = useState<TabId>('business');
   const borderRadius = parseInt(theme.borderRadius, 10) || DEFAULT_BORDER_RADIUS;
 
@@ -97,11 +99,15 @@ export const EmbeddableCalculator = ({ theme = defaultTheme, onCalculate }: Embe
 
       {/* Powered By */}
       <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '12px', color: theme.textColor, opacity: 0.5 }}>
-        Powered by{' '}
-        <a href="https://taxforgeng.com" target="_blank" rel="noopener noreferrer"
-          style={{ color: theme.primaryColor, textDecoration: 'none', fontWeight: '500' }}>
-          TaxForge NG
-        </a>
+        {sandboxMode ? (
+          <span>Sandbox demo — <a href="https://taxforgeng.com/embed-partner" target="_blank" rel="noopener noreferrer" style={{ color: theme.primaryColor, textDecoration: 'none', fontWeight: '500' }}>get your API key →</a></span>
+        ) : (
+          <>Powered by{' '}
+          <a href="https://taxforgeng.com" target="_blank" rel="noopener noreferrer"
+            style={{ color: theme.primaryColor, textDecoration: 'none', fontWeight: '500' }}>
+            TaxForge NG
+          </a></>
+        )}
       </div>
     </div>
   );
