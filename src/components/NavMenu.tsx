@@ -55,6 +55,7 @@ import {
   X,
   Scale,
   AlertTriangle,
+  Handshake,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -156,6 +157,7 @@ const navGroups: NavGroup[] = [
     label: 'Resources',
     icon: GraduationCap,
     links: [
+      { to: "/embed-partner", label: "Partner with Us", icon: Handshake },
       { to: "/blog", label: "Blog", icon: FileText },
       { to: "/faq", label: "FAQ", icon: GraduationCap },
       { to: "/about", label: "About", icon: Building2 },
@@ -169,7 +171,6 @@ const navGroups: NavGroup[] = [
       { to: "/roadmap", label: "Roadmap", icon: Map },
       { to: "/success-stories", label: "Success Stories", icon: Star },
       { to: "/tax-professionals", label: "Find a Tax Pro", icon: Users },
-      { to: "/embed-partner", label: "Partner with Us", icon: Code },
     ]
   },
   {
@@ -327,6 +328,13 @@ export const NavMenu = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-1 sm:gap-2">
+            <Link
+              to="/embed-partner"
+              className="hidden md:inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground border border-border rounded-md px-3 py-1.5 transition-colors hover:bg-accent whitespace-nowrap"
+            >
+              <Handshake className="h-4 w-4" />
+              Partner with Us
+            </Link>
             <div className="hidden sm:block">
               <FeedbackForm />
             </div>
