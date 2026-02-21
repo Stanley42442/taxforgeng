@@ -388,7 +388,7 @@ const EFiling = () => {
           <DialogHeader>
             <DialogTitle>Pay Tax Due</DialogTitle>
             <DialogDescription>
-              Complete payment via Paystack (Test Mode)
+              Complete payment via Paystack
             </DialogDescription>
           </DialogHeader>
           <div className="py-6">
