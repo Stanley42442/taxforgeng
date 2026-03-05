@@ -10,6 +10,14 @@ import { Badge } from '@/components/ui/badge';
 
 const POSTS: BlogPostMeta[] = [
   {
+    slug: 'pit-myths-2026',
+    title: '7 PIT Myths Nigerians Still Believe in 2026',
+    excerpt: 'The Nigeria Tax Act 2025 rewrote the PIT rules — but dangerous misconceptions persist. We debunk seven myths that could cost you money or trigger penalties.',
+    date: 'March 5, 2026',
+    category: 'Guides',
+    readTime: '8 min read',
+  },
+  {
     slug: 'tax-reforms-2026-summary',
     title: 'Nigeria Tax Reforms 2026: Complete Summary',
     excerpt: 'Everything that changed under the Nigeria Tax Act 2025 — new PIT bands, CIT thresholds, Rent Relief, Development Levy, and what it means for you.',
