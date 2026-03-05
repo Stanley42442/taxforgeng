@@ -1,50 +1,43 @@
 
 
-## Switch Paystack to Live Mode
+## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
 
-### Step 1: Update Your Paystack Secret Keys
-
-You'll be prompted to enter your **live** Paystack keys (found in your Paystack Dashboard under Settings > API Keys & Webhooks > Live tab):
-
-- **PAYSTACK_SECRET_KEY** -- replace with your `sk_live_...` key
-- **PAYSTACK_PUBLIC_KEY** -- replace with your `pk_live_...` key
-
-No code changes are needed for the backend functions -- they already read these secrets dynamically.
-
-### Step 2: Remove "Test Mode" Label from E-Filing Page
-
-The payment dialog in `src/pages/EFiling.tsx` (line 391) currently says:
-
-> "Complete payment via Paystack (Test Mode)"
-
-This will be updated to:
-
-> "Complete payment via Paystack"
-
-### Step 3: Configure Your Paystack Webhook (Manual Step)
-
-In your **Paystack Dashboard** (Live mode), set the webhook URL to:
-
-```
-https://uhuxqrrtsiintcwpxxwy.supabase.co/functions/v1/paystack-webhook
-```
-
-This ensures Paystack sends live payment confirmations to your backend.
+A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
 
 ---
 
-### What Does NOT Change
+### Content Structure
 
-- **TierSwitcher "Test Mode"** -- This is an internal admin/dev tool for simulating subscription tiers, unrelated to Paystack. It stays as-is.
-- **Embed "Sandbox"** -- This refers to the API-key-free demo widget, not Paystack. It stays as-is.
-- **All edge functions** (`paystack-initialize`, `paystack-verify`, `paystack-webhook`, etc.) -- These already use the secrets dynamically, so swapping the secret values is all that's needed.
+The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
 
-### Summary of Changes
-
-| What | Action |
+| Section ID | Topic |
 |---|---|
-| `PAYSTACK_SECRET_KEY` secret | Replace with `sk_live_...` |
-| `PAYSTACK_PUBLIC_KEY` secret | Replace with `pk_live_...` |
-| `src/pages/EFiling.tsx` line 391 | Remove "(Test Mode)" from dialog text |
-| Paystack Dashboard webhook URL | Set manually to your backend webhook endpoint |
+| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
+| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
+| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
+| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
+| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
+| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
+| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
+| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
+| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
+| `faq` | 5–6 FAQs with FAQPage schema |
+
+### Technical Implementation
+
+**1. Create `src/pages/blog/PITMyths2026.tsx`**
+- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
+- ~1,500 words, authoritative tone matching existing posts
+- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
+- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
+- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
+
+**2. Register route in `src/App.tsx`**
+- Add lazy import and route at `/blog/pit-myths-2026`
+
+**3. Add to blog listing in `src/pages/Blog.tsx`**
+- New entry in the `POSTS` array with category "Guides", today's date
+
+**4. Update sitemap (`public/sitemap.xml`)**
+- Add `/blog/pit-myths-2026` entry
 
