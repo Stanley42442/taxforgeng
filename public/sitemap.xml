@@ -240,6 +240,12 @@
     <priority>0.70</priority>
   </url>
   <url>
+    <loc>https://taxforgeng.com/blog/pit-myths-2026</loc>
+    <lastmod>2026-03-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
     <loc>https://taxforgeng.com/faq</loc>
     <lastmod>2026-02-13</lastmod>
     <changefreq>monthly</changefreq>

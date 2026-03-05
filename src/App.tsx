@@ -129,6 +129,7 @@ const BlogVATGuideNigeria = lazy(() => import("./pages/blog/VATGuideNigeria"));
 const BlogWHTExplained = lazy(() => import("./pages/blog/WHTExplained"));
 const BlogPayrollTaxGuide = lazy(() => import("./pages/blog/PayrollTaxGuide"));
 const BlogTaxCalendar2026 = lazy(() => import("./pages/blog/TaxCalendar2026"));
+const BlogPITMyths2026 = lazy(() => import("./pages/blog/PITMyths2026"));
 
 // Lazy load TaxAssistant (heavy component with AI chat)
 const TaxAssistant = lazy(() => import("./components/TaxAssistant").then(m => ({ default: m.TaxAssistant })));
@@ -249,6 +250,7 @@ const AnimatedRoutes = () => {
       <Route path="/blog/wht-explained" element={<BlogWHTExplained />} />
       <Route path="/blog/payroll-tax-guide" element={<BlogPayrollTaxGuide />} />
       <Route path="/blog/tax-calendar-2026" element={<BlogTaxCalendar2026 />} />
+      <Route path="/blog/pit-myths-2026" element={<BlogPITMyths2026 />} />
       <Route path="/faq" element={<FAQ />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
