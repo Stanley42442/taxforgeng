@@ -533,8 +533,8 @@ const Pricing = () => {
           Full Feature Comparison
         </h2>
         <div className="rounded-2xl border border-border bg-card shadow-card">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] table-fixed" style={{ borderCollapse: 'collapse', borderSpacing: 0 }}>
+          <div className="overflow-x-auto md:overflow-visible">
+            <table className="w-full table-fixed border-collapse">
               <thead>
                 <tr className="border-b border-border bg-secondary/50">
                   <th className="text-left p-4 font-semibold text-foreground w-[28%]">Feature</th>
