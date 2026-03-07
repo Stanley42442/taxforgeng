@@ -561,13 +561,13 @@ const Pricing = () => {
                   {/* Features in this category */}
                   {features.filter(f => f.category === category.name).map((feature, i) => (
                     <tr key={`${category.name}-${i}`} className={i % 2 === 0 ? 'bg-background' : 'bg-secondary/20'}>
-                      <td className="p-4 text-sm text-foreground w-[28%]">{feature.name}</td>
-                      <td className="p-4 text-center w-[12%]"><FeatureValue value={feature.free} /></td>
-                      <td className="p-4 text-center w-[12%]"><FeatureValue value={feature.starter} /></td>
-                      <td className="p-4 text-center w-[12%]"><FeatureValue value={feature.basic} /></td>
-                      <td className="p-4 text-center w-[12%]"><FeatureValue value={feature.professional} /></td>
-                      <td className="p-4 text-center w-[12%]"><FeatureValue value={feature.business} /></td>
-                      <td className="p-4 text-center w-[12%]"><FeatureValue value={feature.corporate} /></td>
+                       <td className="p-4 text-sm text-foreground">{feature.name}</td>
+                       <td className="p-4 text-center"><FeatureValue value={feature.free} /></td>
+                       <td className="p-4 text-center"><FeatureValue value={feature.starter} /></td>
+                       <td className="p-4 text-center"><FeatureValue value={feature.basic} /></td>
+                       <td className="p-4 text-center"><FeatureValue value={feature.professional} /></td>
+                       <td className="p-4 text-center"><FeatureValue value={feature.business} /></td>
+                       <td className="p-4 text-center"><FeatureValue value={feature.corporate} /></td>
                     </tr>
                   ))}
                 </>
