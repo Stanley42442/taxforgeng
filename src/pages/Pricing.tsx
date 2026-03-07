@@ -533,18 +533,18 @@ const Pricing = () => {
           Full Feature Comparison
         </h2>
         <div className="rounded-2xl border border-border bg-card shadow-card">
-          <div className="overflow-x-auto md:overflow-visible">
-            <table className="w-full table-fixed border-collapse">
-              <thead>
-                <tr className="border-b border-border bg-secondary/50">
-                  <th className="text-left p-4 font-semibold text-foreground w-[28%]">Feature</th>
-                  <th className="text-center p-4 font-semibold text-foreground w-[12%]">Individual</th>
-                  <th className="text-center p-4 font-semibold text-foreground w-[12%]">Starter</th>
-                  <th className="text-center p-4 font-semibold text-foreground w-[12%]">Basic</th>
-                  <th className="text-center p-4 font-semibold text-foreground w-[12%]">Professional</th>
-                  <th className="text-center p-4 font-semibold text-primary w-[12%]">Business ✦</th>
-                  <th className="text-center p-4 font-semibold text-foreground w-[12%]">Corporate</th>
-                </tr>
+           <div className="overflow-x-auto">
+             <table className="w-full table-auto border-collapse">
+               <thead>
+                 <tr className="border-b border-border bg-secondary/50">
+                   <th className="text-left p-4 font-semibold text-foreground">Feature</th>
+                   <th className="text-center p-4 font-semibold text-foreground">Individual</th>
+                   <th className="text-center p-4 font-semibold text-foreground">Starter</th>
+                   <th className="text-center p-4 font-semibold text-foreground">Basic</th>
+                   <th className="text-center p-4 font-semibold text-foreground">Professional</th>
+                   <th className="text-center p-4 font-semibold text-primary">Business ✦</th>
+                   <th className="text-center p-4 font-semibold text-foreground">Corporate</th>
+                 </tr>
               </thead>
             <tbody>
               {featureCategories.map((category, catIndex) => (
@@ -561,13 +561,13 @@ const Pricing = () => {
                   {/* Features in this category */}
                   {features.filter(f => f.category === category.name).map((feature, i) => (
                     <tr key={`${category.name}-${i}`} className={i % 2 === 0 ? 'bg-background' : 'bg-secondary/20'}>
-                      <td className="p-4 text-sm text-foreground w-[28%]">{feature.name}</td>
-                      <td className="p-4 text-center w-[12%]"><FeatureValue value={feature.free} /></td>
-                      <td className="p-4 text-center w-[12%]"><FeatureValue value={feature.starter} /></td>
-                      <td className="p-4 text-center w-[12%]"><FeatureValue value={feature.basic} /></td>
-                      <td className="p-4 text-center w-[12%]"><FeatureValue value={feature.professional} /></td>
-                      <td className="p-4 text-center w-[12%]"><FeatureValue value={feature.business} /></td>
-                      <td className="p-4 text-center w-[12%]"><FeatureValue value={feature.corporate} /></td>
+                       <td className="p-4 text-sm text-foreground">{feature.name}</td>
+                       <td className="p-4 text-center"><FeatureValue value={feature.free} /></td>
+                       <td className="p-4 text-center"><FeatureValue value={feature.starter} /></td>
+                       <td className="p-4 text-center"><FeatureValue value={feature.basic} /></td>
+                       <td className="p-4 text-center"><FeatureValue value={feature.professional} /></td>
+                       <td className="p-4 text-center"><FeatureValue value={feature.business} /></td>
+                       <td className="p-4 text-center"><FeatureValue value={feature.corporate} /></td>
                     </tr>
                   ))}
                 </>
