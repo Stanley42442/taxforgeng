@@ -1,33 +1,43 @@
 
 
-## Fix: Feature Comparison Table Blank Space on Desktop/Tablet
+## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
 
-### Problem
-The feature comparison table has a visible blank space (gap) on the right side on desktop and possibly tablet screens. The table uses `table-fixed` with `min-w-[900px]` and percentage-based column widths that total 100%, but the outer container is wider than the table content, leaving an unfilled gap.
+A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
 
-### Root Cause
-The table is wrapped in `overflow-x-auto` with `min-w-[900px]` and `table-fixed`. On wider screens, the `min-w-[900px]` constraint means the table *can* expand but the fixed percentage widths (28% + 72%) may not cleanly fill the rounded container, especially with `border-collapse` behavior.
+---
 
-### Fix (single file: `src/pages/Pricing.tsx`)
+### Content Structure
 
-1. **Remove `min-w-[900px]`** from the table — it's unnecessary since the container already handles overflow
-2. **Change `table-fixed` to `table-auto`** or keep `table-fixed` but ensure the table always fills 100% width
-3. **Add `w-full`** explicitly and remove the inline `borderSpacing` style that may interfere
-4. **Ensure the outer container doesn't create a gap** — the `overflow-x-auto` div should match the rounded border container seamlessly
+The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
 
-Specifically on line 537, change:
-```tsx
-// From:
-<table className="w-full min-w-[900px] table-fixed" style={{ borderCollapse: 'collapse', borderSpacing: 0 }}>
+| Section ID | Topic |
+|---|---|
+| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
+| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
+| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
+| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
+| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
+| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
+| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
+| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
+| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
+| `faq` | 5–6 FAQs with FAQPage schema |
 
-// To:
-<table className="w-full table-fixed border-collapse">
-```
+### Technical Implementation
 
-And wrap the `overflow-x-auto` div with responsive handling so it only scrolls on small screens:
-```tsx
-<div className="overflow-x-auto md:overflow-visible">
-```
+**1. Create `src/pages/blog/PITMyths2026.tsx`**
+- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
+- ~1,500 words, authoritative tone matching existing posts
+- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
+- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
+- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
 
-This ensures on desktop/tablet the table fills the full container width with no trailing blank space, while still allowing horizontal scroll on mobile where the 7-column layout genuinely needs it.
+**2. Register route in `src/App.tsx`**
+- Add lazy import and route at `/blog/pit-myths-2026`
+
+**3. Add to blog listing in `src/pages/Blog.tsx`**
+- New entry in the `POSTS` array with category "Guides", today's date
+
+**4. Update sitemap (`public/sitemap.xml`)**
+- Add `/blog/pit-myths-2026` entry
 
