@@ -534,16 +534,16 @@ const Pricing = () => {
         </h2>
         <div className="rounded-2xl border border-border bg-card shadow-card">
            <div className="overflow-x-auto">
-             <table className="w-full table-auto border-collapse">
+             <table className="w-full table-fixed border-collapse">
                <thead>
                  <tr className="border-b border-border bg-secondary/50">
-                   <th className="text-left p-4 font-semibold text-foreground">Feature</th>
-                   <th className="text-center p-4 font-semibold text-foreground">Individual</th>
-                   <th className="text-center p-4 font-semibold text-foreground">Starter</th>
-                   <th className="text-center p-4 font-semibold text-foreground">Basic</th>
-                   <th className="text-center p-4 font-semibold text-foreground">Professional</th>
-                   <th className="text-center p-4 font-semibold text-primary">Business ✦</th>
-                   <th className="text-center p-4 font-semibold text-foreground">Corporate</th>
+                   <th className="text-left p-4 font-semibold text-foreground w-[28%]">Feature</th>
+                   <th className="text-center p-4 font-semibold text-foreground w-[12%]">Individual</th>
+                   <th className="text-center p-4 font-semibold text-foreground w-[12%]">Starter</th>
+                   <th className="text-center p-4 font-semibold text-foreground w-[12%]">Basic</th>
+                   <th className="text-center p-4 font-semibold text-foreground w-[12%]">Professional</th>
+                   <th className="text-center p-4 font-semibold text-primary w-[12%]">Business ✦</th>
+                   <th className="text-center p-4 font-semibold text-foreground w-[12%]">Corporate</th>
                  </tr>
               </thead>
             <tbody>

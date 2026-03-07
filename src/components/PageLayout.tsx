@@ -78,7 +78,7 @@ export const PageLayout = ({
           )}
 
           {/* Content - with proper overflow handling */}
-          <div className="w-full overflow-hidden [&>*]:max-w-full [&_table]:block [&_table]:overflow-x-auto [&_table]:max-w-full [&_.overflow-x-auto]:max-w-full">
+          <div className="w-full overflow-hidden [&>*]:max-w-full [&_.overflow-x-auto]:max-w-full">
             {children}
           </div>
         </div>
