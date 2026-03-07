@@ -534,7 +534,16 @@ const Pricing = () => {
         </h2>
         <div className="rounded-2xl border border-border bg-card shadow-card">
            <div className="overflow-x-auto">
-             <table className="w-full table-auto border-collapse">
+             <table className="w-full border-collapse" style={{ tableLayout: 'fixed' }}>
+               <colgroup>
+                 <col style={{ width: '28%' }} />
+                 <col style={{ width: '12%' }} />
+                 <col style={{ width: '12%' }} />
+                 <col style={{ width: '12%' }} />
+                 <col style={{ width: '12%' }} />
+                 <col style={{ width: '12%' }} />
+                 <col style={{ width: '12%' }} />
+               </colgroup>
                <thead>
                  <tr className="border-b border-border bg-secondary/50">
                    <th className="text-left p-4 font-semibold text-foreground">Feature</th>
