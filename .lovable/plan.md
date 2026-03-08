@@ -1,77 +1,43 @@
 
 
-## Phase 2+: Site-Wide Premium Fintech Redesign
+## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
 
-This is a large scope — 63 page files and 39 component files still use the old styling classes (`glass-frosted`, `neumorphic`, `neon-border`, `glow-primary`, `bg-dots`, `bg-mesh`, `animate-float`, etc.). Given the size, I'll break this into manageable batches that can be implemented across multiple messages.
+A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
 
-### Batch 1: High-Traffic Core Pages (this implementation)
+---
 
-These are the pages users interact with most after the homepage.
+### Content Structure
 
-**1. Auth page (`src/pages/Auth.tsx`)**
-- Remove `bg-gradient-hero`, `glass-frosted`, `glow-primary`, `shadow-futuristic`
-- Clean white card on neutral background, simple logo without gradient/glow
-- Refined input styling with subtle focus rings
+The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
 
-**2. Dashboard (`src/pages/Dashboard.tsx`)**
-- Replace all `glass-frosted` cards with clean `bg-card border border-border shadow-sm`
-- Remove `hover-lift`, `glow-sm` from stat cards
-- Clean skeleton loaders (already use `skeleton-shimmer` which is fine)
-- Replace `glass` with `bg-muted/50 border border-border`
+| Section ID | Topic |
+|---|---|
+| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
+| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
+| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
+| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
+| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
+| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
+| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
+| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
+| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
+| `faq` | 5–6 FAQs with FAQPage schema |
 
-**3. Calculator (`src/pages/Calculator.tsx`)**
-- Replace `neumorphic-sm` input wrappers with clean bordered inputs
-- Remove any glass/glow from result sections
+### Technical Implementation
 
-**4. Pricing (`src/pages/Pricing.tsx`)**
-- Already partially cleaned — sweep remaining `glass-frosted`, `shadow-futuristic`, `glow-primary` references
+**1. Create `src/pages/blog/PITMyths2026.tsx`**
+- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
+- ~1,500 words, authoritative tone matching existing posts
+- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
+- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
+- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
 
-### Batch 2: Business Tools Pages
-- `Invoices.tsx` — remove `glass-frosted`, `hover-lift` from cards
-- `Expenses.tsx` — clean card styling
-- `Payroll.tsx` — clean card styling
-- `BusinessReport.tsx` — remove `glass-frosted`, `shadow-futuristic`
-- `ProfitLoss.tsx`, `Compliance.tsx`, `PersonalExpenses.tsx`
+**2. Register route in `src/App.tsx`**
+- Add lazy import and route at `/blog/pit-myths-2026`
 
-### Batch 3: SEO Landing Pages (10+ pages)
-- All SEO pages (`src/pages/seo/*`) share the same pattern: fixed background orbs + `bg-dots` + `bg-mesh` + `glass-frosted` cards
-- Bulk replace: remove fixed background decorations, swap `glass-frosted` → `bg-card border border-border rounded-2xl`
-- Remove `hover-lift` → simple `hover:shadow-md transition-shadow`
+**3. Add to blog listing in `src/pages/Blog.tsx`**
+- New entry in the `POSTS` array with category "Guides", today's date
 
-### Batch 4: Blog Pages & Components
-- Blog post layouts and cards — clean styling
-- SEO components (`CTASection`, `ComparisonTable`, `StatsCounter`, `QuickTaxCalculator`, `RentReliefCalculator`, `SimpleVATCalculator`, `SEODisclaimer`)
-
-### Batch 5: Settings, Security & Admin Pages
-- `Settings.tsx`, `SecurityDashboard.tsx`, `AdminAnalytics.tsx`
-- Various management components (`ActiveSessionsManager`, `WhatsAppVerification`, `ReportScheduleSettings`, etc.)
-
-### Batch 6: Remaining Components
-- `PenaltyEstimator`, `TaxOptimizationTips`, `DigitalVATCalculator`, `OCRReceiptScanner`, `PremiumOnboarding`, `ReviewSubmissionForm`, and ~20 more components
-
-### Implementation Pattern (consistent across all batches)
-
-Every file gets the same systematic replacements:
-```
-glass-frosted  →  bg-card border border-border
-glass          →  bg-muted/50 border border-border  
-glass-subtle   →  bg-card/80 border border-border/60
-glass-dark     →  bg-muted
-neumorphic     →  bg-card border border-border shadow-sm
-neumorphic-sm  →  bg-card border border-border
-neon-border    →  bg-card border border-border
-glow-primary   →  shadow-sm
-glow-sm        →  shadow-sm
-shadow-futuristic → shadow-sm
-hover-lift     →  hover:shadow-md transition-shadow
-hover-glow-primary → hover:shadow-md transition-shadow
-floating-card  →  hover:shadow-lg transition-shadow
-bg-gradient-primary (on icon containers) → bg-primary
-animate-float / animate-float-slow → (remove entirely)
-bg-dots / bg-mesh / bg-gradient-hero fixed backgrounds → (remove entirely)
-```
-
-### Plan for This Message
-
-I'll implement **Batch 1** (Auth, Dashboard, Calculator, Pricing sweep) — these are the 4 most-visited pages after the homepage. Subsequent batches will follow in order.
+**4. Update sitemap (`public/sitemap.xml`)**
+- Add `/blog/pit-myths-2026` entry
 
