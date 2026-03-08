@@ -184,6 +184,13 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       // Defensive check: Create profile if it doesn't exist (handles edge case)
       // Use maybeSingle() to avoid 406 errors during auth timing issues
       if (profileError && profileError.code === 'PGRST116') {
+        // Only attempt profile creation once per session to prevent retry storms
+        if (profileCreateAttempted.current) {
+          logger.warn('[SubscriptionContext] Profile creation already attempted, skipping retry');
+          setState(prev => ({ ...prev, loading: false }));
+          return;
+        }
+        profileCreateAttempted.current = true;
         logger.warn('[SubscriptionContext] No profile found, creating one...');
         const { error: createError } = await supabase
           .from('profiles')
