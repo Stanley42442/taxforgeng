@@ -263,8 +263,10 @@ const Auth = () => {
         } else {
           if (!rememberMe) {
             safeSessionStorage.setItem('taxforge-session-only', 'true');
+            safeLocalStorage.setItem('taxforge-session-only-flag', 'true');
           } else {
             safeSessionStorage.removeItem('taxforge-session-only');
+            safeLocalStorage.removeItem('taxforge-session-only-flag');
           }
           // Show verification message instead of immediate redirect
           toast.success("Account created! Please check your email to verify your account.", {
