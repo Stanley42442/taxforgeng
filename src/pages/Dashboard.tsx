@@ -689,7 +689,7 @@ const Dashboard = () => {
                         <SparklineChart data={sparklineData.net} color={netIncome >= 0 ? "hsl(var(--success))" : "hsl(var(--destructive))"} height={30} width={100} />
                       </div>
                     </div>
-                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
+                    <div className="bg-muted/50 border border-border p-4 rounded-xl hover:shadow-md transition-shadow min-h-[100px]">
                       <div className="flex items-center gap-2 mb-2">
                         <Receipt className="h-4 w-4 text-accent" />
                         <span className="text-xs text-muted-foreground">Deductible</span>
