@@ -130,16 +130,14 @@ const NeumorphicInput = ({
           </Popover>
         )}
       </div>
-      <div className="neumorphic-sm p-1 overflow-hidden">
-        <Input
-          ref={inputRef}
-          inputMode="numeric"
-          value={displayValue}
-          onChange={handleChange}
-          placeholder={placeholder}
-          className="border-0 bg-transparent h-12 text-lg font-medium truncate"
-        />
-      </div>
+      <Input
+        ref={inputRef}
+        inputMode="numeric"
+        value={displayValue}
+        onChange={handleChange}
+        placeholder={placeholder}
+        className="h-12 text-lg font-medium truncate"
+      />
     </div>
   );
 };
