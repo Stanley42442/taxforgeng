@@ -727,7 +727,7 @@ const Auth = () => {
           </div>
 
           {/* Form Card */}
-          <div className="glass-frosted rounded-2xl p-8 shadow-futuristic">
+          <div className="bg-card border border-border rounded-2xl p-8 shadow-sm">
             {/* MFA Challenge View */}
             {view === 'mfa-challenge' && (
               <form onSubmit={handleMfaChallenge} className="space-y-4">
