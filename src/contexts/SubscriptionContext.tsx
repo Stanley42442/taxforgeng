@@ -174,27 +174,36 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         .single();
 
       // Defensive check: Create profile if it doesn't exist (handles edge case)
+      // Use maybeSingle() to avoid 406 errors during auth timing issues
       if (profileError && profileError.code === 'PGRST116') {
         logger.warn('[SubscriptionContext] No profile found, creating one...');
         const { error: createError } = await supabase
           .from('profiles')
-          .insert({
+          .upsert({
             id: user.id,
             email: user.email,
             subscription_tier: 'free',
-          });
+          }, { onConflict: 'id' });
 
         if (createError) {
           logger.error('[SubscriptionContext] Failed to create profile:', createError);
+          // Don't retry — just use defaults for this render
+          setState(prev => ({ ...prev, loading: false }));
+          return;
         } else {
           // Re-fetch the newly created profile
           const { data: newProfile } = await supabase
             .from('profiles')
             .select('subscription_tier, email, created_at, trial_started_at, trial_expires_at, has_selected_initial_tier')
             .eq('id', user.id)
-            .single();
+            .maybeSingle();
           profile = newProfile;
         }
+      } else if (profileError) {
+        // For any other profile error (network, RLS, etc.), don't retry endlessly
+        logger.error('[SubscriptionContext] Profile fetch error:', profileError);
+        setState(prev => ({ ...prev, loading: false }));
+        return;
       }
 
       // Fetch businesses (exclude soft-deleted)

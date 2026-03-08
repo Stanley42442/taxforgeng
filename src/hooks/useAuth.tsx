@@ -97,10 +97,7 @@ const isUnusualLoginTime = (): { isUnusual: boolean; hour: number; timezone: str
   const now = new Date();
   const hour = now.getHours();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  
-  // Consider unusual if between 11 PM (23:00) and 6 AM (06:00)
   const isUnusual = hour >= 23 || hour < 6;
-  
   return { isUnusual, hour, timezone };
 };
 
@@ -111,28 +108,24 @@ const checkIPWhitelist = async (userId: string, ip: string): Promise<boolean> =>
       check_user_id: userId,
       check_ip: ip
     });
-    
     if (error) {
       logger.error('Error checking IP whitelist:', error);
-      return true; // Fail open if error
+      return true;
     }
-    
     return data === true;
   } catch {
-    return true; // Fail open if error
+    return true;
   }
 };
 
-// Track device on login with location awareness - parallelized for performance
+// Track device on login with location awareness
 const trackDevice = async (userId: string, userEmail: string) => {
   try {
-    // Run independent operations in parallel for faster login
     const [deviceInfo, clientIP] = await Promise.all([
       getDeviceInfo(),
       getClientIP()
     ]);
     
-    // Run these in parallel - they don't depend on each other
     const [location, profileResult, blocked] = await Promise.all([
       clientIP ? getLocationFromIP(clientIP) : Promise.resolve(null),
       supabase.from('profiles').select('whatsapp_number').eq('id', userId).maybeSingle(),
@@ -141,13 +134,11 @@ const trackDevice = async (userId: string, userEmail: string) => {
     
     const whatsappNumber = profileResult?.data?.whatsapp_number || null;
     
-    // Check if device is blocked
     if (blocked) {
       console.warn('Login from blocked device detected');
       return { blocked: true, ipBlocked: false };
     }
     
-    // Check IP whitelist and time restrictions in parallel
     const [ipAllowed, timeAllowed] = await Promise.all([
       clientIP ? checkIPWhitelist(userId, clientIP) : Promise.resolve(true),
       supabase.rpc('check_time_restrictions', { check_user_id: userId }).then(({ data }) => data)
@@ -155,207 +146,114 @@ const trackDevice = async (userId: string, userEmail: string) => {
     
     if (!ipAllowed && clientIP) {
       console.warn('Login from non-whitelisted IP detected');
-      // Send alert for blocked IP (fire-and-forget)
       supabase.functions.invoke('send-security-alert', {
         body: {
-          userEmail,
-          userId,
-          alertType: 'ip_blocked',
+          userEmail, userId, alertType: 'ip_blocked',
           timestamp: new Date().toLocaleString(),
-          deviceInfo: { 
-            browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, 
-            os: `${deviceInfo.os} ${deviceInfo.osVersion}`, 
-            deviceName: deviceInfo.deviceName 
-          },
-          locationInfo: {
-            city: location?.city,
-            region: location?.region,
-            country: location?.country
-          },
-          ipAddress: clientIP,
-          whatsappNumber
+          deviceInfo: { browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, os: `${deviceInfo.os} ${deviceInfo.osVersion}`, deviceName: deviceInfo.deviceName },
+          locationInfo: { city: location?.city, region: location?.region, country: location?.country },
+          ipAddress: clientIP, whatsappNumber
         }
       }).catch(err => logger.error('Failed to send IP blocked alert:', err));
       
-      // Also trigger in-app notification
       const locationText = location ? [location.city, location.country].filter(Boolean).join(', ') : undefined;
       notifyIPBlocked(clientIP, locationText);
-      
       return { blocked: false, ipBlocked: true, timeBlocked: false };
     }
     
     if (timeAllowed === false) {
       console.warn('Login outside allowed time window');
-      // Send alert for time-restricted login (fire-and-forget)
       supabase.functions.invoke('send-security-alert', {
         body: {
-          userEmail,
-          userId,
-          alertType: 'time_restricted',
+          userEmail, userId, alertType: 'time_restricted',
           timestamp: new Date().toLocaleString(),
-          deviceInfo: { 
-            browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, 
-            os: `${deviceInfo.os} ${deviceInfo.osVersion}`, 
-            deviceName: deviceInfo.deviceName 
-          },
-          timeInfo: {
-            hour: new Date().getHours(),
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-          },
+          deviceInfo: { browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, os: `${deviceInfo.os} ${deviceInfo.osVersion}`, deviceName: deviceInfo.deviceName },
+          timeInfo: { hour: new Date().getHours(), timezone: Intl.DateTimeFormat().resolvedOptions().timeZone },
           whatsappNumber
         }
       }).catch(err => logger.error('Failed to send time restricted alert:', err));
       
-      // Also trigger in-app notification
       const hour = new Date().getHours();
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       notifyTimeRestricted(hour, timezone);
-      
       return { blocked: false, ipBlocked: false, timeBlocked: true };
     }
 
-    // Check if device exists and get previous locations in parallel
     const [existingDeviceResult, previousDevicesResult] = await Promise.all([
-      supabase
-        .from('known_devices')
-        .select('id, is_trusted, last_country')
-        .eq('user_id', userId)
-        .eq('device_fingerprint', deviceInfo.fingerprint)
-        .single(),
-      supabase
-        .from('known_devices')
-        .select('last_country')
-        .eq('user_id', userId)
-        .not('last_country', 'is', null)
+      supabase.from('known_devices').select('id, is_trusted, last_country').eq('user_id', userId).eq('device_fingerprint', deviceInfo.fingerprint).single(),
+      supabase.from('known_devices').select('last_country').eq('user_id', userId).not('last_country', 'is', null)
     ]);
     
     const existingDevice = existingDeviceResult.data;
     const previousDevices = previousDevicesResult.data;
-    
     const knownCountries = new Set(previousDevices?.map(d => d.last_country).filter(Boolean) || []);
     const currentCountry = location?.country || null;
     const isNewCountry = currentCountry && knownCountries.size > 0 && !knownCountries.has(currentCountry);
     
-    // Log auth event with location
     await logAuthEvent(userId, 'login_success', { device: deviceInfo.deviceName }, clientIP, location as Json);
     
     if (existingDevice) {
-      // Update last seen and device info
-      await supabase
-        .from('known_devices')
-        .update({ 
-          last_seen_at: new Date().toISOString(),
-          browser: deviceInfo.browser,
-          browser_version: deviceInfo.browserVersion,
-          os: deviceInfo.os,
-          os_version: deviceInfo.osVersion,
-          device_type: deviceInfo.deviceType,
-          device_model: deviceInfo.deviceModel,
-          screen_resolution: deviceInfo.screenResolution,
-          timezone: deviceInfo.timezone,
-          language: deviceInfo.language,
-          last_country: currentCountry,
-          last_city: location?.city || null
-        })
-        .eq('id', existingDevice.id);
+      await supabase.from('known_devices').update({ 
+        last_seen_at: new Date().toISOString(),
+        browser: deviceInfo.browser, browser_version: deviceInfo.browserVersion,
+        os: deviceInfo.os, os_version: deviceInfo.osVersion,
+        device_type: deviceInfo.deviceType, device_model: deviceInfo.deviceModel,
+        screen_resolution: deviceInfo.screenResolution, timezone: deviceInfo.timezone,
+        language: deviceInfo.language, last_country: currentCountry,
+        last_city: location?.city || null
+      }).eq('id', existingDevice.id);
       
-      // Check for new country login (different from last known country for this device)
       if (isNewCountry && existingDevice.last_country && existingDevice.last_country !== currentCountry) {
-        // Send new location alert
         supabase.functions.invoke('send-security-alert', {
           body: {
-            userEmail,
-            alertType: 'new_location',
+            userEmail, alertType: 'new_location',
             timestamp: new Date().toLocaleString(),
-            locationInfo: {
-              city: location?.city,
-              region: location?.region,
-              country: currentCountry,
-              previousCountry: existingDevice.last_country
-            },
-            deviceInfo: { 
-              browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, 
-              os: `${deviceInfo.os} ${deviceInfo.osVersion}`, 
-              deviceName: deviceInfo.deviceName 
-            }
+            locationInfo: { city: location?.city, region: location?.region, country: currentCountry, previousCountry: existingDevice.last_country },
+            deviceInfo: { browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, os: `${deviceInfo.os} ${deviceInfo.osVersion}`, deviceName: deviceInfo.deviceName }
           }
         }).catch(err => logger.error('Failed to send new location alert:', err));
       }
     } else {
-      // Insert new device
-      await supabase
-        .from('known_devices')
-        .insert({
-          user_id: userId,
-          device_fingerprint: deviceInfo.fingerprint,
-          device_name: deviceInfo.deviceName,
-          browser: deviceInfo.browser,
-          browser_version: deviceInfo.browserVersion,
-          os: deviceInfo.os,
-          os_version: deviceInfo.osVersion,
-          device_type: deviceInfo.deviceType,
-          device_model: deviceInfo.deviceModel,
-          screen_resolution: deviceInfo.screenResolution,
-          timezone: deviceInfo.timezone,
-          language: deviceInfo.language,
-          last_country: currentCountry,
-          last_city: location?.city || null,
-          is_trusted: false,
-          is_blocked: false
-        });
+      await supabase.from('known_devices').insert({
+        user_id: userId, device_fingerprint: deviceInfo.fingerprint,
+        device_name: deviceInfo.deviceName, browser: deviceInfo.browser,
+        browser_version: deviceInfo.browserVersion, os: deviceInfo.os,
+        os_version: deviceInfo.osVersion, device_type: deviceInfo.deviceType,
+        device_model: deviceInfo.deviceModel, screen_resolution: deviceInfo.screenResolution,
+        timezone: deviceInfo.timezone, language: deviceInfo.language,
+        last_country: currentCountry, last_city: location?.city || null,
+        is_trusted: false, is_blocked: false
+      });
       
-      // Send new device alert (non-blocking)
       supabase.functions.invoke('send-security-alert', {
         body: {
-          userEmail,
-          alertType: 'new_device',
+          userEmail, alertType: 'new_device',
           timestamp: new Date().toLocaleString(),
-          deviceInfo: { 
-            browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, 
-            os: `${deviceInfo.os} ${deviceInfo.osVersion}`, 
-            deviceName: deviceInfo.deviceName 
-          }
+          deviceInfo: { browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, os: `${deviceInfo.os} ${deviceInfo.osVersion}`, deviceName: deviceInfo.deviceName }
         }
       }).catch(err => logger.error('Failed to send new device alert:', err));
       
-      // If this is a login from a completely new country (and we have previous data)
       if (isNewCountry) {
         const previousCountry = Array.from(knownCountries)[0] as string;
         supabase.functions.invoke('send-security-alert', {
           body: {
-            userEmail,
-            alertType: 'new_location',
+            userEmail, alertType: 'new_location',
             timestamp: new Date().toLocaleString(),
-            locationInfo: {
-              city: location?.city,
-              region: location?.region,
-              country: currentCountry,
-              previousCountry
-            },
-            deviceInfo: { 
-              browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, 
-              os: `${deviceInfo.os} ${deviceInfo.osVersion}`, 
-              deviceName: deviceInfo.deviceName 
-            }
+            locationInfo: { city: location?.city, region: location?.region, country: currentCountry, previousCountry },
+            deviceInfo: { browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, os: `${deviceInfo.os} ${deviceInfo.osVersion}`, deviceName: deviceInfo.deviceName }
           }
         }).catch(err => logger.error('Failed to send new location alert:', err));
       }
     }
     
-    // Check for unusual login time
     const { isUnusual, hour, timezone } = isUnusualLoginTime();
     if (isUnusual) {
       supabase.functions.invoke('send-security-alert', {
         body: {
-          userEmail,
-          alertType: 'unusual_time',
+          userEmail, alertType: 'unusual_time',
           timestamp: new Date().toLocaleString(),
           timeInfo: { hour, timezone },
-          deviceInfo: { 
-            browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, 
-            os: `${deviceInfo.os} ${deviceInfo.osVersion}`, 
-            deviceName: deviceInfo.deviceName 
-          }
+          deviceInfo: { browser: `${deviceInfo.browser} ${deviceInfo.browserVersion}`, os: `${deviceInfo.os} ${deviceInfo.osVersion}`, deviceName: deviceInfo.deviceName }
         }
       }).catch(err => logger.error('Failed to send unusual time alert:', err));
     }
@@ -370,13 +268,8 @@ const trackDevice = async (userId: string, userEmail: string) => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  // CRITICAL FIX: Start with loading=false so app renders immediately
-  // Individual pages check auth state as needed
-  const [loading, setLoading] = useState(false);
-
-  // Track if this is a fresh login vs session restoration
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [lastSessionId, setLastSessionId] = useState<string | null>(null);
+  // CRITICAL FIX: Start with loading=true so app waits for session restoration
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -385,34 +278,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
 
-        // Only log login events for actual new logins, not session restorations
         if (session?.user) {
-          const currentSessionId = session.access_token;
-          
           setTimeout(() => {
             switch (event) {
-              case 'SIGNED_IN':
-                // Only track as a login if this is a genuinely new session
-                // (not just restoring from localStorage on page refresh)
-                if (!isInitialLoad || lastSessionId !== currentSessionId) {
-                  // Check if this is from a fresh signIn call by looking at iat (issued at)
-                  const tokenPayload = session.access_token.split('.')[1];
-                  try {
-                    const decoded = JSON.parse(atob(tokenPayload));
-                    const issuedAt = decoded.iat * 1000; // Convert to ms
-                    const now = Date.now();
-                    // If token was issued within the last 30 seconds, this is a fresh login
-                    if (now - issuedAt < 30000) {
-                      trackDevice(session.user.id, session.user.email || '');
-                    }
-                  } catch {
-                    // If we can't parse the token, don't log to avoid duplicates
+              case 'SIGNED_IN': {
+                const tokenPayload = session.access_token.split('.')[1];
+                try {
+                  const decoded = JSON.parse(atob(tokenPayload));
+                  const issuedAt = decoded.iat * 1000;
+                  const now = Date.now();
+                  if (now - issuedAt < 30000) {
+                    trackDevice(session.user.id, session.user.email || '');
                   }
-                  setLastSessionId(currentSessionId);
+                } catch {
+                  // If we can't parse the token, don't log to avoid duplicates
                 }
                 break;
+              }
               case 'SIGNED_OUT':
-                // Already logged in signOut function
                 break;
               case 'PASSWORD_RECOVERY':
                 logAuthEvent(session.user.id, 'password_recovery_initiated');
@@ -423,25 +306,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             }
           }, 0);
         }
-        
-        setIsInitialLoad(false);
       }
     );
 
-    // THEN check for existing session (fire-and-forget, doesn't block)
+    // THEN restore session from storage — this sets loading=false when done
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      setLoading(false);
     }).catch((error) => {
       logger.error('[Auth] Failed to get session:', error);
+      setLoading(false);
     });
 
     // Handle session-only mode (clear on browser close)
     const handleBeforeUnload = () => {
       const isSessionOnly = safeSessionStorage.getItem('taxforge-session-only');
       if (isSessionOnly === 'true') {
-        // Clear auth tokens from localStorage when browser closes
-        // This effectively logs out users who didn't check "Remember me"
         safeLocalStorage.removeItem('sb-uhuxqrrtsiintcwpxxwy-auth-token');
       }
     };
@@ -484,10 +365,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     });
     
-    // Log signup event and send welcome email for new users
     if (!error && data.user) {
       logAuthEvent(data.user.id, 'signup');
-      
       supabase.functions.invoke('send-welcome-email', {
         body: { email, name: fullName }
       }).catch(err => {
@@ -504,9 +383,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       password
     });
     
-    // Log failed login attempt
     if (error) {
-      // We can't log to user's auth_events if login failed, but we could log to a separate table
       logger.error('Login failed:', error.message);
     }
     
@@ -514,7 +391,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    // Log logout event (fire-and-forget for faster logout)
     if (user) {
       logAuthEvent(user.id, 'logout').catch(err => logger.error('Failed to log logout:', err));
     }

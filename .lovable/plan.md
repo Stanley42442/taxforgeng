@@ -1,35 +1,43 @@
 
 
-## Fix: Auth Session Loss (Logged Out After a Few Seconds)
+## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
 
-### Root Cause Analysis
+A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
 
-There are **two separate Supabase client instances** in the project:
-- `src/integrations/supabase/client.ts` (auto-generated, uses raw `localStorage`)
-- `src/lib/supabaseClient.ts` (custom, uses `safeStorage` wrapper)
+---
 
-Both create independent `createClient()` calls pointing to the same project and same localStorage key (`sb-uhuxqrrtsiintcwpxxwy-auth-token`). Each client runs its own auth lifecycle internally. When one client writes a session to storage, the other doesn't detect it in memory — and can overwrite it with `null` during its own initialization. This causes `auth.uid()` to be null on requests, making all RLS-protected queries fail.
+### Content Structure
 
-The console logs confirm this: every request uses the **anon key** as the Bearer token instead of the user's JWT. The profile exists in the database (user `c34c22a5...` has `subscription_tier: basic`), but RLS blocks access because `auth.uid()` is null. SubscriptionContext then enters a retry loop trying to create a profile, generating 15+ failed requests per second.
+The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
 
-### Fix (3 files)
+| Section ID | Topic |
+|---|---|
+| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
+| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
+| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
+| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
+| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
+| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
+| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
+| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
+| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
+| `faq` | 5–6 FAQs with FAQPage schema |
 
-**1. `src/lib/supabaseClient.ts`** — Eliminate the duplicate client. Re-export from the auto-generated client instead of creating a new one:
-```typescript
-export { supabase } from '@/integrations/supabase/client';
-```
-This ensures a single client instance across the entire app.
+### Technical Implementation
 
-**2. `src/hooks/useAuth.tsx`** — Fix the auth initialization race condition. Currently `loading` starts as `false`, so components render before the session is restored. Change to:
-- Start `loading` as `true`
-- Call `getSession()` first to restore the session from storage
-- Then `onAuthStateChange` handles subsequent changes
-- Set `loading = false` only after `getSession()` resolves
+**1. Create `src/pages/blog/PITMyths2026.tsx`**
+- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
+- ~1,500 words, authoritative tone matching existing posts
+- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
+- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
+- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
 
-This follows the proven pattern from the Supabase docs and prevents queries from firing before auth is ready.
+**2. Register route in `src/App.tsx`**
+- Add lazy import and route at `/blog/pit-myths-2026`
 
-**3. `src/contexts/SubscriptionContext.tsx`** — Stop the retry storm. Add a guard so profile creation is only attempted once, and add a `maybeSingle()` fallback instead of `.single()` to avoid 406 errors when the profile temporarily isn't visible due to auth timing.
+**3. Add to blog listing in `src/pages/Blog.tsx`**
+- New entry in the `POSTS` array with category "Guides", today's date
 
-### Why it works on published mobile but not preview
-The preview iframe may have stricter storage restrictions (partitioned storage, cross-origin iframe rules) that cause the `safeStorage` wrapper to silently fail. With two competing clients, the timing differences are amplified. Mobile published site works because it has direct storage access and fewer timing issues with a single page load.
+**4. Update sitemap (`public/sitemap.xml`)**
+- Add `/blog/pit-myths-2026` entry
 
