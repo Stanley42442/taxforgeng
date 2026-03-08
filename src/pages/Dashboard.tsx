@@ -406,7 +406,7 @@ const Dashboard = () => {
       <PageLayout title="Dashboard" icon={LayoutDashboard}>
         <div className="space-y-6 animate-fade-in">
           {/* Summary section skeleton */}
-          <div className="glass-frosted rounded-2xl p-4">
+          <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
             <div className="flex items-center gap-3 mb-4">
               <div className="skeleton-shimmer h-10 w-10 rounded-xl" />
               <div className="space-y-2">
@@ -418,7 +418,7 @@ const Dashboard = () => {
             {/* Stats grid skeleton */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="glass rounded-xl p-4">
+                <div key={i} className="bg-muted/50 border border-border rounded-xl p-4">
                   <div className="skeleton-shimmer h-3 w-16 mb-2 rounded" />
                   <div className="skeleton-shimmer h-6 w-24 mb-1 rounded" />
                   <div className="skeleton-shimmer h-3 w-12 rounded" />
