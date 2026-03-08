@@ -130,7 +130,7 @@ const NeumorphicInput = ({
           </Popover>
         )}
       </div>
-      <div className="neumorphic-sm p-1 overflow-hidden">
+      <div className="bg-card border border-border rounded-lg p-1 overflow-hidden">
         <Input
           ref={inputRef}
           inputMode="numeric"
