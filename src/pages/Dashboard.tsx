@@ -787,7 +787,7 @@ const Dashboard = () => {
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">Contributions</p>
                     </div>
-                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
+                    <div className="bg-muted/50 border border-border p-4 rounded-xl hover:shadow-md transition-shadow min-h-[100px]">
                       <div className="flex items-center gap-2 mb-2">
                         <Heart className="h-4 w-4 text-accent" />
                         <span className="text-xs text-muted-foreground">Insurance</span>
