@@ -224,10 +224,10 @@ const addNotificationToLocalStorage = (
 // Get all notifications from database
 export const getNotifications = async (): Promise<AppNotification[]> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     
     if (!user) {
-      // Fall back to localStorage for non-authenticated users
       return safeLocalStorage.getJSON<AppNotification[]>('app-notifications', []);
     }
 
