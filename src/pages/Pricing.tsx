@@ -592,8 +592,8 @@ const Pricing = () => {
 
       {/* Contact Section */}
       <div className="max-w-2xl mx-auto text-center">
-        <div className="rounded-2xl border border-border glass-frosted p-8 shadow-card hover-lift">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 glow-sm">
+        <div className="rounded-2xl border border-border bg-card p-8">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
             <MessageCircle className="h-7 w-7 text-primary" />
           </div>
           <h3 className="text-xl font-bold text-foreground mb-2">Need Help Choosing?</h3>
@@ -607,7 +607,7 @@ const Pricing = () => {
                 Contact Sales
               </a>
             </Button>
-            <Button variant="hero" onClick={() => navigate('/advisory')}>
+            <Button variant="default" onClick={() => navigate('/advisory')}>
               Start Free Trial
               <ArrowRight className="h-4 w-4" />
             </Button>
@@ -693,12 +693,12 @@ const PricingCard = ({
   return (
     <div className={`relative rounded-xl sm:rounded-2xl border p-4 sm:p-6 transition-all duration-300 ${
       isPopular 
-        ? 'border-primary glass-frosted shadow-lg sm:scale-105 glow-sm' 
-        : 'border-border bg-card shadow-card hover:shadow-lg card-interactive'
+        ? 'border-2 border-primary bg-card shadow-md sm:scale-105' 
+        : 'border-border bg-card hover:shadow-md'
     }`}>
       {isPopular && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className="bg-gradient-primary text-primary-foreground text-[10px] sm:text-xs font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap animate-glow-border">
+          <span className="bg-primary text-primary-foreground text-[10px] sm:text-xs font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
             Most Popular
           </span>
         </div>
@@ -714,7 +714,7 @@ const PricingCard = ({
 
       <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
         <div className={`h-8 w-8 sm:h-10 sm:w-10 rounded-lg flex items-center justify-center ${
-          isPopular ? 'bg-gradient-primary text-primary-foreground' : 'bg-secondary text-primary'
+          isPopular ? 'bg-primary text-primary-foreground' : 'bg-secondary text-primary'
         }`}>
           {icon}
         </div>
@@ -764,7 +764,7 @@ const PricingCard = ({
       </ul>
 
       <Button
-        variant={isPopular ? 'hero' : isCurrentTier ? 'secondary' : isDowngradeTier ? 'outline' : 'outline'}
+        variant={isPopular ? 'default' : isCurrentTier ? 'secondary' : isDowngradeTier ? 'outline' : 'outline'}
         className={`w-full text-xs sm:text-sm h-9 sm:h-10 ${isDowngradeTier ? 'border-warning/50 text-warning hover:bg-warning/10' : ''}`}
         disabled={isCurrentTier || isProcessing}
         onClick={() => onUpgrade(tier)}

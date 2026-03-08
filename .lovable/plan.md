@@ -1,73 +1,43 @@
 
 
-## Phase 2: Premium Fintech Redesign — Calculator, Dashboard, Pricing
+## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
 
-The Phase 1 CSS foundation is already in place (glass-frosted, shadow-futuristic, neumorphic, glow-* are all mapped to clean shadows). The old class names still work but render as simple borders/shadows. This phase removes visual clutter from the markup itself — replacing decorative wrappers, unnecessary animations, and "glass" class usage with clean, direct styling.
+A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
 
-### 1. Calculator Page (`src/pages/Calculator.tsx`)
+---
 
-**Loading state** (lines 239-255): Replace `glass-frosted rounded-2xl p-8 shadow-futuristic` spinner with a simple centered spinner, no glass wrapper.
+### Content Structure
 
-**Header badge** (line 428-429): Remove the `glass` badge with pulsing Sparkles icon ("NRS Compliant"). Replace with plain text or remove entirely.
+The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
 
-**Business selector** (line 442): Replace `glass-frosted rounded-2xl p-5 shadow-futuristic` with `border border-border rounded-xl bg-card p-5`.
-
-**Tax rule toggle** (line 506): Same — replace `glass-frosted rounded-2xl p-5 shadow-futuristic` with clean card styling. Remove `glow-success` and `neumorphic-sm` conditionals on the icon wrapper.
-
-**Entity type tabs** (line 543): Replace `glass-frosted rounded-2xl` TabsList with standard `bg-muted rounded-lg`. Remove `bg-gradient-primary` from active state — use `bg-primary text-primary-foreground`.
-
-**Input form wrapper** (line 562): Replace `glass-frosted rounded-3xl p-6 md:p-8 shadow-futuristic` with `border border-border rounded-xl bg-card p-6 md:p-8`.
-
-**NeumorphicInput** (line 133): Replace `neumorphic-sm p-1` wrapper with a clean div or remove wrapper entirely — let the Input render directly.
-
-**Calculate button** (line 710-720): Replace `variant="hero"` with `variant="default"` (solid primary).
-
-### 2. Dashboard Page (`src/pages/Dashboard.tsx`)
-
-**Sign-in state** (lines 395-401): Replace `glass-frosted rounded-3xl p-10` and `variant="glow"` button with `border border-border rounded-xl bg-card p-10` and standard button.
-
-**Loading skeleton** (lines 408-463): Replace all `glass-frosted`, `glass`, `shadow-futuristic`, `skeleton-shimmer` containers with `bg-card border border-border rounded-xl` and standard `animate-pulse bg-muted rounded` skeleton bars.
-
-**Summary section** (line 537): Replace `glass-frosted rounded-2xl shadow-futuristic border-border/40` with `border border-border rounded-xl bg-card`.
-
-**Summary stat cards** (lines 660-699): Replace `glass p-4 rounded-xl hover-lift` with `border border-border rounded-lg bg-card p-4` — remove hover-lift transform.
-
-**Quick action cards** (lines 817-866): Replace `glass-frosted hover:shadow-futuristic hover:border-primary/30 hover-lift` with `border border-border bg-card hover:border-primary/40 transition-colors`. Remove `glow-primary` on icon hover.
-
-**Business & Reminder cards** (lines 874, 960): Replace `glass-frosted shadow-futuristic` with `border border-border bg-card`. Inner items: replace `glass p-3 rounded-xl` with `border border-border/50 rounded-lg p-3 bg-muted/30`.
-
-**SharedElement/motion wrappers**: Keep framer-motion for list stagger but remove the `SharedElement` wrapper (it adds layout animation overhead with no visible benefit in the clean design).
-
-### 3. Pricing Page (`src/pages/Pricing.tsx`)
-
-**Contact section** (line 595): Replace `glass-frosted p-8 shadow-card hover-lift` with `border border-border bg-card p-8`. Remove `glow-sm` from icon wrapper, replace `bg-gradient-to-br from-primary/20 to-accent/20` with `bg-primary/10`.
-
-**PricingCard** (line 694): Replace `glass-frosted shadow-lg glow-sm` (popular) with `border-2 border-primary bg-card shadow-md`. Remove `card-interactive` and keep simple `hover:shadow-md`. Remove `animate-glow-border` from "Most Popular" badge — use solid `bg-primary text-primary-foreground`.
-
-**CTA buttons**: Replace `variant="hero"` with `variant="default"` throughout.
-
-### 4. General Pattern Replacements (all 3 files)
-
-| Old pattern | New pattern |
+| Section ID | Topic |
 |---|---|
-| `glass-frosted rounded-2xl shadow-futuristic` | `border border-border rounded-xl bg-card` |
-| `glass p-4 rounded-xl hover-lift` | `border border-border rounded-lg bg-card p-4` |
-| `neumorphic-sm p-1` | removed or `rounded-md` |
-| `variant="hero"` | `variant="default"` |
-| `variant="glow"` | `variant="default"` |
-| `glow-primary`, `glow-success`, `glow-sm` | removed |
-| `hover-lift` | removed |
-| `shadow-futuristic` | removed (or `shadow-sm`) |
-| `bg-gradient-primary` | `bg-primary` |
-| `animate-glow-border` | removed |
+| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
+| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
+| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
+| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
+| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
+| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
+| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
+| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
+| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
+| `faq` | 5–6 FAQs with FAQPage schema |
 
-### Files Changed
-- `src/pages/Calculator.tsx` — clean card wrappers, remove glass/neumorphic, simplify inputs
-- `src/pages/Dashboard.tsx` — clean stat cards, quick actions, business list, skeletons
-- `src/pages/Pricing.tsx` — clean pricing cards, contact section, CTAs
+### Technical Implementation
 
-### What This Achieves
-- Consistent "clean fintech" look across the three most-used authenticated pages
-- No more decorative glass/glow/neumorphic classes in primary user flows
-- Matches the Phase 1 homepage direction: content-first, professional, trustworthy
+**1. Create `src/pages/blog/PITMyths2026.tsx`**
+- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
+- ~1,500 words, authoritative tone matching existing posts
+- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
+- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
+- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
+
+**2. Register route in `src/App.tsx`**
+- Add lazy import and route at `/blog/pit-myths-2026`
+
+**3. Add to blog listing in `src/pages/Blog.tsx`**
+- New entry in the `POSTS` array with category "Guides", today's date
+
+**4. Update sitemap (`public/sitemap.xml`)**
+- Add `/blog/pit-myths-2026` entry
 

@@ -130,16 +130,14 @@ const NeumorphicInput = ({
           </Popover>
         )}
       </div>
-      <div className="neumorphic-sm p-1 overflow-hidden">
-        <Input
-          ref={inputRef}
-          inputMode="numeric"
-          value={displayValue}
-          onChange={handleChange}
-          placeholder={placeholder}
-          className="border-0 bg-transparent h-12 text-lg font-medium truncate"
-        />
-      </div>
+      <Input
+        ref={inputRef}
+        inputMode="numeric"
+        value={displayValue}
+        onChange={handleChange}
+        placeholder={placeholder}
+        className="h-12 text-lg font-medium truncate"
+      />
     </div>
   );
 };
@@ -238,16 +236,11 @@ const CalculatorPage = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="glass-frosted rounded-2xl p-8 shadow-futuristic">
-          <div className="flex flex-col items-center gap-4">
-            <div className="relative">
-              <div className="h-12 w-12 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
-              <div className="absolute inset-0 h-12 w-12 rounded-full bg-primary/10 animate-pulse" />
-            </div>
-            <div className="space-y-2 text-center">
-              <div className="skeleton-shimmer h-4 w-32 mx-auto rounded" />
-              <div className="skeleton-shimmer h-3 w-24 mx-auto rounded" />
-            </div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
+          <div className="space-y-2 text-center">
+            <div className="animate-pulse bg-muted h-4 w-32 mx-auto rounded" />
+            <div className="animate-pulse bg-muted h-3 w-24 mx-auto rounded" />
           </div>
         </div>
       </div>
@@ -424,9 +417,9 @@ const CalculatorPage = () => {
       />
       <div className="mx-auto max-w-2xl">
         {/* Header */}
-        <div className="text-center mb-8 animate-slide-up">
-          <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-2 text-sm font-medium mb-4">
-            <Sparkles className="h-4 w-4 text-accent animate-pulse-soft" />
+         <div className="text-center mb-8 animate-slide-up">
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium mb-4">
+            <Sparkles className="h-4 w-4 text-accent" />
             NRS Compliant
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
@@ -439,7 +432,7 @@ const CalculatorPage = () => {
 
         {/* Business Selector */}
         {savedBusinesses.length > 0 && (
-          <div className="mb-6 glass-frosted rounded-2xl p-5 shadow-futuristic animate-slide-up">
+          <div className="mb-6 border border-border rounded-xl bg-card p-5 animate-slide-up">
             <div className="flex items-center gap-4">
               <div className="rounded-xl p-3 bg-primary/10 text-primary flex-shrink-0">
                 <Store className="h-6 w-6" />
@@ -503,13 +496,13 @@ const CalculatorPage = () => {
         </div>
 
         {/* Tax Rule Toggle */}
-        <div className="mb-6 glass-frosted rounded-2xl p-5 shadow-futuristic animate-slide-up">
+        <div className="mb-6 border border-border rounded-xl bg-card p-5 animate-slide-up">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4 min-w-0 flex-1">
               <div className={`rounded-xl p-3 flex-shrink-0 transition-all duration-300 ${
                 use2026Rules 
-                  ? 'bg-success/20 text-success glow-success' 
-                  : 'bg-secondary text-secondary-foreground neumorphic-sm'
+                  ? 'bg-success/20 text-success' 
+                  : 'bg-secondary text-secondary-foreground'
               }`}>
                 <Info className="h-6 w-6" />
               </div>
@@ -540,17 +533,17 @@ const CalculatorPage = () => {
           onValueChange={(v) => setEntityType(v as 'business_name' | 'company')}
           className="mb-6 animate-slide-up-delay-1"
         >
-          <TabsList className="grid w-full grid-cols-2 h-auto p-1.5 glass-frosted rounded-2xl">
+          <TabsList className="grid w-full grid-cols-2 h-auto p-1.5 bg-muted rounded-lg">
             <TabsTrigger 
               value="business_name"
-              className="flex items-center gap-2 py-4 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-300"
+              className="flex items-center gap-2 py-4 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200"
             >
               <Briefcase className="h-5 w-5" />
               <span className="font-semibold">Business Name</span>
             </TabsTrigger>
             <TabsTrigger 
               value="company"
-              className="flex items-center gap-2 py-4 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-300"
+              className="flex items-center gap-2 py-4 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200"
             >
               <Building2 className="h-5 w-5" />
               <span className="font-semibold">Company (LTD)</span>
@@ -559,7 +552,7 @@ const CalculatorPage = () => {
         </Tabs>
 
         {/* Input Form */}
-        <div className="glass-frosted rounded-3xl p-6 md:p-8 shadow-futuristic animate-slide-up-delay-2">
+        <div className="border border-border rounded-xl bg-card p-6 md:p-8 animate-slide-up-delay-2">
           <div className="space-y-8">
             {/* Primary Income */}
             <InputSection title="Primary Income" tooltip="Your main business revenue and expenses">
@@ -708,7 +701,7 @@ const CalculatorPage = () => {
 
             {/* Calculate Button */}
             <Button 
-              variant="hero" 
+              variant="default" 
               size="lg" 
               className="w-full h-14 text-lg"
               onClick={handleCalculate}
