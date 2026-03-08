@@ -46,7 +46,7 @@ const TAX_YEARS = [currentYear, currentYear - 1, currentYear - 2];
 export default function PersonalExpenses() {
   const { device, isMobile, isTablet, containerClass} = useDeviceCSS();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
