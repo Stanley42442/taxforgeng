@@ -1,43 +1,75 @@
 
 
-## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
+## Root Cause: Token Refresh Storm from Concurrent `getUser()` Calls
 
-A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
+The auth logs show **dozens of concurrent `refresh_token` requests per second** immediately after login, each revoking the previous token, until a 429 rate limit is hit. This is **still happening** despite previous fixes.
 
----
+### The Mechanism
 
-### Content Structure
+After a successful password login, the following happens simultaneously:
 
-The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
+1. **`onAuthStateChange`** fires `SIGNED_IN` → updates React state → triggers re-renders
+2. **`trackDevice()`** fires from `onAuthStateChange` → calls `notifyIPBlocked()` / `notifyTimeRestricted()` which call `addNotification()` → each calls `supabase.auth.getUser()`
+3. **`SubscriptionContext.fetchUserData()`** fires on user state change → makes DB queries
+4. **`webVitals.ts`** fires `supabase.auth.getUser()` for every metric (FCP, LCP, CLS, TTFB, INP — up to 5 concurrent calls)
+5. **`errorTracking.ts`** calls `supabase.auth.getUser()` on any error
+6. **`ReminderNotificationProvider`** mounts → `useReminderNotifications` fires → DB queries
+7. **`useSyncedNotifications`** (if Notifications page visited) → `getNotifications()` → `supabase.auth.getUser()`
+8. **`notifications.ts`** — every function (`addNotification`, `getNotifications`, `markNotificationRead`, etc.) independently calls `supabase.auth.getUser()`
 
-| Section ID | Topic |
-|---|---|
-| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
-| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
-| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
-| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
-| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
-| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
-| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
-| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
-| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
-| `faq` | 5–6 FAQs with FAQPage schema |
+The Supabase JS client's `getUser()` method checks the local session token and, if it's near expiry or stale, **triggers a token refresh**. With 10+ concurrent `getUser()` calls, each triggers an independent refresh. Each refresh revokes the previous token. The next refresh sees a revoked token, refreshes again, and so on — creating an exponential storm.
 
-### Technical Implementation
+The `autoRefreshToken: true` setting adds yet another concurrent refresh timer on top of all this.
 
-**1. Create `src/pages/blog/PITMyths2026.tsx`**
-- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
-- ~1,500 words, authoritative tone matching existing posts
-- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
-- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
-- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
+### Why Previous Fixes Didn't Work
 
-**2. Register route in `src/App.tsx`**
-- Add lazy import and route at `/blog/pit-myths-2026`
+The SubscriptionContext `authLoading` gate only prevents DB queries from firing before auth is ready. It does **not** prevent `getUser()` calls from `webVitals`, `errorTracking`, `notifications`, and `trackDevice` — which are the actual source of the concurrent refresh storm.
 
-**3. Add to blog listing in `src/pages/Blog.tsx`**
-- New entry in the `POSTS` array with category "Guides", today's date
+### Fix Plan (4 files)
 
-**4. Update sitemap (`public/sitemap.xml`)**
-- Add `/blog/pit-myths-2026` entry
+#### 1. `src/lib/webVitals.ts` — Stop calling `getUser()` on every metric
+
+Replace `supabase.auth.getUser()` with `supabase.auth.getSession()` which reads from local cache and does NOT trigger a network refresh. Or better yet, just skip user_id — it's optional metadata on web vitals.
+
+**Change**: Replace `supabase.auth.getUser().then(...)` with synchronous session check via `supabase.auth.getSession()` (local cache, no network call). If no session, just queue without user_id.
+
+#### 2. `src/lib/errorTracking.ts` — Stop calling `getUser()` on every error
+
+Same pattern: replace `await supabase.auth.getUser()` with `await supabase.auth.getSession()` which reads the cached session without hitting the auth server.
+
+#### 3. `src/lib/notifications.ts` — Stop calling `getUser()` in every function
+
+All 7 exported functions independently call `supabase.auth.getUser()`. Replace all with `supabase.auth.getSession()` which returns the cached session. The user ID is available from `session.user.id`.
+
+#### 4. `src/hooks/useAuth.tsx` — Deduplicate the `onAuthStateChange` handler
+
+The `onAuthStateChange` handler fires for `TOKEN_REFRESHED` events too, triggering `setUser`/`setSession` state updates that cascade through the entire component tree. Add a check: only update state if the user ID actually changed (skip pure token refreshes).
+
+```typescript
+// Before (fires on every token refresh):
+setSession(session);
+setUser(session?.user ?? null);
+
+// After (only update on meaningful changes):
+setSession(prev => {
+  if (prev?.access_token === session?.access_token) return prev;
+  return session;
+});
+setUser(prev => {
+  const newUser = session?.user ?? null;
+  if (prev?.id === newUser?.id) return prev;
+  return newUser;
+});
+```
+
+### Summary
+
+| File | Problem | Fix |
+|---|---|---|
+| `webVitals.ts` | `getUser()` on every metric (5+ concurrent) | Use `getSession()` (cached, no network) |
+| `errorTracking.ts` | `getUser()` on every error | Use `getSession()` (cached, no network) |
+| `notifications.ts` | `getUser()` in all 7 functions | Use `getSession()` (cached, no network) |
+| `useAuth.tsx` | State updates on every `TOKEN_REFRESHED` event cascade re-renders | Skip state updates when user ID unchanged |
+
+This eliminates all concurrent `getUser()` network calls that trigger the refresh storm. The `getSession()` method reads from local memory/storage and never hits the auth server.
 
