@@ -151,7 +151,14 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
   // Fetch user profile and businesses from database
   const fetchUserData = useCallback(async () => {
+    // CRITICAL: Wait for auth to fully initialize before making any DB requests
+    // This prevents requests from going out with the anon key instead of the user's JWT
+    if (authLoading) {
+      return;
+    }
+
     if (!user) {
+      profileCreateAttempted.current = false;
       setState({
         tier: 'free',
         effectiveTier: 'free',
