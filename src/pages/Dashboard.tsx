@@ -816,9 +816,9 @@ const Dashboard = () => {
       {/* Quick Actions */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 animate-slide-up-delay-1">
         <Link to="/calculator">
-          <Card className="h-full glass-frosted hover:shadow-futuristic hover:border-primary/30 transition-all cursor-pointer group hover-lift">
+          <Card className="h-full bg-card border border-border hover:shadow-md transition-shadow cursor-pointer group">
             <CardContent className="p-4 text-center">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-primary/20 transition-colors group-hover:glow-primary">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-primary/20 transition-colors">
                 <Calculator className="h-5 w-5 text-primary" />
               </div>
               <h3 className="font-medium text-sm">Calculator</h3>
