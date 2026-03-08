@@ -1,43 +1,36 @@
 
 
-## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
+## Fix: Auth Login Still Broken — Two Root Causes Found
 
-A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
+### Problem 1: `track-device` not in `config.toml`
+The edge function defaults to `verify_jwt = true`, so Supabase rejects the call before our code even runs. Since we validate the JWT manually in the function, it needs `verify_jwt = false`.
 
----
+### Problem 2: `auth.getClaims()` does not exist
+Line 28 of the edge function calls `userClient.auth.getClaims(token)` — this method does not exist in `@supabase/supabase-js@2`. The function crashes immediately on every invocation. Must use `auth.getUser(token)` instead.
 
-### Content Structure
+### Problem 3: Token cascade still happening
+The auth logs from 18:09 show the exact same cascade pattern. Because the edge function fails silently (crash → no response or 500), the client-side `supabase.functions.invoke()` triggers error handling that may cause re-auth attempts. Meanwhile, **other components** (SubscriptionContext, etc.) fire their own authenticated queries on login, contributing to the cascade.
 
-The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
+### Fix Plan
 
-| Section ID | Topic |
-|---|---|
-| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
-| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
-| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
-| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
-| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
-| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
-| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
-| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
-| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
-| `faq` | 5–6 FAQs with FAQPage schema |
+**1. Fix `supabase/config.toml`** — Add `track-device` with `verify_jwt = false`
 
-### Technical Implementation
+**2. Fix `supabase/functions/track-device/index.ts`** — Replace `getClaims` with `getUser`:
+```typescript
+// Before (broken):
+const { data: claimsData, error: claimsError } = await userClient.auth.getClaims(token);
+const userId = claimsData.claims.sub;
+const userEmail = claimsData.claims.email;
 
-**1. Create `src/pages/blog/PITMyths2026.tsx`**
-- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
-- ~1,500 words, authoritative tone matching existing posts
-- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
-- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
-- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
+// After (working):
+const { data: { user }, error: userError } = await userClient.auth.getUser(token);
+const userId = user.id;
+const userEmail = user.email;
+```
 
-**2. Register route in `src/App.tsx`**
-- Add lazy import and route at `/blog/pit-myths-2026`
+**3. Redeploy the edge function** and verify it responds correctly.
 
-**3. Add to blog listing in `src/pages/Blog.tsx`**
-- New entry in the `POSTS` array with category "Guides", today's date
-
-**4. Update sitemap (`public/sitemap.xml`)**
-- Add `/blog/pit-myths-2026` entry
+### Files Changed
+- `supabase/config.toml` — add `[functions.track-device]` entry
+- `supabase/functions/track-device/index.ts` — fix `getClaims` → `getUser`
 
