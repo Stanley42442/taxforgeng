@@ -319,19 +319,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     });
 
-    // Handle session-only mode (clear on browser close)
-    const handleBeforeUnload = () => {
-      const isSessionOnly = safeSessionStorage.getItem('taxforge-session-only');
-      if (isSessionOnly === 'true') {
-        safeLocalStorage.removeItem('sb-uhuxqrrtsiintcwpxxwy-auth-token');
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    // Handle session-only mode: if session-only was set in a previous session
+    // and the browser was fully closed (sessionStorage is cleared on close),
+    // clear the auth token now. This avoids using beforeunload which fires
+    // during HMR, iframe reloads, and Lovable preview refreshes.
+    const wasSessionOnly = safeLocalStorage.getItem('taxforge-session-only-flag');
+    const sessionStillAlive = safeSessionStorage.getItem('taxforge-session-active');
+    if (wasSessionOnly === 'true' && !sessionStillAlive) {
+      // Browser was closed and reopened — clear the persisted token
+      safeLocalStorage.removeItem('sb-uhuxqrrtsiintcwpxxwy-auth-token');
+      safeLocalStorage.removeItem('taxforge-session-only-flag');
+    }
+    // Mark session as active (survives page reloads but not browser close)
+    safeSessionStorage.setItem('taxforge-session-active', 'true');
 
     return () => {
       subscription.unsubscribe();
-      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, []);
 
