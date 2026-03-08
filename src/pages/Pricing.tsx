@@ -607,7 +607,7 @@ const Pricing = () => {
                 Contact Sales
               </a>
             </Button>
-            <Button variant="hero" onClick={() => navigate('/advisory')}>
+            <Button variant="default" onClick={() => navigate('/advisory')}>
               Start Free Trial
               <ArrowRight className="h-4 w-4" />
             </Button>
