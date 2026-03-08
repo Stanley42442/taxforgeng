@@ -22,7 +22,7 @@ export default function LoyaltyRewards() {
   const navigate = useNavigate();
   const { transactions, loading } = useLoyaltyPoints();
 
-  if (loading) {
+  if (authLoading) {
     return (
       <PageLayout maxWidth="4xl">
         <div className="flex items-center justify-center py-20">
