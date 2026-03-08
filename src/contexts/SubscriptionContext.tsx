@@ -135,7 +135,8 @@ const SAMPLE_BUSINESSES: Omit<SavedBusiness, 'id' | 'createdAt'>[] = [
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
 export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const profileCreateAttempted = useRef(false);
   const [state, setState] = useState<SubscriptionState>({
     tier: 'free',
     effectiveTier: 'free',
