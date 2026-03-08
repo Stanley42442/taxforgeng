@@ -415,24 +415,24 @@ const Settings = () => {
   return (
     <PageLayout title="Settings" description="Manage your account and preferences" icon={SettingsIcon} maxWidth="4xl">
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 mb-6 glass-frosted">
-          <TabsTrigger value="profile" className="data-[state=active]:glow-sm">
+        <TabsList className="grid w-full grid-cols-5 mb-6 glass-frosted rounded-2xl">
+          <TabsTrigger value="profile" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:glow-sm rounded-xl transition-all">
             <User className="h-4 w-4 mr-2" />
             <span className="hidden sm:inline">Profile</span>
           </TabsTrigger>
-          <TabsTrigger value="subscription" className="data-[state=active]:glow-sm">
+          <TabsTrigger value="subscription" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:glow-sm rounded-xl transition-all">
             <Crown className="h-4 w-4 mr-2" />
             <span className="hidden sm:inline">Plan</span>
           </TabsTrigger>
-          <TabsTrigger value="security" className="data-[state=active]:glow-sm">
+          <TabsTrigger value="security" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:glow-sm rounded-xl transition-all">
             <Shield className="h-4 w-4 mr-2" />
             <span className="hidden sm:inline">Security</span>
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="data-[state=active]:glow-sm">
+          <TabsTrigger value="notifications" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:glow-sm rounded-xl transition-all">
             <MessageCircle className="h-4 w-4 mr-2" />
             <span className="hidden sm:inline">Alerts</span>
           </TabsTrigger>
-          <TabsTrigger value="activity" className="data-[state=active]:glow-sm">
+          <TabsTrigger value="activity" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:glow-sm rounded-xl transition-all">
             <History className="h-4 w-4 mr-2" />
             <span className="hidden sm:inline">Activity</span>
           </TabsTrigger>
