@@ -714,7 +714,7 @@ const PricingCard = ({
 
       <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
         <div className={`h-8 w-8 sm:h-10 sm:w-10 rounded-lg flex items-center justify-center ${
-          isPopular ? 'bg-gradient-primary text-primary-foreground' : 'bg-secondary text-primary'
+          isPopular ? 'bg-primary text-primary-foreground' : 'bg-secondary text-primary'
         }`}>
           {icon}
         </div>
