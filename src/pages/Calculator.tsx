@@ -424,7 +424,7 @@ const CalculatorPage = () => {
       <div className="mx-auto max-w-2xl">
         {/* Header */}
         <div className="text-center mb-8 animate-slide-up">
-          <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-2 text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 rounded-full bg-muted/50 border border-border px-4 py-2 text-sm font-medium mb-4">
             <Sparkles className="h-4 w-4 text-accent animate-pulse-soft" />
             NRS Compliant
           </div>
