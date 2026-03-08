@@ -1,43 +1,52 @@
 
 
-## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
+## Problem: Token Refresh Cascade Still Causing Logout
 
-A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
+The ref-based fix prevented duplicate `trackDevice` calls, but the core issue remains: `trackDevice` itself fires **~10 parallel authenticated Supabase API calls** (known_devices queries, IP whitelist check, time restriction check, profile query, edge function invocations). When these run simultaneously using the same auth token, one call triggers a token refresh that **revokes the old token**, causing the other in-flight calls to fail and trigger their own refresh attempts. This cascades into 50+ `token_revoked` events and a 429 rate limit, which kills the session.
 
----
+### Root Cause
+```text
+trackDevice() fires in parallel:
+  ├── getDeviceInfo()
+  ├── getClientIP()
+  ├── getLocationFromIP()         ── uses auth token
+  ├── supabase.from('profiles')   ── uses auth token
+  ├── isDeviceBlocked()           ── uses auth token
+  ├── checkIPWhitelist()          ── uses auth token (RPC)
+  ├── check_time_restrictions()   ── uses auth token (RPC)
+  ├── known_devices SELECT        ── uses auth token
+  ├── known_devices INSERT/UPDATE ── uses auth token
+  └── send-security-alert invoke  ── uses auth token
+```
+All 10 calls share one token. First refresh revokes it. Cascade ensues.
 
-### Content Structure
+### Fix: Move Device Tracking to a Single Edge Function
 
-The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
+Instead of making 10 parallel client-side API calls, send device info to **one edge function** that performs all tracking server-side using the service role key (no token refresh issues).
 
-| Section ID | Topic |
-|---|---|
-| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
-| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
-| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
-| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
-| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
-| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
-| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
-| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
-| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
-| `faq` | 5–6 FAQs with FAQPage schema |
+**Client side (`useAuth.tsx`):**
+- `trackDevice` becomes a single `supabase.functions.invoke('track-device', { body: { deviceInfo, clientIP } })` call
+- No more parallel DB queries from the client during login
+- Fire-and-forget: don't await, don't block login
 
-### Technical Implementation
+**New edge function (`supabase/functions/track-device/index.ts`):**
+- Receives device fingerprint, user agent, client IP from the request
+- Uses service role key to perform all DB operations (no token refresh)
+- Handles: device blocking check, IP whitelist, time restrictions, known_devices upsert, security alerts
+- Returns `{ blocked, ipBlocked, timeBlocked }` status
 
-**1. Create `src/pages/blog/PITMyths2026.tsx`**
-- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
-- ~1,500 words, authoritative tone matching existing posts
-- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
-- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
-- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
+**Auth.tsx changes:**
+- After successful `signInWithPassword`, check the `track-device` response
+- If blocked/ipBlocked/timeBlocked, sign out and show appropriate message
 
-**2. Register route in `src/App.tsx`**
-- Add lazy import and route at `/blog/pit-myths-2026`
+### Files Changed
+1. **`supabase/functions/track-device/index.ts`** (new) — All device tracking logic consolidated server-side
+2. **`src/hooks/useAuth.tsx`** — Replace `trackDevice` function body with single edge function call
+3. **`supabase/config.toml`** — Add `[functions.track-device]` config (verify_jwt = false, validate in code)
 
-**3. Add to blog listing in `src/pages/Blog.tsx`**
-- New entry in the `POSTS` array with category "Guides", today's date
-
-**4. Update sitemap (`public/sitemap.xml`)**
-- Add `/blog/pit-myths-2026` entry
+### What This Achieves
+- Login triggers exactly **1 network request** for device tracking instead of 10
+- Server-side calls use service role key — no token refresh cascade possible
+- Login becomes near-instant (no blocking on device tracking)
+- All security checks (IP whitelist, time restrictions, device blocking) still enforced
 
