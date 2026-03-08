@@ -657,7 +657,7 @@ const Dashboard = () => {
 
                   {/* Business Summary Cards */}
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
+                    <div className="border border-border bg-card p-4 rounded-lg min-h-[100px]">
                       <div className="flex items-center gap-2 mb-2">
                         <TrendingUp className="h-4 w-4 text-success" />
                         <span className="text-xs text-muted-foreground">Income</span>
