@@ -129,11 +129,12 @@ export const addNotification = async (
   }
 ): Promise<AppNotification | null> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    // Use getSession() instead of getUser() to avoid triggering token refreshes
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     
     if (!user) {
       console.warn('No user logged in, cannot save notification to database');
-      // Fall back to localStorage for non-authenticated users
       return addNotificationToLocalStorage(title, message, type, options);
     }
 
