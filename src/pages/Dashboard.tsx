@@ -1141,7 +1141,7 @@ const Dashboard = () => {
             </Card>
 
             {/* Tax Relief Summary Card */}
-            <Card className="glass-frosted shadow-futuristic">
+            <Card className="bg-card border border-border shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <div className="h-10 w-10 rounded-lg bg-success/10 flex items-center justify-center">
