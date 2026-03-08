@@ -276,7 +276,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       logger.error('Error fetching user data:', error);
       setState(prev => ({ ...prev, loading: false }));
     }
-  }, [user]);
+  }, [user, authLoading]);
 
   useEffect(() => {
     fetchUserData();
