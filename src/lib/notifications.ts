@@ -129,11 +129,12 @@ export const addNotification = async (
   }
 ): Promise<AppNotification | null> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    // Use getSession() instead of getUser() to avoid triggering token refreshes
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     
     if (!user) {
       console.warn('No user logged in, cannot save notification to database');
-      // Fall back to localStorage for non-authenticated users
       return addNotificationToLocalStorage(title, message, type, options);
     }
 
@@ -223,10 +224,10 @@ const addNotificationToLocalStorage = (
 // Get all notifications from database
 export const getNotifications = async (): Promise<AppNotification[]> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     
     if (!user) {
-      // Fall back to localStorage for non-authenticated users
       return safeLocalStorage.getJSON<AppNotification[]>('app-notifications', []);
     }
 
@@ -260,10 +261,10 @@ export const getNotifications = async (): Promise<AppNotification[]> => {
 // Mark notification as read in database
 export const markNotificationRead = async (id: string): Promise<void> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     
     if (!user) {
-      // Fall back to localStorage
       const notifications = safeLocalStorage.getJSON<AppNotification[]>('app-notifications', []);
       const updated = notifications.map((n: AppNotification) => 
         n.id === id ? { ...n, read: true } : n
@@ -292,7 +293,8 @@ export const markNotificationRead = async (id: string): Promise<void> => {
 // Mark all notifications as read
 export const markAllNotificationsRead = async (): Promise<void> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     
     if (!user) {
       const notifications = safeLocalStorage.getJSON<AppNotification[]>('app-notifications', []);
@@ -321,7 +323,8 @@ export const markAllNotificationsRead = async (): Promise<void> => {
 // Delete a notification
 export const deleteNotification = async (id: string): Promise<void> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     
     if (!user) {
       const notifications = safeLocalStorage.getJSON<AppNotification[]>('app-notifications', []);
@@ -350,7 +353,8 @@ export const deleteNotification = async (id: string): Promise<void> => {
 // Clear all notifications from database
 export const clearAllNotifications = async (): Promise<void> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     
     if (!user) {
       safeLocalStorage.removeItem('app-notifications');

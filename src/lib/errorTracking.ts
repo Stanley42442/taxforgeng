@@ -43,11 +43,12 @@ export async function reportError(error: Error, componentStack?: string): Promis
     timestamp: new Date().toISOString(),
   };
 
-  // Try to get user ID if authenticated
+  // Use getSession() instead of getUser() to avoid triggering token refreshes.
+  // getSession() reads from local cache — no network call.
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      report.userId = user.id;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      report.userId = session.user.id;
     }
   } catch {
     // Ignore auth errors during error reporting
