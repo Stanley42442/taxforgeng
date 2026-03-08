@@ -995,7 +995,7 @@ const Dashboard = () => {
                       const isUrgent = dueDate <= addDays(new Date(), 7);
                       
                       return (
-                        <div key={reminder.id} className={`glass p-3 rounded-xl ${isUrgent ? 'border border-warning/30' : ''}`}>
+                        <div key={reminder.id} className={`border border-border/50 p-3 rounded-lg bg-muted/30 ${isUrgent ? 'border-warning/30' : ''}`}>
                           <div className="flex items-start justify-between">
                             <div className="flex items-start gap-3">
                               {isUrgent ? (
