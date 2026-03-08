@@ -1,43 +1,32 @@
 
 
-## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
+## Fix: Session Logout Causes
 
-A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
+After investigating the auth flow, auth logs, and network requests, I found **two code-level causes** that force logouts:
 
----
+### Cause 1: `beforeunload` Wipes Auth Token in Preview
 
-### Content Structure
+In `useAuth.tsx` (lines 322-328), a `beforeunload` handler removes the auth token from localStorage when `taxforge-session-only` is set. In the Lovable preview iframe, Vite HMR (hot module replacement) and preview refreshes trigger `beforeunload`, which deletes the token. On the next load, the session is gone.
 
-The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
+**Fix**: Replace `beforeunload` with `pagehide` + `persisted` check. The `pagehide` event with `persisted === false` only fires on actual tab/window closes, not on in-page navigation or iframe reloads. Additionally, move the token cleanup to happen on the *next* page load instead, by checking sessionStorage on init rather than deleting on unload. This is more reliable across browsers and iframe contexts.
 
-| Section ID | Topic |
-|---|---|
-| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
-| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
-| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
-| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
-| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
-| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
-| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
-| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
-| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
-| `faq` | 5–6 FAQs with FAQPage schema |
+### Cause 2: Stale `session_invalidated_at` Timestamp
 
-### Technical Implementation
+The `manage-sessions` edge function's `check_validity` operation compares `session_invalidated_at` on the profile against the token's `iat`. If a user ever clicked "Revoke all sessions" (even weeks ago), the `session_invalidated_at` timestamp persists forever. Any new login with a token issued *before* that timestamp (e.g., restored from localStorage) gets flagged as invalid.
 
-**1. Create `src/pages/blog/PITMyths2026.tsx`**
-- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
-- ~1,500 words, authoritative tone matching existing posts
-- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
-- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
-- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
+While `useSessionSecurity` is only used on the security settings page (not globally), this is still a latent bug. When the user visits their security dashboard, the validity check fires immediately and can sign them out.
 
-**2. Register route in `src/App.tsx`**
-- Add lazy import and route at `/blog/pit-myths-2026`
+**Fix**: In the `register` operation of the edge function, clear `session_invalidated_at` after successfully registering a new session. This ensures freshly logged-in sessions aren't invalidated by old timestamps.
 
-**3. Add to blog listing in `src/pages/Blog.tsx`**
-- New entry in the `POSTS` array with category "Guides", today's date
+### Changes
 
-**4. Update sitemap (`public/sitemap.xml`)**
-- Add `/blog/pit-myths-2026` entry
+**`src/hooks/useAuth.tsx`** — Replace `beforeunload` token-wipe with a safer init-time check:
+- On mount, check if `taxforge-session-only` was set in a *previous* sessionStorage (it won't survive browser close). If sessionStorage is empty but localStorage has the auth token, it means the browser was closed and reopened — clear the token then.
+- Remove the `beforeunload` listener entirely.
+
+**`supabase/functions/manage-sessions/index.ts`** — In the `register` operation, after inserting/updating the session record, also clear `session_invalidated_at` on the profile so the new session won't be invalidated by stale timestamps.
+
+### Files
+- `src/hooks/useAuth.tsx` (1 file)
+- `supabase/functions/manage-sessions/index.ts` (1 file)
 
