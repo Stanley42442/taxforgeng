@@ -957,7 +957,7 @@ const Dashboard = () => {
             </Card>
 
             {/* Reminders Card */}
-            <Card className="glass-frosted shadow-futuristic">
+            <Card className="border border-border bg-card">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2">
