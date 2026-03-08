@@ -1,33 +1,43 @@
 
 
-## Auth Issue: Missing INSERT Policy on Profiles Table
+## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
 
-### Root Cause
+A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
 
-The `profiles` table has RLS enabled with only **SELECT** and **UPDATE** policies -- there is **no INSERT policy**. Here's what happens:
+---
 
-1. User signs up -- the `handle_new_user` trigger creates their profile (works because it's `SECURITY DEFINER`)
-2. If that trigger fails or the user was created before the trigger existed, no profile row exists
-3. `SubscriptionContext.tsx` detects the missing profile (406 / PGRST116 error) and tries a fallback INSERT
-4. The INSERT fails with `"new row violates row-level security policy"` because there's no INSERT policy
-5. This failure loops on every render, flooding the auth token refresh endpoint and hitting rate limits (429 errors visible in logs)
+### Content Structure
 
-User `c34c22a5-...` (benjamingillespie001@gmail.com) is in exactly this state -- logged in, but no profile row, and every attempt to create one is blocked by RLS.
+The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
 
-### Fix
+| Section ID | Topic |
+|---|---|
+| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
+| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
+| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
+| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
+| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
+| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
+| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
+| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
+| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
+| `faq` | 5–6 FAQs with FAQPage schema |
 
-**1. Database migration** -- Add an INSERT policy on `profiles`:
-```sql
-CREATE POLICY "Users can insert their own profile"
-ON public.profiles
-FOR INSERT
-TO authenticated
-WITH CHECK (auth.uid() = id);
-```
+### Technical Implementation
 
-**2. Code fix** -- Add a guard in `SubscriptionContext.tsx` to prevent the infinite retry loop. The `fetchUserData` function should only attempt the fallback INSERT once and gracefully handle failure instead of re-triggering on every state change.
+**1. Create `src/pages/blog/PITMyths2026.tsx`**
+- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
+- ~1,500 words, authoritative tone matching existing posts
+- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
+- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
+- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
 
-### Files Changed
-- **Database migration**: Add INSERT policy on `profiles` table
-- **`src/contexts/SubscriptionContext.tsx`**: Add retry guard to prevent infinite loop when profile creation fails
+**2. Register route in `src/App.tsx`**
+- Add lazy import and route at `/blog/pit-myths-2026`
+
+**3. Add to blog listing in `src/pages/Blog.tsx`**
+- New entry in the `POSTS` array with category "Guides", today's date
+
+**4. Update sitemap (`public/sitemap.xml`)**
+- Add `/blog/pit-myths-2026` entry
 

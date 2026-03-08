@@ -136,6 +136,7 @@ const SubscriptionContext = createContext<SubscriptionContextType | undefined>(u
 
 export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
+  const profileCreationAttempted = React.useRef(false);
   const [state, setState] = useState<SubscriptionState>({
     tier: 'free',
     effectiveTier: 'free',
@@ -174,7 +175,14 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         .single();
 
       // Defensive check: Create profile if it doesn't exist (handles edge case)
+      // Only attempt once per session to prevent infinite retry loops
       if (profileError && profileError.code === 'PGRST116') {
+        if (profileCreationAttempted.current) {
+          logger.warn('[SubscriptionContext] Profile creation already attempted, skipping retry');
+          setState(prev => ({ ...prev, loading: false }));
+          return;
+        }
+        profileCreationAttempted.current = true;
         logger.warn('[SubscriptionContext] No profile found, creating one...');
         const { error: createError } = await supabase
           .from('profiles')
@@ -186,6 +194,8 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
         if (createError) {
           logger.error('[SubscriptionContext] Failed to create profile:', createError);
+          setState(prev => ({ ...prev, loading: false }));
+          return;
         } else {
           // Re-fetch the newly created profile
           const { data: newProfile } = await supabase
