@@ -430,7 +430,7 @@ const Dashboard = () => {
           {/* Quick actions skeleton */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="glass-frosted rounded-xl p-5 flex flex-col items-center gap-3">
+              <div key={i} className="bg-card border border-border rounded-xl p-5 flex flex-col items-center gap-3 shadow-sm">
                 <div className="skeleton-shimmer h-12 w-12 rounded-xl" />
                 <div className="skeleton-shimmer h-4 w-20 rounded" />
               </div>
