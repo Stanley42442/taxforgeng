@@ -1164,7 +1164,7 @@ const Dashboard = () => {
                     </div>
                     <p className="text-xs text-muted-foreground">20% of rent, max ₦500,000</p>
                   </div>
-                  <div className="glass p-3 rounded-xl">
+                  <div className="border border-border/50 p-3 rounded-lg bg-muted/30">
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-medium">Pension Relief</p>
                       <p className="text-sm font-semibold text-success">
