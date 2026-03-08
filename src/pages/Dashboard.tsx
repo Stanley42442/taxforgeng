@@ -915,7 +915,7 @@ const Dashboard = () => {
                             open={expandedBusinessId === business.id}
                             onOpenChange={() => setExpandedBusinessId(expandedBusinessId === business.id ? null : business.id)}
                           >
-                            <div className="glass p-3 rounded-xl hover:bg-muted/50 transition-colors">
+                            <div className="bg-muted/50 border border-border p-3 rounded-xl hover:bg-muted/70 transition-colors">
                               <CollapsibleTrigger className="w-full">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center gap-3">
