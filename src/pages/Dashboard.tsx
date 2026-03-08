@@ -1055,7 +1055,7 @@ const Dashboard = () => {
               <CardContent>
                 <div className="space-y-3 max-h-[300px] overflow-y-auto">
                   {filteredAnnualTotals.rent > 0 && (
-                    <div className="glass p-3 rounded-xl flex items-center justify-between">
+                    <div className="border border-border/50 p-3 rounded-lg bg-muted/30 flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
                           <Home className="h-5 w-5 text-primary" />
