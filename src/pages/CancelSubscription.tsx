@@ -32,7 +32,7 @@ const cancellationReasons = [
 
 export default function CancelSubscription() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { tier } = useSubscription();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'reason' | 'feedback' | 'confirm'>('reason');

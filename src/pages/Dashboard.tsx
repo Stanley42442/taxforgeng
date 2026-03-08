@@ -101,7 +101,7 @@ interface ReminderSummary {
 
 const Dashboard = () => {
   const { tier, savedBusinesses, loading: businessLoading, refreshBusinesses } = useSubscription();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { urgentCount } = useUpcomingReminders();
   const navigate = useNavigate();
   const [expenseSummary, setExpenseSummary] = useState<ExpenseSummary>({

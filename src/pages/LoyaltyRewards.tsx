@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 export default function LoyaltyRewards() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { transactions, loading } = useLoyaltyPoints();
 
