@@ -246,6 +246,12 @@ serve(async (req) => {
             });
         }
 
+        // Clear stale session_invalidated_at so new logins aren't killed by old timestamps
+        await supabase
+          .from('profiles')
+          .update({ session_invalidated_at: null })
+          .eq('id', user.id);
+
         return new Response(
           JSON.stringify({ success: true }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
