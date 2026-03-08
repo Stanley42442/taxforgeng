@@ -261,10 +261,10 @@ export const getNotifications = async (): Promise<AppNotification[]> => {
 // Mark notification as read in database
 export const markNotificationRead = async (id: string): Promise<void> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     
     if (!user) {
-      // Fall back to localStorage
       const notifications = safeLocalStorage.getJSON<AppNotification[]>('app-notifications', []);
       const updated = notifications.map((n: AppNotification) => 
         n.id === id ? { ...n, read: true } : n
