@@ -1155,7 +1155,7 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="glass p-3 rounded-xl">
+                  <div className="bg-muted/50 border border-border p-3 rounded-xl">
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-medium">Rent Relief</p>
                       <p className="text-sm font-semibold text-success">
