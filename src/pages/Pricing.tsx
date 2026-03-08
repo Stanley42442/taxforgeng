@@ -693,8 +693,8 @@ const PricingCard = ({
   return (
     <div className={`relative rounded-xl sm:rounded-2xl border p-4 sm:p-6 transition-all duration-300 ${
       isPopular 
-        ? 'border-primary glass-frosted shadow-lg sm:scale-105 glow-sm' 
-        : 'border-border bg-card shadow-card hover:shadow-lg card-interactive'
+        ? 'border-2 border-primary bg-card shadow-md sm:scale-105' 
+        : 'border-border bg-card hover:shadow-md'
     }`}>
       {isPopular && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
