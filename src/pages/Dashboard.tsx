@@ -871,7 +871,7 @@ const Dashboard = () => {
         <>
           <div className="grid gap-6 lg:grid-cols-2 animate-slide-up-delay-2">
             {/* Businesses Card */}
-            <Card className="glass-frosted shadow-futuristic">
+            <Card className="border border-border bg-card">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2">
