@@ -388,6 +388,16 @@ const Dashboard = () => {
     return { income: incomeByDay, expenses: expensesByDay, net: netByDay };
   }, [validExpenses]);
 
+  if (authLoading) {
+    return (
+      <PageLayout title="Dashboard" icon={LayoutDashboard}>
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      </PageLayout>
+    );
+  }
+
   if (!user) {
     return (
       <PageLayout title="Dashboard" description="Please sign in to access your dashboard" icon={LayoutDashboard}>

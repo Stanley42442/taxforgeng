@@ -193,6 +193,16 @@ export default function PersonalExpenses() {
   const formatCurrency = (amount: number) => 
     new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(amount);
 
+  if (authLoading) {
+    return (
+      <PageLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      </PageLayout>
+    );
+  }
+
   if (!user) {
     return (
       <PageLayout>
