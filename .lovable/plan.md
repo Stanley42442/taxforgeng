@@ -1,43 +1,30 @@
 
 
-## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
+## Fix: Auth Token Not Attached to API Requests
 
-A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
+### Root Cause
 
----
+The `onAuthStateChange` listener fires `INITIAL_SESSION` immediately when set up -- before `getSession()` resolves. This sets `user` in React state while `loading` is still `true`. SubscriptionContext sees `user` change and immediately calls `fetchUserData`. But the Supabase client hasn't fully attached the JWT to its internal state yet, so all requests go out with the **anon key** instead of the user's JWT.
 
-### Content Structure
+Evidence from network logs: every request has `authorization: Bearer <anon_key>` -- the user's JWT is never used. RLS blocks profile access because `auth.uid()` is null, returning 0 rows. The context then tries to create a profile (also blocked by RLS), and this loops endlessly.
 
-The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
+The auth server logs confirm: dozens of `token_revoked` + login events per second, eventually hitting a 429 rate limit.
 
-| Section ID | Topic |
-|---|---|
-| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
-| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
-| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
-| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
-| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
-| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
-| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
-| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
-| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
-| `faq` | 5–6 FAQs with FAQPage schema |
+### Fix (1 file)
 
-### Technical Implementation
+**`src/contexts/SubscriptionContext.tsx`** -- Gate `fetchUserData` on auth readiness:
 
-**1. Create `src/pages/blog/PITMyths2026.tsx`**
-- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
-- ~1,500 words, authoritative tone matching existing posts
-- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
-- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
-- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
+1. Destructure `loading` (rename to `authLoading`) from `useAuth()` alongside `user`
+2. In `fetchUserData`, return early if `authLoading` is true (session not yet restored)
+3. Add `authLoading` to the useCallback dependency array
+4. Add a `profileCreateAttempted` ref to prevent multiple create attempts in the same session
 
-**2. Register route in `src/App.tsx`**
-- Add lazy import and route at `/blog/pit-myths-2026`
+This ensures no database queries fire until `getSession()` has resolved and the JWT is properly attached to the Supabase client.
 
-**3. Add to blog listing in `src/pages/Blog.tsx`**
-- New entry in the `POSTS` array with category "Guides", today's date
+### Why this fixes both preview and published
 
-**4. Update sitemap (`public/sitemap.xml`)**
-- Add `/blog/pit-myths-2026` entry
+- Preview (iframe): stricter storage timing makes the race condition happen every time
+- Published mobile: faster storage access means `getSession()` often resolves before `onAuthStateChange` fires, so the JWT is attached in time -- but it's still a race
+
+By explicitly waiting for `loading === false`, we eliminate the race entirely.
 
