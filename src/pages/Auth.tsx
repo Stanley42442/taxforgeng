@@ -667,9 +667,9 @@ const Auth = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
-        <div className="glass-frosted rounded-2xl p-8">
-          <div className="h-10 w-10 rounded-full border-2 border-primary border-t-transparent animate-spin glow-primary" />
+    <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="bg-card border border-border rounded-2xl p-8 shadow-sm">
+          <div className="h-10 w-10 rounded-full border-2 border-primary border-t-transparent animate-spin" />
         </div>
       </div>
     );
