@@ -539,7 +539,7 @@ const CalculatorPage = () => {
           onValueChange={(v) => setEntityType(v as 'business_name' | 'company')}
           className="mb-6 animate-slide-up-delay-1"
         >
-          <TabsList className="grid w-full grid-cols-2 h-auto p-1.5 glass-frosted rounded-2xl">
+          <TabsList className="grid w-full grid-cols-2 h-auto p-1.5 bg-muted border border-border rounded-2xl">
             <TabsTrigger 
               value="business_name"
               className="flex items-center gap-2 py-4 rounded-xl data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-300"
