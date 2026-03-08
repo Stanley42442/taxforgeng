@@ -667,7 +667,7 @@ const Dashboard = () => {
                         <SparklineChart data={sparklineData.income} color="hsl(var(--success))" height={30} width={100} />
                       </div>
                     </div>
-                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
+                    <div className="border border-border bg-card p-4 rounded-lg min-h-[100px]">
                       <div className="flex items-center gap-2 mb-2">
                         <TrendingDown className="h-4 w-4 text-destructive" />
                         <span className="text-xs text-muted-foreground">Expenses</span>
