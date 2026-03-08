@@ -963,7 +963,7 @@ const Auth = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full mb-4 gap-2 glass hover-lift"
+                  className="w-full mb-4 gap-2 bg-muted/50 border border-border hover:shadow-md transition-shadow"
                   onClick={handleGoogleSignIn}
                   disabled={isSubmitting}
                 >
