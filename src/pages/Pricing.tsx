@@ -592,8 +592,8 @@ const Pricing = () => {
 
       {/* Contact Section */}
       <div className="max-w-2xl mx-auto text-center">
-        <div className="rounded-2xl border border-border glass-frosted p-8 shadow-card hover-lift">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 glow-sm">
+        <div className="rounded-2xl border border-border bg-card p-8">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
             <MessageCircle className="h-7 w-7 text-primary" />
           </div>
           <h3 className="text-xl font-bold text-foreground mb-2">Need Help Choosing?</h3>
