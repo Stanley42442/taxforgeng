@@ -854,7 +854,7 @@ const Dashboard = () => {
           </Card>
         </Link>
         <Link to="/businesses">
-          <Card className="h-full glass-frosted hover:shadow-futuristic hover:border-success/30 transition-all cursor-pointer group hover-lift">
+          <Card className="h-full border border-border bg-card hover:border-success/40 transition-colors cursor-pointer group">
             <CardContent className="p-4 text-center">
               <div className="h-10 w-10 rounded-lg bg-success/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-success/20 transition-colors">
                 <Building2 className="h-5 w-5 text-success" />
