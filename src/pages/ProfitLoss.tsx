@@ -22,7 +22,7 @@ interface PeriodData { income: number; expenses: number; grossProfit: number; ne
 const tierOrder = ['free', 'basic', 'professional', 'business', 'enterprise'] as const;
 
 const ProfitLoss = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { savedBusinesses, tier } = useSubscription();
   const navigate = useNavigate();
   const [expenses, setExpenses] = useState<ExpenseData[]>([]);
@@ -36,7 +36,6 @@ const ProfitLoss = () => {
     if (user && canAccess) fetchData();
   }, [user, canAccess, selectedBusiness, savedBusinesses]);
 
-  // Reset selected business if it no longer exists
   useEffect(() => {
     if (selectedBusiness !== 'all' && !savedBusinesses.find(b => b.id === selectedBusiness)) {
       setSelectedBusiness('all');
@@ -86,10 +85,39 @@ const ProfitLoss = () => {
 
   const profitMargin = periodData.income > 0 ? ((periodData.netProfit / periodData.income) * 100).toFixed(1) : '0.0';
 
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="w-full max-w-4xl space-y-6 animate-fade-in">
+          <div className="flex items-center gap-4">
+            <div className="skeleton-shimmer h-12 w-12 rounded-xl" />
+            <div className="space-y-2">
+              <div className="skeleton-shimmer h-6 w-40 rounded" />
+              <div className="skeleton-shimmer h-4 w-56 rounded" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="glass-frosted rounded-2xl p-5 space-y-3">
+                <div className="skeleton-shimmer h-4 w-24 rounded" />
+                <div className="skeleton-shimmer h-8 w-32 rounded" />
+              </div>
+            ))}
+          </div>
+          <div className="glass-frosted rounded-2xl p-6 space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="skeleton-shimmer h-10 w-full rounded-lg" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!canAccess) {
     return (
       <PageLayout title="Profit & Loss Statement" description="Financial performance overview" icon={FileText}>
-        <div className="max-w-lg mx-auto py-12">
+        <div className="max-w-lg mx-auto py-12 animate-slide-up">
           <UpgradePrompt 
             feature="Profit & Loss Reports" 
             requiredTier="basic"
@@ -108,7 +136,7 @@ const ProfitLoss = () => {
       headerActions={
         <div className="flex gap-2 flex-wrap">
           <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="w-[140px]"><Calendar className="h-4 w-4 mr-2" /><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-[140px] glass-frosted"><Calendar className="h-4 w-4 mr-2" /><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="month">This Month</SelectItem>
               <SelectItem value="quarter">This Quarter</SelectItem>
@@ -118,7 +146,7 @@ const ProfitLoss = () => {
           </Select>
           {savedBusinesses.length > 0 && (
             <Select value={selectedBusiness} onValueChange={setSelectedBusiness}>
-              <SelectTrigger className="w-[180px]"><SelectValue placeholder="All Businesses" /></SelectTrigger>
+              <SelectTrigger className="w-[180px] glass-frosted"><SelectValue placeholder="All Businesses" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Businesses</SelectItem>
                 {savedBusinesses.map((business: any) => (<SelectItem key={business.id} value={business.id}>{business.name}</SelectItem>))}
@@ -129,19 +157,69 @@ const ProfitLoss = () => {
       }
     >
       {loading ? (
-        <div className="text-center py-12">Loading financial data...</div>
+        <div className="space-y-6 animate-fade-in">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="glass-frosted rounded-2xl p-5 space-y-3">
+                <div className="skeleton-shimmer h-4 w-24 rounded" />
+                <div className="skeleton-shimmer h-8 w-32 rounded" />
+              </div>
+            ))}
+          </div>
+          <div className="glass-frosted rounded-2xl p-6 space-y-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="skeleton-shimmer h-10 w-full rounded-lg" />
+            ))}
+          </div>
+        </div>
       ) : (
         <>
           {/* Summary Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <Card><CardContent className="p-4 overflow-hidden"><div className="flex items-center gap-2 text-sm text-muted-foreground mb-1"><TrendingUp className="h-4 w-4 text-green-500 shrink-0" />Total Revenue</div><div className="text-lg sm:text-2xl font-bold text-green-600 break-all">{formatCurrency(periodData.income)}</div></CardContent></Card>
-            <Card><CardContent className="p-4 overflow-hidden"><div className="flex items-center gap-2 text-sm text-muted-foreground mb-1"><TrendingDown className="h-4 w-4 text-red-500 shrink-0" />Total Expenses</div><div className="text-lg sm:text-2xl font-bold text-red-600 break-all">{formatCurrency(periodData.expenses)}</div></CardContent></Card>
-            <Card><CardContent className="p-4 overflow-hidden"><div className="flex items-center gap-2 text-sm text-muted-foreground mb-1"><DollarSign className="h-4 w-4 shrink-0" />Net Profit</div><div className={`text-lg sm:text-2xl font-bold break-all ${periodData.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatCurrency(periodData.netProfit)}</div></CardContent></Card>
-            <Card><CardContent className="p-4"><div className="text-sm text-muted-foreground mb-1">Profit Margin</div><div className="text-lg sm:text-2xl font-bold">{profitMargin}%</div><Badge variant={Number(profitMargin) >= 20 ? "default" : "secondary"} className="mt-1">{Number(profitMargin) >= 20 ? 'Healthy' : 'Needs Attention'}</Badge></CardContent></Card>
+            <Card className="glass-frosted hover-lift animate-slide-up stagger-1">
+              <CardContent className="p-5 overflow-hidden">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                  <div className="h-8 w-8 rounded-xl bg-success/10 flex items-center justify-center">
+                    <TrendingUp className="h-4 w-4 text-success" />
+                  </div>
+                  <span>Total Revenue</span>
+                </div>
+                <div className="text-lg sm:text-2xl font-bold text-success break-all">{formatCurrency(periodData.income)}</div>
+              </CardContent>
+            </Card>
+            <Card className="glass-frosted hover-lift animate-slide-up stagger-2">
+              <CardContent className="p-5 overflow-hidden">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                  <div className="h-8 w-8 rounded-xl bg-destructive/10 flex items-center justify-center">
+                    <TrendingDown className="h-4 w-4 text-destructive" />
+                  </div>
+                  <span>Total Expenses</span>
+                </div>
+                <div className="text-lg sm:text-2xl font-bold text-destructive break-all">{formatCurrency(periodData.expenses)}</div>
+              </CardContent>
+            </Card>
+            <Card className={`glass-frosted hover-lift animate-slide-up stagger-3 ${periodData.netProfit >= 0 ? 'glow-sm' : ''}`}>
+              <CardContent className="p-5 overflow-hidden">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                  <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <DollarSign className="h-4 w-4 text-primary" />
+                  </div>
+                  <span>Net Profit</span>
+                </div>
+                <div className={`text-lg sm:text-2xl font-bold break-all ${periodData.netProfit >= 0 ? 'text-success' : 'text-destructive'}`}>{formatCurrency(periodData.netProfit)}</div>
+              </CardContent>
+            </Card>
+            <Card className="glass-frosted hover-lift animate-slide-up stagger-4">
+              <CardContent className="p-5">
+                <div className="text-sm text-muted-foreground mb-2">Profit Margin</div>
+                <div className="text-lg sm:text-2xl font-bold">{profitMargin}%</div>
+                <Badge variant={Number(profitMargin) >= 20 ? "default" : "secondary"} className="mt-1">{Number(profitMargin) >= 20 ? 'Healthy' : 'Needs Attention'}</Badge>
+              </CardContent>
+            </Card>
           </div>
 
           {/* P&L Statement */}
-          <Card>
+          <Card className="glass-frosted shadow-futuristic animate-slide-up">
             <CardHeader>
               <CardTitle>Statement Details</CardTitle>
               <CardDescription>
@@ -154,26 +232,36 @@ const ProfitLoss = () => {
             <CardContent>
               <div className="space-y-6">
                 <div>
-                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2"><TrendingUp className="h-5 w-5 text-green-500" />Revenue</h3>
+                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-xl bg-success/10 flex items-center justify-center">
+                      <TrendingUp className="h-4 w-4 text-success" />
+                    </div>
+                    Revenue
+                  </h3>
                   <div className="ml-6 space-y-2">
-                    <div className="flex justify-between py-2 border-b"><span>Invoice Revenue (Paid)</span><span className="font-medium">{formatCurrency(periodData.income)}</span></div>
-                    <div className="flex justify-between py-2 font-bold"><span>Total Revenue</span><span className="text-green-600">{formatCurrency(periodData.income)}</span></div>
+                    <div className="flex justify-between py-3 px-4 glass rounded-lg hover:bg-muted/30 transition-colors"><span>Invoice Revenue (Paid)</span><span className="font-medium">{formatCurrency(periodData.income)}</span></div>
+                    <div className="flex justify-between py-3 px-4 glass-frosted rounded-lg font-bold"><span>Total Revenue</span><span className="text-success">{formatCurrency(periodData.income)}</span></div>
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2"><TrendingDown className="h-5 w-5 text-red-500" />Operating Expenses</h3>
+                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-xl bg-destructive/10 flex items-center justify-center">
+                      <TrendingDown className="h-4 w-4 text-destructive" />
+                    </div>
+                    Operating Expenses
+                  </h3>
                   <div className="ml-6 space-y-2">
                     {Object.entries(periodData.byCategory).map(([category, amount]) => (
-                      <div key={category} className="flex justify-between py-2 border-b"><span className="capitalize">{category.replace('_', ' ')}</span><span className="font-medium">{formatCurrency(amount)}</span></div>
+                      <div key={category} className="flex justify-between py-3 px-4 glass rounded-lg hover:bg-muted/30 transition-colors"><span className="capitalize">{category.replace('_', ' ')}</span><span className="font-medium">{formatCurrency(amount)}</span></div>
                     ))}
-                    {Object.keys(periodData.byCategory).length === 0 && <div className="text-muted-foreground py-2">No expenses recorded</div>}
-                    <div className="flex justify-between py-2 font-bold"><span>Total Expenses</span><span className="text-red-600">{formatCurrency(periodData.expenses)}</span></div>
+                    {Object.keys(periodData.byCategory).length === 0 && <div className="text-muted-foreground py-3 px-4 glass rounded-lg">No expenses recorded</div>}
+                    <div className="flex justify-between py-3 px-4 glass-frosted rounded-lg font-bold"><span>Total Expenses</span><span className="text-destructive">{formatCurrency(periodData.expenses)}</span></div>
                   </div>
                 </div>
-                <div className="border-t-2 pt-4">
-                  <div className="flex justify-between items-center">
+                <div className="border-t-2 border-border pt-4">
+                  <div className={`flex justify-between items-center py-4 px-5 glass-frosted rounded-2xl ${periodData.netProfit >= 0 ? 'glow-sm' : ''}`}>
                     <span className="text-xl font-bold">Net Profit / (Loss)</span>
-                    <span className={`text-2xl font-bold ${periodData.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatCurrency(periodData.netProfit)}</span>
+                    <span className={`text-2xl font-bold ${periodData.netProfit >= 0 ? 'text-success' : 'text-destructive'}`}>{formatCurrency(periodData.netProfit)}</span>
                   </div>
                 </div>
               </div>

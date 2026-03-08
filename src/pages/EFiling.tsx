@@ -43,7 +43,6 @@ const EFiling = () => {
 
   const isBusinessPlus = tier === 'business' || tier === 'corporate';
 
-  // Reset selected business if it no longer exists
   useEffect(() => {
     if (selectedBusiness && !savedBusinesses.find(b => b.id === selectedBusiness)) {
       setSelectedBusiness('');
@@ -54,7 +53,7 @@ const EFiling = () => {
   if (!isBusinessPlus) {
     return (
       <PageLayout title="E-Filing & Payment" icon={FileCheck} maxWidth="md">
-        <div className="max-w-lg mx-auto py-12">
+        <div className="max-w-lg mx-auto py-12 animate-slide-up">
           <UpgradePrompt 
             feature="E-Filing & Tax Payment" 
             requiredTier="business"
@@ -97,15 +96,19 @@ const EFiling = () => {
     switch (filingStep) {
       case 'select':
         return (
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card animate-slide-up">
+          <div className="glass-frosted shadow-futuristic rounded-2xl p-6 animate-slide-up">
             <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-primary" />
+              <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Building2 className="h-4 w-4 text-primary" />
+              </div>
               Select Business to File
             </h2>
             
             {savedBusinesses.length === 0 ? (
               <div className="text-center py-10">
-                <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                <div className="mx-auto w-14 h-14 rounded-2xl bg-muted/50 flex items-center justify-center mb-4 animate-float">
+                  <Building2 className="h-7 w-7 text-muted-foreground" />
+                </div>
                 <p className="text-muted-foreground mb-4">
                   No saved businesses. Save a business first to file returns.
                 </p>
@@ -116,7 +119,7 @@ const EFiling = () => {
             ) : (
               <>
                 <Select value={selectedBusiness} onValueChange={setSelectedBusiness}>
-                  <SelectTrigger className="mb-4">
+                  <SelectTrigger className="mb-4 glass">
                     <SelectValue placeholder="Choose a business" />
                   </SelectTrigger>
                   <SelectContent>
@@ -129,7 +132,7 @@ const EFiling = () => {
                 </Select>
 
                 {business && (
-                  <div className="p-4 rounded-lg bg-secondary/50 mb-4">
+                  <div className="p-4 rounded-xl glass mb-4">
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
                         <p className="text-muted-foreground">Business Name</p>
@@ -169,13 +172,15 @@ const EFiling = () => {
 
       case 'review':
         return (
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card animate-slide-up">
+          <div className="glass-frosted shadow-futuristic rounded-2xl p-6 animate-slide-up">
             <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-              <FileCheck className="h-5 w-5 text-primary" />
+              <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                <FileCheck className="h-4 w-4 text-primary" />
+              </div>
               Review Pre-Filled Return
             </h2>
 
-            <div className="p-4 rounded-lg bg-warning/10 border border-warning/20 mb-6">
+            <div className="p-4 rounded-xl glass border border-warning/20 mb-6">
               <div className="flex items-start gap-2">
                 <AlertCircle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
                 <div>
@@ -188,7 +193,7 @@ const EFiling = () => {
             </div>
 
             <div className="space-y-4 mb-6">
-              <div className="p-4 rounded-lg border border-border">
+              <div className="p-4 rounded-xl glass">
                 <h3 className="font-medium text-foreground mb-3">
                   {business?.entityType === 'company' ? 'Company Income Tax Return' : 'Personal Income Tax Return'}
                 </h3>
@@ -212,23 +217,23 @@ const EFiling = () => {
                 </div>
               </div>
 
-              <div className="p-4 rounded-lg border border-border">
+              <div className="p-4 rounded-xl glass">
                 <h3 className="font-medium text-foreground mb-3">Income & Tax Summary</h3>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
+                  <div className="flex justify-between py-2 px-3 rounded-lg hover:bg-muted/30 transition-colors">
                     <span className="text-muted-foreground">Gross Income</span>
                     <span className="font-medium">{formatCurrency(business?.turnover || 0)}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between py-2 px-3 rounded-lg hover:bg-muted/30 transition-colors">
                     <span className="text-muted-foreground">Allowable Deductions</span>
                     <span className="font-medium">-{formatCurrency((business?.turnover || 0) * 0.2)}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between py-2 px-3 rounded-lg hover:bg-muted/30 transition-colors">
                     <span className="text-muted-foreground">Taxable Income</span>
                     <span className="font-medium">{formatCurrency((business?.turnover || 0) * 0.8)}</span>
                   </div>
                   <hr className="border-border" />
-                  <div className="flex justify-between text-base">
+                  <div className="flex justify-between text-base py-2 px-3 glass-frosted rounded-lg">
                     <span className="font-medium text-foreground">Tax Payable</span>
                     <span className="font-bold text-primary">{formatCurrency(mockTaxDue)}</span>
                   </div>
@@ -250,7 +255,7 @@ const EFiling = () => {
 
       case 'processing':
         return (
-          <div className="rounded-2xl border border-border bg-card p-10 shadow-card animate-slide-up text-center">
+          <div className="glass-frosted shadow-futuristic rounded-2xl p-10 animate-slide-up text-center">
             <Loader2 className="h-16 w-16 text-primary mx-auto mb-6 animate-spin" />
             <h2 className="text-xl font-semibold text-foreground mb-2">
               Processing Your Return
@@ -263,9 +268,9 @@ const EFiling = () => {
 
       case 'payment':
         return (
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card animate-slide-up">
+          <div className="glass-frosted shadow-futuristic rounded-2xl p-6 animate-slide-up">
             <div className="text-center mb-6">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-success/10">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-success/10 glow-sm">
                 <CheckCircle2 className="h-8 w-8 text-success" />
               </div>
               <h2 className="text-xl font-semibold text-foreground mb-2">
@@ -276,7 +281,7 @@ const EFiling = () => {
               </p>
             </div>
 
-            <div className="p-4 rounded-lg bg-primary/5 border border-primary/20 mb-6 overflow-hidden">
+            <div className="p-4 rounded-xl glass border border-primary/20 mb-6 overflow-hidden">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-muted-foreground">Tax Due</p>
@@ -290,11 +295,11 @@ const EFiling = () => {
             </div>
 
             <div className="flex gap-3">
-              <Button variant="outline" className="flex-1">
+              <Button variant="outline" className="flex-1 glass">
                 <Download className="h-4 w-4" />
                 Download Receipt
               </Button>
-              <Button variant="outline" className="flex-1" onClick={() => setFilingStep('select')}>
+              <Button variant="outline" className="flex-1 glass" onClick={() => setFilingStep('select')}>
                 File Another
               </Button>
             </div>
@@ -303,8 +308,8 @@ const EFiling = () => {
 
       case 'complete':
         return (
-          <div className="rounded-2xl border border-border bg-card p-10 shadow-card animate-slide-up text-center">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-success/10">
+          <div className="glass-frosted shadow-futuristic rounded-2xl p-10 animate-slide-up text-center">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-success/10 glow-sm">
               <CheckCircle2 className="h-10 w-10 text-success" />
             </div>
             <h2 className="text-2xl font-bold text-foreground mb-2">
@@ -314,7 +319,7 @@ const EFiling = () => {
               Your tax return has been submitted and payment processed.
             </p>
 
-            <div className="p-4 rounded-lg bg-secondary/50 mb-6 text-left">
+            <div className="p-4 rounded-xl glass mb-6 text-left">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-muted-foreground">Filing Reference</p>
@@ -336,7 +341,7 @@ const EFiling = () => {
             </div>
 
             <div className="flex gap-3 justify-center">
-              <Button variant="outline">
+              <Button variant="outline" className="glass">
                 <Download className="h-4 w-4" />
                 Download Receipt
               </Button>
@@ -358,18 +363,18 @@ const EFiling = () => {
     >
       {/* Progress Steps */}
       <div className="flex justify-center mb-8">
-        <div className="flex items-center gap-2 text-sm">
+        <div className="glass-frosted rounded-2xl p-3 flex items-center gap-2 text-sm">
           {['Select', 'Review', 'Submit', 'Pay', 'Done'].map((step, i) => {
             const stepIndex = ['select', 'review', 'processing', 'payment', 'complete'].indexOf(filingStep);
             const isActive = i <= stepIndex;
             return (
               <div key={step} className="flex items-center gap-2">
-                <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-medium ${
-                  isActive ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'
+                <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-medium transition-all ${
+                  isActive ? 'bg-gradient-primary text-primary-foreground glow-sm' : 'bg-secondary text-muted-foreground'
                 }`}>
                   {i + 1}
                 </div>
-                {i < 4 && <div className={`w-8 h-0.5 ${isActive ? 'bg-primary' : 'bg-secondary'}`} />}
+                {i < 4 && <div className={`w-8 h-0.5 transition-all ${isActive ? 'bg-primary' : 'bg-secondary'}`} />}
               </div>
             );
           })}
@@ -384,7 +389,7 @@ const EFiling = () => {
 
       {/* Payment Dialog */}
       <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-        <DialogContent>
+        <DialogContent className="glass-frosted">
           <DialogHeader>
             <DialogTitle>Pay Tax Due</DialogTitle>
             <DialogDescription>
@@ -392,7 +397,7 @@ const EFiling = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="py-6">
-            <div className="p-4 rounded-lg bg-secondary/50 mb-4 overflow-hidden">
+            <div className="p-4 rounded-xl glass mb-4 overflow-hidden">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <span className="text-muted-foreground">Amount</span>
                 <span className="text-lg sm:text-2xl font-bold text-primary break-all">{formatCurrency(mockTaxDue)}</span>

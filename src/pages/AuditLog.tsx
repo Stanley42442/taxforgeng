@@ -40,7 +40,6 @@ const AuditLog = () => {
 
   const canAccess = tier === 'corporate';
 
-  // Reset filter if selected business no longer exists
   useEffect(() => {
     if (filterBusiness !== 'all' && !savedBusinesses.find(b => b.id === filterBusiness)) {
       setFilterBusiness('all');
@@ -65,16 +64,6 @@ const AuditLog = () => {
     }
   };
 
-  const getActionLabel = (entry: AuditEntry) => {
-    switch (entry.action) {
-      case 'create': return `Created ${entry.businessName}`;
-      case 'update': return `Updated ${entry.field} on ${entry.businessName}`;
-      case 'delete': return `Deleted ${entry.businessName}`;
-      case 'view': return `Viewed ${entry.businessName}`;
-      case 'export': return `Exported report for ${entry.businessName}`;
-    }
-  };
-
   const handleExportPDF = () => {
     exportAuditLogPDF(filteredLogs);
     toast.success('Audit log exported');
@@ -88,10 +77,10 @@ const AuditLog = () => {
   if (!canAccess) {
     return (
       <PageLayout title="Audit Log & History" icon={History} maxWidth="2xl">
-        <Card className="text-center">
+        <Card className="glass-frosted shadow-futuristic animate-slide-up text-center">
           <CardHeader>
-            <div className="mx-auto w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mb-4">
-              <History className="w-8 h-8 text-accent" />
+            <div className="mx-auto w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-4 glow-sm">
+              <History className="w-8 h-8 text-primary-foreground" />
             </div>
             <CardTitle className="text-2xl">Audit Log & History</CardTitle>
             <CardDescription>
@@ -100,25 +89,22 @@ const AuditLog = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid gap-3 text-left">
-              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                <History className="w-5 h-5 text-primary" />
-                <span>Complete change history per business</span>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                <Edit className="w-5 h-5 text-primary" />
-                <span>Track who changed what and when</span>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                <Download className="w-5 h-5 text-primary" />
-                <span>Export logs as PDF or CSV</span>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                <FileText className="w-5 h-5 text-primary" />
-                <span>Compliance-ready documentation</span>
-              </div>
+              {[
+                { icon: History, label: 'Complete change history per business' },
+                { icon: Edit, label: 'Track who changed what and when' },
+                { icon: Download, label: 'Export logs as PDF or CSV' },
+                { icon: FileText, label: 'Compliance-ready documentation' },
+              ].map(({ icon: Icon, label }, i) => (
+                <div key={i} className={`flex items-center gap-3 p-3 glass rounded-xl hover-lift transition-all stagger-${i + 1}`}>
+                  <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <Icon className="w-4 h-4 text-primary" />
+                  </div>
+                  <span>{label}</span>
+                </div>
+              ))}
             </div>
             <Link to="/pricing">
-              <Button className="w-full bg-gradient-primary hover:opacity-90">
+              <Button className="w-full bg-gradient-primary hover:opacity-90 glow-sm">
                 <Crown className="w-4 h-4 mr-2" />
                 Upgrade to Corporate for Audit Log
               </Button>
@@ -137,11 +123,11 @@ const AuditLog = () => {
       maxWidth="6xl"
       headerActions={
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExportCSV}>
+          <Button variant="outline" onClick={handleExportCSV} className="glass-frosted">
             <Download className="w-4 h-4 mr-2" />
             CSV
           </Button>
-          <Button variant="outline" onClick={handleExportPDF}>
+          <Button variant="outline" onClick={handleExportPDF} className="glass-frosted">
             <FileText className="w-4 h-4 mr-2" />
             PDF
           </Button>
@@ -149,15 +135,17 @@ const AuditLog = () => {
       }
     >
       {/* Filters */}
-      <Card className="mb-6">
+      <Card className="mb-6 glass-frosted">
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-muted-foreground" />
+              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Filter className="w-4 h-4 text-primary" />
+              </div>
               <span className="text-sm font-medium">Filters:</span>
             </div>
             <Select value={filterBusiness} onValueChange={setFilterBusiness}>
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-[200px] glass">
                 <SelectValue placeholder="All businesses" />
               </SelectTrigger>
               <SelectContent>
@@ -168,7 +156,7 @@ const AuditLog = () => {
               </SelectContent>
             </Select>
             <Select value={filterAction} onValueChange={setFilterAction}>
-              <SelectTrigger className="w-[150px]">
+              <SelectTrigger className="w-[150px] glass">
                 <SelectValue placeholder="All actions" />
               </SelectTrigger>
               <SelectContent>
@@ -180,7 +168,7 @@ const AuditLog = () => {
                 <SelectItem value="export">Exported</SelectItem>
               </SelectContent>
             </Select>
-            <Badge variant="outline" className="h-10 px-3 flex items-center">
+            <Badge variant="outline" className="h-10 px-3 flex items-center glass">
               {filteredLogs.length} entries
             </Badge>
           </div>
@@ -188,15 +176,17 @@ const AuditLog = () => {
       </Card>
 
       {/* Audit Log Table */}
-      <Card>
+      <Card className="glass-frosted shadow-futuristic animate-slide-up">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Activity History</CardTitle>
           <CardDescription className="text-sm">All recorded changes and actions</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
           {filteredLogs.length === 0 ? (
-            <div className="text-center py-8">
-              <History className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
+            <div className="text-center py-12">
+              <div className="mx-auto w-14 h-14 rounded-2xl bg-muted/50 flex items-center justify-center mb-4 animate-float">
+                <History className="w-7 h-7 text-muted-foreground" />
+              </div>
               <h3 className="text-base font-semibold mb-1">No Activity Found</h3>
               <p className="text-sm text-muted-foreground">
                 {filterBusiness !== 'all' || filterAction !== 'all' 
@@ -218,13 +208,13 @@ const AuditLog = () => {
                 </TableHeader>
                 <TableBody>
                   {filteredLogs.map(entry => (
-                    <TableRow key={entry.id}>
+                    <TableRow key={entry.id} className="hover:bg-muted/30 transition-all">
                       <TableCell className="px-2 sm:px-4 py-2">{getActionIcon(entry.action)}</TableCell>
                       <TableCell className="px-2 sm:px-4 py-2">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                           <Badge 
                             variant="outline" 
-                            className={`capitalize text-[10px] sm:text-xs px-1.5 py-0.5 h-5 w-fit ${
+                            className={`capitalize text-[10px] sm:text-xs px-1.5 py-0.5 h-5 w-fit glass ${
                               entry.action === 'create' ? 'bg-success/10 text-success border-success/30' :
                               entry.action === 'update' ? 'bg-warning/10 text-warning border-warning/30' :
                               entry.action === 'delete' ? 'bg-destructive/10 text-destructive border-destructive/30' :
