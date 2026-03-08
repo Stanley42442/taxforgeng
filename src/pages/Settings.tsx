@@ -515,10 +515,10 @@ const Settings = () => {
             </CardContent>
           </Card>
 
-          <Card className="glass-frosted hover-lift border-destructive/20">
+          <Card className="glass-frosted hover-lift border-destructive/20 glow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-lg bg-destructive/10 flex items-center justify-center">
+                <div className="h-8 w-8 rounded-xl bg-destructive/10 flex items-center justify-center">
                   <RefreshCw className="h-4 w-4 text-destructive" />
                 </div>
                 App Cache
