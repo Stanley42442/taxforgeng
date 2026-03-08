@@ -25,13 +25,13 @@ Deno.serve(async (req) => {
   });
 
   const token = authHeader.replace('Bearer ', '');
-  const { data: claimsData, error: claimsError } = await userClient.auth.getClaims(token);
-  if (claimsError || !claimsData?.claims) {
+  const { data: { user }, error: userError } = await userClient.auth.getUser(token);
+  if (userError || !user) {
     return new Response(JSON.stringify({ error: 'Invalid token' }), { status: 401, headers: corsHeaders });
   }
 
-  const userId = claimsData.claims.sub as string;
-  const userEmail = (claimsData.claims.email as string) || '';
+  const userId = user.id;
+  const userEmail = user.email || '';
 
   // Admin client - uses service role key, no token refresh issues
   const admin = createClient(supabaseUrl, serviceRoleKey, {
