@@ -764,7 +764,7 @@ const PricingCard = ({
       </ul>
 
       <Button
-        variant={isPopular ? 'hero' : isCurrentTier ? 'secondary' : isDowngradeTier ? 'outline' : 'outline'}
+        variant={isPopular ? 'default' : isCurrentTier ? 'secondary' : isDowngradeTier ? 'outline' : 'outline'}
         className={`w-full text-xs sm:text-sm h-9 sm:h-10 ${isDowngradeTier ? 'border-warning/50 text-warning hover:bg-warning/10' : ''}`}
         disabled={isCurrentTier || isProcessing}
         onClick={() => onUpgrade(tier)}

@@ -1182,7 +1182,7 @@ const Dashboard = () => {
                     </div>
                     <p className="text-xs text-muted-foreground">Health & Life premiums</p>
                   </div>
-                  <div className="glass p-3 rounded-xl">
+                  <div className="border border-border/50 p-3 rounded-lg bg-muted/30">
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-medium">NHF Contribution</p>
                       <p className="text-sm font-semibold text-success">
