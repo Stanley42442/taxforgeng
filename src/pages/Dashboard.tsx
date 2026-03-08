@@ -534,7 +534,7 @@ const Dashboard = () => {
 
       {/* Collapsible Summary Section */}
       <Collapsible open={summaryExpanded} onOpenChange={setSummaryExpanded} className="mb-6 animate-slide-up">
-        <div className="glass-frosted rounded-2xl shadow-futuristic border-border/40 overflow-hidden">
+        <div className="border border-border rounded-xl bg-card overflow-hidden">
           {/* Toggle Header */}
           <div className="flex items-center justify-between p-4 border-b border-border/30">
             <ToggleGroup 
