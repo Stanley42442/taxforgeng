@@ -12,7 +12,6 @@ import { useUpcomingReminders } from "@/hooks/useUpcomingReminders";
 import { useSyncedNotifications } from "@/hooks/useSyncedNotifications";
 import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
 import { Badge } from "@/components/ui/badge";
-import { LiveIndicator } from "@/components/ui/live-indicator";
 import {
   Accordion,
   AccordionContent,
@@ -215,14 +214,12 @@ export const NavMenu = () => {
   const { isAdmin } = useAdminCheck();
   const { urgentCount } = useUpcomingReminders();
   const { unreadCount: notificationCount } = useSyncedNotifications();
-  const { isConnected: isRealtimeConnected, newNotificationCount } = useRealtimeNotifications();
+  const { isConnected: isRealtimeConnected } = useRealtimeNotifications();
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Use notificationCount from useSyncedNotifications (already includes realtime updates)
-  // Don't add newNotificationCount to avoid double-counting
   const totalNotificationCount = notificationCount + urgentCount;
 
   const handleSignOut = async () => {
@@ -239,27 +236,19 @@ export const NavMenu = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  // Filter and process groups
   const visibleGroups = useMemo(() => {
     return navGroups
       .filter(group => {
-        // Admin check
         if (group.adminOnly && !isAdmin) return false;
-        
-        // Show condition check
         if (group.showCondition === 'freeOnly' && !isFreeTierOrGuest) return false;
         if (group.showCondition === 'paidOnly' && !isPaidTier) return false;
-        
         return true;
       })
       .map(group => ({
         ...group,
         links: group.links.filter(link => {
-          // Filter by tier
           const linkTierIndex = tierOrder.indexOf(link.minTier || 'free');
           if (linkTierIndex > userTierIndex) return false;
-          
-          // Filter by search
           if (searchQuery) {
             return link.label.toLowerCase().includes(searchQuery.toLowerCase());
           }
@@ -269,7 +258,6 @@ export const NavMenu = () => {
       .filter(group => group.links.length > 0);
   }, [isAdmin, isFreeTierOrGuest, isPaidTier, userTierIndex, searchQuery]);
 
-  // Find active group for default expansion
   const activeGroupId = useMemo(() => {
     for (const group of navGroups) {
       if (group.links.some(link => isActive(link.to))) {
@@ -279,14 +267,12 @@ export const NavMenu = () => {
     return 'overview';
   }, [location.pathname]);
 
-  // Get badge count for a group
   const getBadgeCount = (badgeKey?: string) => {
     if (badgeKey === 'reminders') return urgentCount;
     if (badgeKey === 'notifications') return totalNotificationCount;
     return 0;
   };
 
-  // Desktop quick links (first 5 from visible groups)
   const quickLinks = useMemo(() => {
     const links: NavLink[] = [];
     for (const group of visibleGroups) {
@@ -298,26 +284,26 @@ export const NavMenu = () => {
   }, [visibleGroups]);
 
   return (
-    <header className="w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="w-full border-b border-border bg-background">
       <div className="container mx-auto px-2 sm:px-4">
         <nav className="flex h-14 sm:h-16 items-center justify-between gap-2">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 shrink-0 min-w-0">
-            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl bg-gradient-primary shrink-0">
-              <Calculator className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
+          <Link to="/" className="flex items-center gap-2 shrink-0 min-w-0">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary shrink-0">
+              <Calculator className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="text-base sm:text-xl font-bold text-foreground truncate">TaxForge NG</span>
+            <span className="text-base sm:text-lg font-bold text-foreground truncate">TaxForge NG</span>
           </Link>
 
           {/* Desktop Quick Links */}
-          <div className="hidden xl:flex items-center gap-4 2xl:gap-6">
+          <div className="hidden xl:flex items-center gap-6">
             {quickLinks.map((link) => (
               <Link 
                 key={link.to}
                 to={link.to} 
                 className={`text-sm font-medium transition-colors whitespace-nowrap ${
                   isActive(link.to) 
-                    ? 'text-primary' 
+                    ? 'text-foreground' 
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -327,13 +313,13 @@ export const NavMenu = () => {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-1 sm:gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <Link
               to="/embed-partner"
-              className="hidden md:inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground border border-border rounded-md px-3 py-1.5 transition-colors hover:bg-accent whitespace-nowrap"
+              className="hidden md:inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground rounded-md px-3 py-1.5 transition-colors whitespace-nowrap"
             >
               <Handshake className="h-4 w-4" />
-              Partner with Us
+              Partner
             </Link>
             <div className="hidden sm:block">
               <FeedbackForm />
@@ -342,30 +328,26 @@ export const NavMenu = () => {
               <TierSwitcher />
             </div>
             {tier !== 'free' && (
-              <span className="hidden md:inline-flex text-[10px] sm:text-xs bg-success/20 text-success px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-medium whitespace-nowrap">
+              <span className="hidden md:inline-flex text-xs bg-primary/10 text-primary px-2 py-0.5 rounded font-medium whitespace-nowrap">
                 {tier.charAt(0).toUpperCase() + tier.slice(1)}
               </span>
             )}
             <ThemeToggle />
 
-            {user && isRealtimeConnected && (
-              <LiveIndicator isLive={true} label="" className="hidden sm:flex" />
-            )}
-
             <Link 
               to="/notifications" 
               aria-label="Notifications"
-              className="relative flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+              className="relative flex items-center justify-center h-8 w-8 sm:h-9 sm:w-9 rounded-md hover:bg-secondary transition-colors"
             >
               {totalNotificationCount > 0 ? (
-                <BellRing className="h-4 w-4 sm:h-5 sm:w-5 text-destructive" />
+                <BellRing className="h-4 w-4 text-foreground" />
               ) : (
-                <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+                <Bell className="h-4 w-4 text-muted-foreground" />
               )}
               {totalNotificationCount > 0 && (
                 <Badge 
                   variant="destructive" 
-                  className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center animate-pulse pointer-events-none"
+                  className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px] flex items-center justify-center pointer-events-none"
                 >
                   {totalNotificationCount > 9 ? '9+' : totalNotificationCount}
                 </Badge>
@@ -375,18 +357,18 @@ export const NavMenu = () => {
             {/* Hamburger Menu */}
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10 shrink-0">
-                  <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
+                <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9 shrink-0">
+                  <Menu className="h-4 w-4" />
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[340px] h-full flex flex-col p-0">
                 <div className="flex flex-col h-full min-h-0">
                   {/* Header */}
-                  <div className="px-4 pt-4 pb-2 shrink-0 border-b border-border">
+                  <div className="px-4 pt-4 pb-3 shrink-0 border-b border-border">
                     <div className="flex items-center justify-between mb-3">
                       <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary shrink-0">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary shrink-0">
                           <Calculator className="h-4 w-4 text-primary-foreground" />
                         </div>
                         <span className="font-bold text-foreground truncate">TaxForge NG</span>
@@ -395,8 +377,8 @@ export const NavMenu = () => {
 
                     {/* Tier Badge */}
                     {tier !== 'free' && (
-                      <div className="mb-3 p-2 rounded-lg bg-success/10 border border-success/20">
-                        <p className="text-sm font-medium text-success flex items-center gap-2">
+                      <div className="mb-3 px-3 py-2 rounded-lg bg-primary/5 border border-primary/10">
+                        <p className="text-sm font-medium text-primary flex items-center gap-2">
                           <Crown className="h-4 w-4 shrink-0" />
                           <span className="truncate">{tier.charAt(0).toUpperCase() + tier.slice(1)} Plan</span>
                         </p>
@@ -447,7 +429,7 @@ export const NavMenu = () => {
                             value={group.id}
                             className="border-b-0"
                           >
-                            <AccordionTrigger className="py-2 px-2 hover:no-underline hover:bg-secondary/50 rounded-lg [&[data-state=open]]:bg-secondary/30">
+                            <AccordionTrigger className="py-2 px-2 hover:no-underline hover:bg-secondary rounded-lg [&[data-state=open]]:bg-secondary/50">
                               <div className="flex items-center gap-2">
                                 <GroupIcon className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium">{group.label}</span>
@@ -468,7 +450,7 @@ export const NavMenu = () => {
                                         to={link.to}
                                         className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
                                           isActive(link.to)
-                                            ? 'bg-primary/10 text-primary font-medium'
+                                            ? 'bg-primary/5 text-primary font-medium'
                                             : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                                         }`}
                                       >
@@ -490,7 +472,7 @@ export const NavMenu = () => {
                   <div className="px-4 py-3 border-t border-border space-y-2 shrink-0 bg-background">
                     {user ? (
                       <>
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50">
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary">
                           <User className="h-4 w-4 text-muted-foreground shrink-0" />
                           <span className="text-sm text-muted-foreground truncate">
                             {user.email}
@@ -514,7 +496,7 @@ export const NavMenu = () => {
                     ) : (
                       <SheetClose asChild>
                         <Link to="/auth" className="block">
-                          <Button variant="hero" className="w-full h-9 text-sm">
+                          <Button className="w-full h-9 text-sm">
                             <LogIn className="h-4 w-4 shrink-0" />
                             <span className="truncate">Sign In</span>
                           </Button>

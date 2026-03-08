@@ -35,26 +35,17 @@ export const PageLayout = ({
   headerActions,
 }: PageLayoutProps) => {
   return (
-    <div className="min-h-screen flex flex-col relative w-full overflow-x-hidden">
-      {/* Background layers */}
-      {showBackground && (
-        <>
-          <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
-          <div className="fixed inset-0 bg-mesh pointer-events-none" />
-          <div className="fixed inset-0 bg-dots opacity-15 pointer-events-none" />
-        </>
-      )}
-
-      <main className={`flex-1 relative z-10 py-4 sm:py-6 pb-8 px-4 sm:px-6 lg:px-8 w-full ${className}`}>
+    <div className="min-h-screen flex flex-col relative w-full overflow-x-hidden bg-background">
+      <main className={`flex-1 relative z-10 py-6 sm:py-8 pb-10 px-4 sm:px-6 lg:px-8 w-full ${className}`}>
         <div className={`w-full ${maxWidthClasses[maxWidth]} mx-auto`}>
           {/* Header */}
           {(title || Icon) && (
-            <div className="mb-6 sm:mb-8 animate-slide-up">
+            <div className="mb-8 sm:mb-10 animate-slide-up">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
                   {Icon && (
-                    <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-primary shadow-lg glow-primary shrink-0">
-                      <Icon className="h-6 w-6 sm:h-7 sm:w-7 text-primary-foreground" />
+                    <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10 shrink-0">
+                      <Icon className="h-5 w-5 text-primary" />
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
@@ -62,7 +53,7 @@ export const PageLayout = ({
                       {title}
                     </h1>
                     {description && (
-                      <p className="text-muted-foreground text-sm break-words">
+                      <p className="text-muted-foreground text-sm mt-1 break-words">
                         {description}
                       </p>
                     )}
@@ -77,7 +68,7 @@ export const PageLayout = ({
             </div>
           )}
 
-          {/* Content - with proper overflow handling */}
+          {/* Content */}
           <div className="w-full overflow-hidden [&>*]:max-w-full [&_.overflow-x-auto]:max-w-full">
             {children}
           </div>

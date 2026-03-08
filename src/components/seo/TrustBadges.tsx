@@ -23,25 +23,21 @@ const defaultBadges: TrustBadge[] = [
   { icon: 'clock', text: 'Updated Feb 2026' },
 ];
 
-/**
- * Trust Badges Component
- * Displays trust signals to increase conversion on SEO pages
- */
 export const TrustBadges = ({
   badges = defaultBadges,
   className = '',
 }: TrustBadgesProps) => {
   return (
-    <div className={`flex flex-wrap items-center justify-center gap-3 md:gap-6 ${className}`}>
+    <div className={`flex flex-wrap items-center justify-center gap-4 md:gap-8 ${className}`}>
       {badges.map((badge, index) => {
         const IconComponent = iconMap[badge.icon];
         return (
           <div
             key={index}
-            className="flex items-center gap-2 glass-subtle px-4 py-2.5 rounded-full hover-lift cursor-default"
+            className="flex items-center gap-2"
           >
-            <IconComponent className="h-4 w-4 text-success shrink-0" />
-            <span className="text-sm font-medium text-foreground whitespace-nowrap">
+            <IconComponent className="h-4 w-4 text-primary shrink-0" />
+            <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
               {badge.text}
             </span>
           </div>
