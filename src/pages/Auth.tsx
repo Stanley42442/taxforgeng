@@ -717,7 +717,7 @@ const Auth = () => {
           {/* Logo */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-flex items-center gap-2 mb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary shadow-lg glow-primary">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-sm">
                 <Calculator className="h-6 w-6 text-primary-foreground" />
               </div>
               <span className="text-2xl font-bold text-foreground">TaxForge NG</span>
