@@ -392,9 +392,9 @@ const Dashboard = () => {
     return (
       <PageLayout title="Dashboard" description="Please sign in to access your dashboard" icon={LayoutDashboard}>
         <div className="max-w-md mx-auto text-center">
-          <div className="glass-frosted rounded-3xl p-10">
+          <div className="bg-card border border-border rounded-2xl p-10 shadow-sm">
             <p className="text-muted-foreground mb-6">Please sign in to access your dashboard</p>
-            <Button variant="glow" size="lg" onClick={() => navigate('/auth')}>Sign In</Button>
+            <Button size="lg" onClick={() => navigate('/auth')}>Sign In</Button>
           </div>
         </div>
       </PageLayout>
