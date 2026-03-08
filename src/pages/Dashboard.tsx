@@ -1083,7 +1083,7 @@ const Dashboard = () => {
                     </div>
                   )}
                   {(filteredAnnualTotals.health_insurance > 0 || filteredAnnualTotals.life_insurance > 0) && (
-                    <div className="glass p-3 rounded-xl flex items-center justify-between">
+                    <div className="bg-muted/50 border border-border p-3 rounded-xl flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center">
                           <Heart className="h-5 w-5 text-accent" />
