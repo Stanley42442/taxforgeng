@@ -40,7 +40,7 @@ interface DiscountCode {
 }
 
 const Referrals = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [discountCodes, setDiscountCodes] = useState<DiscountCode[]>([]);
   const [loading, setLoading] = useState(true);
