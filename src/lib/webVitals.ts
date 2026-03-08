@@ -71,12 +71,12 @@ function reportVital(metric: Metric): void {
     connection_type: connection?.effectiveType,
   };
   
-  // Try to attach user ID if available
-  supabase.auth.getUser().then(({ data: { user } }) => {
-    if (user) report.user_id = user.id;
+  // Use getSession() instead of getUser() to avoid triggering token refreshes.
+  // getSession() reads from local cache — no network call.
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    if (session?.user) report.user_id = session.user.id;
     queueVital(report);
   }).catch(() => {
-    // User not logged in - still queue the vital
     queueVital(report);
   });
 }

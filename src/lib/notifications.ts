@@ -353,7 +353,8 @@ export const deleteNotification = async (id: string): Promise<void> => {
 // Clear all notifications from database
 export const clearAllNotifications = async (): Promise<void> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     
     if (!user) {
       safeLocalStorage.removeItem('app-notifications');
