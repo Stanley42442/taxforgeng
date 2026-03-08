@@ -293,7 +293,8 @@ export const markNotificationRead = async (id: string): Promise<void> => {
 // Mark all notifications as read
 export const markAllNotificationsRead = async (): Promise<void> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     
     if (!user) {
       const notifications = safeLocalStorage.getJSON<AppNotification[]>('app-notifications', []);
