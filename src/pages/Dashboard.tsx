@@ -769,7 +769,7 @@ const Dashboard = () => {
 
                   {/* Personal Summary Cards */}
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
+                    <div className="bg-muted/50 border border-border p-4 rounded-xl hover:shadow-md transition-shadow min-h-[100px]">
                       <div className="flex items-center gap-2 mb-2">
                         <Home className="h-4 w-4 text-primary" />
                         <span className="text-xs text-muted-foreground">Rent Relief</span>
