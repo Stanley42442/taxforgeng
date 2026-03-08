@@ -1,43 +1,29 @@
 
 
-## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
+## Fix: Profile Fetch Loop Still Happening
 
-A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
+### Root Cause
 
----
+Two compounding issues:
 
-### Content Structure
+**1. `fetchUserData` dependency on `user` object reference causes infinite re-triggering.**
+`onAuthStateChange` fires on every `TOKEN_REFRESHED` event (which happens frequently), calling `setUser(session?.user)` with a new object reference each time. Since `fetchUserData` has `[user]` in its `useCallback` dependency array, it gets recreated on every token refresh, which re-triggers the `useEffect` that calls it. With the profile missing (406), this creates a tight loop of SELECT queries.
 
-The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
+**2. The profile INSERT may still be failing.**
+The INSERT RLS policy migration was created but the network logs show no POST to profiles -- the `profileCreationAttempted` ref may have been set to `true` before the migration took effect, or the INSERT failed for another reason. Either way, the user `c34c22a5` still has no profile row.
 
-| Section ID | Topic |
-|---|---|
-| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
-| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
-| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
-| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
-| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
-| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
-| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
-| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
-| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
-| `faq` | 5–6 FAQs with FAQPage schema |
+### Fix
 
-### Technical Implementation
+**1. `src/contexts/SubscriptionContext.tsx` -- Stop the loop**
+- Change `useCallback` dependency from `[user]` to `[user?.id]` so `fetchUserData` is only recreated when the user ID actually changes (not on every token refresh)
+- Use `user?.id` and `user?.email` inside the callback, referencing them via a ref or passing them directly
+- Add a simple debounce: if `fetchUserData` was called within the last 2 seconds and got a 406, don't call it again
 
-**1. Create `src/pages/blog/PITMyths2026.tsx`**
-- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
-- ~1,500 words, authoritative tone matching existing posts
-- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
-- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
-- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
+**2. Database migration -- Ensure profile exists for stuck user**
+- Run `INSERT INTO profiles (id, email, subscription_tier) VALUES ('c34c22a5-0edb-4b0e-9bbc-9502a1f8d59b', 'benjamingillespie001@gmail.com', 'free') ON CONFLICT (id) DO NOTHING;` to unstick this specific user
+- Also create a more robust `handle_new_user` trigger that uses `INSERT ... ON CONFLICT DO NOTHING` to prevent this from happening to future users
 
-**2. Register route in `src/App.tsx`**
-- Add lazy import and route at `/blog/pit-myths-2026`
-
-**3. Add to blog listing in `src/pages/Blog.tsx`**
-- New entry in the `POSTS` array with category "Guides", today's date
-
-**4. Update sitemap (`public/sitemap.xml`)**
-- Add `/blog/pit-myths-2026` entry
+### Files Changed
+- `src/contexts/SubscriptionContext.tsx` -- Fix `useCallback` dependency to `[user?.id]`, add ref to store user email, prevent re-fetch loop
+- Database migration -- Insert missing profile row for the stuck user
 
