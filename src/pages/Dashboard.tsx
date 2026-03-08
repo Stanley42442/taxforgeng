@@ -1097,7 +1097,7 @@ const Dashboard = () => {
                     </div>
                   )}
                   {filteredAnnualTotals.child_education > 0 && (
-                    <div className="glass p-3 rounded-xl flex items-center justify-between">
+                    <div className="border border-border/50 p-3 rounded-lg bg-muted/30 flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-lg bg-warning/10 flex items-center justify-center">
                           <GraduationCap className="h-5 w-5 text-warning" />
