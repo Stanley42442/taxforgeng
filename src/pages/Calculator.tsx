@@ -701,7 +701,7 @@ const CalculatorPage = () => {
 
             {/* Calculate Button */}
             <Button 
-              variant="hero" 
+              variant="default" 
               size="lg" 
               className="w-full h-14 text-lg"
               onClick={handleCalculate}
