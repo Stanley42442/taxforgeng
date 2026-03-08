@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/hooks/useAuth';
 import logger from '@/lib/logger';
@@ -135,7 +135,8 @@ const SAMPLE_BUSINESSES: Omit<SavedBusiness, 'id' | 'createdAt'>[] = [
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
 export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const profileCreateAttempted = useRef(false);
   const [state, setState] = useState<SubscriptionState>({
     tier: 'free',
     effectiveTier: 'free',
@@ -150,7 +151,14 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
   // Fetch user profile and businesses from database
   const fetchUserData = useCallback(async () => {
+    // CRITICAL: Wait for auth to fully initialize before making any DB requests
+    // This prevents requests from going out with the anon key instead of the user's JWT
+    if (authLoading) {
+      return;
+    }
+
     if (!user) {
+      profileCreateAttempted.current = false;
       setState({
         tier: 'free',
         effectiveTier: 'free',
@@ -176,6 +184,13 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       // Defensive check: Create profile if it doesn't exist (handles edge case)
       // Use maybeSingle() to avoid 406 errors during auth timing issues
       if (profileError && profileError.code === 'PGRST116') {
+        // Only attempt profile creation once per session to prevent retry storms
+        if (profileCreateAttempted.current) {
+          logger.warn('[SubscriptionContext] Profile creation already attempted, skipping retry');
+          setState(prev => ({ ...prev, loading: false }));
+          return;
+        }
+        profileCreateAttempted.current = true;
         logger.warn('[SubscriptionContext] No profile found, creating one...');
         const { error: createError } = await supabase
           .from('profiles')
@@ -261,7 +276,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       logger.error('Error fetching user data:', error);
       setState(prev => ({ ...prev, loading: false }));
     }
-  }, [user]);
+  }, [user, authLoading]);
 
   useEffect(() => {
     fetchUserData();
