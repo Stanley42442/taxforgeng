@@ -896,7 +896,7 @@ const Dashboard = () => {
                     <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
                     <p className="text-muted-foreground mb-4">Start by calculating taxes for your business</p>
                     <Link to="/calculator">
-                      <Button variant="hero" size="sm">
+                      <Button variant="default" size="sm">
                         <Plus className="h-4 w-4" />
                         Add Business
                       </Button>
