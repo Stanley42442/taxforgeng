@@ -440,7 +440,7 @@ const Dashboard = () => {
           {/* Content grid skeleton */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {Array.from({ length: 2 }).map((_, i) => (
-              <div key={i} className="glass-frosted rounded-xl p-6">
+              <div key={i} className="bg-card border border-border rounded-xl p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <div className="skeleton-shimmer h-5 w-32 rounded" />
                   <div className="skeleton-shimmer h-8 w-20 rounded-lg" />
