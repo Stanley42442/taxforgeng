@@ -667,9 +667,9 @@ const Auth = () => {
 
   if (loading) {
     return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="bg-card border border-border rounded-2xl p-8 shadow-sm">
-          <div className="h-10 w-10 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
+        <div className="glass-frosted rounded-2xl p-8">
+          <div className="h-10 w-10 rounded-full border-2 border-primary border-t-transparent animate-spin glow-primary" />
         </div>
       </div>
     );
@@ -702,7 +702,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-hero flex flex-col overflow-x-hidden">
       {/* Header */}
       <header className="p-4">
         <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
@@ -717,7 +717,7 @@ const Auth = () => {
           {/* Logo */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-flex items-center gap-2 mb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary shadow-lg glow-primary">
                 <Calculator className="h-6 w-6 text-primary-foreground" />
               </div>
               <span className="text-2xl font-bold text-foreground">TaxForge NG</span>
@@ -727,12 +727,12 @@ const Auth = () => {
           </div>
 
           {/* Form Card */}
-          <div className="bg-card border border-border rounded-2xl p-8 shadow-sm">
+          <div className="glass-frosted rounded-2xl p-8 shadow-futuristic">
             {/* MFA Challenge View */}
             {view === 'mfa-challenge' && (
               <form onSubmit={handleMfaChallenge} className="space-y-4">
                 <div className="flex items-center justify-center mb-4">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 glow-sm">
                     {useBackupCode ? (
                       <KeyRound className="h-8 w-8 text-primary" />
                     ) : (
@@ -963,7 +963,7 @@ const Auth = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full mb-4 gap-2 bg-muted/50 border border-border hover:shadow-md transition-shadow"
+                  className="w-full mb-4 gap-2 glass hover-lift"
                   onClick={handleGoogleSignIn}
                   disabled={isSubmitting}
                 >

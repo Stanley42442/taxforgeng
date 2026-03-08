@@ -392,9 +392,9 @@ const Dashboard = () => {
     return (
       <PageLayout title="Dashboard" description="Please sign in to access your dashboard" icon={LayoutDashboard}>
         <div className="max-w-md mx-auto text-center">
-          <div className="bg-card border border-border rounded-2xl p-10 shadow-sm">
+          <div className="glass-frosted rounded-3xl p-10">
             <p className="text-muted-foreground mb-6">Please sign in to access your dashboard</p>
-            <Button size="lg" onClick={() => navigate('/auth')}>Sign In</Button>
+            <Button variant="glow" size="lg" onClick={() => navigate('/auth')}>Sign In</Button>
           </div>
         </div>
       </PageLayout>
@@ -406,7 +406,7 @@ const Dashboard = () => {
       <PageLayout title="Dashboard" icon={LayoutDashboard}>
         <div className="space-y-6 animate-fade-in">
           {/* Summary section skeleton */}
-          <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
+          <div className="glass-frosted rounded-2xl p-4">
             <div className="flex items-center gap-3 mb-4">
               <div className="skeleton-shimmer h-10 w-10 rounded-xl" />
               <div className="space-y-2">
@@ -418,7 +418,7 @@ const Dashboard = () => {
             {/* Stats grid skeleton */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="bg-muted/50 border border-border rounded-xl p-4">
+                <div key={i} className="glass rounded-xl p-4">
                   <div className="skeleton-shimmer h-3 w-16 mb-2 rounded" />
                   <div className="skeleton-shimmer h-6 w-24 mb-1 rounded" />
                   <div className="skeleton-shimmer h-3 w-12 rounded" />
@@ -430,7 +430,7 @@ const Dashboard = () => {
           {/* Quick actions skeleton */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-card border border-border rounded-xl p-5 flex flex-col items-center gap-3 shadow-sm">
+              <div key={i} className="glass-frosted rounded-xl p-5 flex flex-col items-center gap-3">
                 <div className="skeleton-shimmer h-12 w-12 rounded-xl" />
                 <div className="skeleton-shimmer h-4 w-20 rounded" />
               </div>
@@ -440,7 +440,7 @@ const Dashboard = () => {
           {/* Content grid skeleton */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {Array.from({ length: 2 }).map((_, i) => (
-              <div key={i} className="bg-card border border-border rounded-xl p-6 shadow-sm">
+              <div key={i} className="glass-frosted rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="skeleton-shimmer h-5 w-32 rounded" />
                   <div className="skeleton-shimmer h-8 w-20 rounded-lg" />
@@ -534,7 +534,7 @@ const Dashboard = () => {
 
       {/* Collapsible Summary Section */}
       <Collapsible open={summaryExpanded} onOpenChange={setSummaryExpanded} className="mb-6 animate-slide-up">
-        <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
+        <div className="glass-frosted rounded-2xl shadow-futuristic border-border/40 overflow-hidden">
           {/* Toggle Header */}
           <div className="flex items-center justify-between p-4 border-b border-border/30">
             <ToggleGroup 
@@ -657,7 +657,7 @@ const Dashboard = () => {
 
                   {/* Business Summary Cards */}
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                    <div className="bg-muted/50 border border-border p-4 rounded-xl hover:shadow-md transition-shadow min-h-[100px]">
+                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
                       <div className="flex items-center gap-2 mb-2">
                         <TrendingUp className="h-4 w-4 text-success" />
                         <span className="text-xs text-muted-foreground">Income</span>
@@ -667,7 +667,7 @@ const Dashboard = () => {
                         <SparklineChart data={sparklineData.income} color="hsl(var(--success))" height={30} width={100} />
                       </div>
                     </div>
-                    <div className="bg-muted/50 border border-border p-4 rounded-xl hover:shadow-md transition-shadow min-h-[100px]">
+                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
                       <div className="flex items-center gap-2 mb-2">
                         <TrendingDown className="h-4 w-4 text-destructive" />
                         <span className="text-xs text-muted-foreground">Expenses</span>
@@ -677,7 +677,7 @@ const Dashboard = () => {
                         <SparklineChart data={sparklineData.expenses} color="hsl(var(--destructive))" height={30} width={100} />
                       </div>
                     </div>
-                    <div className="bg-muted/50 border border-border p-4 rounded-xl hover:shadow-md transition-shadow min-h-[100px]">
+                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
                       <div className="flex items-center gap-2 mb-2">
                         <PieChart className="h-4 w-4 text-primary" />
                         <span className="text-xs text-muted-foreground">Net</span>
@@ -689,7 +689,7 @@ const Dashboard = () => {
                         <SparklineChart data={sparklineData.net} color={netIncome >= 0 ? "hsl(var(--success))" : "hsl(var(--destructive))"} height={30} width={100} />
                       </div>
                     </div>
-                    <div className="bg-muted/50 border border-border p-4 rounded-xl hover:shadow-md transition-shadow min-h-[100px]">
+                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
                       <div className="flex items-center gap-2 mb-2">
                         <Receipt className="h-4 w-4 text-accent" />
                         <span className="text-xs text-muted-foreground">Deductible</span>
@@ -769,7 +769,7 @@ const Dashboard = () => {
 
                   {/* Personal Summary Cards */}
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                    <div className="bg-muted/50 border border-border p-4 rounded-xl hover:shadow-md transition-shadow min-h-[100px]">
+                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
                       <div className="flex items-center gap-2 mb-2">
                         <Home className="h-4 w-4 text-primary" />
                         <span className="text-xs text-muted-foreground">Rent Relief</span>
@@ -777,7 +777,7 @@ const Dashboard = () => {
                       <p className="text-lg font-bold text-primary">{formatCurrency(filteredAnnualTotals.rent)}</p>
                       <p className="text-xs text-muted-foreground mt-1">Rent paid</p>
                     </div>
-                    <div className="bg-muted/50 border border-border p-4 rounded-xl hover:shadow-md transition-shadow min-h-[100px]">
+                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
                       <div className="flex items-center gap-2 mb-2">
                         <Wallet className="h-4 w-4 text-success" />
                         <span className="text-xs text-muted-foreground">Pension</span>
@@ -787,7 +787,7 @@ const Dashboard = () => {
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">Contributions</p>
                     </div>
-                    <div className="bg-muted/50 border border-border p-4 rounded-xl hover:shadow-md transition-shadow min-h-[100px]">
+                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
                       <div className="flex items-center gap-2 mb-2">
                         <Heart className="h-4 w-4 text-accent" />
                         <span className="text-xs text-muted-foreground">Insurance</span>
@@ -797,7 +797,7 @@ const Dashboard = () => {
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">Health + Life</p>
                     </div>
-                    <div className="bg-muted/50 border border-border p-4 rounded-xl hover:shadow-md transition-shadow min-h-[100px]">
+                    <div className="glass p-4 rounded-xl hover-lift min-h-[100px]">
                       <div className="flex items-center gap-2 mb-2">
                         <Shield className="h-4 w-4 text-warning" />
                         <span className="text-xs text-muted-foreground">Total Deductible</span>
@@ -816,9 +816,9 @@ const Dashboard = () => {
       {/* Quick Actions */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 animate-slide-up-delay-1">
         <Link to="/calculator">
-          <Card className="h-full bg-card border border-border hover:shadow-md transition-shadow cursor-pointer group">
+          <Card className="h-full glass-frosted hover:shadow-futuristic hover:border-primary/30 transition-all cursor-pointer group hover-lift">
             <CardContent className="p-4 text-center">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-primary/20 transition-colors">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-primary/20 transition-colors group-hover:glow-primary">
                 <Calculator className="h-5 w-5 text-primary" />
               </div>
               <h3 className="font-medium text-sm">Calculator</h3>
@@ -827,7 +827,7 @@ const Dashboard = () => {
           </Card>
         </Link>
         <Link to={dashboardMode === 'business' ? '/expenses' : '/personal-expenses'}>
-          <Card className="h-full bg-card border border-border hover:shadow-md transition-shadow cursor-pointer group">
+          <Card className="h-full glass-frosted hover:shadow-futuristic hover:border-accent/30 transition-all cursor-pointer group hover-lift">
             <CardContent className="p-4 text-center">
               <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-accent/20 transition-colors">
                 <Receipt className="h-5 w-5 text-accent" />
@@ -838,7 +838,7 @@ const Dashboard = () => {
           </Card>
         </Link>
         <Link to="/reminders">
-          <Card className="h-full bg-card border border-border hover:shadow-md transition-shadow cursor-pointer group relative">
+          <Card className="h-full glass-frosted hover:shadow-futuristic hover:border-warning/30 transition-all cursor-pointer group relative hover-lift">
             <CardContent className="p-4 text-center">
               <div className="h-10 w-10 rounded-lg bg-warning/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-warning/20 transition-colors">
                 <Bell className="h-5 w-5 text-warning" />
@@ -854,7 +854,7 @@ const Dashboard = () => {
           </Card>
         </Link>
         <Link to="/businesses">
-          <Card className="h-full bg-card border border-border hover:shadow-md transition-shadow cursor-pointer group">
+          <Card className="h-full glass-frosted hover:shadow-futuristic hover:border-success/30 transition-all cursor-pointer group hover-lift">
             <CardContent className="p-4 text-center">
               <div className="h-10 w-10 rounded-lg bg-success/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-success/20 transition-colors">
                 <Building2 className="h-5 w-5 text-success" />
@@ -871,7 +871,7 @@ const Dashboard = () => {
         <>
           <div className="grid gap-6 lg:grid-cols-2 animate-slide-up-delay-2">
             {/* Businesses Card */}
-            <Card className="bg-card border border-border shadow-sm">
+            <Card className="glass-frosted shadow-futuristic">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2">
@@ -915,7 +915,7 @@ const Dashboard = () => {
                             open={expandedBusinessId === business.id}
                             onOpenChange={() => setExpandedBusinessId(expandedBusinessId === business.id ? null : business.id)}
                           >
-                            <div className="bg-muted/50 border border-border p-3 rounded-xl hover:bg-muted/70 transition-colors">
+                            <div className="glass p-3 rounded-xl hover:bg-muted/50 transition-colors">
                               <CollapsibleTrigger className="w-full">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center gap-3">
@@ -957,7 +957,7 @@ const Dashboard = () => {
             </Card>
 
             {/* Reminders Card */}
-            <Card className="bg-card border border-border shadow-sm">
+            <Card className="glass-frosted shadow-futuristic">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2">
@@ -995,7 +995,7 @@ const Dashboard = () => {
                       const isUrgent = dueDate <= addDays(new Date(), 7);
                       
                       return (
-                        <div key={reminder.id} className={`bg-muted/50 border border-border p-3 rounded-xl ${isUrgent ? 'border-warning/30' : ''}`}>
+                        <div key={reminder.id} className={`glass p-3 rounded-xl ${isUrgent ? 'border border-warning/30' : ''}`}>
                           <div className="flex items-start justify-between">
                             <div className="flex items-start gap-3">
                               {isUrgent ? (
@@ -1033,7 +1033,7 @@ const Dashboard = () => {
           {/* Personal Mode - Deductions Summary and Tax Relief Cards */}
           <div className="grid gap-6 lg:grid-cols-2 animate-slide-up-delay-2">
             {/* Personal Deductions Summary Card */}
-            <Card className="bg-card border border-border shadow-sm">
+            <Card className="glass-frosted shadow-futuristic">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2">
@@ -1055,7 +1055,7 @@ const Dashboard = () => {
               <CardContent>
                 <div className="space-y-3 max-h-[300px] overflow-y-auto">
                   {filteredAnnualTotals.rent > 0 && (
-                    <div className="bg-muted/50 border border-border p-3 rounded-xl flex items-center justify-between">
+                    <div className="glass p-3 rounded-xl flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
                           <Home className="h-5 w-5 text-primary" />
@@ -1069,7 +1069,7 @@ const Dashboard = () => {
                     </div>
                   )}
                   {filteredAnnualTotals.pension_contribution > 0 && (
-                    <div className="bg-muted/50 border border-border p-3 rounded-xl flex items-center justify-between">
+                    <div className="glass p-3 rounded-xl flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-lg bg-success/10 flex items-center justify-center">
                           <Wallet className="h-5 w-5 text-success" />
@@ -1083,7 +1083,7 @@ const Dashboard = () => {
                     </div>
                   )}
                   {(filteredAnnualTotals.health_insurance > 0 || filteredAnnualTotals.life_insurance > 0) && (
-                    <div className="bg-muted/50 border border-border p-3 rounded-xl flex items-center justify-between">
+                    <div className="glass p-3 rounded-xl flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center">
                           <Heart className="h-5 w-5 text-accent" />
@@ -1097,7 +1097,7 @@ const Dashboard = () => {
                     </div>
                   )}
                   {filteredAnnualTotals.child_education > 0 && (
-                    <div className="bg-muted/50 border border-border p-3 rounded-xl flex items-center justify-between">
+                    <div className="glass p-3 rounded-xl flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-lg bg-warning/10 flex items-center justify-center">
                           <GraduationCap className="h-5 w-5 text-warning" />
@@ -1111,7 +1111,7 @@ const Dashboard = () => {
                     </div>
                   )}
                   {filteredAnnualTotals.dependent_care > 0 && (
-                    <div className="bg-muted/50 border border-border p-3 rounded-xl flex items-center justify-between">
+                    <div className="glass p-3 rounded-xl flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-lg bg-secondary/50 flex items-center justify-center">
                           <Users className="h-5 w-5 text-secondary-foreground" />
@@ -1141,7 +1141,7 @@ const Dashboard = () => {
             </Card>
 
             {/* Tax Relief Summary Card */}
-            <Card className="bg-card border border-border shadow-sm">
+            <Card className="glass-frosted shadow-futuristic">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <div className="h-10 w-10 rounded-lg bg-success/10 flex items-center justify-center">
@@ -1155,7 +1155,7 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="bg-muted/50 border border-border p-3 rounded-xl">
+                  <div className="glass p-3 rounded-xl">
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-medium">Rent Relief</p>
                       <p className="text-sm font-semibold text-success">
@@ -1164,7 +1164,7 @@ const Dashboard = () => {
                     </div>
                     <p className="text-xs text-muted-foreground">20% of rent, max ₦500,000</p>
                   </div>
-                  <div className="bg-muted/50 border border-border p-3 rounded-xl">
+                  <div className="glass p-3 rounded-xl">
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-medium">Pension Relief</p>
                       <p className="text-sm font-semibold text-success">
@@ -1173,7 +1173,7 @@ const Dashboard = () => {
                     </div>
                     <p className="text-xs text-muted-foreground">Fully deductible</p>
                   </div>
-                  <div className="bg-muted/50 border border-border p-3 rounded-xl">
+                  <div className="glass p-3 rounded-xl">
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-medium">Insurance Relief</p>
                       <p className="text-sm font-semibold text-success">
@@ -1182,7 +1182,7 @@ const Dashboard = () => {
                     </div>
                     <p className="text-xs text-muted-foreground">Health & Life premiums</p>
                   </div>
-                  <div className="bg-muted/50 border border-border p-3 rounded-xl">
+                  <div className="glass p-3 rounded-xl">
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-medium">NHF Contribution</p>
                       <p className="text-sm font-semibold text-success">
