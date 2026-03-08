@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { useState, useEffect, useRef, createContext, useContext, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabaseClient';
 import type { Json } from '@/integrations/supabase/types';
@@ -374,9 +374,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Individual pages check auth state as needed
   const [loading, setLoading] = useState(false);
 
-  // Track if this is a fresh login vs session restoration
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [lastSessionId, setLastSessionId] = useState<string | null>(null);
+  // Use refs to avoid stale closures in onAuthStateChange callback
+  const isInitialLoadRef = useRef(true);
+  const lastSessionIdRef = useRef<string | null>(null);
+  const isTrackingRef = useRef(false);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -392,23 +393,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setTimeout(() => {
             switch (event) {
               case 'SIGNED_IN':
+                // Skip if tracking is already in progress (prevents concurrent calls)
+                if (isTrackingRef.current) return;
+
                 // Only track as a login if this is a genuinely new session
-                // (not just restoring from localStorage on page refresh)
-                if (!isInitialLoad || lastSessionId !== currentSessionId) {
+                if (!isInitialLoadRef.current || lastSessionIdRef.current !== currentSessionId) {
                   // Check if this is from a fresh signIn call by looking at iat (issued at)
                   const tokenPayload = session.access_token.split('.')[1];
                   try {
                     const decoded = JSON.parse(atob(tokenPayload));
-                    const issuedAt = decoded.iat * 1000; // Convert to ms
+                    const issuedAt = decoded.iat * 1000;
                     const now = Date.now();
                     // If token was issued within the last 30 seconds, this is a fresh login
                     if (now - issuedAt < 30000) {
-                      trackDevice(session.user.id, session.user.email || '');
+                      isTrackingRef.current = true;
+                      trackDevice(session.user.id, session.user.email || '')
+                        .catch(err => logger.error('trackDevice failed:', err))
+                        .finally(() => { isTrackingRef.current = false; });
                     }
                   } catch {
                     // If we can't parse the token, don't log to avoid duplicates
                   }
-                  setLastSessionId(currentSessionId);
+                  lastSessionIdRef.current = currentSessionId;
                 }
                 break;
               case 'SIGNED_OUT':
@@ -424,7 +430,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }, 0);
         }
         
-        setIsInitialLoad(false);
+        isInitialLoadRef.current = false;
       }
     );
 
@@ -440,8 +446,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const handleBeforeUnload = () => {
       const isSessionOnly = safeSessionStorage.getItem('taxforge-session-only');
       if (isSessionOnly === 'true') {
-        // Clear auth tokens from localStorage when browser closes
-        // This effectively logs out users who didn't check "Remember me"
         safeLocalStorage.removeItem('sb-uhuxqrrtsiintcwpxxwy-auth-token');
       }
     };
