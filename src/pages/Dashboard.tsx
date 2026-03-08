@@ -406,22 +406,22 @@ const Dashboard = () => {
       <PageLayout title="Dashboard" icon={LayoutDashboard}>
         <div className="space-y-6 animate-fade-in">
           {/* Summary section skeleton */}
-          <div className="glass-frosted rounded-2xl p-4">
+          <div className="border border-border rounded-xl bg-card p-4">
             <div className="flex items-center gap-3 mb-4">
-              <div className="skeleton-shimmer h-10 w-10 rounded-xl" />
+              <div className="animate-pulse bg-muted h-10 w-10 rounded-xl" />
               <div className="space-y-2">
-                <div className="skeleton-shimmer h-5 w-40 rounded" />
-                <div className="skeleton-shimmer h-3 w-24 rounded" />
+                <div className="animate-pulse bg-muted h-5 w-40 rounded" />
+                <div className="animate-pulse bg-muted h-3 w-24 rounded" />
               </div>
             </div>
             
             {/* Stats grid skeleton */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="glass rounded-xl p-4">
-                  <div className="skeleton-shimmer h-3 w-16 mb-2 rounded" />
-                  <div className="skeleton-shimmer h-6 w-24 mb-1 rounded" />
-                  <div className="skeleton-shimmer h-3 w-12 rounded" />
+                <div key={i} className="border border-border rounded-lg bg-card p-4">
+                  <div className="animate-pulse bg-muted h-3 w-16 mb-2 rounded" />
+                  <div className="animate-pulse bg-muted h-6 w-24 mb-1 rounded" />
+                  <div className="animate-pulse bg-muted h-3 w-12 rounded" />
                 </div>
               ))}
             </div>
@@ -430,9 +430,9 @@ const Dashboard = () => {
           {/* Quick actions skeleton */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="glass-frosted rounded-xl p-5 flex flex-col items-center gap-3">
-                <div className="skeleton-shimmer h-12 w-12 rounded-xl" />
-                <div className="skeleton-shimmer h-4 w-20 rounded" />
+              <div key={i} className="border border-border rounded-xl bg-card p-5 flex flex-col items-center gap-3">
+                <div className="animate-pulse bg-muted h-12 w-12 rounded-xl" />
+                <div className="animate-pulse bg-muted h-4 w-20 rounded" />
               </div>
             ))}
           </div>
@@ -440,18 +440,18 @@ const Dashboard = () => {
           {/* Content grid skeleton */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {Array.from({ length: 2 }).map((_, i) => (
-              <div key={i} className="glass-frosted rounded-xl p-6">
+              <div key={i} className="border border-border rounded-xl bg-card p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="skeleton-shimmer h-5 w-32 rounded" />
-                  <div className="skeleton-shimmer h-8 w-20 rounded-lg" />
+                  <div className="animate-pulse bg-muted h-5 w-32 rounded" />
+                  <div className="animate-pulse bg-muted h-8 w-20 rounded-lg" />
                 </div>
                 <div className="space-y-3">
                   {Array.from({ length: 3 }).map((_, j) => (
                     <div key={j} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
-                      <div className="skeleton-shimmer h-10 w-10 rounded-lg" />
+                      <div className="animate-pulse bg-muted h-10 w-10 rounded-lg" />
                       <div className="flex-1 space-y-2">
-                        <div className="skeleton-shimmer h-4 w-3/4 rounded" />
-                        <div className="skeleton-shimmer h-3 w-1/2 rounded" />
+                        <div className="animate-pulse bg-muted h-4 w-3/4 rounded" />
+                        <div className="animate-pulse bg-muted h-3 w-1/2 rounded" />
                       </div>
                     </div>
                   ))}
