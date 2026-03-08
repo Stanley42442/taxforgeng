@@ -552,7 +552,7 @@ const CalculatorPage = () => {
         </Tabs>
 
         {/* Input Form */}
-        <div className="glass-frosted rounded-3xl p-6 md:p-8 shadow-futuristic animate-slide-up-delay-2">
+        <div className="border border-border rounded-xl bg-card p-6 md:p-8 animate-slide-up-delay-2">
           <div className="space-y-8">
             {/* Primary Income */}
             <InputSection title="Primary Income" tooltip="Your main business revenue and expenses">
