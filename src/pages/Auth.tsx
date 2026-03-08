@@ -732,7 +732,7 @@ const Auth = () => {
             {view === 'mfa-challenge' && (
               <form onSubmit={handleMfaChallenge} className="space-y-4">
                 <div className="flex items-center justify-center mb-4">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 glow-sm">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
                     {useBackupCode ? (
                       <KeyRound className="h-8 w-8 text-primary" />
                     ) : (
