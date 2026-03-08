@@ -496,13 +496,13 @@ const CalculatorPage = () => {
         </div>
 
         {/* Tax Rule Toggle */}
-        <div className="mb-6 glass-frosted rounded-2xl p-5 shadow-futuristic animate-slide-up">
+        <div className="mb-6 border border-border rounded-xl bg-card p-5 animate-slide-up">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4 min-w-0 flex-1">
               <div className={`rounded-xl p-3 flex-shrink-0 transition-all duration-300 ${
                 use2026Rules 
-                  ? 'bg-success/20 text-success glow-success' 
-                  : 'bg-secondary text-secondary-foreground neumorphic-sm'
+                  ? 'bg-success/20 text-success' 
+                  : 'bg-secondary text-secondary-foreground'
               }`}>
                 <Info className="h-6 w-6" />
               </div>
