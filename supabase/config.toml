@@ -89,3 +89,6 @@ verify_jwt = false
 
 [functions.generate-api-key]
 verify_jwt = false
+
+[functions.track-device]
+verify_jwt = false
