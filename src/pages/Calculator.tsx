@@ -438,7 +438,7 @@ const CalculatorPage = () => {
 
         {/* Business Selector */}
         {savedBusinesses.length > 0 && (
-          <div className="mb-6 glass-frosted rounded-2xl p-5 shadow-futuristic animate-slide-up">
+          <div className="mb-6 bg-card border border-border rounded-2xl p-5 shadow-sm animate-slide-up">
             <div className="flex items-center gap-4">
               <div className="rounded-xl p-3 bg-primary/10 text-primary flex-shrink-0">
                 <Store className="h-6 w-6" />
