@@ -18,9 +18,19 @@ import {
 } from 'lucide-react';
 
 export default function LoyaltyRewards() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { transactions, loading } = useLoyaltyPoints();
+
+  if (authLoading) {
+    return (
+      <PageLayout maxWidth="4xl">
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      </PageLayout>
+    );
+  }
 
   if (!user) {
     return (

@@ -275,18 +275,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        // Only update state if user identity actually changed.
-        // TOKEN_REFRESHED events fire frequently and cause cascading re-renders
-        // that trigger more getUser/getSession calls across the app.
-        setSession(prev => {
-          if (prev?.access_token === session?.access_token) return prev;
-          return session;
-        });
-        setUser(prev => {
-          const newUser = session?.user ?? null;
-          if (prev?.id === newUser?.id) return prev;
-          return newUser;
-        });
+        // CRITICAL: Skip state updates for TOKEN_REFRESHED events entirely.
+        // The Supabase client already stores the refreshed token internally.
+        // Updating React state here causes cascading re-renders that trigger
+        // more API calls, which trigger more token refreshes — a storm that
+        // hits the 429 rate limit and invalidates the session.
+        if (event === 'TOKEN_REFRESHED') {
+          return;
+        }
+
+        setSession(session);
+        setUser(session?.user ?? null);
 
         if (session?.user) {
           setTimeout(() => {

@@ -182,10 +182,9 @@ const Auth = () => {
           return;
         }
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
+        // Use the useAuth hook's signIn instead of direct supabase call
+        // to avoid bypassing the centralized auth state management
+        const { error } = await signIn(email, password);
         
         if (error) {
           // Record failed attempt
@@ -216,14 +215,16 @@ const Auth = () => {
         await recordLoginAttempt(email, true);
         setShowEmailNotVerifiedMessage(false);
         
-        // Check if MFA is required
-        const { data: factorsData } = await supabase.auth.mfa.listFactors();
-        const verifiedFactors = factorsData?.totp?.filter(f => f.status === 'verified') || [];
+        // Check MFA only via user metadata to avoid getUser() network call
+        // mfa.listFactors() internally calls getUser() which triggers token refreshes
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        const mfaFactors = currentSession?.user?.factors;
+        const verifiedFactors = mfaFactors?.filter(f => f.factor_type === 'totp' && f.status === 'verified') || [];
         
         if (verifiedFactors.length > 0) {
           // MFA is enabled, need to verify
           setMfaFactorId(verifiedFactors[0].id);
-          setMfaUserId(data.user?.id || null);
+          setMfaUserId(currentSession?.user?.id || null);
           setView('mfa-challenge');
           return;
         }

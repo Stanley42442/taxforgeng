@@ -46,7 +46,7 @@ const TAX_YEARS = [currentYear, currentYear - 1, currentYear - 2];
 export default function PersonalExpenses() {
   const { device, isMobile, isTablet, containerClass} = useDeviceCSS();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -192,6 +192,16 @@ export default function PersonalExpenses() {
 
   const formatCurrency = (amount: number) => 
     new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(amount);
+
+  if (authLoading) {
+    return (
+      <PageLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      </PageLayout>
+    );
+  }
 
   if (!user) {
     return (

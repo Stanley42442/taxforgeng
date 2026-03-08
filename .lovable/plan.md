@@ -1,66 +1,43 @@
 
 
-## Fix: Persistent Logout — Three Root Causes Found
+## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
 
-### Evidence from Network Logs
+A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
 
-The network logs from this login attempt show **8 `refresh_token` calls within 3 seconds** of a successful password login, plus a `GET /auth/v1/user` call. The session replay confirms the user lands on a "Login Required" screen on `/personal-expenses`. Here's exactly what's happening and why:
+---
 
-### Root Cause 1: `onAuthStateChange` re-renders on every TOKEN_REFRESHED
+### Content Structure
 
-The current dedup logic compares `access_token`:
-```
-setSession(prev => {
-  if (prev?.access_token === session?.access_token) return prev;
-  return session;
-});
-```
-Every TOKEN_REFRESHED event has a **new** access_token, so this check ALWAYS passes. Each session state update triggers React re-renders. Those re-renders trigger more Supabase API calls (SubscriptionContext, Reminders, etc.), which can trigger more token refreshes, creating a cascade.
+The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
 
-**Fix**: Skip state updates entirely for `TOKEN_REFRESHED` events. Only `session` from useAuth is consumed by `useSessionSecurity` (Security Dashboard page only). The supabase client stores the refreshed token internally — React state doesn't need to track every token change.
+| Section ID | Topic |
+|---|---|
+| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
+| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
+| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
+| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
+| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
+| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
+| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
+| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
+| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
+| `faq` | 5–6 FAQs with FAQPage schema |
 
-### Root Cause 2: Auth.tsx calls `mfa.listFactors()` which triggers `getUser()`
+### Technical Implementation
 
-At line 220, Auth.tsx calls `supabase.auth.mfa.listFactors()` after every login. Internally in supabase-js v2, this calls `getUser()` — a network call (`GET /auth/v1/user`) that can trigger yet another token refresh. This is the `getUser()` call visible in the network logs at 05:18:14.
+**1. Create `src/pages/blog/PITMyths2026.tsx`**
+- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
+- ~1,500 words, authoritative tone matching existing posts
+- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
+- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
+- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
 
-**Fix**: Only call `mfa.listFactors()` if the user has MFA configured (check user metadata), or remove it entirely since MFA enrollment is rare. Also, consolidate by using `useAuth().signIn()` instead of calling `signInWithPassword` directly (currently Auth.tsx bypasses the hook).
+**2. Register route in `src/App.tsx`**
+- Add lazy import and route at `/blog/pit-myths-2026`
 
-### Root Cause 3: Pages show "Login Required" without checking `loading`
+**3. Add to blog listing in `src/pages/Blog.tsx`**
+- New entry in the `POSTS` array with category "Guides", today's date
 
-PersonalExpenses (line 196) checks `if (!user)` but NOT `if (loading)`. During any transient moment where `user` is null — initial page load, HMR reload, token refresh failure — the page immediately shows "Login Required" instead of a spinner. The same pattern exists in Dashboard, LoyaltyRewards, CancelSubscription, BillingHistory, Referrals.
-
-**Fix**: Add `loading` guard: `if (loading) return <spinner>; if (!user) return <login required>`.
-
-### Implementation
-
-**File 1: `src/hooks/useAuth.tsx`**
-- In `onAuthStateChange`, check the `event` parameter. Only update `session`/`user` state for `SIGNED_IN`, `SIGNED_OUT`, `USER_UPDATED`, `PASSWORD_RECOVERY`. For `TOKEN_REFRESHED`, skip state updates entirely — the supabase client already stores the refreshed token internally.
-- This eliminates the cascade: no state update → no re-render → no concurrent API calls → no refresh storm.
-
-**File 2: `src/pages/Auth.tsx`**
-- Remove the direct `supabase.auth.signInWithPassword()` call (line 185). Use `signIn()` from `useAuth()` instead.
-- Remove `mfa.listFactors()` (line 220). If MFA support is needed, check `user_metadata` first or defer the check to after navigation.
-
-**File 3: `src/pages/PersonalExpenses.tsx`**
-- Add `loading` from useAuth. Show a loading spinner when `loading` is true, before checking `!user`.
-
-**File 4: `src/pages/Dashboard.tsx`**
-- Same loading guard fix (line 391 already has `!user` check without `loading`).
-
-**File 5: `src/pages/LoyaltyRewards.tsx`** — Same loading guard.
-
-**File 6: `src/pages/CancelSubscription.tsx`** — Same loading guard.
-
-**File 7: `src/pages/BillingHistory.tsx`** — Same loading guard.
-
-**File 8: `src/pages/Referrals.tsx`** — Same loading guard.
-
-### Why This Will Actually Work This Time
-
-Previous fixes targeted `getUser()` → `getSession()` swaps. That was necessary but insufficient because:
-- The `onAuthStateChange` handler still fired state updates on every TOKEN_REFRESHED, causing cascading re-renders
-- Auth.tsx still triggered `getUser()` via `mfa.listFactors()`
-- Pages still showed "Login Required" during any transient null-user moment
-
-This fix attacks the problem at the root: stop the cascade from starting in the first place (don't re-render on token refresh), remove the hidden `getUser()` call (MFA check), and make pages resilient to transient auth states (loading guards).
+**4. Update sitemap (`public/sitemap.xml`)**
+- Add `/blog/pit-myths-2026` entry
 

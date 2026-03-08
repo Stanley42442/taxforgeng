@@ -64,7 +64,7 @@ interface BillingData {
 }
 
 export default function BillingHistory() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [billingData, setBillingData] = useState<BillingData | null>(null);
@@ -136,6 +136,16 @@ export default function BillingHistory() {
         return <Badge variant="outline">{status}</Badge>;
     }
   };
+
+  if (authLoading) {
+    return (
+      <PageLayout maxWidth="4xl">
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      </PageLayout>
+    );
+  }
 
   if (!user) {
     return (

@@ -32,7 +32,7 @@ const cancellationReasons = [
 
 export default function CancelSubscription() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { tier } = useSubscription();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'reason' | 'feedback' | 'confirm'>('reason');
@@ -75,6 +75,16 @@ export default function CancelSubscription() {
       setLoading(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <PageLayout maxWidth="2xl">
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      </PageLayout>
+    );
+  }
 
   if (!user) {
     return (

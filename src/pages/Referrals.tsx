@@ -40,7 +40,7 @@ interface DiscountCode {
 }
 
 const Referrals = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [discountCodes, setDiscountCodes] = useState<DiscountCode[]>([]);
   const [loading, setLoading] = useState(true);
@@ -136,6 +136,16 @@ const Referrals = () => {
 
   const completedReferrals = referrals.filter((r) => r.status === "completed").length;
   const pendingReferrals = referrals.filter((r) => r.status === "pending").length;
+
+  if (authLoading) {
+    return (
+      <PageLayout title="Referral Program" description="Invite friends and earn rewards" icon={Gift} maxWidth="lg">
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      </PageLayout>
+    );
+  }
 
   if (!user) {
     return (
