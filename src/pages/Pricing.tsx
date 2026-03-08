@@ -698,7 +698,7 @@ const PricingCard = ({
     }`}>
       {isPopular && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className="bg-gradient-primary text-primary-foreground text-[10px] sm:text-xs font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap animate-glow-border">
+          <span className="bg-primary text-primary-foreground text-[10px] sm:text-xs font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
             Most Popular
           </span>
         </div>
