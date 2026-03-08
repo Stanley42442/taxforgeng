@@ -136,11 +136,6 @@ const SubscriptionContext = createContext<SubscriptionContextType | undefined>(u
 
 export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
-  const profileCreationAttempted = React.useRef(false);
-  const lastFetchErrorAt = React.useRef<number>(0);
-  const userRef = React.useRef(user);
-  userRef.current = user;
-
   const [state, setState] = useState<SubscriptionState>({
     tier: 'free',
     effectiveTier: 'free',
@@ -155,8 +150,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
   // Fetch user profile and businesses from database
   const fetchUserData = useCallback(async () => {
-    const currentUser = userRef.current;
-    if (!currentUser) {
+    if (!user) {
       setState({
         tier: 'free',
         effectiveTier: 'free',
@@ -171,65 +165,43 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    // Debounce: if we got a 406/error within the last 5 seconds, skip
-    const now = Date.now();
-    if (now - lastFetchErrorAt.current < 5000) {
-      logger.debug('[SubscriptionContext] Skipping fetch due to recent error (debounce)');
-      return;
-    }
-
     try {
       // Fetch profile for subscription tier and trial info
       let { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('subscription_tier, email, created_at, trial_started_at, trial_expires_at, has_selected_initial_tier')
-        .eq('id', currentUser.id)
+        .eq('id', user.id)
         .single();
 
       // Defensive check: Create profile if it doesn't exist (handles edge case)
-      // Only attempt once per session to prevent infinite retry loops
       if (profileError && profileError.code === 'PGRST116') {
-        lastFetchErrorAt.current = Date.now();
-        if (profileCreationAttempted.current) {
-          logger.warn('[SubscriptionContext] Profile creation already attempted, skipping retry');
-          setState(prev => ({ ...prev, loading: false }));
-          return;
-        }
-        profileCreationAttempted.current = true;
         logger.warn('[SubscriptionContext] No profile found, creating one...');
         const { error: createError } = await supabase
           .from('profiles')
           .insert({
-            id: currentUser.id,
-            email: currentUser.email,
+            id: user.id,
+            email: user.email,
             subscription_tier: 'free',
           });
 
         if (createError) {
           logger.error('[SubscriptionContext] Failed to create profile:', createError);
-          setState(prev => ({ ...prev, loading: false }));
-          return;
         } else {
           // Re-fetch the newly created profile
           const { data: newProfile } = await supabase
             .from('profiles')
             .select('subscription_tier, email, created_at, trial_started_at, trial_expires_at, has_selected_initial_tier')
-            .eq('id', currentUser.id)
+            .eq('id', user.id)
             .single();
           profile = newProfile;
         }
-      } else if (profileError) {
-        lastFetchErrorAt.current = Date.now();
-        logger.error('[SubscriptionContext] Profile fetch error:', profileError);
-        setState(prev => ({ ...prev, loading: false }));
-        return;
       }
 
       // Fetch businesses (exclude soft-deleted)
       const { data: businesses } = await supabase
         .from('businesses')
         .select('*')
-        .eq('user_id', currentUser.id)
+        .eq('user_id', user.id)
         .is('deleted_at', null)
         .order('created_at', { ascending: false });
 
@@ -253,9 +225,9 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       // Check if user has an active trial (any tier with trial_expires_at)
       if (profile?.trial_expires_at) {
         trialEndsAt = new Date(profile.trial_expires_at);
-        const trialNow = new Date();
+        const now = new Date();
         // Trial is active if current time is before expiry
-        isOnTrial = trialNow < trialEndsAt;
+        isOnTrial = now < trialEndsAt;
         if (isOnTrial) {
           // During trial, effectiveTier is whatever tier they selected
           effectiveTier = baseTier;
@@ -271,17 +243,16 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         businessCount: mappedBusinesses.length,
         savedBusinesses: mappedBusinesses,
         subscriptionEndDate: null,
-        email: profile?.email || currentUser.email || null,
+        email: profile?.email || user.email || null,
         loading: false,
         isOnTrial,
         trialEndsAt,
       });
     } catch (error) {
-      lastFetchErrorAt.current = Date.now();
       logger.error('Error fetching user data:', error);
       setState(prev => ({ ...prev, loading: false }));
     }
-  }, [user?.id]);
+  }, [user]);
 
   useEffect(() => {
     fetchUserData();
