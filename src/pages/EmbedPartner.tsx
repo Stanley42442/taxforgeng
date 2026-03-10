@@ -444,7 +444,7 @@ export default function EmbedPartner() {
                 body: 'The widget includes a small "Powered by TaxForge NG" link in the footer. This fulfils the backlink agreement and must remain visible. Do not hide or remove it via CSS.',
               },
             ].map((s) => (
-              <div key={s.step} className="flex gap-4 p-4 bg-card border border-border rounded-xl">
+              <div key={s.step} className="flex gap-4 p-4 glass-frosted rounded-xl hover-lift">
                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
                   {s.step}
                 </div>
