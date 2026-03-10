@@ -523,7 +523,7 @@ export default function EmbedPartner() {
             ].map((f) => {
               const Icon = f.icon;
               return (
-                <Card key={f.title} className="border border-border">
+                <Card key={f.title} className="glass-frosted hover-lift">
                   <CardContent className="pt-6">
                     <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                       <Icon className="h-5 w-5 text-primary" />
