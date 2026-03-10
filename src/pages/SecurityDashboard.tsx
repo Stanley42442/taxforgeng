@@ -962,8 +962,8 @@ const SecurityDashboard = () => {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className={`h-7 w-7 ${device.is_blocked 
-                                      ? "text-green-600 hover:text-green-700 hover:bg-green-50" 
+                                     className={`h-7 w-7 ${device.is_blocked 
+                                      ? "text-success hover:text-success hover:bg-success/10" 
                                       : "text-destructive hover:text-destructive hover:bg-destructive/10"
                                     }`}
                                     onClick={() => handleToggleBlock(device.id, device.is_blocked)}
