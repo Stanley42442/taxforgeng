@@ -139,7 +139,7 @@ const SmallCompanyCITExemption = () => {
           <p className="text-sm text-muted-foreground mt-1">Under old rules: would have paid 20% CIT (₦1,600,000) + 3% TET (₦240,000) = ₦1,840,000. <strong className="text-success">Saving: ₦1,840,000</strong>.</p>
         </div>
 
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-2">Example 2: Tech Startup</h3>
           <p className="text-sm text-muted-foreground mb-2">A fintech startup with:</p>
           <ul className="text-sm text-muted-foreground space-y-1 mb-2">
