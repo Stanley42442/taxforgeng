@@ -229,11 +229,11 @@ const PITMyths2026 = () => {
         <h2 className="text-2xl font-bold text-foreground mb-4">
           Myth 6: "Minimum Wage Earners Are Fully Exempt"
         </h2>
-        <div className="glass-frosted rounded-xl p-6 mb-4">
+        <div className="rounded-xl border border-border bg-card p-6 mb-4">
           <p className="text-sm font-semibold text-destructive mb-1">❌ The Myth</p>
           <p className="text-muted-foreground text-sm">"Earning ₦70,000/month means I pay absolutely nothing."</p>
         </div>
-        <div className="glass-frosted rounded-xl p-6">
+        <div className="rounded-xl border border-border bg-card p-6">
           <p className="text-sm font-semibold text-primary mb-1">✅ The Fact</p>
           <p className="text-muted-foreground text-sm">
             The NTA 2025 exempts minimum wage earners (₦70,000/month, ₦840,000/year) from
