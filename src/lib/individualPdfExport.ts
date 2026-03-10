@@ -138,7 +138,7 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
   // === PROGRESSIVE TAX BANDS TABLE (for PIT) ===
   if (inputs.calculationType === 'pit' && result.breakdown.some(b => b.label.includes('Band'))) {
     y = checkPageBreak(doc, y, 80, () => margin + 20);
-    y = addSectionTitle(doc, 'Progressive Tax Bands Applied', y);
+    y = addAccentSectionHeader(doc, 'PROGRESSIVE TAX BANDS APPLIED', y, 'gold');
     
     const taxBands = inputs.use2026Rules ? [
       { band: 'First NGN 800,000', rate: '0%' },
