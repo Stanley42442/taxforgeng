@@ -312,6 +312,7 @@ const AppShell = () => {
         {!isEmbed && (
           <div className="sticky-header-wrapper">
             <NavMenu />
+            <GracePeriodBanner />
             <TrialBanner />
           </div>
         )}
