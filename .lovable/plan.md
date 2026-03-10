@@ -1,43 +1,34 @@
 
 
-## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
+## Bigger, More Defined, Interactive Lava Blobs
 
-A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
+### Changes
 
----
+**1. `src/components/LavaLampBackground.tsx`** — Rewrite blob config and add z-index cycling
 
-### Content Structure
+- Increase sizes dramatically: background blobs 400-500px, mid 250-350px, foreground 150-220px
+- Increase opacity across the board: foreground 0.25-0.30, mid 0.15-0.18, background 0.08-0.10
+- Reduce blur on mid-ground blobs (10-15px instead of 20-25px) for more definition
+- Add a `z` property per blob and a new `--z-duration` CSS variable to cycle `z-index` over time, so blobs swap depth positions
+- Position blobs so they overlap and "interact" — cluster x positions closer together so paths cross
+- Add a new CSS variable `--z-duration` for z-index animation timing
 
-The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
+**2. `src/index.css`** — Add z-index cycling keyframe and adjust existing animations
 
-| Section ID | Topic |
-|---|---|
-| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
-| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
-| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
-| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
-| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
-| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
-| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
-| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
-| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
-| `faq` | 5–6 FAQs with FAQPage schema |
+- New `@keyframes lava-depth`: cycles `z-index` between values (e.g. 1 → 3 → 1) so blobs appear to pass in front of and behind each other
+- Adjust `lava-drift` to use wider, overlapping horizontal paths (up to 12-15%) so blobs cross each other's trajectories
+- Add `lava-depth` to the `.lava-blob` animation shorthand
 
-### Technical Implementation
+### Blob Config (9 blobs)
+```
+Background (2):  size 450-500, blur 50-60, opacity 0.08-0.10, z-cycle slow
+Mid-ground (3):  size 250-350, blur 8-15,  opacity 0.15-0.18, z-cycle medium  
+Foreground (4):  size 150-220, blur 0-4,   opacity 0.22-0.30, z-cycle fast
+```
 
-**1. Create `src/pages/blog/PITMyths2026.tsx`**
-- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
-- ~1,500 words, authoritative tone matching existing posts
-- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
-- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
-- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
+X positions clustered in 3 zones (15-35%, 40-60%, 65-85%) so blobs cross paths.
 
-**2. Register route in `src/App.tsx`**
-- Add lazy import and route at `/blog/pit-myths-2026`
-
-**3. Add to blog listing in `src/pages/Blog.tsx`**
-- New entry in the `POSTS` array with category "Guides", today's date
-
-**4. Update sitemap (`public/sitemap.xml`)**
-- Add `/blog/pit-myths-2026` entry
+### Files
+1. `src/components/LavaLampBackground.tsx` (~45 lines)
+2. `src/index.css` (~10 lines added/changed)
 
