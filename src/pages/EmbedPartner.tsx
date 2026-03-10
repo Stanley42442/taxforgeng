@@ -354,7 +354,7 @@ export default function EmbedPartner() {
 
       {/* ─── Embed Snippets ─── */}
       <section id="snippets" className="py-16">
-        <div className="container mx-auto px-4 max-w-3xl">
+        <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground">Embed Code</h2>
             <p className="text-muted-foreground mt-2">Copy and paste one of the snippets below into your site.</p>
