@@ -91,7 +91,7 @@ const VATGuideNigeria = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           The standard VAT rate in Nigeria is <strong className="text-foreground">7.5%</strong>, unchanged under the 2026 rules. VAT is calculated on the invoice value of taxable goods and services.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Worked Example</h3>
           <p className="text-sm text-muted-foreground mb-2">A consulting firm invoices ₦1,000,000 for services:</p>
           <div className="text-sm text-muted-foreground space-y-1">
