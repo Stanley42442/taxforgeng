@@ -256,11 +256,11 @@ const PITMyths2026 = () => {
         <h2 className="text-2xl font-bold text-foreground mb-4">
           Myth 7: "The Old 6-Band Rates (7%–24%) Still Work"
         </h2>
-        <div className="glass-frosted rounded-xl p-6 mb-4">
+        <div className="rounded-xl border border-border bg-card p-6 mb-4">
           <p className="text-sm font-semibold text-destructive mb-1">❌ The Myth</p>
           <p className="text-muted-foreground text-sm">"The tax bands haven't really changed — it's still 7%, 11%, 15%, 19%, 21%, 24%."</p>
         </div>
-        <div className="glass-frosted rounded-xl p-6">
+        <div className="rounded-xl border border-border bg-card p-6">
           <p className="text-sm font-semibold text-primary mb-1">✅ The Fact</p>
           <p className="text-muted-foreground text-sm">
             The 2026 PIT bands are completely restructured:
