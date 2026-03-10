@@ -940,7 +940,7 @@ const SecurityDashboard = () => {
                               {device.is_blocked ? (
                                 <Ban className="h-4 w-4 text-destructive" />
                               ) : device.device_type === 'mobile' ? (
-                                <Smartphone className={`h-4 w-4 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
+                                <Smartphone className={`h-4 w-4 ${device.is_trusted ? 'text-success' : 'text-primary'}`} />
                               ) : device.device_type === 'tablet' ? (
                                 <Tablet className={`h-4 w-4 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
                               ) : (
