@@ -57,9 +57,8 @@ const KanoGuide = () => {
     <>
       <SEOHead title="Kano Tax Guide 2026 - KIRS, Agriculture, Trade | TaxForge" description="Tax guide for Kano businesses. KIRS registration, agricultural exemptions, cross-border trade taxes, textile incentives." canonicalPath="/state-guides/kano" keywords="Kano tax guide, KIRS, Kano agriculture tax, cross-border trade tax, Kano business registration" schema={schema} />
 
-      <div className="min-h-screen flex flex-col">
-        <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
-        <div className="fixed inset-0 bg-mesh pointer-events-none" />
+      <div className="min-h-screen flex flex-col bg-background bg-ambient">
+        <LavaLampBackground />
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">
