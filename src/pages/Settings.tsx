@@ -117,7 +117,7 @@ const getEventIcon = (eventType: string) => {
   switch (eventType) {
     case 'login':
     case 'login_success':
-      return <LogIn className="h-4 w-4 text-green-500" />;
+      return <LogIn className="h-4 w-4 text-success" />;
     case 'login_failed':
       return <XCircle className="h-4 w-4 text-destructive" />;
     case 'password_change':
