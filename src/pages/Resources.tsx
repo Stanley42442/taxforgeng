@@ -126,7 +126,7 @@ const Resources = () => {
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">In-Depth Guides</h2>
                 <div className="grid gap-3 md:grid-cols-2">
                   {guides.map((g) => (
-                    <Link key={g.to} to={g.to} className="glass-frosted rounded-xl p-4 hover-lift transition-all group">
+                    <Link key={g.to} to={g.to} className="rounded-lg border border-border bg-card p-4 hover:border-primary/40 transition-all group">
                       <span className="font-semibold text-foreground group-hover:text-primary transition-colors text-sm flex items-center gap-2">
                         {g.title} <ArrowRight className="h-3 w-3" />
                       </span>

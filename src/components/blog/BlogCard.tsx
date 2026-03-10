@@ -14,7 +14,7 @@ export interface BlogPostMeta {
 export const BlogCard = ({ slug, title, excerpt, date, category, readTime }: BlogPostMeta) => (
   <Link
     to={`/blog/${slug}`}
-    className="glass-frosted rounded-2xl p-6 hover-lift transition-all group flex flex-col"
+    className="rounded-xl border border-border bg-card p-6 hover:border-primary/40 hover:shadow-md transition-all group flex flex-col"
   >
     <div className="flex items-center gap-2 mb-3">
       <Badge variant="outline" className="text-xs">{category}</Badge>
