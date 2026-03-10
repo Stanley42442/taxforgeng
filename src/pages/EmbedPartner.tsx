@@ -549,7 +549,7 @@ export default function EmbedPartner() {
           </div>
 
           {submitted ? (
-            <Card className="text-center py-10">
+            <Card className="glass-frosted text-center py-10 shadow-futuristic">
               <CardContent>
                 <div className="h-16 w-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
                   <Check className="h-8 w-8 text-success" />
