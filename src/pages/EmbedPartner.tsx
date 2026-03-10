@@ -564,7 +564,7 @@ export default function EmbedPartner() {
               </CardContent>
             </Card>
           ) : (
-            <Card>
+            <Card className="glass-frosted shadow-futuristic">
               <CardContent className="pt-6">
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid sm:grid-cols-2 gap-4">
