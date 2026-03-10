@@ -111,7 +111,7 @@ const Resources = () => {
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">Online Tax Tools</h2>
                 <div className="grid gap-4 md:grid-cols-3">
                   {tools.map((tool) => (
-                    <Link key={tool.to} to={tool.to} className="glass-frosted rounded-xl p-5 hover-lift transition-all group">
+                    <Link key={tool.to} to={tool.to} className="rounded-lg border border-border bg-card p-5 hover:border-primary/40 transition-all group">
                       <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors flex items-center gap-2">
                         {tool.title} <ArrowRight className="h-3 w-3" />
                       </h3>
