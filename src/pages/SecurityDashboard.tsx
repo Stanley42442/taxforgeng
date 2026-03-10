@@ -1019,7 +1019,7 @@ const SecurityDashboard = () => {
                                   <Badge variant="destructive" className="text-[10px] h-5 px-1.5">Blocked</Badge>
                                 )}
                                 {device.is_trusted && !device.is_blocked && (
-                                  <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50 dark:bg-green-900/20 text-[10px] h-5 px-1.5">Trusted</Badge>
+                                  <Badge variant="outline" className="text-success border-success/30 bg-success/10 text-[10px] h-5 px-1.5">Trusted</Badge>
                                 )}
                               </div>
                               
