@@ -1294,8 +1294,8 @@ const SecurityDashboard = () => {
                           key={event.id}
                           className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
                         >
-                          <div className="h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                            <LogIn className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                          <div className="h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-full bg-success/10 flex items-center justify-center">
+                            <LogIn className="h-4 w-4 sm:h-5 sm:w-5 text-success" />
                           </div>
                           <div className="flex-1 min-w-0 overflow-hidden">
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
