@@ -338,8 +338,8 @@ export default function EmbedPartner() {
       </section>
 
       {/* ─── Live Demo ─── */}
-      <section id="demo" className="py-16 bg-secondary/20">
-        <div className="container mx-auto px-4 max-w-2xl">
+      <section id="demo" className="py-16">
+        <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
             <Badge variant="outline" className="mb-3 gap-1.5 text-success border-success/40 bg-success/10">
               <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
