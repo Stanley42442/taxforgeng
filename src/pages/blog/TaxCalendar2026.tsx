@@ -130,7 +130,7 @@ const TaxCalendar2026 = () => {
             { month: 'November', items: ['Oct PAYE remittance — Nov 10', 'Oct VAT return — Nov 21'] },
             { month: 'December', items: ['Nov PAYE remittance — Dec 10', 'CIT Q4 instalment — Dec 31', 'Nov VAT return — Dec 21'] },
           ].map((m) => (
-            <div key={m.month} className="glass-frosted rounded-xl p-4">
+            <div key={m.month} className="rounded-xl border border-border bg-card p-4">
               <h3 className="font-bold text-foreground mb-2">{m.month}</h3>
               <ul className="space-y-1 text-sm text-muted-foreground">
                 {m.items.map((item, i) => (<li key={i}>• {item}</li>))}
