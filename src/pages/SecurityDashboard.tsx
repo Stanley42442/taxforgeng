@@ -782,13 +782,13 @@ const SecurityDashboard = () => {
                 </div>
                 <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
                   stats.mfaEnabled 
-                    ? 'bg-green-100 dark:bg-green-900/30' 
-                    : 'bg-amber-100 dark:bg-amber-900/30'
+                    ? 'bg-success/10' 
+                    : 'bg-warning/10'
                 }`}>
                   <Smartphone className={`h-6 w-6 ${
                     stats.mfaEnabled 
-                      ? 'text-green-600' 
-                      : 'text-amber-600'
+                      ? 'text-success' 
+                      : 'text-warning'
                   }`} />
                 </div>
               </div>
