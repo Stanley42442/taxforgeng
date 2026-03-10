@@ -666,8 +666,8 @@ export default function EmbedPartner() {
       </section>
 
       {/* ─── Footer CTA ─── */}
-      <section className="py-12 border-t border-border">
-        <div className="container mx-auto px-4 text-center max-w-2xl">
+      <section className="py-12">
+        <div className="text-center max-w-2xl mx-auto">
           <p className="text-muted-foreground text-sm mb-4">
             Already have an account? Access advanced tools, payroll, invoicing and AI tax advice.
           </p>
