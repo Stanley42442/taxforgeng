@@ -914,4 +914,81 @@ html, body, #root {
     background: hsl(var(--primary) / 0.25);
     color: hsl(var(--foreground));
   }
+
+  /* Glassmorphism refinements for dark mode */
+  .glass {
+    background: hsl(var(--card) / 0.6);
+    border-color: hsl(var(--border) / 0.5);
+    box-shadow: var(--shadow-md), inset 0 1px 0 hsl(0 0% 100% / 0.04);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .glass-subtle {
+    background: hsl(var(--card) / 0.35);
+    border-color: hsl(var(--border) / 0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .glass-frosted {
+    background: hsl(var(--card) / 0.45);
+    border-color: hsl(var(--border) / 0.4);
+    box-shadow: var(--shadow-md), inset 0 1px 0 hsl(0 0% 100% / 0.06);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .glass-dark {
+    background: hsl(var(--muted) / 0.5);
+    border-color: hsl(var(--border) / 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* Glow refinements — subtle luminous edges in dark mode */
+  .glow-sm {
+    box-shadow: var(--shadow-sm), 0 0 8px hsl(var(--primary) / 0.08);
+  }
+
+  .glow-md {
+    box-shadow: var(--shadow-md), 0 0 12px hsl(var(--primary) / 0.1);
+  }
+
+  .glow-lg {
+    box-shadow: var(--shadow-lg), 0 0 20px hsl(var(--primary) / 0.12);
+  }
+
+  .glow-primary {
+    box-shadow: var(--shadow-md), 0 0 16px hsl(var(--primary) / 0.15);
+  }
+
+  .glow-accent {
+    box-shadow: var(--shadow-md), 0 0 16px hsl(var(--accent) / 0.12);
+  }
+
+  /* Futuristic shadow — soft colored ambient glow */
+  .shadow-futuristic {
+    box-shadow:
+      0 2px 8px hsl(0 0% 0% / 0.3),
+      0 0 20px hsl(var(--primary) / 0.06),
+      inset 0 1px 0 hsl(0 0% 100% / 0.04);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-lg), 0 0 16px hsl(var(--primary) / 0.1);
+  }
+
+  /* Card hover glow in dark mode */
+  .card-hover-glow:hover {
+    box-shadow: var(--shadow-lg), 0 0 12px hsl(var(--primary) / 0.08);
+  }
+
+  .hover-glow-primary:hover {
+    box-shadow: var(--shadow-lg), 0 0 16px hsl(var(--primary) / 0.12);
+  }
+
+  .hover-glow-accent:hover {
+    box-shadow: var(--shadow-lg), 0 0 16px hsl(var(--accent) / 0.1);
+  }
 }
