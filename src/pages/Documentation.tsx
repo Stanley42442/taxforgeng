@@ -356,7 +356,7 @@ const Documentation = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <Card className="border-border/50">
               <CardHeader>
                 <CardTitle>Key Differentiators</CardTitle>
               </CardHeader>
