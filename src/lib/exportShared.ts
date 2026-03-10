@@ -750,20 +750,32 @@ export function addStatusBadge(
   };
   
   const icons: Record<string, string> = {
-    success: '\u2713', // ✓
-    warning: '\u26A0', // ⚠
-    info: '\u2139',    // ℹ
-    danger: '\u2717',  // ✗
+    success: '\u2713', // ✓ (renders in Helvetica)
+    warning: '!',      // ASCII fallback (⚠ doesn't render)
+    info: 'i',         // ASCII fallback (ℹ doesn't render)
+    danger: 'x',       // ASCII fallback (✗ doesn't render)
   };
   
   const badgeWidth = doc.getTextWidth(text) + 20;
   doc.setFillColor(...colors[type]);
   doc.roundedRect(x, y, badgeWidth, 12, 2, 2, 'F');
   
+  // Draw icon circle for non-checkmark icons
+  if (type !== 'success') {
+    doc.setFillColor(...BRAND_COLORS.white);
+    doc.circle(x + 8, y + 6, 4, 'F');
+    doc.setTextColor(...colors[type]);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text(icons[type], x + 8, y + 8, { align: 'center' });
+  }
+  
   doc.setTextColor(...BRAND_COLORS.white);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
-  doc.text(`${icons[type]} ${text}`, x + badgeWidth / 2, y + 8, { align: 'center' });
+  const labelX = type !== 'success' ? x + 15 : x + badgeWidth / 2;
+  const labelAlign = type !== 'success' ? undefined : { align: 'center' as const };
+  doc.text(`${type === 'success' ? icons[type] + ' ' : ''}${text}`, labelX, y + 8, labelAlign || undefined);
 }
 
 /**
