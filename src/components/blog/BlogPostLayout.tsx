@@ -126,7 +126,7 @@ export const BlogPostLayout = ({
                   </h2>
                   <div className="space-y-4">
                     {faqs.map((faq, i) => (
-                      <div key={i} className="glass-frosted rounded-xl p-6">
+                      <div key={i} className="rounded-xl border border-border bg-card p-6">
                         <h3 className="text-lg font-semibold text-foreground mb-2">{faq.question}</h3>
                         <p className="text-muted-foreground text-sm">{faq.answer}</p>
                       </div>
