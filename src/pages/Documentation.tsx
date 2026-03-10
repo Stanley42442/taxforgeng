@@ -59,7 +59,7 @@ const StatCard = ({
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5 }}
   >
-    <Card className="relative overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm">
+    <Card className="relative overflow-hidden border-border/50">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent" />
       <CardContent className="relative p-6">
         <div className="flex items-center gap-4">
