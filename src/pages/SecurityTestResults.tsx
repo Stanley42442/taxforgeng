@@ -557,7 +557,7 @@ const SecurityTestResults = () => {
         <CardContent>
           <ul className="space-y-2 text-sm">
             <li className="flex items-start gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
+              <CheckCircle className="h-4 w-4 text-success mt-0.5" />
               <span>Enable leaked password protection in Supabase Auth settings</span>
             </li>
             <li className="flex items-start gap-2">
