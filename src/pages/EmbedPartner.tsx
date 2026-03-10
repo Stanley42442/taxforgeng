@@ -367,7 +367,7 @@ export default function EmbedPartner() {
             </TabsList>
 
             <TabsContent value="sdk">
-              <Card>
+              <Card className="glass-frosted">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">JavaScript SDK — recommended</CardTitle>
                   <CopyButton text={JS_SDK_SNIPPET} label="Copy Snippet" />
