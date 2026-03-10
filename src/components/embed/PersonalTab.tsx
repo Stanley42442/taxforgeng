@@ -38,7 +38,6 @@ const PersonalTab = ({ theme, borderRadius, onCalculate }: PersonalTabProps) => 
   const calculate = () => {
     setIsCalculating(true);
     setTimeout(() => {
-      // Cap pension at 8% of gross
       const cappedPension = Math.min(pension, grossSalary * 0.08);
       const rentRelief = Math.min(annualRent * 0.2, RENT_RELIEF_CAP);
       const totalDeductions = cappedPension + nhf + nhis + lifeInsurance + rentRelief + mortgageInterest;
@@ -74,8 +73,8 @@ const PersonalTab = ({ theme, borderRadius, onCalculate }: PersonalTabProps) => 
       <input type="text" inputMode="numeric" style={s.input} placeholder={placeholder}
         value={value ? `₦${formatWithCommas(value)}` : ''}
         onChange={(e) => handleInput(e, setter)}
-        onFocus={(e) => (e.target.style.borderColor = theme.primaryColor)}
-        onBlur={(e) => (e.target.style.borderColor = '#e5e7eb')}
+        onFocus={(e) => { e.target.style.borderColor = theme.primaryColor; e.target.style.boxShadow = s.inputFocus.boxShadow as string; e.target.style.backgroundColor = '#ffffff'; }}
+        onBlur={(e) => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none'; e.target.style.backgroundColor = '#fafbfc'; }}
       />
     </div>
   );
@@ -113,7 +112,7 @@ const PersonalTab = ({ theme, borderRadius, onCalculate }: PersonalTabProps) => 
       )}
 
       <button style={{ ...s.button, opacity: isCalculating ? 0.7 : 1 }} onClick={calculate} disabled={isCalculating}>
-        <Calculator size={18} />
+        <Calculator size={16} />
         {isCalculating ? 'Calculating...' : 'Calculate Tax'}
       </button>
 
@@ -121,6 +120,8 @@ const PersonalTab = ({ theme, borderRadius, onCalculate }: PersonalTabProps) => 
         <div style={s.resultCard}>
           <div style={s.resultTitle}>Total Annual Tax</div>
           <div style={s.resultValue}>{formatCurrency(result.totalTaxPayable)}</div>
+
+          <div style={s.resultDivider} />
 
           <div style={s.resultGrid}>
             <div style={s.resultItem}>
@@ -144,12 +145,12 @@ const PersonalTab = ({ theme, borderRadius, onCalculate }: PersonalTabProps) => 
           {/* PIT band breakdown */}
           {result.bands && result.bands.length > 0 && (
             <div style={{ marginTop: '16px' }}>
-              <div style={{ fontSize: '13px', fontWeight: '600', marginBottom: '8px', color: theme.textColor }}>
+              <div style={{ fontSize: '12px', fontWeight: '600', marginBottom: '8px', color: theme.textColor, textTransform: 'uppercase' as const, letterSpacing: '0.04em', opacity: 0.6 }}>
                 PIT Band Breakdown
               </div>
               {result.bands.map((band: any, i: number) => (
                 <div key={i} style={s.bandRow}>
-                  <span style={{ color: theme.textColor, opacity: 0.7 }}>{band.label} @ {band.rate}</span>
+                  <span style={{ color: theme.textColor, opacity: 0.6 }}>{band.label} @ {band.rate}</span>
                   <span style={{ fontWeight: '600', color: theme.textColor }}>{formatCurrency(band.tax)}</span>
                 </div>
               ))}

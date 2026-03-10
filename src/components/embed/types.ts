@@ -90,76 +90,109 @@ export const parseCurrencyInput = (value: string): number => {
   return numeric ? Number(numeric) : 0;
 };
 
+/** Converts hex #RRGGBB to "R, G, B" for rgba() usage */
+function hexToRgb(hex: string): string {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.substring(0, 2), 16);
+  const g = parseInt(h.substring(2, 4), 16);
+  const b = parseInt(h.substring(4, 6), 16);
+  return `${r}, ${g}, ${b}`;
+}
+
 export function getStyles(theme: PartnerTheme, borderRadius: number) {
+  const rgb = hexToRgb(theme.primaryColor);
+
   return {
     inputGroup: { marginBottom: '16px' } as React.CSSProperties,
     label: {
       display: 'block',
-      fontSize: '14px',
+      fontSize: '13px',
       fontWeight: '500',
       marginBottom: '6px',
       color: theme.textColor,
+      opacity: 0.7,
+      letterSpacing: '0.01em',
     } as React.CSSProperties,
     input: {
       width: '100%',
-      padding: '12px 16px',
-      borderRadius: `${borderRadius / 2}px`,
-      border: '1px solid #e5e7eb',
-      fontSize: '16px',
+      padding: '11px 14px',
+      borderRadius: `${Math.min(borderRadius / 2, 8)}px`,
+      border: '1px solid #e2e8f0',
+      fontSize: '15px',
       outline: 'none',
-      transition: 'border-color 0.2s',
+      transition: 'border-color 0.2s, box-shadow 0.2s',
       boxSizing: 'border-box' as const,
+      backgroundColor: '#fafbfc',
     } as React.CSSProperties,
+    inputFocus: {
+      borderColor: theme.primaryColor,
+      boxShadow: `0 0 0 3px rgba(${rgb}, 0.1)`,
+      backgroundColor: '#ffffff',
+    },
     button: {
       width: '100%',
-      padding: '14px',
-      borderRadius: `${borderRadius / 2}px`,
+      padding: '13px',
+      borderRadius: `${Math.min(borderRadius / 2, 8)}px`,
       backgroundColor: theme.primaryColor,
       color: '#ffffff',
-      fontSize: '16px',
+      fontSize: '15px',
       fontWeight: '600',
       border: 'none',
       cursor: 'pointer',
-      transition: 'opacity 0.2s',
+      transition: 'opacity 0.2s, transform 0.1s',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       gap: '8px',
+      letterSpacing: '0.01em',
     } as React.CSSProperties,
     resultCard: {
       marginTop: '24px',
       padding: '20px',
-      borderRadius: `${borderRadius / 2}px`,
-      backgroundColor: `${theme.primaryColor}10`,
-      border: `1px solid ${theme.primaryColor}30`,
+      borderRadius: `${Math.min(borderRadius / 2, 8)}px`,
+      backgroundColor: theme.backgroundColor,
+      border: '1px solid #e2e8f0',
     } as React.CSSProperties,
     resultTitle: {
-      fontSize: '14px',
+      fontSize: '13px',
       color: theme.textColor,
-      opacity: 0.7,
+      opacity: 0.6,
       marginBottom: '4px',
+      fontWeight: '500',
+      textTransform: 'uppercase' as const,
+      letterSpacing: '0.05em',
     } as React.CSSProperties,
     resultValue: {
-      fontSize: '28px',
+      fontSize: '32px',
       fontWeight: '700',
       color: theme.primaryColor,
+      letterSpacing: '-0.02em',
+    } as React.CSSProperties,
+    resultDivider: {
+      height: '1px',
+      backgroundColor: '#e2e8f0',
+      margin: '16px 0',
     } as React.CSSProperties,
     resultGrid: {
       display: 'grid',
       gridTemplateColumns: '1fr 1fr',
-      gap: '12px',
+      gap: '10px',
       marginTop: '16px',
     } as React.CSSProperties,
     resultItem: {
-      padding: '10px',
-      borderRadius: `${borderRadius / 3}px`,
-      backgroundColor: theme.backgroundColor,
-      border: '1px solid #e5e7eb',
+      padding: '10px 12px',
+      borderRadius: `${Math.min(borderRadius / 3, 6)}px`,
+      backgroundColor: '#f8fafc',
+      border: '1px solid #f1f5f9',
     } as React.CSSProperties,
     resultItemLabel: {
-      fontSize: '12px',
+      fontSize: '11px',
       color: theme.textColor,
-      opacity: 0.6,
+      opacity: 0.5,
+      fontWeight: '500',
+      textTransform: 'uppercase' as const,
+      letterSpacing: '0.04em',
+      marginBottom: '2px',
     } as React.CSSProperties,
     resultItemValue: {
       fontSize: '15px',
@@ -174,14 +207,37 @@ export function getStyles(theme: PartnerTheme, borderRadius: number) {
       color: theme.primaryColor,
       textDecoration: 'none',
       fontWeight: '500',
+      padding: '10px',
+      borderRadius: `${Math.min(borderRadius / 3, 6)}px`,
+      border: `1px solid rgba(${rgb}, 0.2)`,
+      transition: 'background-color 0.2s',
     } as React.CSSProperties,
     bandRow: {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      padding: '6px 0',
+      padding: '7px 0',
       fontSize: '13px',
-      borderBottom: '1px solid #f3f4f6',
+      borderBottom: '1px solid #f1f5f9',
+    } as React.CSSProperties,
+    badgeSuccess: {
+      marginTop: '12px',
+      padding: '10px 14px',
+      borderRadius: `${Math.min(borderRadius / 3, 6)}px`,
+      backgroundColor: '#f0fdf4',
+      border: '1px solid #bbf7d0',
+      fontSize: '13px',
+      color: '#166534',
+      fontWeight: '500',
+    } as React.CSSProperties,
+    badgeWarning: {
+      marginTop: '12px',
+      padding: '10px 14px',
+      borderRadius: `${Math.min(borderRadius / 3, 6)}px`,
+      backgroundColor: '#fffbeb',
+      border: '1px solid #fde68a',
+      fontSize: '12px',
+      color: '#92400e',
     } as React.CSSProperties,
   };
 }
