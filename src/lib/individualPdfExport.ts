@@ -184,7 +184,7 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
   // === RELIEFS SECTION ===
   if (result.reliefs && result.reliefs.length > 0) {
     y = checkPageBreak(doc, y, 100, () => margin + 20);
-    y = addSectionTitle(doc, 'Tax Reliefs & Allowances', y);
+    y = addAccentSectionHeader(doc, 'TAX RELIEFS & ALLOWANCES', y, 'green');
 
     // Define column structure with explicit widths for proper text wrapping
     const reliefTypeCol = { x: margin, width: 50 };
