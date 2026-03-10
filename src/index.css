@@ -418,8 +418,9 @@ body {
       lava-float var(--rise-duration, 18s) ease-in-out infinite,
       lava-drift var(--drift-duration, 24s) ease-in-out infinite,
       lava-morph var(--morph-duration, 20s) ease-in-out infinite,
-      lava-color var(--color-duration, 10s) ease-in-out infinite alternate;
-    will-change: transform, border-radius, background-color;
+      lava-color var(--color-duration, 10s) ease-in-out infinite alternate,
+      lava-depth var(--z-duration, 30s) ease-in-out infinite;
+    will-change: transform, border-radius, background-color, z-index;
   }
 
   .dark .lava-blob {
@@ -447,10 +448,17 @@ body {
 
   @keyframes lava-drift {
     0%, 100% { margin-left: 0; }
-    20% { margin-left: 6%; }
-    40% { margin-left: -4%; }
-    60% { margin-left: 8%; }
-    80% { margin-left: -6%; }
+    15% { margin-left: 12%; }
+    35% { margin-left: -8%; }
+    55% { margin-left: 15%; }
+    75% { margin-left: -12%; }
+  }
+
+  @keyframes lava-depth {
+    0%, 100% { z-index: 1; }
+    25% { z-index: 3; }
+    50% { z-index: 2; }
+    75% { z-index: 1; }
   }
 
   @keyframes lava-morph {
