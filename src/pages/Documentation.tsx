@@ -59,7 +59,7 @@ const StatCard = ({
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5 }}
   >
-    <Card className="relative overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm">
+    <Card className="relative overflow-hidden border-border/50">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent" />
       <CardContent className="relative p-6">
         <div className="flex items-center gap-4">
@@ -93,7 +93,7 @@ const FeatureCard = ({
   description: string; 
   features: string[];
 }) => (
-  <Card className="h-full border-border/50 bg-card/50 backdrop-blur-sm">
+  <Card className="h-full border-border/50">
     <CardHeader>
       <div className="flex items-center gap-3">
         <div className="rounded-lg bg-primary/10 p-2">
@@ -129,7 +129,7 @@ const PricingTier = ({
   features: string[];
   popular?: boolean;
 }) => (
-  <Card className={`relative border-border/50 bg-card/50 backdrop-blur-sm ${popular ? 'ring-2 ring-primary' : ''}`}>
+  <Card className={`relative border-border/50 ${popular ? 'ring-2 ring-primary' : ''}`}>
     {popular && (
       <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
         Most Popular
@@ -298,7 +298,7 @@ const Documentation = () => {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-8">
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <Card className="border-border/50">
               <CardHeader>
                 <CardTitle>Executive Summary</CardTitle>
               </CardHeader>
@@ -356,7 +356,7 @@ const Documentation = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <Card className="border-border/50">
               <CardHeader>
                 <CardTitle>Key Differentiators</CardTitle>
               </CardHeader>
@@ -439,7 +439,7 @@ const Documentation = () => {
 
           {/* Pricing Tab */}
           <TabsContent value="pricing" className="space-y-6">
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm mb-6">
+            <Card className="border-border/50 mb-6">
               <CardContent className="py-4">
                 <p className="text-center text-muted-foreground">
                   <CreditCard className="h-4 w-4 inline mr-2" />
@@ -526,7 +526,7 @@ const Documentation = () => {
           {/* Technical Tab */}
           <TabsContent value="technical" className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
-              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+              <Card className="border-border/50">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Code className="h-5 w-5 text-primary" />
@@ -545,7 +545,7 @@ const Documentation = () => {
                   </ul>
                 </CardContent>
               </Card>
-              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+              <Card className="border-border/50">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <LayoutDashboard className="h-5 w-5 text-primary" />
@@ -565,7 +565,7 @@ const Documentation = () => {
               </Card>
             </div>
 
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <Card className="border-border/50">
               <CardHeader>
                 <CardTitle>Database Schema (25+ Tables)</CardTitle>
               </CardHeader>
@@ -583,7 +583,7 @@ const Documentation = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <Card className="border-border/50">
               <CardHeader>
                 <CardTitle>Edge Functions (17 Serverless Functions)</CardTitle>
               </CardHeader>
@@ -613,7 +613,7 @@ const Documentation = () => {
 
           {/* Security Tab */}
           <TabsContent value="security" className="space-y-6">
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <Card className="border-border/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Lock className="h-5 w-5 text-primary" />

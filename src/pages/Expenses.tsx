@@ -1423,7 +1423,7 @@ const Expenses = () => {
                   <div 
                     key={item.id} 
                     className={`flex items-center justify-between p-3 rounded-lg border ${
-                      item.isDueSoon ? 'bg-warning/10 border-warning/30' : 'bg-card/50 border-border/50'
+                      item.isDueSoon ? 'bg-warning/10 border-warning/30' : 'bg-card border-border/50'
                     }`}
                   >
                     <div className="flex items-center gap-3 min-w-0">
@@ -1463,7 +1463,7 @@ const Expenses = () => {
                 Month-over-Month Comparison
               </h3>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-lg bg-card/50 border border-border/50">
+                <div className="p-4 rounded-lg bg-card border border-border/50">
                   <p className="text-xs text-muted-foreground mb-1">Expenses</p>
                   <div className="flex items-center gap-2">
                     {monthComparison.expenseChange > 0 ? (
@@ -1479,7 +1479,7 @@ const Expenses = () => {
                     {formatCurrency(monthComparison.current.expenses)} vs {formatCurrency(monthComparison.previous.expenses)}
                   </p>
                 </div>
-                <div className="p-4 rounded-lg bg-card/50 border border-border/50">
+                <div className="p-4 rounded-lg bg-card border border-border/50">
                   <p className="text-xs text-muted-foreground mb-1">Income</p>
                   <div className="flex items-center gap-2">
                     {monthComparison.incomeChange > 0 ? (
@@ -1506,7 +1506,7 @@ const Expenses = () => {
 
           {/* Budget Alert */}
           {monthlyBudget > 0 && (
-            <div className={`rounded-xl p-4 mb-6 border ${isBudgetExceeded ? 'bg-destructive/10 border-destructive/30' : 'bg-card/50 border-border/50'}`}>
+            <div className={`rounded-xl p-4 mb-6 border ${isBudgetExceeded ? 'bg-destructive/10 border-destructive/30' : 'bg-card border-border/50'}`}>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   {isBudgetExceeded ? (
@@ -1554,7 +1554,7 @@ const Expenses = () => {
                   const isEditing = editingGoalBusiness === business.id;
                   
                   return (
-                    <div key={business.id} className="p-4 rounded-xl bg-card/50 border border-border/50">
+                    <div key={business.id} className="p-4 rounded-xl bg-card border border-border/50">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <span className="text-lg">🏢</span>
@@ -1725,7 +1725,7 @@ const Expenses = () => {
               </div>
               <div className="space-y-3">
                 {sortedMonths.map(([key, data]) => (
-                  <div key={key} className="bg-card/50 border border-border/50 rounded-lg p-4 overflow-hidden">
+                  <div key={key} className="bg-card border border-border/50 rounded-lg p-4 overflow-hidden">
                     <p className="font-medium text-foreground mb-2">{data.monthName}</p>
                     <div className="grid grid-cols-3 gap-2 text-sm">
                       <div className="min-w-0">
