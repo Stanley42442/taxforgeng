@@ -65,7 +65,7 @@ const WHTExplained = () => {
 
       <section id="rates">
         <h2 className="text-2xl font-bold text-foreground mb-4">WHT Rates by Payment Type</h2>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -96,7 +96,7 @@ const WHTExplained = () => {
 
       <section id="how-it-works">
         <h2 className="text-2xl font-bold text-foreground mb-4">How WHT Works</h2>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Worked Example</h3>
           <p className="text-sm text-muted-foreground mb-2">Company A hires Company B for consulting at ₦2,000,000:</p>
           <div className="text-sm text-muted-foreground space-y-1">
@@ -116,11 +116,11 @@ const WHTExplained = () => {
           Under the 2026 rules, WHT treatment depends on the recipient type and income category:
         </p>
         <div className="grid gap-4 md:grid-cols-2 mb-4">
-          <div className="glass-frosted rounded-xl p-5 border-l-4 border-primary">
+          <div className="rounded-xl border border-border bg-card p-5 border-l-4 border-primary">
             <h3 className="font-semibold text-foreground mb-2">WHT as Credit (Companies)</h3>
             <p className="text-sm text-muted-foreground">WHT on trading transactions (contracts, supplies) is a credit against CIT. The company includes the gross income in its tax return and offsets the WHT credit.</p>
           </div>
-          <div className="glass-frosted rounded-xl p-5 border-l-4 border-success">
+          <div className="rounded-xl border border-border bg-card p-5 border-l-4 border-success">
             <h3 className="font-semibold text-foreground mb-2">WHT as Final Tax (Individuals)</h3>
             <p className="text-sm text-muted-foreground">For individuals receiving dividends, interest, or rent, the WHT deducted is now the final tax — no additional assessment or filing is needed for those income streams.</p>
           </div>
@@ -142,7 +142,7 @@ const WHTExplained = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           WHT must be remitted to NRS within <strong className="text-foreground">21 days</strong> from the date of deduction. Late remittance attracts 10% per annum interest on the unremitted amount.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Remittance Steps</h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
             {[
@@ -178,7 +178,7 @@ const WHTExplained = () => {
             { mistake: 'Not issuing credit notes', fix: 'Failure to issue credit notes within 30 days leaves the recipient unable to claim their credit. This damages business relationships and creates compliance issues.' },
             { mistake: 'Forgetting to apply DTA rates', fix: 'For payments to treaty countries, the DTA rate (often lower) should be applied instead of the domestic rate.' },
           ].map((item, i) => (
-            <div key={i} className="glass-frosted rounded-xl p-5 border-l-4 border-warning/60">
+            <div key={i} className="rounded-xl border border-border bg-card p-5 border-l-4 border-warning/60">
               <h3 className="font-semibold text-foreground text-sm mb-1">{item.mistake}</h3>
               <p className="text-sm text-muted-foreground">{item.fix}</p>
             </div>

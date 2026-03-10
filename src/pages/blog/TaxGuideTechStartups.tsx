@@ -61,7 +61,7 @@ const TaxGuideTechStartups = () => {
             { tax: 'WHT', rate: '5-10%', desc: 'Deducted on payments for services, dividends, interest, and rent.' },
             { tax: 'PAYE', rate: '0-25%', desc: 'Personal income tax on employee salaries, deducted monthly.' },
           ].map((item) => (
-            <div key={item.tax} className="glass-frosted rounded-xl p-5">
+            <div key={item.tax} className="rounded-xl border border-border bg-card p-5">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-lg font-bold text-foreground">{item.tax}</span>
                 <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{item.rate}</span>
@@ -83,7 +83,7 @@ const TaxGuideTechStartups = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           Most early-stage tech startups — from fintech MVPs to SaaS platforms to e-commerce ventures — comfortably qualify. The threshold was doubled from ₦25 million in the 2026 reforms, making this benefit accessible to many more companies.
         </p>
-        <div className="glass-frosted rounded-xl p-5 border-l-4 border-success mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 border-l-4 border-success mb-4">
           <h3 className="font-semibold text-foreground mb-2">Example: Pre-Revenue Startup</h3>
           <p className="text-sm text-muted-foreground">
             A recently incorporated fintech with ₦0 revenue, ₦5M in seed funding spent on development, and ₦8M in assets. <strong className="text-foreground">Result:</strong> Qualifies for 0% CIT. Since there are no assessable profits, the Development Levy is also ₦0. Total tax: ₦0.
@@ -102,7 +102,7 @@ const TaxGuideTechStartups = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           Once your turnover crosses ₦25 million, you must register for VAT within 6 months. At that point, you charge 7.5% VAT on vatable services (which includes most tech services and SaaS subscriptions), file monthly returns, and can claim input VAT on business purchases.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-2">VAT-Exempt Items Relevant to Tech</h3>
           <ul className="text-sm text-muted-foreground space-y-1">
             <li>• Educational technology services (may qualify for exemption)</li>
@@ -127,7 +127,7 @@ const TaxGuideTechStartups = () => {
           <li className="flex items-start gap-2"><span className="text-primary">•</span>Renewable energy technology</li>
           <li className="flex items-start gap-2"><span className="text-primary">•</span>Manufacturing (including hardware)</li>
         </ul>
-        <div className="glass-frosted rounded-xl p-5 border-l-4 border-primary mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 border-l-4 border-primary mb-4">
           <h3 className="font-semibold text-foreground mb-2">2026 Update: Economic Development Incentive (EDI)</h3>
           <p className="text-sm text-muted-foreground mb-2">
             Under the Nigeria Tax Act 2025 (effective 2026), Pioneer Status is replaced by the <strong className="text-foreground">Economic Development Incentive (EDI)</strong>. Instead of a full tax holiday, EDI provides a <strong className="text-foreground">5% annual tax credit for 5 years</strong> on qualifying capital expenditure in designated sectors.
@@ -197,7 +197,7 @@ const TaxGuideTechStartups = () => {
             { mistake: 'Missing the VAT registration trigger', fix: 'Monitor your rolling 12-month turnover. Register for VAT within 6 months of crossing ₦25M.' },
             { mistake: 'Not documenting expenses properly', fix: 'Keep receipts and invoices for all business expenses. Unsubstantiated deductions can be disallowed by NRS.' },
           ].map((item, i) => (
-            <div key={i} className="glass-frosted rounded-xl p-5 border-l-4 border-warning/60">
+            <div key={i} className="rounded-xl border border-border bg-card p-5 border-l-4 border-warning/60">
               <h3 className="font-semibold text-foreground text-sm mb-1">❌ {item.mistake}</h3>
               <p className="text-sm text-muted-foreground">✅ {item.fix}</p>
             </div>

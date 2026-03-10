@@ -52,7 +52,7 @@ const PITPAYEGuide2026 = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           The Nigeria Tax Act 2025 introduced a completely new set of Personal Income Tax bands effective January 2026. The most significant change is the ₦800,000 tax-free threshold, which replaces the old graduated relief system.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -98,7 +98,7 @@ const PITPAYEGuide2026 = () => {
 
       <section id="old-vs-new">
         <h2 className="text-2xl font-bold text-foreground mb-4">Old vs New Comparison</h2>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -156,7 +156,7 @@ const PITPAYEGuide2026 = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           The 2026 Rent Relief replaces the old Consolidated Relief Allowance (CRA). It's simpler but requires actual rent payments. You can deduct 20% of your annual rent from your taxable income, with a maximum deduction of ₦500,000.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Rent Relief Examples</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -207,7 +207,7 @@ const PITPAYEGuide2026 = () => {
             { mistake: 'Forgetting pension deduction', fix: 'Pension contributions (8% employee) are deducted before applying tax bands. Missing this overstates your tax.' },
             { mistake: 'Mixing up monthly and annual figures', fix: 'Tax bands are annual. Divide annual tax by 12 for the monthly PAYE figure.' },
           ].map((item, i) => (
-            <div key={i} className="glass-frosted rounded-xl p-5 border-l-4 border-warning/60">
+            <div key={i} className="rounded-xl border border-border bg-card p-5 border-l-4 border-warning/60">
               <h3 className="font-semibold text-foreground text-sm mb-1">❌ {item.mistake}</h3>
               <p className="text-sm text-muted-foreground">✅ {item.fix}</p>
             </div>

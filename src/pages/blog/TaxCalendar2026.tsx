@@ -62,7 +62,7 @@ const TaxCalendar2026 = () => {
       <section id="monthly">
         <h2 className="text-2xl font-bold text-foreground mb-4">Monthly Obligations</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">These obligations recur every month and are the most frequent compliance requirements:</p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-border"><th className="text-left py-2 text-foreground font-semibold">Obligation</th><th className="text-left py-2 text-foreground font-semibold">Due Date</th><th className="text-left py-2 text-foreground font-semibold">Authority</th></tr></thead>
@@ -80,7 +80,7 @@ const TaxCalendar2026 = () => {
 
       <section id="quarterly">
         <h2 className="text-2xl font-bold text-foreground mb-4">Quarterly Deadlines</h2>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-border"><th className="text-left py-2 text-foreground font-semibold">Obligation</th><th className="text-left py-2 text-foreground font-semibold">Q1</th><th className="text-left py-2 text-foreground font-semibold">Q2</th><th className="text-left py-2 text-foreground font-semibold">Q3</th><th className="text-left py-2 text-foreground font-semibold">Q4</th></tr></thead>
@@ -95,7 +95,7 @@ const TaxCalendar2026 = () => {
 
       <section id="annual">
         <h2 className="text-2xl font-bold text-foreground mb-4">Annual Deadlines</h2>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-border"><th className="text-left py-2 text-foreground font-semibold">Deadline</th><th className="text-left py-2 text-foreground font-semibold">Date (Dec Year-End)</th><th className="text-left py-2 text-foreground font-semibold">Notes</th></tr></thead>
@@ -130,7 +130,7 @@ const TaxCalendar2026 = () => {
             { month: 'November', items: ['Oct PAYE remittance — Nov 10', 'Oct VAT return — Nov 21'] },
             { month: 'December', items: ['Nov PAYE remittance — Dec 10', 'CIT Q4 instalment — Dec 31', 'Nov VAT return — Dec 21'] },
           ].map((m) => (
-            <div key={m.month} className="glass-frosted rounded-xl p-4">
+            <div key={m.month} className="rounded-xl border border-border bg-card p-4">
               <h3 className="font-bold text-foreground mb-2">{m.month}</h3>
               <ul className="space-y-1 text-sm text-muted-foreground">
                 {m.items.map((item, i) => (<li key={i}>• {item}</li>))}
@@ -142,7 +142,7 @@ const TaxCalendar2026 = () => {
 
       <section id="penalties">
         <h2 className="text-2xl font-bold text-foreground mb-4">Late Filing Penalties</h2>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-border"><th className="text-left py-2 text-foreground font-semibold">Tax Type</th><th className="text-left py-2 text-foreground font-semibold">Late Filing Penalty</th><th className="text-left py-2 text-foreground font-semibold">Late Payment Interest</th></tr></thead>
@@ -167,7 +167,7 @@ const TaxCalendar2026 = () => {
             { title: 'Keep records for 6 years', tip: 'NRS can audit tax returns going back 6 years. Maintain organised digital records of all invoices, receipts, and returns.' },
             { title: 'Reconcile monthly', tip: 'Don\'t wait until year-end. Reconcile your VAT, WHT, and PAYE records monthly to catch errors early.' },
           ].map((item, i) => (
-            <div key={i} className="glass-frosted rounded-xl p-5">
+            <div key={i} className="rounded-xl border border-border bg-card p-5">
               <h3 className="font-semibold text-foreground text-sm mb-1">{item.title}</h3>
               <p className="text-sm text-muted-foreground">{item.tip}</p>
             </div>

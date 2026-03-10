@@ -64,11 +64,11 @@ const SmallCompanyCITExemption = () => {
           To qualify for the Small Company Exemption under the 2026 rules, your company must meet <strong className="text-foreground">both</strong> of the following criteria:
         </p>
         <div className="grid gap-4 sm:grid-cols-2 mb-4">
-          <div className="glass-frosted rounded-xl p-5 border-l-4 border-success">
+          <div className="rounded-xl border border-border bg-card p-5 border-l-4 border-success">
             <h3 className="font-semibold text-foreground mb-2">Turnover Test</h3>
             <p className="text-sm text-muted-foreground">Annual gross turnover must be <strong className="text-foreground">₦50 million or less</strong></p>
           </div>
-          <div className="glass-frosted rounded-xl p-5 border-l-4 border-success">
+          <div className="rounded-xl border border-border bg-card p-5 border-l-4 border-success">
             <h3 className="font-semibold text-foreground mb-2">Asset Test</h3>
             <p className="text-sm text-muted-foreground">Total assets must be <strong className="text-foreground">₦250 million or less</strong></p>
           </div>
@@ -80,7 +80,7 @@ const SmallCompanyCITExemption = () => {
 
       <section id="old-vs-new">
         <h2 className="text-2xl font-bold text-foreground mb-4">Old vs New Thresholds</h2>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -127,7 +127,7 @@ const SmallCompanyCITExemption = () => {
       <section id="worked-examples">
         <h2 className="text-2xl font-bold text-foreground mb-4">Worked Examples</h2>
 
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-2">Example 1: Small Retail Business</h3>
           <p className="text-sm text-muted-foreground mb-2">A Lagos-based retail business with:</p>
           <ul className="text-sm text-muted-foreground space-y-1 mb-2">
@@ -139,7 +139,7 @@ const SmallCompanyCITExemption = () => {
           <p className="text-sm text-muted-foreground mt-1">Under old rules: would have paid 20% CIT (₦1,600,000) + 3% TET (₦240,000) = ₦1,840,000. <strong className="text-success">Saving: ₦1,840,000</strong>.</p>
         </div>
 
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-2">Example 2: Tech Startup</h3>
           <p className="text-sm text-muted-foreground mb-2">A fintech startup with:</p>
           <ul className="text-sm text-muted-foreground space-y-1 mb-2">
@@ -161,7 +161,7 @@ const SmallCompanyCITExemption = () => {
             { mistake: 'Assuming the Development Levy applies to small companies', fix: 'Small companies qualifying for 0% CIT are also exempt from the 4% Development Levy. The levy only applies to large companies.' },
             { mistake: 'Not tracking the asset threshold', fix: 'The ₦250M asset limit is new. If your business holds significant property, equipment, or IP, verify you\'re below this threshold.' },
           ].map((item, i) => (
-            <div key={i} className="glass-frosted rounded-xl p-5 border-l-4 border-warning/60">
+            <div key={i} className="rounded-xl border border-border bg-card p-5 border-l-4 border-warning/60">
               <h3 className="font-semibold text-foreground text-sm mb-1">❌ {item.mistake}</h3>
               <p className="text-sm text-muted-foreground">✅ {item.fix}</p>
             </div>

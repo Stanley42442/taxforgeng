@@ -55,7 +55,7 @@ const PayrollTaxGuide = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           As a Nigerian employer, you are responsible for deducting and remitting several taxes and contributions from your employees' salaries. These obligations apply regardless of your company size, though some levies have minimum employee thresholds.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Summary of Employer Obligations</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -78,7 +78,7 @@ const PayrollTaxGuide = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           Pay-As-You-Earn (PAYE) is the mechanism by which employers deduct income tax from employees' salaries. Under the 2026 rules, the tax-free threshold is ₦800,000 annually, which means most minimum-wage earners pay zero PAYE.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">2026 PIT Bands (Annual)</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -94,7 +94,7 @@ const PayrollTaxGuide = () => {
             </table>
           </div>
         </div>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Worked Example</h3>
           <p className="text-sm text-muted-foreground mb-2">Employee with ₦400,000 monthly gross (₦4,800,000 annual):</p>
           <div className="text-sm text-muted-foreground space-y-1">
@@ -154,7 +154,7 @@ const PayrollTaxGuide = () => {
 
       <section id="step-by-step">
         <h2 className="text-2xl font-bold text-foreground mb-4">Step-by-Step Monthly Payroll Process</h2>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <ul className="space-y-3 text-sm text-muted-foreground">
             {[
               'Calculate gross salary for each employee (basic + allowances + overtime + bonuses)',
@@ -178,7 +178,7 @@ const PayrollTaxGuide = () => {
 
       <section id="deadlines">
         <h2 className="text-2xl font-bold text-foreground mb-4">Filing Deadlines</h2>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-border"><th className="text-left py-2 text-foreground font-semibold">Obligation</th><th className="text-left py-2 text-foreground font-semibold">Deadline</th><th className="text-left py-2 text-foreground font-semibold">Penalty</th></tr></thead>

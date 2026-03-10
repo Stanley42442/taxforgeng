@@ -95,11 +95,11 @@ const PITMyths2026 = () => {
         <h2 className="text-2xl font-bold text-foreground mb-4">
           Myth 1: "The ₦800k Threshold Means I Pay No Tax"
         </h2>
-        <div className="glass-frosted rounded-xl p-6 mb-4">
+        <div className="rounded-xl border border-border bg-card p-6 mb-4">
           <p className="text-sm font-semibold text-destructive mb-1">❌ The Myth</p>
           <p className="text-muted-foreground text-sm">"If I earn under ₦800,000 I'm completely tax-free."</p>
         </div>
-        <div className="glass-frosted rounded-xl p-6">
+        <div className="rounded-xl border border-border bg-card p-6">
           <p className="text-sm font-semibold text-primary mb-1">✅ The Fact</p>
           <p className="text-muted-foreground text-sm">
             The ₦800,000 figure is a <strong className="text-foreground">0% tax band</strong>, not an exemption
@@ -120,11 +120,11 @@ const PITMyths2026 = () => {
         <h2 className="text-2xl font-bold text-foreground mb-4">
           Myth 2: "The CRA Still Applies in 2026"
         </h2>
-        <div className="glass-frosted rounded-xl p-6 mb-4">
+        <div className="rounded-xl border border-border bg-card p-6 mb-4">
           <p className="text-sm font-semibold text-destructive mb-1">❌ The Myth</p>
           <p className="text-muted-foreground text-sm">"I can still claim my 20% + ₦200,000 Consolidated Relief Allowance."</p>
         </div>
-        <div className="glass-frosted rounded-xl p-6">
+        <div className="rounded-xl border border-border bg-card p-6">
           <p className="text-sm font-semibold text-primary mb-1">✅ The Fact</p>
           <p className="text-muted-foreground text-sm">
             The CRA has been <strong className="text-foreground">completely abolished</strong> under the NTA 2025.
@@ -151,11 +151,11 @@ const PITMyths2026 = () => {
         <h2 className="text-2xl font-bold text-foreground mb-4">
           Myth 3: "Everyone Gets Rent Relief Automatically"
         </h2>
-        <div className="glass-frosted rounded-xl p-6 mb-4">
+        <div className="rounded-xl border border-border bg-card p-6 mb-4">
           <p className="text-sm font-semibold text-destructive mb-1">❌ The Myth</p>
           <p className="text-muted-foreground text-sm">"Rent Relief replaces CRA, so everyone gets it by default."</p>
         </div>
-        <div className="glass-frosted rounded-xl p-6">
+        <div className="rounded-xl border border-border bg-card p-6">
           <p className="text-sm font-semibold text-primary mb-1">✅ The Fact</p>
           <p className="text-muted-foreground text-sm">
             Rent Relief is <strong className="text-foreground">not automatic</strong>. To claim it, you must:
@@ -178,11 +178,11 @@ const PITMyths2026 = () => {
         <h2 className="text-2xl font-bold text-foreground mb-4">
           Myth 4: "Freelancers Don't Pay PIT"
         </h2>
-        <div className="glass-frosted rounded-xl p-6 mb-4">
+        <div className="rounded-xl border border-border bg-card p-6 mb-4">
           <p className="text-sm font-semibold text-destructive mb-1">❌ The Myth</p>
           <p className="text-muted-foreground text-sm">"PIT is only for salaried employees — freelancers and contractors are excluded."</p>
         </div>
-        <div className="glass-frosted rounded-xl p-6">
+        <div className="rounded-xl border border-border bg-card p-6">
           <p className="text-sm font-semibold text-primary mb-1">✅ The Fact</p>
           <p className="text-muted-foreground text-sm">
             Under the NTA 2025, <strong className="text-foreground">all income sources</strong> must be aggregated
@@ -202,11 +202,11 @@ const PITMyths2026 = () => {
         <h2 className="text-2xl font-bold text-foreground mb-4">
           Myth 5: "My Employer Handles Everything — I Don't Need to File"
         </h2>
-        <div className="glass-frosted rounded-xl p-6 mb-4">
+        <div className="rounded-xl border border-border bg-card p-6 mb-4">
           <p className="text-sm font-semibold text-destructive mb-1">❌ The Myth</p>
           <p className="text-muted-foreground text-sm">"PAYE is deducted at source, so I have no filing obligation."</p>
         </div>
-        <div className="glass-frosted rounded-xl p-6">
+        <div className="rounded-xl border border-border bg-card p-6">
           <p className="text-sm font-semibold text-primary mb-1">✅ The Fact</p>
           <p className="text-muted-foreground text-sm">
             While employers remit PAYE monthly, you may still need to file a personal return if you:
@@ -229,11 +229,11 @@ const PITMyths2026 = () => {
         <h2 className="text-2xl font-bold text-foreground mb-4">
           Myth 6: "Minimum Wage Earners Are Fully Exempt"
         </h2>
-        <div className="glass-frosted rounded-xl p-6 mb-4">
+        <div className="rounded-xl border border-border bg-card p-6 mb-4">
           <p className="text-sm font-semibold text-destructive mb-1">❌ The Myth</p>
           <p className="text-muted-foreground text-sm">"Earning ₦70,000/month means I pay absolutely nothing."</p>
         </div>
-        <div className="glass-frosted rounded-xl p-6">
+        <div className="rounded-xl border border-border bg-card p-6">
           <p className="text-sm font-semibold text-primary mb-1">✅ The Fact</p>
           <p className="text-muted-foreground text-sm">
             The NTA 2025 exempts minimum wage earners (₦70,000/month, ₦840,000/year) from
@@ -256,11 +256,11 @@ const PITMyths2026 = () => {
         <h2 className="text-2xl font-bold text-foreground mb-4">
           Myth 7: "The Old 6-Band Rates (7%–24%) Still Work"
         </h2>
-        <div className="glass-frosted rounded-xl p-6 mb-4">
+        <div className="rounded-xl border border-border bg-card p-6 mb-4">
           <p className="text-sm font-semibold text-destructive mb-1">❌ The Myth</p>
           <p className="text-muted-foreground text-sm">"The tax bands haven't really changed — it's still 7%, 11%, 15%, 19%, 21%, 24%."</p>
         </div>
-        <div className="glass-frosted rounded-xl p-6">
+        <div className="rounded-xl border border-border bg-card p-6">
           <p className="text-sm font-semibold text-primary mb-1">✅ The Fact</p>
           <p className="text-muted-foreground text-sm">
             The 2026 PIT bands are completely restructured:
@@ -298,28 +298,28 @@ const PITMyths2026 = () => {
           most misunderstood. Here's what you need to know:
         </p>
         <div className="grid gap-4 sm:grid-cols-2 mt-4">
-          <div className="glass-frosted rounded-xl p-5">
+          <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="font-semibold text-foreground text-sm mb-2">What It Is</h3>
             <p className="text-muted-foreground text-sm">
               A tax deduction of up to <strong className="text-foreground">₦500,000/year</strong> on rent
               paid for your primary residence. It reduces your taxable income, not your tax directly.
             </p>
           </div>
-          <div className="glass-frosted rounded-xl p-5">
+          <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="font-semibold text-foreground text-sm mb-2">Who Qualifies</h3>
             <p className="text-muted-foreground text-sm">
               Any individual who pays rent on their primary home. You must provide evidence of actual
               rent payments — a tenancy agreement alone is not sufficient without proof of payment.
             </p>
           </div>
-          <div className="glass-frosted rounded-xl p-5">
+          <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="font-semibold text-foreground text-sm mb-2">How to Claim</h3>
             <p className="text-muted-foreground text-sm">
               Declare during self-assessment filing, or submit documentation to your employer for PAYE
               adjustment. Keep rent receipts, bank transfer records, and your tenancy agreement.
             </p>
           </div>
-          <div className="glass-frosted rounded-xl p-5">
+          <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="font-semibold text-foreground text-sm mb-2">Tax Savings Example</h3>
             <p className="text-muted-foreground text-sm">
               If you pay ₦1.2M/year in rent, you can deduct ₦500,000. At a marginal rate of 21%, that's

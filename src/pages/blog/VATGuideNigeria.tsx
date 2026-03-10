@@ -68,7 +68,7 @@ const VATGuideNigeria = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           Under the 2026 rules, VAT registration is mandatory for any business or individual with an annual turnover exceeding <strong className="text-foreground">₦25 million</strong>. This threshold was clarified by the Nigeria Tax Act 2025 to reduce the compliance burden on micro-enterprises.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Registration Requirements</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -91,7 +91,7 @@ const VATGuideNigeria = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           The standard VAT rate in Nigeria is <strong className="text-foreground">7.5%</strong>, unchanged under the 2026 rules. VAT is calculated on the invoice value of taxable goods and services.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Worked Example</h3>
           <p className="text-sm text-muted-foreground mb-2">A consulting firm invoices ₦1,000,000 for services:</p>
           <div className="text-sm text-muted-foreground space-y-1">
@@ -112,7 +112,7 @@ const VATGuideNigeria = () => {
           The 2026 rules expanded the list of VAT-exempt items to reduce the tax burden on essential goods and services:
         </p>
         <div className="grid gap-4 md:grid-cols-2 mb-4">
-          <div className="glass-frosted rounded-xl p-5">
+           <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="font-semibold text-foreground mb-3">Exempt Goods</h3>
             <ul className="space-y-1 text-sm text-muted-foreground">
               {['Basic food (unprocessed)', 'Baby products', 'Agricultural equipment', 'Medical supplies & pharmaceuticals', 'Educational materials', 'Fertilisers & seeds'].map((item, i) => (
@@ -120,7 +120,7 @@ const VATGuideNigeria = () => {
               ))}
             </ul>
           </div>
-          <div className="glass-frosted rounded-xl p-5">
+          <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="font-semibold text-foreground mb-3">Exempt Services</h3>
             <ul className="space-y-1 text-sm text-muted-foreground">
               {['Medical services', 'Educational services', 'Community banking services', 'Plays and cultural performances', 'Agricultural services', 'Exported services (zero-rated)'].map((item, i) => (
@@ -136,7 +136,7 @@ const VATGuideNigeria = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           <strong className="text-foreground">Output VAT</strong> is the VAT you charge on your sales. <strong className="text-foreground">Input VAT</strong> is the VAT you pay on your business purchases. The difference is what you remit to NRS.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Monthly VAT Calculation</h3>
           <div className="text-sm text-muted-foreground space-y-1">
             <p>Output VAT collected in January: ₦500,000</p>
@@ -155,7 +155,7 @@ const VATGuideNigeria = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           VAT returns must be filed <strong className="text-foreground">monthly</strong>, due by the <strong className="text-foreground">21st of the following month</strong>. Filing is done through the NRS TaxPro Max portal or at your local NRS office.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Filing Checklist</h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
             {[
@@ -174,7 +174,7 @@ const VATGuideNigeria = () => {
 
       <section id="penalties">
         <h2 className="text-2xl font-bold text-foreground mb-4">Penalties for Non-Compliance</h2>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-border"><th className="text-left py-2 text-foreground font-semibold">Offence</th><th className="text-left py-2 text-foreground font-semibold">Penalty</th></tr></thead>

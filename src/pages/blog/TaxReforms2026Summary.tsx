@@ -58,7 +58,7 @@ const TaxReforms2026Summary = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           The reform was driven by the need to simplify Nigeria's tax code, broaden the tax base, reduce the burden on low-income earners, and make the system more competitive for businesses. The result is a cleaner, more predictable tax structure that benefits both individuals and small companies.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Key Changes at a Glance</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -87,7 +87,7 @@ const TaxReforms2026Summary = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           The 2026 PIT structure introduces a generous ₦800,000 tax-free threshold, which means most minimum-wage earners and many lower-income workers pay zero income tax. Above this threshold, five progressive bands apply:
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
