@@ -815,6 +815,47 @@ export function addSectionTitle(doc: jsPDF, title: string, y: number): number {
   return y + 8;
 }
 
+/**
+ * Add a polished accent section header with colored left-border bar
+ * Inspired by the payslip pattern — creates a professional, fintech-style section break
+ */
+export function addAccentSectionHeader(
+  doc: jsPDF,
+  title: string,
+  y: number,
+  type: 'green' | 'red' | 'blue' | 'warning' | 'gold' = 'green'
+): number {
+  const margin = PDF_SETTINGS.margin;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const contentWidth = pageWidth - margin * 2;
+
+  const config: Record<string, { accent: RGB; bg: RGB; text: RGB }> = {
+    green:   { accent: BRAND_COLORS.nigerianGreen, bg: BRAND_COLORS.lightGreen,  text: BRAND_COLORS.darkGreen },
+    red:     { accent: BRAND_COLORS.danger,        bg: BRAND_COLORS.dangerBg,    text: [153, 27, 27] as const },
+    blue:    { accent: BRAND_COLORS.info,           bg: BRAND_COLORS.infoBg,      text: [30, 64, 175] as const },
+    warning: { accent: BRAND_COLORS.warning,        bg: BRAND_COLORS.warningBg,   text: [146, 64, 14] as const },
+    gold:    { accent: BRAND_COLORS.gold,           bg: BRAND_COLORS.lightBg,     text: BRAND_COLORS.darkGreen },
+  };
+
+  const c = config[type] || config.green;
+
+  // Background fill
+  doc.setFillColor(...c.bg);
+  doc.rect(margin + 3, y - 1, contentWidth - 3, 12, 'F');
+
+  // Left accent bar
+  doc.setFillColor(...c.accent);
+  doc.rect(margin, y - 1, 3, 12, 'F');
+
+  // Title text
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...c.text);
+  doc.text(title, margin + 8, y + 7);
+
+  return y + 16;
+}
+
 // ============================================
 // PDF UTILITY FUNCTIONS
 // ============================================
