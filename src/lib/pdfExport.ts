@@ -281,7 +281,7 @@ export const generateProfessionalPDF = (
   y += 60;
 
   // === TAX BREAKDOWN TABLE ===
-  y = addSectionTitle(doc, 'Detailed Tax Breakdown', y);
+  y = addAccentSectionHeader(doc, 'Detailed Tax Breakdown', y, 'green');
 
   // Table header
   y = addTableHeader(doc, [
