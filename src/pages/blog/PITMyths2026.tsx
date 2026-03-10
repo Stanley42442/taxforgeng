@@ -95,11 +95,11 @@ const PITMyths2026 = () => {
         <h2 className="text-2xl font-bold text-foreground mb-4">
           Myth 1: "The ₦800k Threshold Means I Pay No Tax"
         </h2>
-        <div className="glass-frosted rounded-xl p-6 mb-4">
+        <div className="rounded-xl border border-border bg-card p-6 mb-4">
           <p className="text-sm font-semibold text-destructive mb-1">❌ The Myth</p>
           <p className="text-muted-foreground text-sm">"If I earn under ₦800,000 I'm completely tax-free."</p>
         </div>
-        <div className="glass-frosted rounded-xl p-6">
+        <div className="rounded-xl border border-border bg-card p-6">
           <p className="text-sm font-semibold text-primary mb-1">✅ The Fact</p>
           <p className="text-muted-foreground text-sm">
             The ₦800,000 figure is a <strong className="text-foreground">0% tax band</strong>, not an exemption
