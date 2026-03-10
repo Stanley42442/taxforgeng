@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { LavaLampBackground } from '@/components/LavaLampBackground';
 import { SEOHead, createArticleSchema, createHowToSchema, createBreadcrumbSchema, createFAQSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';

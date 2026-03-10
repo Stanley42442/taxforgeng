@@ -565,7 +565,7 @@ const SecurityTestResults = () => {
               <span>Consider restricting CORS origins to specific domains</span>
             </li>
             <li className="flex items-start gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
+              <CheckCircle className="h-4 w-4 text-success mt-0.5" />
               <span>Implement Content Security Policy (CSP) headers</span>
             </li>
             <li className="flex items-start gap-2">

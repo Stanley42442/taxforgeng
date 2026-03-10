@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { LavaLampBackground } from '@/components/LavaLampBackground';
 import { Link } from 'react-router-dom';
 import { SEOHead, createCalculatorSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema, createSpeakableSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
