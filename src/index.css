@@ -246,23 +246,31 @@ body {
      ================================================ */
   .glass {
     @apply border border-border;
-    background: hsl(var(--card));
+    background: hsl(var(--card) / 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     box-shadow: var(--shadow-sm);
   }
 
   .glass-subtle {
     @apply border border-border/60;
-    background: hsl(var(--card) / 0.8);
+    background: hsl(var(--card) / 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   .glass-dark {
     @apply border-t border-border;
-    background: hsl(var(--muted));
+    background: hsl(var(--muted) / 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
 
   .glass-frosted {
     @apply border border-border;
-    background: hsl(var(--card));
+    background: hsl(var(--card) / 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     box-shadow: var(--shadow-sm);
   }
 
@@ -270,7 +278,9 @@ body {
      CLEAN CARD VARIANTS (replaces neumorphism)
      ================================================ */
   .neumorphic {
-    background: hsl(var(--card));
+    background: hsl(var(--card) / 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     box-shadow: var(--shadow-md);
     border: 1px solid hsl(var(--border));
     border-radius: var(--radius);
