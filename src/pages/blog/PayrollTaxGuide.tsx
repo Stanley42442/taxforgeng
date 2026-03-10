@@ -94,7 +94,7 @@ const PayrollTaxGuide = () => {
             </table>
           </div>
         </div>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Worked Example</h3>
           <p className="text-sm text-muted-foreground mb-2">Employee with ₦400,000 monthly gross (₦4,800,000 annual):</p>
           <div className="text-sm text-muted-foreground space-y-1">
