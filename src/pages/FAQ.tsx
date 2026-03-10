@@ -6,6 +6,7 @@ import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
 import { ContentMeta } from '@/components/seo/ContentMeta';
 import { Link } from 'react-router-dom';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { PageLayout } from '@/components/PageLayout';
 
 const faqCategories = [
   {
