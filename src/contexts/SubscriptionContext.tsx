@@ -171,6 +171,8 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         loading: false,
         isOnTrial: false,
         trialEndsAt: null,
+        isInGracePeriod: false,
+        gracePeriodEndsAt: null,
       });
       return;
     }
