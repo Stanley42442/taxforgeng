@@ -408,8 +408,8 @@ export default function EmbedPartner() {
       </section>
 
       {/* ─── Integration Guide ─── */}
-      <section id="guide" className="py-16 bg-secondary/10">
-        <div className="container mx-auto px-4 max-w-3xl">
+      <section id="guide" className="py-16">
+        <div className="max-w-3xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">Integration Guide</h2>
