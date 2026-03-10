@@ -804,14 +804,14 @@ const SecurityDashboard = () => {
                 </div>
                 <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
                   stats.backupCodesRemaining > 3 
-                    ? 'bg-green-100 dark:bg-green-900/30' 
+                    ? 'bg-success/10' 
                     : stats.backupCodesRemaining > 0
-                      ? 'bg-amber-100 dark:bg-amber-900/30'
+                      ? 'bg-warning/10'
                       : 'bg-muted'
                 }`}>
                   <Key className={`h-6 w-6 ${
                     stats.backupCodesRemaining > 3 
-                      ? 'text-green-600' 
+                      ? 'text-success' 
                       : stats.backupCodesRemaining > 0
                         ? 'text-amber-600'
                         : 'text-muted-foreground'
