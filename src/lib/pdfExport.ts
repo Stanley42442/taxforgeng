@@ -382,7 +382,7 @@ export const generateProfessionalPDF = (
 
   // === ALERTS SECTION ===
   if (result.alerts.length > 0 && y < pageHeight - 60) {
-    y = addSectionTitle(doc, 'Alerts & Recommendations', y);
+    y = addAccentSectionHeader(doc, 'Alerts & Recommendations', y, 'warning');
 
     result.alerts.forEach(alert => {
       y = checkPageBreak(doc, y, 20, () => margin + 20);

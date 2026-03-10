@@ -155,7 +155,7 @@ export const exportDashboardToPDF = (data: DashboardExportData) => {
 
   // === BUSINESSES LIST ===
   if (data.businesses.length > 0) {
-    y = addSectionTitle(doc, 'Registered Businesses', y);
+    y = addAccentSectionHeader(doc, 'REGISTERED BUSINESSES', y, 'green');
 
     // Table header
     y = addTableHeader(doc, [

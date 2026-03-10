@@ -268,7 +268,7 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
   // === ALERTS & RECOMMENDATIONS ===
   if ((result.alerts && result.alerts.length > 0) || (result.recommendations && result.recommendations.length > 0)) {
     y = checkPageBreak(doc, y, 60, () => margin + 20);
-    y = addSectionTitle(doc, 'Alerts & Recommendations', y);
+    y = addAccentSectionHeader(doc, 'ALERTS & RECOMMENDATIONS', y, 'warning');
 
     // Alerts
     if (result.alerts && result.alerts.length > 0) {
