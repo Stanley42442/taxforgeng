@@ -1,43 +1,30 @@
 
 
-## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
+## Make All Remaining See-Through Cards Solid
 
-A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
+### Problem
+Several pages still have inline `bg-card/50 backdrop-blur-sm` on cards/divs, making them semi-transparent. The main offenders:
 
----
+### Files to fix
 
-### Content Structure
+**1. `src/pages/Documentation.tsx`** — 12 instances of `bg-card/50 backdrop-blur-sm` on Card components → replace with just removing those classes (Card default is already `bg-card`).
 
-The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
+**2. `src/pages/Expenses.tsx`** — 6 instances of `bg-card/50` on inner divs → replace with `bg-card`.
 
-| Section ID | Topic |
-|---|---|
-| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
-| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
-| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
-| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
-| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
-| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
-| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
-| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
-| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
-| `faq` | 5–6 FAQs with FAQPage schema |
+**3. `src/components/InstallPWAPrompt.tsx`** — `bg-card/95 backdrop-blur-xl` → `bg-card`.
 
-### Technical Implementation
+**4. `src/components/ui/sonner.tsx`** — toast uses `bg-background/95 backdrop-blur-xl` → `bg-background` (keep the rest).
 
-**1. Create `src/pages/blog/PITMyths2026.tsx`**
-- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
-- ~1,500 words, authoritative tone matching existing posts
-- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
-- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
-- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
+These are the content cards that appear see-through. Overlay/modal backdrops (`bg-background/80 backdrop-blur-sm` on loaders, celebrations, etc.) are intentionally translucent and will be left as-is.
 
-**2. Register route in `src/App.tsx`**
-- Add lazy import and route at `/blog/pit-myths-2026`
+### Changes
 
-**3. Add to blog listing in `src/pages/Blog.tsx`**
-- New entry in the `POSTS` array with category "Guides", today's date
+| File | What | Count |
+|------|------|-------|
+| `Documentation.tsx` | Remove `bg-card/50 backdrop-blur-sm` from Card className props | 12 |
+| `Expenses.tsx` | `bg-card/50` → `bg-card` on divs | 6 |
+| `InstallPWAPrompt.tsx` | `bg-card/95 backdrop-blur-xl` → `bg-card` | 1 |
+| `sonner.tsx` | `bg-background/95 backdrop-blur-xl` → `bg-background` in toast class | 1 |
 
-**4. Update sitemap (`public/sitemap.xml`)**
-- Add `/blog/pit-myths-2026` entry
+Total: 4 files, ~20 replacements. All cards become fully solid.
 
