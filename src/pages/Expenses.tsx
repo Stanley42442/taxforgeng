@@ -1423,7 +1423,7 @@ const Expenses = () => {
                   <div 
                     key={item.id} 
                     className={`flex items-center justify-between p-3 rounded-lg border ${
-                      item.isDueSoon ? 'bg-warning/10 border-warning/30' : 'bg-card/50 border-border/50'
+                      item.isDueSoon ? 'bg-warning/10 border-warning/30' : 'bg-card border-border/50'
                     }`}
                   >
                     <div className="flex items-center gap-3 min-w-0">
