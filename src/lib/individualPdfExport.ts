@@ -237,9 +237,19 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
     { text: 'Amount', x: breakdownAmountCol.x, width: breakdownAmountCol.width, align: 'right' },
   ], y);
 
-  result.breakdown.forEach((item, index) => {
-    y = checkPageBreak(doc, y, 25, () => margin + 20);
+  // Define column structure for repeat headers
+  const breakdownHeaderCols = [
+    { text: 'Component', x: componentCol.x, width: componentCol.width },
+    { text: 'Amount', x: breakdownAmountCol.x, width: breakdownAmountCol.width, align: 'right' as const },
+  ];
 
+  result.breakdown.forEach((item, index) => {
+    y = checkPageBreak(doc, y, 25, () => {
+      let newY = margin + 20;
+      newY = addAccentSectionHeader(doc, 'DETAILED TAX CALCULATION (cont.)', newY, 'green');
+      newY = addWrappedTableHeader(doc, breakdownHeaderCols, newY);
+      return newY;
+    });
     const isNegative = item.amount < 0;
     const amountStr = isNegative 
       ? `(${formatNaira(Math.abs(item.amount))})` 
