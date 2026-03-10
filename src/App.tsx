@@ -11,6 +11,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ReminderNotificationProvider } from "@/components/ReminderNotificationProvider";
 import { TrialBanner } from "@/components/TrialBanner";
+import { GracePeriodBanner } from "@/components/GracePeriodBanner";
 import { TierSelectionWrapper } from "@/components/TierSelectionWrapper";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { LazyRouteErrorBoundary } from "@/components/LazyRouteErrorBoundary";
