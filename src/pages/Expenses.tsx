@@ -1479,7 +1479,7 @@ const Expenses = () => {
                     {formatCurrency(monthComparison.current.expenses)} vs {formatCurrency(monthComparison.previous.expenses)}
                   </p>
                 </div>
-                <div className="p-4 rounded-lg bg-card/50 border border-border/50">
+                <div className="p-4 rounded-lg bg-card border border-border/50">
                   <p className="text-xs text-muted-foreground mb-1">Income</p>
                   <div className="flex items-center gap-2">
                     {monthComparison.incomeChange > 0 ? (
