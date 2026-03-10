@@ -1,43 +1,26 @@
 
 
-## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
+## Redesign Quick Reference Card
 
-A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
+The Quick Reference section at the bottom of PayrollCalculator is a plain unstyled grid of bullet lists — it looks flat and unfinished compared to the premium fintech style used elsewhere.
 
----
+### Design
 
-### Content Structure
+Replace the plain `div` columns with individual styled sub-cards inside the grid, each with an icon, a colored header badge, and clean spacing. This matches the solid-card fintech pattern used across the rest of the app.
 
-The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
+### Changes — `src/components/PayrollCalculator.tsx`
 
-| Section ID | Topic |
-|---|---|
-| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
-| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
-| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
-| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
-| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
-| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
-| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
-| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
-| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
-| `faq` | 5–6 FAQs with FAQPage schema |
+**1. Add imports** — `BookOpen`, `Percent`, `Receipt` icons from lucide-react.
 
-### Technical Implementation
+**2. Replace lines 290–329** (the Quick Reference Card) with:
 
-**1. Create `src/pages/blog/PITMyths2026.tsx`**
-- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
-- ~1,500 words, authoritative tone matching existing posts
-- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
-- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
-- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
+- Outer Card stays, title updated to include a `BookOpen` icon.
+- Each of the 3 columns becomes a bordered `div` with `rounded-lg border bg-muted/30 p-4` styling:
+  - **Pension Rates** — `Percent` icon, items use a clean `flex justify-between` layout (label left, value right) instead of bullet points.
+  - **2026 PIT Rates** — table-style rows with band and rate, alternating subtle background.
+  - **2026 Allowable Deductions** — clean list with small colored dots instead of bullet characters; "ABOLISHED" row gets a red badge.
 
-**2. Register route in `src/App.tsx`**
-- Add lazy import and route at `/blog/pit-myths-2026`
+This gives each section visual weight, clear hierarchy, and a polished look consistent with the rest of the dashboard.
 
-**3. Add to blog listing in `src/pages/Blog.tsx`**
-- New entry in the `POSTS` array with category "Guides", today's date
-
-**4. Update sitemap (`public/sitemap.xml`)**
-- Add `/blog/pit-myths-2026` entry
+**1 file, 1 section rewrite (~40 lines).**
 
