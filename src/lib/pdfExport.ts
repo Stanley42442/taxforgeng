@@ -320,7 +320,7 @@ export const generateProfessionalPDF = (
   if (result.sectorId && result.sectorRules) {
     y = checkPageBreak(doc, y, 80, () => margin + 20);
 
-    y = addSectionTitle(doc, 'Sector Tax Rules Applied', y);
+    y = addAccentSectionHeader(doc, 'Sector Tax Rules Applied', y, 'gold');
     
     doc.setTextColor(...BRAND_COLORS.muted);
     doc.setFontSize(9);
