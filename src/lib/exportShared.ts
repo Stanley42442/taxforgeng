@@ -361,30 +361,35 @@ export function addPDFFooter(
   
   // Separator line
   doc.setFillColor(...BRAND_COLORS.nigerianGreen);
-  doc.rect(margin, footerY - 5, contentWidth, 0.5, 'F');
+  doc.rect(margin, footerY - 2, contentWidth, 0.5, 'F');
   
   doc.setTextColor(...BRAND_COLORS.muted);
-  doc.setFontSize(7);
+  doc.setFontSize(6);
   doc.setFont('helvetica', 'normal');
   
-  // Disclaimer
+  let currentY = footerY + 4;
+  
+  // Disclaimer — wrapped to fit within content width
   if (disclaimer) {
-    doc.text(disclaimer, pageWidth / 2, footerY + 2, { align: 'center' });
+    const wrappedDisclaimer = doc.splitTextToSize(disclaimer, contentWidth - 10);
+    doc.text(wrappedDisclaimer, pageWidth / 2, currentY, { align: 'center' });
+    currentY += wrappedDisclaimer.length * 3.5;
   }
   
-  // Copyright and website - updated for individual operator
-  const copyrightText = `\u00A9 ${new Date().getFullYear()} ${COMPANY_INFO.shortName} | Operated by ${COMPANY_INFO.operatorShort} | ${COMPANY_INFO.email} | Educational tool only`;
-  doc.text(copyrightText, pageWidth / 2, footerY + 7, { align: 'center' });
+  currentY += 1;
   
-  // Timestamp
+  // Copyright line
+  const copyrightText = `© ${new Date().getFullYear()} ${COMPANY_INFO.shortName} | ${COMPANY_INFO.operatorShort} | ${COMPANY_INFO.email}`;
+  doc.text(copyrightText, pageWidth / 2, currentY, { align: 'center' });
+  currentY += 4;
+  
+  // Timestamp (left) + Page number (right) on the same line
   if (showTimestamp) {
-    doc.text(`Generated: ${formatTimestamp()}`, margin, footerY + 12);
+    doc.text(`Generated: ${formatTimestamp()}`, margin, currentY);
   }
-  
-  // Page numbers
   if (pageNumber !== undefined && totalPages !== undefined) {
-    doc.setFontSize(8);
-    doc.text(`Page ${pageNumber} of ${totalPages}`, pageWidth - margin, pageHeight - 10, { align: 'right' });
+    doc.setFontSize(7);
+    doc.text(`Page ${pageNumber} of ${totalPages}`, pageWidth - margin, currentY, { align: 'right' });
   }
 }
 
