@@ -1134,10 +1134,10 @@ const SecurityDashboard = () => {
                                     </p>
                                     <div className="flex items-center gap-1">
                                       <span className="relative flex h-2 w-2">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success/75 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
                                       </span>
-                                      <span className="text-[10px] text-green-600 font-medium">Online</span>
+                                      <span className="text-[10px] text-success font-medium">Online</span>
                                     </div>
                                     {isCurrentDevice && (
                                       <Badge variant="outline" className="text-primary border-primary/30 text-[10px] h-5 px-1.5">
