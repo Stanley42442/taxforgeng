@@ -62,7 +62,7 @@ const TaxCalendar2026 = () => {
       <section id="monthly">
         <h2 className="text-2xl font-bold text-foreground mb-4">Monthly Obligations</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">These obligations recur every month and are the most frequent compliance requirements:</p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-border"><th className="text-left py-2 text-foreground font-semibold">Obligation</th><th className="text-left py-2 text-foreground font-semibold">Due Date</th><th className="text-left py-2 text-foreground font-semibold">Authority</th></tr></thead>
