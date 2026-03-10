@@ -98,7 +98,7 @@ body {
     --shadow-xl: 0 20px 25px hsl(220 14% 10% / 0.07), 0 8px 10px hsl(220 14% 10% / 0.04);
 
     /* Sidebar */
-    --sidebar-background: 0 0% 99%;
+    --sidebar-background: 40 20% 98.5%;
     --sidebar-foreground: 220 14% 10%;
     --sidebar-primary: 152 55% 28%;
     --sidebar-primary-foreground: 0 0% 100%;
