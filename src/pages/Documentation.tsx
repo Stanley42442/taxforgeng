@@ -93,7 +93,7 @@ const FeatureCard = ({
   description: string; 
   features: string[];
 }) => (
-  <Card className="h-full border-border/50 bg-card/50 backdrop-blur-sm">
+  <Card className="h-full border-border/50">
     <CardHeader>
       <div className="flex items-center gap-3">
         <div className="rounded-lg bg-primary/10 p-2">
