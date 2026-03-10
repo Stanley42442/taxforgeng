@@ -295,8 +295,8 @@ export default function EmbedPartner() {
       />
 
       {/* ─── Hero ─── */}
-      <section className="bg-gradient-to-br from-primary/10 via-background to-secondary/10 border-b border-border">
-        <div className="container mx-auto px-4 py-16 md:py-24 text-center max-w-4xl">
+      <section className="mb-16">
+        <div className="text-center max-w-4xl mx-auto">
           <Badge variant="secondary" className="mb-4 gap-1.5">
             <Zap className="h-3 w-3" /> Free for Partners
           </Badge>
