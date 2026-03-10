@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, Info } from "lucide-react";
+import { Calculator, Info, BookOpen, Percent, Receipt } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import { RentReliefTooltip, RentReliefWarnings } from "@/components/RentReliefTooltip";
@@ -290,39 +290,81 @@ export const PayrollCalculator = () => {
       {/* Quick Reference Card */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Quick Reference</CardTitle>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <BookOpen className="h-5 w-5 text-primary" />
+            Quick Reference
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div>
-              <h4 className="font-medium mb-2">Pension Rates</h4>
-              <ul className="space-y-1 text-muted-foreground">
-                <li>• Employee: 8% of gross</li>
-                <li>• Employer: 10% of gross</li>
-                <li>• Total: 18% contribution</li>
-              </ul>
+            <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Percent className="h-4 w-4 text-primary" />
+                <h4 className="font-semibold">Pension Rates</h4>
+              </div>
+              <div className="space-y-2">
+                {[
+                  { label: "Employee", value: "8%" },
+                  { label: "Employer", value: "10%" },
+                  { label: "Total", value: "18%" },
+                ].map((item) => (
+                  <div key={item.label} className="flex justify-between">
+                    <span className="text-muted-foreground">{item.label}</span>
+                    <span className="font-medium">{item.value}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div>
-              <h4 className="font-medium mb-2">2026 PIT Rates</h4>
-              <ul className="space-y-1 text-muted-foreground">
-                <li>• ₦0 - ₦800k: 0%</li>
-                <li>• ₦800k - ₦3m: 15%</li>
-                <li>• ₦3m - ₦12m: 18%</li>
-                <li>• ₦12m - ₦25m: 21%</li>
-                <li>• ₦25m - ₦50m: 23%</li>
-                <li>• Above ₦50m: 25%</li>
-              </ul>
+
+            <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Calculator className="h-4 w-4 text-primary" />
+                <h4 className="font-semibold">2026 PIT Rates</h4>
+              </div>
+              <div className="space-y-1">
+                {[
+                  { band: "₦0 – ₦800k", rate: "0%" },
+                  { band: "₦800k – ₦3m", rate: "15%" },
+                  { band: "₦3m – ₦12m", rate: "18%" },
+                  { band: "₦12m – ₦25m", rate: "21%" },
+                  { band: "₦25m – ₦50m", rate: "23%" },
+                  { band: "Above ₦50m", rate: "25%" },
+                ].map((item, i) => (
+                  <div key={item.band} className={`flex justify-between px-2 py-1 rounded ${i % 2 === 0 ? 'bg-muted/50' : ''}`}>
+                    <span className="text-muted-foreground">{item.band}</span>
+                    <span className="font-medium">{item.rate}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div>
-              <h4 className="font-medium mb-2">2026 Allowable Deductions</h4>
-              <ul className="space-y-1 text-muted-foreground">
-                <li>• <strong>Rent Relief:</strong> 20% of rent (max ₦500k) - requires proof</li>
-                <li>• Pension: Up to 8% of gross</li>
-                <li>• NHF: 2.5% of basic salary</li>
-                <li>• NHIS: Actual premiums paid</li>
-                <li>• Life Insurance: Actual premiums</li>
-                <li className="text-amber-600">• Old CRA: <strong>ABOLISHED</strong></li>
-              </ul>
+
+            <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Receipt className="h-4 w-4 text-primary" />
+                <h4 className="font-semibold">2026 Deductions</h4>
+              </div>
+              <div className="space-y-2">
+                {[
+                  { label: "Rent Relief", detail: "20% of rent (max ₦500k)", color: "bg-primary" },
+                  { label: "Pension", detail: "Up to 8% of gross", color: "bg-primary" },
+                  { label: "NHF", detail: "2.5% of basic salary", color: "bg-primary" },
+                  { label: "NHIS", detail: "Actual premiums paid", color: "bg-primary" },
+                  { label: "Life Insurance", detail: "Actual premiums", color: "bg-primary" },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-start gap-2">
+                    <div className={`h-1.5 w-1.5 rounded-full ${item.color} mt-1.5 shrink-0`} />
+                    <div>
+                      <span className="font-medium">{item.label}</span>
+                      <span className="text-muted-foreground"> — {item.detail}</span>
+                    </div>
+                  </div>
+                ))}
+                <div className="flex items-center gap-2 pt-1">
+                  <div className="h-1.5 w-1.5 rounded-full bg-destructive shrink-0" />
+                  <span className="text-muted-foreground">Old CRA</span>
+                  <Badge variant="destructive" size="sm">ABOLISHED</Badge>
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>
