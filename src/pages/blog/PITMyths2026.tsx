@@ -305,7 +305,7 @@ const PITMyths2026 = () => {
               paid for your primary residence. It reduces your taxable income, not your tax directly.
             </p>
           </div>
-          <div className="glass-frosted rounded-xl p-5">
+          <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="font-semibold text-foreground text-sm mb-2">Who Qualifies</h3>
             <p className="text-muted-foreground text-sm">
               Any individual who pays rent on their primary home. You must provide evidence of actual
