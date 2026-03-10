@@ -265,6 +265,25 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         }
       }
 
+      // Check for grace period on active subscription
+      let isInGracePeriod = false;
+      let gracePeriodEndsAt: Date | null = null;
+
+      const { data: activeSub } = await supabase
+        .from('paystack_subscriptions')
+        .select('grace_period_ends_at, status')
+        .eq('user_id', user.id)
+        .in('status', ['past_due', 'active', 'non_renewing'])
+        .not('grace_period_ends_at', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (activeSub?.grace_period_ends_at) {
+        gracePeriodEndsAt = new Date(activeSub.grace_period_ends_at);
+        isInGracePeriod = new Date() < gracePeriodEndsAt;
+      }
+
       setState({
         tier: baseTier,
         effectiveTier: isOnTrial ? baseTier : baseTier,
@@ -275,6 +294,8 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         loading: false,
         isOnTrial,
         trialEndsAt,
+        isInGracePeriod,
+        gracePeriodEndsAt,
       });
     } catch (error) {
       logger.error('Error fetching user data:', error);
