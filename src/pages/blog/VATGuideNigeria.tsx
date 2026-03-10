@@ -112,7 +112,7 @@ const VATGuideNigeria = () => {
           The 2026 rules expanded the list of VAT-exempt items to reduce the tax burden on essential goods and services:
         </p>
         <div className="grid gap-4 md:grid-cols-2 mb-4">
-          <div className="glass-frosted rounded-xl p-5">
+           <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="font-semibold text-foreground mb-3">Exempt Goods</h3>
             <ul className="space-y-1 text-sm text-muted-foreground">
               {['Basic food (unprocessed)', 'Baby products', 'Agricultural equipment', 'Medical supplies & pharmaceuticals', 'Educational materials', 'Fertilisers & seeds'].map((item, i) => (
