@@ -37,6 +37,8 @@ export interface SubscriptionState {
   loading: boolean;
   isOnTrial: boolean;
   trialEndsAt: Date | null;
+  isInGracePeriod: boolean;
+  gracePeriodEndsAt: Date | null;
 }
 
 interface SubscriptionContextType extends SubscriptionState {
