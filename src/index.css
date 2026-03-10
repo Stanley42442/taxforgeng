@@ -246,31 +246,23 @@ body {
      ================================================ */
   .glass {
     @apply border border-border;
-    background: hsl(var(--card) / 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: hsl(var(--card));
     box-shadow: var(--shadow-sm);
   }
 
   .glass-subtle {
     @apply border border-border/60;
-    background: hsl(var(--card) / 0.5);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: hsl(var(--card));
   }
 
   .glass-dark {
     @apply border-t border-border;
-    background: hsl(var(--muted) / 0.7);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: hsl(var(--muted));
   }
 
   .glass-frosted {
     @apply border border-border;
-    background: hsl(var(--card) / 0.65);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: hsl(var(--card));
     box-shadow: var(--shadow-sm);
   }
 
@@ -902,35 +894,27 @@ html, body, #root {
     color: hsl(var(--foreground));
   }
 
-  /* Glassmorphism refinements for dark mode */
+  /* Card refinements for dark mode */
   .glass {
-    background: hsl(var(--card) / 0.6);
+    background: hsl(var(--card));
     border-color: hsl(var(--border) / 0.5);
     box-shadow: var(--shadow-md), inset 0 1px 0 hsl(0 0% 100% / 0.04);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
   }
 
   .glass-subtle {
-    background: hsl(var(--card) / 0.35);
+    background: hsl(var(--card));
     border-color: hsl(var(--border) / 0.3);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
   }
 
   .glass-frosted {
-    background: hsl(var(--card) / 0.45);
+    background: hsl(var(--card));
     border-color: hsl(var(--border) / 0.4);
     box-shadow: var(--shadow-md), inset 0 1px 0 hsl(0 0% 100% / 0.06);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
   }
 
   .glass-dark {
-    background: hsl(var(--muted) / 0.5);
+    background: hsl(var(--muted));
     border-color: hsl(var(--border) / 0.4);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
   }
 
   /* Glow refinements — subtle luminous edges in dark mode */
