@@ -87,7 +87,7 @@ const TaxReforms2026Summary = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           The 2026 PIT structure introduces a generous ₦800,000 tax-free threshold, which means most minimum-wage earners and many lower-income workers pay zero income tax. Above this threshold, five progressive bands apply:
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>

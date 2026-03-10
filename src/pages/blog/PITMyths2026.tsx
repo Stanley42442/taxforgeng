@@ -319,7 +319,7 @@ const PITMyths2026 = () => {
               adjustment. Keep rent receipts, bank transfer records, and your tenancy agreement.
             </p>
           </div>
-          <div className="glass-frosted rounded-xl p-5">
+          <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="font-semibold text-foreground text-sm mb-2">Tax Savings Example</h3>
             <p className="text-muted-foreground text-sm">
               If you pay ₦1.2M/year in rent, you can deduct ₦500,000. At a marginal rate of 21%, that's
