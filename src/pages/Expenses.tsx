@@ -1463,7 +1463,7 @@ const Expenses = () => {
                 Month-over-Month Comparison
               </h3>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-lg bg-card/50 border border-border/50">
+                <div className="p-4 rounded-lg bg-card border border-border/50">
                   <p className="text-xs text-muted-foreground mb-1">Expenses</p>
                   <div className="flex items-center gap-2">
                     {monthComparison.expenseChange > 0 ? (
