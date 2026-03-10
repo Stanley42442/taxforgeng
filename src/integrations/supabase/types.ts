@@ -2330,6 +2330,7 @@ export type Database = {
           customer_code: string
           email_token: string | null
           failed_payments_count: number | null
+          grace_period_ends_at: string | null
           id: string
           next_payment_date: string | null
           plan_code: string
@@ -2352,6 +2353,7 @@ export type Database = {
           customer_code: string
           email_token?: string | null
           failed_payments_count?: number | null
+          grace_period_ends_at?: string | null
           id?: string
           next_payment_date?: string | null
           plan_code: string
@@ -2374,6 +2376,7 @@ export type Database = {
           customer_code?: string
           email_token?: string | null
           failed_payments_count?: number | null
+          grace_period_ends_at?: string | null
           id?: string
           next_payment_date?: string | null
           plan_code?: string

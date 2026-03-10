@@ -1,0 +1,1 @@
+ALTER TABLE public.paystack_subscriptions ADD COLUMN IF NOT EXISTS grace_period_ends_at timestamptz DEFAULT NULL;
