@@ -116,11 +116,11 @@ const WHTExplained = () => {
           Under the 2026 rules, WHT treatment depends on the recipient type and income category:
         </p>
         <div className="grid gap-4 md:grid-cols-2 mb-4">
-          <div className="glass-frosted rounded-xl p-5 border-l-4 border-primary">
+          <div className="rounded-xl border border-border bg-card p-5 border-l-4 border-primary">
             <h3 className="font-semibold text-foreground mb-2">WHT as Credit (Companies)</h3>
             <p className="text-sm text-muted-foreground">WHT on trading transactions (contracts, supplies) is a credit against CIT. The company includes the gross income in its tax return and offsets the WHT credit.</p>
           </div>
-          <div className="glass-frosted rounded-xl p-5 border-l-4 border-success">
+          <div className="rounded-xl border border-border bg-card p-5 border-l-4 border-success">
             <h3 className="font-semibold text-foreground mb-2">WHT as Final Tax (Individuals)</h3>
             <p className="text-sm text-muted-foreground">For individuals receiving dividends, interest, or rent, the WHT deducted is now the final tax — no additional assessment or filing is needed for those income streams.</p>
           </div>
