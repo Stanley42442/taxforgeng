@@ -222,7 +222,7 @@ const Compliance = () => {
                         <div className="text-sm text-muted-foreground flex items-center gap-2">
                           <Calendar className="h-3 w-3" />Due: {format(new Date(item.due_date), 'MMM d, yyyy')}
                           {item.status !== 'completed' && (
-                            <span className={isUrgent ? 'text-red-600 font-medium' : ''}>
+                            <span className={isUrgent ? 'text-destructive font-medium' : ''}>
                               ({daysUntilDue > 0 ? `${daysUntilDue} days left` : daysUntilDue === 0 ? 'Due today' : `${Math.abs(daysUntilDue)} days overdue`})
                             </span>
                           )}

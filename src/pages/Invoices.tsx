@@ -47,10 +47,10 @@ interface Invoice {
 
 const statusColors: Record<string, string> = {
   draft: "bg-muted text-muted-foreground",
-  sent: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  paid: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  overdue: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-  cancelled: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
+  sent: "bg-primary/10 text-primary",
+  paid: "bg-success/10 text-success",
+  overdue: "bg-destructive/10 text-destructive",
+  cancelled: "bg-muted text-muted-foreground",
 };
 
 const statusIcons: Record<string, React.ReactNode> = {

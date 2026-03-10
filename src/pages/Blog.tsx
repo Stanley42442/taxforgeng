@@ -162,9 +162,7 @@ const Blog = () => {
 
               <SEODisclaimer />
             </article>
-          </div>
-        </main>
-      </div>
+      </PageLayout>
     </>
   );
 };

@@ -200,9 +200,7 @@ const About = () => {
 
               <SEODisclaimer />
             </article>
-          </div>
-        </main>
-      </div>
+      </PageLayout>
     </>
   );
 };

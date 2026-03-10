@@ -146,10 +146,8 @@ const Resources = () => {
               />
 
               <SEODisclaimer />
-            </div>
           </article>
-        </main>
-      </div>
+      </PageLayout>
     </>
   );
 };
