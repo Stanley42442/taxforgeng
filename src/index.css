@@ -415,14 +415,16 @@ body {
   .lava-blob {
     background-color: hsl(var(--primary));
     animation:
-      lava-move var(--rise-duration, 30s) cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite,
-      lava-morph var(--morph-duration, 24s) ease-in-out infinite,
-      lava-color var(--color-duration, 12s) ease-in-out infinite alternate;
-    will-change: transform, border-radius, background-color;
+      lava-float var(--rise-duration, 18s) ease-in-out infinite,
+      lava-drift var(--drift-duration, 24s) ease-in-out infinite,
+      lava-morph var(--morph-duration, 20s) ease-in-out infinite,
+      lava-color var(--color-duration, 10s) ease-in-out infinite alternate,
+      lava-depth var(--z-duration, 30s) ease-in-out infinite;
+    will-change: transform, border-radius, background-color, z-index;
   }
 
   .dark .lava-blob {
-    opacity: 0.45;
+    opacity: calc(var(--opacity, 0.1) * 1.4);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -432,19 +434,41 @@ body {
     }
   }
 
-  @keyframes lava-move {
-    0%   { transform: translate(0, 0) scale(1); }
-    25%  { transform: translate(6%, -30vh) scale(1.02); }
-    50%  { transform: translate(-4%, -75vh) scale(0.98); }
-    75%  { transform: translate(5%, -25vh) scale(1.03); }
-    100% { transform: translate(0, 0) scale(1); }
+  @keyframes lava-float {
+    0%   { transform: translateY(0vh) scaleX(1) scaleY(1); }
+    10%  { transform: translateY(-10vh) scaleX(0.95) scaleY(1.1); }
+    25%  { transform: translateY(-35vh) scaleX(0.88) scaleY(1.25); }
+    40%  { transform: translateY(-65vh) scaleX(0.85) scaleY(1.3); }
+    50%  { transform: translateY(-80vh) scaleX(0.92) scaleY(1.15); }
+    60%  { transform: translateY(-70vh) scaleX(1.05) scaleY(0.9); }
+    75%  { transform: translateY(-40vh) scaleX(1.12) scaleY(0.85); }
+    90%  { transform: translateY(-10vh) scaleX(1.05) scaleY(0.95); }
+    100% { transform: translateY(0vh) scaleX(1) scaleY(1); }
+  }
+
+  @keyframes lava-drift {
+    0%, 100% { margin-left: 0; }
+    15% { margin-left: 12%; }
+    35% { margin-left: -8%; }
+    55% { margin-left: 15%; }
+    75% { margin-left: -12%; }
+  }
+
+  @keyframes lava-depth {
+    0%, 100% { z-index: 1; }
+    25% { z-index: 3; }
+    50% { z-index: 2; }
+    75% { z-index: 1; }
   }
 
   @keyframes lava-morph {
-    0%, 100% { border-radius: 50% 45% 55% 50% / 50% 55% 45% 50%; }
-    25% { border-radius: 45% 55% 50% 50% / 55% 45% 50% 55%; }
-    50% { border-radius: 55% 50% 45% 55% / 45% 50% 55% 45%; }
-    75% { border-radius: 50% 50% 55% 45% / 50% 55% 45% 50%; }
+    0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+    15% { border-radius: 40% 60% 50% 50% / 35% 55% 45% 65%; }
+    30% { border-radius: 30% 50% 70% 40% / 25% 65% 35% 75%; }
+    45% { border-radius: 50% 30% 60% 40% / 55% 40% 60% 30%; }
+    60% { border-radius: 70% 40% 30% 60% / 65% 35% 55% 45%; }
+    75% { border-radius: 40% 70% 50% 30% / 45% 55% 35% 65%; }
+    90% { border-radius: 55% 45% 40% 60% / 50% 40% 60% 50%; }
   }
 
   @keyframes lava-color {
