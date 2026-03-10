@@ -126,7 +126,7 @@ const getEventIcon = (eventType: string) => {
       return <Mail className="h-4 w-4 text-primary" />;
     case '2fa_enabled':
     case '2fa_disabled':
-      return <Smartphone className="h-4 w-4 text-purple-500" />;
+      return <Smartphone className="h-4 w-4 text-accent-foreground" />;
     default:
       return <Shield className="h-4 w-4 text-muted-foreground" />;
   }
