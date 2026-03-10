@@ -8,6 +8,7 @@ import { ContentMeta } from '@/components/seo/ContentMeta';
 import { Download, FileText, Calculator, Calendar, CheckCircle2, ArrowRight, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { PageLayout } from '@/components/PageLayout';
 
 const Resources = () => {
   const schema = {
