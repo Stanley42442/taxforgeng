@@ -328,7 +328,7 @@ export default function EmbedPartner() {
               { label: "Mobile friendly", value: "100%" },
               { label: "Setup time", value: "< 5 min" },
             ].map((s) => (
-              <div key={s.label} className="bg-card border border-border rounded-xl p-4">
+              <div key={s.label} className="glass-frosted rounded-xl p-4 hover-lift">
                 <p className="text-2xl font-bold text-primary">{s.value}</p>
                 <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
               </div>
