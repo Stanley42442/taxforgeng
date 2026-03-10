@@ -539,8 +539,8 @@ export default function EmbedPartner() {
       </section>
 
       {/* ─── Partnership Request Form ─── */}
-      <section id="request" className="py-16 bg-secondary/10">
-        <div className="container mx-auto px-4 max-w-xl">
+      <section id="request" className="py-16">
+        <div className="max-w-xl mx-auto">
           <div className="text-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground">Request an API Key</h2>
             <p className="text-muted-foreground mt-2">
