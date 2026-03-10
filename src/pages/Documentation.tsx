@@ -298,7 +298,7 @@ const Documentation = () => {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-8">
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <Card className="border-border/50">
               <CardHeader>
                 <CardTitle>Executive Summary</CardTitle>
               </CardHeader>
