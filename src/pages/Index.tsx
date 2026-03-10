@@ -18,6 +18,7 @@ import { lazy, Suspense } from "react";
 
 const SuccessStories = lazy(() => import("@/components/SuccessStories").then(m => ({ default: m.SuccessStories })));
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { LavaLampBackground } from "@/components/LavaLampBackground";
 import { SEOHead, createSoftwareApplicationSchema, createOrganizationSchema, createLocalBusinessSchema } from "@/components/seo/SEOHead";
 import { useReviewStats } from "@/hooks/useReviewStats";
 
@@ -31,7 +32,8 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden relative bg-background bg-ambient">
+    <div className="min-h-screen flex flex-col overflow-x-hidden relative bg-background">
+      <LavaLampBackground />
       <SEOHead
         title="TaxForge NG | Free Nigerian Tax Calculator 2026 - CIT, VAT, WHT, PIT"
         description="TaxForge NG: Free Nigerian tax calculator for CIT, VAT, WHT, PIT with 2026 reforms. Business advisory, sector guides, and small company tools. No signup needed."

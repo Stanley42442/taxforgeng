@@ -1,44 +1,43 @@
 
 
-## Lava Lamp Background — Mixed Blur for Depth Effect
+## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
 
-### Concept
-Floating green and gold blob shapes that mimic lava lamp oil bubbles. Some blobs are **sharp/clear** (foreground), others are **heavily blurred** (background depth), creating a parallax-like layered effect.
+A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
 
-### Implementation
+---
 
-**1. New file: `src/components/LavaLampBackground.tsx`** (~90 lines)
-- Renders 7 blob `<div>` elements, each with:
-  - CSS-animated `border-radius` morphing (organic lava shapes)
-  - CSS-animated color shifting between `hsl(var(--primary))` (green) and `hsl(var(--accent))` (gold)
-  - Slow vertical rise/fall + horizontal drift
-  - Staggered durations (15-30s) and delays for organic randomness
-- **Depth via blur variation**:
-  - 2-3 blobs: `blur(0)` or `blur(4px)` — sharp, clearly visible, smaller (~80-120px), higher opacity (~10-15%)
-  - 2-3 blobs: `blur(20-30px)` — mid-ground, medium size (~150-200px), medium opacity (~8-10%)
-  - 1-2 blobs: `blur(50-60px)` — far background, large (~250-350px), low opacity (~5-6%)
-- Container: `fixed inset-0 z-0 pointer-events-none overflow-hidden`
-- `prefers-reduced-motion`: disables all animations
+### Content Structure
 
-**2. CSS keyframes in `src/index.css`** (~25 lines)
-- `lava-rise`: `translateY` oscillation (e.g. 0% → -15% → 5% → 0%)
-- `lava-drift`: `translateX` sway
-- `lava-morph`: `border-radius` shape shifting between organic values
-- `lava-color`: `background-color` transition green ↔ gold
+The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
 
-**3. Update `src/components/PageLayout.tsx`** (~3 lines)
-- Import and render `<LavaLampBackground />` when `showBackground` is true
-- Remove the static `bg-dots` div
+| Section ID | Topic |
+|---|---|
+| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
+| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
+| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
+| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
+| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
+| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
+| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
+| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
+| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
+| `faq` | 5–6 FAQs with FAQPage schema |
 
-**4. Update `src/pages/Index.tsx`** (~2 lines)
-- Add `<LavaLampBackground />` to the landing page
+### Technical Implementation
 
-### Visual Result
-Sharp small blobs float in the foreground like nearby oil droplets. Large blurred blobs sit deep behind, creating atmospheric depth. The mix of clear + blurred creates the illusion of a 3D lava lamp with objects at different distances from the viewer.
+**1. Create `src/pages/blog/PITMyths2026.tsx`**
+- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
+- ~1,500 words, authoritative tone matching existing posts
+- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
+- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
+- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
 
-### Files
-1. `src/components/LavaLampBackground.tsx` (new)
-2. `src/index.css` (add keyframes)
-3. `src/components/PageLayout.tsx` (swap bg-dots for lava lamp)
-4. `src/pages/Index.tsx` (add lava lamp)
+**2. Register route in `src/App.tsx`**
+- Add lazy import and route at `/blog/pit-myths-2026`
+
+**3. Add to blog listing in `src/pages/Blog.tsx`**
+- New entry in the `POSTS` array with category "Guides", today's date
+
+**4. Update sitemap (`public/sitemap.xml`)**
+- Add `/blog/pit-myths-2026` entry
 
