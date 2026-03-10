@@ -142,7 +142,7 @@ const WHTExplained = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           WHT must be remitted to NRS within <strong className="text-foreground">21 days</strong> from the date of deduction. Late remittance attracts 10% per annum interest on the unremitted amount.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Remittance Steps</h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
             {[
