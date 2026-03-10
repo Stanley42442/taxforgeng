@@ -123,7 +123,7 @@ const getEventIcon = (eventType: string) => {
     case 'password_change':
       return <Key className="h-4 w-4 text-warning" />;
     case 'email_change':
-      return <Mail className="h-4 w-4 text-blue-500" />;
+      return <Mail className="h-4 w-4 text-primary" />;
     case '2fa_enabled':
     case '2fa_disabled':
       return <Smartphone className="h-4 w-4 text-purple-500" />;
