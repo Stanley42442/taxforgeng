@@ -154,7 +154,7 @@ const PayrollTaxGuide = () => {
 
       <section id="step-by-step">
         <h2 className="text-2xl font-bold text-foreground mb-4">Step-by-Step Monthly Payroll Process</h2>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <ul className="space-y-3 text-sm text-muted-foreground">
             {[
               'Calculate gross salary for each employee (basic + allowances + overtime + bonuses)',
