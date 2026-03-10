@@ -112,7 +112,7 @@ export const STANDARD_DISCLAIMER =
 export const PDF_SETTINGS = {
   margin: 20,
   headerHeight: 18,
-  footerHeight: 25,
+  footerHeight: 40,
   lineHeight: 6,
   tableRowHeight: 10,
   logoSize: 15,
