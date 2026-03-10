@@ -52,7 +52,7 @@ const PITPAYEGuide2026 = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           The Nigeria Tax Act 2025 introduced a completely new set of Personal Income Tax bands effective January 2026. The most significant change is the ₦800,000 tax-free threshold, which replaces the old graduated relief system.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
