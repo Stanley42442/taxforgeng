@@ -14,6 +14,7 @@ import {
   addWrappedTableRow,
   addAlertBox,
   addSectionTitle,
+  addAccentSectionHeader,
   checkPageBreak,
 } from "./exportShared";
 
