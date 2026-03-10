@@ -1,45 +1,43 @@
 
 
-## Assessment: Your Export Stack vs. the Research
+## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
 
-Your project is already in great shape. Here's the honest breakdown:
+A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
 
-### What you already have (and it's solid)
-- **PDF** — jsPDF with a custom table engine (`addTableHeader`, `addTableRow`, `addWrappedTableRow`) plus full brand theming. This is more customized than what `jspdf-autotable` would give you.
-- **Excel** — SheetJS (`xlsx`) with multi-sheet workbooks, currency formats, formulas. Gold standard, already in place.
-- **CSV** — Custom `toCSV()` + `escapeCSVValue()` in `exportShared.ts`. Works fine for your data sizes.
-- **JSON/TXT** — Native browser via `downloadFile()`. No library needed.
-- **ZIP** — JSZip for bulk payslip downloads. Already integrated.
+---
 
-### What could actually improve things
+### Content Structure
 
-**1. Add `jspdf-autotable` for data-heavy tables only**
-Your custom table rendering is great for branded reports, but for pages with large dynamic datasets (expense lists, transaction history, audit logs), `autotable` handles pagination, column auto-sizing, and overflow automatically — things your manual code has to handle with `checkPageBreak`. This would reduce code in `businessReportPdf.ts` and `expensesSummaryPdf.ts` while still allowing your branded header/footer/summary boxes.
+The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
 
-**2. Skip PapaParse — not needed**
-Your CSV data is structured objects, not messy user-uploaded CSVs. Your custom `toCSV()` handles escaping correctly. PapaParse's value is in *parsing* complex CSVs, not generating them. Adding it would be unnecessary bloat.
+| Section ID | Topic |
+|---|---|
+| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
+| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
+| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
+| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
+| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
+| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
+| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
+| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
+| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
+| `faq` | 5–6 FAQs with FAQPage schema |
 
-**3. Add a universal "Export Menu" component**
-You have export functions scattered across pages. A reusable `<ExportMenu formats={['pdf','csv','xlsx']} onExport={...} />` component would standardize the UX — consistent dropdown, loading states, error toasts, and format icons across every page.
+### Technical Implementation
 
-### Proposed changes
+**1. Create `src/pages/blog/PITMyths2026.tsx`**
+- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
+- ~1,500 words, authoritative tone matching existing posts
+- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
+- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
+- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
 
-| Change | Effort | Impact |
-|--------|--------|--------|
-| Install `jspdf-autotable` and use it for long data tables in expense/audit/transaction PDFs | Medium | Cleaner code, better auto-pagination |
-| Create `<ExportMenu>` reusable component with format picker, loading state, toast feedback | Medium | Consistent UX across all export points |
-| Add TXT export option to the export system (plaintext summary) | Low | Completeness — some users prefer it |
+**2. Register route in `src/App.tsx`**
+- Add lazy import and route at `/blog/pit-myths-2026`
 
-### Files to create/modify
-1. **New:** `src/components/ExportMenu.tsx` — Reusable export dropdown with format icons
-2. **Modify:** `src/lib/exportShared.ts` — Add `exportToTXT()` helper
-3. **Modify:** `src/lib/expensesSummaryPdf.ts` — Optionally adopt `autotable` for the monthly breakdown table
-4. **Modify:** `src/lib/businessReportPdf.ts` — Optionally adopt `autotable` for transaction tables
-5. **Modify:** Pages that have export buttons — use the new `<ExportMenu>` component
+**3. Add to blog listing in `src/pages/Blog.tsx`**
+- New entry in the `POSTS` array with category "Guides", today's date
 
-### What stays the same
-- Your branded PDF headers, footers, summary boxes, accent section headers — all stay
-- Excel export — already excellent
-- CSV generation — custom `toCSV()` is sufficient
-- ZIP bulk downloads — already working
+**4. Update sitemap (`public/sitemap.xml`)**
+- Add `/blog/pit-myths-2026` entry
 

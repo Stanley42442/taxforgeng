@@ -1045,7 +1045,7 @@ export function downloadFile(
  */
 export function generateFilename(
   type: string,
-  extension: 'pdf' | 'csv' | 'json' | 'ics',
+  extension: 'pdf' | 'csv' | 'json' | 'ics' | 'txt' | 'xlsx',
   suffix?: string
 ): string {
   const date = formatDateForFilename();
@@ -1540,6 +1540,48 @@ export function formatPDFTimestamp(date: Date = new Date()): string {
     minute: '2-digit',
     hour12: true,
   }).replace(':', '.');
+}
+
+// ============================================
+// TXT EXPORT UTILITY
+// ============================================
+
+/**
+ * Export data as a plain-text summary file
+ * Useful for users who want simple, readable text output
+ */
+export function exportToTXT(
+  title: string,
+  sections: Array<{ heading: string; lines: string[] }>,
+  filename?: string
+): void {
+  const separator = '─'.repeat(50);
+  const doubleSeparator = '═'.repeat(50);
+
+  const lines: string[] = [
+    doubleSeparator,
+    `  ${COMPANY_INFO.shortName} — ${title}`,
+    `  Generated: ${formatTimestamp()}`,
+    doubleSeparator,
+    '',
+  ];
+
+  sections.forEach(section => {
+    lines.push(separator);
+    lines.push(`  ${section.heading.toUpperCase()}`);
+    lines.push(separator);
+    section.lines.forEach(line => lines.push(`  ${line}`));
+    lines.push('');
+  });
+
+  lines.push(separator);
+  lines.push(`  ${STANDARD_DISCLAIMER}`);
+  lines.push(`  ${COMPANY_INFO.website} | ${COMPANY_INFO.email}`);
+  lines.push(doubleSeparator);
+
+  const content = lines.join('\n');
+  const fname = filename || generateFilename(title.toLowerCase().replace(/\s+/g, '-'), 'txt');
+  downloadFile(content, fname, 'text/plain;charset=utf-8');
 }
 
 // ============================================

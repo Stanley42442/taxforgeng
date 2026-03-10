@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import { formatCurrency } from "./taxCalculations";
 import {
   BRAND_COLORS,
@@ -7,8 +8,6 @@ import {
   addPDFHeader,
   addPDFFooter,
   addPageNumbers,
-  addTableHeader,
-  addTableRow,
   addSummaryBox,
   addAccentSectionHeader,
   generateFilename,
@@ -25,20 +24,19 @@ export const exportMonthlySummaryPDF = (
   sortedMonths: Array<[string, MonthlyData]>
 ) => {
   const doc = new jsPDF();
-  const pageWidth = doc.internal.pageSize.getWidth();
   const margin = PDF_SETTINGS.margin;
 
   // Header
   let y = addPDFHeader(doc, { badgeText: 'EXPENSE SUMMARY' });
 
   // Title
-  doc.setTextColor(BRAND_COLORS.text[0], BRAND_COLORS.text[1], BRAND_COLORS.text[2]);
+  doc.setTextColor(...BRAND_COLORS.text);
   doc.setFontSize(20);
   doc.setFont('helvetica', 'bold');
   doc.text('Monthly Expense Summary', margin, y);
   y += 8;
 
-  doc.setTextColor(BRAND_COLORS.muted[0], BRAND_COLORS.muted[1], BRAND_COLORS.muted[2]);
+  doc.setTextColor(...BRAND_COLORS.muted);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.text(`Generated: ${formatNigerianDate(new Date().toISOString())}`, margin, y);
@@ -64,40 +62,56 @@ export const exportMonthlySummaryPDF = (
   // Table section header
   y = addAccentSectionHeader(doc, 'MONTHLY BREAKDOWN', y, 'green');
 
-  // Table header
-  y = addTableHeader(doc, [
-    { text: 'Month', x: margin + 5 },
-    { text: 'Income', x: margin + 70 },
-    { text: 'Expenses', x: margin + 110 },
-    { text: 'Net', x: pageWidth - margin - 5, align: 'right' as const },
-  ], y);
-
-  // Table rows
-  sortedMonths.forEach(([, data], index) => {
-    y = addTableRow(doc, [
-      { text: data.monthName, x: margin + 5 },
-      { text: formatCurrency(data.income), x: margin + 70, color: BRAND_COLORS.success },
-      { text: formatCurrency(data.expenses), x: margin + 110, color: BRAND_COLORS.danger },
-      { 
-        text: formatCurrency(data.net), 
-        x: pageWidth - margin - 5, 
-        align: 'right' as const,
-        color: data.net >= 0 ? BRAND_COLORS.success : BRAND_COLORS.danger
-      },
-    ], y, index % 2 === 0);
+  // AutoTable for monthly breakdown — handles pagination automatically
+  autoTable(doc, {
+    startY: y,
+    head: [['Month', 'Income', 'Expenses', 'Net']],
+    body: sortedMonths.map(([, data]) => [
+      data.monthName,
+      formatCurrency(data.income),
+      formatCurrency(data.expenses),
+      formatCurrency(data.net),
+    ]),
+    foot: [['TOTAL', formatCurrency(totals.income), formatCurrency(totals.expenses), formatCurrency(totals.net)]],
+    theme: 'grid',
+    headStyles: {
+      fillColor: [BRAND_COLORS.nigerianGreen[0], BRAND_COLORS.nigerianGreen[1], BRAND_COLORS.nigerianGreen[2]],
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+      fontSize: 9,
+    },
+    footStyles: {
+      fillColor: [BRAND_COLORS.nigerianGreen[0], BRAND_COLORS.nigerianGreen[1], BRAND_COLORS.nigerianGreen[2]],
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+      fontSize: 9,
+    },
+    bodyStyles: {
+      fontSize: 9,
+      textColor: [BRAND_COLORS.text[0], BRAND_COLORS.text[1], BRAND_COLORS.text[2]],
+    },
+    alternateRowStyles: {
+      fillColor: [BRAND_COLORS.lightBg[0], BRAND_COLORS.lightBg[1], BRAND_COLORS.lightBg[2]],
+    },
+    columnStyles: {
+      0: { cellWidth: 50 },
+      1: { halign: 'right', textColor: [BRAND_COLORS.success[0], BRAND_COLORS.success[1], BRAND_COLORS.success[2]] },
+      2: { halign: 'right', textColor: [BRAND_COLORS.danger[0], BRAND_COLORS.danger[1], BRAND_COLORS.danger[2]] },
+      3: { halign: 'right' },
+    },
+    margin: { left: margin, right: margin },
+    didParseCell: (data) => {
+      // Color net column based on value
+      if (data.column.index === 3 && data.section === 'body') {
+        const rowData = sortedMonths[data.row.index];
+        if (rowData) {
+          const net = rowData[1].net;
+          const color = net >= 0 ? BRAND_COLORS.success : BRAND_COLORS.danger;
+          data.cell.styles.textColor = [color[0], color[1], color[2]];
+        }
+      }
+    },
   });
-
-  // Totals row
-  y += 3;
-  doc.setFillColor(BRAND_COLORS.nigerianGreen[0], BRAND_COLORS.nigerianGreen[1], BRAND_COLORS.nigerianGreen[2]);
-  doc.rect(margin, y, pageWidth - margin * 2, 12, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.text('TOTAL', margin + 5, y + 8);
-  doc.text(formatCurrency(totals.income), margin + 70, y + 8);
-  doc.text(formatCurrency(totals.expenses), margin + 110, y + 8);
-  doc.text(formatCurrency(totals.net), pageWidth - margin - 5, y + 8, { align: 'right' });
 
   // Footer
   addPDFFooter(doc, {

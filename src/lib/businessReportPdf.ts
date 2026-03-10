@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import { formatCurrency } from "./taxCalculations";
 import {
   BRAND_COLORS,
@@ -9,11 +10,7 @@ import {
   addPageNumbers,
   addSummaryGrid,
   addAccentSectionHeader,
-  addTableHeader,
-  addTableRow,
-  checkPageBreak,
   truncateText,
-  type RGB,
 } from "./exportShared";
 
 interface Expense {
@@ -58,7 +55,7 @@ export const generateBusinessReportPDF = (data: BusinessReportData) => {
   const margin = PDF_SETTINGS.margin;
   const contentWidth = pageWidth - margin * 2;
 
-  // === HEADER (shared) ===
+  // === HEADER ===
   let y = addPDFHeader(doc, { badgeText: 'BUSINESS REPORT' });
 
   // Title
@@ -84,7 +81,7 @@ export const generateBusinessReportPDF = (data: BusinessReportData) => {
   doc.text(`Registered Turnover: ${formatCurrency(data.turnover)}`, margin, y);
   y += 15;
 
-  // === SUMMARY GRID (shared) ===
+  // === SUMMARY GRID ===
   y = addSummaryGrid(doc, [
     { label: 'Income', value: formatCurrency(data.totalIncome), color: BRAND_COLORS.success },
     { label: 'Expenses', value: formatCurrency(data.totalExpenses), color: BRAND_COLORS.danger },
@@ -125,53 +122,88 @@ export const generateBusinessReportPDF = (data: BusinessReportData) => {
 
   y += 45;
 
-  // === EXPENSE BREAKDOWN ===
+  // === EXPENSE BREAKDOWN (autotable) ===
   y = addAccentSectionHeader(doc, 'EXPENSE BREAKDOWN BY CATEGORY', y, 'gold');
 
-  y = addTableHeader(doc, [
-    { text: 'Category', x: margin + 5 },
-    { text: 'Amount', x: pageWidth - margin - 5, align: 'right' as const },
-  ], y);
-
   const categories = Object.entries(data.categoryBreakdown).sort(([, a], [, b]) => b - a);
-  categories.forEach(([category, amount], index) => {
-    y = checkPageBreak(doc, y, 15, () => margin + 20);
-    y = addTableRow(doc, [
-      { text: CATEGORY_LABELS[category] || category, x: margin + 5 },
-      { text: formatCurrency(amount), x: pageWidth - margin - 5, align: 'right' as const },
-    ], y, index % 2 === 0);
+
+  autoTable(doc, {
+    startY: y,
+    head: [['Category', 'Amount']],
+    body: categories.map(([category, amount]) => [
+      CATEGORY_LABELS[category] || category,
+      formatCurrency(amount),
+    ]),
+    theme: 'grid',
+    headStyles: {
+      fillColor: [BRAND_COLORS.nigerianGreen[0], BRAND_COLORS.nigerianGreen[1], BRAND_COLORS.nigerianGreen[2]],
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+      fontSize: 9,
+    },
+    bodyStyles: {
+      fontSize: 9,
+      textColor: [BRAND_COLORS.text[0], BRAND_COLORS.text[1], BRAND_COLORS.text[2]],
+    },
+    alternateRowStyles: {
+      fillColor: [BRAND_COLORS.lightBg[0], BRAND_COLORS.lightBg[1], BRAND_COLORS.lightBg[2]],
+    },
+    columnStyles: {
+      1: { halign: 'right' },
+    },
+    margin: { left: margin, right: margin },
   });
 
-  y += 10;
+  // Get Y after autotable
+  y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
 
-  // === RECENT TRANSACTIONS ===
-  y = checkPageBreak(doc, y, 80, () => margin + 20);
+  // === RECENT TRANSACTIONS (autotable) ===
   y = addAccentSectionHeader(doc, `RECENT TRANSACTIONS (${Math.min(data.expenses.length, 10)} of ${data.expenses.length})`, y, 'blue');
 
-  y = addTableHeader(doc, [
-    { text: 'Date', x: margin + 5 },
-    { text: 'Description', x: margin + 30 },
-    { text: 'Type', x: pageWidth - margin - 40 },
-    { text: 'Amount', x: pageWidth - margin - 5, align: 'right' as const },
-  ], y);
-
   const recentExpenses = data.expenses.slice(0, 10);
-  recentExpenses.forEach((expense, index) => {
-    y = checkPageBreak(doc, y, 15, () => margin + 20);
 
-    const date = new Date(expense.date).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' });
-    const desc = truncateText(expense.description, 40);
-    const typeColor: RGB = expense.type === 'income' ? BRAND_COLORS.success : BRAND_COLORS.danger;
-
-    y = addTableRow(doc, [
-      { text: date, x: margin + 5 },
-      { text: desc, x: margin + 30 },
-      { text: expense.type === 'income' ? 'Income' : 'Expense', x: pageWidth - margin - 40, color: typeColor },
-      { text: formatCurrency(expense.amount), x: pageWidth - margin - 5, align: 'right' as const },
-    ], y, index % 2 === 0);
+  autoTable(doc, {
+    startY: y,
+    head: [['Date', 'Description', 'Type', 'Amount']],
+    body: recentExpenses.map(expense => [
+      new Date(expense.date).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }),
+      truncateText(expense.description, 40),
+      expense.type === 'income' ? 'Income' : 'Expense',
+      formatCurrency(expense.amount),
+    ]),
+    theme: 'grid',
+    headStyles: {
+      fillColor: [BRAND_COLORS.nigerianGreen[0], BRAND_COLORS.nigerianGreen[1], BRAND_COLORS.nigerianGreen[2]],
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+      fontSize: 9,
+    },
+    bodyStyles: {
+      fontSize: 9,
+      textColor: [BRAND_COLORS.text[0], BRAND_COLORS.text[1], BRAND_COLORS.text[2]],
+    },
+    alternateRowStyles: {
+      fillColor: [BRAND_COLORS.lightBg[0], BRAND_COLORS.lightBg[1], BRAND_COLORS.lightBg[2]],
+    },
+    columnStyles: {
+      0: { cellWidth: 30 },
+      2: { cellWidth: 25 },
+      3: { halign: 'right' },
+    },
+    margin: { left: margin, right: margin },
+    didParseCell: (cellData) => {
+      // Color the Type column
+      if (cellData.column.index === 2 && cellData.section === 'body') {
+        const expense = recentExpenses[cellData.row.index];
+        if (expense) {
+          const color = expense.type === 'income' ? BRAND_COLORS.success : BRAND_COLORS.danger;
+          cellData.cell.styles.textColor = [color[0], color[1], color[2]];
+        }
+      }
+    },
   });
 
-  // === FOOTER & PAGE NUMBERS (shared) ===
+  // === FOOTER & PAGE NUMBERS ===
   addPDFFooter(doc, {
     disclaimer: 'This report is generated for informational purposes only. Please verify all figures with your records.',
   });
