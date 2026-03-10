@@ -174,7 +174,7 @@ const VATGuideNigeria = () => {
 
       <section id="penalties">
         <h2 className="text-2xl font-bold text-foreground mb-4">Penalties for Non-Compliance</h2>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-border"><th className="text-left py-2 text-foreground font-semibold">Offence</th><th className="text-left py-2 text-foreground font-semibold">Penalty</th></tr></thead>

@@ -167,7 +167,7 @@ const TaxCalendar2026 = () => {
             { title: 'Keep records for 6 years', tip: 'NRS can audit tax returns going back 6 years. Maintain organised digital records of all invoices, receipts, and returns.' },
             { title: 'Reconcile monthly', tip: 'Don\'t wait until year-end. Reconcile your VAT, WHT, and PAYE records monthly to catch errors early.' },
           ].map((item, i) => (
-            <div key={i} className="glass-frosted rounded-xl p-5">
+            <div key={i} className="rounded-xl border border-border bg-card p-5">
               <h3 className="font-semibold text-foreground text-sm mb-1">{item.title}</h3>
               <p className="text-sm text-muted-foreground">{item.tip}</p>
             </div>

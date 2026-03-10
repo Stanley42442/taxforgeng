@@ -178,7 +178,7 @@ const WHTExplained = () => {
             { mistake: 'Not issuing credit notes', fix: 'Failure to issue credit notes within 30 days leaves the recipient unable to claim their credit. This damages business relationships and creates compliance issues.' },
             { mistake: 'Forgetting to apply DTA rates', fix: 'For payments to treaty countries, the DTA rate (often lower) should be applied instead of the domestic rate.' },
           ].map((item, i) => (
-            <div key={i} className="glass-frosted rounded-xl p-5 border-l-4 border-warning/60">
+            <div key={i} className="rounded-xl border border-border bg-card p-5 border-l-4 border-warning/60">
               <h3 className="font-semibold text-foreground text-sm mb-1">{item.mistake}</h3>
               <p className="text-sm text-muted-foreground">{item.fix}</p>
             </div>

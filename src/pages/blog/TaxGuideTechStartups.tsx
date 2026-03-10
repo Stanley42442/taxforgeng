@@ -197,7 +197,7 @@ const TaxGuideTechStartups = () => {
             { mistake: 'Missing the VAT registration trigger', fix: 'Monitor your rolling 12-month turnover. Register for VAT within 6 months of crossing ₦25M.' },
             { mistake: 'Not documenting expenses properly', fix: 'Keep receipts and invoices for all business expenses. Unsubstantiated deductions can be disallowed by NRS.' },
           ].map((item, i) => (
-            <div key={i} className="glass-frosted rounded-xl p-5 border-l-4 border-warning/60">
+            <div key={i} className="rounded-xl border border-border bg-card p-5 border-l-4 border-warning/60">
               <h3 className="font-semibold text-foreground text-sm mb-1">❌ {item.mistake}</h3>
               <p className="text-sm text-muted-foreground">✅ {item.fix}</p>
             </div>
