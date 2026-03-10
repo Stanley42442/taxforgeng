@@ -7,11 +7,11 @@ interface AuthorBoxProps {
 }
 
 export const AuthorBox = ({ date, updated, author = 'TaxForge NG Team' }: AuthorBoxProps) => (
-  <div className="flex items-center gap-4 glass-frosted rounded-xl px-5 py-3 mb-8">
+  <div className="flex items-center gap-4 rounded-xl border border-border bg-card px-5 py-3 mb-8">
     <div className="h-10 w-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground">
       <User className="h-5 w-5" />
     </div>
-    <div>
+    <div className="border-l border-border pl-4">
       <p className="text-sm font-semibold text-foreground">{author}</p>
       <div className="flex items-center gap-3 text-xs text-muted-foreground">
         <span className="flex items-center gap-1">

@@ -90,6 +90,9 @@ const Blog = () => {
   const [category, setCategory] = useState('All');
   const filtered = category === 'All' ? POSTS : POSTS.filter((p) => p.category === category);
 
+  const getCategoryCount = (cat: string) =>
+    cat === 'All' ? POSTS.length : POSTS.filter((p) => p.category === cat).length;
+
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
@@ -129,24 +132,26 @@ const Blog = () => {
                 />
               </header>
 
-              {/* Category filter */}
-              <div className="flex gap-2 mb-8 flex-wrap justify-center">
-                {CATEGORIES.map((c) => (
-                  <Badge
-                    key={c}
-                    variant={c === category ? 'default' : 'outline'}
-                    className="cursor-pointer px-4 py-1.5 text-sm transition-colors"
-                    onClick={() => setCategory(c)}
-                  >
-                    {c}
-                  </Badge>
-                ))}
+              {/* Category filter toolbar */}
+              <div className="rounded-lg border border-border bg-card p-3 mb-8">
+                <div className="flex gap-2 flex-wrap justify-center">
+                  {CATEGORIES.map((c) => (
+                    <Badge
+                      key={c}
+                      variant={c === category ? 'default' : 'outline'}
+                      className="cursor-pointer px-4 py-1.5 text-sm transition-colors"
+                      onClick={() => setCategory(c)}
+                    >
+                      {c} <span className="ml-1 text-xs opacity-70">({getCategoryCount(c)})</span>
+                    </Badge>
+                  ))}
+                </div>
               </div>
 
               {/* Post grid */}
               <div className="grid gap-6 md:grid-cols-2 mb-12">
-                {filtered.map((post) => (
-                  <BlogCard key={post.slug} {...post} />
+                {filtered.map((post, i) => (
+                  <BlogCard key={post.slug} {...post} featured={i === 0 && category === 'All'} />
                 ))}
               </div>
 

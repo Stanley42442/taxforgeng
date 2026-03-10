@@ -9,12 +9,17 @@ export interface BlogPostMeta {
   date: string;
   category: string;
   readTime: string;
+  featured?: boolean;
 }
 
-export const BlogCard = ({ slug, title, excerpt, date, category, readTime }: BlogPostMeta) => (
+export const BlogCard = ({ slug, title, excerpt, date, category, readTime, featured }: BlogPostMeta) => (
   <Link
     to={`/blog/${slug}`}
-    className="rounded-xl border border-border bg-card p-6 hover:border-primary/40 hover:shadow-md transition-all group flex flex-col"
+    className={`rounded-xl border bg-card flex flex-col transition-all group ${
+      featured
+        ? 'md:col-span-2 border-t-2 border-t-primary border-border p-8 hover:shadow-lg'
+        : 'border-border p-6 hover:shadow-md'
+    } hover:border-primary/40`}
   >
     <div className="flex items-center gap-2 mb-3">
       <Badge variant="outline" className="text-xs">{category}</Badge>
@@ -22,7 +27,7 @@ export const BlogCard = ({ slug, title, excerpt, date, category, readTime }: Blo
         <Clock className="h-3 w-3" /> {readTime}
       </span>
     </div>
-    <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+    <h3 className={`font-bold text-foreground mb-2 group-hover:text-primary transition-colors ${featured ? 'text-xl' : 'text-lg'}`}>
       {title}
     </h3>
     <p className="text-sm text-muted-foreground mb-4 flex-grow">{excerpt}</p>
