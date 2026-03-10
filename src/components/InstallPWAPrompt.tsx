@@ -110,7 +110,7 @@ export const InstallPWAPrompt = () => {
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
         className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-sm z-50"
       >
-        <div className="bg-card/95 backdrop-blur-xl border border-border/50 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-card border border-border/50 rounded-2xl shadow-2xl overflow-hidden">
           {/* Header with app icon */}
           <div className="p-4 pb-3 flex items-start gap-3">
             <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
