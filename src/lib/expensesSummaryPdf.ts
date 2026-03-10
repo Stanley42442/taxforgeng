@@ -10,6 +10,7 @@ import {
   addTableHeader,
   addTableRow,
   addSummaryBox,
+  addAccentSectionHeader,
   generateFilename,
 } from "./exportShared";
 
