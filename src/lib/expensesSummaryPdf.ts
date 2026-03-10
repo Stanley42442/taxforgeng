@@ -65,6 +65,7 @@ export const exportMonthlySummaryPDF = (
   y = addAccentSectionHeader(doc, 'MONTHLY BREAKDOWN', y, 'green');
 
   // Table header
+  y = addTableHeader(doc, [
     { text: 'Month', x: margin + 5 },
     { text: 'Income', x: margin + 70 },
     { text: 'Expenses', x: margin + 110 },
