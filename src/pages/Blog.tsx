@@ -7,6 +7,7 @@ import { ContentMeta } from '@/components/seo/ContentMeta';
 import { BlogCard, type BlogPostMeta } from '@/components/blog/BlogCard';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
+import { PageLayout } from '@/components/PageLayout';
 
 const POSTS: BlogPostMeta[] = [
   {
