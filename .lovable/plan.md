@@ -1,43 +1,37 @@
 
 
-## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
+## Fix All 5 PDF Visual Issues
 
-A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
+Based on the uploaded PDFs and code review, here are the exact problems and fixes:
 
----
+### 1. Footer text collision (Invoice + all PDFs)
+**Problem:** `addPDFFooter` places disclaimer at `footerY + 2`, copyright at `footerY + 7`, timestamp at `footerY + 12`, and page numbers at `pageHeight - 10` — all within a 25px `footerHeight`. The long `STANDARD_DISCLAIMER` string doesn't wrap, so it overflows into the copyright line.
 
-### Content Structure
+**Fix:** Use `doc.splitTextToSize()` to wrap the disclaimer, then stack copyright and timestamp below it with proper spacing. Increase `footerHeight` from 25 to 40 to reserve more space. Update `checkPageBreak`'s bottom margin calculation accordingly.
 
-The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
+### 2. Alert/recommendation text overflow (PIT Report)
+**Problem:** In `addAlertBox`, long messages are rendered with a single `doc.text()` call at fixed height 12px — text runs off the right edge.
 
-| Section ID | Topic |
-|---|---|
-| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
-| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
-| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
-| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
-| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
-| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
-| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
-| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
-| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
-| `faq` | 5–6 FAQs with FAQPage schema |
+**Fix:** Use `doc.splitTextToSize()` inside `addAlertBox` to wrap text, then dynamically size the box height based on line count.
 
-### Technical Implementation
+### 3. Unicode icon rendering ("⚠" → "!9")
+**Problem:** `addAlertBox` and `addStatusBadge` use Unicode characters `\u26A0` (⚠), `\u2139` (ℹ), `\u2717` (✗) which Helvetica cannot render.
 
-**1. Create `src/pages/blog/PITMyths2026.tsx`**
-- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
-- ~1,500 words, authoritative tone matching existing posts
-- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
-- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
-- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
+**Fix:** Replace with simple ASCII markers: warning → `"!"`, info → `"i"`, danger → `"x"`, success → keep `"\u2713"` (checkmark works in Helvetica). Draw a small colored circle behind the letter for visual weight.
 
-**2. Register route in `src/App.tsx`**
-- Add lazy import and route at `/blog/pit-myths-2026`
+### 4. Repeating table headers on page breaks (autotable)
+**Problem:** `businessReportPdf.ts` and `expensesSummaryPdf.ts` use `jspdf-autotable` but don't set `showHead: 'everyPage'` (it defaults to `'everyPage'` in autotable, but the custom table rendering via `addTableHeader`/`addTableRow` in `pdfExport.ts` and `individualPdfExport.ts` does NOT repeat headers after `checkPageBreak`).
 
-**3. Add to blog listing in `src/pages/Blog.tsx`**
-- New entry in the `POSTS` array with category "Guides", today's date
+**Fix:** In the `checkPageBreak` callback (`onNewPage`) for table sections, re-render the table header. This applies to `pdfExport.ts` and `individualPdfExport.ts`.
 
-**4. Update sitemap (`public/sitemap.xml`)**
-- Add `/blog/pit-myths-2026` entry
+### 5. Invoice notes section overlapping footer
+**Problem:** The invoice's notes section (`y + 50` box at line 223) can extend into the footer area. No `checkPageBreak` is used.
+
+**Fix:** Add a space check before the notes section. If insufficient room, push to next page.
+
+### Files to modify
+1. **`src/lib/exportShared.ts`** — Fix `addPDFFooter` (wrap disclaimer text), fix `addAlertBox` (wrap + dynamic height), fix icon characters, increase `footerHeight`
+2. **`src/lib/pdfExport.ts`** — Add table header repeat in `onNewPage` callback
+3. **`src/lib/individualPdfExport.ts`** — Add table header repeat in `onNewPage` callback, wrap recommendation text with `splitTextToSize`
+4. **`src/lib/invoicePdfExport.ts`** — Add space check before notes section
 
