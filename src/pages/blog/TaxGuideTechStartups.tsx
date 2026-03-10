@@ -61,7 +61,7 @@ const TaxGuideTechStartups = () => {
             { tax: 'WHT', rate: '5-10%', desc: 'Deducted on payments for services, dividends, interest, and rent.' },
             { tax: 'PAYE', rate: '0-25%', desc: 'Personal income tax on employee salaries, deducted monthly.' },
           ].map((item) => (
-            <div key={item.tax} className="glass-frosted rounded-xl p-5">
+            <div key={item.tax} className="rounded-xl border border-border bg-card p-5">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-lg font-bold text-foreground">{item.tax}</span>
                 <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{item.rate}</span>
