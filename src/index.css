@@ -246,31 +246,23 @@ body {
      ================================================ */
   .glass {
     @apply border border-border;
-    background: hsl(var(--card) / 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: hsl(var(--card));
     box-shadow: var(--shadow-sm);
   }
 
   .glass-subtle {
     @apply border border-border/60;
-    background: hsl(var(--card) / 0.5);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: hsl(var(--card));
   }
 
   .glass-dark {
     @apply border-t border-border;
-    background: hsl(var(--muted) / 0.7);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: hsl(var(--muted));
   }
 
   .glass-frosted {
     @apply border border-border;
-    background: hsl(var(--card) / 0.65);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: hsl(var(--card));
     box-shadow: var(--shadow-sm);
   }
 
