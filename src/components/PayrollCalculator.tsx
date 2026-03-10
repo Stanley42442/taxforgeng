@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, Info } from "lucide-react";
+import { Calculator, Info, BookOpen, Percent, Receipt } from "lucide-react";
 import { formatCurrency } from "@/lib/taxCalculations";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import { RentReliefTooltip, RentReliefWarnings } from "@/components/RentReliefTooltip";
