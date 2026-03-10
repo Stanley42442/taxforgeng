@@ -239,8 +239,8 @@ export default function PersonalExpenses() {
           })}>
             <div>
               <h1 className={getResponsiveClasses(device, {
-                mobile: 'display-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent',
-                all: 'text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent'
+                mobile: 'display-lg font-bold text-foreground',
+                all: 'text-2xl sm:text-3xl font-bold text-foreground'
               })}>
                 Personal Expenses
               </h1>
