@@ -18,6 +18,7 @@ import { lazy, Suspense } from "react";
 
 const SuccessStories = lazy(() => import("@/components/SuccessStories").then(m => ({ default: m.SuccessStories })));
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { LavaLampBackground } from "@/components/LavaLampBackground";
 import { SEOHead, createSoftwareApplicationSchema, createOrganizationSchema, createLocalBusinessSchema } from "@/components/seo/SEOHead";
 import { useReviewStats } from "@/hooks/useReviewStats";
 
