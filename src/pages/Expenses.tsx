@@ -1554,7 +1554,7 @@ const Expenses = () => {
                   const isEditing = editingGoalBusiness === business.id;
                   
                   return (
-                    <div key={business.id} className="p-4 rounded-xl bg-card/50 border border-border/50">
+                    <div key={business.id} className="p-4 rounded-xl bg-card border border-border/50">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <span className="text-lg">🏢</span>
