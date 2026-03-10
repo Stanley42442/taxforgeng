@@ -68,7 +68,7 @@ const VATGuideNigeria = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           Under the 2026 rules, VAT registration is mandatory for any business or individual with an annual turnover exceeding <strong className="text-foreground">₦25 million</strong>. This threshold was clarified by the Nigeria Tax Act 2025 to reduce the compliance burden on micro-enterprises.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Registration Requirements</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
