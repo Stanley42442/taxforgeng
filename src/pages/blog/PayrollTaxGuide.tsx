@@ -55,7 +55,7 @@ const PayrollTaxGuide = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           As a Nigerian employer, you are responsible for deducting and remitting several taxes and contributions from your employees' salaries. These obligations apply regardless of your company size, though some levies have minimum employee thresholds.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Summary of Employer Obligations</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
