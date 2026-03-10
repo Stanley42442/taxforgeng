@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { LucideIcon } from "lucide-react";
+import { LavaLampBackground } from "./LavaLampBackground";
 
 interface PageLayoutProps {
   children: ReactNode;
