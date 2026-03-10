@@ -149,6 +149,8 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     loading: true,
     isOnTrial: false,
     trialEndsAt: null,
+    isInGracePeriod: false,
+    gracePeriodEndsAt: null,
   });
 
   // Fetch user profile and businesses from database
