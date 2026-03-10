@@ -734,8 +734,8 @@ const SecurityDashboard = () => {
                   <p className="text-sm text-muted-foreground">Total Logins</p>
                   <p className="text-2xl font-bold">{stats.totalLogins}</p>
                 </div>
-                <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                  <LogIn className="h-6 w-6 text-green-600" />
+                <div className="h-12 w-12 rounded-full bg-success/10 flex items-center justify-center">
+                  <LogIn className="h-6 w-6 text-success" />
                 </div>
               </div>
             </CardContent>
