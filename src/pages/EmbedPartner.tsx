@@ -386,7 +386,7 @@ export default function EmbedPartner() {
             </TabsContent>
 
             <TabsContent value="iframe">
-              <Card>
+              <Card className="glass-frosted">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">iFrame — for CMS platforms (WordPress, Webflow, etc.)</CardTitle>
                   <CopyButton text={IFRAME_SNIPPET} label="Copy Snippet" />
