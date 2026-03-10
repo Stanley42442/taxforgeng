@@ -18,6 +18,7 @@ import {
   addAccentSectionHeader,
   checkPageBreak,
 } from "./exportShared";
+import type { TableColumn } from "./exportShared";
 import type { VerificationData, ValidationResult } from "@/types/verification";
 import { VERIFICATION_SOURCES } from "@/types/verification";
 
