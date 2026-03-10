@@ -1117,14 +1117,14 @@ const SecurityDashboard = () => {
                             >
                               <div className="flex items-center gap-3">
                                 <div className={`h-8 w-8 shrink-0 rounded-full flex items-center justify-center ${
-                                  isCurrentDevice ? 'bg-primary/10' : 'bg-green-100 dark:bg-green-900/30'
+                                  isCurrentDevice ? 'bg-primary/10' : 'bg-success/10'
                                 }`}>
                                   {device.deviceType === 'mobile' ? (
-                                    <Smartphone className={`h-4 w-4 ${isCurrentDevice ? 'text-primary' : 'text-green-600'}`} />
+                                    <Smartphone className={`h-4 w-4 ${isCurrentDevice ? 'text-primary' : 'text-success'}`} />
                                   ) : device.deviceType === 'tablet' ? (
-                                    <Tablet className={`h-4 w-4 ${isCurrentDevice ? 'text-primary' : 'text-green-600'}`} />
+                                    <Tablet className={`h-4 w-4 ${isCurrentDevice ? 'text-primary' : 'text-success'}`} />
                                   ) : (
-                                    <Laptop className={`h-4 w-4 ${isCurrentDevice ? 'text-primary' : 'text-green-600'}`} />
+                                    <Laptop className={`h-4 w-4 ${isCurrentDevice ? 'text-primary' : 'text-success'}`} />
                                   )}
                                 </div>
                                 <div className="flex-1 min-w-0">
