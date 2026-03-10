@@ -1725,7 +1725,7 @@ const Expenses = () => {
               </div>
               <div className="space-y-3">
                 {sortedMonths.map(([key, data]) => (
-                  <div key={key} className="bg-card/50 border border-border/50 rounded-lg p-4 overflow-hidden">
+                  <div key={key} className="bg-card border border-border/50 rounded-lg p-4 overflow-hidden">
                     <p className="font-medium text-foreground mb-2">{data.monthName}</p>
                     <div className="grid grid-cols-3 gap-2 text-sm">
                       <div className="min-w-0">
