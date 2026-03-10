@@ -87,7 +87,7 @@ body {
     /* Gradients — simplified */
     --gradient-primary: linear-gradient(135deg, hsl(152 55% 28%) 0%, hsl(152 50% 36%) 100%);
     --gradient-accent: linear-gradient(135deg, hsl(38 90% 52%) 0%, hsl(32 85% 48%) 100%);
-    --gradient-hero: hsl(0 0% 99%);
+    --gradient-hero: hsl(40 20% 98.5%);
     --gradient-card: hsl(0 0% 100%);
 
     /* Shadows — clean, simple */
