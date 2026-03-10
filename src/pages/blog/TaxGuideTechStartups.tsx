@@ -83,7 +83,7 @@ const TaxGuideTechStartups = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           Most early-stage tech startups — from fintech MVPs to SaaS platforms to e-commerce ventures — comfortably qualify. The threshold was doubled from ₦25 million in the 2026 reforms, making this benefit accessible to many more companies.
         </p>
-        <div className="glass-frosted rounded-xl p-5 border-l-4 border-success mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 border-l-4 border-success mb-4">
           <h3 className="font-semibold text-foreground mb-2">Example: Pre-Revenue Startup</h3>
           <p className="text-sm text-muted-foreground">
             A recently incorporated fintech with ₦0 revenue, ₦5M in seed funding spent on development, and ₦8M in assets. <strong className="text-foreground">Result:</strong> Qualifies for 0% CIT. Since there are no assessable profits, the Development Levy is also ₦0. Total tax: ₦0.
