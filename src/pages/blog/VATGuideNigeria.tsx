@@ -136,7 +136,7 @@ const VATGuideNigeria = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           <strong className="text-foreground">Output VAT</strong> is the VAT you charge on your sales. <strong className="text-foreground">Input VAT</strong> is the VAT you pay on your business purchases. The difference is what you remit to NRS.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Monthly VAT Calculation</h3>
           <div className="text-sm text-muted-foreground space-y-1">
             <p>Output VAT collected in January: ₦500,000</p>
