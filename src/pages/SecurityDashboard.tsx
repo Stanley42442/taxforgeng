@@ -981,7 +981,7 @@ const SecurityDashboard = () => {
                                     <Button
                                       variant="ghost"
                                       size="icon"
-                                      className={`h-7 w-7 ${device.is_trusted ? "text-amber-500 hover:text-amber-600 hover:bg-amber-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}`}
+                                      className={`h-7 w-7 ${device.is_trusted ? "text-warning hover:text-warning hover:bg-warning/10" : "text-success hover:text-success hover:bg-success/10"}`}
                                       onClick={() => handleToggleTrust(device.id, device.is_trusted)}
                                       disabled={togglingTrustId === device.id}
                                     >
