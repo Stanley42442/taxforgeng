@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { LavaLampBackground } from '@/components/LavaLampBackground';
 import { Link } from 'react-router-dom';
 import { SEOHead, createCalculatorSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema, createTaxRateSchema, createSpeakableSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
@@ -143,13 +144,8 @@ const SalaryAfterTax = () => {
         schema={schema}
       />
 
-      <div className="min-h-screen flex flex-col">
-        {/* Background */}
-        <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
-        <div className="fixed inset-0 bg-mesh pointer-events-none" />
-        <div className="fixed inset-0 bg-dots opacity-20 pointer-events-none" />
-        <div className="fixed top-20 right-10 w-80 h-80 rounded-full bg-primary/10 blur-3xl animate-float-slow pointer-events-none" />
-        <div className="fixed bottom-20 left-10 w-64 h-64 rounded-full bg-success/8 blur-3xl animate-float pointer-events-none" />
+      <div className="min-h-screen flex flex-col bg-background bg-ambient">
+        <LavaLampBackground />
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">

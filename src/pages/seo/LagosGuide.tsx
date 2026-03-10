@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { LavaLampBackground } from '@/components/LavaLampBackground';
 import { SEOHead, createArticleSchema, createFAQSchema, createBreadcrumbSchema, createHowToSchema } from '@/components/seo/SEOHead';
 import { SEOHero } from '@/components/seo/SEOHero';
 import { CTASection } from '@/components/seo/CTASection';
@@ -63,9 +64,8 @@ const LagosGuide = () => {
         schema={schema}
       />
 
-      <div className="min-h-screen flex flex-col">
-        <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
-        <div className="fixed inset-0 bg-mesh pointer-events-none" />
+      <div className="min-h-screen flex flex-col bg-background bg-ambient">
+        <LavaLampBackground />
 
         <main className="relative z-10 flex-grow">
           <div className="container mx-auto px-4 py-8 md:py-12">

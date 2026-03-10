@@ -734,8 +734,8 @@ const SecurityDashboard = () => {
                   <p className="text-sm text-muted-foreground">Total Logins</p>
                   <p className="text-2xl font-bold">{stats.totalLogins}</p>
                 </div>
-                <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                  <LogIn className="h-6 w-6 text-green-600" />
+                <div className="h-12 w-12 rounded-full bg-success/10 flex items-center justify-center">
+                  <LogIn className="h-6 w-6 text-success" />
                 </div>
               </div>
             </CardContent>
@@ -782,13 +782,13 @@ const SecurityDashboard = () => {
                 </div>
                 <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
                   stats.mfaEnabled 
-                    ? 'bg-green-100 dark:bg-green-900/30' 
-                    : 'bg-amber-100 dark:bg-amber-900/30'
+                    ? 'bg-success/10' 
+                    : 'bg-warning/10'
                 }`}>
                   <Smartphone className={`h-6 w-6 ${
                     stats.mfaEnabled 
-                      ? 'text-green-600' 
-                      : 'text-amber-600'
+                      ? 'text-success' 
+                      : 'text-warning'
                   }`} />
                 </div>
               </div>
@@ -804,14 +804,14 @@ const SecurityDashboard = () => {
                 </div>
                 <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
                   stats.backupCodesRemaining > 3 
-                    ? 'bg-green-100 dark:bg-green-900/30' 
+                    ? 'bg-success/10' 
                     : stats.backupCodesRemaining > 0
-                      ? 'bg-amber-100 dark:bg-amber-900/30'
+                      ? 'bg-warning/10'
                       : 'bg-muted'
                 }`}>
                   <Key className={`h-6 w-6 ${
                     stats.backupCodesRemaining > 3 
-                      ? 'text-green-600' 
+                      ? 'text-success' 
                       : stats.backupCodesRemaining > 0
                         ? 'text-amber-600'
                         : 'text-muted-foreground'
@@ -934,15 +934,15 @@ const SecurityDashboard = () => {
                               device.is_blocked 
                                 ? 'bg-destructive/10' 
                                 : device.is_trusted 
-                                  ? 'bg-green-100 dark:bg-green-900/30' 
-                                  : 'bg-primary/10'
+                                   ? 'bg-success/10' 
+                                   : 'bg-primary/10'
                             }`}>
                               {device.is_blocked ? (
                                 <Ban className="h-4 w-4 text-destructive" />
                               ) : device.device_type === 'mobile' ? (
-                                <Smartphone className={`h-4 w-4 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
+                                <Smartphone className={`h-4 w-4 ${device.is_trusted ? 'text-success' : 'text-primary'}`} />
                               ) : device.device_type === 'tablet' ? (
-                                <Tablet className={`h-4 w-4 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
+                                <Tablet className={`h-4 w-4 ${device.is_trusted ? 'text-success' : 'text-primary'}`} />
                               ) : (
                                 <Laptop className={`h-4 w-4 ${device.is_trusted ? 'text-green-600' : 'text-primary'}`} />
                               )}
@@ -962,8 +962,8 @@ const SecurityDashboard = () => {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className={`h-7 w-7 ${device.is_blocked 
-                                      ? "text-green-600 hover:text-green-700 hover:bg-green-50" 
+                                     className={`h-7 w-7 ${device.is_blocked 
+                                      ? "text-success hover:text-success hover:bg-success/10" 
                                       : "text-destructive hover:text-destructive hover:bg-destructive/10"
                                     }`}
                                     onClick={() => handleToggleBlock(device.id, device.is_blocked)}
@@ -981,7 +981,7 @@ const SecurityDashboard = () => {
                                     <Button
                                       variant="ghost"
                                       size="icon"
-                                      className={`h-7 w-7 ${device.is_trusted ? "text-amber-500 hover:text-amber-600 hover:bg-amber-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}`}
+                                      className={`h-7 w-7 ${device.is_trusted ? "text-warning hover:text-warning hover:bg-warning/10" : "text-success hover:text-success hover:bg-success/10"}`}
                                       onClick={() => handleToggleTrust(device.id, device.is_trusted)}
                                       disabled={togglingTrustId === device.id}
                                     >
@@ -1019,7 +1019,7 @@ const SecurityDashboard = () => {
                                   <Badge variant="destructive" className="text-[10px] h-5 px-1.5">Blocked</Badge>
                                 )}
                                 {device.is_trusted && !device.is_blocked && (
-                                  <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50 dark:bg-green-900/20 text-[10px] h-5 px-1.5">Trusted</Badge>
+                                  <Badge variant="outline" className="text-success border-success/30 bg-success/10 text-[10px] h-5 px-1.5">Trusted</Badge>
                                 )}
                               </div>
                               
@@ -1117,14 +1117,14 @@ const SecurityDashboard = () => {
                             >
                               <div className="flex items-center gap-3">
                                 <div className={`h-8 w-8 shrink-0 rounded-full flex items-center justify-center ${
-                                  isCurrentDevice ? 'bg-primary/10' : 'bg-green-100 dark:bg-green-900/30'
+                                  isCurrentDevice ? 'bg-primary/10' : 'bg-success/10'
                                 }`}>
                                   {device.deviceType === 'mobile' ? (
-                                    <Smartphone className={`h-4 w-4 ${isCurrentDevice ? 'text-primary' : 'text-green-600'}`} />
+                                    <Smartphone className={`h-4 w-4 ${isCurrentDevice ? 'text-primary' : 'text-success'}`} />
                                   ) : device.deviceType === 'tablet' ? (
-                                    <Tablet className={`h-4 w-4 ${isCurrentDevice ? 'text-primary' : 'text-green-600'}`} />
+                                    <Tablet className={`h-4 w-4 ${isCurrentDevice ? 'text-primary' : 'text-success'}`} />
                                   ) : (
-                                    <Laptop className={`h-4 w-4 ${isCurrentDevice ? 'text-primary' : 'text-green-600'}`} />
+                                    <Laptop className={`h-4 w-4 ${isCurrentDevice ? 'text-primary' : 'text-success'}`} />
                                   )}
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -1134,10 +1134,10 @@ const SecurityDashboard = () => {
                                     </p>
                                     <div className="flex items-center gap-1">
                                       <span className="relative flex h-2 w-2">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success/75 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
                                       </span>
-                                      <span className="text-[10px] text-green-600 font-medium">Online</span>
+                                      <span className="text-[10px] text-success font-medium">Online</span>
                                     </div>
                                     {isCurrentDevice && (
                                       <Badge variant="outline" className="text-primary border-primary/30 text-[10px] h-5 px-1.5">
@@ -1294,8 +1294,8 @@ const SecurityDashboard = () => {
                           key={event.id}
                           className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
                         >
-                          <div className="h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                            <LogIn className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                          <div className="h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-full bg-success/10 flex items-center justify-center">
+                            <LogIn className="h-4 w-4 sm:h-5 sm:w-5 text-success" />
                           </div>
                           <div className="flex-1 min-w-0 overflow-hidden">
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
@@ -1369,9 +1369,9 @@ const SecurityDashboard = () => {
                               severity === 'error' 
                                 ? 'bg-destructive/5 border-destructive/20' 
                                 : severity === 'warning'
-                                  ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800'
+                                  ? 'bg-warning/5 border-warning/20'
                                   : severity === 'success'
-                                    ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800'
+                                    ? 'bg-success/5 border-success/20'
                                     : 'bg-muted/50 border-border'
                             }`}
                           >

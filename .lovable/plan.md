@@ -1,56 +1,43 @@
 
 
-## Redesign Remaining Unstyled Pages — Phase 4
+## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
 
-### Scope
+A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
 
-**15 SEO pages** still use the legacy `bg-gradient-hero` + `bg-mesh` + floating blur circles background system instead of the unified `LavaLampBackground` + `bg-ambient` system. Two security pages use hardcoded colors.
+---
 
-### Group 1: SEO Pages — Swap Background System (15 files)
+### Content Structure
 
-All SEO pages share the same legacy pattern:
-```jsx
-<div className="min-h-screen flex flex-col">
-  <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
-  <div className="fixed inset-0 bg-mesh pointer-events-none" />
-  <div className="fixed inset-0 bg-dots opacity-20 pointer-events-none" />
-  <div className="fixed top-20 ... blur-3xl animate-float-slow pointer-events-none" />
-  <div className="fixed bottom-20 ... blur-3xl animate-float pointer-events-none" />
-  <main className="relative z-10 flex-grow">
-```
+The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
 
-These pages cannot use `<PageLayout>` directly because they need `<SEOHead>` outside the layout and use `<article>` semantics with `container mx-auto`. Instead, replace the 4-5 background divs with `<LavaLampBackground />` + `bg-ambient` class:
+| Section ID | Topic |
+|---|---|
+| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
+| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
+| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
+| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
+| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
+| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
+| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
+| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
+| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
+| `faq` | 5–6 FAQs with FAQPage schema |
 
-```jsx
-<div className="min-h-screen flex flex-col bg-background bg-ambient">
-  <LavaLampBackground />
-  <main className="relative z-10 flex-grow">
-```
+### Technical Implementation
 
-**Files (15):**
-- `src/pages/seo/PITPAYECalculator.tsx`
-- `src/pages/seo/AbujaGuide.tsx`
-- `src/pages/seo/RentRelief2026.tsx`
-- `src/pages/seo/WHTCalculator.tsx`
-- `src/pages/seo/SmallCompanyExemption.tsx`
-- `src/pages/seo/KanoGuide.tsx`
-- `src/pages/seo/FreeCalculator.tsx`
-- `src/pages/seo/TaxReforms2026.tsx`
-- `src/pages/seo/SalaryAfterTax.tsx`
-- `src/pages/seo/StateGuidesHub.tsx`
-- `src/pages/seo/LagosGuide.tsx`
-- `src/pages/seo/VATCalculator.tsx`
-- `src/pages/seo/PortHarcourtGuide.tsx`
-- `src/pages/seo/CITCalculator.tsx`
-- `src/pages/seo/TaxReports.tsx`
+**1. Create `src/pages/blog/PITMyths2026.tsx`**
+- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
+- ~1,500 words, authoritative tone matching existing posts
+- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
+- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
+- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
 
-### Group 2: Security Pages — Theme-Aware Colors (2 files)
+**2. Register route in `src/App.tsx`**
+- Add lazy import and route at `/blog/pit-myths-2026`
 
-Replace hardcoded `bg-green-100 dark:bg-green-900/30`, `bg-yellow-100`, `bg-red-100`, `bg-blue-100` with semantic tokens (`bg-success/10`, `bg-warning/10`, `bg-destructive/10`, `bg-primary/10`).
+**3. Add to blog listing in `src/pages/Blog.tsx`**
+- New entry in the `POSTS` array with category "Guides", today's date
 
-**Files:**
-- `src/pages/SecurityTestResults.tsx`
-- `src/pages/SecurityDashboard.tsx`
-
-### Total: 17 files
+**4. Update sitemap (`public/sitemap.xml`)**
+- Add `/blog/pit-myths-2026` entry
 
