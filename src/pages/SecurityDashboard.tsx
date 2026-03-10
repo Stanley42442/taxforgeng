@@ -934,8 +934,8 @@ const SecurityDashboard = () => {
                               device.is_blocked 
                                 ? 'bg-destructive/10' 
                                 : device.is_trusted 
-                                  ? 'bg-green-100 dark:bg-green-900/30' 
-                                  : 'bg-primary/10'
+                                   ? 'bg-success/10' 
+                                   : 'bg-primary/10'
                             }`}>
                               {device.is_blocked ? (
                                 <Ban className="h-4 w-4 text-destructive" />
