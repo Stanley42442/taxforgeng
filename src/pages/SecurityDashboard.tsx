@@ -1369,9 +1369,9 @@ const SecurityDashboard = () => {
                               severity === 'error' 
                                 ? 'bg-destructive/5 border-destructive/20' 
                                 : severity === 'warning'
-                                  ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800'
+                                  ? 'bg-warning/5 border-warning/20'
                                   : severity === 'success'
-                                    ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800'
+                                    ? 'bg-success/5 border-success/20'
                                     : 'bg-muted/50 border-border'
                             }`}
                           >
