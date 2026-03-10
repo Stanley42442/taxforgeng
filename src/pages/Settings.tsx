@@ -121,7 +121,7 @@ const getEventIcon = (eventType: string) => {
     case 'login_failed':
       return <XCircle className="h-4 w-4 text-destructive" />;
     case 'password_change':
-      return <Key className="h-4 w-4 text-amber-500" />;
+      return <Key className="h-4 w-4 text-warning" />;
     case 'email_change':
       return <Mail className="h-4 w-4 text-blue-500" />;
     case '2fa_enabled':
