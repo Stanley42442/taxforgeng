@@ -526,7 +526,7 @@ const Documentation = () => {
           {/* Technical Tab */}
           <TabsContent value="technical" className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
-              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+              <Card className="border-border/50">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Code className="h-5 w-5 text-primary" />
