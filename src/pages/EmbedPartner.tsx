@@ -484,7 +484,7 @@ export default function EmbedPartner() {
 
       {/* ─── Why Partner ─── */}
       <section className="py-16">
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground">Why Partner with TaxForge NG?</h2>
           </div>
