@@ -207,7 +207,7 @@ const PITPAYEGuide2026 = () => {
             { mistake: 'Forgetting pension deduction', fix: 'Pension contributions (8% employee) are deducted before applying tax bands. Missing this overstates your tax.' },
             { mistake: 'Mixing up monthly and annual figures', fix: 'Tax bands are annual. Divide annual tax by 12 for the monthly PAYE figure.' },
           ].map((item, i) => (
-            <div key={i} className="glass-frosted rounded-xl p-5 border-l-4 border-warning/60">
+            <div key={i} className="rounded-xl border border-border bg-card p-5 border-l-4 border-warning/60">
               <h3 className="font-semibold text-foreground text-sm mb-1">❌ {item.mistake}</h3>
               <p className="text-sm text-muted-foreground">✅ {item.fix}</p>
             </div>

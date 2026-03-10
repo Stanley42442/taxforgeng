@@ -161,7 +161,7 @@ const SmallCompanyCITExemption = () => {
             { mistake: 'Assuming the Development Levy applies to small companies', fix: 'Small companies qualifying for 0% CIT are also exempt from the 4% Development Levy. The levy only applies to large companies.' },
             { mistake: 'Not tracking the asset threshold', fix: 'The ₦250M asset limit is new. If your business holds significant property, equipment, or IP, verify you\'re below this threshold.' },
           ].map((item, i) => (
-            <div key={i} className="glass-frosted rounded-xl p-5 border-l-4 border-warning/60">
+            <div key={i} className="rounded-xl border border-border bg-card p-5 border-l-4 border-warning/60">
               <h3 className="font-semibold text-foreground text-sm mb-1">❌ {item.mistake}</h3>
               <p className="text-sm text-muted-foreground">✅ {item.fix}</p>
             </div>
