@@ -6,6 +6,7 @@ import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
 import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
 import { ContentMeta } from '@/components/seo/ContentMeta';
 import { MapPin, Target, Zap, Shield, Users, Calculator, BarChart3, CheckCircle2, ArrowRight } from 'lucide-react';
+import { PageLayout } from '@/components/PageLayout';
 
 const About = () => {
   const schema = {
