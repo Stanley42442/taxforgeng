@@ -11,7 +11,7 @@ import {
   addSummaryBox,
   addTableHeader,
   addTableRow,
-  addSectionTitle,
+  addAccentSectionHeader,
   toCSV,
   addCSVHeader,
   downloadFile,
