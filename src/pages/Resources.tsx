@@ -8,6 +8,7 @@ import { ContentMeta } from '@/components/seo/ContentMeta';
 import { Download, FileText, Calculator, Calendar, CheckCircle2, ArrowRight, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { PageLayout } from '@/components/PageLayout';
 
 const Resources = () => {
   const schema = {
@@ -67,13 +68,8 @@ const Resources = () => {
         schema={schema}
       />
 
-      <div className="min-h-screen flex flex-col">
-        <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
-        <div className="fixed inset-0 bg-mesh pointer-events-none" />
-
-        <main className="relative z-10 flex-grow">
-          <article className="container mx-auto px-4 py-8 md:py-12">
-            <div className="max-w-4xl mx-auto">
+      <PageLayout maxWidth="4xl">
+          <article>
               <PageBreadcrumbs items={[
                 { label: 'Home', href: '/' },
                 { label: 'Resources' },
@@ -150,10 +146,8 @@ const Resources = () => {
               />
 
               <SEODisclaimer />
-            </div>
           </article>
-        </main>
-      </div>
+      </PageLayout>
     </>
   );
 };

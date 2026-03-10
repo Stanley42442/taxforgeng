@@ -106,10 +106,10 @@ const TIER_DISPLAY_NAMES: Record<string, string> = {
 
 const TIER_COLORS: Record<string, string> = {
   free: 'bg-muted text-muted-foreground',
-  starter: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  basic: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200',
-  professional: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-  business: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
+  starter: 'bg-primary/10 text-primary',
+  basic: 'bg-success/10 text-success',
+  professional: 'bg-accent/10 text-accent-foreground',
+  business: 'bg-warning/10 text-warning',
   corporate: 'bg-gradient-to-r from-primary to-accent text-primary-foreground',
 };
 
@@ -117,16 +117,16 @@ const getEventIcon = (eventType: string) => {
   switch (eventType) {
     case 'login':
     case 'login_success':
-      return <LogIn className="h-4 w-4 text-green-500" />;
+      return <LogIn className="h-4 w-4 text-success" />;
     case 'login_failed':
       return <XCircle className="h-4 w-4 text-destructive" />;
     case 'password_change':
-      return <Key className="h-4 w-4 text-amber-500" />;
+      return <Key className="h-4 w-4 text-warning" />;
     case 'email_change':
-      return <Mail className="h-4 w-4 text-blue-500" />;
+      return <Mail className="h-4 w-4 text-primary" />;
     case '2fa_enabled':
     case '2fa_disabled':
-      return <Smartphone className="h-4 w-4 text-purple-500" />;
+      return <Smartphone className="h-4 w-4 text-accent-foreground" />;
     default:
       return <Shield className="h-4 w-4 text-muted-foreground" />;
   }
@@ -383,9 +383,8 @@ const Settings = () => {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-4xl space-y-6 animate-fade-in">
-          {/* Header skeleton */}
+      <PageLayout maxWidth="4xl">
+        <div className="space-y-6 animate-fade-in">
           <div className="flex items-center gap-4">
             <div className="skeleton-shimmer h-12 w-12 rounded-xl" />
             <div className="space-y-2">
@@ -393,11 +392,7 @@ const Settings = () => {
               <div className="skeleton-shimmer h-4 w-48 rounded" />
             </div>
           </div>
-          
-          {/* Tabs skeleton */}
           <div className="skeleton-shimmer h-12 w-full rounded-xl" />
-          
-          {/* Form skeleton */}
           <div className="glass-frosted rounded-xl p-6 space-y-6">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="space-y-2">
@@ -408,7 +403,7 @@ const Settings = () => {
             <div className="skeleton-shimmer h-10 w-32 rounded-lg" />
           </div>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 

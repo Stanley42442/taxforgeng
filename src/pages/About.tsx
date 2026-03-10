@@ -6,6 +6,7 @@ import { SEODisclaimer } from '@/components/seo/SEODisclaimer';
 import { PageBreadcrumbs } from '@/components/seo/PageBreadcrumbs';
 import { ContentMeta } from '@/components/seo/ContentMeta';
 import { MapPin, Target, Zap, Shield, Users, Calculator, BarChart3, CheckCircle2, ArrowRight } from 'lucide-react';
+import { PageLayout } from '@/components/PageLayout';
 
 const About = () => {
   const schema = {
@@ -52,14 +53,8 @@ const About = () => {
         schema={schema}
       />
 
-      <div className="min-h-screen flex flex-col">
-        <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
-        <div className="fixed inset-0 bg-mesh pointer-events-none" />
-        <div className="fixed inset-0 bg-dots opacity-20 pointer-events-none" />
-
-        <main className="relative z-10 flex-grow">
-          <div className="container mx-auto px-4 py-8 md:py-12">
-            <article className="max-w-4xl mx-auto">
+      <PageLayout maxWidth="4xl">
+            <article>
               <PageBreadcrumbs items={[
                 { label: 'Home', href: '/' },
                 { label: 'About' },
@@ -205,9 +200,7 @@ const About = () => {
 
               <SEODisclaimer />
             </article>
-          </div>
-        </main>
-      </div>
+      </PageLayout>
     </>
   );
 };

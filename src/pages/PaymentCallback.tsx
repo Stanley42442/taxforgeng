@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PageLayout } from '@/components/PageLayout';
 
 type VerificationStatus = 'verifying' | 'success' | 'failed' | 'error';
 
@@ -185,20 +186,16 @@ export default function PaymentCallback() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative w-full overflow-x-hidden">
-      <div className="fixed inset-0 bg-gradient-hero pointer-events-none" />
-      <div className="fixed inset-0 bg-mesh pointer-events-none" />
-      <main className="flex-1 relative z-10 py-8 px-4 sm:px-6 lg:px-8 w-full">
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <Card className="w-full max-w-md">
-            <CardContent className="pt-6">
-              <AnimatePresence mode="wait">
-                {renderContent()}
-              </AnimatePresence>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-    </div>
+    <PageLayout maxWidth="md">
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Card className="w-full max-w-md glass-frosted">
+          <CardContent className="pt-6">
+            <AnimatePresence mode="wait">
+              {renderContent()}
+            </AnimatePresence>
+          </CardContent>
+        </Card>
+      </div>
+    </PageLayout>
   );
 }

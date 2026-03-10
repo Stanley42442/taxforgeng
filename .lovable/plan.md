@@ -1,55 +1,43 @@
 
 
-## Redesign Remaining Pages for Fintech Glassmorphism Consistency
+## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
 
-### Scope Assessment
+A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
 
-After auditing all 60+ pages, most already use `PageLayout` (53 pages) and many use `glass-frosted` styling. The following groups need updates:
+---
 
-### Group 1: Content/SEO Pages — Upgrade Background System (5 pages)
-These pages use a legacy `bg-gradient-hero` + `bg-mesh` background instead of the `PageLayout` + `LavaLampBackground` + `bg-ambient` system used everywhere else.
+### Content Structure
 
-**Pages:** `About.tsx`, `Blog.tsx`, `Resources.tsx`, `FAQ.tsx`, `PaymentCallback.tsx`
+The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
 
-**Change:** Replace the custom wrapper (`<div className="min-h-screen flex flex-col">` + fixed gradient/mesh backgrounds) with `<PageLayout>`, keeping all existing internal content (which already uses `glass-frosted` properly).
+| Section ID | Topic |
+|---|---|
+| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
+| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
+| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
+| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
+| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
+| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
+| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
+| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
+| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
+| `faq` | 5–6 FAQs with FAQPage schema |
 
-### Group 2: Hardcoded Status Colors — Replace with Theme-Aware Classes (3 pages)
-These pages use raw Tailwind colors (`bg-yellow-100`, `bg-blue-100`, `bg-red-100`, `bg-green-100`) instead of theme-aware design tokens.
+### Technical Implementation
 
-**Pages:** `Compliance.tsx`, `Invoices.tsx`, `BillingHistory.tsx`
+**1. Create `src/pages/blog/PITMyths2026.tsx`**
+- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
+- ~1,500 words, authoritative tone matching existing posts
+- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
+- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
+- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
 
-**Change:** Replace hardcoded `statusColors` maps with theme-aware alternatives:
-- Pending/Draft → `bg-warning/10 text-warning`
-- In Progress/Sent → `bg-primary/10 text-primary`
-- Completed/Paid → `bg-success/10 text-success`
-- Overdue/Cancelled → `bg-destructive/10 text-destructive`
+**2. Register route in `src/App.tsx`**
+- Add lazy import and route at `/blog/pit-myths-2026`
 
-### Group 3: EmbedPartner Page — Full Glassmorphism Upgrade (1 page)
-`EmbedPartner.tsx` uses plain `bg-background`, `bg-secondary/20`, bare `Card`s with `border border-border`, and `bg-card border border-border rounded-xl` for step cards. No glass effects at all.
+**3. Add to blog listing in `src/pages/Blog.tsx`**
+- New entry in the `POSTS` array with category "Guides", today's date
 
-**Change:**
-- Wrap in `PageLayout` with `showBackground={true}`
-- Hero section: use `glass-frosted` for stats cards
-- Feature cards: add `glass-frosted rounded-2xl hover-lift`
-- Step cards: `glass-frosted rounded-xl` instead of `bg-card border border-border rounded-xl`
-- Section backgrounds: remove `bg-secondary/20` and `bg-secondary/10`, use transparent sections over the ambient background
-- Form card: `glass-frosted rounded-2xl shadow-futuristic`
-
-### Group 4: Loading Skeletons — Consistent Glass Treatment (2 pages)
-`Settings.tsx` and `ProfitLoss.tsx` have loading states that use raw `min-h-screen` divs without `PageLayout`.
-
-**Change:** Wrap loading states in `<PageLayout>` so even loading states get the ambient background and consistent spacing.
-
-### Files to Edit (11 total)
-1. `src/pages/About.tsx` — swap wrapper to PageLayout
-2. `src/pages/Blog.tsx` — swap wrapper to PageLayout
-3. `src/pages/Resources.tsx` — swap wrapper to PageLayout
-4. `src/pages/FAQ.tsx` — swap wrapper to PageLayout
-5. `src/pages/PaymentCallback.tsx` — swap wrapper to PageLayout
-6. `src/pages/Compliance.tsx` — theme-aware status colors
-7. `src/pages/Invoices.tsx` — theme-aware status colors
-8. `src/pages/BillingHistory.tsx` — theme-aware status colors
-9. `src/pages/EmbedPartner.tsx` — full glassmorphism upgrade
-10. `src/pages/Settings.tsx` — loading state in PageLayout
-11. `src/pages/ProfitLoss.tsx` — loading state in PageLayout
+**4. Update sitemap (`public/sitemap.xml`)**
+- Add `/blog/pit-myths-2026` entry
 

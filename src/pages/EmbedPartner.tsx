@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { EmbeddableCalculator } from "@/components/EmbeddableCalculator";
 import { SEOHead, createHowToSchema, createCalculatorSchema } from "@/components/seo/SEOHead";
+import { PageLayout } from "@/components/PageLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
@@ -285,7 +286,7 @@ export default function EmbedPartner() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <PageLayout maxWidth="6xl" showBackground={true}>
       <SEOHead
         title="Embed Nigeria Tax Calculator on Your Site | TaxForge NG Partner Program"
         description="Free embeddable Nigeria tax calculator widget for media, fintechs and accountancy firms. Live demo, ready-to-paste code snippets, and full integration guide."
@@ -295,8 +296,8 @@ export default function EmbedPartner() {
       />
 
       {/* ─── Hero ─── */}
-      <section className="bg-gradient-to-br from-primary/10 via-background to-secondary/10 border-b border-border">
-        <div className="container mx-auto px-4 py-16 md:py-24 text-center max-w-4xl">
+      <section className="mb-16">
+        <div className="text-center max-w-4xl mx-auto">
           <Badge variant="secondary" className="mb-4 gap-1.5">
             <Zap className="h-3 w-3" /> Free for Partners
           </Badge>
@@ -328,7 +329,7 @@ export default function EmbedPartner() {
               { label: "Mobile friendly", value: "100%" },
               { label: "Setup time", value: "< 5 min" },
             ].map((s) => (
-              <div key={s.label} className="bg-card border border-border rounded-xl p-4">
+              <div key={s.label} className="glass-frosted rounded-xl p-4 hover-lift">
                 <p className="text-2xl font-bold text-primary">{s.value}</p>
                 <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
               </div>
@@ -338,8 +339,8 @@ export default function EmbedPartner() {
       </section>
 
       {/* ─── Live Demo ─── */}
-      <section id="demo" className="py-16 bg-secondary/20">
-        <div className="container mx-auto px-4 max-w-2xl">
+      <section id="demo" className="py-16">
+        <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
             <Badge variant="outline" className="mb-3 gap-1.5 text-success border-success/40 bg-success/10">
               <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
@@ -354,7 +355,7 @@ export default function EmbedPartner() {
 
       {/* ─── Embed Snippets ─── */}
       <section id="snippets" className="py-16">
-        <div className="container mx-auto px-4 max-w-3xl">
+        <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground">Embed Code</h2>
             <p className="text-muted-foreground mt-2">Copy and paste one of the snippets below into your site.</p>
@@ -367,7 +368,7 @@ export default function EmbedPartner() {
             </TabsList>
 
             <TabsContent value="sdk">
-              <Card>
+              <Card className="glass-frosted">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">JavaScript SDK — recommended</CardTitle>
                   <CopyButton text={JS_SDK_SNIPPET} label="Copy Snippet" />
@@ -386,7 +387,7 @@ export default function EmbedPartner() {
             </TabsContent>
 
             <TabsContent value="iframe">
-              <Card>
+              <Card className="glass-frosted">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">iFrame — for CMS platforms (WordPress, Webflow, etc.)</CardTitle>
                   <CopyButton text={IFRAME_SNIPPET} label="Copy Snippet" />
@@ -408,8 +409,8 @@ export default function EmbedPartner() {
       </section>
 
       {/* ─── Integration Guide ─── */}
-      <section id="guide" className="py-16 bg-secondary/10">
-        <div className="container mx-auto px-4 max-w-3xl">
+      <section id="guide" className="py-16">
+        <div className="max-w-3xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">Integration Guide</h2>
@@ -444,7 +445,7 @@ export default function EmbedPartner() {
                 body: 'The widget includes a small "Powered by TaxForge NG" link in the footer. This fulfils the backlink agreement and must remain visible. Do not hide or remove it via CSS.',
               },
             ].map((s) => (
-              <div key={s.step} className="flex gap-4 p-4 bg-card border border-border rounded-xl">
+              <div key={s.step} className="flex gap-4 p-4 glass-frosted rounded-xl hover-lift">
                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
                   {s.step}
                 </div>
@@ -457,7 +458,7 @@ export default function EmbedPartner() {
           </div>
 
           {/* Troubleshooting */}
-          <Card>
+          <Card className="glass-frosted">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 text-warning" /> Troubleshooting
@@ -484,7 +485,7 @@ export default function EmbedPartner() {
 
       {/* ─── Why Partner ─── */}
       <section className="py-16">
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground">Why Partner with TaxForge NG?</h2>
           </div>
@@ -523,7 +524,7 @@ export default function EmbedPartner() {
             ].map((f) => {
               const Icon = f.icon;
               return (
-                <Card key={f.title} className="border border-border">
+                <Card key={f.title} className="glass-frosted hover-lift">
                   <CardContent className="pt-6">
                     <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                       <Icon className="h-5 w-5 text-primary" />
@@ -539,8 +540,8 @@ export default function EmbedPartner() {
       </section>
 
       {/* ─── Partnership Request Form ─── */}
-      <section id="request" className="py-16 bg-secondary/10">
-        <div className="container mx-auto px-4 max-w-xl">
+      <section id="request" className="py-16">
+        <div className="max-w-xl mx-auto">
           <div className="text-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground">Request an API Key</h2>
             <p className="text-muted-foreground mt-2">
@@ -549,7 +550,7 @@ export default function EmbedPartner() {
           </div>
 
           {submitted ? (
-            <Card className="text-center py-10">
+            <Card className="glass-frosted text-center py-10 shadow-futuristic">
               <CardContent>
                 <div className="h-16 w-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
                   <Check className="h-8 w-8 text-success" />
@@ -564,7 +565,7 @@ export default function EmbedPartner() {
               </CardContent>
             </Card>
           ) : (
-            <Card>
+            <Card className="glass-frosted shadow-futuristic">
               <CardContent className="pt-6">
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid sm:grid-cols-2 gap-4">
@@ -666,8 +667,8 @@ export default function EmbedPartner() {
       </section>
 
       {/* ─── Footer CTA ─── */}
-      <section className="py-12 border-t border-border">
-        <div className="container mx-auto px-4 text-center max-w-2xl">
+      <section className="py-12">
+        <div className="text-center max-w-2xl mx-auto">
           <p className="text-muted-foreground text-sm mb-4">
             Already have an account? Access advanced tools, payroll, invoicing and AI tax advice.
           </p>
@@ -681,6 +682,6 @@ export default function EmbedPartner() {
           </div>
         </div>
       </section>
-    </div>
+    </PageLayout>
   );
 }
