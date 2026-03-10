@@ -135,7 +135,7 @@ const Blog = () => {
                   <Badge
                     key={c}
                     variant={c === category ? 'default' : 'outline'}
-                    className="cursor-pointer px-4 py-1.5 text-sm"
+                    className="cursor-pointer px-4 py-1.5 text-sm transition-colors"
                     onClick={() => setCategory(c)}
                   >
                     {c}

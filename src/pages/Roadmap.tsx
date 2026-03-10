@@ -161,7 +161,7 @@ const Roadmap = () => {
           const statusConfig = getStatusConfig(item.status);
           
           return (
-            <div key={item.title} className="glass-frosted rounded-2xl p-6 hover-lift relative overflow-hidden">
+            <div key={item.title} className="rounded-xl border border-border bg-card p-6 hover:shadow-md transition-all relative overflow-hidden">
               {item.status === 'testing' && <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-success via-success to-transparent" />}
               {item.status === 'in-progress' && <div className="absolute top-0 left-0 h-1 bg-gradient-to-r from-primary via-primary to-transparent" style={{ width: `${item.progress}%` }} />}
 

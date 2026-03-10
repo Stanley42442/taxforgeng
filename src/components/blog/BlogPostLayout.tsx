@@ -126,7 +126,7 @@ export const BlogPostLayout = ({
                   </h2>
                   <div className="space-y-4">
                     {faqs.map((faq, i) => (
-                      <div key={i} className="glass-frosted rounded-xl p-6">
+                      <div key={i} className="rounded-xl border border-border bg-card p-6">
                         <h3 className="text-lg font-semibold text-foreground mb-2">{faq.question}</h3>
                         <p className="text-muted-foreground text-sm">{faq.answer}</p>
                       </div>
@@ -144,7 +144,7 @@ export const BlogPostLayout = ({
                       <Link
                         key={post.slug}
                         to={`/blog/${post.slug}`}
-                        className="glass-frosted rounded-xl p-4 hover-lift transition-all group"
+                        className="rounded-lg border border-border bg-card p-4 hover:border-primary/40 transition-all group"
                       >
                         <span className="font-semibold text-foreground group-hover:text-primary transition-colors text-sm flex items-center gap-2">
                           {post.title} <ArrowRight className="h-3 w-3" />
@@ -164,7 +164,7 @@ export const BlogPostLayout = ({
                       <Link
                         key={tool.to}
                         to={tool.to}
-                        className="glass-frosted rounded-xl p-4 hover-lift transition-all group"
+                        className="rounded-lg border border-border bg-card p-4 hover:border-primary/40 transition-all group"
                       >
                         <span className="font-semibold text-foreground group-hover:text-primary transition-colors text-sm flex items-center gap-2">
                           {tool.title} <ArrowRight className="h-3 w-3" />

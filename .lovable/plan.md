@@ -1,29 +1,43 @@
 
 
-## Upgrade Blog Page and Cards to Match Dashboard Fintech Style
+## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
 
-### Problem
-The Blog page and its cards use `glass-frosted` translucent styling instead of the solid `bg-card border border-border` pattern used on the Dashboard. The same issue exists in related link cards across `BlogPostLayout.tsx`, `Resources.tsx`, `StateGuidesHub.tsx`, and `Roadmap.tsx`.
+A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
 
-### Changes
+---
 
-**1. `src/components/blog/BlogCard.tsx`** — Replace `glass-frosted` card with solid Card component style:
-- Import `Card` from ui/card
-- Replace `glass-frosted rounded-2xl p-6 hover-lift` with `rounded-xl border border-border bg-card p-6 hover:border-primary/40 hover:shadow-md transition-all`
-- Add icon-colored accent dot or top border accent per category
-- Keep existing content structure (badge, title, excerpt, date, arrow)
+### Content Structure
 
-**2. `src/pages/Blog.tsx`** — Improve category filter badges styling:
-- Add `transition-colors` to badges for smoother interaction
+The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
 
-**3. `src/components/blog/BlogPostLayout.tsx`** — Replace `glass-frosted rounded-xl p-4 hover-lift` on Related Posts and Related Tools links (lines 147, 167) with `rounded-lg border border-border bg-card p-4 hover:border-primary/40 transition-all`
+| Section ID | Topic |
+|---|---|
+| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
+| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
+| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
+| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
+| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
+| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
+| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
+| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
+| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
+| `faq` | 5–6 FAQs with FAQPage schema |
 
-**4. `src/pages/Resources.tsx`** — Replace `glass-frosted rounded-xl p-4 hover-lift` on guide links (line 129) with `rounded-lg border border-border bg-card p-4 hover:border-primary/40 transition-all`
+### Technical Implementation
 
-**5. `src/pages/seo/StateGuidesHub.tsx`** — Replace `glass-frosted rounded-2xl p-6 hover-lift` (line 68) with `rounded-xl border border-border bg-card p-6 hover:border-primary/40 hover:shadow-md transition-all`
+**1. Create `src/pages/blog/PITMyths2026.tsx`**
+- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
+- ~1,500 words, authoritative tone matching existing posts
+- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
+- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
+- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
 
-**6. `src/pages/Roadmap.tsx`** — Replace `glass-frosted rounded-2xl p-6 hover-lift` (line 164) with `rounded-xl border border-border bg-card p-6 hover:shadow-md transition-all`
+**2. Register route in `src/App.tsx`**
+- Add lazy import and route at `/blog/pit-myths-2026`
 
-### Summary
-6 files, replacing `glass-frosted` translucent cards with solid `bg-card border border-border` cards matching the Dashboard's fintech aesthetic.
+**3. Add to blog listing in `src/pages/Blog.tsx`**
+- New entry in the `POSTS` array with category "Guides", today's date
+
+**4. Update sitemap (`public/sitemap.xml`)**
+- Add `/blog/pit-myths-2026` entry
 

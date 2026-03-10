@@ -65,7 +65,7 @@ const StateGuidesHub = () => {
 
               <div className="grid gap-6 md:grid-cols-2 mb-12">
                 {states.map((s) => (
-                  <Link key={s.to} to={s.to} className="glass-frosted rounded-2xl p-6 hover-lift transition-all group">
+                  <Link key={s.to} to={s.to} className="rounded-xl border border-border bg-card p-6 hover:border-primary/40 hover:shadow-md transition-all group">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
                         <MapPin className="h-5 w-5 text-primary" />

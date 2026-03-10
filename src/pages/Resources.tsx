@@ -90,7 +90,7 @@ const Resources = () => {
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">Downloadable Resources</h2>
                 <div className="grid gap-6 md:grid-cols-2">
                   {downloads.map((item, i) => (
-                    <div key={i} className="glass-frosted rounded-2xl p-6 flex flex-col">
+                    <div key={i} className="rounded-xl border border-border bg-card p-6 flex flex-col">
                       <div className="flex items-center gap-3 mb-3">
                         <div className="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
                           <item.icon className="h-5 w-5 text-primary" />
@@ -111,7 +111,7 @@ const Resources = () => {
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">Online Tax Tools</h2>
                 <div className="grid gap-4 md:grid-cols-3">
                   {tools.map((tool) => (
-                    <Link key={tool.to} to={tool.to} className="glass-frosted rounded-xl p-5 hover-lift transition-all group">
+                    <Link key={tool.to} to={tool.to} className="rounded-lg border border-border bg-card p-5 hover:border-primary/40 transition-all group">
                       <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors flex items-center gap-2">
                         {tool.title} <ArrowRight className="h-3 w-3" />
                       </h3>
@@ -126,7 +126,7 @@ const Resources = () => {
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">In-Depth Guides</h2>
                 <div className="grid gap-3 md:grid-cols-2">
                   {guides.map((g) => (
-                    <Link key={g.to} to={g.to} className="glass-frosted rounded-xl p-4 hover-lift transition-all group">
+                    <Link key={g.to} to={g.to} className="rounded-lg border border-border bg-card p-4 hover:border-primary/40 transition-all group">
                       <span className="font-semibold text-foreground group-hover:text-primary transition-colors text-sm flex items-center gap-2">
                         {g.title} <ArrowRight className="h-3 w-3" />
                       </span>
