@@ -225,7 +225,7 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
 
   // === TAX BREAKDOWN SECTION ===
   y = checkPageBreak(doc, y, 80, () => margin + 20);
-  y = addSectionTitle(doc, 'Detailed Tax Calculation', y);
+  y = addAccentSectionHeader(doc, 'DETAILED TAX CALCULATION', y, 'green');
 
   // Define column structure with explicit widths
   const componentCol = { x: margin, width: contentWidth - 55 };
