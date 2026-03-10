@@ -1,43 +1,39 @@
 
 
-## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
+## Fix Opaque Cards + Smoother Lava Lamp Blobs
 
-A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
+### Problem 1: Opaque Cards
+The light mode `.glass` and `.glass-frosted` classes use `background: hsl(var(--card))` — fully opaque white with no `backdrop-filter`. Only dark mode gets translucency. Cards need semi-transparent backgrounds with backdrop blur in both themes so you can see the lava lamp through them.
 
----
+The `Card` component (card.tsx) default variant uses `bg-card` which is also fully opaque.
 
-### Content Structure
+### Problem 2: Jerky Blob Movement
+Current `lava-float` has 9 keyframe stops with aggressive scale distortions (scaleY up to 1.3). `lava-drift` uses `margin-left` (not GPU-accelerated). Multiple separate animations fighting over transform create jitter.
 
-The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
+### Changes
 
-| Section ID | Topic |
-|---|---|
-| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
-| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
-| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
-| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
-| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
-| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
-| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
-| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
-| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
-| `faq` | 5–6 FAQs with FAQPage schema |
+**1. `src/index.css` — Light mode glass translucency**
+- `.glass`: `background: hsl(var(--card) / 0.7)` + `backdrop-filter: blur(12px)`
+- `.glass-frosted`: `background: hsl(var(--card) / 0.65)` + `backdrop-filter: blur(16px)`
+- `.glass-subtle`: `background: hsl(var(--card) / 0.5)` + `backdrop-filter: blur(8px)`
+- `.neumorphic`: `background: hsl(var(--card) / 0.75)` + `backdrop-filter: blur(10px)`
 
-### Technical Implementation
+**2. `src/index.css` — Smoother lava animations**
+- Combine `lava-float` + `lava-drift` into single `lava-move` keyframe using `translate()` (GPU-accelerated), eliminating `margin-left`
+- Reduce to 5 keyframe stops with gentle scale (max scaleY 1.08)
+- Use `cubic-bezier(0.45, 0.05, 0.55, 0.95)` for liquid easing
+- Remove `lava-depth` (z-index animation causes visual popping)
+- Simplify `lava-morph` to 4 stops with subtler radius shifts
 
-**1. Create `src/pages/blog/PITMyths2026.tsx`**
-- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
-- ~1,500 words, authoritative tone matching existing posts
-- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
-- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
-- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
+**3. `src/components/ui/card.tsx` — Card default variant translucency**
+- Change default variant from `bg-card` to `bg-card/70 backdrop-blur-xl` so the base Card component is also see-through
 
-**2. Register route in `src/App.tsx`**
-- Add lazy import and route at `/blog/pit-myths-2026`
+**4. `src/components/LavaLampBackground.tsx`**
+- Remove per-blob `filter: blur()` since we'll add a uniform blur
+- Simplify blob config to use the new combined animation variables
 
-**3. Add to blog listing in `src/pages/Blog.tsx`**
-- New entry in the `POSTS` array with category "Guides", today's date
-
-**4. Update sitemap (`public/sitemap.xml`)**
-- Add `/blog/pit-myths-2026` entry
+### Files (3)
+1. `src/index.css` — glass translucency + animation rewrite
+2. `src/components/ui/card.tsx` — translucent default variant
+3. `src/components/LavaLampBackground.tsx` — simplified blob config
 
