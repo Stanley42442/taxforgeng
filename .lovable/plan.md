@@ -1,54 +1,43 @@
 
 
-## Fix Subscription Lifecycle: Expiry Alerts, Grace Period, and Auto-Downgrade
+## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
 
-### Problems Identified
+A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
 
-1. **No renewal reminders for paid subscriptions** — The `send-trial-expiry-reminder` function only targets *trial* users (checks `created_at` 5 days ago for free-tier users). Paid subscribers with active Paystack subscriptions get no warning before their next payment date or when their subscription lapses.
+---
 
-2. **No grace period** — When `subscription.disable` fires from Paystack, the webhook marks the subscription as cancelled but says "don't immediately downgrade." However, there is no mechanism that ever *does* downgrade them later. The comment says "the webhook will handle the actual downgrade when subscription expires" but no such webhook event processing exists.
+### Content Structure
 
-3. **No expiry detection cron** — There are no scheduled cron jobs running. The `check-trial-expiry` function exists but is never invoked on a schedule. Same for `cleanup-logs`, `send-trial-expiry-reminder`, etc. They're all manual-only.
+The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
 
-4. **Trial reminder is broken** — `send-trial-expiry-reminder` queries for `subscription_tier = 'free'` users who signed up 5 days ago. But trial users have their tier set to the trial tier (e.g. `business`), not `free`. So this function finds nobody.
+| Section ID | Topic |
+|---|---|
+| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
+| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
+| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
+| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
+| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
+| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
+| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
+| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
+| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
+| `faq` | 5–6 FAQs with FAQPage schema |
 
-### Plan
+### Technical Implementation
 
-**1. Create a new edge function: `check-subscription-expiry`**
-This is the core lifecycle manager. It runs on a schedule and handles:
-- **Renewal reminders (7 days before):** Find active `paystack_subscriptions` where `next_payment_date` is within 7 days. Send notification + email.
-- **Renewal reminders (1 day before):** Same but 1-day window, more urgent messaging.
-- **Grace period start:** Find subscriptions where `next_payment_date` has passed and status is still `active` or `non_renewing`. Mark them with a new `grace_period_ends_at` column (3 days from now). Send "your subscription has lapsed, you have 3 days" notification.
-- **Grace period expired — auto-downgrade:** Find subscriptions where `grace_period_ends_at` has passed. Downgrade the user's `profiles.subscription_tier` to `free`, mark subscription as `expired`, send downgrade notification + email.
+**1. Create `src/pages/blog/PITMyths2026.tsx`**
+- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
+- ~1,500 words, authoritative tone matching existing posts
+- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
+- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
+- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
 
-**2. Fix `send-trial-expiry-reminder`**
-Change the query from `subscription_tier = 'free'` to checking `trial_expires_at` directly (users whose `trial_expires_at` is 2 days from now).
+**2. Register route in `src/App.tsx`**
+- Add lazy import and route at `/blog/pit-myths-2026`
 
-**3. Fix `check-trial-expiry`**
-Currently only checks `subscription_tier = 'business'` trials. Change to check any tier with a non-null `trial_expires_at` that has passed.
+**3. Add to blog listing in `src/pages/Blog.tsx`**
+- New entry in the `POSTS` array with category "Guides", today's date
 
-**4. Add `grace_period_ends_at` column to `paystack_subscriptions`**
-New nullable timestamp column to track when the grace period ends.
-
-**5. Set up cron jobs**
-Schedule `check-subscription-expiry` to run every 6 hours. Schedule `check-trial-expiry` daily. Schedule `send-trial-expiry-reminder` daily.
-
-**6. Add frontend grace period banner**
-In `SubscriptionContext`, fetch the user's subscription status including grace period. Show a `GracePeriodBanner` component (similar to `TrialBanner`) when the user is in a grace period.
-
-### Database changes
-```sql
-ALTER TABLE paystack_subscriptions 
-  ADD COLUMN grace_period_ends_at timestamptz DEFAULT NULL;
-```
-
-### Files to create/modify
-1. **New:** `supabase/functions/check-subscription-expiry/index.ts` — Main lifecycle cron
-2. **Modify:** `supabase/functions/send-trial-expiry-reminder/index.ts` — Fix trial query
-3. **Modify:** `supabase/functions/check-trial-expiry/index.ts` — Fix tier filter
-4. **New:** `src/components/GracePeriodBanner.tsx` — Grace period warning UI
-5. **Modify:** `src/contexts/SubscriptionContext.tsx` — Fetch grace period status, expose it
-6. **Modify:** `supabase/config.toml` — Add new function config
-7. **SQL migration:** Add `grace_period_ends_at` column
-8. **SQL insert:** Set up cron jobs for the 3 scheduled functions
+**4. Update sitemap (`public/sitemap.xml`)**
+- Add `/blog/pit-myths-2026` entry
 
