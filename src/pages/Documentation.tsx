@@ -649,7 +649,7 @@ const Documentation = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <Card className="border-border/50">
               <CardHeader>
                 <CardTitle>Platform Pages (44+)</CardTitle>
               </CardHeader>
@@ -688,7 +688,7 @@ const Documentation = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <Card className="border-border/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Rocket className="h-5 w-5 text-primary" />
@@ -725,7 +725,7 @@ const Documentation = () => {
           transition={{ delay: 0.5 }}
           className="mt-12 text-center"
         >
-          <Card className="border-border/50 bg-gradient-to-r from-primary/10 to-primary/5 backdrop-blur-sm">
+          <Card className="border-border/50 bg-gradient-to-r from-primary/10 to-primary/5">
             <CardContent className="py-8">
               <h3 className="text-xl font-semibold mb-2">Interested in Learning More?</h3>
               <p className="text-muted-foreground mb-4">
