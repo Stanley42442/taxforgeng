@@ -219,8 +219,16 @@ export const generatePaymentInvoicePDF = (data: PaymentInvoiceData): jsPDF => {
   y += 25;
 
   // === NOTES SECTION ===
+  // Check if there's enough room above the footer; if not, start a new page
+  const notesHeight = 50;
+  const footerReserve = PDF_SETTINGS.footerHeight + 10;
+  if (y + notesHeight > pageHeight - footerReserve) {
+    doc.addPage();
+    y = margin + 10;
+  }
+  
   doc.setFillColor(...BRAND_COLORS.lightBg);
-  doc.roundedRect(margin, y, contentWidth, 50, 3, 3, 'F');
+  doc.roundedRect(margin, y, contentWidth, notesHeight, 3, 3, 'F');
   
   doc.setTextColor(...BRAND_COLORS.nigerianGreen);
   doc.setFontSize(9);

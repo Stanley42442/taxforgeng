@@ -278,15 +278,19 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
       });
     }
 
-    // Recommendations
+    // Recommendations — wrapped to prevent overflow
     if (result.recommendations && result.recommendations.length > 0) {
       result.recommendations.forEach(rec => {
-        y = checkPageBreak(doc, y, 10, () => margin + 20);
-        doc.setTextColor(...BRAND_COLORS.muted);
         doc.setFontSize(8);
         doc.setFont('helvetica', 'normal');
-        doc.text(`\u2022 ${rec}`, margin + 5, y);
-        y += 8;
+        const wrappedRec = doc.splitTextToSize(`\u2022 ${rec}`, contentWidth - 10);
+        y = checkPageBreak(doc, y, wrappedRec.length * 4 + 4, () => margin + 20);
+        doc.setTextColor(...BRAND_COLORS.muted);
+        wrappedRec.forEach((line: string) => {
+          doc.text(line, margin + 5, y);
+          y += 4;
+        });
+        y += 2;
       });
     }
   }

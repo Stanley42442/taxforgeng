@@ -806,21 +806,41 @@ export function addAlertBox(
   };
   
   const icons: Record<string, string> = {
-    info: '\u2139',    // ℹ
-    warning: '\u26A0', // ⚠
-    success: '\u2713', // ✓
-    danger: '\u2717',  // ✗
+    info: 'i',         // ASCII fallback
+    warning: '!',      // ASCII fallback
+    success: '\u2713', // ✓ (renders in Helvetica)
+    danger: 'x',       // ASCII fallback
   };
   
-  doc.setFillColor(...bgColors[type]);
-  doc.roundedRect(margin, y, contentWidth, 12, 2, 2, 'F');
-  
-  doc.setTextColor(...textColors[type]);
+  // Wrap message text to fit within the alert box
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${icons[type]} ${message}`, margin + 5, y + 8);
+  const textMaxWidth = contentWidth - 22; // space for icon + padding
+  const wrappedLines: string[] = doc.splitTextToSize(message, textMaxWidth);
+  const lineCount = wrappedLines.length;
+  const boxHeight = Math.max(14, lineCount * 4 + 10);
   
-  return y + 16;
+  doc.setFillColor(...bgColors[type]);
+  doc.roundedRect(margin, y, contentWidth, boxHeight, 2, 2, 'F');
+  
+  // Draw icon circle
+  const iconColor = textColors[type];
+  doc.setFillColor(...iconColor);
+  doc.circle(margin + 8, y + boxHeight / 2, 4, 'F');
+  doc.setTextColor(...BRAND_COLORS.white);
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'bold');
+  doc.text(icons[type], margin + 8, y + boxHeight / 2 + 1.5, { align: 'center' });
+  
+  // Render wrapped message lines
+  doc.setTextColor(...iconColor);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  wrappedLines.forEach((line, i) => {
+    doc.text(line, margin + 16, y + 7 + i * 4);
+  });
+  
+  return y + boxHeight + 4;
 }
 
 /**
