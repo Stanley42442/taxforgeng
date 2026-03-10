@@ -78,7 +78,7 @@ const PayrollTaxGuide = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           Pay-As-You-Earn (PAYE) is the mechanism by which employers deduct income tax from employees' salaries. Under the 2026 rules, the tax-free threshold is ₦800,000 annually, which means most minimum-wage earners pay zero PAYE.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">2026 PIT Bands (Annual)</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
