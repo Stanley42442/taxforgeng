@@ -202,11 +202,11 @@ const PITMyths2026 = () => {
         <h2 className="text-2xl font-bold text-foreground mb-4">
           Myth 5: "My Employer Handles Everything — I Don't Need to File"
         </h2>
-        <div className="glass-frosted rounded-xl p-6 mb-4">
+        <div className="rounded-xl border border-border bg-card p-6 mb-4">
           <p className="text-sm font-semibold text-destructive mb-1">❌ The Myth</p>
           <p className="text-muted-foreground text-sm">"PAYE is deducted at source, so I have no filing obligation."</p>
         </div>
-        <div className="glass-frosted rounded-xl p-6">
+        <div className="rounded-xl border border-border bg-card p-6">
           <p className="text-sm font-semibold text-primary mb-1">✅ The Fact</p>
           <p className="text-muted-foreground text-sm">
             While employers remit PAYE monthly, you may still need to file a personal return if you:
