@@ -96,7 +96,7 @@ const WHTExplained = () => {
 
       <section id="how-it-works">
         <h2 className="text-2xl font-bold text-foreground mb-4">How WHT Works</h2>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Worked Example</h3>
           <p className="text-sm text-muted-foreground mb-2">Company A hires Company B for consulting at ₦2,000,000:</p>
           <div className="text-sm text-muted-foreground space-y-1">
