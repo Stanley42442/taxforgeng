@@ -106,10 +106,10 @@ const TIER_DISPLAY_NAMES: Record<string, string> = {
 
 const TIER_COLORS: Record<string, string> = {
   free: 'bg-muted text-muted-foreground',
-  starter: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  basic: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200',
-  professional: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-  business: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
+  starter: 'bg-primary/10 text-primary',
+  basic: 'bg-success/10 text-success',
+  professional: 'bg-accent/10 text-accent-foreground',
+  business: 'bg-warning/10 text-warning',
   corporate: 'bg-gradient-to-r from-primary to-accent text-primary-foreground',
 };
 
