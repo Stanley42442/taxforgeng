@@ -156,7 +156,7 @@ const PITPAYEGuide2026 = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           The 2026 Rent Relief replaces the old Consolidated Relief Allowance (CRA). It's simpler but requires actual rent payments. You can deduct 20% of your annual rent from your taxable income, with a maximum deduction of ₦500,000.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Rent Relief Examples</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
