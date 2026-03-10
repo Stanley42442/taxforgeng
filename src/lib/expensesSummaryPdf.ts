@@ -10,6 +10,7 @@ import {
   addTableHeader,
   addTableRow,
   addSummaryBox,
+  addAccentSectionHeader,
   generateFilename,
 } from "./exportShared";
 
@@ -59,6 +60,9 @@ export const exportMonthlySummaryPDF = (
   });
 
   y += 5;
+
+  // Table section header
+  y = addAccentSectionHeader(doc, 'MONTHLY BREAKDOWN', y, 'green');
 
   // Table header
   y = addTableHeader(doc, [

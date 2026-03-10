@@ -15,6 +15,7 @@ import {
   addTableRow,
   addAlertBox,
   addSectionTitle,
+  addAccentSectionHeader,
   checkPageBreak,
 } from "./exportShared";
 import type { VerificationData, ValidationResult } from "@/types/verification";
@@ -280,7 +281,7 @@ export const generateProfessionalPDF = (
   y += 60;
 
   // === TAX BREAKDOWN TABLE ===
-  y = addSectionTitle(doc, 'Detailed Tax Breakdown', y);
+  y = addAccentSectionHeader(doc, 'Detailed Tax Breakdown', y, 'green');
 
   // Table header
   y = addTableHeader(doc, [
@@ -319,7 +320,7 @@ export const generateProfessionalPDF = (
   if (result.sectorId && result.sectorRules) {
     y = checkPageBreak(doc, y, 80, () => margin + 20);
 
-    y = addSectionTitle(doc, 'Sector Tax Rules Applied', y);
+    y = addAccentSectionHeader(doc, 'Sector Tax Rules Applied', y, 'gold');
     
     doc.setTextColor(...BRAND_COLORS.muted);
     doc.setFontSize(9);
@@ -381,7 +382,7 @@ export const generateProfessionalPDF = (
 
   // === ALERTS SECTION ===
   if (result.alerts.length > 0 && y < pageHeight - 60) {
-    y = addSectionTitle(doc, 'Alerts & Recommendations', y);
+    y = addAccentSectionHeader(doc, 'Alerts & Recommendations', y, 'warning');
 
     result.alerts.forEach(alert => {
       y = checkPageBreak(doc, y, 20, () => margin + 20);

@@ -14,6 +14,7 @@ import {
   addWrappedTableRow,
   addAlertBox,
   addSectionTitle,
+  addAccentSectionHeader,
   checkPageBreak,
 } from "./exportShared";
 
@@ -87,7 +88,7 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
   });
 
   // === INPUT VALUES SECTION ===
-  y = addSectionTitle(doc, 'Input Values', y);
+  y = addAccentSectionHeader(doc, 'INPUT VALUES', y, 'green');
 
   doc.setFillColor(...BRAND_COLORS.lightBg);
   const inputItems: [string, string][] = [];
@@ -137,7 +138,7 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
   // === PROGRESSIVE TAX BANDS TABLE (for PIT) ===
   if (inputs.calculationType === 'pit' && result.breakdown.some(b => b.label.includes('Band'))) {
     y = checkPageBreak(doc, y, 80, () => margin + 20);
-    y = addSectionTitle(doc, 'Progressive Tax Bands Applied', y);
+    y = addAccentSectionHeader(doc, 'PROGRESSIVE TAX BANDS APPLIED', y, 'gold');
     
     const taxBands = inputs.use2026Rules ? [
       { band: 'First NGN 800,000', rate: '0%' },
@@ -183,7 +184,7 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
   // === RELIEFS SECTION ===
   if (result.reliefs && result.reliefs.length > 0) {
     y = checkPageBreak(doc, y, 100, () => margin + 20);
-    y = addSectionTitle(doc, 'Tax Reliefs & Allowances', y);
+    y = addAccentSectionHeader(doc, 'TAX RELIEFS & ALLOWANCES', y, 'green');
 
     // Define column structure with explicit widths for proper text wrapping
     const reliefTypeCol = { x: margin, width: 50 };
@@ -224,7 +225,7 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
 
   // === TAX BREAKDOWN SECTION ===
   y = checkPageBreak(doc, y, 80, () => margin + 20);
-  y = addSectionTitle(doc, 'Detailed Tax Calculation', y);
+  y = addAccentSectionHeader(doc, 'DETAILED TAX CALCULATION', y, 'green');
 
   // Define column structure with explicit widths
   const componentCol = { x: margin, width: contentWidth - 55 };
@@ -267,7 +268,7 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
   // === ALERTS & RECOMMENDATIONS ===
   if ((result.alerts && result.alerts.length > 0) || (result.recommendations && result.recommendations.length > 0)) {
     y = checkPageBreak(doc, y, 60, () => margin + 20);
-    y = addSectionTitle(doc, 'Alerts & Recommendations', y);
+    y = addAccentSectionHeader(doc, 'ALERTS & RECOMMENDATIONS', y, 'warning');
 
     // Alerts
     if (result.alerts && result.alerts.length > 0) {
