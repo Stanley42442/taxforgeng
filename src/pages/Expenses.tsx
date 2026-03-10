@@ -1506,7 +1506,7 @@ const Expenses = () => {
 
           {/* Budget Alert */}
           {monthlyBudget > 0 && (
-            <div className={`rounded-xl p-4 mb-6 border ${isBudgetExceeded ? 'bg-destructive/10 border-destructive/30' : 'bg-card/50 border-border/50'}`}>
+            <div className={`rounded-xl p-4 mb-6 border ${isBudgetExceeded ? 'bg-destructive/10 border-destructive/30' : 'bg-card border-border/50'}`}>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   {isBudgetExceeded ? (
