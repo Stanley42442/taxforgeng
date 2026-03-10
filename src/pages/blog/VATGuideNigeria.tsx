@@ -155,7 +155,7 @@ const VATGuideNigeria = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           VAT returns must be filed <strong className="text-foreground">monthly</strong>, due by the <strong className="text-foreground">21st of the following month</strong>. Filing is done through the NRS TaxPro Max portal or at your local NRS office.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-3">Filing Checklist</h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
             {[
