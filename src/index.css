@@ -382,15 +382,52 @@ body {
      BACKGROUND PATTERNS — simplified
      ================================================ */
   .bg-dots {
-    background-image: none;
+    background-image: radial-gradient(circle, hsl(var(--foreground) / 0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
 
   .bg-grid {
-    background-image: none;
+    background-image: 
+      linear-gradient(hsl(var(--foreground) / 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--foreground) / 0.02) 1px, transparent 1px);
+    background-size: 32px 32px;
   }
 
   .bg-mesh {
-    background: transparent;
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 20%, hsl(var(--primary) / 0.04) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 80% at 85% 70%, hsl(var(--accent) / 0.035) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 50% at 50% 0%, hsl(var(--primary) / 0.025) 0%, transparent 60%);
+  }
+
+  .dark .bg-mesh {
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 20%, hsl(var(--primary) / 0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 80% at 85% 70%, hsl(var(--accent) / 0.045) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 50% at 50% 0%, hsl(var(--primary) / 0.035) 0%, transparent 60%);
+  }
+
+  .bg-ambient {
+    position: relative;
+  }
+
+  .bg-ambient::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 20%, hsl(var(--primary) / 0.04) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 80% at 85% 70%, hsl(var(--accent) / 0.035) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 50% at 50% 0%, hsl(var(--primary) / 0.025) 0%, transparent 60%);
+  }
+
+  .dark .bg-ambient::before {
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 20%, hsl(var(--primary) / 0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 80% at 85% 70%, hsl(var(--accent) / 0.045) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 50% at 50% 0%, hsl(var(--primary) / 0.035) 0%, transparent 60%);
   }
 
   /* ================================================
