@@ -64,11 +64,11 @@ const SmallCompanyCITExemption = () => {
           To qualify for the Small Company Exemption under the 2026 rules, your company must meet <strong className="text-foreground">both</strong> of the following criteria:
         </p>
         <div className="grid gap-4 sm:grid-cols-2 mb-4">
-          <div className="glass-frosted rounded-xl p-5 border-l-4 border-success">
+          <div className="rounded-xl border border-border bg-card p-5 border-l-4 border-success">
             <h3 className="font-semibold text-foreground mb-2">Turnover Test</h3>
             <p className="text-sm text-muted-foreground">Annual gross turnover must be <strong className="text-foreground">₦50 million or less</strong></p>
           </div>
-          <div className="glass-frosted rounded-xl p-5 border-l-4 border-success">
+          <div className="rounded-xl border border-border bg-card p-5 border-l-4 border-success">
             <h3 className="font-semibold text-foreground mb-2">Asset Test</h3>
             <p className="text-sm text-muted-foreground">Total assets must be <strong className="text-foreground">₦250 million or less</strong></p>
           </div>
