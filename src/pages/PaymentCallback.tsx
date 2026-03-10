@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PageLayout } from '@/components/PageLayout';
 
 type VerificationStatus = 'verifying' | 'success' | 'failed' | 'error';
 
