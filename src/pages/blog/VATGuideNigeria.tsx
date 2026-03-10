@@ -120,7 +120,7 @@ const VATGuideNigeria = () => {
               ))}
             </ul>
           </div>
-          <div className="glass-frosted rounded-xl p-5">
+          <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="font-semibold text-foreground mb-3">Exempt Services</h3>
             <ul className="space-y-1 text-sm text-muted-foreground">
               {['Medical services', 'Educational services', 'Community banking services', 'Plays and cultural performances', 'Agricultural services', 'Exported services (zero-rated)'].map((item, i) => (
