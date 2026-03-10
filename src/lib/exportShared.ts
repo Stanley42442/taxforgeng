@@ -420,8 +420,13 @@ export function addTableHeader(
   const pageWidth = doc.internal.pageSize.getWidth();
   const contentWidth = pageWidth - margin * 2;
   
+  // Left accent bar for visual weight
+  doc.setFillColor(...BRAND_COLORS.darkGreen);
+  doc.rect(margin, y, 3, 12, 'F');
+  
+  // Main header background
   doc.setFillColor(...BRAND_COLORS.nigerianGreen);
-  doc.roundedRect(margin, y, contentWidth, 10, 2, 2, 'F');
+  doc.roundedRect(margin + 3, y, contentWidth - 3, 12, 0, 0, 'F');
   
   doc.setTextColor(...BRAND_COLORS.white);
   doc.setFontSize(9);
@@ -429,10 +434,10 @@ export function addTableHeader(
   
   columns.forEach(col => {
     const textOptions = col.align && col.align !== 'left' ? { align: col.align as 'right' | 'center' } : undefined;
-    doc.text(col.text, col.x, y + 7, textOptions);
+    doc.text(col.text, col.x, y + 8, textOptions);
   });
   
-  return y + 12;
+  return y + 14;
 }
 
 /**
