@@ -1045,7 +1045,7 @@ export function downloadFile(
  */
 export function generateFilename(
   type: string,
-  extension: 'pdf' | 'csv' | 'json' | 'ics',
+  extension: 'pdf' | 'csv' | 'json' | 'ics' | 'txt' | 'xlsx',
   suffix?: string
 ): string {
   const date = formatDateForFilename();
