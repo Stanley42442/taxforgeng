@@ -1,51 +1,43 @@
 
 
-## Background Atmosphere Redesign — Warm, Calm, Memorable
+## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
 
-### Problem
-The background is completely flat — `0 0% 99%` (cold near-white) in light mode, `220 14% 6%` (stark charcoal) in dark mode. All texture utilities (`bg-dots`, `bg-grid`, `bg-mesh`) are disabled (`none`/`transparent`). The result feels clinical and uninviting.
+A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
 
-### Inspiration
-- **Linear.app**: Soft radial gradient orbs that drift subtly behind content
-- **Stripe Dashboard**: Warm off-white with faint blue-tinted gradients at edges
-- **Mercury.com**: Calm blue-gray backgrounds with soft depth
-- **Notion**: Warm cream undertones that feel "lived in"
+---
 
-### Approach — 3 Layers of Subtle Warmth
+### Content Structure
 
-**Layer 1: Warmer Base Colors**
-- Light mode: Shift background from cold `0 0% 99%` to warm cream `40 20% 98.5%` (faint golden warmth, like Notion)
-- Dark mode: Shift from stark `220 14% 6%` to warmer `225 15% 7.5%` with slight blue depth
-- Muted tones get matching warmth adjustments
+The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
 
-**Layer 2: Ambient Gradient Orbs (Linear/Stripe-style)**
-- Re-enable `bg-mesh` with 2-3 very soft radial gradients using primary green and accent gold at 3-6% opacity
-- Fixed positioned, covers full viewport, behind all content
-- Applied via `PageLayout` and the Index page wrapper
-- Dark mode: Same orbs but at slightly higher opacity with cooler tones
+| Section ID | Topic |
+|---|---|
+| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
+| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
+| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
+| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
+| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
+| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
+| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
+| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
+| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
+| `faq` | 5–6 FAQs with FAQPage schema |
 
-**Layer 3: Subtle Dot Grid Texture**
-- Re-enable `bg-dots` with a faint dot pattern (1px dots at ~3% opacity, 24px spacing)
-- Gives the background a "crafted" feel without being distracting
+### Technical Implementation
 
-### Files Changed
+**1. Create `src/pages/blog/PITMyths2026.tsx`**
+- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
+- ~1,500 words, authoritative tone matching existing posts
+- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
+- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
+- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
 
-1. **`src/index.css`** (~20 lines)
-   - Adjust `:root` background/muted HSL values for warmth
-   - Adjust `.dark` background/muted HSL values
-   - Re-enable `bg-dots` with subtle dot pattern
-   - Re-enable `bg-mesh` with ambient radial gradient orbs
-   - Add `.bg-ambient` utility combining mesh + dots for easy use
+**2. Register route in `src/App.tsx`**
+- Add lazy import and route at `/blog/pit-myths-2026`
 
-2. **`src/components/PageLayout.tsx`** (~3 lines)
-   - Add ambient background layer div when `showBackground` is true (already a prop, currently unused)
+**3. Add to blog listing in `src/pages/Blog.tsx`**
+- New entry in the `POSTS` array with category "Guides", today's date
 
-3. **`src/pages/Index.tsx`** (~2 lines)
-   - Add `bg-ambient` class to hero wrapper for the landing page gradient atmosphere
-
-### What This Does NOT Change
-- No card, border, or component styling changes
-- No color palette changes (primary green, accent gold stay the same)
-- No animation changes
-- All glassmorphism/fintech work from phases 1-3 stays intact
+**4. Update sitemap (`public/sitemap.xml`)**
+- Add `/blog/pit-myths-2026` entry
 
