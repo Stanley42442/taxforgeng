@@ -127,7 +127,7 @@ const SmallCompanyCITExemption = () => {
       <section id="worked-examples">
         <h2 className="text-2xl font-bold text-foreground mb-4">Worked Examples</h2>
 
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-2">Example 1: Small Retail Business</h3>
           <p className="text-sm text-muted-foreground mb-2">A Lagos-based retail business with:</p>
           <ul className="text-sm text-muted-foreground space-y-1 mb-2">
