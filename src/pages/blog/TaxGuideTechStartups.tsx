@@ -102,7 +102,7 @@ const TaxGuideTechStartups = () => {
         <p className="text-muted-foreground leading-relaxed mb-4">
           Once your turnover crosses ₦25 million, you must register for VAT within 6 months. At that point, you charge 7.5% VAT on vatable services (which includes most tech services and SaaS subscriptions), file monthly returns, and can claim input VAT on business purchases.
         </p>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <h3 className="font-semibold text-foreground mb-2">VAT-Exempt Items Relevant to Tech</h3>
           <ul className="text-sm text-muted-foreground space-y-1">
             <li>• Educational technology services (may qualify for exemption)</li>
