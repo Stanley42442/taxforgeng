@@ -298,7 +298,7 @@ const PITMyths2026 = () => {
           most misunderstood. Here's what you need to know:
         </p>
         <div className="grid gap-4 sm:grid-cols-2 mt-4">
-          <div className="glass-frosted rounded-xl p-5">
+          <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="font-semibold text-foreground text-sm mb-2">What It Is</h3>
             <p className="text-muted-foreground text-sm">
               A tax deduction of up to <strong className="text-foreground">₦500,000/year</strong> on rent
