@@ -112,7 +112,7 @@ export const STANDARD_DISCLAIMER =
 export const PDF_SETTINGS = {
   margin: 20,
   headerHeight: 18,
-  footerHeight: 25,
+  footerHeight: 40,
   lineHeight: 6,
   tableRowHeight: 10,
   logoSize: 15,
@@ -361,30 +361,35 @@ export function addPDFFooter(
   
   // Separator line
   doc.setFillColor(...BRAND_COLORS.nigerianGreen);
-  doc.rect(margin, footerY - 5, contentWidth, 0.5, 'F');
+  doc.rect(margin, footerY - 2, contentWidth, 0.5, 'F');
   
   doc.setTextColor(...BRAND_COLORS.muted);
-  doc.setFontSize(7);
+  doc.setFontSize(6);
   doc.setFont('helvetica', 'normal');
   
-  // Disclaimer
+  let currentY = footerY + 4;
+  
+  // Disclaimer — wrapped to fit within content width
   if (disclaimer) {
-    doc.text(disclaimer, pageWidth / 2, footerY + 2, { align: 'center' });
+    const wrappedDisclaimer = doc.splitTextToSize(disclaimer, contentWidth - 10);
+    doc.text(wrappedDisclaimer, pageWidth / 2, currentY, { align: 'center' });
+    currentY += wrappedDisclaimer.length * 3.5;
   }
   
-  // Copyright and website - updated for individual operator
-  const copyrightText = `\u00A9 ${new Date().getFullYear()} ${COMPANY_INFO.shortName} | Operated by ${COMPANY_INFO.operatorShort} | ${COMPANY_INFO.email} | Educational tool only`;
-  doc.text(copyrightText, pageWidth / 2, footerY + 7, { align: 'center' });
+  currentY += 1;
   
-  // Timestamp
+  // Copyright line
+  const copyrightText = `© ${new Date().getFullYear()} ${COMPANY_INFO.shortName} | ${COMPANY_INFO.operatorShort} | ${COMPANY_INFO.email}`;
+  doc.text(copyrightText, pageWidth / 2, currentY, { align: 'center' });
+  currentY += 4;
+  
+  // Timestamp (left) + Page number (right) on the same line
   if (showTimestamp) {
-    doc.text(`Generated: ${formatTimestamp()}`, margin, footerY + 12);
+    doc.text(`Generated: ${formatTimestamp()}`, margin, currentY);
   }
-  
-  // Page numbers
   if (pageNumber !== undefined && totalPages !== undefined) {
-    doc.setFontSize(8);
-    doc.text(`Page ${pageNumber} of ${totalPages}`, pageWidth - margin, pageHeight - 10, { align: 'right' });
+    doc.setFontSize(7);
+    doc.text(`Page ${pageNumber} of ${totalPages}`, pageWidth - margin, currentY, { align: 'right' });
   }
 }
 
@@ -745,20 +750,32 @@ export function addStatusBadge(
   };
   
   const icons: Record<string, string> = {
-    success: '\u2713', // ✓
-    warning: '\u26A0', // ⚠
-    info: '\u2139',    // ℹ
-    danger: '\u2717',  // ✗
+    success: '\u2713', // ✓ (renders in Helvetica)
+    warning: '!',      // ASCII fallback (⚠ doesn't render)
+    info: 'i',         // ASCII fallback (ℹ doesn't render)
+    danger: 'x',       // ASCII fallback (✗ doesn't render)
   };
   
   const badgeWidth = doc.getTextWidth(text) + 20;
   doc.setFillColor(...colors[type]);
   doc.roundedRect(x, y, badgeWidth, 12, 2, 2, 'F');
   
+  // Draw icon circle for non-checkmark icons
+  if (type !== 'success') {
+    doc.setFillColor(...BRAND_COLORS.white);
+    doc.circle(x + 8, y + 6, 4, 'F');
+    doc.setTextColor(...colors[type]);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text(icons[type], x + 8, y + 8, { align: 'center' });
+  }
+  
   doc.setTextColor(...BRAND_COLORS.white);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
-  doc.text(`${icons[type]} ${text}`, x + badgeWidth / 2, y + 8, { align: 'center' });
+  const labelX = type !== 'success' ? x + 15 : x + badgeWidth / 2;
+  const labelAlign = type !== 'success' ? undefined : { align: 'center' as const };
+  doc.text(`${type === 'success' ? icons[type] + ' ' : ''}${text}`, labelX, y + 8, labelAlign || undefined);
 }
 
 /**
@@ -789,21 +806,41 @@ export function addAlertBox(
   };
   
   const icons: Record<string, string> = {
-    info: '\u2139',    // ℹ
-    warning: '\u26A0', // ⚠
-    success: '\u2713', // ✓
-    danger: '\u2717',  // ✗
+    info: 'i',         // ASCII fallback
+    warning: '!',      // ASCII fallback
+    success: '\u2713', // ✓ (renders in Helvetica)
+    danger: 'x',       // ASCII fallback
   };
   
-  doc.setFillColor(...bgColors[type]);
-  doc.roundedRect(margin, y, contentWidth, 12, 2, 2, 'F');
-  
-  doc.setTextColor(...textColors[type]);
+  // Wrap message text to fit within the alert box
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${icons[type]} ${message}`, margin + 5, y + 8);
+  const textMaxWidth = contentWidth - 22; // space for icon + padding
+  const wrappedLines: string[] = doc.splitTextToSize(message, textMaxWidth);
+  const lineCount = wrappedLines.length;
+  const boxHeight = Math.max(14, lineCount * 4 + 10);
   
-  return y + 16;
+  doc.setFillColor(...bgColors[type]);
+  doc.roundedRect(margin, y, contentWidth, boxHeight, 2, 2, 'F');
+  
+  // Draw icon circle
+  const iconColor = textColors[type];
+  doc.setFillColor(...iconColor);
+  doc.circle(margin + 8, y + boxHeight / 2, 4, 'F');
+  doc.setTextColor(...BRAND_COLORS.white);
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'bold');
+  doc.text(icons[type], margin + 8, y + boxHeight / 2 + 1.5, { align: 'center' });
+  
+  // Render wrapped message lines
+  doc.setTextColor(...iconColor);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  wrappedLines.forEach((line, i) => {
+    doc.text(line, margin + 16, y + 7 + i * 4);
+  });
+  
+  return y + boxHeight + 4;
 }
 
 /**

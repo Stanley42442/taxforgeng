@@ -18,6 +18,7 @@ import {
   addAccentSectionHeader,
   checkPageBreak,
 } from "./exportShared";
+import type { TableColumn } from "./exportShared";
 import type { VerificationData, ValidationResult } from "@/types/verification";
 import { VERIFICATION_SOURCES } from "@/types/verification";
 
@@ -291,9 +292,20 @@ export const generateProfessionalPDF = (
   ], y);
 
   // Table rows
+  const tableHeaderColumns: TableColumn[] = [
+    { text: 'Description', x: margin + 5 },
+    { text: 'Rate', x: margin + 120 },
+    { text: 'Amount', x: pageWidth - margin - 5, align: 'right' },
+  ];
+
   result.breakdown.forEach((item, index) => {
-    y = checkPageBreak(doc, y, 15, () => margin + 20);
-    
+    y = checkPageBreak(doc, y, 15, () => {
+      // Re-render table header on new page
+      let newY = margin + 20;
+      newY = addAccentSectionHeader(doc, 'Detailed Tax Breakdown (cont.)', newY, 'green');
+      newY = addTableHeader(doc, tableHeaderColumns, newY);
+      return newY;
+    });
     const isNegative = item.amount < 0;
     const amountStr = isNegative 
       ? `(${formatCurrency(Math.abs(item.amount))})` 
