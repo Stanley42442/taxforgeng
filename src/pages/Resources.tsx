@@ -90,7 +90,7 @@ const Resources = () => {
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-8">Downloadable Resources</h2>
                 <div className="grid gap-6 md:grid-cols-2">
                   {downloads.map((item, i) => (
-                    <div key={i} className="glass-frosted rounded-2xl p-6 flex flex-col">
+                    <div key={i} className="rounded-xl border border-border bg-card p-6 flex flex-col">
                       <div className="flex items-center gap-3 mb-3">
                         <div className="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
                           <item.icon className="h-5 w-5 text-primary" />
