@@ -15,6 +15,7 @@ import {
   addTableRow,
   addAlertBox,
   addSectionTitle,
+  addAccentSectionHeader,
   checkPageBreak,
 } from "./exportShared";
 import type { VerificationData, ValidationResult } from "@/types/verification";
