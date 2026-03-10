@@ -129,7 +129,7 @@ const PricingTier = ({
   features: string[];
   popular?: boolean;
 }) => (
-  <Card className={`relative border-border/50 bg-card/50 backdrop-blur-sm ${popular ? 'ring-2 ring-primary' : ''}`}>
+  <Card className={`relative border-border/50 ${popular ? 'ring-2 ring-primary' : ''}`}>
     {popular && (
       <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
         Most Popular
