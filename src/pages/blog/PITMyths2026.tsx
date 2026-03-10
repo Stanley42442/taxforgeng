@@ -312,7 +312,7 @@ const PITMyths2026 = () => {
               rent payments — a tenancy agreement alone is not sufficient without proof of payment.
             </p>
           </div>
-          <div className="glass-frosted rounded-xl p-5">
+          <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="font-semibold text-foreground text-sm mb-2">How to Claim</h3>
             <p className="text-muted-foreground text-sm">
               Declare during self-assessment filing, or submit documentation to your employer for PAYE
