@@ -681,6 +681,6 @@ export default function EmbedPartner() {
           </div>
         </div>
       </section>
-    </div>
+    </PageLayout>
   );
 }
