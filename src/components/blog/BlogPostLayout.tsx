@@ -144,7 +144,7 @@ export const BlogPostLayout = ({
                       <Link
                         key={post.slug}
                         to={`/blog/${post.slug}`}
-                        className="glass-frosted rounded-xl p-4 hover-lift transition-all group"
+                        className="rounded-lg border border-border bg-card p-4 hover:border-primary/40 transition-all group"
                       >
                         <span className="font-semibold text-foreground group-hover:text-primary transition-colors text-sm flex items-center gap-2">
                           {post.title} <ArrowRight className="h-3 w-3" />
