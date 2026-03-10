@@ -127,7 +127,7 @@ const TaxGuideTechStartups = () => {
           <li className="flex items-start gap-2"><span className="text-primary">•</span>Renewable energy technology</li>
           <li className="flex items-start gap-2"><span className="text-primary">•</span>Manufacturing (including hardware)</li>
         </ul>
-        <div className="glass-frosted rounded-xl p-5 border-l-4 border-primary mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 border-l-4 border-primary mb-4">
           <h3 className="font-semibold text-foreground mb-2">2026 Update: Economic Development Incentive (EDI)</h3>
           <p className="text-sm text-muted-foreground mb-2">
             Under the Nigeria Tax Act 2025 (effective 2026), Pioneer Status is replaced by the <strong className="text-foreground">Economic Development Incentive (EDI)</strong>. Instead of a full tax holiday, EDI provides a <strong className="text-foreground">5% annual tax credit for 5 years</strong> on qualifying capital expenditure in designated sectors.
