@@ -565,7 +565,7 @@ const Documentation = () => {
               </Card>
             </div>
 
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <Card className="border-border/50">
               <CardHeader>
                 <CardTitle>Database Schema (25+ Tables)</CardTitle>
               </CardHeader>
