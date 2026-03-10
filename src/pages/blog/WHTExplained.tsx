@@ -65,7 +65,7 @@ const WHTExplained = () => {
 
       <section id="rates">
         <h2 className="text-2xl font-bold text-foreground mb-4">WHT Rates by Payment Type</h2>
-        <div className="glass-frosted rounded-xl p-5 mb-4">
+        <div className="rounded-xl border border-border bg-card p-5 mb-4">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
