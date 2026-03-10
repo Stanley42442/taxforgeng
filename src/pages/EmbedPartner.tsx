@@ -285,7 +285,7 @@ export default function EmbedPartner() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <PageLayout maxWidth="6xl" showBackground={true}>
       <SEOHead
         title="Embed Nigeria Tax Calculator on Your Site | TaxForge NG Partner Program"
         description="Free embeddable Nigeria tax calculator widget for media, fintechs and accountancy firms. Live demo, ready-to-paste code snippets, and full integration guide."
