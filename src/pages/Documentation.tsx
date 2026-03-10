@@ -439,7 +439,7 @@ const Documentation = () => {
 
           {/* Pricing Tab */}
           <TabsContent value="pricing" className="space-y-6">
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm mb-6">
+            <Card className="border-border/50 mb-6">
               <CardContent className="py-4">
                 <p className="text-center text-muted-foreground">
                   <CreditCard className="h-4 w-4 inline mr-2" />
