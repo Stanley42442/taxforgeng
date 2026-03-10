@@ -88,7 +88,7 @@ export const generateIndividualTaxPDF = (data: ExportData, showWatermark = false
   });
 
   // === INPUT VALUES SECTION ===
-  y = addSectionTitle(doc, 'Input Values', y);
+  y = addAccentSectionHeader(doc, 'INPUT VALUES', y, 'green');
 
   doc.setFillColor(...BRAND_COLORS.lightBg);
   const inputItems: [string, string][] = [];
