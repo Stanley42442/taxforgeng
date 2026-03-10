@@ -1,43 +1,46 @@
 
 
-## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
+## Blog Total Makeover
 
-A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
+### Scope
+All 4 shared blog components + all 9 blog post pages + the Blog index page. Replace `glass-frosted` with solid cards, upgrade typography, improve content section styling, and add visual polish.
 
----
+### Changes
 
-### Content Structure
+**1. `src/components/blog/AuthorBox.tsx`** — Solid card style
+- Replace `glass-frosted rounded-xl` with `rounded-xl border border-border bg-card`
+- Add a subtle separator between avatar and text
 
-The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
+**2. `src/components/blog/TableOfContents.tsx`** — Solid card, two-column on desktop
+- Replace `glass-frosted rounded-xl` with `rounded-xl border border-border bg-card`
+- Use `sm:grid-cols-2` for TOC items when there are 6+ entries
+- Add hover background on each link (`hover:bg-muted/50 rounded px-2 py-1`)
 
-| Section ID | Topic |
-|---|---|
-| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
-| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
-| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
-| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
-| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
-| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
-| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
-| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
-| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
-| `faq` | 5–6 FAQs with FAQPage schema |
+**3. `src/components/blog/BlogPostLayout.tsx`** — Major layout upgrade
+- Replace raw `div` wrapper with `PageLayout` for consistent background/spacing (removes manual fixed gradient divs on lines 94-96)
+- Upgrade FAQ section: use Radix `Accordion` instead of flat cards for a collapsible, interactive feel
+- Related Posts: add category-colored left border accent and short description
+- Related Tools: add icon (Calculator/Wrench) before each tool name
+- Import `Accordion, AccordionItem, AccordionTrigger, AccordionContent` from ui/accordion
 
-### Technical Implementation
+**4. `src/components/blog/BlogCard.tsx`** — Feature the first/latest post
+- Add a `featured` boolean prop
+- When featured: full-width card with larger title (`text-xl`), a colored top border (`border-t-2 border-primary`), and more padding
+- Blog index: render first post as featured (spanning full grid width with `md:col-span-2`)
 
-**1. Create `src/pages/blog/PITMyths2026.tsx`**
-- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
-- ~1,500 words, authoritative tone matching existing posts
-- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
-- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
-- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
+**5. `src/pages/Blog.tsx`** — Index page polish
+- First post renders as featured card spanning full width
+- Add post count indicator next to category badges (e.g., "Guides (5)")
+- Wrap category badges in a solid `bg-card border rounded-lg p-3` toolbar
 
-**2. Register route in `src/App.tsx`**
-- Add lazy import and route at `/blog/pit-myths-2026`
+**6. All 9 blog post pages** — Replace every `glass-frosted rounded-xl p-5` content block with `rounded-xl border border-border bg-card p-5`
+Files: `TaxReforms2026Summary.tsx`, `PITMyths2026.tsx`, `PITPAYEGuide2026.tsx`, `PayrollTaxGuide.tsx`, `SmallCompanyCITExemption.tsx`, `TaxCalendar2026.tsx`, `TaxGuideTechStartups.tsx`, `VATGuideNigeria.tsx`, `WHTExplained.tsx`
 
-**3. Add to blog listing in `src/pages/Blog.tsx`**
-- New entry in the `POSTS` array with category "Guides", today's date
-
-**4. Update sitemap (`public/sitemap.xml`)**
-- Add `/blog/pit-myths-2026` entry
+### Summary
+- 4 shared components upgraded (AuthorBox, TableOfContents, BlogPostLayout, BlogCard)
+- 1 index page polished (Blog.tsx)
+- 9 blog post pages: bulk `glass-frosted` to `bg-card border` replacement
+- FAQ upgraded to accordion
+- Featured post card pattern added
+- ~14 files total
 
