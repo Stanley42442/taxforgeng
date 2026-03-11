@@ -1,25 +1,43 @@
 
 
-## Update Favicon and PWA Icons with New Logo
+## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
 
-Replace all existing icons (favicon, PWA 192x192, PWA 512x512, and Apple touch icon) with the uploaded new logo featuring the green shield with gold "TF" monogram.
+A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
 
-### Steps
+---
 
-1. **Copy and resize the uploaded image** into `public/` directory as:
-   - `favicon-192.png` — 192x192px for favicon small size
-   - `favicon-512.png` — 512x512px for favicon large size  
-   - `apple-touch-icon.png` — 180x180px for iOS
-   - `icon-192.png` — 192x192px for PWA manifest
-   - `icon-512.png` — 512x512px for PWA manifest
+### Content Structure
 
-2. **Update `index.html`** to reference new favicon paths (`favicon-192.png`, `favicon-512.png`)
+The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
 
-3. **Update `public/manifest.json`** to point to the new PWA icons (already references `icon-192.png` and `icon-512.png`)
+| Section ID | Topic |
+|---|---|
+| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
+| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
+| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
+| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
+| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
+| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
+| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
+| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
+| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
+| `faq` | 5–6 FAQs with FAQPage schema |
 
-4. **Update `vite.config.ts`** PWA plugin config to include new icon assets in `includeAssets`
+### Technical Implementation
 
-5. **Update OG image reference** in `index.html` (optional) to also use the new logo for social sharing consistency
+**1. Create `src/pages/blog/PITMyths2026.tsx`**
+- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
+- ~1,500 words, authoritative tone matching existing posts
+- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
+- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
+- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
 
-The new logo is a high-quality AI-generated image with the TaxForge branding (green shield with gold TF monogram, upward arrow, and coin stacks) which matches the existing brand colors and will work well as both favicon and PWA icon.
+**2. Register route in `src/App.tsx`**
+- Add lazy import and route at `/blog/pit-myths-2026`
+
+**3. Add to blog listing in `src/pages/Blog.tsx`**
+- New entry in the `POSTS` array with category "Guides", today's date
+
+**4. Update sitemap (`public/sitemap.xml`)**
+- Add `/blog/pit-myths-2026` entry
 
