@@ -1,43 +1,24 @@
 
 
-## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
+## Update the Static HTML Loading Shell in index.html
 
-A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
+### Problem
+The initial loader in `index.html` (lines 277-293) is a plain white screen with a basic green spinner and "Loading TaxForge..." text. This is what users see before React mounts — it doesn't match the branded premium aesthetic.
 
----
+### Solution
+Update the static HTML shell to visually match the `AuthLoadingScreen` component: warm cream background, TaxForge logo, dual-ring spinner with primary/accent colors, and the "Nigeria Tax Calculator" subtitle.
 
-### Content Structure
+### Changes — `index.html`
 
-The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
+Replace the `#initial-loader` div (lines 277-293) with:
 
-| Section ID | Topic |
-|---|---|
-| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
-| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
-| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
-| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
-| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
-| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
-| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
-| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
-| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
-| `faq` | 5–6 FAQs with FAQPage schema |
+1. **Background**: Use the warm cream (`#f8f6f0` / the theme's background color) instead of white
+2. **Logo**: Show the actual `/icon-192.png` with rounded corners and shadow
+3. **Brand text**: "TaxForge" heading + "Nigeria Tax Calculator" subtitle
+4. **Spinner**: Dual concentric rings matching the React component (primary green outer ring, accent gold inner ring, counter-rotating)
+5. **Progress bar**: Thin gradient shimmer bar at the bottom
+6. **Remove the nav header** from the static shell — the branded splash is full-screen centered, matching the React version
+7. **Add CSS keyframes** for the dual-ring spin and shimmer animations
 
-### Technical Implementation
-
-**1. Create `src/pages/blog/PITMyths2026.tsx`**
-- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
-- ~1,500 words, authoritative tone matching existing posts
-- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
-- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
-- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
-
-**2. Register route in `src/App.tsx`**
-- Add lazy import and route at `/blog/pit-myths-2026`
-
-**3. Add to blog listing in `src/pages/Blog.tsx`**
-- New entry in the `POSTS` array with category "Guides", today's date
-
-**4. Update sitemap (`public/sitemap.xml`)**
-- Add `/blog/pit-myths-2026` entry
+The static shell will seamlessly blend into the React `AuthLoadingScreen` when it mounts, creating a smooth perceived loading experience.
 
