@@ -533,7 +533,14 @@ const Pricing = () => {
         <h2 className="text-2xl font-bold text-foreground text-center mb-8">
           Full Feature Comparison
         </h2>
-        <div className="rounded-2xl border border-border bg-card shadow-card">
+
+        {/* Mobile/Tablet: Accordion cards */}
+        <div className="lg:hidden">
+          <MobileFeatureComparison features={features} featureCategories={featureCategories} />
+        </div>
+
+        {/* Desktop: Full table */}
+        <div className="hidden lg:block rounded-2xl border border-border bg-card shadow-card">
            <div className="overflow-x-auto">
              <table className="w-full table-fixed border-collapse">
                <thead>
@@ -550,7 +557,6 @@ const Pricing = () => {
             <tbody>
               {featureCategories.map((category, catIndex) => (
                 <>
-                  {/* Category Header */}
                   <tr key={`cat-${catIndex}`} className="bg-muted/30">
                     <td colSpan={7} className="p-3">
                       <div className="flex items-center gap-2 font-semibold text-foreground">
@@ -559,7 +565,6 @@ const Pricing = () => {
                       </div>
                     </td>
                   </tr>
-                  {/* Features in this category */}
                   {features.filter(f => f.category === category.name).map((feature, i) => (
                     <tr key={`${category.name}-${i}`} className={i % 2 === 0 ? 'bg-background' : 'bg-secondary/20'}>
                        <td className="p-4 text-sm text-foreground">{feature.name}</td>
