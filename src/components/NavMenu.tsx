@@ -263,10 +263,15 @@ export const NavMenu = () => {
         duration: 8000,
         icon: <Share className="h-5 w-5" />,
       });
+    } else {
+      toast.info("Install TaxForge NG", {
+        description: "Look for the install icon in your browser's address bar, or use your browser menu to add this app to your home screen.",
+        duration: 8000,
+      });
     }
   };
 
-  const showInstallButton = !isStandalone && (!!deferredPrompt || isIOS);
+  
 
   const totalNotificationCount = notificationCount + urgentCount;
 
@@ -518,14 +523,12 @@ export const NavMenu = () => {
 
                   {/* Footer */}
                     <div className="px-4 py-3 border-t border-border space-y-2 shrink-0 bg-background">
-                      {showInstallButton && (
-                        <SheetClose asChild>
-                          <Button variant="outline" className="w-full h-9 text-sm" onClick={handleInstallClick}>
-                            <Download className="h-4 w-4 shrink-0" />
-                            <span className="truncate">Install App</span>
-                          </Button>
-                        </SheetClose>
-                      )}
+                      <SheetClose asChild>
+                        <Button variant="outline" className="w-full h-9 text-sm" onClick={handleInstallClick}>
+                          <Download className="h-4 w-4 shrink-0" />
+                          <span className="truncate">Install App</span>
+                        </Button>
+                      </SheetClose>
                     {user ? (
                       <>
                         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary">
