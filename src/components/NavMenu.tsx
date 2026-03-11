@@ -230,7 +230,6 @@ export const NavMenu = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isStandalone, setIsStandalone] = useState(false);
   const [installDialogOpen, setInstallDialogOpen] = useState(false);
-  const [isIOS] = useState(false);
 
   useEffect(() => {
     const standalone = 
@@ -239,9 +238,6 @@ export const NavMenu = () => {
     setIsStandalone(standalone);
     if (standalone) return;
 
-    const ua = navigator.userAgent;
-    const ios = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
-    
 
     const handler = (e: Event) => {
       e.preventDefault();
