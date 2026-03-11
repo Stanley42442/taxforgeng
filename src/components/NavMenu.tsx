@@ -66,6 +66,7 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { toast } from "sonner";
+import { InstallAppDialog } from "@/components/InstallAppDialog";
 
 interface NavLink {
   to: string;
