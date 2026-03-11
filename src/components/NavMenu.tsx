@@ -263,6 +263,11 @@ export const NavMenu = () => {
         duration: 8000,
         icon: <Share className="h-5 w-5" />,
       });
+    } else {
+      toast.info("Install TaxForge NG", {
+        description: "Look for the install icon in your browser's address bar, or use your browser menu to add this app to your home screen.",
+        duration: 8000,
+      });
     }
   };
 
