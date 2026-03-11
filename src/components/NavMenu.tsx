@@ -241,7 +241,7 @@ export const NavMenu = () => {
 
     const ua = navigator.userAgent;
     const ios = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
-    setIsIOS(ios);
+    
 
     const handler = (e: Event) => {
       e.preventDefault();
