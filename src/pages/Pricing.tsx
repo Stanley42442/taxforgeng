@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { MobileFeatureComparison } from "@/components/MobileFeatureComparison";
 import { useNavigate, Link } from "react-router-dom";
 import { SEOHead, createBreadcrumbSchema } from "@/components/seo/SEOHead";
 import { PageBreadcrumbs } from "@/components/seo/PageBreadcrumbs";
