@@ -274,25 +274,28 @@
     </noscript>
     <div id="root">
       <!-- Static shell matching NavMenu layout - paints LCP element ("TaxForge NG") instantly before React mounts -->
-      <div id="initial-loader" style="min-height:100vh;background:#f8faf9;">
-        <header style="border-bottom:1px solid #e5e7eb;background:#fff;">
-          <div style="max-width:80rem;margin:0 auto;padding:0 1rem;">
-            <nav style="display:flex;align-items:center;height:3.5rem;">
-              <a href="/" style="display:flex;align-items:center;gap:0.5rem;text-decoration:none;">
-                <div style="width:2rem;height:2rem;border-radius:0.5rem;background:linear-gradient(135deg,#16a34a,#15803d);"></div>
-                <span style="font-size:1rem;font-weight:700;color:#0a0a0b;font-family:system-ui,-apple-system,sans-serif;">TaxForge NG</span>
-              </a>
-            </nav>
-          </div>
-        </header>
-        <div style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 3.5rem);">
+      <div id="initial-loader" style="min-height:100vh;background:#f8f6f0;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:20px;">
+          <img src="/icon-192.png" alt="TaxForge" width="64" height="64" style="border-radius:16px;box-shadow:0 10px 30px -10px rgba(22,163,74,0.3);" />
           <div style="text-align:center;">
-            <div id="loader-spinner" style="width:48px;height:48px;border:3px solid #e5e7eb;border-top-color:#16a34a;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
-            <p id="loader-text" style="color:#6b7280;font-family:system-ui;margin:0;">Loading TaxForge...</p>
+            <h1 style="margin:0;font-size:1.5rem;font-weight:700;color:#0a0a0b;font-family:'Outfit',system-ui,sans-serif;letter-spacing:-0.025em;">TaxForge</h1>
+            <p style="margin:2px 0 0;font-size:0.875rem;color:#6b7280;font-family:'Outfit',system-ui,sans-serif;">Nigeria Tax Calculator</p>
           </div>
+          <div id="loader-spinner" style="position:relative;width:40px;height:40px;margin-top:8px;">
+            <div style="position:absolute;inset:0;border-radius:50%;border:2.5px solid transparent;border-top-color:#16a34a;border-right-color:rgba(22,163,74,0.3);animation:spin 1s linear infinite;"></div>
+            <div style="position:absolute;inset:6px;border-radius:50%;border:2px solid transparent;border-bottom-color:#d4a843;border-left-color:rgba(212,168,67,0.3);animation:spin 1.4s linear infinite reverse;"></div>
+          </div>
+          <p id="loader-text" style="color:#6b7280;font-family:'Outfit',system-ui,sans-serif;margin:0;font-size:0.75rem;animation:pulse 2s ease-in-out infinite;">Loading your session…</p>
+        </div>
+        <div style="position:absolute;bottom:0;left:0;right:0;height:4px;overflow:hidden;">
+          <div style="height:100%;width:33%;border-radius:9999px;background:linear-gradient(90deg,#16a34a,#d4a843,#16a34a);background-size:200% 100%;animation:shimmer 1.5s linear infinite;"></div>
         </div>
       </div>
-      <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+      <style>
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+        @keyframes shimmer{to{background-position:-200% 0}}
+      </style>
     </div>
     <script>
       // FAILSAFE: If React doesn't mount within 8 seconds, show error and reload option
