@@ -341,6 +341,7 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="taxforge-ng-theme">
       <AuthProvider>
+        <AuthLoadingScreen>
           <SubscriptionProvider>
               <LanguageProvider>
               <TooltipProvider>
@@ -360,6 +361,7 @@ const App = () => (
               </TooltipProvider>
             </LanguageProvider>
           </SubscriptionProvider>
+        </AuthLoadingScreen>
       </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
