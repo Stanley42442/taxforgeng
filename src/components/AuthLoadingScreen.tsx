@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { ReactNode, useState, useEffect } from "react";
+import { LavaLampBackground } from "./LavaLampBackground";
 
 interface AuthLoadingScreenProps {
   children: ReactNode;
@@ -10,21 +11,14 @@ export const AuthLoadingScreen = ({ children }: AuthLoadingScreenProps) => {
   const [showSplash, setShowSplash] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
 
-  // Normal flow: hide splash when auth loading completes
   useEffect(() => {
     if (!loading && showSplash) {
-      // Start fade-out animation
       setIsExiting(true);
-      // Remove splash after animation completes
-      const timer = setTimeout(() => {
-        setShowSplash(false);
-      }, 400); // Match animation duration
+      const timer = setTimeout(() => setShowSplash(false), 400);
       return () => clearTimeout(timer);
     }
   }, [loading, showSplash]);
 
-  // FAILSAFE: Force hide splash after 15 seconds as a fallback
-  // This prevents infinite loading on very slow devices or network issues
   useEffect(() => {
     const forceTimeout = setTimeout(() => {
       if (showSplash) {
@@ -33,41 +27,69 @@ export const AuthLoadingScreen = ({ children }: AuthLoadingScreenProps) => {
         setTimeout(() => setShowSplash(false), 400);
       }
     }, 15000);
-
     return () => clearTimeout(forceTimeout);
   }, [showSplash]);
 
   if (showSplash && (loading || isExiting)) {
     return (
-      <div 
-        className={`min-h-screen bg-background flex flex-col items-center justify-center gap-6 transition-opacity duration-400 ${
+      <div
+        className={`min-h-screen bg-background flex flex-col items-center justify-center relative overflow-hidden transition-opacity duration-400 ${
           isExiting ? 'opacity-0' : 'opacity-100'
         }`}
       >
-        {/* Logo/Brand */}
-        <div className={`flex items-center gap-3 transition-all duration-300 ${
+        <LavaLampBackground />
+
+        <div className={`relative z-10 flex flex-col items-center gap-5 transition-all duration-300 ${
           isExiting ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
         }`}>
-          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
-            <span className="text-2xl font-bold text-primary-foreground">T</span>
+          {/* Logo */}
+          <img
+            src="/icon-192.png"
+            alt="TaxForge"
+            className="w-16 h-16 rounded-2xl shadow-lg"
+          />
+
+          {/* Brand text */}
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">TaxForge</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">Nigeria Tax Calculator</p>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">TaxForge</h1>
-            <p className="text-xs text-muted-foreground">Nigeria Tax Calculator</p>
+
+          {/* Dual-ring spinner */}
+          <div className="relative w-10 h-10 mt-2">
+            <div
+              className="absolute inset-0 rounded-full animate-spin"
+              style={{
+                border: '2.5px solid transparent',
+                borderTopColor: 'hsl(var(--primary))',
+                borderRightColor: 'hsl(var(--primary) / 0.3)',
+                animationDuration: '1s',
+              }}
+            />
+            <div
+              className="absolute inset-1.5 rounded-full animate-spin"
+              style={{
+                border: '2px solid transparent',
+                borderBottomColor: 'hsl(var(--accent))',
+                borderLeftColor: 'hsl(var(--accent) / 0.3)',
+                animationDirection: 'reverse',
+                animationDuration: '1.4s',
+              }}
+            />
           </div>
+
+          <p className="text-xs text-muted-foreground animate-pulse">Loading your session…</p>
         </div>
 
-        {/* Loading spinner */}
-        <div className={`flex flex-col items-center gap-3 transition-all duration-300 delay-75 ${
-          isExiting ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
-        }`}>
-          <div className="relative">
-            <div className="h-10 w-10 rounded-full border-3 border-muted" />
-            <div className="absolute inset-0 h-10 w-10 rounded-full border-3 border-primary border-t-transparent animate-spin" />
-          </div>
-          <p className="text-sm text-muted-foreground animate-pulse">
-            Loading your session...
-          </p>
+        {/* Bottom gradient progress bar */}
+        <div className="absolute bottom-0 left-0 right-0 h-1 overflow-hidden">
+          <div
+            className="h-full w-1/3 rounded-full animate-shimmer"
+            style={{
+              background: 'linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--primary)))',
+              backgroundSize: '200% 100%',
+            }}
+          />
         </div>
       </div>
     );
