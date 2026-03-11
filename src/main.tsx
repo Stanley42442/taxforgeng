@@ -59,14 +59,11 @@ const CACHE_VERSION = import.meta.env.VITE_BUILD_TIME || 'dev';
 const clearStaleCaches = async (): Promise<void> => {
   const lastVersion = safeLocalStorage.getItem('cache-version');
   
-  // Only clear if version changed and service workers are supported
-  if (lastVersion !== CACHE_VERSION && 'serviceWorker' in navigator) {
+  // Only clear if version changed and caches API is available
+  if (lastVersion !== CACHE_VERSION && 'caches' in window) {
     try {
-      // Unregister all service workers
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(registrations.map(r => r.unregister()));
-      
-      // Clear all caches
+      // Only clear caches, do NOT unregister service workers
+      // The service worker must stay registered for PWA installability
       const cacheNames = await caches.keys();
       await Promise.all(cacheNames.map(name => caches.delete(name)));
       
