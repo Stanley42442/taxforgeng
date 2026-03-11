@@ -274,7 +274,14 @@
     <div id="root">
       <!-- Static shell matching NavMenu layout - paints LCP element ("TaxForge NG") instantly before React mounts -->
       <div id="initial-loader" style="min-height:100vh;background:#f8f6f0;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;">
-        <div class="loader-content" style="display:flex;flex-direction:column;align-items:center;gap:20px;">
+        <!-- Animated orbs -->
+        <div class="static-orb" style="width:400px;height:400px;top:-10%;left:-5%;background:#16a34a;animation-duration:12s;"></div>
+        <div class="static-orb" style="width:350px;height:350px;bottom:-8%;right:-5%;background:#d4a843;animation-duration:15s;animation-delay:-4s;"></div>
+        <div class="static-orb" style="width:300px;height:300px;top:40%;left:60%;background:#16a34a;animation-duration:18s;animation-delay:-7s;"></div>
+        <div class="static-orb" style="width:250px;height:250px;bottom:20%;left:10%;background:#d4a843;animation-duration:14s;animation-delay:-2s;"></div>
+        <div class="static-orb" style="width:320px;height:320px;top:10%;right:20%;background:#16a34a;animation-duration:16s;animation-delay:-9s;"></div>
+        <div class="static-orb" style="width:280px;height:280px;bottom:5%;left:45%;background:#d4a843;animation-duration:13s;animation-delay:-5s;"></div>
+        <div class="loader-content" style="display:flex;flex-direction:column;align-items:center;gap:20px;position:relative;z-index:1;">
           <img class="loader-logo" src="/icon-192.png" alt="TaxForge" width="64" height="64" style="border-radius:16px;box-shadow:0 10px 30px -10px rgba(22,163,74,0.3);" />
           <div style="text-align:center;">
             <h1 class="loader-title" style="margin:0;font-size:1.5rem;font-weight:700;color:#0a0a0b;font-family:'Outfit',system-ui,sans-serif;letter-spacing:-0.025em;">TaxForge</h1>
@@ -286,7 +293,7 @@
           </div>
           <p id="loader-text" style="color:#6b7280;font-family:'Outfit',system-ui,sans-serif;margin:0;font-size:0.75rem;animation:pulse 2s ease-in-out infinite;">Loading your session…</p>
         </div>
-        <div style="position:absolute;bottom:0;left:0;right:0;height:4px;overflow:hidden;">
+        <div style="position:absolute;bottom:0;left:0;right:0;height:4px;overflow:hidden;z-index:1;">
           <div style="height:100%;width:33%;border-radius:9999px;background:linear-gradient(90deg,#16a34a,#d4a843,#16a34a);background-size:200% 100%;animation:shimmer 1.5s linear infinite;"></div>
         </div>
       </div>
@@ -294,6 +301,17 @@
         @keyframes spin{to{transform:rotate(360deg)}}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
         @keyframes shimmer{to{background-position:-200% 0}}
+        @keyframes orb-float{
+          0%{transform:translate(0,0) scale(1)}
+          25%{transform:translate(30px,-40px) scale(1.05)}
+          50%{transform:translate(-20px,-60px) scale(0.95)}
+          75%{transform:translate(-40px,-20px) scale(1.02)}
+          100%{transform:translate(0,0) scale(1)}
+        }
+        .static-orb{
+          position:absolute;border-radius:50%;filter:blur(60px);opacity:0.35;
+          z-index:0;animation:orb-float 12s ease-in-out infinite;
+        }
         @media(min-width:768px){
           .loader-content{gap:28px!important}
           .loader-logo{width:96px!important;height:96px!important;border-radius:20px!important}
@@ -301,6 +319,7 @@
           .loader-subtitle{font-size:1rem!important}
           #loader-spinner{width:56px!important;height:56px!important}
           #loader-text{font-size:0.875rem!important}
+          .static-orb{filter:blur(80px)!important;opacity:0.3!important}
         }
         @media(min-width:1024px){
           .loader-content{gap:32px!important}
@@ -309,6 +328,7 @@
           .loader-subtitle{font-size:1.125rem!important}
           #loader-spinner{width:72px!important;height:72px!important}
           #loader-text{font-size:1rem!important}
+          .static-orb{filter:blur(100px)!important;opacity:0.25!important}
         }
       </style>
     </div>
