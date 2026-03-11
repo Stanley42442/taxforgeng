@@ -56,7 +56,6 @@ import {
   AlertTriangle,
   Handshake,
   Download,
-  Share,
   type LucideIcon,
 } from "lucide-react";
 import {
