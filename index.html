@@ -275,11 +275,11 @@
     <div id="root">
       <!-- Static shell matching NavMenu layout - paints LCP element ("TaxForge NG") instantly before React mounts -->
       <div id="initial-loader" style="min-height:100vh;background:#f8f6f0;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:20px;">
-          <img src="/icon-192.png" alt="TaxForge" width="64" height="64" style="border-radius:16px;box-shadow:0 10px 30px -10px rgba(22,163,74,0.3);" />
+        <div class="loader-content" style="display:flex;flex-direction:column;align-items:center;gap:20px;">
+          <img class="loader-logo" src="/icon-192.png" alt="TaxForge" width="64" height="64" style="border-radius:16px;box-shadow:0 10px 30px -10px rgba(22,163,74,0.3);" />
           <div style="text-align:center;">
-            <h1 style="margin:0;font-size:1.5rem;font-weight:700;color:#0a0a0b;font-family:'Outfit',system-ui,sans-serif;letter-spacing:-0.025em;">TaxForge</h1>
-            <p style="margin:2px 0 0;font-size:0.875rem;color:#6b7280;font-family:'Outfit',system-ui,sans-serif;">Nigeria Tax Calculator</p>
+            <h1 class="loader-title" style="margin:0;font-size:1.5rem;font-weight:700;color:#0a0a0b;font-family:'Outfit',system-ui,sans-serif;letter-spacing:-0.025em;">TaxForge</h1>
+            <p class="loader-subtitle" style="margin:2px 0 0;font-size:0.875rem;color:#6b7280;font-family:'Outfit',system-ui,sans-serif;">Nigeria Tax Calculator</p>
           </div>
           <div id="loader-spinner" style="position:relative;width:40px;height:40px;margin-top:8px;">
             <div style="position:absolute;inset:0;border-radius:50%;border:2.5px solid transparent;border-top-color:#16a34a;border-right-color:rgba(22,163,74,0.3);animation:spin 1s linear infinite;"></div>
@@ -295,6 +295,22 @@
         @keyframes spin{to{transform:rotate(360deg)}}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
         @keyframes shimmer{to{background-position:-200% 0}}
+        @media(min-width:768px){
+          .loader-content{gap:28px!important}
+          .loader-logo{width:96px!important;height:96px!important;border-radius:20px!important}
+          .loader-title{font-size:2rem!important}
+          .loader-subtitle{font-size:1rem!important}
+          #loader-spinner{width:56px!important;height:56px!important}
+          #loader-text{font-size:0.875rem!important}
+        }
+        @media(min-width:1024px){
+          .loader-content{gap:32px!important}
+          .loader-logo{width:120px!important;height:120px!important;border-radius:24px!important}
+          .loader-title{font-size:2.5rem!important}
+          .loader-subtitle{font-size:1.125rem!important}
+          #loader-spinner{width:72px!important;height:72px!important}
+          #loader-text{font-size:1rem!important}
+        }
       </style>
     </div>
     <script>
