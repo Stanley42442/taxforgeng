@@ -230,7 +230,7 @@ export const NavMenu = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isStandalone, setIsStandalone] = useState(false);
   const [installDialogOpen, setInstallDialogOpen] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
+  const [isIOS] = useState(false);
 
   useEffect(() => {
     const standalone = 
