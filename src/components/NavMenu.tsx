@@ -271,7 +271,7 @@ export const NavMenu = () => {
     }
   };
 
-  const showInstallButton = !isStandalone && (!!deferredPrompt || isIOS);
+  
 
   const totalNotificationCount = notificationCount + urgentCount;
 
