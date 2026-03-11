@@ -229,6 +229,7 @@ export const NavMenu = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isStandalone, setIsStandalone] = useState(false);
+  const [installDialogOpen, setInstallDialogOpen] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
