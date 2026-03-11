@@ -210,6 +210,11 @@ const navGroups: NavGroup[] = [
   },
 ];
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
+
 export const NavMenu = () => {
   const { tier } = useSubscription();
   const { user, signOut } = useAuth();
@@ -221,6 +226,47 @@ export const NavMenu = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isStandalone, setIsStandalone] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+
+  useEffect(() => {
+    const standalone = 
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true;
+    setIsStandalone(standalone);
+    if (standalone) return;
+
+    const ua = navigator.userAgent;
+    const ios = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
+    setIsIOS(ios);
+
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      await deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === "accepted") {
+        toast.success("App installed successfully!");
+      }
+      setDeferredPrompt(null);
+    } else if (isIOS) {
+      toast.info("To install on iPhone:", {
+        description: "Tap the Share button, then \"Add to Home Screen\"",
+        duration: 8000,
+        icon: <Share className="h-5 w-5" />,
+      });
+    }
+  };
+
+  const showInstallButton = !isStandalone && (!!deferredPrompt || isIOS);
 
   const totalNotificationCount = notificationCount + urgentCount;
 
