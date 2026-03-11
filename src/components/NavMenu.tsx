@@ -259,18 +259,9 @@ export const NavMenu = () => {
         toast.success("App installed successfully!");
       }
       setDeferredPrompt(null);
-    } else if (isIOS) {
-      toast.info("To install on iPhone:", {
-        description: "Tap the Share button, then \"Add to Home Screen\"",
-        duration: 8000,
-        icon: <Share className="h-5 w-5" />,
-      });
     } else {
-      window.open("https://taxforgeng.com", "_blank");
-      toast.info("Install TaxForge NG", {
-        description: "The app has opened in a new tab. Use your browser's install button (in the address bar) to add it to your device.",
-        duration: 8000,
-      });
+      setOpen(false);
+      setTimeout(() => setInstallDialogOpen(true), 200);
     }
   };
 
