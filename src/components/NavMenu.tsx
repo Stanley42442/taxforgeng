@@ -517,7 +517,15 @@ export const NavMenu = () => {
                   </div>
 
                   {/* Footer */}
-                  <div className="px-4 py-3 border-t border-border space-y-2 shrink-0 bg-background">
+                    <div className="px-4 py-3 border-t border-border space-y-2 shrink-0 bg-background">
+                      {showInstallButton && (
+                        <SheetClose asChild>
+                          <Button variant="outline" className="w-full h-9 text-sm" onClick={handleInstallClick}>
+                            <Download className="h-4 w-4 shrink-0" />
+                            <span className="truncate">Install App</span>
+                          </Button>
+                        </SheetClose>
+                      )}
                     {user ? (
                       <>
                         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary">
