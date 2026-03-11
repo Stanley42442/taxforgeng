@@ -559,6 +559,7 @@ export const NavMenu = () => {
           </div>
         </nav>
       </div>
+      <InstallAppDialog open={installDialogOpen} onOpenChange={setInstallDialogOpen} />
     </header>
   );
 };
