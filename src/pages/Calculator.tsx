@@ -256,6 +256,12 @@ const CalculatorPage = () => {
       setExpenseBreakdown({});
       return { totalExpenses: 0, deductibleExpenses: 0 };
     }
+
+    // OFFLINE: Skip expense fetch, use empty data (calculator still works for manual input)
+    if (!navigator.onLine) {
+      setExpenseBreakdown({});
+      return { totalExpenses: 0, deductibleExpenses: 0 };
+    }
     
     const { data, error } = await supabase
       .from('expenses')
