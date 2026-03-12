@@ -1,43 +1,70 @@
 
 
-## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
+## Make PWA Usable Offline
 
-A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
+### Problem
+The PWA correctly caches assets and serves the app shell offline, but when opened offline it just shows "You're offline — Viewing cached data (read-only)" with no usable features. The entire app is gated behind Supabase queries that fail offline, making every feature inaccessible.
 
----
+### Root Cause
+The offline infrastructure (IndexedDB, compression, sync queue) exists but is **never connected** to the actual feature hooks. All data hooks (`SubscriptionContext`, `useAuth`, `useEmployees`, etc.) query Supabase directly with no fallback. When offline, every query fails and the app renders in a broken/empty state.
 
-### Content Structure
+### Approach: Graceful Degradation
+Make pure-computation features fully work offline, show cached data for data-dependent features, and clearly indicate which features need internet.
 
-The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
+### Changes
 
-| Section ID | Topic |
-|---|---|
-| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
-| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
-| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
-| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
-| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
-| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
-| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
-| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
-| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
-| `faq` | 5–6 FAQs with FAQPage schema |
+**1. `src/contexts/SubscriptionContext.tsx` — Cache businesses to IndexedDB on fetch, fall back to cached data when offline**
+- After successfully fetching businesses from the database, save them to IndexedDB via `saveBusinesses()`
+- When offline (`!navigator.onLine`), load businesses from IndexedDB via `getBusinesses()` instead of querying the database
+- Cache the profile tier in `safeLocalStorage` so we know the user's tier offline
+- This unlocks the Dashboard, Calculator, and business-related features offline
 
-### Technical Implementation
+**2. `src/hooks/useAuth.tsx` — Preserve session offline**
+- The auth session is already persisted in localStorage by the Supabase client (`persistSession: true`)
+- Add a check: if offline and we have a cached session/user, use it instead of blocking on network requests
+- Skip device tracking, IP checks, and auth event logging when offline
 
-**1. Create `src/pages/blog/PITMyths2026.tsx`**
-- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
-- ~1,500 words, authoritative tone matching existing posts
-- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
-- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
-- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
+**3. `src/pages/IndividualCalculator.tsx` — Already works offline (pure computation)**
+- The individual tax calculator uses `calculateIndividualTax()` which is pure math — no network needed
+- Only change: suppress the Supabase calls for saving calculation history when offline (queue them instead)
 
-**2. Register route in `src/App.tsx`**
-- Add lazy import and route at `/blog/pit-myths-2026`
+**4. `src/pages/Calculator.tsx` — Enable offline with cached businesses**
+- When offline, load saved businesses from the SubscriptionContext cache (from change #1)
+- Suppress expense fetching from Supabase; use cached expenses from IndexedDB
+- The tax calculation itself (`calculateTax()`) is pure computation and works offline
 
-**3. Add to blog listing in `src/pages/Blog.tsx`**
-- New entry in the `POSTS` array with category "Guides", today's date
+**5. `src/pages/Dashboard.tsx` — Show cached data when offline**
+- When offline, load expenses and reminders from IndexedDB cache instead of Supabase
+- Show a subtle indicator that data may be stale
+- Disable actions that require network (add business, delete, etc.)
 
-**4. Update sitemap (`public/sitemap.xml`)**
-- Add `/blog/pit-myths-2026` entry
+**6. `src/components/OfflineBanner.tsx` — Improve messaging**
+- Instead of "Viewing cached data (read-only)", show: "You're offline — Calculators and cached data available"
+- List what works: Tax calculators, saved businesses, cached dashboard data
+- List what needs internet: AI assistant, payments, syncing
+
+**7. `src/contexts/OfflineDataContext.tsx` — Auto-cache on data fetch**
+- Add a `cacheOnFetch` pattern: whenever online data is fetched successfully by any hook, automatically cache it to IndexedDB
+- This ensures the IndexedDB cache stays fresh without requiring manual cache management
+
+### Technical detail
+
+```text
+Online flow (no change):
+  useAuth → Supabase session → SubscriptionContext → Supabase queries → render
+
+Offline flow (new):
+  useAuth → localStorage session (cached) → SubscriptionContext → IndexedDB cache → render
+  Tax calculators → pure computation (no network needed)
+  Dashboard → IndexedDB cached expenses/reminders → render with stale indicator
+  AI chat, payments → disabled with clear messaging
+```
+
+### Files to modify
+- `src/contexts/SubscriptionContext.tsx` — Add IndexedDB cache/fallback for businesses and tier
+- `src/hooks/useAuth.tsx` — Skip network calls when offline, use cached session
+- `src/pages/Dashboard.tsx` — Fall back to IndexedDB data when offline
+- `src/pages/Calculator.tsx` — Use cached data when offline
+- `src/components/OfflineBanner.tsx` — Better offline messaging
+- `src/contexts/OfflineDataContext.tsx` — Wire auto-caching into data flow
 
