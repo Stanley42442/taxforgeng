@@ -2,6 +2,9 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/hooks/useAuth';
 import logger from '@/lib/logger';
+import { safeLocalStorage } from '@/lib/safeStorage';
+import { saveBusinesses as cacheBusinessesToIDB, getBusinesses as getCachedBusinesses } from '@/lib/offlineStorage';
+import { useOfflineStatus } from '@/hooks/useOfflineStatus';
 
 export type SubscriptionTier = 'free' | 'starter' | 'basic' | 'professional' | 'business' | 'corporate';
 
