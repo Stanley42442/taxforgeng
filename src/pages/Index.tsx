@@ -169,7 +169,7 @@ const Index = () => {
       {/* CTA Section */}
       <section className="relative z-10 py-20 md:py-28">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto rounded-2xl bg-primary p-10 md:p-16 text-center">
+          <div className="max-w-4xl mx-auto rounded-2xl bg-primary p-10 md:p-16 text-center">
             <h2 className="mb-4 text-3xl md:text-4xl font-bold text-primary-foreground">
               Ready to Optimize Your Taxes?
             </h2>
