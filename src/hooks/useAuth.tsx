@@ -291,6 +291,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setTimeout(() => {
             switch (event) {
               case 'SIGNED_IN': {
+                if (!navigator.onLine) break;
                 const tokenPayload = session.access_token.split('.')[1];
                 try {
                   const decoded = JSON.parse(atob(tokenPayload));
@@ -307,10 +308,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               case 'SIGNED_OUT':
                 break;
               case 'PASSWORD_RECOVERY':
-                logAuthEvent(session.user.id, 'password_recovery_initiated');
+                if (navigator.onLine) logAuthEvent(session.user.id, 'password_recovery_initiated');
                 break;
               case 'USER_UPDATED':
-                logAuthEvent(session.user.id, 'profile_updated');
+                if (navigator.onLine) logAuthEvent(session.user.id, 'profile_updated');
                 break;
             }
           }, 0);
@@ -322,6 +323,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+
+      // OFFLINE FALLBACK: If no session (expired token can't refresh offline),
+      // restore the user identity from the raw cached token in localStorage.
+      // We only need id + email to load cached data from IndexedDB.
+      if (!session && !navigator.onLine) {
+        try {
+          const raw = safeLocalStorage.getItem('sb-uhuxqrrtsiintcwpxxwy-auth-token');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed?.user) {
+              setUser(parsed.user as User);
+              logger.info('[Auth] Restored cached user identity for offline use');
+            }
+          }
+        } catch (e) {
+          logger.error('[Auth] Failed to parse cached auth token:', e);
+        }
+      }
+
       setLoading(false);
     }).catch((error) => {
       logger.error('[Auth] Failed to get session:', error);
