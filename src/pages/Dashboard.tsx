@@ -163,7 +163,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     const checkOnboardingStatus = async () => {
-      if (!user) return;
+      if (!user || !navigator.onLine) return;
       
       // Check if user has completed onboarding
       const { data } = await supabase
