@@ -322,6 +322,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+
+      // OFFLINE FALLBACK: If no session (expired token can't refresh offline),
+      // restore the user identity from the raw cached token in localStorage.
+      // We only need id + email to load cached data from IndexedDB.
+      if (!session && !navigator.onLine) {
+        try {
+          const raw = safeLocalStorage.getItem('sb-uhuxqrrtsiintcwpxxwy-auth-token');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed?.user) {
+              setUser(parsed.user as User);
+              logger.info('[Auth] Restored cached user identity for offline use');
+            }
+          }
+        } catch (e) {
+          logger.error('[Auth] Failed to parse cached auth token:', e);
+        }
+      }
+
       setLoading(false);
     }).catch((error) => {
       logger.error('[Auth] Failed to get session:', error);
