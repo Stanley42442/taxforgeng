@@ -44,7 +44,7 @@ const Index = () => {
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 pt-12 pb-16 md:pt-24 md:pb-28 relative z-10">
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="mx-auto max-w-4xl text-center">
           {/* Main Hero Content */}
           <div className="animate-slide-up">
             <p className="mb-5 text-sm font-medium text-primary tracking-wide uppercase">
