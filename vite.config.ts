@@ -47,9 +47,9 @@ export default defineConfig(({ mode }) => ({
         clientsClaim: true,
         // CRITICAL: Only cache static assets, NOT JS/CSS bundles
         // This prevents stale code from blocking app updates
-        globPatterns: ['**/*.{ico,png,svg,woff2}'],
-        // Don't precache the HTML - always fetch fresh
-        navigateFallback: null,
+        globPatterns: ['**/*.{js,css,ico,png,svg,woff2}'],
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api/, /^\/supabase/, /^\/rest/],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB limit
         // Clean up old caches on activation
         cleanupOutdatedCaches: true,
