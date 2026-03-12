@@ -157,10 +157,35 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     gracePeriodEndsAt: null,
   });
 
+  // Load cached data for offline mode
+  const loadOfflineData = useCallback(async () => {
+    try {
+      const cachedTier = safeLocalStorage.getItem('taxforge_cached_tier') as SubscriptionTier | null;
+      const cachedEmail = safeLocalStorage.getItem('taxforge_cached_email');
+      const cachedBusinesses = await getCachedBusinesses<SavedBusiness>();
+      
+      setState({
+        tier: cachedTier || 'free',
+        effectiveTier: cachedTier || 'free',
+        businessCount: cachedBusinesses.length,
+        savedBusinesses: cachedBusinesses,
+        subscriptionEndDate: null,
+        email: cachedEmail || user?.email || null,
+        loading: false,
+        isOnTrial: false,
+        trialEndsAt: null,
+        isInGracePeriod: false,
+        gracePeriodEndsAt: null,
+      });
+    } catch (error) {
+      logger.error('[SubscriptionContext] Failed to load offline data:', error);
+      setState(prev => ({ ...prev, loading: false }));
+    }
+  }, [user]);
+
   // Fetch user profile and businesses from database
   const fetchUserData = useCallback(async () => {
     // CRITICAL: Wait for auth to fully initialize before making any DB requests
-    // This prevents requests from going out with the anon key instead of the user's JWT
     if (authLoading) {
       return;
     }
@@ -183,6 +208,12 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
+    // OFFLINE: Use cached data instead of network requests
+    if (!isOnline) {
+      await loadOfflineData();
+      return;
+    }
+
     try {
       // Fetch profile for subscription tier and trial info
       let { data: profile, error: profileError } = await supabase
@@ -192,9 +223,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         .single();
 
       // Defensive check: Create profile if it doesn't exist (handles edge case)
-      // Use maybeSingle() to avoid 406 errors during auth timing issues
       if (profileError && profileError.code === 'PGRST116') {
-        // Only attempt profile creation once per session to prevent retry storms
         if (profileCreateAttempted.current) {
           logger.warn('[SubscriptionContext] Profile creation already attempted, skipping retry');
           setState(prev => ({ ...prev, loading: false }));
@@ -212,11 +241,9 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
         if (createError) {
           logger.error('[SubscriptionContext] Failed to create profile:', createError);
-          // Don't retry — just use defaults for this render
           setState(prev => ({ ...prev, loading: false }));
           return;
         } else {
-          // Re-fetch the newly created profile
           const { data: newProfile } = await supabase
             .from('profiles')
             .select('subscription_tier, email, created_at, trial_started_at, trial_expires_at, has_selected_initial_tier')
@@ -225,7 +252,6 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
           profile = newProfile;
         }
       } else if (profileError) {
-        // For any other profile error (network, RLS, etc.), don't retry endlessly
         logger.error('[SubscriptionContext] Profile fetch error:', profileError);
         setState(prev => ({ ...prev, loading: false }));
         return;
@@ -250,23 +276,26 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         verificationStatus: b.cac_verified ? 'verified' : 'not_verified',
       }));
 
-      // Calculate trial status using the dedicated fields
+      // Cache businesses to IndexedDB and tier to localStorage for offline use
       const baseTier = (profile?.subscription_tier as SubscriptionTier) || 'free';
+      safeLocalStorage.setItem('taxforge_cached_tier', baseTier);
+      safeLocalStorage.setItem('taxforge_cached_email', profile?.email || user.email || '');
+      cacheBusinessesToIDB(mappedBusinesses).catch(err => 
+        logger.error('[SubscriptionContext] Failed to cache businesses:', err)
+      );
+
+      // Calculate trial status using the dedicated fields
       let isOnTrial = false;
       let trialEndsAt: Date | null = null;
       let effectiveTier = baseTier;
 
-      // Check if user has an active trial (any tier with trial_expires_at)
       if (profile?.trial_expires_at) {
         trialEndsAt = new Date(profile.trial_expires_at);
         const now = new Date();
-        // Trial is active if current time is before expiry
         isOnTrial = now < trialEndsAt;
         if (isOnTrial) {
-          // During trial, effectiveTier is whatever tier they selected
           effectiveTier = baseTier;
         } else {
-          // Trial expired - should have been downgraded by database function
           effectiveTier = 'free';
         }
       }
@@ -305,9 +334,14 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       });
     } catch (error) {
       logger.error('Error fetching user data:', error);
-      setState(prev => ({ ...prev, loading: false }));
+      // If network error while offline, try cached data
+      if (!navigator.onLine) {
+        await loadOfflineData();
+      } else {
+        setState(prev => ({ ...prev, loading: false }));
+      }
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, isOnline, loadOfflineData]);
 
   useEffect(() => {
     fetchUserData();

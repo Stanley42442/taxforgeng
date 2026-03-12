@@ -196,6 +196,25 @@ const Dashboard = () => {
       return;
     }
 
+    // OFFLINE: Load from IndexedDB cache
+    if (!navigator.onLine) {
+      try {
+        const { getExpenses: getCachedExpenses } = await import('@/lib/offlineStorage');
+        const cachedExpenses = await getCachedExpenses<Expense>();
+        if (cachedExpenses.length > 0) {
+          setExpenses(cachedExpenses);
+          const income = cachedExpenses.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
+          const expense = cachedExpenses.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
+          const deductible = cachedExpenses.filter(e => e.isDeductible).reduce((sum, e) => sum + e.amount, 0);
+          setExpenseSummary({ totalIncome: income, totalExpenses: expense, deductibleExpenses: deductible });
+        }
+      } catch (err) {
+        logger.error('Failed to load cached expenses:', err);
+      }
+      setLoading(false);
+      return;
+    }
+
     const { data: expenseData } = await supabase
       .from('expenses')
       .select('*')
@@ -215,6 +234,11 @@ const Dashboard = () => {
         businessId: e.business_id || undefined,
       }));
       setExpenses(mapped);
+
+      // Cache expenses to IndexedDB for offline use
+      import('@/lib/offlineStorage').then(({ saveExpenses }) => {
+        saveExpenses(mapped).catch(err => logger.error('Failed to cache expenses:', err));
+      });
 
       const income = mapped.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
       const expense = mapped.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);

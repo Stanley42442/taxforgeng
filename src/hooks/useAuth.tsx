@@ -399,6 +399,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       logger.error('Login failed:', error.message);
     }
     
+    // Track device after successful login (skip if offline)
+    if (!error && data.user && navigator.onLine) {
+      trackDevice(data.user.id, data.user.email || '').catch(err => 
+        logger.error('Post-login device tracking failed:', err)
+      );
+    }
+    
     return { error: error as Error | null };
   };
 
