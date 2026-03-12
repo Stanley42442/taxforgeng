@@ -291,6 +291,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setTimeout(() => {
             switch (event) {
               case 'SIGNED_IN': {
+                if (!navigator.onLine) break;
                 const tokenPayload = session.access_token.split('.')[1];
                 try {
                   const decoded = JSON.parse(atob(tokenPayload));
@@ -307,10 +308,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               case 'SIGNED_OUT':
                 break;
               case 'PASSWORD_RECOVERY':
-                logAuthEvent(session.user.id, 'password_recovery_initiated');
+                if (navigator.onLine) logAuthEvent(session.user.id, 'password_recovery_initiated');
                 break;
               case 'USER_UPDATED':
-                logAuthEvent(session.user.id, 'profile_updated');
+                if (navigator.onLine) logAuthEvent(session.user.id, 'profile_updated');
                 break;
             }
           }, 0);

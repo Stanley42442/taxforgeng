@@ -191,6 +191,12 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     }
 
     if (!user) {
+      // OFFLINE FALLBACK: Even without a valid user session, load cached data
+      // so the app remains functional with previously cached businesses/tier
+      if (!isOnline) {
+        await loadOfflineData();
+        return;
+      }
       profileCreateAttempted.current = false;
       setState({
         tier: 'free',
