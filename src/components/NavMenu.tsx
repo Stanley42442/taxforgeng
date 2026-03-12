@@ -327,7 +327,7 @@ export const NavMenu = () => {
 
   return (
     <header className="w-full border-b border-border bg-background">
-      <div className="container mx-auto px-2 sm:px-4">
+      <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <nav className="flex h-14 sm:h-16 items-center justify-between gap-2">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 shrink-0 min-w-0">
