@@ -30,7 +30,7 @@ export const PageLayout = ({
   title,
   description,
   icon: Icon,
-  maxWidth = "6xl",
+  maxWidth = "7xl",
   showBackground = true,
   className = "",
   headerActions,
