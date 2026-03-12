@@ -44,7 +44,7 @@ const Index = () => {
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 pt-12 pb-16 md:pt-24 md:pb-28 relative z-10">
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="mx-auto max-w-4xl text-center">
           {/* Main Hero Content */}
           <div className="animate-slide-up">
             <p className="mb-5 text-sm font-medium text-primary tracking-wide uppercase">
@@ -101,7 +101,7 @@ const Index = () => {
       {/* FAQ Section */}
       <section className="relative z-10 py-20 md:py-28 border-t border-border">
         <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-4xl grid gap-6 md:grid-cols-2">
+          <div className="mx-auto max-w-5xl grid gap-6 md:grid-cols-2">
             {[
               {
                 title: "How Much Tax Do I Pay in Nigeria?",
@@ -169,7 +169,7 @@ const Index = () => {
       {/* CTA Section */}
       <section className="relative z-10 py-20 md:py-28">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto rounded-2xl bg-primary p-10 md:p-16 text-center">
+          <div className="max-w-4xl mx-auto rounded-2xl bg-primary p-10 md:p-16 text-center">
             <h2 className="mb-4 text-3xl md:text-4xl font-bold text-primary-foreground">
               Ready to Optimize Your Taxes?
             </h2>

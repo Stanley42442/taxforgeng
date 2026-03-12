@@ -1,28 +1,43 @@
 
 
-## Fix: Content Too Narrow Across All Pages
+## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
 
-### Problem
-The `PageLayout` default was changed to `7xl` (1400px), but **38 pages explicitly set a narrower `maxWidth`** like `"4xl"` (896px) or `"6xl"` (1152px). On a wide screen, this leaves significant unused space. Additionally, the homepage (`Index.tsx`) doesn't use `PageLayout` at all — it uses its own `container` + `max-w-3xl`/`max-w-4xl` constraints per section.
+A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
 
-### Fix
+---
 
-**1. Widen commonly-used page widths in `PageLayout.tsx`**
+### Content Structure
 
-Update the width map to make content fill more of the screen:
-- `"4xl"`: `max-w-4xl` (896px) → `max-w-6xl` (1152px)  
-- `"6xl"`: `max-w-6xl` (1152px) → `max-w-[1400px]`
+The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
 
-This way pages that set `maxWidth="4xl"` or `"6xl"` will be wider without needing to edit each page individually. Pages using `"2xl"` or `"xl"` (forms, narrow content) stay narrow intentionally.
+| Section ID | Topic |
+|---|---|
+| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
+| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
+| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
+| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
+| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
+| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
+| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
+| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
+| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
+| `faq` | 5–6 FAQs with FAQPage schema |
 
-**2. Widen homepage sections in `Index.tsx`**
+### Technical Implementation
 
-- Hero section: `max-w-3xl` → `max-w-4xl` for the text block
-- FAQ grid: `max-w-4xl` → `max-w-5xl` 
-- CTA section: `max-w-3xl` → `max-w-4xl`
-- These sections use `container mx-auto` (1400px) as the outer wrapper, but inner `max-w-*` classes constrain content too tightly
+**1. Create `src/pages/blog/PITMyths2026.tsx`**
+- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
+- ~1,500 words, authoritative tone matching existing posts
+- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
+- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
+- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
 
-### Files to modify
-- `src/components/PageLayout.tsx` — Widen `4xl` and `6xl` breakpoints in the map
-- `src/pages/Index.tsx` — Widen hero, FAQ, and CTA inner max-widths
+**2. Register route in `src/App.tsx`**
+- Add lazy import and route at `/blog/pit-myths-2026`
+
+**3. Add to blog listing in `src/pages/Blog.tsx`**
+- New entry in the `POSTS` array with category "Guides", today's date
+
+**4. Update sitemap (`public/sitemap.xml`)**
+- Add `/blog/pit-myths-2026` entry
 
