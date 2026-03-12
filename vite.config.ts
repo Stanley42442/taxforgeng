@@ -40,11 +40,9 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     mode === "production" && asyncCssPlugin(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['favicon.ico', 'og-image.png', 'apple-touch-icon.png'],
       workbox: {
-        skipWaiting: true,
-        clientsClaim: true,
         // CRITICAL: Only cache static assets, NOT JS/CSS bundles
         // This prevents stale code from blocking app updates
         globPatterns: ['**/*.{js,css,ico,png,svg,woff2}'],
