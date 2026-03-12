@@ -1,37 +1,43 @@
 
 
-## Fix PWA Offline Support
+## New Blog Post: "7 PIT Myths Nigerians Still Believe in 2026"
 
-### Root Causes
+A myth-busting, fact-driven blog post that naturally follows the PIT calculator promotion. It addresses common misconceptions about the 2026 PIT rules, integrates Rent Relief education, and links back to the calculator.
 
-1. **No navigation fallback** — `navigateFallback: null` in `vite.config.ts` (line 52) means when you go offline and navigate to any route, the service worker has no cached HTML to serve. It just fails.
+---
 
-2. **JS/CSS bundles not precached** — `globPatterns` only includes `*.{ico,png,svg,woff2}` (line 50). The actual app code (JS/CSS) is only cached via runtime `NetworkFirst` strategy, which means on the very first offline load after install, the bundles may not be cached yet if they were never fetched while online.
+### Content Structure
 
-3. **Cache wiped on every deploy** — `clearStaleCaches` in `main.tsx` (line 59-78) runs `caches.delete()` on ALL cache names every time `VITE_BUILD_TIME` changes. This destroys the runtime caches that hold JS/CSS bundles, effectively breaking offline on every deploy.
+The post will use the existing `BlogPostLayout` component (same pattern as all 8 current posts) and cover these sections:
 
-### Fix
+| Section ID | Topic |
+|---|---|
+| `why-myths-matter` | Why PIT myths are dangerous (penalties, overpayment) |
+| `myth-1` | "The ₦800k threshold means I pay no tax" — clarifies it applies only to the first ₦800k, not total income |
+| `myth-2` | "CRA still applies in 2026" — CRA is abolished, replaced by six specific deductions |
+| `myth-3` | "Everyone gets Rent Relief automatically" — requires actual rent payments + documentation |
+| `myth-4` | "Freelancers don't pay PIT" — all income sources must be aggregated |
+| `myth-5` | "My employer handles everything, I don't need to file" — self-assessment scenarios |
+| `myth-6` | "Minimum wage earners are fully exempt" — they pay near-zero, not zero (₦6,000/year) |
+| `myth-7` | "The old 6-band rates (7%–24%) still work" — new bands are 0%–25% with different thresholds |
+| `rent-relief-facts` | Rent Relief: what it actually is, how to claim it, the ₦500k cap |
+| `faq` | 5–6 FAQs with FAQPage schema |
 
-**File: `vite.config.ts`** — Two changes in the VitePWA config:
+### Technical Implementation
 
-1. Set `navigateFallback: '/index.html'` so SPA routing works offline (the service worker returns the cached shell for any navigation request)
-2. Add JS/CSS to `globPatterns`: `'**/*.{js,css,ico,png,svg,woff2}'` so the app shell is precached during service worker install, guaranteeing offline availability from first install
+**1. Create `src/pages/blog/PITMyths2026.tsx`**
+- Uses `BlogPostLayout` with all SEO props (article schema, FAQ schema, breadcrumbs)
+- ~1,500 words, authoritative tone matching existing posts
+- Links to PIT/PAYE Calculator (`/pit-paye-calculator`), Rent Relief Calculator (`/rent-relief-2026`), and the existing PIT guide
+- Related posts: Tax Reforms Summary, PIT & PAYE Guide, Small Company CIT Exemption
+- Related tools: PIT/PAYE Calculator, Rent Relief Calculator
 
-Also add `navigateFallbackDenylist: [/^\/api/, /^\/supabase/]` to avoid intercepting API calls.
+**2. Register route in `src/App.tsx`**
+- Add lazy import and route at `/blog/pit-myths-2026`
 
-**File: `src/main.tsx`** — Fix `clearStaleCaches` to only delete known stale caches, not the workbox precache:
+**3. Add to blog listing in `src/pages/Blog.tsx`**
+- New entry in the `POSTS` array with category "Guides", today's date
 
-Instead of deleting all caches, only delete caches that are NOT the workbox precache manifest (names starting with `workbox-precache`). This preserves the precached app shell while still clearing old runtime caches.
-
-### Technical details
-
-```text
-vite.config.ts workbox changes:
-  globPatterns: ['**/*.{js,css,ico,png,svg,woff2}']   // was: only static assets
-  navigateFallback: '/index.html'                      // was: null
-  navigateFallbackDenylist: [/^\/api/, /^\/supabase/]  // new: skip API routes
-
-main.tsx clearStaleCaches change:
-  Filter out 'workbox-precache' from cache deletion    // was: delete ALL caches
-```
+**4. Update sitemap (`public/sitemap.xml`)**
+- Add `/blog/pit-myths-2026` entry
 

@@ -65,7 +65,9 @@ const clearStaleCaches = async (): Promise<void> => {
       // Only clear caches, do NOT unregister service workers
       // The service worker must stay registered for PWA installability
       const cacheNames = await caches.keys();
-      await Promise.all(cacheNames.map(name => caches.delete(name)));
+      // Preserve workbox precache — only clear runtime caches
+      const staleCaches = cacheNames.filter(name => !name.startsWith('workbox-precache'));
+      await Promise.all(staleCaches.map(name => caches.delete(name)));
       
       console.log('[Init] Stale caches cleared for version:', CACHE_VERSION);
     } catch (error) {
