@@ -101,7 +101,7 @@ const Index = () => {
       {/* FAQ Section */}
       <section className="relative z-10 py-20 md:py-28 border-t border-border">
         <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-4xl grid gap-6 md:grid-cols-2">
+          <div className="mx-auto max-w-5xl grid gap-6 md:grid-cols-2">
             {[
               {
                 title: "How Much Tax Do I Pay in Nigeria?",
