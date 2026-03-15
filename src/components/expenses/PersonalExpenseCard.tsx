@@ -63,10 +63,7 @@ export const PersonalExpenseCard = memo(function PersonalExpenseCard({
   return (
     <Card 
       style={style}
-      className={getResponsiveClasses(device, {
-        mobile: 'mobile-card neumorphic-inset touch-feedback',
-        all: 'glass hover:shadow-lg transition-shadow'
-      })}
+      className="border border-border bg-card hover:shadow-md transition-shadow duration-200"
     >
       <CardContent className={isMobile ? 'p-3' : 'p-4'}>
         {isMobile ? (

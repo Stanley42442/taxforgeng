@@ -284,8 +284,8 @@ export default function PersonalExpenses() {
           transition={{ delay: 0.1 }}
         >
           <Card className={getResponsiveClasses(device, {
-            mobile: 'glass-premium mb-4 mobile-card',
-            all: 'glass-premium mb-6'
+            mobile: 'border border-border bg-card mb-4 rounded-xl',
+            all: 'border border-border bg-card mb-6 rounded-xl'
           })}>
             <Collapsible open={summaryExpanded} onOpenChange={setSummaryExpanded}>
               <CardHeader className={isMobile ? 'pb-2 px-4' : 'pb-2'}>
@@ -311,10 +311,7 @@ export default function PersonalExpenses() {
                       const amount = annualTotals[cat.id as keyof typeof annualTotals] || 0;
                       const Icon = cat.icon;
                       return (
-                        <div key={cat.id} className={getResponsiveClasses(device, {
-                          mobile: 'p-2.5 rounded-lg bg-background/50 border border-border/50 neumorphic-inset',
-                          all: 'p-3 rounded-lg bg-background/50 border border-border/50'
-                        })}>
+                        <div key={cat.id} className="p-3 rounded-lg bg-background/50 border border-border/50">
                           <div className="flex items-center gap-2 mb-1">
                             <Icon className={isMobile ? 'h-3 w-3 text-muted-foreground' : 'h-4 w-4 text-muted-foreground'} />
                             <span className={isMobile ? 'text-[10px] text-muted-foreground truncate' : 'text-xs text-muted-foreground truncate'}>{cat.name}</span>
@@ -368,7 +365,7 @@ export default function PersonalExpenses() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
           >
-            <Card className="glass-premium mb-6 border-warning/30">
+            <Card className="border border-border bg-card mb-6 rounded-xl border-warning/30">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -423,7 +420,7 @@ export default function PersonalExpenses() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card className="glass mb-6">
+          <Card className="border border-border bg-card mb-6 rounded-xl">
             <Collapsible open={templatesExpanded} onOpenChange={setTemplatesExpanded}>
               <CardHeader className="pb-2">
                 <CollapsibleTrigger className="flex items-center justify-between w-full">

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { SEOHead, createHowToSchema, createBreadcrumbSchema } from "@/components/seo/SEOHead";
 import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
@@ -41,7 +41,10 @@ import {
   Plug,
   Home,
   Package,
-  Calculator
+  Calculator,
+  Lock,
+  Crown,
+  CheckCircle2,
 } from "lucide-react";
 import { calculateTax, type TaxInputs, type SectorTaxRules } from "@/lib/taxCalculations";
 import { SectorPresets } from "@/components/SectorPresets";
@@ -221,18 +224,6 @@ const CalculatorPage = () => {
   const isLoading = authLoading || subscriptionLoading;
   const isFreeTierOrGuest = !user || tier === 'free';
 
-  useEffect(() => {
-    if (!isLoading && isFreeTierOrGuest) {
-      toast.info("Business Tax requires a paid plan. Redirecting to Personal Tax Calculator.", {
-        duration: 4000
-      });
-      navigate('/individual-calculator', { 
-        state: { showUpgradePrompt: true },
-        replace: true 
-      });
-    }
-  }, [isLoading, isFreeTierOrGuest, navigate]);
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -247,8 +238,67 @@ const CalculatorPage = () => {
     );
   }
 
+  // Show an inline upgrade gate — no redirect, no toast confusion
   if (isFreeTierOrGuest) {
-    return null;
+    return (
+      <PageLayout maxWidth="2xl" showBackground={true}>
+        <SEOHead
+          title="Business Tax Calculator - Paid Feature | TaxForge NG"
+          description="The Business Tax Calculator requires a paid plan. Calculate CIT, VAT, WHT for your Nigerian business with TaxForge NG."
+          canonicalPath="/calculator"
+        />
+        <div className="mx-auto max-w-xl">
+          <div className="text-center mb-8 animate-slide-up">
+            <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mb-5">
+              <Lock className="h-8 w-8 text-primary" />
+            </div>
+            <h1 className="text-3xl font-bold text-foreground mb-3">Business Tax Calculator</h1>
+            <p className="text-muted-foreground">
+              Business tax calculations (CIT, VAT, WHT) are available on paid plans.
+            </p>
+          </div>
+
+          <div className="border border-border rounded-xl bg-card p-8 animate-slide-up-delay-1">
+            <div className="space-y-4 mb-8">
+              {[
+                "Company Income Tax (CIT) calculation",
+                "VAT on business sales & purchases",
+                "Withholding Tax (WHT)",
+                "Sector-specific tax rules",
+                "Save businesses & auto-load expenses",
+                "PDF & Excel export reports",
+              ].map((feature) => (
+                <div key={feature} className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span className="text-sm text-foreground">{feature}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-3">
+              <Link to="/pricing">
+                <Button size="lg" className="w-full h-12 text-base font-semibold">
+                  <Crown className="h-5 w-5 mr-2" />
+                  View Plans & Upgrade
+                  <ArrowRight className="h-5 w-5 ml-2" />
+                </Button>
+              </Link>
+              <Link to="/individual-calculator">
+                <Button variant="outline" size="lg" className="w-full h-12 text-base">
+                  <Calculator className="h-5 w-5 mr-2" />
+                  Use Free Personal Calculator
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          <p className="text-center text-xs text-muted-foreground mt-4">
+            Already have an account?{" "}
+            <Link to="/auth" className="text-primary hover:underline">Sign in</Link>
+          </p>
+        </div>
+      </PageLayout>
+    );
   }
 
   const fetchBusinessExpenses = async (businessId: string) => {

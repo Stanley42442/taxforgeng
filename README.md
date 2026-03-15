@@ -1,73 +1,102 @@
-# Welcome to your Lovable project
+# TaxForge NG
 
-## Project info
+**A free Nigerian tax calculator and business management platform — built for the 2026 Nigeria Tax Act.**
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Covers CIT, VAT, WHT, PIT/PAYE, payroll, expenses, invoicing, and more for Nigerian individuals and businesses.
 
-## How can I edit this code?
+**Live site:** [taxforgeng.com](https://taxforgeng.com)
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- **Frontend:** React 18 + TypeScript + Vite
+- **UI:** shadcn/ui + Tailwind CSS + Framer Motion
+- **Backend:** Supabase (Auth, Postgres, Edge Functions)
+- **Mobile:** Android app via Capacitor
+- **PWA:** Offline-first with service workers
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## Running Locally
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Requirements: Node.js 18+ and npm (or bun)
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# 1. Clone the repo
+git clone https://github.com/Stanley42442/taxforgeng.git
+cd taxforgeng
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# 2. Install dependencies
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
+# 3. Copy environment variables
+cp .env.example .env
+# Fill in your Supabase URL and anon key in .env
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 4. Start the dev server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app runs at `http://localhost:8080` by default.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## Available Scripts
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+| Command | Description |
+|---|---|
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm run preview` | Preview production build locally |
+| `npm run lint` | Run ESLint |
+| `npx vitest run` | Run test suite |
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## Android App
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+The Android app is built with [Capacitor](https://capacitorjs.com/). After building the web app:
 
-## How can I deploy this project?
+```sh
+npm run build
+npx cap sync android
+npx cap open android   # opens Android Studio
+```
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+---
 
-## Can I connect a custom domain to my Lovable project?
+## Tax Coverage (2026 Nigeria Tax Act)
 
-Yes, you can!
+| Tax | Details |
+|---|---|
+| **PIT / PAYE** | ₦800,000 tax-free band, 15%–25% rates |
+| **CIT** | 0% for small companies (≤₦50M turnover, ≤₦250M assets), 30% standard |
+| **VAT** | 7.5%, with exempt and zero-rated sectors |
+| **WHT** | Withholding tax across payment types |
+| **Rent Relief** | New 2026 deduction for individuals |
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+---
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Project Structure
+
+```
+src/
+├── pages/          # 60+ route-level pages (all lazy-loaded)
+├── components/     # Reusable UI components
+├── lib/            # Tax calculation logic, PDF exports, utilities
+├── hooks/          # Custom React hooks
+├── contexts/       # Auth, subscription, language contexts
+├── types/          # TypeScript types
+└── __tests__/      # Vitest unit & integration tests
+android/            # Capacitor Android project
+supabase/           # Supabase config, migrations, edge functions
+```
+
+---
+
+## License
+
+Educational tool — not official tax advice. Operated by Gillespie / OptiSolve Labs, Port Harcourt, Rivers State, Nigeria.
+
+© 2026 TaxForge NG

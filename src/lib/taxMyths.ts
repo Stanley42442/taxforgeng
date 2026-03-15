@@ -1324,3 +1324,31 @@ export const calculatePenalty = (
     description
   };
 };
+
+/**
+ * Async loader for the taxMyths data module.
+ *
+ * All current consumers (Learn, SectorGuide, PenaltyEstimator) are already
+ * lazy-loaded pages, so the 56KB data is already isolated in its own chunk.
+ *
+ * For any NEW component that imports from this module outside a lazy route,
+ * use this function instead of a top-level static import:
+ *
+ * @example
+ * const { taxMyths, sectorGuides } = await loadTaxMyths();
+ */
+export const loadTaxMyths = async () => {
+  const mod = await import("@/lib/taxMyths");
+  return {
+    taxMyths: mod.taxMyths,
+    sectorGuides: mod.sectorGuides,
+    videoGuides: mod.videoGuides,
+    getMythsByCategory: mod.getMythsByCategory,
+    getMythsByTier: mod.getMythsByTier,
+    getHighSeverityMyths: mod.getHighSeverityMyths,
+    getSectorGuidesByTier: mod.getSectorGuidesByTier,
+    getVideoGuidesByTier: mod.getVideoGuidesByTier,
+    searchMythsAndGuides: mod.searchMythsAndGuides,
+    calculatePenalty: mod.calculatePenalty,
+  };
+};

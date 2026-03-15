@@ -1,4 +1,4 @@
-package app.lovable.af4b139c57f44e7ab8682181153aa5d9;
+package app.taxforgeng.com;
 
 import com.getcapacitor.BridgeActivity;
 

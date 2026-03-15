@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Capacitor } from "@capacitor/core";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -339,8 +340,11 @@ const Auth = () => {
     setIsSubmitting(true);
     
     try {
+      const isNative = Capacitor.isNativePlatform();
+      const redirectUrl = isNative ? 'taxforgeng://auth' : `${window.location.origin}/auth`;
+      
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth`,
+        redirectTo: redirectUrl,
       });
       
       if (error) {
@@ -402,7 +406,7 @@ const Auth = () => {
         type: 'signup',
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth`,
+          emailRedirectTo: Capacitor.isNativePlatform() ? 'taxforgeng://auth' : `${window.location.origin}/auth`,
         }
       });
       

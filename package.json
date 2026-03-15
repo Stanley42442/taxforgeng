@@ -1,5 +1,5 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "taxforgeng",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@capacitor/android": "^8.2.0",
+    "@capacitor/app": "^8.0.1",
+    "@capacitor/browser": "^8.0.2",
     "@capacitor/core": "^8.2.0",
     "@capacitor/ios": "^8.2.0",
     "@fontsource/outfit": "^5.2.8",

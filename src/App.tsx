@@ -25,6 +25,7 @@ import { UpgradeCelebrationProvider } from "@/components/UpgradeCelebrationProvi
 import { OfflineDataProvider } from "@/contexts/OfflineDataContext";
 import { StorageWarningBanner } from "@/components/StorageWarningBanner";
 import { OfflineBanner } from "@/components/OfflineBanner";
+import { NativeAppGate } from "@/components/NativeAppGate";
 import "@/styles/print.css";
 import { lazy, Suspense, useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -350,11 +351,13 @@ const App = () => (
                     <Toaster />
                     <Sonner />
                     <BrowserRouter>
-                      <UpgradeCelebrationProvider>
-                        <SharedElementProvider>
-                          <AppShell />
-                        </SharedElementProvider>
-                      </UpgradeCelebrationProvider>
+                      <NativeAppGate>
+                        <UpgradeCelebrationProvider>
+                          <SharedElementProvider>
+                            <AppShell />
+                          </SharedElementProvider>
+                        </UpgradeCelebrationProvider>
+                      </NativeAppGate>
                     </BrowserRouter>
                   </>
                 </OfflineDataProvider>
