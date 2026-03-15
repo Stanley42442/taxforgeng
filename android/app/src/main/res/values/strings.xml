@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">taxforgeng</string>
+    <string name="title_activity_main">taxforgeng</string>
+    <string name="package_name">app.lovable.af4b139c57f44e7ab8682181153aa5d9</string>
+    <string name="custom_url_scheme">app.lovable.af4b139c57f44e7ab8682181153aa5d9</string>
+</resources>
